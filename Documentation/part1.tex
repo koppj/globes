@@ -353,6 +353,41 @@ FUNCTIONS TO BE DEFINED. (WORK IN PROGRESS).
 
 \chapter{Finding degenerate solutions}
 
+\example{Finding the $\mathrm{sgn}(\ldm)$-degeneracy}{
+\label{ex:sgndeg}
+
+In many cases, one can find the $\mathrm{sgn}(\ldm)$-degeneracy with {\tt ChiAll}: One lets the local minimizer start at the position of the suspected solution at the opposite sign of $\ldm$.  The following example corresponds to finding the degenerate solution for the example on page~\pageref{ex:corrth13dcp}.
+\begin{quote}
+{\tt
+{\footnotesize
+/\% Experiment initialization: \%/ \\
+ClearExp(); InitExperiment("{\tt NuFact2.exp}"); SetRunningTime(0,4.0); \\
+\\
+/\% Set reference rate vector: \%/ \\
+th12=arcsin(sqrt(0.8))/2; sdm=7e-5; th23=3.14/4; ldm=2e-3; \\
+th13=arcsin(sqrt(0.001))/2; dcp=3.14/2; \\
+\mbox{SetVacuumParameters(\{th12, \, th13, \, th23, \, dcp, \, sdm, \, ldm\});  SetRates();} \\
+\\
+/\% Find negative-sign solution: \%/ \\
+SetStartingValues(\{th12, \, th13, \, th23, \, dcp, \, sdm, \, -ldm, \, 1.0\}); \\
+SetInputErrors(\{th12*0.1, \, 10, \, 10, \, 10, \, sdm*0.1, \, ldm/3, \, 0.05\}); \\
+d = ChiAll(\{th12, \, th13, \, th23, \, dcp, \, sdm, \, ldm, \, 1.0\}); \\
+\\
+/\% Compute chi-square matrix: \%/ \\
+for (float x=-4; x<-2; x=x+2/50) \\
+\hspace*{0.5cm} for (float y=0; y<200; y=y+200/50) \{ \\
+\hspace*{1cm} theth13 = arcsin(sqrt(10$\hat{\, \, \,}$x))/2; \\
+\mbox{\hspace*{1cm} Print(\{x,y,Chi(\{d[2], theth13,  d[4],  y, d[6], d[7], d[8]\}) \}) \};}
+}
+}
+\end{quote}
+
+The resulting matrix can then be plotted as a contour plot in addition to the original solution (2 d.o.f., gray contours):
+\begin{center}
+\colorbox{white}{\includegraphics[width=7.5cm]{correntex}}
+\end{center}
+
+}
 \bi
 \item
  Single- and multiple experiment support
