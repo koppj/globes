@@ -39,14 +39,14 @@ The library can be installed using the command,
   make install
 
 The install target also will install a program with name globes to
-/usr/bin.
+/usr/local/bin.
 
-The default install directory prefix is /usr.  Consult the
+The default install directory prefix is /usr/local.  Consult the
 "Further Information" section below for instructions on installing the
 library in another location or changing other default compilation
 options.
 
-If you are not using make install you will find the static libary
+If you are not using 'make install' you will find the static libary
 at source/.lib/libglobes.a which you can copy to any destination.
 However keep in mind that the linking command will be somewhat different,
 ie. you have to specify all the dynamically linked objects besides libglobes,
@@ -108,6 +108,8 @@ The simplest way to compile this package is:
      all sorts of other programs in order to regenerate files that came
      with the distribution.
 
+  5. Since you've installed a library don't forget to run 'ldconfig'!
+
 Installation without root privilege
 ===================================
 
@@ -116,8 +118,11 @@ Install GLoBES to a directory of your choice GLB_DIR. This is done by
 and then follow the usual installation guide. The only remaining problem
 is that you have to tell the compiler where to find the header files, and 
 the linker where to find the library. Furthermore you have to make sure 
-that the shared object files are found during execution. The simplest
-solution to this is to set the environment variable LD_RUN_PATH
+that the shared object files are found during execution. Running 'configure'
+also produces a 'Makefile' in the examples subdirectory which can serve as
+a template for the compilation and linking process, since all necessary
+flags are correctly filled in. 
+Another solution is to set the environment variable LD_RUN_PATH
 during linking to GLB_DIR/lib/. Best thing is to add this to your
 shell dot-file (e.g. .bashrc). Then you can use:
 A typical compiler command like

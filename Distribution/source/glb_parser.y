@@ -61,7 +61,8 @@
 #define DOUBLE_LIST_INDEXED_SL 14
 #define DOUBLE_LIST_INDEXED_BL 15
 #define COUNTER 16
-  
+#define GMAX 1E100
+
   static int exp_count=1;
   static int energy_len;
   static int loc_count; 
@@ -101,42 +102,63 @@
 
   static glb_parser_decl token_list[]={
     {"$version",CHAR,0,1E8,&buff.version,NULL,"global"},
-    {"$parent_energy",DOUBLE,0,1E8,&buff.emax,NULL,"global"},
-    {"$target_mass",DOUBLE,0,1E8,&buff.targetmass,NULL,"global"},
+    {"$parent_energy",DOUBLE,0,GMAX,&buff.emax,NULL,"global"},
+    {"$target_mass",DOUBLE,0,GMAX,&buff.targetmass,NULL,"global"},
+#ifdef GLB_OLD_AEDL
+    {"$simbins" ,COUNTER,0,500,&buff.simbins,NULL,"global"}, 
+    {"$simtresh" ,DOUBLE,0,GMAX,&buff.simtresh,NULL,"global"},
+    {"$simbeam" ,DOUBLE,0,GMAX,&buff.simbeam,NULL,"global"},  
+    {"$numofbins",COUNTER,0,500,&buff.numofbins,NULL,"global"},
+    {"$simbinsize",DOUBLE_LIST,0,GMAX,&buff.simbinsize,
+     &buff.simbins,"global"},
+    {"$errorfunction",INT,0,1,&buff.errorfunction,NULL,"global"}, 
+    {"@treshold_setttings" ,DOUBLE_INDEXED_PAIR,
+     0,100,&buff.bgtcenter[0],&loc_count,"rule"},
+    {"@treshold_error" ,DOUBLE_INDEXED_PAIR,
+     0,100,&buff.bgterror[0],&loc_count,"rule"}, 
+#endif /* GLB_OLD_AEDL */
+    {"$sampling_points" ,COUNTER,0,500,&buff.simbins,NULL,"global"}, 
+    {"$sampling_min" ,DOUBLE,0,GMAX,&buff.simtresh,NULL,"global"},
+    {"$sampling_max" ,DOUBLE,0,GMAX,&buff.simbeam,NULL,"global"},
     
+    {"$bins",COUNTER,0,500,&buff.numofbins,NULL,"global"},
+    {"$emin",DOUBLE,0,GMAX,&buff.emin,NULL,"global"}, 
+    {"$emax",DOUBLE,0,GMAX,&buff.emax,NULL,"global"},
+
     {"$baseline",DOUBLE,0,2*GLB_EARTH_RADIUS,&buff.baseline,NULL,"global"},
     {"$profiletype",INT,1,3,&buff.density_profile_type,NULL,"global"},
-    {"$binsize",DOUBLE_LIST,0,1E8,&buff.binsize,&buff.numofbins,"global"}, 
-    {"$simbinsize",DOUBLE_LIST,0,1E8,&buff.simbinsize,
+    {"$binsize",DOUBLE_LIST,0,GMAX,&buff.binsize,&buff.numofbins,"global"}, 
+    {"$sampling_stepsize",DOUBLE_LIST,0,GMAX,&buff.simbinsize,
      &buff.simbins,"global"}, 
 
    
-   {"$numofbins",COUNTER,0,500,&buff.numofbins,NULL,"global"},
-   {"$densitytab",DOUBLE_LIST,0,100,&buff.densitytab,&buff.psteps,"global"},
-   {"$lengthtab",DOUBLE_LIST,0,13000,&buff.lengthtab,&buff.psteps,"global"},
-   {"rulechannellist",INT_LIST_INDEXED,0,10E8,&buff.rulechannellist[0],
+  
+   {"$densitytab",DOUBLE_LIST,0,GMAX,&buff.densitytab,&buff.psteps,"global"},
+   {"$lengthtab",DOUBLE_LIST,0,2*GLB_EARTH_RADIUS,
+    &buff.lengthtab,&buff.psteps,"global"},
+   {"rulechannellist",INT_LIST_INDEXED,0,GMAX,&buff.rulechannellist[0],
     &buff.lengthofrules[0],"rule"},
-   {"rulescoeff",DOUBLE_LIST_INDEXED,0,10E8,&buff.rulescoeff[0],
+   {"rulescoeff",DOUBLE_LIST_INDEXED,0,GMAX,&buff.rulescoeff[0],
     &buff.lengthofrules[0],"rule"},
    
-   {"bgrulechannellist",INT_LIST_INDEXED,0,10E8,&buff.bgrulechannellist[0],
+   {"bgrulechannellist",INT_LIST_INDEXED,0,GMAX,&buff.bgrulechannellist[0],
     &buff.lengthofbgrules[0],"rule"},
-   {"bgrulescoeff",DOUBLE_LIST_INDEXED,0,10E8,&buff.bgrulescoeff[0],
+   {"bgrulescoeff",DOUBLE_LIST_INDEXED,0,GMAX,&buff.bgrulescoeff[0],
     &buff.lengthofbgrules[0],"rule"},
    {"rule",UNTYPE,-1,1,NULL,&buff.numofrules,"global"},
    {"@signal",UNTYPE,-1,1,NULL,&loc_count,"rule"},
    {"@background",UNTYPE,-1,1,NULL,&loc_count,"rule"},
 
-    {"@pre_smearing_efficiencies",DOUBLE_LIST_INDEXED,0,1E8,
+    {"@pre_smearing_efficiencies",DOUBLE_LIST_INDEXED,0,GMAX,
      &buff.user_pre_smearing_channel[0],&loc_count,"channel"},
    
-    {"@pre_smearing_background",DOUBLE_LIST_INDEXED,0,1E8,
+    {"@pre_smearing_background",DOUBLE_LIST_INDEXED,0,GMAX,
      &buff.user_pre_smearing_background[0],&loc_count,"channel"},
 
-    {"@post_smearing_efficiencies",DOUBLE_LIST_INDEXED,0,1E8,
+    {"@post_smearing_efficiencies",DOUBLE_LIST_INDEXED,0,GMAX,
      &buff.user_post_smearing_channel[0],&loc_count,"channel"},
    
-    {"@post_smearing_background",DOUBLE_LIST_INDEXED,0,1E8,
+    {"@post_smearing_background",DOUBLE_LIST_INDEXED,0,GMAX,
      &buff.user_post_smearing_background[0],&loc_count,"channel"},
     
    
@@ -156,26 +178,17 @@
     0,100,&buff.bgerror[0],&loc_count,"rule"},
    {"@backgroundcenter",DOUBLE_INDEXED_PAIR
     ,0,100,&buff.bgcenter[0],&loc_count,"rule"},
-   {"@treshold_setttings" ,DOUBLE_INDEXED_PAIR,
-    0,100,&buff.bgtcenter[0],&loc_count,"rule"},
-   {"@treshold_error" ,DOUBLE_INDEXED_PAIR,
-    0,100,&buff.bgterror[0],&loc_count,"rule"}, 
+   
 
-   {"@energy_window" ,DOUBLE_INDEXED_PAIR_INV,0,100,&buff.energy_window[0],
+   {"@energy_window" ,DOUBLE_INDEXED_PAIR_INV,0,GMAX,&buff.energy_window[0],
     &loc_count,"rule"},
-   {"$densitysteps",COUNTER,1,200,&buff.psteps,NULL,"global"},
+   {"$densitysteps",COUNTER,1,GMAX,&buff.psteps,NULL,"global"},
   
-   {"$errorfunction",INT,0,1,&buff.errorfunction,NULL,"global"},
+  
 
-   {"$filter_state",INT,0,1,&buff.filter_state,NULL,"global"},
-   {"$filter_value",DOUBLE,0,1E8,&buff.filter_value,NULL,"global"},
-   {"$simbins" ,COUNTER,0,500,&buff.simbins,NULL,"global"}, 
-   {"$simtresh" ,DOUBLE,0,1E8,&buff.simtresh,NULL,"global"},
-   {"$simbeam" ,DOUBLE,0,1E8,&buff.simbeam,NULL,"global"},
+   {"$filter_state",INT,GLB_OFF,GLB_ON,&buff.filter_state,NULL,"global"},
+   {"$filter_value",DOUBLE,0,GMAX,&buff.filter_value,NULL,"global"},
 
-
-   {"$emin",DOUBLE,0,1E8,&buff.emin,NULL,"global"}, 
-   {"$emax",DOUBLE,0,1E8,&buff.emax,NULL,"global"},
    {"cross",UNTYPE,0,20,NULL,&buff.num_of_xsecs,"global"},
    {"@cross_file",CHAR,0,20,&xsc.file_name,NULL,"cross"},
 
@@ -183,17 +196,17 @@
    {"flux",UNTYPE,0,20,NULL,&buff.num_of_fluxes,"global"},
    {"@flux_file",CHAR,0,20,&flt.file_name,NULL,"flux"},
 
-    {"@builtin",INT,0,2,&flt.builtin,NULL,"flux"},
-    {"@time",DOUBLE,0,200,&flt.time,NULL,"flux"},
-    {"@power",DOUBLE,0,1E8,&flt.target_power,NULL,"flux"},
-    {"@stored_muons",DOUBLE,0,1E30,&flt.stored_muons,NULL,"flux"},
-    {"@parent_energy",DOUBLE,0,1E8,&flt.parent_energy,NULL,"flux"},
-    {"@norm",DOUBLE,0,1E30,&flt.norm,NULL,"flux"},
+    {"@builtin",INT,1,2,&flt.builtin,NULL,"flux"},
+    {"@time",DOUBLE,0,GMAX,&flt.time,NULL,"flux"},
+    {"@power",DOUBLE,0,GMAX,&flt.target_power,NULL,"flux"},
+    {"@stored_muons",DOUBLE,0,GMAX,&flt.stored_muons,NULL,"flux"},
+    {"@parent_energy",DOUBLE,0,GMAX,&flt.parent_energy,NULL,"flux"},
+    {"@norm",DOUBLE,0,GMAX,&flt.norm,NULL,"flux"},
     
  
 
-   {"@type" ,INT,0,3,&ibf.type,&loc_count,"energy"},
-   {"@sigma_e" ,DOUBLE_LIST,0,10,&ibf.sigma,&ibf.num_of_params,"energy"},
+   {"@type" ,INT,1,2,&ibf.type,&loc_count,"energy"},
+   {"@sigma_e" ,DOUBLE_LIST,0,GMAX,&ibf.sigma,&ibf.num_of_params,"energy"},
    {"@sigma_function" ,FUN,0,1000,&ibf.sig_f,NULL,"energy"},
     
   
@@ -1166,9 +1179,13 @@ static struct glb_init arith_fncts[] =
   {
     {"sin",  sin},
     {"cos",  cos},
+    {"tan",  tan},
+    {"asin", asin},
+    {"acos", acos},
     {"atan", atan},
-    {"ln",   log},
+    {"log",   log},
     {"exp",  exp},
+    {"log10", log10},
     {"sqrt", sqrt},
     {NULL, NULL}
      };
@@ -1300,6 +1317,33 @@ glb_putsym (char *sym_name, int sym_type)
 
 /* Name handling */
 
+static glb_naming *glb_putnames (char *sym_name, char *context, int value,
+				 glb_naming *in)
+{
+  glb_naming *ptr;
+  ptr = (glb_naming *) glb_malloc (sizeof (glb_naming));
+  ptr->name = (char *) glb_malloc (strlen (sym_name) + 1);
+  strcpy (ptr->name,sym_name);
+  ptr->context = (char *) glb_malloc (strlen (context) + 1);
+  strcpy (ptr->context,context);
+  ptr->value = value; /* set value to -1 for new ones  */
+  ptr->next = (struct glb_naming *) in;
+  //in = ptr;
+  return ptr;
+}
+
+static glb_naming *copy_names (glb_naming *in)
+{
+  
+  glb_namerec *ptr;
+  for (ptr = name_table; ptr != (glb_namerec *) NULL;
+       ptr = (glb_namerec *)ptr->next)
+    {
+      in=glb_putnames(ptr->name,ptr->context,ptr->value,in);
+    }
+  return in;
+}
+
 
 
 glb_namerec *glb_getname (const char *sym_name, char* context)
@@ -1307,13 +1351,10 @@ glb_namerec *glb_getname (const char *sym_name, char* context)
   glb_namerec *ptr;
   for (ptr = name_table; ptr != (glb_namerec *) NULL;
        ptr = (glb_namerec *)ptr->next)
-    if (strcmp (ptr->name,sym_name) == 0)
+    if (strcmp (ptr->name,sym_name) == 0 )
 	return ptr;
   return 0;
 }
-
-
-
 
 glb_namerec *glb_putname (char *sym_name, char *context, int sym_type)
 {
@@ -1390,18 +1431,21 @@ void glbClearAEDLVariables()
 
 void glb_copy_buff()
 {
-  buff_list[exp_count]=buff;
+  /* I am not sure how well this assigment really works */
+  buff.names=copy_names(buff.names);
+  buff_list[exp_count]=buff; 
   exp_count++;
 }
 
 void glbReset() 
 {
-  glb_line_num=1;
+  glb_line_num=0;
   energy_len=1;
   energy_count=-1;
   loc_count=-1;
   flux_count=-1;
   glbInitExp(&buff);
+ 
   if(name_table!=NULL) free_nametable();
   if(sym_table!=NULL) free_symtable();
   name_table =(glb_namerec *) NULL;
@@ -1419,7 +1463,7 @@ void glbResetEOF()
 {
   int i;
   exp_count=0;
-  glb_line_num=1;
+  glb_line_num=0;
   energy_len=1;
   energy_count=-1;
   loc_count=-1;
@@ -1456,7 +1500,7 @@ int glbInitExperiment(char *inf,glb_exp *in, int *counter)
   glb_option_type_reset(&opt);
   glb_flux_reset(&flt);
   input=glb_fopen(inf,"r");
-  if(input==NULL) return -1;
+  if(input==NULL) return -2;
   /* This line produces a warning with -Wall:
    * 'warning: char format, different type arg (arg 3)'
    * I think however that understand the problem.
@@ -1465,14 +1509,14 @@ int glbInitExperiment(char *inf,glb_exp *in, int *counter)
   if(strncmp(tch,tct,8)!=0) {glb_warning("Not a GLoBES file!"); return 1;}
   glb_fclose(input);
   yyin=glb_fopen(inf,"r");
-  if(yyin==NULL) return -1;
+  if(yyin==NULL) return -2;
   glb_file_id=(char*) strdup(inf);
   glbResetEOF();
   k=yyparse ();
   glb_fclose(yyin);
   glb_free(context);
   glb_free(glb_file_id);
-  if(k!=0) return -1;
+  if(k!=0) return -2;
   
   k=0;
   if(*counter+exp_count>32) glb_fatal("Too many experiments!");
@@ -1483,7 +1527,7 @@ int glbInitExperiment(char *inf,glb_exp *in, int *counter)
     }
   (*counter)= (*counter) + exp_count;
 
-  if(k!=0) return -2;
+  if(k!=0) return -1;
   
   return 0;
 

@@ -266,6 +266,9 @@ double glbGetFilter();
 int glbSetFilterInExperiment(int experiment,double filter);
 double glbGetFilterInExperiment(int experiment);
 
+/* Translation of named variables to numbers and vice versa */
+int glbNameToValue(int exp, const char* context, const char *name);
+const char *glbValueToName(int exp,const char* context, int value);
 
 #ifdef GLB_EXPERIMENTAL
 /* These functions are part of the user-defined chi^2 interface and will

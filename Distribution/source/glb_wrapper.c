@@ -1287,21 +1287,22 @@ static void glb_builtin_channel_printf(FILE *stream,
   sum=(double *) glb_malloc(sizeof(double)*c);
   for(k=0;k<c;k++) sum[k]=0.0;
   fprintf(stream,"\n");
-  
+  fprintf(stream,"%s",printf_left);
   for(i=0;i<l;i++)
-    {
+    { 
+      fprintf(stream,"%s",printf_left);
       fprintf(stream,"%6.4g%s",energy[i],printf_middle);
 	for(k=0;k<c;k++)
 	  {
-	    fprintf(stream,"%12.6g\t%s",res[k][i],printf_middle);
+	    fprintf(stream,"%12.6g%s",res[k][i],printf_middle);
 	    sum[k]+=res[k][i];
 	  }
 	fprintf(stream,"%s",printf_right);
 
     }
    
-  fprintf(stream,"------");
-  for(k=0;k<c;k++)
+  fprintf(stream,"----------------------");
+  for(k=1;k<c;k++)
     {
       fprintf(stream,"----------------");
     }
@@ -2145,5 +2146,44 @@ glbGetFilterInExperiment(int experiment)
       if(experiment!=GLB_ALL) break;
     }
   return out;
+}
+
+/* Accessing parser meta-information */
+
+int 
+glbNameToValue(int exp,const char* context, const char *name)
+{
+  glb_naming *ptr;
+  struct experiment *in;
+  /* Testing the experiment number */
+  if(!(((exp >= 0)&&(exp < glb_num_of_exps)))) { 
+    glb_error("Invalid value for experiment number");
+    return -1;}
+  in=(struct experiment *) glb_experiment_list[exp];
+  for (ptr = in->names; ptr != (glb_naming *) NULL;
+       ptr = (glb_naming *)ptr->next)
+    if (strcmp (ptr->name,name) == 0 && strcmp(ptr->context,context)==0)
+	return (ptr->value)-1;
+  return -1;
+}
+
+
+const char
+*glbValueToName(int exp,const char* context, int value)
+{
+  glb_naming *ptr;
+  struct experiment *in;
+  /* Testing the experiment number */
+  if(!(((exp >= 0)&&(exp < glb_num_of_exps)))) { 
+    glb_error("Invalid value for experiment number");
+    return NULL;}
+  in=(struct experiment *) glb_experiment_list[exp];
+  for (ptr = in->names; ptr != (glb_naming *) NULL;
+       ptr = (glb_naming *)ptr->next)
+    {
+        if (ptr->value == value + 1  && strcmp(ptr->context,context)==0)
+	  return ptr->name;
+    }
+  return NULL;
 }
 

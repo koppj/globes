@@ -1,22 +1,60 @@
+dnl GLoBES -- General LOng Baseline Experiment Simulator
+dnl (C) 2002 - 2004,  The GLoBES Team
+dnl
+dnl GLoBES is mainly intended for academic purposes. Proper
+dnl credit must be given if you use GLoBES or parts of it. Please
+dnl read the section 'Credit' in the README file.
+dnl
+dnl This program is free software; you can redistribute it and/or modify
+dnl it under the terms of the GNU General Public License as published by
+dnl the Free Software Foundation; either version 2 of the License, or
+dnl (at your option) any later version.
+dnl
+dnl This program is distributed in the hope that it will be useful,
+dnl but WITHOUT ANY WARRANTY; without even the implied warranty of
+dnl MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+dnl GNU General Public License for more details.
+dnl
+dnl You should have received a copy of the GNU General Public License
+dnl along with this program; if not, write to the Free Software
+dnl Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+dnl
 dnl Process this file with autoconf to produce a configure script.
+
 AC_INIT(source/globes.c)
 
 dnl Versioning of GLoBES
 dnl last digit: increment whenever code has changed
 dnl middle digit: increment when features have been introduced/removed
 dnl first digit: major improvements/rewrites
-AM_INIT_AUTOMAKE(globes,1.8.0)
+AM_INIT_AUTOMAKE(globes,1.8.1)
 
 dnl Versioning of libglobes.so
 dnl code changed: c:r+1:a
 dnl API changed: c+1:0:a
 dnl -> API extended: c:0:a+1
 dnl -> API shrunken: c:0:0
-GLBLIBVERSION="4:0:1"
+GLBLIBVERSION="4:1:1"
 
 dnl From here no editing !
 AC_SUBST(GLBLIBVERSION)
 AC_DEFINE_UNQUOTED(GLB_LIBVERSION,"$GLBLIBVERSION")
+
+dnl This part serves to convert Makefile.in in examples to a
+dnl Makefile which works automagically 
+
+if test $prefix = NONE; then
+ GLBLDF="-lglobes"
+else
+ GLBLDR="${prefix}/lib"
+ GLBLDF="${GLBLDR}/libglobes.so -Wl,--rpath -Wl,${GLBLDR}"
+ GLBINC="-I${prefix}/include/"
+fi
+
+AC_SUBST(GLBLDF)
+AC_SUBST(GLBINC)
+
+
 
 dnl Checks for programs.
 AC_PROG_AWK
@@ -28,10 +66,8 @@ AC_PROG_LN_S
 AC_PROG_YACC
 AM_PROG_LEX
 AM_PROG_LIBTOOL
+
 dnl Checks for libraries.
-
-
-
 AC_CHECK_LIB(m,main,[],AC_MSG_ERROR([libm not found]))
 AC_CHECK_LIB(gslcblas,main,[],AC_MSG_ERROR([libgslcblas not found]))
 AC_CHECK_LIB(gsl,main,[],AC_MSG_ERROR([libgsl not found]))
@@ -93,10 +129,6 @@ else
 fi
 ])
 
-
-
-
-
 dnl Checks for header files.
 AC_HEADER_STDC
 
@@ -107,5 +139,17 @@ AC_TYPE_SIZE_T
 dnl Checks for library functions.
 AC_CHECK_FUNCS(strdup)
 
+dnl Remind the user of things he might need ;-)
+if test $prefix = NONE; then
+ echo "********************************************"
+ echo "*          After 'make install':           *"
+ echo "* Do not forget to run 'ldconfig' as root! *"
+ echo "********************************************"	
+else
+ echo "****************************************************" 
+ echo "*              After 'make install':               *"
+ echo "* Do not forget to add ${prefix}/bin to your path! *"
+ echo "****************************************************"
+fi
 
-AC_OUTPUT(Makefile source/Makefile nrc/Makefile)
+AC_OUTPUT(Makefile source/Makefile nrc/Makefile examples/Makefile)

@@ -65,6 +65,8 @@ CC = @CC@
 CPP = @CPP@
 CXX = @CXX@
 DLLTOOL = @DLLTOOL@
+GLBINC = @GLBINC@
+GLBLDF = @GLBLDF@
 GLBLIBVERSION = @GLBLIBVERSION@
 LEX = @LEX@
 LIBTOOL = @LIBTOOL@
@@ -76,9 +78,10 @@ RANLIB = @RANLIB@
 VERSION = @VERSION@
 YACC = @YACC@
 
-DIST_SUBDIRS = source nrc
+DIST_SUBDIRS = source nrc 
 SUBDIRS = nrc source
-EXTRA_DIST = globes/globes.h data/CNGS_Spectra.dat data/NUMI12minus.dat data/NUMIminus.dat  data/XCC_CNGS.dat data/JHFminus.dat   data/NUMI12plus.dat data/NUMIplus.dat   data/XCCreactor.dat data/JHFplus.dat    data/NUMI9minus.dat data/Reactor.dat    data/XNC.dat data/MINOS_Spectra.dat  data/NUMI9plus.dat data/XCC.dat        data/XQE.dat data/ICARUS.glb     data/JHFSKantinew.glb data/NUMI.glb       data/NUMI9.glb data/NuFact2.glb    data/JHFHKAll.glb data/JHFSKcomb.glb  data/NUMI12.glb data/NUMI9anti.glb  data/OPERA.glb data/JHFSK.glb      data/JHFSKnew.glb data/NUMI12anti.glb data/NUMI9comb.glb data/Reactor.glb    data/JHFSKanti.glb data/MINOS.glb      data/NUMI12comb.glb data/NuFact.glb
+
+EXTRA_DIST = globes/globes.h data/CNGS_Spectra.dat data/NUMI12minus.dat data/NUMIminus.dat  data/XCC_CNGS.dat data/JHFminus.dat   data/NUMI12plus.dat data/NUMIplus.dat   data/XCCreactor.dat data/JHFplus.dat    data/NUMI9minus.dat data/Reactor.dat    data/XNC.dat data/MINOS_Spectra.dat  data/NUMI9plus.dat data/XCC.dat        data/XQE.dat data/ICARUS.glb     data/JHFSKantinew.glb data/NUMI.glb       data/NUMI9.glb data/NuFact2.glb    data/JHFHKAll.glb data/JHFSKcomb.glb  data/NUMI12.glb data/NUMI9anti.glb  data/OPERA.glb data/JHFSK.glb      data/JHFSKnew.glb data/NUMI12anti.glb data/NUMI9comb.glb data/Reactor.glb    data/JHFSKanti.glb data/MINOS.glb      data/NUMI12comb.glb data/NuFact.glb examples/Makefile.in examples/example1.c  examples/example3.c examples/myio.c examples/example-tour.c  examples/example2.c  examples/example4.c examples/myio.h examples/XCC.dat examples/NuFact.glb
 
 
 AM_YFLAGS = -d 
@@ -98,9 +101,9 @@ GZIP_ENV = --best
 all: all-redirect
 .SUFFIXES:
 $(srcdir)/Makefile.in: Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
-	cd $(top_srcdir) && $(AUTOMAKE) --gnu --include-deps Makefile
+	cd $(top_srcdir) && $(AUTOMAKE) --gnu Makefile
 
-Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status
+Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status $(BUILT_SOURCES)
 	cd $(top_builddir) \
 	  && CONFIG_FILES=$@ CONFIG_HEADERS= $(SHELL) ./config.status
 
@@ -239,7 +242,12 @@ distdir: $(DISTFILES)
 	-rm -rf $(distdir)
 	mkdir $(distdir)
 	-chmod 777 $(distdir)
-	$(mkinstalldirs) $(distdir)/data $(distdir)/globes
+	here=`cd $(top_builddir) && pwd`; \
+	top_distdir=`cd $(distdir) && pwd`; \
+	distdir=`cd $(distdir) && pwd`; \
+	cd $(top_srcdir) \
+	  && $(AUTOMAKE) --include-deps --build-dir=$$here --srcdir-name=$(top_srcdir) --output-dir=$$top_distdir --gnu Makefile
+	$(mkinstalldirs) $(distdir)/data $(distdir)/examples $(distdir)/globes
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \

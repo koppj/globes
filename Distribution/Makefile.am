@@ -1,5 +1,6 @@
-DIST_SUBDIRS = source nrc
+DIST_SUBDIRS = source nrc 
 SUBDIRS = nrc source
+
 EXTRA_DIST =  globes/globes.h\
 data/CNGS_Spectra.dat data/NUMI12minus.dat\
 data/NUMIminus.dat  data/XCC_CNGS.dat\
@@ -18,6 +19,9 @@ data/JHFSK.glb      data/JHFSKnew.glb\
 data/NUMI12anti.glb data/NUMI9comb.glb\
 data/Reactor.glb    data/JHFSKanti.glb\
 data/MINOS.glb      data/NUMI12comb.glb\
-data/NuFact.glb
+data/NuFact.glb\
+examples/Makefile.in examples/example1.c  examples/example3.c examples/myio.c\
+examples/example-tour.c  examples/example2.c  examples/example4.c\
+examples/myio.h examples/XCC.dat examples/NuFact.glb
 
 AM_YFLAGS =  -d 

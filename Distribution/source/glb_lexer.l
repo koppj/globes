@@ -26,6 +26,7 @@
 %pointer
 %option noyywrap
 
+
 %x incl
 %s grp
 %s rule
@@ -55,7 +56,7 @@
  #define MAX_INCLUDE_DEPTH 10
 static YY_BUFFER_STATE include_stack[MAX_INCLUDE_DEPTH];
 static int include_stack_ptr = 0;
-int glb_line_num=1;
+int glb_line_num=0;
 char *glb_file_id;
 static int line_buf[MAX_INCLUDE_DEPTH];
 static char *file_name_buf[MAX_INCLUDE_DEPTH];
@@ -63,6 +64,8 @@ static int cond_buf;
 /* I am not sure wether this works with nested contexts */
 static int cond_buf_i; 
 static int cond_buf_str; 
+static char *fnbuf,*fnbuf2;
+static size_t len,i;
 
 
 
@@ -125,22 +128,34 @@ line_buf[include_stack_ptr]=glb_line_num;
 include_stack[include_stack_ptr++] =
 YY_CURRENT_BUFFER;
 
-yyin = glb_fopen( yytext, "r" );
+fnbuf=strdup(yytext);
+len=strlen(fnbuf);
+if(fnbuf[len-1]!='\"') {fprintf(stderr,"FATAL:" 
+" Unterminated filename\n");exit(1) ;}
+if(fnbuf[0]!='\"') {fprintf(stderr,"FATAL:" 
+" Unquoted filename\n");exit(1) ;}
+fnbuf2=(char *) glb_malloc((len-1)*sizeof(char));
+for(i=0;i<len-1;i++) fnbuf2[i]=fnbuf[i+1];
+fnbuf2[len-2]='\0';
+yyin = glb_fopen( fnbuf2, "r" );
 
 if ( ! yyin ){
-fprintf(stderr,"FATAL: Could not open file %s\n",yytext);exit(1);}
+fprintf(stderr,"FATAL: Could not open file %s\n",fnbuf2);exit(1);}
 
-file_name_buf[include_stack_ptr]=(char*) strdup(yytext);
+file_name_buf[include_stack_ptr]=(char*) strdup(fnbuf2);
 glb_file_id=file_name_buf[include_stack_ptr];
 line_buf[include_stack_ptr]=glb_line_num;
-glb_line_num=1;
+glb_line_num=0;
+
+glb_free(fnbuf);
+glb_free(fnbuf2);
 
 yy_switch_to_buffer(
 		    yy_create_buffer( yyin, YY_BUF_SIZE ) );
 
+
 BEGIN(cond_buf_i);
 }
-
 
 
 
@@ -249,12 +264,12 @@ return s->type;
 }
 
 <defc>#{ID}        {glb_namerec *s;
-s = glb_getname (yytext,"chl");
+s = glb_getname (yytext,"channel");
 if (s == 0) 
-s = glb_putname (yytext,"chl",NAME);
+s = glb_putname (yytext,"channel",NAME);
 BEGIN(INITIAL);
 BEGIN(chl); 
-if(strcmp(s->context,"chl")!=0) 
+if(strcmp(s->context,"channel")!=0) 
 {yylval.nameptr=s;return RDF;}
  
 yylval.nameptr = s;  
@@ -373,12 +388,9 @@ return s->type;
 
 [ \t]*          /* eat up whitespace */
 
-"%!GLoBES"  /* empty */
+"%!GLoBES" /* empty */
 
 .           return (int) yytext[0];
-
-
-
 
 
 \n         /* yylloc.first_line++;*/ glb_line_num++; return '\n';

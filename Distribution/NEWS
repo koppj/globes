@@ -394,3 +394,69 @@
 	   glbTotalRuleRate(0,0,GLB_ALL,GLB_W_EFF,GLB_W_BG,GLB_W_COEFF,GLB_SIG)
 	works like glbShowRuleRates, just has no stream argument and returns 
 	'double'.
+
+******* Version 1.8.1
+	
+	For nufact fluxes the assigemnt of polarities is correct, i.e.
+		@builtin=1 is mu^+
+		@builtin=2 is mu^-
+
+
+	Changed the definition of AEDL in order to match the documentation:
+		$simbins -> $sampling_points
+		$simtresh -> $sampling_min
+		$simbeam -> $sampling_max
+		$numofbins -> $bins
+		$simbinsize -> $sampling_stepsize
+
+	Applied these changes to all glb-files and furthermore removed
+	all efficiencies and backgrounds which have been unity (for clarity).
+
+	If one really has to use old files, it possible to compile
+	GLoBES with -DGLB_OLD_AEDL and then it will parse also old files.
+
+	Changed $version in all glb-files to 1.8.1
+
+	Adjusted the verbosity levels for error reporting and debugging:
+		0 fatal messages are printed
+		1 + error messages (default)
+		2 + warnings
+		3 + all files read
+		4 + all files tried to read
+
+	Fixed an off by one bug in the line counting for reporting parse
+	errors.
+
+12/07/04 Added a name record to struct experiment and the corresponding
+	functions in glb_parser.y to fill this record with the name information
+	obtained during parsing. There are now two new functions which allow
+	to access this feature:
+		glbNameToValue(0,"rule","#rule0")
+		glbValueToName(0,"rule",0)
+	This name record is freed by glbFreeExp.
+
+	Rearranged the return values of glbInitExperiment, the more negative
+	the worse 
+	->  0 only for a flawless file (no defaults used etc.)
+	-> -1 for files which produced a warning but no error
+	-> -2 for file which produced an error
+	does not return for fatal errors.
+	
+	Added pretty printing to globes.
+
+	Added -D option to globes, which allows to define AEDL variables:
+		-DNAME=VALUE
+
+	Added -N No-oscillation to globes.
+
+	inlcude now requires quotes around the file name.
+
+14/07/04 Added subdirectory examples to the tar-ball, which contains the 
+	examples by Walter. I took his Makefile as starting point to write 
+	a Makefile.in which is then processed by 'configure', which in turn
+	yields a Makefile which should work irrespective of the installation 
+	mode. Thus all flags are filled in automatically depending on wether 
+	root has installed GLoBES or a user has it installed to some 
+	non-standard location. Furthemore 'configure' spits out a reminder for
+	necessary post-install actions, like running 'ldconfig'. Update
+	'INSTALL' accordingly.

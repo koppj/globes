@@ -30,6 +30,7 @@
 #include <time.h>
 #include <string.h>
 #include <argp.h>
+#include <ctype.h>
 
 #include <globes/globes.h>
 
@@ -41,6 +42,42 @@ const char *argp_program_version =
 const char *argp_program_bug_address =
 "<globes@ph.tum.de>";
 
+static void parse_definition(const char *in)
+{
+  const char *delim="=";
+  double val;
+  char *token=NULL;
+  char *lhs=NULL;
+  char *rhs=NULL;
+  char *inc=NULL;
+  size_t length=0;
+
+  inc=strdup(in);
+  if(inc==NULL) return;
+  token=strtok(inc,delim);
+  if(token!=NULL) 
+    {
+     lhs=strdup(token);
+     length++;
+    }
+  token=strtok(NULL,delim); 
+  if(token!=NULL) 
+    {
+     rhs=strdup(token);
+     length++;
+    }
+  
+  if(length!=2) {
+    glb_free(lhs);
+    glb_free(rhs);
+    fprintf(stderr,"ERROR: Definition is not of form 'DEFINITION=VALUE'\n");
+    return;}
+  val=atof(rhs);
+  glbDefineAEDLVariable(lhs,val);
+  glb_free(lhs);
+  glb_free(rhs);
+  return;
+}
 
 /* Program documentation. */
 static char doc[] ="Rate computation for GLoBES";
@@ -72,8 +109,19 @@ static struct argp_option options[] ={
   {"mathematica",'m',0,0,"Output in Mathematica (TM) list format"},
   {"coefficients",'i',0,0,"Rule rates without rule coefficients"},
   {"verbosity",'v',"LEVEL",OPTION_ARG_OPTIONAL,"Verbosity level for warnings"
-   " and errors\n   0 everthing off\n   1 errors on (default)\n   2 warnings"
-   " on"},
+   " and errors, 0 everthing off, 1 errors on (default), 2 warnings"
+   " on, 3 debug info, 4 more debug info"},
+  {"pretty-printing",'P',0,0,"pretty-printing - default"},
+  {"simple-printing",'S',0,0,"simple-printing"},
+  {"Oscillation",'O',0,0,"Standards oscillations"},
+  {"No-oscillation",'N',0,0,"Oscillations switched off"},
+  {"Define",'D',"DEFINITION",0,"Define AEDL variable"},
+  {"Left",'L',"STRING",0,"Left delimiter used in formatting output"},
+  {"Right",'R',"STRING",0,"Right delimiter used in"
+   " formatting output"},
+  {"Middle",'M',"STRING",0,"Middle delimiter used in"
+   " formatting output"},
+  {"user",'u',0,0,"Output formatting in user defined mode"},
   { 0 } 
 };
 
@@ -81,10 +129,11 @@ static struct argp_option options[] ={
 struct arguments
 {
   char* args[1];                /* many arguments*/
-  int channel,rule,experiment;
-  int smearing,eff,bg,spectrum,mathematica,coeff,verbosity;
+  int channel,rule,experiment,user;
+  int smearing,eff,bg,spectrum,mathematica,coeff,verbosity,pretty,oscillation;
   char *output_file;
   char* params;
+  char *left,*middle,*right;
 };
 
 
@@ -110,6 +159,10 @@ parse_opt (int key, char *arg, struct argp_state *state)
       break;
     case 'o':
       arguments->output_file = arg;
+      break;
+
+    case 'u':
+      arguments->user = 1;
       break;
     case 'p':
       arguments->params = arg;
@@ -138,10 +191,34 @@ parse_opt (int key, char *arg, struct argp_state *state)
     case 't':
       arguments->spectrum = 0;
       break;
+    case 'S':
+      arguments->pretty = 0;
+      break;
+    case 'P':
+      arguments->pretty = 1;
+      break;
     case 'm':
       arguments->mathematica = 1;
       break;
-   
+    case 'O':
+      arguments->oscillation = 1;
+      break;
+    case 'N':
+      arguments->oscillation = 0;
+      break;
+    case 'D':
+      parse_definition(arg);
+      break;
+    case 'L':
+      arguments->left = arg;
+      break;
+    case 'M':
+      arguments->middle = arg;
+      break;
+    case 'R':
+      arguments->right = arg;
+      break;
+      
 
       
     case ARGP_KEY_ARG:
@@ -224,13 +301,15 @@ static void glb_channel_printf_total(FILE *stream,
   free(sum);
 }
 
+
+
 static void glb_channel_printf_mathematica(FILE *stream,
 				       const double *energy,
 				       const double **res, size_t l,size_t c)
 {
   int i,k;
   fprintf(stream,"\n");
-   glbPrintDelimiter(stream,'l');
+  glbPrintDelimiter(stream,'l');
   for(k=0;k<c;k++)
     {
        glbPrintDelimiter(stream,'l');
@@ -252,6 +331,31 @@ static void glb_channel_printf_mathematica(FILE *stream,
   fprintf(stream,"\n");
 }
 
+static void rule_name(FILE *stream,int exp,int number)
+{
+  fprintf(stream,"--------- %s ---------\n",glbValueToName(exp,"rule",number));
+}
+
+static void channel_name(FILE *stream,int exp,int number,int spec)
+{
+  size_t c,i;
+  
+  c=glbGetNumberOfChannels(exp);
+  if(spec!=1) fprintf(stream,"\n      \t");
+  else fprintf(stream,"\n          \t");
+
+  for(i=0;i<c;i++) 
+    {
+      if(number!=GLB_ALL) i=number;
+      fprintf(stream,"%s\t",glbValueToName(exp,"channel",i));
+      glbPrintDelimiter(stream,'m');
+      if(number!=GLB_ALL) break;
+    }
+
+  fprintf(stream,"\n");
+  
+  return;
+}
 
 
 // ---------------------------------------------
@@ -270,7 +374,7 @@ int main(int argc, char *argv[])
   char *central_values;
   void *print_buf;
   FILE *stream;
-  int i,rv;
+  int i,rv,s;
   struct arguments arguments;
   glb_params oscp;
   double osc[]={0.553574,0.160875,M_PI/4,0.0,0.0007,0.003};
@@ -288,9 +392,14 @@ int main(int argc, char *argv[])
   arguments.spectrum=0;
   arguments.mathematica=0;
   arguments.verbosity=1;
-
+  arguments.pretty=1;
+  arguments.oscillation=1;
+  arguments.left="";
+  arguments.right="\n";
+  arguments.middle="\t";
+  arguments.user=0;
   
-
+ 
 
 
   /* Parse our arguments; every option seen by `parse_opt' will
@@ -299,7 +408,7 @@ int main(int argc, char *argv[])
 
   /* Initialize libglobes */
   glbInit(argv[0]);
-
+  glbSetPrintDelimiters(arguments.left,arguments.middle,arguments.right);
   glbSetVerbosityLevel(arguments.verbosity);
   
   /* Redirecting the output stream according to -o=FILE */
@@ -309,7 +418,8 @@ int main(int argc, char *argv[])
       stream=fopen(arguments.output_file,"w");
       if(stream==NULL) 
 	{ 
-	  fprintf(stderr,"%s: FATAL: Could not open file for output",argv[0]);
+	  fprintf(stderr,"%s: FATAL: Could not open file for output\n"
+		  ,argv[0]);
 	  exit(1);
 	}
     }
@@ -351,9 +461,12 @@ int main(int argc, char *argv[])
 
 #endif /* TEST */
   /* Processing the argument file */
-  glbInitExperiment(arguments.args[0],&glb_experiment_list[0],
-		    &glb_num_of_exps);
+  s=glbInitExperiment(arguments.args[0],&glb_experiment_list[0],
+		      &glb_num_of_exps);
 
+  /* Testing for failure */
+  if(s<-1) {fprintf(stderr,"%s: FATAL: Unrecoverable parse error\n",
+		    argv[0]);exit(1);}
 
 #ifdef TEST
   
@@ -368,16 +481,17 @@ int main(int argc, char *argv[])
 
   oscp=glbDefineParams(oscp,osc[0],
 		       osc[1],osc[2],osc[3],osc[4],osc[5]);
-
+  
+  if(arguments.oscillation==0) oscp=glbDefineParams(oscp,0,
+		       0,0,0,osc[4],osc[5]);
+  
   glbSetOscillationParameters(oscp);
+  
   glbSetRates();
 
 #ifdef TEST
-fprintf(stdout,"total signal rate %g\n",
-	glbTotalRuleRate(0,0,0,GLB_W_EFF,GLB_W_BG,GLB_W_COEFF,GLB_SIG));
-
-fprintf(stdout,"total background rate %g\n",
-	  glbTotalRuleRate(GLB_ALL,GLB_ALL,GLB_ALL,GLB_W_EFF,GLB_W_BG,GLB_W_COEFF,GLB_BG));
+  fprintf(stderr,"glbNameToValue ... %d\n",glbNameToValue(0,"channel","#ch0"));
+  fprintf(stderr,"glbValueToName ... %s\n",glbValueToName(0,"flux",0));
 #endif /* TEST */
 
   /* Chosing the right outputformat */
@@ -397,18 +511,29 @@ fprintf(stdout,"total background rate %g\n",
       glbSetChannelPrintFunction(glb_channel_printf_mathematica);
       glbSetPrintDelimiters("{",",","}");
     }
+
+  if(arguments.user==1) 
+    {
+      glbSetChannelPrintFunction(glb_channel_printf_mathematica);     
+    }
  
   /* Displaying the channel rates */
   if(arguments.rule==-2) 
-    glbShowChannelRates(stream,arguments.experiment,arguments.channel,
+    {
+      if(arguments.pretty==1) channel_name(stream,arguments.experiment,
+					   arguments.channel,
+					   arguments.spectrum);
+      glbShowChannelRates(stream,arguments.experiment,arguments.channel,
 		      arguments.smearing,arguments.eff,arguments.bg);
-
+    }
   
   /* Displaying the rule level rates */
   if(arguments.rule!=-2)
     {     
       if(arguments.rule!=GLB_ALL)
 	{
+	 if(arguments.pretty==1) rule_name(stream,arguments.experiment,
+					   arguments.rule);
 	   glbPrintDelimiter(stream,'l');
 	  glbShowRuleRates(stream,arguments.experiment,arguments.rule,GLB_ALL,
 			   arguments.eff,arguments.bg,arguments.coeff,GLB_SIG);
@@ -424,9 +549,10 @@ fprintf(stdout,"total background rate %g\n",
 	  fprintf(stream,"\n");
 	  for(i=0;i<glbGetNumberOfRules(arguments.experiment);i++)
 	    {
-	      /* FIXME -- wrong delimiter */
-	      if(i==0)  fprintf(stream,"\t");
-	       glbPrintDelimiter(stream,'l');
+	      fprintf(stream,"\n");
+	      if(arguments.pretty==1) rule_name(stream,arguments.experiment,i);
+	      glbPrintDelimiter(stream,'l');
+	      fprintf(stream,"\t");
 	      glbShowRuleRates(stream,arguments.experiment,i,
 			       GLB_ALL,arguments.eff,arguments.bg,
 			       arguments.coeff,GLB_SIG);

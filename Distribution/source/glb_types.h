@@ -26,6 +26,20 @@
 #define GLB_TYPES_H 1
 
 
+/* This is a close relative of glb_namerec, which is needed in order
+ * to facilitate the cooperation between AEDL and C.
+ */
+
+struct glb_naming
+{
+  char *name; /* name of symbol      */   
+  char *context;  /* context rule, channel etc.           */
+  int value;  /* e.g. rule number */
+  struct glb_naming *next;    /* link field              */
+};
+
+typedef struct glb_naming glb_naming;
+
 /* Data structure for handling fluxes and built-in fluxes */
 typedef struct {
   int builtin;
@@ -138,6 +152,11 @@ struct experiment {
 
   char *version;
 
+
+  /* This contains the parsing meta-information like names of rules etc. */
+
+  glb_naming *names;
+  
   /** The beam spectrum is loaded with glb_flux_loader(file_name, flux_ident)
    */
 

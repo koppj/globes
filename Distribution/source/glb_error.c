@@ -132,7 +132,7 @@ FILE *glb_fopen(const char *filename, const char *mode)
       test_name=glb_malloc((a+b+2)*sizeof(char));
       test_name=strcpy(test_name,glb_path_vector[i]);
       test_name=strcat(test_name,filename);
-      if(verbosity_level >= 3) fprintf(stderr,"Searched path: %s\n",test_name);
+      if(verbosity_level >= 4) fprintf(stderr,"Searched path: %s\n",test_name);
       t=fopen(test_name,"r");
       if(t!=NULL) 
 	{
@@ -165,7 +165,7 @@ FILE *glb_fopen(const char *filename, const char *mode)
   if(new_name==NULL) {glb_error("File not found");return NULL;}
   
   value = fopen(new_name,mode);
-  if(verbosity_level >= 2) fprintf(stderr,"File read: %s\n",new_name);
+  if(verbosity_level >= 3) fprintf(stderr,"File read: %s\n",new_name);
   glb_free(new_name);
   if(value== NULL)
     glb_error("Could not open file");

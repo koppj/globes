@@ -49,6 +49,33 @@
 
 static struct experiment MInitMemory0(struct experiment in);
 
+/* Functions for dealing with glb_naming */
+
+static void
+glb_free_names(glb_naming *stale)
+{
+    glb_naming *ptr;  
+    glb_naming *dummy;
+    ptr=stale;
+    while(ptr != (glb_naming *) NULL)
+      {	
+	glb_free(ptr->name);
+	glb_free(ptr->context);
+	dummy=ptr->next;
+	glb_free(ptr);
+	ptr=dummy;  
+      }
+    stale=NULL;
+}
+
+
+
+
+
+
+
+
+
 /* here come the glb_flux functions */
 
 /* Dynamically allocating flux storage */
@@ -263,6 +290,7 @@ void glbInitExp(glb_exp ins)
   struct experiment *in;
   in=(struct experiment *) ins;
   in->version=NULL;
+  in->names=NULL;
   in->num_of_fluxes=-1;
   in->density_profile_type=-1;
   /* FIXME - a potential memory leak */
@@ -361,7 +389,7 @@ void glbFreeExp(glb_exp ins)
   int i,j;
   struct experiment *in;
   in=(struct experiment *) ins;
-  
+  glb_free_names(in->names);
   glb_free(in->version);
   for(i=0;i<32;i++)glb_flux_free(in->fluxes[i]);
   for(i=0;i<32;i++)glb_xsec_free(in->xsecs[i]);
