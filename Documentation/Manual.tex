@@ -185,25 +185,11 @@
 
 {\setlength{\baselineskip}{1.2cm}}
 
-\input{tumlogo}
-
-\begin{minipage}{7cm}
-\begin{center}
-{\bf Technische Universit{\"a}t M{\"u}nchen} \\
-Physik-Department \\
-Institut f{\"u}r Theoretische Physik, T30d \\
-\end{center}
-\end{minipage}
-
-\vspace{-2cm}
-
-\hfill \oTUM{3.5cm}
-
-\vspace{3cm}
+\vspace*{3cm}
 
 \begin{center}
 { \Large \bf
-\GLOBES\ 1.X \\
+\GLOBES\ 2.0 \\
 General Long Baseline Experiment Simulator \\ }
 \vspace*{0.5cm}
 {\large \bf User's and experiment definition manual }
@@ -319,7 +305,7 @@ degenerate solutions.
 \GLOBES\ is mainly developed for academic use. Thus The \GLOBES\ Team would
 appreciate being given academic credit for it. Whenever you use \GLOBES\
 to produce a publication or a talk indicate that you have used \GLOBES\ and
-please cite the following reference
+please cite the following reference~\cite{globes_paper}
 \begin{quote}
 P. Huber, M. Lindner and W. Winter ... 
 \end{quote}
@@ -329,7 +315,7 @@ It will evolve during time since it is intendend for
 regular revision.
 Besides, many of the data which is used by \GLOBES\ and distributed together
 with it should be correctly referenced where possible. For details see the
-???.
+corresponding sub-section of the bibliography.
 
 Apart from that, \GLOBES\ is free software and open source, as such it is 
 licensed under the GNU Public License.
@@ -479,8 +465,38 @@ papers for suggestions which lead to improvements in the software.
 
 % Bibliography:
 
+
+\addcontentsline{toc}{chapter}{Bibliography}
 \bibliographystyle{./unsrt}
 \bibliography{references}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{Referencing the data in \GLOBES}
+\label{ref_data}
+
+\index{norm}{Referencing!data in \GLOBES}
+\GLOBES\ wouldn't be of much use without having high quality input data.
+Much of this input data has been published somewhere and the authors
+of those publication would appreciate to be cited by the user
+when he/she is using their work. It is solely the user's responsibility 
+to make sure that he/she understand where a certain input for \GLOBES\ comes
+from and wether additional work has to be cited in addition to the 
+\GLOBES\ paper~\cite{globes_paper}. To help this task we provide here the
+necessary information for the data which is shiped together with \GLOBES.
+
+When using the built-in earth matter profile, the original source is 
+reference~\cite{Stacey}.
+
+All files ending with \verb+.dat+ or \verb+.glb+ 
+in the \verb+data+ subdirectory of the \GLOBES\ tar-ball have at their
+beginning a comment field which clearly indicates which works should be
+cited when using a certain file. Make sure that dependencies are correctly
+tracked, \ie\ in some cases files included by other files have to checked
+also. One can use the \verb+-v3+ option to \verb+globes+ to see which files
+are included.
+
+It is advisable to use the same style for your own input files, since in
+case they are distributed, everbody will know how to correctly reference your
+work.
 
 % Index:
 

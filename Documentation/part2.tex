@@ -2,6 +2,7 @@
 % PART II: Experiment definition module
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\index{norm}{AEDL@\AEDL|(}
 \part{The Abstract Experiment Definition Language -- AEDL}
 \label{part:2}
 
@@ -13,9 +14,9 @@ Here the general concept of the AEDL is described and illustrated by an example.
 
 The goal of AEDL is to describe a large number of complex and very 
 different experiments by a limited number of parameters. It allows a
-representation of very different setups within one data structure, and thus implements universal rate and $\chi^2$ computation methods. For experiment simulations, a new piece of code is usually written and compiled
+representation of very different setups within one data structure, and thus implements universal rate and $\chi^2$ computation methods. For experiment simulations, usually a new piece of code is written and compiled
 for each different experiment. In many cases, even parameter changes, such as
-the number of bins, requires the recompilation of the source code. 
+the number of bins, require the recompilation of the source code. 
 However, such a technique soon reaches its limits when the simulated experiments are rather complex, or more than one type of experiment is studied simultaneously. Furthermore, it is very difficult to verify the correctness of the obtained results, since every time a new piece of code is added to 
 deal with a new experiment type, new errors will be introduced.
 
@@ -29,12 +30,12 @@ one source. This restricts the classes of neutrino sources which can be studied 
 \item
  Geometrical effects of a source distribution, such as in the sun or the atmosphere, can not be described.
 \item
- Sources with a physically significant time dependencies  can not be studied, such as  supernov\ae. It is, however, possible
+ Sources with a physically significant time dependency  can not be studied, such as  supernov\ae. It is, however, possible
 to study beams with bunch structure, since the time dependence of the
 neutrino source is physically only important to suppress backgrounds. 
 \end{itemize}
 
-The description of the neutrino oscillation physics is, at least numerically, relatively simple. We use the {\em evolution operator method} to compute the neutrino oscillation probabilities and divide the matter density profile into layers with constant matter densities. For each of these layers, the Hamiltonian in matter is diagonalized in order to propagate the neutrino transition amplitudes. Finally, the transition probability is obtained by the absolute square of the total neutrino transition amplitudes. Depending on the precision of the studied experiment, this approach turns out to be precise enough in Earth matter even if only a small number matter density steps is used. Since we allow an uncertainty of the matter density profile, it is, in fact, in most cases sufficient to consider only one density step with the average matter density together with a matter density uncertainty~\cite{Ohlsson:2003ip}. Note that this approach may not be applicable to quickly varying extraterrestrial matter density profiles.
+The description of the neutrino oscillation physics is, at least numerically, relatively simple. We use the {\em evolution operator method}~\cite{Ohlsson:1999um}  to compute the neutrino oscillation probabilities and divide the matter density profile into layers of constant matter density. For each of these layers, the Hamiltonian in matter is diagonalized in order to propagate the neutrino transition amplitudes. Finally, the transition probability is obtained by the absolute square of the total neutrino transition amplitudes. Depending on the precision of the studied experiment, this approach turns out to be precise enough in Earth matter even if only a small number matter density steps is used. Since we allow an uncertainty of the matter density profile, it is, in fact, in most cases sufficient to consider only one density step with the average matter density together with a matter density uncertainty~\cite{Ohlsson:2003ip}. Note that this approach may not be applicable to quickly varying extraterrestrial matter density profiles.
 
 While it is comparatively simple to define a general neutrino source 
 and to compute the oscillation physics, the general properties of a detector simulation are much more complicated. The basic assumption in building an abstract detector description is \emph{linearity}, \ie , that two neutrino events do not interfere with each other. Furthermore it is assumed that all information on the oscillation physics 
@@ -120,8 +121,7 @@ Of course, an abstract experiment definition language can not simulate all possi
 
 \section{A simple example for AEDL}
 
-Experiments are in \GLOBES\ defined by the Abstract Experiment Definition Language (AEDL). The experiment definition is written into a text file using the AEDL syntax. Currently, a number of pre-defined experiment definition files are provided with \GLOBES , which have to be modified manually in order to define new experiments. An IDE (Integrated Developement Environment) for AEDL files may follow in one of the next
-versions. The application software then uses this text file to initialize the experiment, where other secondary files might read for source fluxes, cross sections \etc . In this section, we show the definition of a very simple neutrino factory in AEDL, where we do not go into details. In the next chapter, we will discuss each of the individual steps in detail.
+Experiments are in \GLOBES\ defined by the Abstract Experiment Definition Language (AEDL). The experiment definition is written into a text file using the AEDL syntax. Currently, a number of pre-defined experiment definition files are provided with \GLOBES , which have to be modified manually in order to define new experiments.  The application software then uses this text file to initialize the experiment, where other secondary files might read for source fluxes, cross sections \etc . In this section, we show the definition of a very simple neutrino factory in AEDL, where we do not go into details. In the next chapter, we will discuss each of the individual steps in detail.
 
 The first line of every experiment definition file has to be
 \begin{quote}
@@ -130,7 +130,7 @@ The first line of every experiment definition file has to be
 in order not to confuse it with some other file format.
 %
 First, we instruct \GLOBES\ to use the built-in source flux for a neutrino factory
-originating from stored $\mu^+$'s. Therefore, we set the {\tt @builtin} variable to $1$. Next, we specify the muon energy to be $50\,\mathrm{GeV}$ by the {\tt @parent\_energy} variable. We assume 
+originating from stored $\mu^+$'s. This achieved by setting the {\tt @builtin} variable to $1$. Next, we specify the muon energy to be $50\,\mathrm{GeV}$ by the {\tt @parent\_energy} variable. We assume 
 that there will be $5.33\cdot 10^{20}$ useful muon decays per year
 and that this luminosity is available for $8$ years, \ie , a total number
 of $ 4.264\cdot10^{21}$ muons is stored:
@@ -220,7 +220,8 @@ The last step is to encapsulate the channels into a rule:
 {\tt \tb @background = 1.0e-05 @ \#disappearance}\\
 {\tt \tb @backgroundcenter = 1 : 0.0}\\
 {\tt \tb @backgrounderror = 0.05 : 0.0001}\\
-{\tt \tb @errordim = 0}\\
+{\tt \tb @errordim\_sys\_on = 0}\\
+{\tt \tb @errordim\_sys\_off = 2}\\
 {\tt \tb @energy\_window = 4.0 : 50.0}\\
 {\tt >}
 \end{quote}
@@ -232,7 +233,7 @@ one refers to the energy calibration error of the signal, which is defined
 in \Sec~\ref{sec:energy}. The background variable
 specifies the composition of the beam background. In this (simplified) case, we
 use the fraction $1\cdot 10^{-5}$ of the channel named {\tt \#disappearance}, \ie , the muon neutrinos with a mis-identified charge. The background center variable allows to rescale the total background contribution from all background components
-simultaneously. It is only useful if there is more than one background component, otherwise it is usually $1$. The background error variable is defined such as the signal error variable, \ie\ we have a $5\%$ background uncertainty and a very small energy calibration error. The ``error dimension variable'' {\tt @errordim} selects how the systematical errors are treated (\cf, \Tab~\ref{tab:error_dim}). 
+simultaneously. It is only useful if there is more than one background component, otherwise it is usually $1$. The background error variable is defined such as the signal error variable, \ie\ we have a $5\%$ background uncertainty and a very small energy calibration error. The ``error dimension variable'' {\tt @errordim\_sys\_X} selects how the systematical errors are treated (\cf, \Tab~\ref{tab:error_dim}). 
 
 The here defined experiment represents a first simplified version of a neutrino factory experiment. It still lacks the correct energy dependence of the efficiencies, the antineutrino disappearance channel, and the channels and rules for the symmetric operation with $\mu^-$ stored. However, it may serve as a simple, introductory example. In the next chapter, we will demonstrate that the AEDL is much more powerful than illustrated here.
 
@@ -293,7 +294,7 @@ beginning with {\tt \#}
 in the above example: {\tt \#ch1}. It can be used later to refer to the 
 channel defined in {\tt <$\ldots$>}. Those names are so-called 
 ``automatic variables'' and have to start with {\tt \#}. Note that these names have to be unique and can only be refered to after their definition.
-However, similar to C, one can give a header definition before:
+However, similar to C, one can give a declaration without definition before:
 \begin{quote}
 {\tt    channel(\#ch2)<>}
 \end{quote}
@@ -301,7 +302,13 @@ Now one can refer to the name {\tt \#ch2}, while the actual channel definition c
 variable is a number, which obtains its value from a counter for each type of environment. For example, for {\tt channel} the counter is {\tt numofchannels}. The counter keeps track of how many different names 
 there are for one type of environment, which means that it counts the number of channels, rules, energy resolution functions \etc . Thus, the automatic
 variables are numbered in the order of their definition, and the number
-can later be used to refer to them in the C code (from $0$ to {\tt numof...}$-1$). Within each environment type, there are several 
+can later be used to refer to them in the C code (from $0$ to {\tt numof...}$-1$). In order to facilitate the the mapping from names in AEDL to indices
+in C there are two functions \GLB{NameToValue} and \GLB{ValueToName} which
+make this transition (see \Sec~\ref{sec:aedl_names}, 
+page~\pageref{sec:aedl_names}).
+
+
+Within each environment type, there are several 
 variables beginning with {\tt @}, which can only be used within the 
 appropriate type of environment. In many cases, 
 they have a special syntax, such as {\tt @channel}.          
@@ -312,7 +319,8 @@ If you want to have several experiments in one file, separate the different
 \begin{quote}
 {\tt    \#NEXT\#}
 \end{quote}
-This command resets the counters for channels, rules, fluxes, and energy resolution environments. All variables have their scope limited 
+This command resets the counters for channels, rules, fluxes, cross section 
+and energy resolution environments. All variables have their scope limited 
 by either {\tt \%!GLoBES, \#NEXT\#} or {\tt EOF}.  This allows 
 a consistent treatment of various experiments in one file.
 
@@ -337,7 +345,8 @@ automatic variable {\tt \#CC} in both experiments,
 but the cross section data are different (for example, because of different target nuclei), the correct 
 cross section data will be applied to each of the experiments. 
 Note that, alternatively, one can 
-also load both files successively. 
+also load both files successively by two separate calls of 
+\GLB{InitExperiment}. 
 
 Furthermore, one can define constants such as
 \begin{quote}
@@ -348,7 +357,7 @@ Pi = 3.141
 These constants can not only be defined within one \AEDL\ file, but also
 by the calling C program, which allows to use a simple but powerful variable
 substitution mechanism as described in~\Sec~\ref{sec:aedlparams}.
-\index{norm}{External \AEDL\ parameters}
+\index{norm}{AEDL@\AEDL!external parameters}
 
 In addition, some simple algebraic manipulations are possible, such as
 \begin{quote}
@@ -394,7 +403,7 @@ in the logical order of their definition, and demonstrate how they translate int
 \section{Source properties and integrated luminosity}
 \label{sec:source}
 
-As we have disussed before, \GLOBES\ can only deal with point sources. Thus,  it is not possible to study effects from the finite size of the neutrino production region, such as in the Sun or in reactor experiments with many
+As we have disussed before, \GLOBES\ can only deal with point sources. Thus,  it is not possible to study effects from the finite size of the neutrino production region, such as in the sun or in reactor experiments with many
 neutrino sources (\eg, KamLAND). Therefore, a neutrino source in \GLOBES\ can, in general, be characterized by the flux spectrum for each neutrino flavor, the CP sign (neutrinos or antineutrinos), and the total luminosity
 of the source.
 
@@ -408,7 +417,9 @@ the total integrated luminosity of the experiment. In \GLOBES , the total number
 \end{array}\right.\,.
 \end{equation}
 Thus, the source power corresponds to either the amount of energy produced per time frame in the target (such as for nuclear reactors or sources based on pion decay), or the useful muon decays per time frame (neutrino factories). In addition, the definition of the source power makes only sense together with the flux normalization, the running time, and fiducial detector mass in order to define the total integrated luminosity. Therefore, one can, in principle, use arbitrary units for these components as long as their product gives the wanted neutrino flux. However, it is
-recommended to use normalizations such that the source power units are $\mathrm{MW}$ for a proton-based beam, and $\mathrm{GW}_\mathrm{thermal}$ for a reactor experiment. Correspondingly, the detector mass units should be kilotons for a proton-based beam, and tons for a reactor experiment.
+recommended to use normalizations such that the source power units are $\mathrm{MW}$ for a proton-based beam, and $\mathrm{GW}_\mathrm{thermal}$ for a reactor experiment. Correspondingly, the detector mass units should be kilotons for a proton-based beam, and tons for a reactor experiment. In any case it is a good
+idea to document the choices made by the user by corresponding comments
+in \AEDL.
 
 \index{aedl}{target mass@{\tt \$target\_mass}}
 The quantity which can be used to scale the overall integrated luminosity of an experiment, is the fiducial detector mass. For example,
@@ -471,7 +482,7 @@ normalization must contain a factor $L_0^2$. Here $L_0$ is the distance from the
 numbers in the flux file give, after the multiplication with {\tt @norm}, 
 the proper numbers of produced neutrinos corresponding to the chosen target power {\tt @power}. Usually this adjustment of {\tt @norm} is performed by comparison with known energy spectra for a specific experiment.
 
-\index{aedl}{{\tt flux}!flux file@{\tt "@flux\_file}}
+\index{aedl}{{\tt flux}!flux file@{\tt "@flux\_file}}\index{norm}{Flux!file}
 The software assumes that the given flux file has seven columns and
 501 lines with equidistant energies. The format is:
 \begin{quotation}
@@ -484,10 +495,18 @@ $ E\quad
 \Phi_{\bar\nu_\tau}$
 \end{quotation}
 In order to access fluxes at arbitrary energies, linear interpolation 
-is used by the software. In general, it is advisable to provide the flux between {\tt \$sampling\_min} and {\tt \$sampling\_max} (\cf, \Sec~\ref{sec:energy}), since these values are used by the software. However, if the energy leaves the range of values given in the file, zero is returned. 
-Note that unused (and therefore often unknown) fluxes can be initialized with zeros, but can not just be omitted. For example, if one wants to define an experiment with different running times with neutrinos and antineutrinos, one can just use the same flux file in two different {\tt flux} environments with two different running times {\tt @time}. The unused fluxes in each case will then just be ignored.
+is used by the software. In general, it is advisable to provide the flux between {\tt \$sampling\_min} and {\tt \$sampling\_max} (\cf, \Sec~\ref{sec:energy}), since these values are used by the software. However, if the energy leaves the range of values given in the file, zero is returned.
+The the columns for the fluxes for unused flavours have to be filled all the 
+same,\eg\ with zeros. 
 
-% Continue here (WW)
+The flux files accept one-line comments, which start
+with {\tt \#} and end with the linefeed character `\verb+\n+', they are
+not counted as a line and their content is discarded. This comments
+are useful to provide meta information about the fluxes like units
+or the origin of the information. This is also the default method
+to point the user to the references he/she should to cite when using
+a particular flux.\index{norm}{Flux!file!comments in}
+\index{norm}{Referencing!flux data}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Baseline and matter density profile}
@@ -523,12 +542,15 @@ $3$ & {\tt \$lengthtab},  {\tt \$densitytab} & Arbitrary profile (table of layer
 \index{aedl}{densitytab@{\tt \$densitytab}}
 
 Furthermore, the matter density profile along the baseline
-has to be specified. The simplest matter density profile is a constant matter density profile with the average matter density from the PREM\cite{Stacey} onion shell model of the Earth\index{norm}{PREM}\index{norm}{Earth matter density}:
+has to be specified. The simplest matter density profile is a constant matter density profile with the average matter density from the PREM~\cite{Stacey} onion shell model of the earth\index{norm}{PREM| \see{Matter density}}
+\index{norm}{Matter density!of the earth}:
 \begin{quote}
 {\tt \$profiletype=1 }
 \end{quote}
 %
-For a better approximation of the realistic Earth matter density profile, one can use an arbitrary number of equidistant steps of the PREM profile:
+If your using this option please cite reference~\cite{Stacey}\index{norm}{Referencing!matter profile data}.
+
+For a better approximation of the realistic earth matter density profile, one can use an arbitrary number of equidistant steps of the PREM profile:
 \begin{quote}
 {\tt \$profiletype=2 } \\
 {\tt \$densitysteps=20 }
@@ -544,7 +566,7 @@ manually with a list of thicknesses and densities of the matter density layers. 
 {\tt \$densitytab=\{2.8, 3.5\}}\\
 {\tt \$lengthtab=\{1000.0, 2000.0\}}
 \end{quote}
-It is important that both lists habe the same length and that the  thicknesses given in  {\tt \$lengthtab} add up to the length of
+It is important that both lists have the same length and that the  thicknesses given in  {\tt \$lengthtab} add up to the length of
 the baseline, which does not have to be explicitely specified anymore. In addition, matter densities are always given in $g/cm^3$.
 %
 This approach can also be used for a constant matter density profile with
@@ -561,7 +583,7 @@ The possible options for matter density profiles are summarized in \Tab~\ref{tab
 \section{Cross sections}
 \label{sec:cross_section}
 
-Cross sections\index{norm}{Cross sections} will later be used as part of the 
+Cross sections\index{norm}{Cross section} will later be used as part of the 
 channel definition (see \Sec~\ref{sec:channel}). Similar to the source 
 fluxes, they are provided by the user as a data file:
 \index{aedl}{{\tt cross}}
@@ -580,6 +602,7 @@ Cross sections are in \GLOBES\ given as differential cross section per energy:
 \end{equation}
 The software assumes that the cross section files are text files with 
 seven columns and $1001$ lines of the form
+\index{norm}{Cross section!file}
 \index{aedl}{{\tt cross}!cross file@{\tt  "@cross\_file}}
 \begin{quotation}
 $\mathrm{log}_{10} E\quad
@@ -596,6 +619,16 @@ range of values given in the file, $0.0$ will be assumed. In general, it is advi
 Unused cross sections have to be filled with zeros, and can not
  be just omitted.
 
+Like the flux files, the cross section files 
+accept one-line comments, which start
+with {\tt \#} and end with the linefeed character `\verb+\n+', they are
+not counted as a line and their content is discarded. This comments
+are useful to provide meta information about the cross sections like units
+or the origin of the information. This is also the default method
+to point the user to the references he/she should to cite when using
+a particular cross section.\index{norm}{Cross section!file!comments in}
+\index{norm}{Referencing!cross section data}
+
 \section{Oscillation channels}
 \label{sec:channel}
 
@@ -606,7 +639,10 @@ $P_{\alpha\beta}$, and the total event rates composed of signal and
 background. A channel describes the path from one
 initial neutrino flavor in the source to the event rates in the detector for one specific interaction type (IT) and final flavor.  
 Therefore, a channel contains the description of the 
-initial neutrino flavor, its CP eigenvalue (neutrino or antineutrino), 
+initial neutrino flavor, its CP eigenvalue 
+(neutrino or antineutrino)\footnote{Currently \GLOBES\ does not support lepton
+number violating transitions, \ie\ no transitions from neutrino to 
+antineutrino (or vice versa) are considered.}, 
 the detected neutrino flavor, the interaction cross sections for the chosen interaction type, and the energy resolution function of the detector.
 
 Before we come to the definition of the channel in AEDL, we introduce the general concept for the calculation of event rates. The first step is to
@@ -669,7 +705,7 @@ Thus, $R_\beta^{\text{IT}}(E,E')$ describes the energy response of
 the detector, \ie , a neutrino with a (true) energy $E$ is reconstructed
 with an energy between $E'$ and $E'+dE'$ with a probability
 $R_\beta^{\text{IT}}(E,E') dE'$. The function $R(E,E')$ is also often called ``energy resolution function''. Actually, its internal representation
-in the software is a smearing matrix\index{norm}{Energy resolution}\index{norm}{Smear matrix}. The function $\epsilon_\beta^{\text{IT}}(E')$ will later be refered to as ``post-smearing efficiencies'', since it will allow us to define cuts and threshold functions {\em after} the smearing is performed, \ie, as function of $E'$. The detailed definition and initialization of the energy resolution function is described in \Sec~\ref{sec:energy}.
+in the software is a smearing matrix\index{norm}{Energy!resolution}\index{norm}{Smear matrix}. The function $\epsilon_\beta^{\text{IT}}(E')$ will later be refered to as ``post-smearing efficiencies'', since it will allow us to define cuts and threshold functions {\em after} the smearing is performed, \ie, as function of $E'$. The detailed definition and initialization of the energy resolution function is described in \Sec~\ref{sec:energy}.
 
 Eventually, we can write down the number of events per bin $i$ \index{norm}{Bin} and channel $c$ as
 \begin{equation}
@@ -723,7 +759,9 @@ Therefore this feature can be used to speed up the rate
 computation considerably, especially in cases where a large set
 of channels exist which are only used for the computation of backgrounds.
 Usually it is an excellent approximation to treat backgrounds as if they
-were not affected by oscillations.
+were not affected by oscillations\footnote{In case, the backgrounds have
+a sizeable dependence on the oscillation parameters they carry information
+on the oscillation parameters and are therefore more like a signal.}.
 
 Note that the energy environment will be described in the next section. 
 In addition, one can define pre- and post-smearing effects together
@@ -736,11 +774,12 @@ energy resolution function in the next section.
 \label{sec:energy}
 
 \index{aedl}{{\tt energy}|(}
+\index{norm}{Energy!resolution|(}
 The definition and implementation of the energy resolution function is 
-rather sophisticated in \GLOBES . In particular, since this aspect is 
- time-critical, several algorithms are implemented. The choice of the 
-proper algorithm depends on the experiment and the frequencies of the
- involved neutrino oscillations.
+rather sophisticated in \GLOBES . In particular, the choice of the 
+proper parameters depends on the experiment and the frequencies of the
+ involved neutrino oscillations. This choice also greatly influences the
+speed of the calculation.
 
 In this section, we first discuss the principles of the energy smearing, where it is assumed that the reader is familiar with \Sec~\ref{sec:channel}. Then we introduce an automatic energy smearing algorithm, which is fairly simple to understand and applicable to most beam-based experiments. 
 In most cases, the reader may want to continue to the next section after reading these two subsections. In the third subsection, we describe a more elaborate (and slower) smearing algorithm, which can be used together with rather fast neutrino oscillations compared to the bin size, such as for
@@ -759,7 +798,8 @@ This usually involves a binning of the simulated events in the
 reconstructed energy $E'$. Therefore, one simplify \eq~(\ref{eq:events_bin}) by
 \begin{equation}
 \label{eq:post_smearing}
-\int_{E_i-\Delta E_i/2}^{E_i+\Delta E_i/2} dE' \, R^c(E,E') \, \epsilon^c(E') = \hat\epsilon_i^c \cdot \int_{E_i-\Delta E_i/2}^{E_i+\Delta E_i/2} dE' 
+\int_{E_i-\Delta E_i/2}^{E_i+\Delta E_i/2} dE' \, R^c(E,E') \, \epsilon^c(E')
+ \simeq \hat\epsilon_i^c \cdot \int_{E_i-\Delta E_i/2}^{E_i+\Delta E_i/2} dE' 
 \quad R^c(E,E')\,.
 \end{equation}
 Here the  $\hat\epsilon_i^c$ are the 
@@ -783,10 +823,8 @@ P^c(E)\,
 
 There is no principle reason why one should not evaluate this integral directly by the usual numerical methods. However, it turns out that this 
 is very slow in many cases. Therefore, we will introduce two different approximation schemes for different applications in the next two subsections.
-In either case, the integrand in \eq~(\ref{eq:simple_int}) has to be evaluated at fixed ``sampling points''. These sampling points can be 
-either defined by the user, or be computed by
-\GLOBES . The choice between these options also depends on 
-the algorithm which is used for the calculation, as it is explained in the following subsections. 
+In either case, the integrand in \eq~(\ref{eq:simple_int}) has to be evaluated at fixed ``sampling points''. These sampling points have to directly 
+or indirectly be defined by the user.
 
 \begin{figure}[t!]
 \begin{center}
@@ -800,10 +838,8 @@ the general evaluation algorithm. As it is illustrated in \figu{energies},
 \GLOBES\ uses several levels with respect to the energy ranges:
 \begin{description}
 \item[Sampling point level]
- This level is used internally to evaluate the integrand in \eq~(\ref{eq:simple_int}) at all sampling points. The energy scale is the actual incident neutrino energy $E$. Note that the sampling range should exceed the energy bin range by about the energy resolution error, since the corresponding sampling points have to be evaluated by the algorithm. 
-However, this exceeding is only
-necessary to avoid aliasing effects if the integrand in \eq~(\ref{eq:simple_int}) is large at the limits of the sampling range.
-For a manual definition of the sampling points (depends on algorithm), use
+ This level is used internally to evaluate the integrand in \eq~(\ref{eq:simple_int}) at all sampling points. The energy scale is the actual incident neutrino energy $E$. 
+For a manual definition of the sampling points, use
 \index{aedl}{sampling points@{\tt \$sampling\_points}}
 \index{aedl}{sampling min@{\tt \$sampling\_min}}
 \index{aedl}{sampling max@{\tt \$sampling\_max}}
@@ -814,7 +850,13 @@ For a manual definition of the sampling points (depends on algorithm), use
 \$sampling\_max =         50.0
 }
 \end{quote}
-for equidistant sampling points. Arbitrarily spaced sampling points can 
+for equidistant sampling points. If no values are given for these variables
+they are assumed to be equal to their corresponding counter part at bin level,
+\ie\ \verb+$sampling_points = $bins+, \verb+$sampling_min = $emin+ and
+\verb+$sampling_max = $emax+.
+
+
+Arbitrarily spaced sampling points can 
 be specified with 
 {\tt \$sampling\_stepsize}\index{aedl}{sampling stepsize@{\tt \$sampling\_stepsize}}
 \begin{quote}
@@ -822,14 +864,22 @@ be specified with
 \$sampling\_stepsize=\{1.0,2.0,3.0,4.0,5.0,...\}
 }
 \end{quote}
+The choice of the sampling point configuration strongly depends on the 
+experiment and required accuracy. Ideally the integrand 
+of~\eq~\ref{eq:simple_int} is zero outside the sampling range, if this cannot
+be achieved it is usually sufficient that the sampling range is by about
+three times the energy resolution\footnote{evaluated at {\tt \$emin} and
+{\tt \$emax} respectively} larger than the bin range. 
+The spacing of the sampling points should be somewhat smaller (a factor 
+$\simeq 2$ usually is more than ebough) than the 
+finest details of the integrand.
 
 
- 
-Note that the algorithm expects to 
-have at least as many sampling points as energy bins, since otherwise 
-the number of (unphysical) sampling constrains the experiment performance.
-\item[Bin level] This level is determined by the experiment. Note than energy
-bin sizes much smaller than the energy resolution will not improve the results. The energy bin range and the number of energy bins do always have to be specified. For the case of large values of the integrand in \eq~(\ref{eq:simple_int}) at the energy range limits, it is recommended to exceed the analysis energy window by about the energy calibration error in order to avoid aliasing effects.
+
+\item[Bin level] This level is determined by the experiment and its analysis. 
+Note that energy
+bin sizes much smaller than the energy resolution will not improve the results. The energy bin range and the number of energy bins do always have to be specified. For the case of large values of the integrand in \eq~(\ref{eq:simple_int}) at the energy range limits, it is recommended to exceed the analysis energy window by about three times the energy calibration error in order 
+to avoid cutoff effects.
 
 In order to define a range between $E_\mathrm{min}$
 and $E_\mathrm{max}$ divided by a certain number of equidistant bins,
@@ -856,10 +906,15 @@ and $E_\mathrm{max}$ and the size of each bin  $\Delta E_i$:
 \index{aedl}{binsize@{\tt \$binsize}}
 The number of bins will be automatically computed by \GLOBES . Note that the
 bin sizes have to add up to the energy range {\tt \$emax}-{\tt \$emin}.
+
+The choices at bin level are mainly determined by optimizing the
+performance of the experiment.
+
 \item[Analysis level]
 On the analysis level, an energy window can be defined within each rule. For
 details, see next chapter.
 \end{description}
+
 In general, the energy smearing happens between the sampling point and bin levels, which means that the energy smearing matrix will have {\tt \$sampling\_points} columns and {\tt \$bins} rows. 
 
 As illustrated in the figure, an interesting feature in combination with the
@@ -879,7 +934,7 @@ If they are introduced before,
 we call them
 {\tt @pre\_smearing\_efficiencies} or {\tt @pre\_smearing\_background}. 
 If they are introduced after, we call them {\tt @post\_smearing\_efficiencies} or {\tt @post\_smearing\_background}.
-Note that pre-smearing components are always a function of the incident neutrino energy $E$. Thus, there have to be as  many elements as there are sampling points. For some algorithms, the number of sampling points is determined automatically by \GLOBES , and the number of elements in the  pre-smearing vectors has to be adjusted in the second run.
+Note that pre-smearing components are always a function of the incident neutrino energy $E$. Thus, there have to be as  many elements as there are sampling points. 
 Examples for pre-smearing quantities are non-beam backgrounds, such as from geophysical neutrinos. The post-smearing components are always a function of the reconstructed neutrino energy $E'$, such as the post-smearing efficiencies $\epsilon_\beta^{\text{IT}}(E')$ in \eq~(\ref{eq:e_res}). Examples for post-smearing efficiencies are cuts and detection threshold functions. All post-smearing components have to have as 
 many elements as there are energy bins. Efficiencies are multiplicative 
 and their default value is $1$, whereas backgrounds are additive and their default value is $0$. Thus, a more elaborate channel can be defined as
@@ -915,18 +970,19 @@ The individual parameters of the environment will be defined below and depend on
 
 This algorithm is the simplest of the built-in algorithms for the evaluation
 of \eq~(\ref{eq:simple_int}). It is applicable to most of the
- accelerator-based experiments which can be simulated with \GLOBES .
+experiments which can be simulated with \GLOBES .
 
-The key idea is to use a ``flat'' model with sampling points identical to 
-the bins (\cf, \figu{energies}). This is a good approximation as long as
+The key idea is to use a ``flat'' model, \ie\ the integrand 
+of~\eq~\ref{eq:simple_int}  is well approximated by being piecewise
+constant in each sampling step. This is a good approximation as long as
 \begin{itemize}
 \item
- The number of bins is larger than the energy resolution.
+ No details are lost, \ie\ the spacing of sampling points 
+is smaller than the energy resolution.
 \item
- The integrand in \eq~(\ref{eq:simple_int}) is small at the bin range limits
-{\tt \$emin} and {\tt \$emax} (in order to avoid aliasing effects).
+The edges are treated correctly.
 \item
- The neutrino oscillations are slow on a scale of the bin distance.
+ The neutrino oscillations are slow on a scale of the smapling point distance.
 \end{itemize}
 In this case, \eq~(\ref{eq:simple_int}) is reduced to
 \begin{equation}
@@ -944,9 +1000,14 @@ has to be only evaluated at previously known values of the energy, which
 makes it possible to compute the transition amplitudes for all channels
 simultaneously. One assumption is that all involved factors are piece-wise
 constant, \ie, they hardly change within each bin. This 
-assumption seems to be very restrictive. Note, however, if one analyzes simulated data (which are simulated with the same algorithm), the errors
-will cancel between the simulated and fitted data. 
-This algorithm is the fastest which \GLOBES\ offers, and is selected by
+assumption seems to be very restrictive, which is however not quite correct.
+First of all, if one analyzes simulated data (which are simulated with the same algorithm), the errors
+will cancel between the simulated and fitted data. Second, and more important,
+this algorithm is just a very basic integration routine\footnote{It is planed 
+for to have something like a Gau\ss-Kronrod scheme as an alternative here.} and converges to
+the true result for decreasing step size. Thus if the number of sampling
+points is large enough this algorithm is very accurate. 
+This algorithm is selected by
 %
 \index{aedl}{{\tt energy}!type@{\tt "@type}}
 %
@@ -956,14 +1017,14 @@ This algorithm is the fastest which \GLOBES\ offers, and is selected by
 within the {\tt \#energy} environment.
 The computation of the bin kernel $K_i^c$ is performed
 by \GLOBES. Thus, it requires that the number of bins
-{\tt \$bins} and the minimum energy {\tt \$emin} and maximum energy {\tt \$emax} for equidistant bins are given.
+{\tt \$bins} and the minimum energy {\tt \$emin} and maximum energy {\tt \$emax} are given in case of equidistant bins.
 %
 \index{norm}{Energy!resolution}
 \index{norm}{Energy!resolution function}
 %
 As far as the parameterization for the energy resolution function 
 $R^c(E,E')$ in \eq~(\ref{eq:kernel}) is concerned, the algorithm uses
-the Gaussian
+a Gau\ss ian
 \begin{equation}
 R^c(E,E')=\frac{1}{\sigma(E)\,\sqrt{2\pi}}\,e^{-\frac{(E-E')^2}{2\sigma^2(E)}} \, .
 \end{equation} 
@@ -999,6 +1060,11 @@ x>1.8\cdot10^{-3}\\
 \alpha\cdot10^{-3} \,,&\mathrm{for}\,\, x \leq 1.8\cdot10^{-3}
 \end{array} \right.
 \end{equation}
+The somewhat complicated form is due to the fact that inverse $\beta$-decay
+has a neutrino threshold of $1.8\,\mathrm{MeV}$ and that a neutrino
+at threshold already produces $\simeq 1\,\mathrm{MeV}$ visible energy in
+the detector (for more details see \eg~\cite{Huber:2003pm}). 
+
 In the actual implementation of the algorithm,  the sum in \eq~(\ref{eq:algo_one}) is only computed for the $E_j$'s where $K(E_j)$ 
 is above a certain threshold, which is by default $10^{-7}$. 
 This threshold is defined at the compiling time. 
@@ -1090,7 +1156,7 @@ This scheme is used by choosing as type for the energy resolution
 \subsection{Manual energy smearing}
 
 In some cases, one may use the output of a detector Monte Carlo simulation
-directly. Then one can use manual energy smearing instead of one of the
+directly. Then one can use ''manual'' energy smearing instead  of the
 automatic energy smearing algorithms. 
 
 The energy smearing matrix $K_{ij}$ has {\tt \$bins} rows and {\tt \$sampling\_points} columns, which are numbered from $0$ to {\tt \$bins}$-1$ or {\tt \$sampling\_points}$-1$. It is equivalent to the 
@@ -1128,12 +1194,12 @@ energy(\#name)<\\
 Note that the sum of all entries in each {\em column} should be equal 
 to unity,
 since all of the incoming neutrinos should be assigned to energy bins. In many practical cases, however, the definition of the energy smearing can
-lead to sums smaller than unity, such as in the case of truncated Gaussian
+lead to sums smaller than unity, such as in the case of truncated Gau\ss ian
 distributions. The sum of entries in each {\em row} is not defined, since the events might be unevently distributed into the energy bins
 according to the energy resolution function.
 
 \index{aedl}{{\tt energy}|)}
-
+\index{norm}{Energy!resolution|)}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Rules and the treatment of systematics}
 \label{sec:rules}
@@ -1292,7 +1358,7 @@ one should truncate the analysis range by a few bins at the boundaries
 and therefore ensure in this way that only those $s_i$ are used whose index
 $k$ is within the range $0,\ldots, N_\mathrm{bins}-1$ (\cf, \figu{energies}). 
 Thus, it is possible to constrain the analysis energy range 
-with each rule to an energy window\index{norm}{Energy window}:
+with each rule to an energy window\index{norm}{Energy!window}:
 \index{aedl}{{\tt rule}!energy window@{\tt "@energy\_window}}
 \begin{quote}
 {\tt 
@@ -1300,8 +1366,8 @@ with each rule to an energy window\index{norm}{Energy window}:
 }
 \end{quote}
 The default energy window is given between the minimal and maximal reconstructed energy. To be on the save side, reduce analysis window
-compared to the bin range on each side by about three standard deviations 
-of the calibration error.
+compared to the bin range on each side by about three times the
+energy calibration error.
 
 Eventually, the total event rate $x_i$ in a bin $i$ is given by
 \begin{equation}
@@ -1427,7 +1493,9 @@ versions of \GLOBES\ and \AEDL\ files, it is possible to use in each
 {\tt \$version="1.8.1"}
 \end{quote}
 This information can be accessed by the versioning functions as described in~\Sec~\ref{sec:versioning}.
+\index{norm}{AEDL@\AEDL|)}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Testing \& debugging of \AEDL\ files}
 \label{chap:exp_def}
@@ -1435,7 +1503,7 @@ This information can be accessed by the versioning functions as described in~\Se
 \AEDL\ is a powerful language to describe a variety 
 of different experiments.
 This chapter demonstrates how to test an \AEDL\ file in order to check
-if they really describes given experiment. 
+if it really describes a given experiment. 
 For this application, the \GLOBES\ package contains the program
 {\tt globes}\index{norm}{globes@{\tt globes}}. It can either be 
 regarded as an \AEDL\ debugger, or as a simple command-line oriented tool to convert the rather  abstract \AEDL\ experiment description into more accessible event rates.
@@ -1444,9 +1512,9 @@ regarded as an \AEDL\ debugger, or as a simple command-line oriented tool to con
 \label{sec:globes_basics}
 
 The {\tt globes}\index{norm}{globes@{\tt globes}} binary is installed 
-together with the library \index{norm}{libglobes@{\tt libglobes}}, but
+together with the library\index{norm}{libglobes@{\tt libglobes}}, but
 into the directory {\tt \$prefix/bin/}. In order to use the {\tt globes} 
-utility, this directory has to be in the path of the shell used to call the program.\footnote{This is automatically done if
+utility, this directory has to be in the path of the shell used to call the program.\footnote{This is automatically the case if
 no options are given to {\tt configure}, and {\tt make install} was 
 executed with root-privilege, \ie, a standard installation was done.}
 
@@ -1496,7 +1564,7 @@ the number of un-oscillated events is given.
 \index{norm}{globes@{\tt globes}!warnings}
 \index{norm}{globes@{\tt globes}!errors}
 \index{norm}{globes@{\tt globes}!verbosity}
-The \AEDL\ parser and interpreter has basically three levels of messages to
+The \AEDL\ parser and interpreter have basically three levels of messages to
 the user: Warnings, errors and fatal errors. 
 Fatal errors are always reported and lead to a 
 program exit with status '1'. Usually only errors and no warnings
@@ -1516,8 +1584,8 @@ at this level it is often necessary to review the intermediate steps in the even
 By default, {\tt globes} returns total rates corresponding to the 
 {\tt -t} option. This can be changed to
 to a full spectrum by using {\tt -s}. The spectral rates are shown in a
-table where the first columns always gives the central energy of the
-corresponding bin.
+table where the first column always gives the central energy of the
+corresponding bin or the sampling point.
 
 If there is more than one experiment in a file, \ie, there is at least one 
 {\tt \#NEXT\#} command, only the event rates for one experiment will be shown.  This experiment can be chosen with the {\tt -e} option, which takes 
@@ -1593,14 +1661,16 @@ The option {\tt -u} uses the same principal formatting as {\tt -m}, but
 it allows to specify the left, middle, and right delimiters in constructing
 the list, such as
 \begin{quote}
+{\tt
 left\\
 left 1 middle 2 middle 3 right\\
 middle\\
 left\\
 left 1 middle 2 middle 3 right\\
 right\\
+}
 \end{quote}
-This is, with left = '\{', middle = ',' and right = '\}',
+This is, with {\tt left} = '\{', {\tt middle} = ',' and {\tt right} = '\}',
 equivalent to the list $\{\{1,2,3\},\{1,2,3\}\}$. 
 The delimiters can be set by {\tt -L}, {\tt -M} and {\tt -R} as in the 
 following example:
@@ -1617,8 +1687,9 @@ produces a a two column file such as
 1.3 0.18\\
 ...
 \end{quote}
-where the first columns is the central energy of the bin, and
-the second columns gives the event rate. Usually, the output is a concatenation of many such two columns tables, where 
+where the first column is the central energy of the bin or the sampling point,
+ and
+the second column gives the event rate. Usually, the output is a concatenation of many such two columns tables, where 
 each rule part or channel part has its own table. Thus one can, by using
 {\tt -u} and user-defined delimiters, construct many different  
 output formats.

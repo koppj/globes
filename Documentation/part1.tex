@@ -7,7 +7,7 @@
 
 \chapter{A \GLOBES\ tour}
 \label{chapter:tour}
-\index{norm}{GLoBES tour}
+\index{norm}{GLOBES tour@\GLOBES~tour}
 
 In this first chapter, we show a \GLOBES\ tour illustrating the
 main features of \GLOBES . The complete example  
@@ -534,7 +534,7 @@ $P_{\mathrm{Tg}} \simeq  4 \, \mathrm{MW}$ & \cite{Huber:2002mx} \\[0.1cm]
 \end{tabular}
 \end{center}
 \mycaption{\label{tab:experiments} \index{norm}{Experiment files (table)}
-\index{norm}{{\tt glb}-files} 
+\index{norm}{glb files@{\tt glb}-files} 
 Pre-defined experiment prototypes, their filenames (to be used in \GLB{InitExperiment}), their short descriptions, and the references in which they are originally used and discussed (except from minor modifications, such as a
 different implementation of the energy threshold function). Note that
 some of these experiments are outdated in terms of integrated luminosities,
@@ -627,8 +627,8 @@ supporting files, are first of all searched in the current directory, and then i
 \index{norm}{Path resolution}
 A list of pre-defined experiment prototypes, their filenames, their short descriptions, and the references of their definitions can be found in \tabl{experiments}. If the program cannot find these files, or some of them are syntactically not correct, it will break at this place. 
 
-\index{norm}{Clear experiment list}
-\index{norm}{Delete experiments}
+\index{norm}{Experiment!list!clear}
+\index{norm}{Experiment!delete}
 One can also remove all experiments from the evaluation list at running
  time:
 \begin{function}
@@ -844,7 +844,7 @@ returns the value of the density parameter {\tt which} in the
 structure {\tt in}.
 \end{function} 
 \begin{function}
-\GLBNS{SetIteration} \index{norm}{Iterations}
+\GLBNS{SetIteration} \index{norm}{Minimizer!iterations}
 {\tt glb\_params glbSetIteration(glb\_params in, int iter)} sets the number of iterations in the structure {\tt in}
 to the value {\tt iter}. If the assignment was unsuccessful, the 
 function returns {\tt NULL}.
@@ -966,7 +966,7 @@ user.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter[Calculating $\chi^2$ with systematics only]{Calculating $\boldsymbol{\chi^2}$ with systematics only}
-\index{norm}{Systematics $\chi^2$}
+\index{norm}{Systematics!$\chi^2$}
 
 Calculating a $\chi^2$-value with or without systematics, but no correlations and degeneracies, is the simplest and fastest possibility to obtain high-level information on an experiment. In general, \GLOBES\ uses the six independent oscillation parameters $\theta_{12}$, $\theta_{13}$, $\theta_{23}$, $\deltacp$, $\sdm$, $\ldm$, as well as the matter density 
 scaling factor $\hat{\rho}$ of each experiment.\index{norm}{Matter density!
@@ -987,7 +987,7 @@ matter density scaling factors.
 
 \example{Correlation between $\stheta$ and $\deltacp$}{
 \label{ex:corrth13dcp}
-\index{norm}{Two-parameter correlation}
+\index{norm}{Correlation!two-parameter}
 A typical and fast application for \GLB{ChiSys} is the visualization of
  two-parameter correlations using systematics only. For example, to
   calculate the two-parameter 
@@ -1043,7 +1043,7 @@ This equality will not hold for the minimizers in the next sections anymore.
 \index{norm}{Systematics} \index{norm}{Pull method}
 The treatment of systematics in \GLOBES\ is performed by the so-call
 {\em pull method} with the help of auxiliary systematics parameters.
-They are taken completely uncorrelated among different rules, and treated with simple Gaussian statistics. In general, a rule is a set 
+They are taken completely uncorrelated among different rules, and treated with simple Gau\ss ian statistics. In general, a rule is a set 
 of signal and background event rates coming from different oscillation
 channels, where the event rates of all rule contributions are added.
 For more details of the rule concept, see \Part~\ref{part:2} of this manual,
@@ -1067,9 +1067,9 @@ spectral information. For details, we refer to \Chapt~\ref{chapt:running}.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter[Calculating $\chi^2$-projections: how one can include correlations]{Calculating $\boldsymbol{\chi^2}$-projections: how one can include correlations}
 \label{chapt:correlations}
-\index{norm}{Correlations $\chi^2$}
+\index{norm}{Correlation!and $\Delta\chi^2$}
 
-\index{norm}{Correlations!multi-parameter}
+\index{norm}{Correlation!multi-parameter}
 This chapter deals with the rather complicated issue of $n$-parameter correlations. It is one of the greatest strengths of this software 
 to include the full $n$-parameter correlation in the high-dimensional parameter space with reasonable effort. Of course, calculating $\chi^2$-projections is somewhat more complicated than using systematics only. Therefore, we use a simple step by step introduction to the problem. 
 
@@ -1159,9 +1159,9 @@ This danger can be summarized as follows:
 \mathrm{Too \, pessimistic \, result} \, < \, \underbrace{\mathrm{Real \, result}}_{\mathrm{Located \, by \, careful \, usage}} \, \le \, \mathrm{GLoBES \, result} \,  < \,  \mathrm{Too \, optimisitic \, result} \nonumber
 \end{equation}
 
-\index{norm}{Priors} 
-\index{norm}{Input errors} 
-\index{norm}{Starting values}
+\index{norm}{External information!priors} 
+\index{norm}{External information!input errors} 
+\index{norm}{External information!starting values}
 In many cases, the fit manifold is restricted by the knowledge 
 from earlier experiments. For example, the knowledge on the solar 
 parameters will in most cases be supplied by the solar neutrino experiments. 
@@ -1178,21 +1178,22 @@ consequences of relaxing it and using realistic errors. Only if such
 a test has demonstrated that the impact of the uncertainty on a 
 given fit parameter is negligible it can be assumed as fixed safely. 
  The inclusion of external input in \GLOBES\ is done by the use of 
-Gaussian {\em priors}: We assume that an external measurement has 
+Gau\ss ian {\em priors}: We assume that an external measurement has 
 determined the measured parameter to be at the central value 
-(which we call {\em starting value}) with a $1 \sigma$ Gaussian error 
+(which we call {\em starting value}) with a $1 \sigma$ Gau\ss ian error 
 (which we call {\em input error}). The explicit definition of these 
 priors will be shown in the next section. 
 
 \section{The treatment of external input}
 \label{sec:externalinput}
 
-\index{norm}{External input}
+\index{norm}{External information}
+\index{norm}{External input| \see{External information}}
 It is one of the strengths of the \GLOBES\ software to use external input 
 in order to reduce the extension of the fit manifold with the knowledge 
 from external
 (earlier) measurements. The treatment of external input is done by the 
-addition of Gaussian so-called {\em priors} to the systematics-minimized 
+addition of Gau\ss ian so-called {\em priors} to the systematics-minimized 
 $\chi^2$-function. For example, for the matter density, one obtains as the 
 final projected $\chi^2_F$ after minimization over the matter density
 scaling factor \index{norm}{Matter density!scaling factor} $\hat{\rho}$
@@ -1241,8 +1242,8 @@ final $\chi^2$. Alternatively one could re-run the minimizer with the
 position of the previously found minimum as starting position but now
 with switching off the constraint on $\ldm$.
 
-\index{norm}{Input errors} 
-\index{norm}{Starting values}
+\index{norm}{External information!input errors} 
+\index{norm}{External information!starting values}
 In order to set the starting values and input errors, two function have to
  be called {\em before the usage of any minimizer}:
 \begin{function}
@@ -1271,7 +1272,7 @@ set starting values to {\tt out}.
 All functions take or return as many matter density parameters as there are initialized experiments. In addition, they return $-1$ if the operation
 was not successful.
 
-\index{norm}{External precision}
+\index{norm}{External information!precision}
 Eventually, a typical initialization of the external input with
 $10\%$ external precisions for the solar 
 parameters\footnote{In fact, accelerator-based long-baseline experiments 
@@ -1293,7 +1294,8 @@ matter density scaling factors are
 all $1.0$, which means that they do not need to be adjusted for the
 starting values.
 
-\index{norm}{Priors}
+\index{norm}{Minimizer!priors}
+\index{norm}{External information!priors}
 \index{norm}{Advanced tricks}
 Though the priors are an elegant way to treat external input, 
 there are also some complications with priors. The following hints are for the
@@ -1321,7 +1323,7 @@ more advanced \GLOBES\ user:
  section. At the true solution, this problem usually does not occur
  because the prior contributions are close to zero.    
 \item
-Currently, \GLOBES\ only supports Gaussian priors for the individual
+Currently, \GLOBES\ only supports Gau\ss ian priors for the individual
 oscillation parameters. Especially for the solar parameters, this is only
  an approximation, since they are imposed on $\theta_{12}$ and not
  on $\sin 2 \theta_{12}$, $\sin 2 \theta_{12} \cdot \sdm$, or $\sin  
@@ -1510,7 +1512,7 @@ Function & Purpose & Parameters $\rightarrow$ Result\\
 {\tt glbGetDensity\-ProjectionFlag} \GLBNS{GetDensityProjectionFlag} & Return flag for density parameter {\tt which} in vector {\tt in}.  & {\tt (const glb\_projection in, int which)} $\rightarrow$ {\tt int} flag \\
 \hline
 \end{tabular}
-\caption{\label{tab:defprojection}\index{norm}{Projection type}
+\caption{\label{tab:defprojection}\index{norm}{Projection!type}
 Different functions handling the
 \GLB{\_projection} type. Flags are either \GLBC{GLB\_FIXED} or \GLBC{GLB\_FREE}. The (un-shown) return values of the {\tt Set-} and {\tt Define-} functions point either to the assigned vector if successful, or they are {\tt NULL} if unsuccessful.}
 \end{table}
@@ -1535,7 +1537,7 @@ the type {\tt glb\_projection} has to be allocated first, and freed
 later. The access functions for {\tt glb\_projection} are summarized in \Tab~\ref{tab:defprojection}. Since the complete set is very similar to
 the one for {\tt glb\_params}, we do not go into greater details here.
 
-\index{norm}{Projection: Define}
+\index{norm}{Projection! definition}
 As soon as we have defined a projection, we can assign it:
 \begin{function}
 \GLBNS{SetProjection}
@@ -1578,15 +1580,16 @@ is compared with the result including the full multi-parameter correlation.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Locating degenerate solutions}
-\index{norm}{Degenerate solutions}
-\index{norm}{Degeneracies $\chi^2$}
+\index{norm}{Degeneracies|(}
+\index{norm}{Degeneracies!multiple solutions}
+\index{norm}{Degeneracies!and $\Delta\chi^2$}
 
 In the last chapter, we introduced the projection of any set of $k$ parameters onto any $n-k$ dimensional hyperplane, which was performed by the minimization over the $k$ free fit parameters. Similarly, one can minimize over {\em all} $n$ parameters to find the local minimum close to any starting point. This approach is very useful for the exact numerical location of a degeneracy if its approximate position is known. For the determination of the approximate position, one can use analytical approaches or an educated guess. 
 Though the usage of the all-parameter minimizers is quite simple, one should keep in mind that they are local minimizers. Therefore, one may need a very sophisticated application software to find all degenerate solutions.
 
 \example{Finding the $\mathrm{sgn}(\ldm)$-degeneracy}{
 \label{ex:sgndeg}
-\index{norm}{Degeneracies: sgn($\ldm$)-degeneracy}
+\index{norm}{Degeneracies!sgn($\ldm$)-degeneracy}
 
 In many cases, one can find the exact position of the $\mathrm{sgn}(\ldm)$-degeneracy with \GLB{ChiAll}, where one starts 
 the local minimizer at the suspected position 
@@ -1621,7 +1624,7 @@ $\stheta$-$\deltacp$-plane (\cf, {\tt example3.c}), one can plot it as a contour
 
 }
 
-\index{norm}{All-parameter minimization}
+\index{norm}{Minimization!all-parameter}
 The function to perform the all-parameter minimization is {\tt glbChiAll}:
 \begin{function}
 \GLBNS{ChiAll} 
@@ -1660,6 +1663,8 @@ minimum as {\tt in} vector, and $\ldm$ kept free.
 \item[Finding degeneracies with multiple experiments.] For multiple experiments, it turns out to be useful to locate the degeneracies for individual experiments first. Then, all of the found degeneracies below the threshold can be tested for the combination of all experiments.
 \end{description}
 Finally, note that any degenerate solution below the confidence level threshold which can not be located makes the result appear better than it actually is. Thus, one should be careful with the determination of the degenerate solutions in order to find all of them.
+\index{norm}{Degeneracies|)}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Obtaining low-level information}
@@ -1691,7 +1696,7 @@ evaluated experiment.
 \end{function}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{\AEDL\ names}
-\index{norm}{AEDL!names}
+\index{norm}{AEDL@\AEDL!names}
 \label{sec:aedl_names}
 
 Since in \AEDL\ rules, cross section, fluxes etc. carry a `name' by
@@ -2070,8 +2075,8 @@ $100$ matter density steps and print them:
 
 \example{The impact of systematics, correlations, and degeneracies}{
 \label{ex:barcharts}
-\index{norm}{Bar charts}
-\index{norm}{Systematics on/off}
+\index{norm}{Bar plots}
+\index{norm}{Systematics!on/off}
 Here it is demonstrated how one can successively include systematics, correlations, and degeneracies at the example of the $\stheta$-sensitivity limit.
 An important part of this example is how two switch the systematics off,
 \ie, how to obtain the sensitivity limit from statistics only. Since
@@ -2117,7 +2122,7 @@ limits at the $3 \sigma$ confidence level, where we do not include the
 \section{Systematics}
 \label{sec:systematics}
 \index{norm}{Systematics}
-\index{norm}{Systematics on/off}
+\index{norm}{Systematics!on/off}
 
 Changing the systematics at running time can be useful to investigate
 the impact factors affecting the measurement.
@@ -2150,9 +2155,9 @@ $-1$ if not successful.
 returns the error dimension for systematics on ({\tt on\_off} is \GLBC{GLB\_ON}) or off ({\tt on\_off} is \GLBC{GLB\_OFF}) of experiment {\tt exp} and rule {\tt rule}.
 \end{function}
 
-\index{norm}{Signal errors}
-\index{norm}{Background errors}
-\index{norm}{Background centers}
+\index{norm}{Signal!errors}
+\index{norm}{Background!errors}
+\index{norm}{Background!centers}
 Except from the general treatment of systematics, one can read out
 and write the signal and background errors, as well as the background
 centers. For the definitions of these quantities, see \Sec~\ref{sec:rules}.
@@ -2196,7 +2201,7 @@ As usual, all these functions return $-1$ if they were not successful.
 
 \section{External parameters in \AEDL\ files}
 \label{sec:aedlparams}
-\index{norm}{External \AEDL\ parameters}
+\index{norm}{AEDL@\AEDL!external parameters}
 
 Using external parameters in \AEDL\ files is a very powerful feature
 to change experiment parameters at running time which require that
@@ -2256,7 +2261,7 @@ clears the \AEDL\ variable list.
 This function is called automatically upon exit of the program.
 
 \section{Algorithm parameters: Filter functions}
-\index{norm}{Filter functions}
+\index{norm}{Filter!functions}
 
 The oscillation frequency filters to filter fast oscillations
 can also be accessed by the user interface. For details of

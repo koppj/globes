@@ -39,7 +39,7 @@ ANSI C/C++ compiler, but the \verb+globes+ binary uses the
 All those libraries are also available as rpm's from the various
 distributors of GNU/Linux: See their web sites for downloads. Due to
 the rather difficult nature of the build process of BLAS and LAPACK,
-it is recommended that one use a suitable rpm instead. In addition,
+it is recommended that one uses a suitable rpm instead. In addition,
 there is a good chance that
 gcc, f2c and GSL are already part of your installation. Furthmore, you need
 a working \verb+make+ to build and install \GLOBES.
@@ -81,7 +81,7 @@ library in another location or changing other default compilation
 options.
 
 The install target also will install a program with name \verb+globes+ to
-\verb+$prefix+.
+\verb+$prefix/bin+.
 
 If you are not using \verb+make install+ you will find the static libary
 at \verb+source/.lib/libglobes.a+ which you can copy to any destination.
@@ -95,7 +95,8 @@ which are
 \end{quote}
 
 In general it is advisable to use the shared libraries. If you don't
-have root privileges, see the corresponding section of this file.
+have root privileges, see the corresponding section 
+(page~\pageref{inst_noroot}).
 If you install \GLOBES\ with root privileges, do not forget to run 
 {\tt ldconfig} after installation.
  
@@ -152,6 +153,7 @@ The simplest way to compile this package is:
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section*{Installation without root privilege}
 \index{norm}{Installation!w/o root privilege}
+\label{inst_noroot}
 
 Install \GLOBES\ to a directory of your choice \verb+GLB_DIR+. This is done by
 \begin{quote}
