@@ -34,10 +34,9 @@
 
 int main(int argc, char *argv[])
 { 
-  /* char* MYFILE=""; */
+  /* char* MYFILE=""; */ 
   char* MYFILE="gl-tour.dat"; /* if empty, write to screen */
   FILE* stream;
-  
   if(strlen(MYFILE)>0) stream=fopen(MYFILE, "w");
   else stream = stdout;
   
@@ -50,7 +49,7 @@ int main(int argc, char *argv[])
   double theta23 = M_PI/4;
   double deltacp = M_PI/2;
   double sdm = 7e-5;
-  double ldm = 2e-3;
+  double ldm = 2.0e-3;
  
   /* Initialize one experiment NuFact.glb */
   glbInitExperiment("NuFact.glb",&glb_experiment_list[0],&glb_num_of_exps); 

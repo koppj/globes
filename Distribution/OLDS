@@ -501,5 +501,36 @@
 	As a consequence of Manfred`s aclocal/libtool problems, I added
 	AM_MAINTAINER_MODE to configure.in
 
-	Checked that the CVS contains all necessary files to roll a tar-ball
- 	
+	Tested the tar-ball and it works!
+
+	Tried to check that the CVS contains all necessary files to roll 
+	a tar-ball and found that it does not work as expected. I do not
+	quite understand what´s going on. Description:
+
+		Running `make dist' in the CVS on `lea' does not work
+		Running `make dist' in the CVS on `patrick' does work
+		Running `make dist' in the tar-ball on `patrick' does work
+		Running `make dist' in the tar-ball on `lea' does work
+	
+ 		Running `make distcheck' in the CVS on `patrick' does work
+		Running `make distcheck' in the tar-ball on `patrick' does work
+		
+		Running `make distcheck' in the CVS on `lea' does not work
+		Running `make distcheck' in the tar-ball on `lea' does not work
+
+	Running `autoreconf' does not improve, but running 
+	`automake --add-missing' seems to overcome at least the `make dist'
+	problem.
+
+	The file are all in the CVS and I guess that this a version problem
+	between automake. Since if I run a `diff' on the top-level Makefiles
+	on `lea' and `patrick' I get among others:
+
+	<       cd $(top_srcdir) && $(AUTOMAKE) --gnu Makefile
+	---
+	>       cd $(top_srcdir) && $(AUTOMAKE) --gnu --include-deps Makefile
+
+
+	Tested the examples, they work.
+
+	Removed glbSetProfileScaling since it has absolutely no effect.

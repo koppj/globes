@@ -18,6 +18,16 @@
  #*     eprint    = "hep-ph/0211300",
  #*     SLACcitation  = "%%CITATION = HEP-PH 0211300;%%"
  #* }
+ #
+ #* %The experiment in this file tries to approximate as closely as possible
+ #* %the following LOI
+ #* Article{Itow:2001ee,
+ #*    author    = "Itow, Y. and others",
+ #*    title     = "The JHF-Kamioka neutrino project",
+ #*    year      = "2001",
+ #*    eprint    = "hep-ex/0106019",
+ #*    SLACcitation  = "%%CITATION = HEP-EX 0106019;%%"
+ #* }
  */
 
 $version="1.8.1"

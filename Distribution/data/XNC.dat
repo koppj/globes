@@ -5,6 +5,30 @@
 # If you are using this file for producing a scientific publication
 # or a talk please cite the following references.
 #
+#* %The cross sections in this file are, at low energies, taken from
+#* @Article{Messier:1999kj,
+#*     author    = "Messier, Mark D.",
+#*     title     = "Evidence for neutrino mass from observations of atmospheric
+#*                  neutrinos with Super-Kamiokande",
+#*     note     = "UMI-99-23965"
+#* }
+#* %and have been kindly provided as machine readable file by the author.
+#
+#* %The high energy part is taken from the following reference and
+#* %additionaly we have performed a matching to the low energy part.
+#* @Article{Paschos:2001np,
+#*     author    = "Paschos, E. A. and Yu, J. Y.",
+#*     title     = "Neutrino interactions in oscillation experiments",
+#*     journal   = "Phys. Rev.",
+#*     volume    = "D65",
+#*     year      = "2002",
+#*     pages     = "033002",
+#*     eprint    = "hep-ph/0107261",
+#*     SLACcitation  = "%%CITATION = HEP-PH 0107261;%%"
+#* }
+#* %Again, they have been kindly provided as machine readable file by the 
+#* %authors.
+#
 -1.      0.15518364109144947   0.15518364109144947   0.15518364109144947   0.020466363321176104   0.020466363321176104   0.020466363321176104
 -0.996   0.15633399350273008   0.15633399350273008   0.15633399350273008   0.02064730506210255    0.02064730506210255    0.02064730506210255
 -0.992   0.15749498999381795   0.15749498999381795   0.15749498999381795   0.02082992103634393    0.02082992103634393    0.02082992103634393

@@ -175,7 +175,6 @@ int glbGetErrorDim(int experiment, int rule, int on_off);
 
 int glbSwitchSystematics(int experiment, int rule, int on_off);
 
-int glbSetProfileScaling(int experiment, double scale);
 
 int glbSetTargetMass(int experiment, double mass);
 double glbGetTargetMass(int experiment);

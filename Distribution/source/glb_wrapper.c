@@ -1500,49 +1500,6 @@ glbGetErrorDim(int experiment, int rule, int on_off)
 
 
 int 
-glbSetProfileScaling(int experiment, double scale)
-{
-  int i;
-  if(experiment==GLB_ALL)
-    {
-      if(scale > 0)
-	{
-	  for(i=0;i<glb_num_of_exps;i++)
-	    {
-	      glb_set_profile_scaling(scale,i);
-	      
-	    }  
-	}
-      else
-	{
-	  glb_error("Target mass has to be positive");
-	  return -1;
-	}
-      return 0;
-    }
-
-
-  if((experiment >= 0)&&(experiment < glb_num_of_exps))
-    {
-      if(scale > 0)
-	{
-	  glb_set_profile_scaling(scale,experiment);
-	}
-      else
-	{
-	  glb_error("Profile scale factor has to be positive");
-	  return -1;
-	}
-    }
-  else 
-    {
-      glb_error("Invalid value for experiment number");
-      return -1;
-    }
-  return 0;
-}
-
-int 
 glbSetTargetMass(int experiment,double mass)
 {
   struct glb_experiment *in;

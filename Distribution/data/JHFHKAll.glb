@@ -17,6 +17,16 @@
  #*     eprint    = "hep-ph/0204352",
  #*     SLACcitation  = "%%CITATION = HEP-PH 0204352;%%"
  #* }
+ #
+ #* %The experiment in this file tries to approximate as closely as possible
+ #* %the following LOI
+ #* Article{Itow:2001ee,
+ #*    author    = "Itow, Y. and others",
+ #*    title     = "The JHF-Kamioka neutrino project",
+ #*    year      = "2001",
+ #*    eprint    = "hep-ex/0106019",
+ #*    SLACcitation  = "%%CITATION = HEP-EX 0106019;%%"
+ #* }
  */
 
 $version="1.8.1"
@@ -111,7 +121,6 @@ channel(#ANTI_nu_mu_bar_disappearance_CC)<
 /* 6 */
 channel(#ANTI_nu_mu_bar_disappearance_NC)<
 	@channel = 	#JHFminus:	-:	m:	m:	#NC:    #ERES
-	@post_smearing_efficiencies = {0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99}
 >
 
 /* 7 */
@@ -142,25 +151,21 @@ channel(#ANTI_nu_mu_bar_disappearance_QE)<
 /* 12 */
 channel(#nu_e_appearance_NC)<
 	@channel = 	#JHFplus:	+:	m:	e:	#NC:    #ERES
-	@post_smearing_efficiencies = {0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99}
 >
 
 /* 13 */
 channel(#nu_tau_appearance_NC)<
 	@channel = 	#JHFplus:	+:	m:	t:	#NC:    #ERES
-	@post_smearing_efficiencies = {0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99}
 >
 
 /* 14 */
 channel(#ANTI_nu_e_bar_appearance_NC)<
 	@channel = 	#JHFminus:	-:	m:	e:	#NC:    #ERES
-	@post_smearing_efficiencies = {0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99}
 >
 
 /* 15 */
 channel(#ANTI_nu_tau_bar_appearance_NC)<
 	@channel = 	#JHFminus:	-:	m:	t:	#NC:    #ERES
-	@post_smearing_efficiencies = {0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99,0.99}
 >
 
 /* 16 */

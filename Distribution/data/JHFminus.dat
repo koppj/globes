@@ -5,6 +5,16 @@
 # If you are using this file for producing a scientific publication
 # or a talk please cite the following references.
 #
+#* %The fluxes in this file are taken from
+#* Article{Itow:2001ee,
+#*    author    = "Itow, Y. and others",
+#*    title     = "The JHF-Kamioka neutrino project",
+#*    year      = "2001",
+#*    eprint    = "hep-ex/0106019",
+#*    SLACcitation  = "%%CITATION = HEP-EX 0106019;%%"
+#* }
+#* %and have been kindly provided as machine readable file by T. Nakaya
+#
 0.05                 6513.5               0.   0.   100.00000000000004   57999.99999999999      0.
 0.1498               6411.4046            0.   0.   631.4749199999999    220075.19999999998     0.
 0.2496               6150.8456            0.   0.   1069.34576           401871.19999999995     0.
