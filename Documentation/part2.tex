@@ -113,7 +113,8 @@ $4\,\mathrm{GeV}$ to $50\,\mathrm{GeV}$.
 {\tt /* beam */}\\
 {\tt \$beam\_type = 1}\\
 {\tt \$target\_mass = 50}\\
-{\tt \$stored\_muons = 4.264e+21}\\
+{\tt \$time = 8}\\
+{\tt \$stored\_muons = 5.33e+20}\\
 {\tt \$numofbins = 20}\\
 {\tt \$emin = 4.0}\\
 {\tt \$emax = 50.0}
@@ -236,14 +237,62 @@ to simulate multiple source experiments like KamLAND. All neutrino
 sources usable within \GLOBES\ therefore can be specified by the
 flux spectra for each flavour and CP sign and the total luminosity
 of the source. There are two principal ways to provide a flux:
-use a built-in source or a file provided by the user. 
+use a built-in source or a file provided by the user. Built-in sources
+as well as user defined fluxes are referred to internally by the
+ {\tt \$beam\_type} variable. Certain values of  {\tt \$beam\_type} are
+pre-defined and used for the built-in fluxes, \eg\ {\tt \$beam\_type = 1}
+selects the neutrino factory flux.
 
 The built-in source is muon decay, since the neutrino
 spectra and flavour composition are known analytically in that case. For 
 this sources the energy of the parent particle has to be specified
-and the number of useful decays per year.
+and the number of useful decays per year. Thus the sequence for setting
+up a neutrino factory is
+\begin{quote}
+{\tt \$beam\_type = 1}\\
+{\tt \$parent\_energy = 50.0}\\
+{\tt \$stored\_muons = 5.33e+20}\\
+\end{quote}
+The values of {\tt \$parent\_energy} and {\tt emax} are always the same.
 
-In the latter case the fluxes are read from a file with seven rows and
+
+User defined fluxes are dealt with a little different at initialization
+and the value of {\tt \$beam\_type} is automatically assigned. This is
+necessary to avoid any problems with multiple experiments, since the fluxes
+are read only once. Reading a flux file looks like
+\begin{quote}
+{\tt flux(\#dummy)<}\\
+{\tt \hspace*{3ex}@flux\_file\_p = user\_file\_1.dat}\\
+{\tt \hspace*{3ex}@flux\_file\_m = user\_file\_2.dat}\\
+{\tt >}\\
+{\tt \$target\_power = 4.0 }
+\end{quote} 
+
+Since many sources have two modes of operation, it is possible to define
+a pair of fluxes by using the polarity flag when loading the files. Usually
+files connected in this way use the suffixes ``plus'' and ``minus'' in the 
+file names. The individual members of the pair can be accessed by the polarity
+variable. Also the built-in fluxes provide this choice.
+The flux read by {\tt @flux\_file\_p} can be accesed by selecting positive
+polarity, whereas the flux read by {\tt @flux\_file\_m} is selected by a 
+negative value of the polarity.
+
+
+
+For sources based on $\pi$-decay and nuclear reactors the total power
+involved defines how many neutrinos are produced therefore this variable is
+used to define the luminosity. Furthermore it is useful to define 
+the operation time of an experiment in years. Note however that the 
+number of events used in analysis only depends on the product of
+\begin{equation}
+\mathrm{mass}\,\left[10^6\,\mathrm{kg}\right]\times \mathrm{time}
+\,\left[\mathrm{years}\right]\times\left\{ \begin{array}{c}
+\mathrm{source~power}\,\left[\mathrm{MWy}\right]\\
+\mathrm{useful~decays}\,\left[\mathrm{year}^{-1}\right]
+\end{array}\right.\,.
+\end{equation}
+
+The format of the flux files is seven rows and
 501 lines.
 \begin{quotation}
 $ E\quad
@@ -265,26 +314,6 @@ particles per unit mass asf. which is not always straightforward. Thus a fudge
 factor will be useful in any case. Right now however this is not the only 
 fudge factor since for some experiments the definition of their target mass
 involves another fudge factor. 
-
-Since many sources have two modes of operation, it is possible to define
-a pair of fluxes by using the polarity flag when loading the files. Usually
-files connected in this way use the suffixes ``plus'' and ``minus'' in the 
-file names. The individual members of the pair can be accessed by the polarity
-variable. Also the built-in fluxes provide this choice.
-
-
-For sources based on $\pi$-decay and nuclear reactors the total power
-involved defines how many neutrinos are produced therefore this variable is
-used to define the luminosity. Furthermore it is useful to define 
-the operation time of an experiment in years. Note however that the 
-number of events used in analysis only depends on the product of
-\begin{equation}
-\mathrm{mass}\,\left[10^6\,\mathrm{kg}\right]\times \mathrm{time}
-\,\left[\mathrm{years}\right]\times\left\{ \begin{array}{c}
-\mathrm{source~power}\,\left[\mathrm{MWy}\right]\\
-\mathrm{useful~decays}\,\left[\mathrm{year}^{-1}\right]
-\end{array}\right.\,.
-\end{equation}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Oscillation properties}
 
@@ -297,6 +326,13 @@ of the path - the baseline\index{Baseline}
 \begin{equation}
 L\,\left[\mathrm{km}\right]
 \end{equation} 
+The baseline is set by 
+\begin{quote}
+{\tt \$baseline = 3000.0 }
+\end{quote}
+
+
+
 
 Furthermore there is
 the matter profile encountered along the baseline which can be set in
@@ -304,15 +340,30 @@ several ways. The simplest way is to use a constant density corresponding
 to the average density along the baseline calculated using the 
 PREM\cite{Stacey} onion shell model of the 
 Earth\index{PREM}\index{Earth matter density}.
+\begin{quote}
+TBD
+\end{quote}
+
 
 Another possibility is to use several layers of constant density each in 
 order to improve the approximation to the actual Earth matter profile. In this
 case the user specifies the total baseline and the number of layers. The
 time consumed in computing the oscillation probabilities is directly 
 proportional to the number of layers.
+\begin{quote}
+TBD
+\end{quote}
+
 
 The third possibility to specify the matter profile is to provide a list
 of thicknesses and densities for the layers. 
+\begin{quote}
+{\tt \$densitytab=\{ 2.8, 3.5\}}\\
+{\tt \$lengthtab=\{ 1000.0, 2000.0\}}\\
+\end{quote}
+It is important that both list are of equal length and that the sum
+of the thicknesses given in  {\tt \$lengthtab} add up to the value of
+{\tt \$baseline}.
 
 For any type of profile a central value $a$ and a corresponding error 
 $\delta a$ have to be specified\index{Density error}\index{Density center}.
@@ -329,7 +380,15 @@ value for $a$ is $1$ and a typical value for $\delta a = 0.05$.
 \section{Detection properties}
 
 The most obvious property of the neutrino detection is the total
-active mass of the target as already defined in section~\ref{sec:source}.
+active mass of the target as already defined in section~\ref{sec:source} and
+its value is defined by 
+\begin{quote}
+{\tt \$target\_mass = 50.0 }
+\end{quote}
+Furthermore the running time has to be specified by
+\begin{quote}
+{\tt \$time = 8.0 }
+\end{quote}
 
 \subsection{Cross section}
 \label{sec:cross_section}
@@ -357,6 +416,14 @@ where the logarithm of the energy values is evenly spaced.
 For accessing cross section at 
 arbitrary energies linear interpolation is used. Once the energy leaves the
 range of values given in the file $0.0$ is returned.
+
+A cross section file is read by 
+\begin{quote}
+{\tt flux(\#name)<}\\
+{\tt \hspace*{3ex}@cross\_file =user\_file\_1.dat}\\
+{\tt >}
+\end{quote}  
+and can later be refered to by {\tt \#name}.
 
 
 \subsection{Channels}
@@ -426,9 +493,6 @@ R_\beta^{\text{IT}}(E,E')\,\epsilon_\beta^{\text{IT}}(E')
 \,V_\beta(\hat{E}-E')\,, 
 \end{eqnarray}
 
-!!!!!!!!!!!!
-Do we need $\epsilon(E')$ ???
-!!!!!!!!!!!!
 
 Thus $R_\beta^{\text{IT}}(E,E')$ describes the energy response of 
 the detector, \ie\ a neutrino with a (true) energy of $E$ has a probability
@@ -439,6 +503,8 @@ in the program\index{Energy resolution}\index{Smear matrix}. The detailed
 definition and initialization of the energy resolution function is described
 in section~\ref{sec:energy}.
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Rules}
 \label{sec:rules}
 
@@ -674,14 +740,28 @@ R^c(E,E')\,
 \epsilon^c(E')\,.
 \end{eqnarray} 
 %
+
+Instead of using directly equation~\ref{eq:e_res} we will use a different
+definition concerning $\epsilon(E')$. In general  $\epsilon(E')$ has to be
+determined by means of a Monte Carlo simulation of the experiment. This
+usually involves anyhow a binning of the simulated events in the reconstructed
+energy $E'$, therefore one more easily can obtain  $\hat\epsilon_i$ defined
+by
+\begin{equation}
+\label{eq:post_smearing}
+\hat\epsilon_i \cdot \int_{E_i-\Delta E_i/2}^{E_i+\Delta E_i/2} dE' 
+\quad R^c(E,E')\,.
+\end{equation}
+These  $\hat\epsilon_i$ are refered to as so called 
+``post-smearing'' efficiencies.
+
 The integration with respect to the reconstructed energy $E'$ can be
 performed independently of the oscillation parameters and we define
 the bin kernel for the $i$th bin $K_i^c$
 \begin{equation}
 \label{eq:kernel}
 K_i^c(E):=\int_{E_i-\Delta E_i/2}^{E_i+\Delta E_i/2} dE' 
-\quad R^c(E,E')\,
-\epsilon^c(E')\,.
+\quad R^c(E,E')\,.
 \end{equation}
 With this definition equation~\ref{eq:events_bin} can be rewritten as
 \begin{equation}
