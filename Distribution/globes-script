@@ -5,7 +5,7 @@
 cd $PWD
 
 # Fixing library depencies
-l=`less source/libglobes.la|grep dependency_libs`
+l=`less source/libglb.la|grep dependency_libs`
 l2=${l#dependency_libs=\'}
 depenlib="${l2%\'} -lstdc++" 
 

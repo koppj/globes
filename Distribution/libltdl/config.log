@@ -591,7 +591,7 @@ configure:20033: checking whether libtool supports -dlopen/-dlpreopen
 configure:20045: result: yes
 configure:20064: checking for shl_load
 configure:20121: gcc -o conftest -g -O2   conftest.c  >&5
-/tmp/ccw4w8IJ.o: In function `main':
+/tmp/ccjGvzkm.o: In function `main':
 /home/phuber/Desktop/GLOBES/Distribution/libltdl/conftest.c:66: undefined reference to `shl_load'
 /home/phuber/Desktop/GLOBES/Distribution/libltdl/conftest.c:66: undefined reference to `shl_load'
 collect2: ld returned 1 exit status
