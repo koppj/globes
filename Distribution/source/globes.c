@@ -464,6 +464,9 @@ int main(int argc, char *argv[])
   s=glbInitExperiment(arguments.args[0],&glb_experiment_list[0],
 		      &glb_num_of_exps);
 
+  
+
+
   /* Testing for failure */
   if(s<-1) {fprintf(stderr,"%s: FATAL: Unrecoverable parse error\n",
 		    argv[0]);exit(1);}

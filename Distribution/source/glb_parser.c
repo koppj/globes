@@ -2687,7 +2687,7 @@ int glbInitExperiment(char *inf,glb_exp *in, int *counter)
    * I think however that understand the problem.
    */
   fscanf(input,"%8c",&tct);
-  if(strncmp(tch,tct,8)!=0) {glb_warning("Not a GLoBES file!"); return 1;}
+  if(strncmp(tch,tct,8)!=0) {glb_error("Not a GLoBES file!"); return -2;}
   glb_fclose(input);
   yyin=glb_fopen(inf,"r");
   if(yyin==NULL) return -2;
@@ -2707,6 +2707,7 @@ int glbInitExperiment(char *inf,glb_exp *in, int *counter)
       k=+glbDefaultExp(ins[*counter+i]);
     }
   (*counter)= (*counter) + exp_count;
+
 
   if(k!=0) return -1;
   

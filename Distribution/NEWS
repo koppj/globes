@@ -474,3 +474,5 @@
 	
 	Added a REFERENCES file, the idea is to collect all bibliographical
 	information about *our* glb-files in one place.
+
+20/07/04 The contents of `data' will be installed to $(prefix)/share/globes/

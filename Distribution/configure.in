@@ -152,4 +152,5 @@ else
  echo "****************************************************"
 fi
 
-AC_OUTPUT(Makefile source/Makefile nrc/Makefile examples/Makefile)
+AC_OUTPUT([Makefile source/Makefile nrc/Makefile examples/Makefile\
+ data/Makefile test/Makefile])
