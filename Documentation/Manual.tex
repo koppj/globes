@@ -16,6 +16,10 @@
 \usepackage{fancyheadings}
 \usepackage[footnotesize,bf]{caption}
 \usepackage{makeidx}
+%Preparations for multiple indices
+\usepackage{multind}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \usepackage{ae,aecompl} % only for Type 1 fonts for readable pdf convert
 
 \newcommand{\capdef}{}
@@ -28,7 +32,12 @@
 \makeatother
 
 % Index: use "makeindex Manual" to create .ind file
-\makeindex
+%\makeindex
+
+\makeindex{norm}
+\makeindex{constants}
+\makeindex{api}
+\makeindex{aedl}
 
 \newcommand{\bi}{\begin{itemize}}
 \newcommand{\ei}{\end{itemize}}
@@ -89,9 +98,15 @@
 
 % Set as GLoBES command and add to index:
 % Always use GLB when mentioning a command in text!
-\newcommand{\GLB}[1]{{\tt #1}\index{{\tt  "#1}}}
+\newcommand{\GLB}[1]{{\tt glb#1}\index{api}{#1@{\tt #1}}}
 % Always use GLBNS when adding a command to the index without showing it!
-\newcommand{\GLBNS}[1]{\index{{\tt #1}}}
+\newcommand{\GLBNS}[1]{\index{api}{#1@{\tt #1}}}
+
+% Set as GLoBES command and add to index:
+% Always use GLB when mentioning a command in text!
+\newcommand{\GLBC}[1]{{\tt #1}\index{constants}{{\tt  #1}}}
+% Always use GLBNS when adding a command to the index without showing it!
+\newcommand{\GLBNSC}[1]{\index{constants}{{\tt #1}}}
 \newcommand{\gq}[1]{\begin{quote} {\tt #1} \end{quote}}
 \newcommand{\go}[1]{$\rightarrow$ Output: \begin{quote} {\sf #1} \end{quote}}
 
@@ -229,6 +244,19 @@ Version from \today
 
 \clearpage
 \thispagestyle{empty}
+\bigskip
+\begin{quote}
+    Copyright \copyright  2004  The GLoBES Team.
+    Permission is granted to copy, distribute and/or modify this document
+    under the terms of the GNU Free Documentation License, Version 1.2
+    or any later version published by the Free Software Foundation;
+    with no Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
+    A copy of the license is included in the section entitled "GNU
+    Free Documentation License".
+\end{quote}
+\bigskip
+    
+
 
 \cleardoublepage
 \setcounter{page}{1}
@@ -403,6 +431,9 @@ to reproduce the event rates of a specific experiment.
 
 % Index:
 
-\printindex
+\printindex{api}{API functions}
+\printindex{constants}{API constants \& macros}
+\printindex{aedl}{AEDL reference}
+\printindex{norm}{Index}
 
 \end{document}
