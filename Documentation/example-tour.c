@@ -34,8 +34,8 @@
 
 int main(int argc, char *argv[])
 { 
-  char* MYFILE="";
-  /* char* MYFILE="gl-tour.dat"; /* if empty, write to screen */
+  /* char* MYFILE=""; */
+  char* MYFILE="gl-tour.dat"; /* if empty, write to screen */
   FILE* stream;
   
   if(strlen(MYFILE)>0) stream=fopen(MYFILE, "w");
@@ -160,15 +160,13 @@ int main(int argc, char *argv[])
   glbInitExperiment("NuFact.glb",&glb_experiment_list[0],&glb_num_of_exps); 
    
   /* Change baseline of second experiment to magic baseline */  
-  double* lengths = NULL;   /* Profile get-functions initialize memory space if NULL */
-  double* densities = NULL;
+  double* lengths; 
+  double* densities;
   glbAverageDensityProfile(7500,&lengths,&densities);
   fprintf(stream,"Magic baseline length: %g, Density: %g\n\n",lengths[0],densities[0]); 
-  glbSetBaselineInExperiment(1,7500); 
-  /* Later after bugfix - make also sure that profile type is correct : */
-  /*glbSetProfileDataInExperiment(1,1,lengths,densities);*/
-  free(lengths);lengths=NULL; 
-  free(densities);densities=NULL;
+  glbSetProfileDataInExperiment(1,1,lengths,densities);
+  free(lengths);
+  free(densities);
  
 	/* Initialize a number of parameter vector(s) again */
   true_values = glbAllocParams();
