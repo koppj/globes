@@ -17,7 +17,8 @@ glb_profile.h
 
 # libglobes_la_LIBADD =  
 libglobes_la_LDFLAGS =  @LIBS@ -version-info @GLBLIBVERSION@
-
+libglobes_la_CFLAGS= $(AM_CFLAGS)
+libglobes_la_CXXFLAGS= $(AM_CFLAGS)
 
 
 pkginclude_HEADERS = ../globes/globes.h
@@ -29,5 +30,6 @@ glb_version.c \
 glb_rate_engine.c glb_parser.y glb_fluxes.c glb_smear.c glb_lexer.l glb_probability.cc glb_profile.c\
  user_chi.c \
 glb_wrapper.c globes.c 
-
+globes_CXXFLAGS= $(AM_CFLAGS)
+globes_CFLAGS= $(AM_CFLAGS)
 globes_LDADD = @LIBS@ 

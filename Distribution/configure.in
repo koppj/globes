@@ -21,13 +21,19 @@ dnl Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 dnl
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT(source/globes.c)
+AC_PREREQ(2.57)
 
 dnl Versioning of GLoBES
 dnl last digit: increment whenever code has changed
 dnl middle digit: increment when features have been introduced/removed
 dnl first digit: major improvements/rewrites
-AM_INIT_AUTOMAKE(globes,2.1.0)
+dnl In contrast to the result of autoupdate I had to swap the
+dnl the AC_INIT and AC_CONFIG_SRCDIR
+AC_INIT([globes],[2.1.0])
+AC_CONFIG_SRCDIR([source/globes.c])
+
+dnl Tellin autoconf we are going to use automake
+AM_INIT_AUTOMAKE
 
 dnl To avoid problems due to clock skew and/or lacking autotools on
 dnl user system
@@ -68,8 +74,8 @@ AC_PROG_CPP
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_YACC
-AM_PROG_LEX
-AM_PROG_LIBTOOL
+AC_PROG_LEX
+AC_PROG_LIBTOOL
 
 dnl Checks for libraries.
 AC_CHECK_LIB(m,main,[],AC_MSG_ERROR([libm not found]))
@@ -81,12 +87,11 @@ AC_CHECK_LIB(f2c,main,[],[
 globes_temp_lib="$LIBS"
 LIBS="-lf2c $LIBS"
 AC_CACHE_CHECK([for libf2c on SUSE],globes_cv_libf2c,
-[AC_TRY_LINK([int MAIN__;],[
+[AC_LINK_IFELSE([AC_LANG_PROGRAM([[int MAIN__;]], [[
 int main (void) 
 { 
  exit(0);
-}],
-globes_cv_libf2c="yes",globes_cv_libf2c="no",globes_cv_libf2c="no")
+}]])],[globes_cv_libf2c="yes"],[globes_cv_libf2c="no"])
 ])
 if test $globes_cv_libf2c = yes; then
  AC_DEFINE(HAVE_LIBF2C)
@@ -100,12 +105,11 @@ AC_CHECK_LIB(blas,main,[],[
 globes_temp_lib="$LIBS"
 LIBS="-lblas $LIBS"
 AC_CACHE_CHECK([blas on SUSE],globes_cv_libblas,
-[AC_TRY_LINK([int MAIN__;],[
+[AC_LINK_IFELSE([AC_LANG_PROGRAM([[int MAIN__;]], [[
 int main (void) 
 { 
  exit(0);
-}],
-globes_cv_libblas="yes",globes_cv_libblas="no",globes_cv_libblas="no")
+}]])],[globes_cv_libblas="yes"],[globes_cv_libblas="no"])
 ])
 if test $globes_cv_libblas = yes; then
  AC_DEFINE(HAVE_LIBBLAS)
@@ -119,12 +123,11 @@ AC_CHECK_LIB(lapack,main,[],[
 globes_temp_lib="$LIBS"
 LIBS="-llapack $LIBS"
 AC_CACHE_CHECK([lapack on SUSE],globes_cv_liblapack,
-[AC_TRY_LINK([int MAIN__;],[
+[AC_LINK_IFELSE([AC_LANG_PROGRAM([[int MAIN__;]], [[
 int main (void) 
 { 
  exit(0);
-}],
-globes_cv_liblapack="yes",globes_cv_liblapack="no",globes_cv_liblapack="no")
+}]])],[globes_cv_liblapack="yes"],[globes_cv_liblapack="no"])
 ])
 if test $globes_cv_liblapack = yes; then
  AC_DEFINE(HAVE_LIBLAPACK)
@@ -167,5 +170,6 @@ else
  echo "***********************${stars}********************"
 fi
 
-AC_OUTPUT([Makefile source/Makefile examples/Makefile\
+AC_CONFIG_FILES([Makefile source/Makefile examples/Makefile\
  data/Makefile])
+AC_OUTPUT
