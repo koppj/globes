@@ -7,6 +7,7 @@
 
 \chapter{A \GLOBES\ tour}
 \label{chapter:tour}
+\index{GLoBES tour}
 
 In this first chapter, we show a \GLOBES\ tour illustrating the
 main features of \GLOBES . The complete example  
@@ -404,6 +405,7 @@ Finally, we have to destroy the parameter vectors again:
 \chapter{\GLOBES\ basics}
 \label{chapt:gettingstarted}
 
+\index{Installation}
 In this first chapter of the user's manual, we assume that the \GLOBES\ software is readily installed on your computer system. For the installation,
 see \App~\ref{app:installation} and the {\tt INSTALL} file in the
 software package. We demonstrate how to load pre-defined experiments 
@@ -411,7 +413,7 @@ and introduce the basic concepts of \GLOBES . We do not go
 into details of the programming language, which means that standard parts
 of the program code common to all of the examples in the following chapters are, in general, omitted.
 An example of a minimal \GLOBES\ program in C can be found on page~\pageref{ex:c}. Furthermore, the files of the examples in this part can be found in the {\tt Example} subdirectory of your \GLOBES\ distribution. \index{Examples} Since it depends on your installed
-configuration, we refer to the {\tt README} file in the \GLOBES\ main directory, and the comments in the Makefile of the {\tt Example} subdirectory for how to complile the example files. Make sure that
+configuration, we refer to the {\tt README} file in the \GLOBES\ main directory, and the comments in the Makefile of the {\tt Example} subdirectory for how to compile the example files. Make sure that
 the data files (\AEDL\ and supporting files) in the {\tt data} 
 subdirectory can be found by the
 examples. In case of doubt, you can simply copy the necessary files
@@ -425,7 +427,8 @@ respective references in the table.
 
 \example{Using \GLOBES\ with C}{\label{ex:c}
 \index{C-Code}
-Here comes the C-code sceleton, which is
+\index{Program}
+Here comes the C-code skeleton, which is
 (more or less) common to all of our \GLOBES\ examples:
 \begin{quote}
 {\tt {\footnotesize
@@ -519,16 +522,19 @@ $P_{\mathrm{Tg}} \simeq  4 \, \mathrm{MW}$ & \cite{Huber:2002mx} \\[0.1cm]
 \hline
 \end{tabular}
 \end{center}
-\mycaption{\label{tab:experiments} \index{Experiment data files (table)} Pre-defined experiment prototypes, their filenames (to be used in \GLB{glbInitExperiment}), their short descriptions, and the references in which they are originally used and discussed (except from minor modifications, such as a
+\mycaption{\label{tab:experiments} \index{Experiment files (table)}
+\index{{\tt glb}-files} 
+Pre-defined experiment prototypes, their filenames (to be used in \GLB{glbInitExperiment}), their short descriptions, and the references in which they are originally used and discussed (except from minor modifications, such as a
 different implementation of the energy threshold function). Note that
 some of these experiments are outdated in terms of integrated luminosities,
 baseline, fluxes, efficiencies, or other factors.}
 \end{table}
 
 \section{Initialization of \GLOBES}
+\index{Initialization}
 
 Before one can use \GLOBES , one has to initialize the \GLOBES\
-library \GLB{libglobes}:
+library \GLB{libglobes}: \index{Initialization: \GLOBES\ library}
 \begin{function}
 \index{Initialization of {\tt libglobes}}
 \GLBNS{glbInit} {\tt void glbInit(char *name)} initializes the library {\tt libglobes} and has
@@ -555,13 +561,15 @@ the global variable {\tt glb\_num\_of\_exps} must not be modified by the
 user.} In addition, using the parameter value \GLB{GLB\_ALL} as
 experiment number initiates a combined analysis of all loaded experiments.
  
+\index{Experiment list}
+\index{Initialization: Experiments}
 For storing the experiments, \GLOBES\ uses the initially empty list of experiments \GLB{glb\_experiment\_list}. To add a pre-defined experiment to this list, one can use the function {\tt glbInitExperiment}:
 \begin{function}
 \index{Experiment initialization}
 \GLBNS{glbInitExperiment}
 {\tt int glbInitExperiment(char *inf, glb\_exp *in, int *counter)}
  adds a single experiment with the filename {\tt inf} to the list of currently loaded experiments. The {\tt counter} is a pointer to the 
- variable containg the number of experiments, and the experiment {\tt in}
+ variable containing the number of experiments, and the experiment {\tt in}
  points to the beginning of the experiment list. The function returns
  zero if it was successful. 
 \end{function}
@@ -574,8 +582,10 @@ experiment then has the number {\tt glb\_num\_of\_exps}-1. The elements
 of the experiment list have the type \GLB{glb\_exp}, which the
 user will not need to access directly in most cases. The experiment definition files, which usually end with {\tt .glb}, and any
 supporting files, are first of all searched in the current directory, and then in the global path variable \GLB{GLB\_PATH} set in your environment.
-A list of pre-defined experiment prototypes, their filenames, their short descriptions, and the references of their definitions can be found in \tabl{experiments}. If the program cannot find these files, or some of them are syntactially not correct, it will break at this place. 
+A list of pre-defined experiment prototypes, their filenames, their short descriptions, and the references of their definitions can be found in \tabl{experiments}. If the program cannot find these files, or some of them are syntactically not correct, it will break at this place. 
 
+\index{Clear experiment list}
+\index{Delete experiments}
 One can also remove all experiments from the evaluation list at running
  time:
 \begin{function}
@@ -595,7 +605,7 @@ Quantities & Examples & Units \\
 \hline
 Angles & $\theta_{13}$, $\theta_{12}$, $\theta_{23}$, $\deltacp$ & Radians  \\
 Mass squared differences & $\sdm$, $\ldm$ & $\mathrm{eV}^2$ \\
-Matter densitities & $\rho_i$ & $\mathrm{g}/\mathrm{cm}^3$ \\
+Matter densities & $\rho_i$ & $\mathrm{g}/\mathrm{cm}^3$ \\
 Baseline lengths & $L_i$ & $\mathrm{km}$ \\
 Energies & $E_\nu$ & $\mathrm{GeV}$ \\  
 Fiducial masses & $m_{\mathrm{Det}}$ & $\mathrm{t}$ (reactor exp.) or $\mathrm{kt}$ (accelerator exp.), \newline  depends on experiment definition \\
@@ -608,12 +618,14 @@ depends on flux definition
 Cross sections/E & $\sigma_{\mathrm{CC}}/E$ & $10^{-38} \, \mathrm{cm^2}/\mathrm{GeV^2}$ \\
 \hline
 \end{tabular}
-\mycaption{\label{tab:units} \index{Units in \GLOBES } Quantities used in \GLOBES , examples of these quantities, and their standard units in the application software.}
+\mycaption{\label{tab:units} \index{Units in \GLOBES\ (table)} Quantities used in \GLOBES , examples of these quantities, and their standard units in the application software.}
 \end{center}
 \end{table}
 
 \section{Units in \GLOBES\ and the integrated luminosity}
 \label{sec:luminosity}
+\index{Integrated luminosity}
+\index{Detector mass} \index{Source power} \index{Running time}
 
 While interacting with the user interface of \GLOBES , parameters are transferred to and from the \GLOBES\ library. In \GLOBES , one set of units 
 for each type of quantity is used in order to avoid confusion about the definition of individual parameters. \tabl{units} summarizes the units of the most important quantities. In principle, the event rates are
@@ -627,10 +639,10 @@ proportional to the product of source power $\times$ target mass $\times$
  experiment runs $100\%$ of the year. Thus, for shorter running periods,
  the running times need to be renormalized. Source powers are
  usually useful parent particle decays per year (neutrino factories,
- $\beta$-beams), target power in megawatts (superbeams), or thermal
- reactor power in gigawatts (reactor experiments).
+ $\beta$-beams), target power in mega watts (superbeams), or thermal
+ reactor power in giga watts (reactor experiments).
 %
-Since the pre-defined experiments in \tabl{experiments} are given for specfific luminosities, it is useful to read out and change these
+Since the pre-defined experiments in \tabl{experiments} are given for specific luminosities, it is useful to read out and change these
  parameters of the individual experiments:
 \begin{function}
 \GLBNS{glbSetSourcePower}
@@ -672,6 +684,7 @@ together with the neutrino flux, whereas the target mass scales the whole
 experiment.
 
 \section{Handling oscillation parameter vectors}
+\index{Oscillation parameter vectors}
 
 Before we can set the simulated event rates or access any oscillation
 parameters, we need to become familiar with the concept \GLOBES\ uses
@@ -695,7 +708,8 @@ to include matter density uncertainties,
 the minimizers also use fit values and external errors for the matter
 densities of all loaded experiments. More precisely, the matter density
 profile of each experiment $i$ is multiplied by a scaling factor
-$\hat{\rho_i}$, \index{Matter density scaling factor} 
+$\hat{\rho_i}$, \index{Matter density scaling factor}
+\index{Matter density profile} 
 which is stored in the density information of {\tt glb\_params}. 
 Each of
 these scaling factors has $1.0$ as pre-defined value. Since it
@@ -782,9 +796,9 @@ the density parameters of all experiments will be set accordingly.
 {\tt double glbGetDensityParams(glb\_params in, int which)}
 returns the value of the density parameter {\tt which} in the 
 structure {\tt in}.
-\end{function}
+\end{function} 
 \begin{function}
-\GLBNS{glbSetIteration}
+\GLBNS{glbSetIteration} \index{Iterations}
 {\tt glb\_params glbSetIteration(glb\_params in, int iter)} sets the number of iterations in the structure {\tt in}
 to the value {\tt iter}. If the assignment was unsuccessful, the 
 function returns {\tt NULL}.
@@ -796,7 +810,7 @@ returns the value of the number of iterations in the
 structure {\tt in}.
 \end{function}
 In total, the parameter vector handling in a program normally has the
-following order:
+following order:\index{Parameter vector handling}
 \begin{quote}
 {\tt
 glbInitExperiment(...); \\
@@ -815,6 +829,8 @@ glbFreeParams(vector1); \\
 \end{quote}
 
 \section{Computing the simulated data}
+\index{True values} \index{Simulated data} \index{Reference rate vector}
+\index{Set oscillation parameters}
 
 Compared to existing experiments, which use real data, future experiments
 uses simulated data. Thus, the {\em true parameter values} and their results in form of the reference event rate vectors are simulated. After setting the true parameter values, the {\em fit parameter values} can be varied in order to obtain information on the measurement performance for the given set of true parameter values. Therefore, it is often useful to show the results of a future measurement as function of the true parameter values for which the reference rate vectors are computed -- at least within the currently allowed ranges. The true parameter values for the vacuum neutrino oscillation parameters have to be set by the functions \GLB{glbSetOscillationParameters} and \GLB{glbSetRates} {\em before} any evaluation function is used and {\em after} the experiments have been initialized and the experiment parameters have been adjusted which could change the rates (such as baseline or target mass). This means that
@@ -845,7 +861,7 @@ Page~\pageref{ex:c}.
 In order to keep track of the used version of \GLOBES , the software
 provides a number of functions to check the \GLOBES\ and experiment
 versions. It is up to the user to implement mechanisms into the
-program and \AEDL\ files to check wether
+program and \AEDL\ files to check whether
 \begin{itemize}
 \item
  The program should only run with this specific version of \GLOBES
@@ -890,8 +906,8 @@ user.
 \end{function}
 
 \chapter[Calculating $\chi^2$ with systematics only]{Calculating $\boldsymbol{\chi^2}$ with systematics only}
+\index{Systematics $\chi^2$}
 
-\index{Systematics}
 Calculating a $\chi^2$-value with or without systematics, but no correlations and degeneracies, is the simplest and fastest possibility to obtain high-level information on an experiment. In general, \GLOBES\ uses the six independent oscillation parameters $\theta_{12}$, $\theta_{13}$, $\theta_{23}$, $\deltacp$, $\sdm$, $\ldm$, as well as the matter density 
 scaling factor $\hat{\rho}$ of each experiment.\index{Matter density
 scaling factor} Thus, there are six plus the number of experiments parameters determining the rate vectors. Using the matter density scaling factors  in addition to the oscillation parameters will allow the simulation of the correlations with matter density uncertainties: In this
@@ -899,11 +915,12 @@ approach, the matter density profile normalization $\hat{\rho}$ can
 be treated
 as parameter to be measured by the experiment, where an external precision
 given by observations is imposed (typically up to $5\%$). 
+\index{Matter density uncertainty}
  For this section, it is important to keep in mind
 that there are more parameters than just the oscillation parameters
 determining the simple $\chi^2$. However, as we have described in the
 last section, the mechanism for the matter density scaling factors
-is hidden in the defintion of \GLB{glb\_params}: Each of the scaling
+is hidden in the definition of \GLB{glb\_params}: Each of the scaling
 factors is initially set to $1.0$. Therefore, for the calculation of
 $\chi^2$ with systematics only, we do not have to care about the
 matter density scaling factors.
@@ -960,10 +977,10 @@ experiments or rules, use \GLB{GLB\_ALL} as parameter value.
 \end{function}
 Note that the result of {\tt glbChiSys} for all experiments or rules
 corresponds to the sum of all of the individual {\tt glbChiSys} calls. 
-This equality will not hold for the minimizors in the next sections anymore. 
+This equality will not hold for the minimizers in the next sections anymore. 
  An example how to use  {\tt glbChiSys} can be found on page~\pageref{ex:corrth13dcp}.  
 
-\index{Systematics}
+\index{Systematics} \index{Pull method}
 The treatment of systematics in \GLOBES\ is performed by the so-call
 {\em pull method} with the help of auxiliary systematics parameters.
 They are taken completely uncorrelated among different rules, and treated with simple Gaussian statistics. In general, a rule is a set 
@@ -981,7 +998,7 @@ In order to implement an overall signal normalization error $\sigma_{n_s}$,  the
 \be
  \hat{\chi^2} = \underset{n_s}{\mathrm{min}} \left(  \chi^2(n_s, \hdots) + \frac{(n_s)^2}{\sigma_{n_s}^2} \right).
 \ee 
-This minimization is done independently for all auxiliary parameters of the rule. The total $\chi^2$ for the considered experiment is finally obtained by repreating this procedure for all rules and adding their $\chi^2$-values. In general, the situation is more complicated because of the usage of many systematical errors. More details about systematics parameters and the definition of signal, background, and oscillation channels can be found in \Sec~\ref{sec:rules}, too.
+This minimization is done independently for all auxiliary parameters of the rule. The total $\chi^2$ for the considered experiment is finally obtained by repeating this procedure for all rules and adding their $\chi^2$-values. In general, the situation is more complicated because of the usage of many systematical errors. More details about systematics parameters and the definition of signal, background, and oscillation channels can be found in \Sec~\ref{sec:rules}, too.
 
 The systematics minimization of an experiment can be easily switched on and off with \GLB{glbSwitchSystematics}, \ie, one can also compute the $\chi^2$ with statistics only. In addition, several options for 
 systematics are available, such as only using total event rates without
@@ -989,6 +1006,7 @@ spectral information. For details, we refer to \Chapt~\ref{chapt:running}.
 
 \chapter[Calculating $\chi^2$-projections: how one can include correlations]{Calculating $\boldsymbol{\chi^2}$-projections: how one can include correlations}
 \label{chapt:correlations}
+\index{Correlations $\chi^2$}
 
 \index{Multi-parameter correlation}
 This chapter deals with the rather complicated issue of $n$-parameter correlations. It is one of the greatest strengths of this software 
@@ -1002,15 +1020,15 @@ region in this plane with all the other parameter correlations included.
 In practice, this projection is very difficult: a grid-based method would need $(N_{\mathrm{grid}})^n$ function calls of {\tt glbChiSys} to calculate the precision including the full $n$-parameter correlation, where $N_{\mathrm{grid}}$ is the number of points in each direction of the lattice. For example, taking only $N_{\mathrm{grid}}=20$ and $n=7$ (six oscillation parameters and matter density) would mean more than one billion function calls of {\tt glbChiSys}. One can easily image that this is too much for any sophisticated application.
 
 \index{Minimizer}
-The solution to this problem is using a local $n$-dimensional (local) minimizer for the procection instead of a grid-based method, where we will
+The solution to this problem is using a local $n$-dimensional (local) minimizer for the projection instead of a grid-based method, where we will
 illustrate this minimization process later. It turns out
 that such a minimizer can include a full $6$-parameter correlation with of the order of $1\, 000$ function calls of {\tt glbChiSys}. It is a standard method which can be found in every good book for numerical calculation routines. Thus, for each point on the projection axis/plane, one can obtain a result within about $10$ to $30$ seconds on a modern computer, which means that the complete measurement precision for one fixed true parameter set can be obtained in as much as $10$ to $15$ minutes. One can easily imagine that such a minimizer makes more sophisticated applications possible with the help of overnight calculations, such as showing the dependencies on the true parameter values.
 
-This approach also has one major disadvantage: One can not simply program a robust grid-based code and let it run, since using a local minimizer always means that one may end up in an unwanted local minimum and not in the investigated global one. Thus, one has to use some (analytical or numerical) knowledge on the topology of the fit manifold and start the local minimizer close enough to the investigated solution. Fortunately, this can be done quite straightfoward in most cases, since the structure of the neutrino oscillation formulas does not cause very complicated topologies of the fit manifolds. Especially the simulation of reactor experiments and conventional beams or superbeams is rather simple with purely numerical
+This approach also has one major disadvantage: One can not simply program a robust grid-based code and let it run, since using a local minimizer always means that one may end up in an unwanted local minimum and not in the investigated global one. Thus, one has to use some (analytical or numerical) knowledge on the topology of the fit manifold and start the local minimizer close enough to the investigated solution. Fortunately, this can be done quite straightforward in most cases, since the structure of the neutrino oscillation formulas does not cause very complicated topologies of the fit manifolds. Especially the simulation of reactor experiments and conventional beams or superbeams is rather simple with purely numerical
 approaches. Neutrino factories have, especially for small values of
 $\theta_{13}$, a much more complicated topology. In this case, results
 of the many analytical discussions of this issue can be used. This means
- that one can implicitely use the analytical knowledge to obtain better predictions for the measurement performances, since the minimizer has
+ that one can implicitly use the analytical knowledge to obtain better predictions for the measurement performances, since the minimizer has
  to be started only close enough to the exact solution by an ``educated
  guess''. One can easily imagine that the used methods then also depend
  on the region of the parameter space. In this manual, we only use
@@ -1037,23 +1055,23 @@ In many cases, the fit manifold is restricted by the knowledge from earlier expe
 
 \index{External input}
 It is one of the strengths of the \GLOBES\ software to use external input in order to reduce the fit manifold with the knowledge from external
-(eariler) measurements. The treatment of external input is done by the addition of Gaussian so-called {\em priors} to the systematics-minimized $\chi^2$-function. For example, for the matter density, one obtains as the final projected $\chi^2_F$ after minimzation over the matter density
+(earlier) measurements. The treatment of external input is done by the addition of Gaussian so-called {\em priors} to the systematics-minimized $\chi^2$-function. For example, for the matter density, one obtains as the final projected $\chi^2_F$ after minimization over the matter density
 scaling factor \index{Matter density scaling factor} $\hat{\rho}$
 \be
  \chi^2_F = \underset{\rho}{\mathrm{min}} \left( \chi^2(\hat{\rho}) + \frac{(\hat{\rho} - \hat{\rho}^0)^2}{\sigma_{\hat{\rho}}^2} \right).
 \label{equ:priors}
 \ee
 This example is a very simple one, since in fact the
-minimzation is simultaneously performed over all priors and free oscillation parameters. In \equ{priors}, $\hat{\rho}^0$ is the {\em starting value} of the prior, and $\sigma_{\hat{\rho}}$ the $1 \sigma$ absolute (half width) {\em input error}. Thus, it is assumed that an external measurement has determined the matter density with a precision (input error) $\sigma_{\hat{\rho}}$ at the central value $\hat{\rho}^0$. Usually, the starting value is fixed at the best-fit value, and the input error to the $1 \sigma$ half width of the external measurement. For the matter density, $\hat{\rho}^0$  is usually set to $1.0$ corresponding to
+minimization is simultaneously performed over all priors and free oscillation parameters. In \equ{priors}, $\hat{\rho}^0$ is the {\em starting value} of the prior, and $\sigma_{\hat{\rho}}$ the $1 \sigma$ absolute (half width) {\em input error}. Thus, it is assumed that an external measurement has determined the matter density with a precision (input error) $\sigma_{\hat{\rho}}$ at the central value $\hat{\rho}^0$. Usually, the starting value is fixed at the best-fit value, and the input error to the $1 \sigma$ half width of the external measurement. For the matter density, $\hat{\rho}^0$  is usually set to $1.0$ corresponding to
 the actual matter density profile such as given by the experiment
  definition file, and $\sigma_{\hat{\rho}}$ to the 
 relative matter density uncertainty (\eg, $0.05$ for 5\% uncertainty).
 
 In principle, one can set the priors for the matter density and all oscillation parameters. For example, if the disappearance channels of the experiment determine the leading oscillation parameters with unprecedented
 precisions, one can omit the respective input errors. In \GLOBES , a
-value of $0$ correponds to neglecting the prior. If, however, earlier external measurements provide better information, one can set their absolute precisions with the input errors. The starting values are usually chosen to be the best-fit values of this external input, such as
+value of $0$ corresponds to neglecting the prior. If, however, earlier external measurements provide better information, one can set their absolute precisions with the input errors. The starting values are usually chosen to be the best-fit values of this external input, such as
 for the precisions of the solar experiments. In some cases, it may be
-necessary to adjust them, such as for artificial contraints to the
+necessary to adjust them, such as for artificial constraints to the
 oscillation parameters. In other cases, minor modifications of the starting values can cause a faster convergence of the algorithm.
 For example, for the investigation of the
 opposite-sign solution, one can use the prior to constrain $\ldm$
@@ -1061,6 +1079,7 @@ in order to force the minimizer not to  fall into the (unwanted) best-fit soluti
 to converge into the unwanted best-fit solution. However, note that one should in this case check that the actually determined value for $\ldm$ after minimization is close enough to the guessed values $-\ldm$ in order to avoid significant artifical contributions of the priors to the 
 final $\chi^2$.
 
+\index{Input errors} \index{Starting values}
 In order to set the starting values and input errors, two function have to
  be called {\em before the usage of any minimizer}:
 \begin{function}
@@ -1071,7 +1090,7 @@ In order to set the starting values and input errors, two function have to
 \GLBNS{glbSetInputErrors}
 {\tt int glbSetInputErrors(const glb\_params in)}
  sets the input errors for all of the following minimizer calls to {\tt in}.
- An input error of $0$ correponds to not taking into account the
+ An input error of $0$ corresponds to not taking into account the
  respective prior.
 \end{function}
 Accordingly, there are functions to return the actually set starting values
@@ -1089,6 +1108,7 @@ set starting values to {\tt out}.
 All functions take or return as many matter density parameters as there are initialized experiments. In addition, they return $-1$ if the operation
 was not successful.
 
+\index{External precision}
 Eventually, a typical initialization of the external input with
 $10\%$ external precisions for the solar parameters\footnote{In fact, accelerator-based long-baseline experiments are primarily sensitive to the product $\sin 2 \theta_{12} \cdot \sdm$, which means that these errors effectively add up to an error of this product of about $15\%$.}, 
 and $5\%$ matter density uncertainties for all experiments looks like this:
@@ -1104,6 +1124,8 @@ In this example, the starting values are set to the best-fit (simulated) values.
 all $1.0$, which means that they do not need to be adjusted for the
 starting values.
 
+\index{Priors}
+\index{Advanced tricks}
 Though the priors are an elegant way to treat external input, there are also some complications with priors. The following hints are for the
 more advanced \GLOBES\ user:
 \begin{enumerate}
@@ -1111,7 +1133,7 @@ more advanced \GLOBES\ user:
  The priors are only added once to the final $\chi^2$, no matter how
  many experiments there are simulated. This is already one reason
  (besides the minimization) why the sum of all projected $\chi^2$'s of 
- the indivual experiments 
+ the individual experiments 
  cannot correspond to the $\chi^2$ of the combination of all experiments.
 \item
  Priors are not used for parameters which are not minimized over, \ie, 
@@ -1201,6 +1223,7 @@ The two lists of data then represent the $\stheta$ precisions with two-parameter
 
 The projection onto the $\stheta$- (or $\deltacp$-) axis is performed by fixing $\stheta$ (or $\deltacp$) and minimizing the $\chi^2$-function over all free fit parameters and the matter densities. We illustrate this method at the example of the projection of the two-dimensional manifold in the $\stheta$-$\deltacp$-plane onto the $\stheta$-axis in \figu{projex}. In this figure, the left-hand plot shows the correlation in the $\stheta$-$\deltacp$-plane computed with {\tt glbChiSys}. The right-hand plot illustrates the projection of this two-dimensional manifold onto the $\stheta$ axis by minimizing $\chi^2$ over $\deltacp$. In this simple example, the minimization is done along the vertical gray lines in the left hand plot. The obtained minima are located on the thick gray curve, which means the the right-hand plot represents the $\chi^2$-value along this curve. In fact, one can easily see that one obtains the correct projected $3 \sigma$ errors in this example (\cf, arrows). This figure illustrates the projection of a two-parameter correlation. In general, the full $n$-parameter correlation is treated similarly by the simultaneous (local) minimization over all free fit parameters. 
 
+\index{Minimizer}
 The following functions are some of the simplest minimizers 
 provided by \GLOBES :
 \begin{function}
@@ -1229,7 +1252,7 @@ The position of the minimum is then returned in {\tt out}
 together with the number of iterations used for the minimization.
 It is very often useful to print the output of the minimization with
 \GLB{glbPrintParams} in order to check that the minimum is the
-appropriate one. For example, if the mininizer ends up in the wong-sign
+appropriate one. For example, if the minimizer ends up in the wrong-sign
 solution in $\ldm$, priors can be used to force it into the tested
 minimum. In addition, the number of iterations used allows an optimization
 of the convergence speed. 
@@ -1242,7 +1265,7 @@ equal to the sum of the individual $\chi^2$-values anymore. This has two reasons
 The the output of the minimizer in {\tt out} carries as many matter density scaling factors as there are experiments. Either
 one (for the simulation of one experiment) or all (for the simulation of
 all experiments) are different from $1.0$ if matter density uncertainties
-are present, since each experiment may face other matter density conditions. The minimizer for indivdual experiments ``know'' which
+are present, since each experiment may face other matter density conditions. The minimizer for individual experiments ``know'' which
 experiment they are currently treating, which means that only the returned
 matter density scaling factor of the appropriate experiment is modified.
 For example, calculating {\tt glbChiTheta} for the last experiment
@@ -1263,7 +1286,7 @@ oscillation parameters in this example: In order to avoid falling
 into the wrong minimum, the fit value of $\deltacp$ is guessed from \figu{projex} (left). This quite sophisticated ``guessing'' is typical
 for neutrino factories because of the $(\deltacp, \theta_{13})$-degeneracy, whereas it is for superbeams often sufficient
 to use the best-fit values. A strong indication for a wrong guessing 
-are discontiuous jumps in the projected $\chi^2$-function, where the minimizer jumps from one minimum to another. In such cases, the starting point of the minimizer has to be adjusted to help it find the true minimum.
+are discontinuous jumps in the projected $\chi^2$-function, where the minimizer jumps from one minimum to another. In such cases, the starting point of the minimizer has to be adjusted to help it find the true minimum.
 
 Other examples for projections onto a parameter axis while keeping exactly one parameter fixed are \GLB{glbChiTheta23}, \GLB{glbChiDm}, and \GLB{glbChiDms}, which
 can be found in \Tab~\ref{tab:stdfunctions} on page~\pageref{tab:stdfunctions}.
@@ -1274,7 +1297,7 @@ can be found in \Tab~\ref{tab:stdfunctions} on page~\pageref{tab:stdfunctions}.
 In general, one can show the measurement result in any $k$-dimensional hyperplane, where $k$ is smaller than the dimension of the parameter space $n$, and thus the dimension of the fit manifold. In this case, $k$ parameters are fixed and $n-k$ parameters are minimized over. One such example is the projection of the fit manifold onto the $\stheta$-$\deltacp$-plane, \ie, $k=2$ here. In this case, the two
 parameters $\stheta$ and $\deltacp$ are kept fixed, and the others are
 minimized over. 
-The corresponding function is
+The corresponding function is \index{Projection onto $\theta_{13}$-$\deltacp$-plane}
 \begin{function}
 \GLBNS{glbChiThetaDelta}
 {\tt double glbChiThetaDelta(const glb\_params in, glb\_params out, int exp)} returns the projected $\chi^2$ onto the $\theta_{13}$-$\deltacp$-plane for the  experiment {\tt exp}. For the simulation of all initialized experiments,
@@ -1310,8 +1333,9 @@ Function & Purpose & Parameters $\rightarrow$ Result\\
 {\tt glbGetDensity\-ProjectionFlag} \GLBNS{glbGetDensityProjectionFlag} & Return flag for density parameter {\tt which} in vector {\tt in}.  & {\tt (const glb\_projection in, int which)} $\rightarrow$ {\tt int} flag \\
 \hline
 \end{tabular}
-\caption{\label{tab:defprojection} Different functions handling the
-\GLB{glb\_projection} type. Flags are either \GLB{GLB\_FIXED} or \GLB{GLB\_FREE}. The (unshown) return values of the {\tt Set-} and {\tt Define-} functions point either to the assigned vector if successful, or they are {\tt NULL} if unsuccessful.}
+\caption{\label{tab:defprojection}\index{Projection type}
+Different functions handling the
+\GLB{glb\_projection} type. Flags are either \GLB{GLB\_FIXED} or \GLB{GLB\_FREE}. The (un-shown) return values of the {\tt Set-} and {\tt Define-} functions point either to the assigned vector if successful, or they are {\tt NULL} if unsuccessful.}
 \end{table}
 
 In principle, one can also use three- or more-dimensional projections. In addition, one may want to use a different set of parameters for single- or two-parameter projections. The very flexible function \GLB{glbChiNP} is
@@ -1334,6 +1358,7 @@ the type {\tt glb\_projection} has to be created first, and destroyed
 later. The access functions for {\tt glb\_projection} are summarized in \Tab~\ref{tab:defprojection}. Since the complete set is very similar to
 the one for {\tt glb\_params}, we do not go into greater details here.
 
+\index{Projection: Define}
 As soon as we have defined a projection, we can assign it:
 \begin{function}
 \GLBNS{glbSetProjection}
@@ -1341,7 +1366,7 @@ As soon as we have defined a projection, we can assign it:
 to {\tt in}. The return value is $0$ if successful, and $-1$ if
 unsuccessful.
 \end{function}
-Similarly, the currenty assigned projection can be returned with:
+Similarly, the currently assigned projection can be returned with:
 \begin{function}
 \GLBNS{glbGetProjection}
 {\tt int glbGetProjection(glb\_projection out)} writes the currently
@@ -1376,12 +1401,14 @@ is compared with the result including the full multi-parameter correlation.
 
 \chapter{Locating degenerate solutions}
 \index{Degenerate solutions}
+\index{Degeneracies $\chi^2$}
 
-In the last chapter, we introduced the projection of any set of $k$ parameter onto any $n-k$ dimensional hyperplane, which was done by the minimization over the $k$ free fit parameters. Similarly, one can minimize over {\em all} $n$ parameters to find the local minimum close to any starting point. This approach is very useful for the exact numerical location of a degeneracy if its approximate position is known. For the determination of the approximate positon, one can use analytical approaches or an educated guess. 
+In the last chapter, we introduced the projection of any set of $k$ parameter onto any $n-k$ dimensional hyperplane, which was done by the minimization over the $k$ free fit parameters. Similarly, one can minimize over {\em all} $n$ parameters to find the local minimum close to any starting point. This approach is very useful for the exact numerical location of a degeneracy if its approximate position is known. For the determination of the approximate position, one can use analytical approaches or an educated guess. 
 Though the usage of the all-parameter minimizers is quite simple, one should keep in mind that they are local minimizers. Therefore, one may need a very sophisticated application software to find all degenerate solutions.
 
 \example{Finding the $\mathrm{sgn}(\ldm)$-degeneracy}{
 \label{ex:sgndeg}
+\index{Degeneracies: sgn($\ldm$)-degeneracy}
 
 In many cases, one can find the exact position of the $\mathrm{sgn}(\ldm)$-degeneracy with \GLB{glbChiAll}, where one starts 
 the local minimizer at the suspected position 
@@ -1401,7 +1428,7 @@ and let it converge into the minimum.  The following code excerpt  corresponds t
   glbSetStartingValues(starting\_values); \\
   glbSetInputErrors(input\_errors); \\
   \\
-  /* Localize degenerate solution by minimzation over all parameters */ \\
+  /* Localize degenerate solution by minimization over all parameters */ \\
   double CL=glbChiAll(starting\_values,deg\_pos,GLB\_ALL); \\
    \\
   \mbox{/* Now: CL is the chi2 of the deg.~solution and deg\_pos the position */} 
@@ -1427,12 +1454,13 @@ use {\tt GLB\_ALL} for {\tt exp}. The values in {\tt in} are the guessed fit val
 %
 This function takes the suspected position of the local minimum and returns its actual position in {\tt out}, as well as the $\chi^2$-value 
 at the minimum as return value. Thus, the return value can be immediately
-used to judge wether the located degeneracy appears at the chosen
+used to judge whether the located degeneracy appears at the chosen
 confidence level.
 
 The example on page~\pageref{ex:sgndeg} illustrates how to locate the $\mathrm{sgn}(\ldm)$-degeneracy and show the corresponding degenerate solution in the $\stheta$-$\deltacp$-plane together with the original solution.
 In this case, the position of the degeneracy can be easily guessed to be at the best-fit parameter values but the $\ldm$ inverted. The minimizer then runs off the plane of the best-fit parameters into the local minimum. It is very important to take into account the position of the degeneracy off this plane, since the actual $\chi^2$ in the minimum is certainly lower than on the plane of the best-fit parameter values. Thus, the degeneracy may not even appear at the chosen confidence level on the plane, but it does appear at the true minimum. The two sections\footnote{The discussed figure on page~\pageref{ex:sgndeg} is produced by  {\tt glbChiSys} and thus only represents a section through the fit manifold. For the projection including correlations, one may rather want to use {\tt glbChiThetaDelta}.} through the fit manifold shown in the figure on page~\pageref{ex:sgndeg} therefore do not appear at the same oscillation parameter values (except from the ones shown in the figure). 
 
+\index{Advanced tricks}
 For the more advanced reader, a number of tricks can be useful for the numerical localization of degenerate solutions:
 \begin{description}
 \item[Minimum $\boldsymbol{\chi^2}$ larger than threshold.] If a located degeneracy has a minimum $\chi^2$ larger than the corresponding confidence level threshold for the discussed quantity of interest, the degeneracy can be immediately ignored. This saves a lot of computation time.
@@ -1454,6 +1482,7 @@ as {\tt in} vector and $\ldm$ kept free.
 Finally, note that any degenerate solution below the confidence level threshold which can not be located makes the result appear better than it actually is. Thus, one should be careful with the determination of the degenerate solutions in order to find all of them.
 
 \chapter{Obtaining low-level information}
+\index{Low-level information}
 
 In this chapter, we discuss possibilities to obtain low-level information
 in \GLOBES , \ie, about oscillation probabilities, rates, and other
@@ -1488,6 +1517,7 @@ In fact, many of these functions are very advanced, which means
 that the reader who wants to use them should be familiar with
 \Secs~\ref{sec:channel} and~\Sec~\ref{sec:rules} of the \AEDL\ manual.
 
+\index{Event rates}
 \GLOBES\ currently supports rule-based and channel-based event rate functions, where the information is in written into a file
 or returned in a list. The rule-based functions are:
 \begin{function}
@@ -1501,7 +1531,7 @@ or background rate {\tt signal} (either \GLB{GLB\_SIG} or \GLB{GLB\_BG}).
 The position {\tt pos} refers to the component within the signal or 
 background, and can also be {\tt GLB\_ALL}. The function may return
 the rates with (\GLB{GLB\_W\_COEFF}) or without (\GLB{GLB\_WO\_COEFF})
-overall efficieny coefficient, as it is specified by {\tt coeffi}. 
+overall efficiency coefficient, as it is specified by {\tt coeffi}. 
 In addition, it may contain the post-smearing efficiencies (set
 {\tt effi} to \GLB{GLB\_W\_EFF} or \GLB{GLB\_WO\_EFF}), and the
 post-smearing backgrounds (set
@@ -1648,7 +1678,7 @@ sections, \ie, any value in the allowed energy range can be given as input:
 double E, double distance, int l, int anti)} returns
 the flux of flux number {\tt ident} of the experiment {\tt exp}
 for the flavor $\nu_l$ 
-and polarity {\tt anti} ($+1$: neutrinos, $-1$: antineutinos) at the energy {\tt E} and distance {\tt distance}.
+and polarity {\tt anti} ($+1$: neutrinos, $-1$: antineutrinos) at the energy {\tt E} and distance {\tt distance}.
 \end{function}
 
 \begin{function}
@@ -1662,6 +1692,7 @@ Note that all flux or flavor numbers run from $0$ to $N-1$ in these functions.
 
 \chapter{Changing experiment parameters at running time}
 \label{chapt:running}
+\index{Experiment parameters}
 
 Many of the parameters in experiment definitions can be changed
 at running time. For example, we have introduced in 
@@ -1679,6 +1710,8 @@ introduce a mechanism how one can even change these \AEDL\ parameters
 during running time.
 
 \section{Baseline and matter density profile}
+\index{Baseline: Change}
+\index{Matter density profile: Change}
 
 In order to change the baseline of an experiment, it is important
 to keep in mind that each experiment has a profile type defined
@@ -1698,7 +1731,7 @@ for arbitrary matter density profiles.
 \begin{function}
 \GLBNS{glbSetBaselineInExperiment}
 {\tt int glbSetBaselineInExperiment(int exp, double baseline)}
-sets the baseline length in experimente {\tt exp} to {\tt baseline}.
+sets the baseline length in experiment {\tt exp} to {\tt baseline}.
 The function returns $-1$ if it was not successful.
 \end{function}
 Note that {\tt glbSetBaselineInExperiment} does not change the
@@ -1741,7 +1774,7 @@ It is then up to the user to return the allocated memory!
 In addition, they normally return the length of the lists $N$
 in form of a pointer, where the corresponding memory space 
 has to be provided by the user (normally, it is enough to declare
-a variable of the type {\tt size\_t} corrsponding to positive
+a variable of the type {\tt size\_t} corresponding to positive
 integer numbers).
 The following functions return matter density profiles:
 \begin{function}
@@ -1845,7 +1878,7 @@ In addition, it uses a little trick: It avoids falling into the wrong
 by using the fit value of $\deltacp$ from the step before as prediction
 of the position of the current calculation.
 
-The returned lists of data from thie example represent $\chi^2$ 
+The returned lists of data from the example represent $\chi^2$ 
 as function of the fit value of $\stheta$. The intersections of these
 curves with the line $\chi^2 = 9$ give the $\stheta$ sensitivity
 limits at the $3 \sigma$ confidence level, where we do not include the
@@ -1856,10 +1889,12 @@ limits at the $3 \sigma$ confidence level, where we do not include the
 }
 
 \section{Systematics}
+\index{Systematics}
+\index{Systematics on/off}
 
 Changing the systematics at running time can be useful to investigate
 the impact factors affecting the measurement.
-In \GLOBES , the sytematics is defined rule-based, \ie, each rule
+In \GLOBES , the systematics is defined rule-based, \ie, each rule
 has its own systematics. In addition, \AEDL\ requires that it has to be
 defined in each rule what ``Systematics on'' and ``Systematics off'' means.
 Therefore, it is usually very simple to switch the systematics on and off:
@@ -1874,6 +1909,7 @@ In the example on page~\pageref{ex:barcharts}, the application of
 {\tt glbSwitchSystematics} is demonstrated to show the impact of
 systematics, correlations, and degeneracies.
 
+\index{Error dimension}
 The error dimension (for the definition, see \Sec~\ref{sec:rules}) can also be accessed directly with 
 \begin{function}
 \GLBNS{glbSetErrorDim}
@@ -1887,6 +1923,9 @@ $-1$ if not successful.
 returns the error dimension for systematics on ({\tt on\_off} is \GLB{GLB\_ON}) or off ({\tt on\_off} is \GLB{GLB\_OFF}) of experiment {\tt exp} and rule {\tt rule}.
 \end{function}
 
+\index{Signal errors}
+\index{Background errors}
+\index{Background centers}
 Except from the general treatment of systematics, one can read out
 and write the signal and background errors, as well as the background
 centers. For the definitions of these quantities, see \Sec~\ref{sec:rules}.
@@ -1918,7 +1957,7 @@ to {\tt norm} (normalization error) and {\tt tilt} (tilt/calibration error).
 \GLBNS{glbSetBGCenters}
 {\tt int glbSetBGCenters(int exp, int rule, double norm, double tilt)}
 sets the background centers of experiment {\tt exp} and rule {\tt rule}
-to {\tt norm} (normalization center) and {\tt tilt} (tilt/calibrationcenter).
+to {\tt norm} (normalization center) and {\tt tilt} (tilt/calibration center).
 \end{function}
 \begin{function}
 \GLBNS{glbGetBGCenters}
@@ -1930,6 +1969,7 @@ As usual, all these functions return $-1$ if they were not successful.
 
 \section{External parameters in \AEDL\ files}
 \label{sec:aedlparams}
+\index{External \AEDL\ parameters}
 
 Using external parameters in \AEDL\ files is a very powerful feature
 to change experiment parameters at running time which require that
@@ -1966,7 +2006,7 @@ energy resolution such as with
 {\tt
 int i; \\
 for(i=5;i<20;i++) \\
-\{ \\	 
+\{ \\    
 \hspace*{1cm} glbClearExperimentList(); \\
 \hspace*{1cm} glbDefineAEDLVariable("myres",0.01*i); \\
 \hspace*{1cm} glbInitExperiment(...); \\
@@ -1989,6 +2029,7 @@ clears the \AEDL\ variable list.
 This function is called automatically upon exit of the program.
 
 \section{Algorithm parameters: Filter functions}
+\index{Filter functions}
 
 The oscillation frequency filters to filter fast oscillations
 can also be accessed by the user interface. For details of
