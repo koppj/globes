@@ -345,7 +345,8 @@ the assignment was successful, and {\tt NULL} otherwise.
 {\tt void glbPrintParams(FILE *stream, const glb\_params in)} prints the
 parameters in {\tt in} to the file {\tt stream}. The oscillation
 parameters, all density values, and the number of iterations are
-printed as pretty output.
+printed as pretty output. Use {\tt stdout} for {\tt stream} if you want
+to print to the screen.
 \end{function}
 In addition to these basic functions, there are functions to access
 the individual parameters within the parameter vectors:
