@@ -1,0 +1,214 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\NeedsTeXFormat{LaTeX2e}
+\documentclass[12pt,a4paper]{article}
+
+%-- used packages ------------------------------------------------------
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{epsfig}
+\usepackage{graphicx}
+\usepackage{cite}
+%\usepackage{mcite}
+%-- page parameters -------------------------------------------------
+
+\jot = 1.5ex
+\parskip 5pt plus 1pt
+\parindent 0pt
+\evensidemargin -0.1in   \oddsidemargin  -0.1in
+\textwidth  6.45in       \textheight 9.1in
+\topmargin -1.0cm        \headsep    1.0cm
+
+%-- command (re)definitions -----------------------------------------
+
+
+\newcommand{\capdef}{}
+%\newcommand{\mycaption}[2][\capdef]{\renewcommand{\capdef}{#2}%
+%       \caption[#1]{{\itshape #2}}}
+\newcommand{\mycaption}[2][\capdef]{\renewcommand{\capdef}{#2}%
+       \caption[#1]{{\footnotesize #2}}}
+\makeatletter
+\renewcommand{\fnum@table}{\textbf{\tablename~\thetable}}
+\renewcommand{\fnum@figure}{\textbf{\figurename~\thefigure}}
+\makeatother
+\def\ltap{\ \raisebox{-.4ex}{\rlap{$\sim$}} \raisebox{.4ex}{$<$}\ }
+\def\gtap{\ \raisebox{-.4ex}{\rlap{$\sim$}} \raisebox{.4ex}{$>$}\ }
+
+\newcounter{myenumi}
+\newcommand{\myitem}{\refstepcounter{myenumi}\item}
+\renewcommand{\themyenumi}{\roman{myenumi}}
+\newenvironment{mylist}{%
+        \setcounter{myenumi}{0}
+        \begin{list}{\textit{\themyenumi)}}{%
+        \setlength{\topsep}{0.2\baselineskip}%
+        \setlength{\partopsep}{-\topsep}%
+        \setlength{\itemsep}{\topsep}%
+        \setlength{\parsep}{0\baselineskip}%
+        \setlength{\leftmargin}{0em}%
+        \setlength{\listparindent}{\parindent}%
+        \setlength{\itemindent}{2.5em}%
+        \setlength{\labelwidth}{1.5em}%
+        \setlength{\labelsep}{0.75em}}}%
+{\end{list}}
+
+\newlength{\myem}
+\settowidth{\myem}{m}
+\newcommand{\sep}[1]{#1}
+\newcounter{mysubequation}[equation]
+\renewcommand{\themysubequation}{\alph{mysubequation}}
+\newcommand{\mytag}{\stepcounter{mysubequation}%
+\tag{\theequation\protect\sep{\themysubequation}}}
+\newcommand{\globallabel}[1]{\refstepcounter{equation}\label{#1}}
+
+\makeatletter
+\renewcommand{\section}{\@startsection{section}{1}{0em}{-\baselineskip}%
+{\baselineskip}{\normalfont\large\bfseries}}
+\renewcommand{\subsection}%
+{\@startsection{subsection}{2}{0em}{-0.7\baselineskip}%
+{0.7\baselineskip}{\normalfont\bfseries}}
+\makeatother
+
+\newcommand{\ie}{{\it i.e.}}
+\newcommand{\Ie}{{\it I.e.}}
+\newcommand{\eg}{{\it e.g.}}
+\newcommand{\Eg}{{\it E.g.}}
+\newcommand{\cf}{{\it cf.}}
+\newcommand{\etc}{{\it etc.}}
+\newcommand{\eq}{Eq.}
+\newcommand{\eqs}{Eqs.}
+\newcommand{\Def}{Definition}
+\newcommand{\fig}{Fig.}
+\newcommand{\Fig}{Fig.}
+\newcommand{\figs}{Figs.}
+\newcommand{\Figs}{Figs.}
+\newcommand{\Ref}{Ref.}
+\newcommand{\Refs}{Refs.}
+\newcommand{\Sec}{Sec.}
+\newcommand{\Secs}{Secs.}
+\newcommand{\Chapt}{Chapter}
+\newcommand{\Chapts}{Chapters}
+\newcommand{\Part}{Part}
+\newcommand{\App}{Appendix}
+\newcommand{\Apps}{Appendices}
+\newcommand{\Tab}{Table}
+\newcommand{\Tabs}{Tables}
+
+\newcommand{\bi}{\begin{itemize}}
+\newcommand{\ei}{\end{itemize}}
+\newcommand{\ra}{$\rightarrow$}
+\newcommand{\be}{\begin{equation}}
+\newcommand{\ee}{\end{equation}}
+\newcommand{\bea}{\begin{eqnarray}}
+\newcommand{\eea}{\end{eqnarray}}
+\newcommand{\nn}{\nonumber}
+\newcommand{\ldm}{\Delta m_{31}^2}
+\newcommand{\sdm}{\Delta m_{21}^2}
+\newcommand{\deltacp}{\delta_{\mathrm{CP}}}
+\newcommand{\stheta}{\sin^2 2 \theta_{13}}
+
+\newcommand{\JHFSK}{{\sc JHF-SK}}
+\newcommand{\NUMI }{{\sc NuMI}}
+\newcommand{\ReactorI}{{\sc Reactor-I}}
+\newcommand{\ReactorII}{{\sc Reactor-II}}
+\newcommand{\JHFHK}{{\sc JHF-HK}}
+\newcommand{\NuFactI}{{\sc NuFact-I}}
+\newcommand{\NuFactII}{{\sc NuFact-II}}
+
+\newcommand{\GLOBES}{{\sf GLoBES}}
+\newcommand{\AEDL}{{\sf AEDL}}
+\newcommand{\EDM}{{\sf EDM}}
+
+\newcommand{\equ}[1]{\eq~(\ref{equ:#1})}
+\newcommand{\figu}[1]{\fig~\ref{fig:#1}}
+\newcommand{\tabl}[1]{\Tab~\ref{tab:#1}}
+\newcommand{\tb}{\hspace*{3ex}}
+
+\begin{document}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%                     Title-page                              %%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{titlepage}
+
+% the footnote symbols are only redefined for the title page !
+\renewcommand{\thefootnote}{\alph{footnote}}
+
+\vspace*{-3.cm}
+\begin{flushright}
+TUM-HEP-5XX/04\\
+MPP-2004-YY\\
+%hep-ph/
+\end{flushright}
+
+\vspace*{0.5cm}
+
+\renewcommand{\thefootnote}{\fnsymbol{footnote}}
+\setcounter{footnote}{-1}
+
+{\begin{center}
+{\Large\bf GLoBES}
+\end{center}}
+\renewcommand{\thefootnote}{\alph{footnote}}
+
+\vspace*{.8cm}
+%\vspace*{.3cm}
+{\begin{center} {\large{\sc
+                P.~Huber\footnote[1]{\makebox[1.cm]{Email:}
+                phuber@ph.tum.de},~
+                M.~Lindner\footnote[2]{\makebox[1.cm]{Email:}
+                lindner@ph.tum.de},~and~
+                W.~Winter\footnote[5]{\makebox[1.cm]{Email:}
+                wwinter@ph.tum.de}
+                }}
+\end{center}}
+\vspace*{0cm}
+{\it
+\begin{center}
+
+\footnotemark[1]${}^,$\footnotemark[2]${}^,$\footnotemark[3]%
+       Institut f\"ur theoretische Physik, Physik--Department,\\
+       Technische Universit\"at M\"unchen,
+       James--Franck--Strasse, D--85748 Garching, Germany
+
+
+\end{center}}
+
+\vspace*{1cm}
+
+
+\begin{abstract}
+This is the abstract.
+\end{abstract}
+
+
+\vspace*{.5cm}
+
+
+\end{titlepage}
+
+
+
+
+\newpage
+
+\renewcommand{\thefootnote}{\arabic{footnote}}
+\setcounter{footnote}{0}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                     Introduction                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\section{Introduction}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%             References                         %%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+\newpage
+\bibliographystyle{./apsrev}
+\bibliography{./references}
+
+\end{document}
+
