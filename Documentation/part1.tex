@@ -195,7 +195,8 @@ statistics $\chi^2$ only:
 \go{
 chi2 with statistics only: 39.143
 }
-Let us now locate the exact position of the sgn-degeneracy:
+Let us now locate the exact position\footnote{For a exact definition of 
+inverted hierarchy, see page~\pageref{mass_ordering}.} of the sgn-degeneracy:
 \gq{
   glbDefineParams(input\_errors,theta12*0.1,0,0,0,sdm*0.1,ldm/3); \\
   glbDefineParams(starting\_values,theta12,theta13,theta23, \\
@@ -434,7 +435,12 @@ We will in this part not go into details of the experiment
 definition. The pre-defined experiment prototypes in the {\tt data}
 subdirectory are summarized in \tabl{experiments}. They correspond
 (except from minor modifications) to the experiments in the
-respective references in the table.
+respective references in the table. These files are installed to
+the directory \verb+${prefix}/share/globes+ which usually defaults
+to  \verb+/usr/local/share/globes+. It is useful to add this path
+to the value of \verb+GLB_PATH+.
+\index{norm}{glb files@{\tt glb}-files!installation} 
+
 
 \example{Using \GLOBES\ with C}{\label{ex:c}
 \index{norm}{C-Code}
@@ -538,7 +544,7 @@ $P_{\mathrm{Tg}} \simeq  4 \, \mathrm{MW}$ & \cite{Huber:2002mx} \\[0.1cm]
 Pre-defined experiment prototypes, their filenames (to be used in \GLB{InitExperiment}), their short descriptions, and the references in which they are originally used and discussed (except from minor modifications, such as a
 different implementation of the energy threshold function). Note that
 some of these experiments are outdated in terms of integrated luminosities,
-baseline, fluxes, efficiencies, or other factors.}
+baseline, fluxes, efficiencies, or other factors. In any case these file are installed along with \GLOBES.}
 \end{table}
 
 \section{Initialization of \GLOBES}
@@ -770,6 +776,21 @@ experiments are initialized.
 Similarly, any change in the number of experiments requires that the
 parameter structures be re-initialized, \ie, freed and allocated again.
 
+\label{mass_ordering}
+\index{norm}{Mass hierarchy}
+\paragraph{Note:} Inverting the mass hierarchy is not
+precisely the same than to change from $\Delta m^2_{31}
+\rightarrow -\Delta m^2_{31}$.
+In this case the absolute value of $\Delta m^2_{32}$ changes also, which
+introduces a new frequency to the problem. Therefore, if we assume
+normal hierarchy  whenever $\Delta m^2_{31}>0$, the corresponding
+point in parameters space for inverted hierarchy is given by $\Delta 
+m^2_{31}\rightarrow - \Delta m^2_{31} + \Delta m^2_{21}$, because
+with this defintion the absolute value of  $\Delta m^2_{32}$ is unchanged
+and no new frequency is introduced.\\
+
+
+
 Another piece of information will be returned from the minimizers 
 (\cf, \Chapt~\ref{chapt:correlations}) and transferred
 into the {\tt glb\_params} structure is the number
@@ -891,7 +912,8 @@ reference rate vectors are computed -- at least within the currently allowed
 ranges. The true parameter values for the vacuum neutrino oscillation 
 parameters have to be set by the function \GLB{SetOscillationParameters} 
 and the reference rate vector, \ie\ the data, has to be computed by a call 
-to \GLB{SetRates}. This has to be done {\em before} any evaluation 
+to \GLB{SetRates}.
+This has to be done {\em before} any evaluation 
 function is used and  {\em after} the experiments have been initialized and 
 also the experiment 
 parameters have been adjusted which could change the rates (such as baseline
@@ -1590,8 +1612,10 @@ Though the usage of the all-parameter minimizers is quite simple, one should kee
 \example{Finding the $\mathrm{sgn}(\ldm)$-degeneracy}{
 \label{ex:sgndeg}
 \index{norm}{Degeneracies!sgn($\ldm$)-degeneracy}
+\index{norm}{Mass hierarchy}
 
-In many cases, one can find the exact position of the $\mathrm{sgn}(\ldm)$-degeneracy with \GLB{ChiAll}, where one starts 
+In many cases, one can find the exact position of the 
+$\mathrm{sgn}(\ldm)$-degeneracy with \GLB{ChiAll}, where one starts 
 the local minimizer at the suspected position 
 and let it run into the minimum.  The following code excerpt  corresponds to finding the degenerate solution for the example on
   page~\pageref{ex:corrth13dcp}, and it is from {\tt example3.c}: 
@@ -1640,7 +1664,9 @@ confidence level.
 
 The example on page~\pageref{ex:sgndeg} illustrates how to locate the $\mathrm{sgn}(\ldm)$-degeneracy and show the corresponding degenerate solution in the $\stheta$-$\deltacp$-plane together with the original solution.
 In this case, the position of the degeneracy can be easily guessed to be 
-at the true parameter values but with inverted $\ldm$. The minimizer then runs off the plane of these parameters into the local minimum. It is very important to take into account the position of the degeneracy off this plane, since the actual $\chi^2$ in the minimum is probably lower than in the plane. Thus, the degeneracy may not even appear at the chosen confidence level in the plane, but it does appear at the real minimum. The two sections through the fit manifold shown in the figure on page~\pageref{ex:sgndeg} therefore do not appear at the same oscillation parameter values (except from the ones shown in the 
+at the true parameter values but with inverted\footnote{For a exact 
+definition of 
+inverted hierarchy, see page~\pageref{mass_ordering}.} $\ldm$. The minimizer then runs off the plane of these parameters into the local minimum. It is very important to take into account the position of the degeneracy off this plane, since the actual $\chi^2$ in the minimum is probably lower than in the plane. Thus, the degeneracy may not even appear at the chosen confidence level in the plane, but it does appear at the real minimum. The two sections through the fit manifold shown in the figure on page~\pageref{ex:sgndeg} therefore do not appear at the same oscillation parameter values (except from the ones shown in the 
 figure).\footnote{The discussed figure on page~\pageref{ex:sgndeg} is produced by  {\tt glbChiSys} and thus only represents a section through the fit manifold. For the projection including correlations, one may rather want to use {\tt glbChiThetaDelta}.} 
 
 \index{norm}{Advanced tricks}

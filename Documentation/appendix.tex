@@ -81,7 +81,9 @@ library in another location or changing other default compilation
 options.
 
 The install target also will install a program with name \verb+globes+ to
-\verb+$prefix/bin+.
+\verb+$prefix/bin+ and the files in the \verb+data+ directory of the tar-ball
+to \verb+$prefix/share/globes+.
+\index{norm}{glb files@{\tt glb}-files!installation}
 
 If you are not using \verb+make install+ you will find the static libary
 at \verb+source/.lib/libglobes.a+ which you can copy to any destination.
@@ -262,11 +264,11 @@ A warning: not all \verb+configure+ scripts look for a site script.
 \index{norm}{Installation|)}
 
 
-
+{\footnotesize
 \input{gpl}
 
 \input{fdl}
-
+}
 
 
 \end{appendix}

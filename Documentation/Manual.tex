@@ -22,6 +22,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \usepackage{ae,aecompl} % only for Type 1 fonts for readable pdf convert
 
+\newcommand{\glbxxx}{hep-ph/0407xxx}
 \newcommand{\capdef}{}
 \newcommand{\mycaption}[2][\capdef]{\renewcommand{\capdef}{#2}%
         \caption[#1]{{ %\itshape
@@ -189,7 +190,7 @@
 
 \begin{center}
 { \Large \bf
-{\Huge \GLOBES\ 2.0} \\
+{\Huge \GLOBES} \\
 General Long Baseline Experiment Simulator \\ }
 \vspace*{0.5cm}
 {\large \bf User's and experiment definition manual }
@@ -208,14 +209,9 @@ General Long Baseline Experiment Simulator \\ }
 
 \begin{center}
 
-Current affiliation(s):
 
-\vspace*{0.5cm}
 
-{\em $^{\mathrm{a},\mathrm{b},\mathrm{c}}$%
-       Institut f\"ur Theoretische Physik, Physik--Department,\\
-       Technische Universit\"at M\"unchen,
-       James--Franck--Strasse, D--85748 Garching, Germany}
+
 
 \end{center}
 
@@ -232,8 +228,18 @@ Current affiliation(s):
 \vspace{1cm}
 
 \begin{center}
-Version from \today
+Version from \today\ for \GLOBES\ 2.0
 \end{center}
+
+
+\vspace*{0.5cm}
+\vfill
+\hrule
+
+{\em\small $^{\mathrm{a},\mathrm{b},\mathrm{c}}$%
+       Institut f\"ur Theoretische Physik, Physik--Department,\\
+       Technische Universit\"at M\"unchen,
+       James--Franck--Strasse, D--85748 Garching, Germany}
 
 %\end{titlepage}
 
@@ -267,6 +273,7 @@ Version from \today
 
 \chapter*{What is \GLOBES ?}
 
+\vspace*{-2ex}
 \GLOBES\ (``General Long Baseline Experiment Simulator'') is a flexible
 software package to simulate neutrino oscillation 
 long baseline and reactor experiments. On the
@@ -324,12 +331,15 @@ appreciate being given academic credit for it. Whenever you use \GLOBES\
 to produce a publication or a talk indicate that you have used \GLOBES\ and
 please cite the reference~\cite{globes_paper}
 \begin{quote}
-P. Huber, M. Lindner and W. Winter ... 
+P. Huber, M. Lindner and W. Winter\\
+Simulation of long baseline neutrino oscillation experiments with \GLOBES\\
+arXiv:\glbxxx.  
 \end{quote}
-but \emph{not} this manual. This manual itself is not scientific 
+but \emph{not} this manual. This manual itself is not a scientific 
 publication and will not be submitted to a scientific journal. 
 It will evolve during time since it is intended for 
-regular revision. Besides that, many of the data which are used by \GLOBES\ and distributed together with it should be properly referenced. 
+regular revision. Besides that, many of the data which are used by \GLOBES\ 
+and distributed together with it should be properly referenced. 
 For details see below.
 
 Apart from that, \GLOBES\ is free software and open source, \ie, it is 
@@ -358,7 +368,7 @@ checked, too (for example, cross section or flux files). One can use
 the \verb+-v3+ option to \verb+globes+ to see which files
 are included.
 
-It is recommended that you use the same style for your own input files, since, in case they are distributed, everbody will know how to correctly reference your work.
+It is recommended that you use the same style for your own input files, since, in case they are distributed, everybody will know how to correctly reference your work.
 
 \cleardoublepage
 \tableofcontents
@@ -454,12 +464,9 @@ in the last chapter of \Part~\ref{part:2}.
 a C++ compiler to be properly compiled. For pedagogical reasons, variable
 declarations are done at that place where the variable is needed for the
 first time, which is at variance with C syntax but not with C++ syntax.
-That is the only way in which the examples deviate form ISO C. 
-
-%Finally, \Part~\ref{part:3} of this manual serves as reference manual,
-%and the appendix contains further supplementary information.
-
-
+That is the only way in which the examples deviate form ISO C. Moreover
+the actual numerical values of the results of the examples may be different
+from the ones in this manual. 
 
 \mainmatter
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -494,12 +501,21 @@ PH is especially thankful for the invaluable advice of Thomas Fischbacher on
 many design issues. 
 In addition, we would like to thank
 Mark Rolinec for his help to translate the experiment descriptions
-into \AEDL , and for creating the illustrations in this manuscript.
+into \AEDL, and for creating the illustrations in this manuscript.
 Finally, thanks to all the people who have been pushing this project
 for many years, to the ones who have been continuing asking for the 
 publication of the software, and the referees of several of our
 papers for suggestions which lead to improvements in the software.
 
+
+This work and the development of \GLOBES\ have been supported by:
+\begin{itemize}
+\item Physik Department der Technischen Universit\"at M\"unchen
+\item Max-Planck-Institut f\"ur Physik 
+\item Sonderforschungsbereich 375 f\"ur Astro-Teilchenphysik\\ 
+der Deutschen Forschungsgemeinschaft
+\item Studienstiftung des Deutschen Volkes 
+\end{itemize}
 
 \input{appendix}
 
@@ -507,7 +523,7 @@ papers for suggestions which lead to improvements in the software.
 
 
 \addcontentsline{toc}{chapter}{Bibliography}
-\bibliographystyle{./unsrt}
+\bibliographystyle{./OurBibTeX}
 \bibliography{references}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
