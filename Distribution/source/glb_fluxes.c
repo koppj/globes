@@ -338,8 +338,8 @@ double glb_flux_calc(double en, double baseline,
 void glb_flux_loader(glb_flux *data, int ident, int polarity)
 {
    /* the polarity  argument is unused */
-  int i,number;
-
+  int i,number,s,ts=0;
+  char tok;
  
   FILE *fp = glb_fopen(data->file_name,"r");
   number=ident;
@@ -347,46 +347,124 @@ void glb_flux_loader(glb_flux *data, int ident, int polarity)
   
   data->flux_storage=glb_alloc_flux_storage(501);
       if (fp!=NULL)
-	{
-	  for (i=0; i<=NFLUX; i++) fscanf(fp,"%lf %lf %lf %lf %lf %lf %lf",
-					  &data->flux_storage[i][0],
-					  &data->flux_storage[i][1],
-					  &data->flux_storage[i][2], 
-					  &data->flux_storage[i][3],
-					  &data->flux_storage[i][4],
-					  &data->flux_storage[i][5],
-					  &data->flux_storage[i][6]);
+	{ 
+	  /* peel off all leading comments */
+	  while(1)
+	    {
+	      tok=fgetc(fp);
+	      if(tok=='#') 
+		{
+		  while(fgetc(fp)!='\n');
+		}
+	      else
+		{
+		  ungetc(tok,fp);
+		  break;
+		}
+	    }
+	  for (i=0; i<=NFLUX; i++) 
+	    {
+	      /* get rid of comments inside */
+	      tok=fgetc(fp);
+	      if(tok=='#') 
+		{
+		  while(fgetc(fp)!='\n');
+		  i--;
+		}
+	      else
+		{
+		  ungetc(tok,fp);
+		  /* read the data */
+		  s=fscanf(fp,"%lf %lf %lf %lf %lf %lf %lf \n",
+			   &data->flux_storage[i][0],
+			   &data->flux_storage[i][1],
+			   &data->flux_storage[i][2], 
+			   &data->flux_storage[i][3],
+			   &data->flux_storage[i][4],
+			   &data->flux_storage[i][5],
+			   &data->flux_storage[i][6]);
+		  
+		  if(s!=7) 
+		    fprintf(stderr,"Error: Wrong format in file %s\n",
+			    data->file_name);
+		  else
+		    ts++;		
+		}
+	      
+	    }
 	  fclose(fp);
 	}
       else
 	{
 	  fprintf(stderr,"Error: Could not open %s\n",data->file_name); 
 	} 
+    
+      
+      if(ts!=501) fprintf(stderr,"Error: Wrong format in file %s\n",
+			  data->file_name);      
 }
+
 
 void glb_X_section_loader(glb_xsec *data)
 {
-  int i,number;
+  int i,number,s,ts=0;
+  char tok;
   FILE* fp;
   fp = glb_fopen(data->file_name, "r");
   data->xsec_storage=glb_alloc_xsec_storage(1001);
   if (fp!=NULL)
   {
-    for (i=0; i<1001; i++) fscanf(fp,"%lf %lf %lf %lf %lf %lf %lf",
-				  &data->xsec_storage[i][0],
-				  &data->xsec_storage[i][1],
-				  &data->xsec_storage[i][2], 
-				  &data->xsec_storage[i][3],
-				  &data->xsec_storage[i][4],
-				  &data->xsec_storage[i][5],
-				  &data->xsec_storage[i][6]);
+    /* peel off all leading comments */
+    while(1)
+      {
+	tok=fgetc(fp);
+	if(tok=='#') 
+	  while(fgetc(fp)!='\n');
+	else
+	  {
+	    ungetc(tok,fp);
+	    break;
+	  }
+      }
+    
+    for (i=0; i<1001; i++)
+      {
+	/* get rid of comments inside */
+	tok=fgetc(fp);
+	if(tok=='#') 
+	  {
+	    while(fgetc(fp)!='\n');
+	    i--;
+	  }
+	else
+	  {
+	    ungetc(tok,fp);
+	    /* read the data */
+	    s=fscanf(fp,"%lf %lf %lf %lf %lf %lf %lf \n",
+		     &data->xsec_storage[i][0],
+		     &data->xsec_storage[i][1],
+		     &data->xsec_storage[i][2], 
+		     &data->xsec_storage[i][3],
+		     &data->xsec_storage[i][4],
+		     &data->xsec_storage[i][5],
+		     &data->xsec_storage[i][6]);
+	    if(s!=7) 
+	      fprintf(stderr,"Error: Wrong format in file %s\n",
+		      data->file_name);
+	    else
+	      ts++;
+	  }
+      }
+    fclose(fp);
   }
   else
-  {
-    fprintf(stderr,"Error: Could not open %s\n",data->file_name);
-  }
-
-  fclose(fp);
+    {
+      fprintf(stderr,"Error: Could not open %s\n",data->file_name);
+    }
+  
+  if(ts!=1001) fprintf(stderr,"Error: Wrong format in file %s\n",
+		      data->file_name);
+ 
 }
 
 double glb_xsec_calc(double enl,int l, int anti, const glb_xsec *data)

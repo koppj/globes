@@ -463,3 +463,14 @@
 
 	Updated top-level Makefile.am in order to be okay with changed contents
 	in data/
+
+19/07/04 Added a BUGS file
+	
+	Added some format checks to glb_X_section_loader and glb_flux_loader.
+	Moreover both functions now accept one-line comments like
+		# this is a comment
+		1 2 3 4 5 6 7 
+		# this is another comment
+	
+	Added a REFERENCES file, the idea is to collect all bibliographical
+	information about *our* glb-files in one place.

@@ -1,0 +1,13 @@
+BUG#1 final_clean sometimes produces SEGFAULT
+
+From: Patrick Huber
+Date: 19.07.04
+
+	On some occasions final_clean produces a SEGFAULT. This happens
+	when the program exits after some fatal parse errors, since
+	then some pointers are not correctly setup by glb_default_expirment
+	(it is never called). Then the call of glbFreeExp produces a
+	SEGFAULT in the attempt to free one of the SignalRates pointers
+	in one of the experiment structures. The problem may have its roots in
+	copy_buff in the parser.
+-------------------------------------------------------------------------------

@@ -5,18 +5,33 @@ Prerequisites for installation of GLoBES
 ========================================
 
 Besides the usual things like a working libc you need to have
-
+ 
+	gcc	The GNU compiler collection
+ 			gcc.gnu.org
 	BLAS 	Basic Linear Algebra Subprograms
 			www.netlib.org/blas/ 	
 	LAPACK	Linear Algebra PACKage
 			www.netlib.org/lapack/
+	f2c	Fortran to C
+			www.netlib.org/f2c/
 	GSL 	The GNU Scientific Library
 			www.gnu.org/software/gsl/
+
+The library `libglobes' should in principle compile with any
+ANSI C/C++ compiler but the `globes' binary uses the 
+`argp' facility of `glibc' to parse its command line options.
 
 All those libraries are also available as rpm's from the various
 distributors of GNU/Linux, see their web sites for downloads. Due to
 the rather difficult nature of the build process of BLAS and LAPACK
-it is recommended to use a suitable rpm instead.
+it is recommended to use a suitable rpm instead. Chances are that
+gcc, f2c and GSL are already part of your installation. Furthmore you need
+a working `make' to build and install GLoBES.
+
+In future releases it is planed to at least get rid of LAPACK, because
+then also BLAS and f2c would drop out. Furthemore there is no prinicipal
+reason why not also to get rid of any C++ parts. This will greatly simplify
+the build process and ease the requirements for installation.
 
 Installation Instructions
 =========================

@@ -1,0 +1,42 @@
+Referencing of data in GLoBES
+=============================
+
+GLoBES wouldn't be of much use without having high quality input data.
+Much of this input data has been published somewhere and the authors
+of those publication would appreciate to be cited by the user
+when he/she is using their work. It is solely the user's responsibility 
+to make sure that he/she understand where a certain input for GLoBES comes
+from and wether additional work has to be cited in addition to the 
+GLoBES paper~\cite{globes_paper}. To help this task we provide here the
+necessary information for the data which is shiped together with GLoBES.
+
+When using the built-in earth matter profile, the original source is 
+reference~\cite{Stacey}.
+
+All files ending with `.dat' or `.glb' in the `data' subdirectory have at 
+their beginning a comment field which clearly indicates which works should be
+cited when using a certain file. Make sure that dependencies are correctly
+tracked, i.e. in some cases files included by other files have to checked
+also. One can use the `-v3' option to `globes' to see which files
+are included.
+
+It is advisable to use the same style for your own input files, since in
+case they are distributed, everbody will know how to correctly reference your
+work.
+
+==============================================
+Below the corresponding data in BibTeX format: 
+
+@Article{globes_paper, 
+   author = "Huber, P and Lindner, M and Winter, W",
+   title = "Simulation of long-baseline neutrino oscillation
+            experiments with {GLoBES}",
+   year = "2004"
+}
+
+@Book{Stacey,
+  author = 	 {Stacey, F. D.},
+  title = 	 {Physics of the Earth},
+  publisher = 	 {Wiley},
+  year = 	 {1977},
+}
