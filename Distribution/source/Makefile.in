@@ -105,6 +105,7 @@ AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
+BLCONVENIENCE = @BLCONVENIENCE@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
@@ -123,6 +124,7 @@ ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
+F2CCONVENIENCE = @F2CCONVENIENCE@
 F77 = @F77@
 FFLAGS = @FFLAGS@
 GLBINC = @GLBINC@
@@ -176,6 +178,10 @@ SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
 VERSION = @VERSION@
+WANT_LAPACK_FALSE = @WANT_LAPACK_FALSE@
+WANT_LAPACK_TRUE = @WANT_LAPACK_TRUE@
+WANT_LIBF2C_FALSE = @WANT_LIBF2C_FALSE@
+WANT_LIBF2C_TRUE = @WANT_LIBF2C_TRUE@
 YACC = @YACC@
 ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
@@ -234,8 +240,11 @@ glb_rate_engine.h glb_types.h glb_parser.h glb_min_sup.h  glb_version.h \
 glb_lexer.h glb_fluxes.h glb_parser_type.h glb_wrapper.h glb_modules.h\
 glb_profile.h
 
-libglb_la_LDFLAGS = @LIBS@ -version-info @GLBLIBVERSION@ @LIBLTDL@
+libglb_la_LDFLAGS = @F2CCONVENIENCE@  @BLCONVENIENCE@ @LIBS@ \
+-version-info @GLBLIBVERSION@ @LIBLTDL@
+
 libglb_la_CPPFLAGS = -DGLB_MODULE_DIR=\"$(pkglibdir)\"
+libglb_la_DEPENDENCIES = @BLCONVENIENCE@
 all: all-am
 
 .SUFFIXES:

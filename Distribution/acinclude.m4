@@ -1,7 +1,15 @@
 dnl Here follow some house-made macros to solve the SUSE libf2c problem
 
+dnl Check for g2c
+AC_DEFUN([AC_CHECK_G2C]),[
+AC_CHECK_LIB(g2c,main,[],[NOF2C="no"])
+])
+
 dnl Check for f2c and taking care of the SUSE libf2c problem 
-AC_DEFUN([AC_CHECK_SUSE_f2c],[
+dnl and alse taking into account that this thing is sometimes
+dnl called g2c!
+AC_DEFUN([AC_CHECK_F2C],[
+NOF2C="yes"
 dnl Check for libf2c and taking care of the SUSE libf2c problem 
 AC_CHECK_LIB(f2c,main,[],[
 globes_temp_lib="$LIBS"
@@ -16,7 +24,10 @@ int main (void)
 if test $globes_cv_libf2c = yes; then
  AC_DEFINE(HAVE_LIBF2C)
 else
- LIBS="$globes_temp_lib" && AC_MSG_ERROR([libf2c not found])
+ LIBS="$globes_temp_lib"
+dnl nothing like libf2c found perhaps libg2c exists ...
+ AC_CHECK_G2C
+ AC_CHECK_HEADERS([g2c.h])
 fi
 ])
 ])
@@ -36,7 +47,7 @@ int main (void)
 if test $globes_cv_libblas = yes; then
  AC_DEFINE(HAVE_LIBBLAS)
 else
- LIBS=$globes_temp_lib && AC_MSG_ERROR([libblas not found])
+ LIBS=$globes_temp_lib && NOBLAS="no"
 fi
 ])
 ])
@@ -54,177 +65,95 @@ int main (void)
 }]])],[globes_cv_liblapack="yes"],[globes_cv_liblapack="no"])
 ])
 if test $globes_cv_liblapack = yes; then
- AC_DEFINE(HAVE_LIBLAPACK)
+ AC_DEFINE(HAVE_LIBLAPACK)	
 else
- LIBS="$globes_temp_lib" && AC_MSG_ERROR([liblapack not found])
+ LIBS="$globes_temp_lib" && NOLAPACK="no"
 fi
 ])
 ])
 
+dnl This macro serves to make it possible to use a convenience version
+dnl of the BLAS and LAPACK functions GLoBES needs (zgeev_). By
+dnl default it looks for an installed BLAS/LAPACK and if found they
+dnl will be used in linking the program. If not found the convenience
+dnl version is built in the `lapack' subdirectory and this one is
+dnl linked statically. If the option `--enable-lapack-convience' is given
+dnl no search for a installed BLAS/LAPACK is performed and the convience
+dnl library is used.
+AC_DEFUN([AC_LAPACK_CONVENIENCE],[
+AC_ARG_ENABLE(lapack-convenience,[  --enable-lapack-convenience   Using the BLAS and LAPACK convience functions],bl_convenience="yes",bl_convenience="no")
+if test $bl_convenience = "no"; then	
+	NOBLAS="yes"
+	NOLAPACK="yes"
+	AC_CHECK_SUSE_blas
+	AC_CHECK_SUSE_lapack
+	BLCONVENIENCE=""
+	if test $NOBLAS = "no"; then
+		BLCONVENIENCE="\$(top_builddir)/lapack/libglblapack.la"
+	fi
+
+	if test $NOLAPACK = "no"; then
+		BLCONVENIENCE="\$(top_builddir)/lapack/libglblapack.la"
+	fi
+
+	if test -n "$BLCONVENIENCE"; then
+		echo "LAPACK/BLAS seems to be not installed in your system"
+		echo "Using convenience library instead ..."
+		bl_convenience="yes"
+	fi
+else
+	BLCONVENIENCE="\$(top_builddir)/lapack/libglblapack.la"
+fi
+dnl This control wether the stuff in `lapack' is built
+AM_CONDITIONAL(WANT_LAPACK,test x$bl_convenience = xyes)
+dnl This contains the correct linker flag for using the convience library
+AC_SUBST(BLCONVENIENCE)
+])
+
+dnl This macro serves to make it possible to use a convenience version
+dnl of libf2c. By
+dnl default it looks for an installed libf2c (or libg2c) and if found they
+dnl will be used in linking the program. If not found the convenience
+dnl version is built in the `libf2c' subdirectory and this one is
+dnl linked statically. If the option `--enable-lapack-convience' is given
+dnl no search for a installed libf2c is performed and the convience
+dnl library is used.
+AC_DEFUN([AC_LIBF2C_CONVENIENCE],[
+AC_ARG_ENABLE(libf2c-convenience,[  --enable-libf2c-convenience   Using the libf2c convenience library],f2c_convenience="yes",f2c_convenience="no")
+if test $f2c_convenience = "no"; then	
+	NOF2C="yes"
+	AC_CHECK_F2C
+	F2CCONVENIENCE=""
+	F2CINC=""
+	if test $NOF2C = "no"; then
+		F2CCONVENIENCE="\$(top_builddir)/libf2c/libf2c.la"
+		F2CINC="\$(top_builddir)/libf2c"
+	fi
+
+	if test -n "$F2CCONVENIENCE"; then
+		echo "libf2c/libg2c seems to be not installed in your system"
+		echo "Using convenience library instead ..."
+		f2c_convenience="yes"
+	fi
+else
+	F2CCONVENIENCE="\$(top_builddir)/libf2c/libf2c.la"
+	F2CINC="\$(top_builddir)/libf2c"
+fi
+dnl This control wether the stuff in `libf2c' is built
+AM_CONDITIONAL(WANT_LIBF2C,test x$f2c_convenience = xyes)
+dnl These defines are needed for proper compilation of the convenienece library
+AC_DEFINE(USE_STRLEN)
+AC_DEFINE(NON_ANSI_RW_MODES)
+AC_DEFINE(UIOLEN_int)
+AC_DEFINE(NON_UNIX_STDIO)
+dnl This contains the correct linker flag for using the convience library
+AC_SUBST(F2CCONVENIENCE)
+AC_SUBST(F2CINC)
+])
+
 dnl Experimental support for making rpm's
-dnl @synopsis AM_RPM_INIT
-dnl
-dnl Setup variables for creation of rpms.  It will define several
-dnl variables useful for creating rpms on a system where rpms are
-dnl supported.  Currently, I requires changes to Makefile.am to
-dnl function properly (see the example below).
-dnl
-dnl Also note that I do not use any non-UNIX OSs (and for the most
-dnl part, I only use RedHat), so this is probably generally not useful
-dnl for other systems.
-dnl
-dnl Required setup:
-dnl
-dnl In configure.in:
-dnl
-dnl   dnl For my rpm.m4 macros
-dnl   RPM_RELEASE=1
-dnl   AC_SUBST(RPM_RELEASE)
-dnl
-dnl   AM_RPM_INIT
-dnl   dnl Enable or disable the rpm making rules in Makefile.am
-dnl   AM_CONDITIONAL(MAKE_RPMS, test x$make_rpms = xtrue)
-dnl
-dnl Furthermore, the %GNUconfigure rpm macro has a problem in that it
-dnl does not define CXXFLAGS for the target system correctly, so for
-dnl compiling C++ code, add the following line _before_ calling
-dnl AC_PROG_CXX:
-dnl
-dnl   dnl This is a little hack to make this work with rpm better (see mysql++.spec.in)
-dnl   test -z "$CXXFLAGS" && CXXFLAGS="${CFLAGS}"
-dnl
-dnl Changes to Makefile.am (I am trying to get rid of this step;
-dnl suggestions invited):
-dnl
-dnl   if MAKE_RPMS
-dnl   rpm: @RPM_TARGET@
-dnl
-dnl   .PHONY: rpm
-dnl
-dnl   $(RPM_TARGET): $(DISTFILES)
-dnl     ${MAKE} dist
-dnl     -mkdir -p $(RPM_DIR)/SRPMS
-dnl     -mkdir -p `dirname $(RPM_TARGET)`
-dnl     $(RPM_PROG) $(RPM_ARGS) $(RPM_TARBALL)
-dnl     @echo Congratulations, $(RPM_TARGET) "(and friends)" should now exist.
-dnl   else
-dnl   endif
-dnl
-dnl Also, it works best with a XXXX.spec.in file like the following
-dnl (this is way down on the wishlist, but a program to generate the
-dnl skeleton spec.in much like autoscan would just kick butt!):
-dnl
-dnl   ---------- 8< ----------
-dnl   # -*- Mode:rpm-spec -*-
-dnl   # mysql++.spec.in
-dnl   Summary: Your package description goes here
-dnl   %define rel @RPM_RELEASE@
-dnl
-dnl   %define version @VERSION@
-dnl   %define pkgname @PACKAGE@
-dnl   %define prefix /usr
-dnl
-dnl   %define lt_release @LT_RELEASE@
-dnl   %define lt_version @LT_CURRENT@.@LT_REVISION@.@LT_AGE@
-dnl
-dnl   # This is a hack until I can figure out how to better handle replacing
-dnl   # autoconf macros... (gotta love autoconf...)
-dnl   %define __aclocal   aclocal || aclocal -I ./macros
-dnl   %define configure_args  @RPM_CONFIGURE_ARGS@
-dnl
-dnl   Name: %{pkgname}
-dnl   Version: %{version}
-dnl   Release: %{rel}
-dnl
-dnl   Copyright: LGPL
-dnl   Group: # your group name goes here
-dnl   Source: %{pkgname}-%{version}.tar.gz
-dnl   Requires: # additional requirements
-dnl   Buildroot: /tmp/%{pkgname}-root
-dnl   URL: http://yoururl.go.here
-dnl   Prefix: %{prefix}
-dnl   BuildArchitectures: # Target platforms, i.e., i586
-dnl   Packager: Your Name <youremail@your.address>
-dnl
-dnl   %description
-dnl   Your package description
-dnl
-dnl   %changelog
-dnl
-dnl   %prep
-dnl   %setup
-dnl   #%patch
-dnl
-dnl   %build
-dnl   %GNUconfigure %{configure_args}
-dnl   # This is why we copy the CFLAGS to the CXXFLAGS in configure.in
-dnl   # CFLAGS="%{optflags}" CXXFLAGS="%{optflags}" ./configure %{_target_platform} --prefix=%{prefix}
-dnl   make
-dnl
-dnl   %install
-dnl   # To make things work with BUILDROOT
-dnl   if [ "$RPM_BUILD_ROOT" != "/tmp/%{pkgname}-root" ]
-dnl   then
-dnl     echo
-dnl     echo @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-dnl     echo @                                                                    @
-dnl     echo @  RPM_BUILD_ROOT is not what I expected.  Please clean it yourself. @
-dnl     echo @                                                                    @
-dnl     echo @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-dnl     echo
-dnl   else
-dnl     echo Cleaning RPM_BUILD_ROOT: "$RPM_BUILD_ROOT"
-dnl     rm -rf "$RPM_BUILD_ROOT"
-dnl   fi
-dnl   make DESTDIR="$RPM_BUILD_ROOT" install
-dnl
-dnl   %clean
-dnl   # Call me paranoid, but I do not want to be responsible for nuking
-dnl   # someone's harddrive!
-dnl   if [ "$RPM_BUILD_ROOT" != "/tmp/%{pkgname}-root" ]
-dnl   then
-dnl     echo
-dnl     echo @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-dnl     echo @                                                                    @
-dnl     echo @  RPM_BUILD_ROOT is not what I expected.  Please clean it yourself. @
-dnl     echo @                                                                    @
-dnl     echo @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-dnl     echo
-dnl   else
-dnl     echo Cleaning RPM_BUILD_ROOT: "$RPM_BUILD_ROOT"
-dnl     rm -rf "$RPM_BUILD_ROOT"
-dnl   fi
-dnl
-dnl   %files
-dnl   %defattr(-, root, root)
-dnl   # Your application file list goes here
-dnl   # %{prefix}/lib/lib*.so*
-dnl   %doc COPYRIGHT ChangeLog README AUTHORS NEWS
-dnl   %doc doc/*
-dnl
-dnl   # If you install a library
-dnl   %post -p /sbin/ldconfig
-dnl
-dnl   # If you install a library
-dnl   %postun -p /sbin/ldconfig
-dnl
-dnl   %package devel
-dnl   Summary: Development files for %{pkgname}
-dnl   Group: Applications/Databases
-dnl   %description devel
-dnl   Development files for %{pkgname}.
-dnl
-dnl   %files devel
-dnl   %defattr(-, root, root)
-dnl   # Your development files go here
-dnl   # Programmers documentation goes here
-dnl   %doc doc
-dnl
-dnl   # end of file
-dnl   ---------- >8 ----------
-dnl
-dnl @version $Id: acinclude.m4,v 1.3 2004/09/15 12:29:42 globes Exp $
-dnl @author Dale K. Hawkins <dhawkins@cdrgts.com>
+dnl This is largely adapted from the rpm.m4 macro by
+dnl Dale K. Hawkins <dhawkins@cdrgts.com>
 
 dnl AM_RPM_INIT
 dnl Figure out how to create rpms for this system and setup for an
@@ -237,7 +166,7 @@ dnl Find the RPM (rpmbuild) program
 AC_ARG_WITH(rpm-prog,[  --with-rpm-prog=PROG   Which rpm to use (optional)],
             rpm_prog="$withval", rpm_prog="rpmbuild")
 
-AC_ARG_ENABLE(rpm-rules, [  --enable-rpm-rules       Try to create rpm make rules (defaults to yes for Linux)],
+AC_ARG_ENABLE(rpm-rules, [  --enable-rpm-rules       Try to create rpm make rules [[default=no]]],
                 enable_rpm_rules="$withval",enable_rpm_rules=no)
 
 AC_ARG_WITH(rpm-extra-args, [  --with-rpm-extra-args=ARGS       Run rpm with extra arguments (defaults to none)],

@@ -1,12 +1,12 @@
-DIST_SUBDIRS = source data libltdl modules globes
-SUBDIRS = libltdl source data modules globes
-INCLUDES = $(LTDLINCL)
+DIST_SUBDIRS = lapack source data libltdl modules globes libf2c
+SUBDIRS = libf2c lapack libltdl source data modules globes 
+INCLUDES = $(LTDLINCL) $(F2CINCL)
 
 EXTRA_DIST = examples/Makefile.in examples/example1.c\
   examples/example3.c examples/myio.c\
 examples/example-tour.c  examples/example2.c  examples/example4.c\
 examples/myio.h examples/XCC.dat examples/NuFact.glb\
-BUGS globes-script
+BUGS globes-script lapack/COPYING
 
 nodist_bin_SCRIPTS = globes-config globes-module
 noinst_SCRIPTS = globes-script

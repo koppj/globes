@@ -464,7 +464,7 @@ ac_includes_default="\
 #endif"
 
 ac_subdirs_all="$ac_subdirs_all libltdl"
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT GLBLIBVERSION GLBMLDF GLBLDF GLBINC GLBMODULES CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE CXX CXXFLAGS ac_ct_CXX CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE CPP LN_S YACC LEX LEXLIB LEX_OUTPUT_ROOT HAVE_LIBTOOL LTDLINCL LIBLTDL build build_cpu build_vendor build_os host host_cpu host_vendor host_os EGREP ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL subdirs RPM_RELEASE RPM_ARCHS RPM_PROG RPM_SOURCE_DIR RPM_BUILD_DIR RPM_DIR RPM_TARGET RPM_ARGS RPM_TARBALL RPM_VERSION RPM_CONFIGURE_ARGS MAKE_RPMS_TRUE MAKE_RPMS_FALSE LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT GLBLIBVERSION GLBMLDF GLBLDF GLBINC GLBMODULES CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE CXX CXXFLAGS ac_ct_CXX CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE CPP LN_S YACC LEX LEXLIB LEX_OUTPUT_ROOT HAVE_LIBTOOL LTDLINCL LIBLTDL build build_cpu build_vendor build_os host host_cpu host_vendor host_os EGREP ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL subdirs WANT_LIBF2C_TRUE WANT_LIBF2C_FALSE F2CCONVENIENCE WANT_LAPACK_TRUE WANT_LAPACK_FALSE BLCONVENIENCE RPM_RELEASE RPM_ARCHS RPM_PROG RPM_SOURCE_DIR RPM_BUILD_DIR RPM_DIR RPM_TARGET RPM_ARGS RPM_TARBALL RPM_VERSION RPM_CONFIGURE_ARGS MAKE_RPMS_TRUE MAKE_RPMS_FALSE LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -1037,7 +1037,9 @@ Optional Features:
   --enable-fast-install[=PKGS]
                           optimize for fast installation [default=yes]
   --disable-libtool-lock  avoid locking (might break parallel builds)
-  --enable-rpm-rules       Try to create rpm make rules (defaults to yes for Linux)
+  --enable-libf2c-convenience   Using the libf2c convenience library
+  --enable-lapack-convenience   Using the BLAS and LAPACK convience functions
+  --enable-rpm-rules       Try to create rpm make rules [default=no]
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -2011,7 +2013,6 @@ for allow in ´echo $allowed´
  		standard="yes"
 	fi
  done
-
 
 
 
@@ -4306,8 +4307,6 @@ echo "${ECHO_T}no" >&6
 fi
 
 
-
-
   case $enable_ltdl_convenience in
   no) { { echo "$as_me:$LINENO: error: this package needs a convenience libltdl" >&5
 echo "$as_me: error: this package needs a convenience libltdl" >&2;}
@@ -4927,7 +4926,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 4930 "configure"' > conftest.$ac_ext
+  echo '#line 4929 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -5801,7 +5800,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:5804:" \
+echo "$as_me:5803:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -6851,11 +6850,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:6854: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:6853: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:6858: \$? = $ac_status" >&5
+   echo "$as_me:6857: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -7094,11 +7093,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:7097: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:7096: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:7101: \$? = $ac_status" >&5
+   echo "$as_me:7100: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -7154,11 +7153,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:7157: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:7156: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:7161: \$? = $ac_status" >&5
+   echo "$as_me:7160: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -9339,7 +9338,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 9342 "configure"
+#line 9341 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -9437,7 +9436,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 9440 "configure"
+#line 9439 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11626,11 +11625,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:11629: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:11628: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:11633: \$? = $ac_status" >&5
+   echo "$as_me:11632: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -11686,11 +11685,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:11689: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:11688: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:11693: \$? = $ac_status" >&5
+   echo "$as_me:11692: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -13047,7 +13046,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 13050 "configure"
+#line 13049 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -13145,7 +13144,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 13148 "configure"
+#line 13147 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -13982,11 +13981,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13985: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13984: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:13989: \$? = $ac_status" >&5
+   echo "$as_me:13988: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -14042,11 +14041,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14045: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14044: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:14049: \$? = $ac_status" >&5
+   echo "$as_me:14048: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -16077,11 +16076,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:16080: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:16079: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:16084: \$? = $ac_status" >&5
+   echo "$as_me:16083: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -16320,11 +16319,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:16323: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:16322: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:16327: \$? = $ac_status" >&5
+   echo "$as_me:16326: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -16380,11 +16379,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:16383: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:16382: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:16387: \$? = $ac_status" >&5
+   echo "$as_me:16386: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -18565,7 +18564,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 18568 "configure"
+#line 18567 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -18663,7 +18662,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 18666 "configure"
+#line 18665 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -19683,9 +19682,6 @@ subdirs="$subdirs libltdl"
 
 
 
-
-
-
 echo "$as_me:$LINENO: checking for main in -lm" >&5
 echo $ECHO_N "checking for main in -lm... $ECHO_C" >&6
 if test "${ac_cv_lib_m_main+set}" = set; then
@@ -19904,6 +19900,18 @@ fi
 
 
 
+# Check whether --enable-libf2c-convenience or --disable-libf2c-convenience was given.
+if test "${enable_libf2c_convenience+set}" = set; then
+  enableval="$enable_libf2c_convenience"
+  f2c_convenience="yes"
+else
+  f2c_convenience="no"
+fi;
+if test $f2c_convenience = "no"; then
+	NOF2C="yes"
+
+NOF2C="yes"
+
 echo "$as_me:$LINENO: checking for main in -lf2c" >&5
 echo $ECHO_N "checking for main in -lf2c... $ECHO_C" >&6
 if test "${ac_cv_lib_f2c_main+set}" = set; then
@@ -20038,14 +20046,217 @@ if test $globes_cv_libf2c = yes; then
 _ACEOF
 
 else
- LIBS="$globes_temp_lib" && { { echo "$as_me:$LINENO: error: libf2c not found" >&5
-echo "$as_me: error: libf2c not found" >&2;}
-   { (exit 1); exit 1; }; }
+ LIBS="$globes_temp_lib"
+
+
+for ac_header in g2c.h
+do
+as_ac_Header=`echo "ac_cv_header_$ac_header" | $as_tr_sh`
+if eval "test \"\${$as_ac_Header+set}\" = set"; then
+  echo "$as_me:$LINENO: checking for $ac_header" >&5
+echo $ECHO_N "checking for $ac_header... $ECHO_C" >&6
+if eval "test \"\${$as_ac_Header+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_Header'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_Header'}'`" >&6
+else
+  # Is the header compilable?
+echo "$as_me:$LINENO: checking $ac_header usability" >&5
+echo $ECHO_N "checking $ac_header usability... $ECHO_C" >&6
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+$ac_includes_default
+#include <$ac_header>
+_ACEOF
+rm -f conftest.$ac_objext
+if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
+  (eval $ac_compile) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest.$ac_objext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_header_compiler=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ac_header_compiler=no
+fi
+rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
+echo "$as_me:$LINENO: result: $ac_header_compiler" >&5
+echo "${ECHO_T}$ac_header_compiler" >&6
+
+# Is the header present?
+echo "$as_me:$LINENO: checking $ac_header presence" >&5
+echo $ECHO_N "checking $ac_header presence... $ECHO_C" >&6
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <$ac_header>
+_ACEOF
+if { (eval echo "$as_me:$LINENO: \"$ac_cpp conftest.$ac_ext\"") >&5
+  (eval $ac_cpp conftest.$ac_ext) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } >/dev/null; then
+  if test -s conftest.err; then
+    ac_cpp_err=$ac_c_preproc_warn_flag
+    ac_cpp_err=$ac_cpp_err$ac_c_werror_flag
+  else
+    ac_cpp_err=
+  fi
+else
+  ac_cpp_err=yes
+fi
+if test -z "$ac_cpp_err"; then
+  ac_header_preproc=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+  ac_header_preproc=no
+fi
+rm -f conftest.err conftest.$ac_ext
+echo "$as_me:$LINENO: result: $ac_header_preproc" >&5
+echo "${ECHO_T}$ac_header_preproc" >&6
+
+# So?  What about this header?
+case $ac_header_compiler:$ac_header_preproc:$ac_c_preproc_warn_flag in
+  yes:no: )
+    { echo "$as_me:$LINENO: WARNING: $ac_header: accepted by the compiler, rejected by the preprocessor!" >&5
+echo "$as_me: WARNING: $ac_header: accepted by the compiler, rejected by the preprocessor!" >&2;}
+    { echo "$as_me:$LINENO: WARNING: $ac_header: proceeding with the compiler's result" >&5
+echo "$as_me: WARNING: $ac_header: proceeding with the compiler's result" >&2;}
+    ac_header_preproc=yes
+    ;;
+  no:yes:* )
+    { echo "$as_me:$LINENO: WARNING: $ac_header: present but cannot be compiled" >&5
+echo "$as_me: WARNING: $ac_header: present but cannot be compiled" >&2;}
+    { echo "$as_me:$LINENO: WARNING: $ac_header:     check for missing prerequisite headers?" >&5
+echo "$as_me: WARNING: $ac_header:     check for missing prerequisite headers?" >&2;}
+    { echo "$as_me:$LINENO: WARNING: $ac_header: see the Autoconf documentation" >&5
+echo "$as_me: WARNING: $ac_header: see the Autoconf documentation" >&2;}
+    { echo "$as_me:$LINENO: WARNING: $ac_header:     section \"Present But Cannot Be Compiled\"" >&5
+echo "$as_me: WARNING: $ac_header:     section \"Present But Cannot Be Compiled\"" >&2;}
+    { echo "$as_me:$LINENO: WARNING: $ac_header: proceeding with the preprocessor's result" >&5
+echo "$as_me: WARNING: $ac_header: proceeding with the preprocessor's result" >&2;}
+    { echo "$as_me:$LINENO: WARNING: $ac_header: in the future, the compiler will take precedence" >&5
+echo "$as_me: WARNING: $ac_header: in the future, the compiler will take precedence" >&2;}
+    (
+      cat <<\_ASBOX
+## --------------------------------- ##
+## Report this to the globes lists.  ##
+## --------------------------------- ##
+_ASBOX
+    ) |
+      sed "s/^/$as_me: WARNING:     /" >&2
+    ;;
+esac
+echo "$as_me:$LINENO: checking for $ac_header" >&5
+echo $ECHO_N "checking for $ac_header... $ECHO_C" >&6
+if eval "test \"\${$as_ac_Header+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  eval "$as_ac_Header=\$ac_header_preproc"
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_Header'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_Header'}'`" >&6
+
+fi
+if test `eval echo '${'$as_ac_Header'}'` = yes; then
+  cat >>confdefs.h <<_ACEOF
+#define `echo "HAVE_$ac_header" | $as_tr_cpp` 1
+_ACEOF
+
+fi
+
+done
+
 fi
 
 fi
 
 
+	F2CCONVENIENCE=""
+	if test $NOF2C = "no"; then
+		F2CCONVENIENCE="\$(top_builddir)/libf2c/libf2c.la"
+	fi
+
+	if test -n "$F2CCONVENIENCE"; then
+		echo "libf2c/libg2c seems to be not installed in your system"
+		echo "Using convenience library instead ..."
+		f2c_convenience="yes"
+	fi
+else
+	F2CCONVENIENCE="\$(top_builddir)/libf2c/libf2c.la"
+fi
+
+
+if test x$f2c_convenience = xyes; then
+  WANT_LIBF2C_TRUE=
+  WANT_LIBF2C_FALSE='#'
+else
+  WANT_LIBF2C_TRUE='#'
+  WANT_LIBF2C_FALSE=
+fi
+
+
+
+cat >>confdefs.h <<\_ACEOF
+#define USE_STRLEN 1
+_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
+#define NON_ANSI_RW_MODES 1
+_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
+#define UIOLEN_int 1
+_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
+#define NON_UNIX_STDIO 1
+_ACEOF
+
+
+
+
+# Check whether --enable-lapack-convenience or --disable-lapack-convenience was given.
+if test "${enable_lapack_convenience+set}" = set; then
+  enableval="$enable_lapack_convenience"
+  bl_convenience="yes"
+else
+  bl_convenience="no"
+fi;
+if test $bl_convenience = "no"; then
+	NOBLAS="yes"
+	NOLAPACK="yes"
 
 
 echo "$as_me:$LINENO: checking for main in -lblas" >&5
@@ -20182,9 +20393,7 @@ if test $globes_cv_libblas = yes; then
 _ACEOF
 
 else
- LIBS=$globes_temp_lib && { { echo "$as_me:$LINENO: error: libblas not found" >&5
-echo "$as_me: error: libblas not found" >&2;}
-   { (exit 1); exit 1; }; }
+ LIBS=$globes_temp_lib && NOBLAS="no"
 fi
 
 fi
@@ -20326,13 +20535,38 @@ if test $globes_cv_liblapack = yes; then
 _ACEOF
 
 else
- LIBS="$globes_temp_lib" && { { echo "$as_me:$LINENO: error: liblapack not found" >&5
-echo "$as_me: error: liblapack not found" >&2;}
-   { (exit 1); exit 1; }; }
+ LIBS="$globes_temp_lib" && NOLAPACK="no"
 fi
 
 fi
 
+
+	BLCONVENIENCE=""
+	if test $NOBLAS = "no"; then
+		BLCONVENIENCE="\$(top_builddir)/lapack/libglblapack.la"
+	fi
+
+	if test $NOLAPACK = "no"; then
+		BLCONVENIENCE="\$(top_builddir)/lapack/libglblapack.la"
+	fi
+
+	if test -n "$BLCONVENIENCE"; then
+		echo "LAPACK/BLAS seems to be not installed in your system"
+		echo "Using convenience library instead ..."
+		bl_convenience="yes"
+	fi
+else
+	BLCONVENIENCE="\$(top_builddir)/lapack/libglblapack.la"
+fi
+
+
+if test x$bl_convenience = xyes; then
+  WANT_LAPACK_TRUE=
+  WANT_LAPACK_FALSE='#'
+else
+  WANT_LAPACK_TRUE='#'
+  WANT_LAPACK_FALSE=
+fi
 
 
 
@@ -20781,7 +21015,6 @@ fi
 done
 
 
-
 RPM_RELEASE=0
 
 
@@ -20973,9 +21206,7 @@ fi
           ac_config_files="$ac_config_files globes.spec"
 
 
-
-
-                                                                                          ac_config_files="$ac_config_files Makefile globes/Makefile source/Makefile examples/Makefile data/Makefile modules/MakefileExample modules/Makefile globes-config.src globes-module.src"
+                                                                                                              ac_config_files="$ac_config_files Makefile libf2c/Makefile lapack/Makefile globes/Makefile source/Makefile examples/Makefile data/Makefile modules/MakefileExample modules/Makefile globes-config.src globes-module.src"
 
 
 cat >confcache <<\_ACEOF
@@ -21125,6 +21356,20 @@ if test -z "${am__fastdepCXX_TRUE}" && test -z "${am__fastdepCXX_FALSE}"; then
   { { echo "$as_me:$LINENO: error: conditional \"am__fastdepCXX\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
 echo "$as_me: error: conditional \"am__fastdepCXX\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${WANT_LIBF2C_TRUE}" && test -z "${WANT_LIBF2C_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"WANT_LIBF2C\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"WANT_LIBF2C\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${WANT_LAPACK_TRUE}" && test -z "${WANT_LAPACK_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"WANT_LAPACK\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"WANT_LAPACK\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
@@ -21576,6 +21821,8 @@ do
   # Handling of arguments.
   "globes.spec" ) CONFIG_FILES="$CONFIG_FILES globes.spec" ;;
   "Makefile" ) CONFIG_FILES="$CONFIG_FILES Makefile" ;;
+  "libf2c/Makefile" ) CONFIG_FILES="$CONFIG_FILES libf2c/Makefile" ;;
+  "lapack/Makefile" ) CONFIG_FILES="$CONFIG_FILES lapack/Makefile" ;;
   "globes/Makefile" ) CONFIG_FILES="$CONFIG_FILES globes/Makefile" ;;
   "source/Makefile" ) CONFIG_FILES="$CONFIG_FILES source/Makefile" ;;
   "examples/Makefile" ) CONFIG_FILES="$CONFIG_FILES examples/Makefile" ;;
@@ -21750,6 +21997,12 @@ s,@FFLAGS@,$FFLAGS,;t t
 s,@ac_ct_F77@,$ac_ct_F77,;t t
 s,@LIBTOOL@,$LIBTOOL,;t t
 s,@subdirs@,$subdirs,;t t
+s,@WANT_LIBF2C_TRUE@,$WANT_LIBF2C_TRUE,;t t
+s,@WANT_LIBF2C_FALSE@,$WANT_LIBF2C_FALSE,;t t
+s,@F2CCONVENIENCE@,$F2CCONVENIENCE,;t t
+s,@WANT_LAPACK_TRUE@,$WANT_LAPACK_TRUE,;t t
+s,@WANT_LAPACK_FALSE@,$WANT_LAPACK_FALSE,;t t
+s,@BLCONVENIENCE@,$BLCONVENIENCE,;t t
 s,@RPM_RELEASE@,$RPM_RELEASE,;t t
 s,@RPM_ARCHS@,$RPM_ARCHS,;t t
 s,@RPM_PROG@,$RPM_PROG,;t t
@@ -22420,9 +22673,6 @@ do
 	stars="${stars}*"
 	empty="${empty} "
 done
-
-
-
 
 if test $standard = "yes" ; then
  echo "********************************************"

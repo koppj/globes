@@ -86,6 +86,7 @@ AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
+BLCONVENIENCE = @BLCONVENIENCE@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
@@ -104,6 +105,7 @@ ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
+F2CCONVENIENCE = @F2CCONVENIENCE@
 F77 = @F77@
 FFLAGS = @FFLAGS@
 GLBINC = @GLBINC@
@@ -157,6 +159,10 @@ SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
 VERSION = @VERSION@
+WANT_LAPACK_FALSE = @WANT_LAPACK_FALSE@
+WANT_LAPACK_TRUE = @WANT_LAPACK_TRUE@
+WANT_LIBF2C_FALSE = @WANT_LIBF2C_FALSE@
+WANT_LIBF2C_TRUE = @WANT_LIBF2C_TRUE@
 YACC = @YACC@
 ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
@@ -202,14 +208,14 @@ sharedstatedir = @sharedstatedir@
 subdirs = @subdirs@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
-DIST_SUBDIRS = source data libltdl modules globes
-SUBDIRS = libltdl source data modules globes
+DIST_SUBDIRS = lapack source data libltdl modules globes libf2c
+SUBDIRS = libf2c lapack libltdl source data modules globes 
 INCLUDES = $(LTDLINCL)
 EXTRA_DIST = examples/Makefile.in examples/example1.c\
   examples/example3.c examples/myio.c\
 examples/example-tour.c  examples/example2.c  examples/example4.c\
 examples/myio.h examples/XCC.dat examples/NuFact.glb\
-BUGS globes-script
+BUGS globes-script lapack/COPYING
 
 nodist_bin_SCRIPTS = globes-config globes-module
 noinst_SCRIPTS = globes-script
@@ -412,7 +418,7 @@ distclean-tags:
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkdir_p) $(distdir)/. $(distdir)/examples $(distdir)/modules
+	$(mkdir_p) $(distdir)/. $(distdir)/examples $(distdir)/lapack $(distdir)/modules
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \

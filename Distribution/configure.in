@@ -126,10 +126,11 @@ AC_CHECK_LIB(m,main,[],AC_MSG_ERROR([libm not found]))
 AC_CHECK_LIB(gslcblas,main,[],AC_MSG_ERROR([libgslcblas not found]))
 AC_CHECK_LIB(gsl,main,[],AC_MSG_ERROR([libgsl not found]))
 
-dnl same for SUSE
-AC_CHECK_SUSE_f2c
-AC_CHECK_SUSE_blas
-AC_CHECK_SUSE_lapack
+dnl Checking wether f2c is there (or something similar, like g2c)
+AC_LIBF2C_CONVENIENCE
+
+dnl Handling the BLAS/LAPACK stuff
+AC_LAPACK_CONVENIENCE
 
 dnl Checks for header files.
 AC_HEADER_STDC
@@ -141,9 +142,7 @@ AC_TYPE_SIZE_T
 dnl Checks for library functions.
 AC_CHECK_FUNCS(strdup)
 
-
 dnl Experimental rpm-builing support
-dnl For my rpm.m4 macros
 RPM_RELEASE=0
 AC_SUBST(RPM_RELEASE)
 dnl
@@ -152,7 +151,9 @@ dnl   dnl Enable or disable the rpm making rules in Makefile.am
 AM_CONDITIONAL(MAKE_RPMS, test x$make_rpms = xtrue)
 AC_CONFIG_FILES(globes.spec)
 
-AC_CONFIG_FILES([Makefile globes/Makefile source/Makefile examples/Makefile\
+AC_CONFIG_FILES([Makefile libf2c/Makefile lapack/Makefile\
+ globes/Makefile source/Makefile\
+ examples/Makefile\
  data/Makefile modules/MakefileExample modules/Makefile globes-config.src\
  globes-module.src])
 
@@ -166,9 +167,6 @@ do
 	stars="${stars}*"
 	empty="${empty} "
 done
-
-
-
 
 dnl Remind the user of things he might need ;-)
 if test $standard = "yes" ; then
