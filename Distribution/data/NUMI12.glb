@@ -1,6 +1,6 @@
 %!GLoBES
 
-$version="1.7.5"
+$version="1.8.1"
 
 /* 	 Beam data 	 */
 
@@ -12,14 +12,14 @@ flux(#NUMI12plus)<
 
 $target_mass = 	        85.
 
-$numofbins = 		20
+$bins = 		20
 
 $emin = 	        1.2
 $emax = 	        2.5
 
-$simbins = 		20
-$simtresh =    		1.2
-$simbeam =         	2.5
+$sampling_points = 		20
+$sampling_min =    		1.2
+$sampling_max =         	2.5
 
 
 /* 	 Baseline 	 */
@@ -33,7 +33,6 @@ $lengthtab = 		{712}
 
 $filter_state = 0 
 $filter_value = 1000000 
-$errorfunction = 0 
 
 /*       Energy Resolution       */
 

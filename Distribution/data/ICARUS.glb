@@ -1,6 +1,6 @@
 %!GLoBES
 
-$version="1.7.5"
+$version="1.8.1"
 
 /* 	 Beam data 	 */
 
@@ -12,7 +12,7 @@ flux(#CNGS)<
 
 $target_mass = 	        2.35
 
-$numofbins = 		29
+$bins = 		29
 $emin = 	         1.0
 $emax = 	        30.0
 
@@ -29,7 +29,6 @@ $lengthtab = 		{732.0}
 
 $filter_state = 0 
 $filter_value = 1000000 
-$errorfunction = 0 
 
 
 /*       Energy Resolution       */

@@ -1,6 +1,6 @@
 %!GLoBES
 
-$version="1.7.5"
+$version="1.8.1"
 
 /* 	 Beam data 	 */
 
@@ -18,7 +18,7 @@ flux(#JHFminus)<
 
 $target_mass = 	112.5
 
-$numofbins = 	20
+$bins = 	20
 
 $emin = 	0.4
 $emax = 	1.2
@@ -34,7 +34,6 @@ $lengthtab =		{295.0}
 
 $filter_state = 0 
 $filter_value = 1000000 
-$errorfunction = 0 
 
 /*       Energy Resolution       */
 
