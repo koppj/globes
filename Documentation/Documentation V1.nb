@@ -40,9 +40,9 @@ Wolfram Research.
 
 (*NotebookFileLineBreakTest
 NotebookFileLineBreakTest*)
-(*NotebookOptionsPosition[    396300,       9712]*)
-(*NotebookOutlinePosition[    397366,       9745]*)
-(*  CellTagsIndexPosition[    397322,       9741]*)
+(*NotebookOptionsPosition[    396374,       9714]*)
+(*NotebookOutlinePosition[    397440,       9747]*)
+(*  CellTagsIndexPosition[    397396,       9743]*)
 (*WindowFrame->Normal*)
 
 
@@ -8826,6 +8826,8 @@ Cell[TextData[{
   CellFrame->True,
   Background->GrayLevel[0.849989]],
 
+Cell["MSetBaseline always requires an MChangeProfile command!", "Text"],
+
 Cell[TextData[{
   StyleBox["MSetTargetMass[Target mass,Experiment_Number]",
     FontFamily->"Courier"],
@@ -10212,26 +10214,27 @@ Cell[CellGroupData[{
 Cell[370947, 8811, 44, 0, 87, "Section"],
 Cell[370994, 8813, 216, 5, 46, "Text"],
 Cell[371213, 8820, 199, 6, 70, "Text"],
-Cell[371415, 8828, 210, 6, 70, "Text"],
-Cell[371628, 8836, 237, 6, 70, "Text"],
-Cell[371868, 8844, 295, 8, 95, "Text"],
-Cell[372166, 8854, 115, 3, 46, "Text"],
-Cell[372284, 8859, 50, 1, 39, "Input"],
+Cell[371415, 8828, 71, 0, 46, "Text"],
+Cell[371489, 8830, 210, 6, 70, "Text"],
+Cell[371702, 8838, 237, 6, 70, "Text"],
+Cell[371942, 8846, 295, 8, 95, "Text"],
+Cell[372240, 8856, 115, 3, 46, "Text"],
+Cell[372358, 8861, 50, 1, 39, "Input"],
 
 Cell[CellGroupData[{
-Cell[372359, 8864, 56, 1, 39, "Input"],
-Cell[372418, 8867, 52, 1, 39, "Output"]
+Cell[372433, 8866, 56, 1, 39, "Input"],
+Cell[372492, 8869, 52, 1, 39, "Output"]
 }, Open  ]],
-Cell[372485, 8871, 81, 1, 39, "Input"],
-Cell[372569, 8874, 249, 8, 70, "Text"]
+Cell[372559, 8873, 81, 1, 39, "Input"],
+Cell[372643, 8876, 249, 8, 70, "Text"]
 }, Open  ]],
 
 Cell[CellGroupData[{
-Cell[372855, 8887, 39, 0, 87, "Section"],
+Cell[372929, 8889, 39, 0, 87, "Section"],
 
 Cell[CellGroupData[{
-Cell[372919, 8891, 74, 1, 39, "Input"],
-Cell[372996, 8894, 23252, 812, 2246, "Output"]
+Cell[372993, 8893, 74, 1, 39, "Input"],
+Cell[373070, 8896, 23252, 812, 2246, "Output"]
 }, Open  ]]
 }, Open  ]]
 }, Open  ]]
