@@ -5,6 +5,15 @@
 # If you are using this file for producing a scientific publication
 # or a talk please cite the following references.
 #
+#* %This flux corresponds to the `PH2low' configuration in
+#* @Unpublished{NUMIL714,
+#*	author = "M. Diwan, M. Messier, B. Viren, L. Wai",
+#*	title = "A study of {$\nu_\mu \rightarrow \nu_e$} sensitivity 
+#*	in MINOS", 
+#*	note = "NUMI-L-714 (2001)"
+#*   }
+#* %and was kindly provided as machine readable file by M. Goodman
+#
 0.09999999999999999   5.0058260545811125e13   1.4614421874999988e14   0.   4.566190352877114e12    5.647662118397271e14    0.
 0.18979999999999997   1.7764448528445372e14   9.436209817418308e14    0.   1.602590456578305e13    1.9792726048102102e15   0.
 0.27959999999999996   3.796801907023858e14    3.074331542678383e15    0.   3.385925593915786e13    4.1753565285507895e15   0.

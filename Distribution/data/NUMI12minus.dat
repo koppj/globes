@@ -5,6 +5,10 @@
 # If you are using this file for producing a scientific publication
 # or a talk please cite the following references.
 #
+#* %This flux corresponds to the 12km off-axis at 712km location as
+#* %it can be found at
+#* http://www-nova.fnal.gov/beam/beam.html
+#
 0.1                   0.   0.   0.   273.3001308833966     9756.52080142878          0.
 0.1396                0.   0.   0.   -310.00354474455975   16258.742164133864        0.
 0.17920000000000003   0.   0.   0.   -524.0460870045695    23362.46400081152         0.

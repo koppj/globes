@@ -15,6 +15,17 @@
  #*    eprint    = "hep-ph/0403068",
  #*    SLACcitation  = "%%CITATION = HEP-PH 0403068;%%"
  #* }
+ #
+ #* %This file approximates 
+ #* @Article{Aprili:2002wx,
+ #*    author    = "Aprili, P. and others",
+ #*    collaboration = "ICARUS",
+ #*    title     = "The ICARUS experiment: A second-generation proton decay
+ #*                 experiment and neutrino observatory at the Gran Sasso
+ #*                 laboratory. Cloning of T600 modules to reach the design
+ #*                 sensitive mass. (Addendum)",
+ #*    note     = "CERN-SPSC-2002-027"
+ #* }
  */
 
 $version="1.8.1"

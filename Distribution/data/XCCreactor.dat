@@ -5,6 +5,18 @@
 # If you are using this file for producing a scientific publication
 # or a talk please cite the following references.
 #
+#* @Article{Vogel:1999zy,
+#*     author    = "Vogel, P. and Beacom, John F.",
+#*     title     = "The angular distribution of the neutron inverse beta decay,
+#*                  anti-nu/e + p --> e+ + n",
+#*     journal   = "Phys. Rev.",
+#*     volume    = "D60",
+#*     year      = "1999",
+#*     pages     = "053003",
+#*     eprint    = "hep-ph/9903554",
+#*     SLACcitation  = "%%CITATION = HEP-PH 9903554;%%"
+#* }
+#
 -2.741362717275923    0.   0.   0.   167.22750826902617   0.   0.
 -2.7404841904135178   0.   0.   0.   185.17204083738457   0.   0.
 -2.739605663551113    0.   0.   0.   203.1529098328227    0.   0.

@@ -5,6 +5,32 @@
 # If you are using this file for producing a scientific publication
 # or a talk please cite the following references.
 #
+#* %The parametrization is taken from
+#* @Article{Murayama:2000iq,
+#*     author    = "Murayama, Hitoshi and Pierce, Aaron",
+#*     title     = "Energy spectra of reactor neutrinos at KamLAND",
+#*     journal   = "Phys. Rev.",
+#*     volume    = "D65",
+#*     year      = "2002",
+#*     pages     = "013012",
+#*     eprint    = "hep-ph/0012075",
+#*     SLACcitation  = "%%CITATION = HEP-PH 0012075;%%"
+#* }
+#
+#* %This flux assumes the same fuel composition as in 
+#* @Article{Eguchi:2002dm,
+#*     author    = "Eguchi, K. and others",
+#*     collaboration = "KamLAND",
+#*     title     = "First results from KamLAND: Evidence for reactor anti-
+#*                  neutrino disappearance",
+#*     journal   = "Phys. Rev. Lett.",
+#*     volume    = "90",
+#*     year      = "2003",
+#*     pages     = "021802",
+#*     eprint    = "hep-ex/0212021",
+#*     SLACcitation  = "%%CITATION = HEP-EX 0212021;%%"
+#* }
+#
 0.00001                   0.   0.   0.   2.548748531417107e15    0.   0.
 0.0000338                 0.   0.   0.   2.5372817403499075e15   0.   0.
 0.000057600000000000004   0.   0.   0.   2.5258149492827075e15   0.   0.

@@ -16,7 +16,32 @@
  #*    eprint    = "hep-ph/0403068",
  #*    SLACcitation  = "%%CITATION = HEP-PH 0403068;%%"
  #* }
+ #
+ #* %This file describes the experiment in
+ #* @Article{Guler:2000bd,
+ #*     author    = "Guler, M. and others",
+ #*     collaboration = "OPERA",
+ #*     title     = "OPERA: An appearance experiment to search for nu/mu <-->
+ #*                  nu/tau  oscillations in the CNGS beam. Experimental
+ #*                  proposal",
+ #*     note     = "CERN-SPSC-2000-028"
+ #* }
+ #
+ #* %The electron appearance is taken from
+ #* @Article{Komatsu:2002sz,
+ #*      author    = "Komatsu, M. and Migliozzi, P. and Terranova, F.",
+ #*      title     = "Sensitivity to Theta(13) of the CERN to Gran Sasso 
+ #*                   neutrino beam",
+ #*      journal   = "J. Phys.",
+ #*      volume    = "G29",
+ #*      year      = "2003",
+ #*      pages     = "443",
+ #*      eprint    = "hep-ph/0210043",
+ #*      SLACcitation  = "%%CITATION = HEP-PH 0210043;%%"
+ #* }
+ #
  */
+
 
 $version="1.8.1"
 

@@ -16,6 +16,24 @@
  #*    eprint    = "hep-ph/0403068",
  #*    SLACcitation  = "%%CITATION = HEP-PH 0403068;%%"
  #* }
+ #
+ #* %The disappearance analysis is taken from
+ #* @Article{Ables:1995wq,
+ #*    author    = "Ables, E. and others",
+ #*    collaboration = "MINOS",
+ #*    title     = "P-875: A Long baseline neutrino oscillation experiment at
+ #*                 Fermilab",
+ #*    note     = "FERMILAB-PROPOSAL-0875"
+ #* }
+ #
+ #* %The electron appearance analysis closely matches the one in
+ #* @Unpublished{NUMIL714,
+ #*	author = "M. Diwan, M. Messier, B. Viren, L. Wai",
+ #*	title = "A study of {$\nu_\mu \rightarrow \nu_e$} sensitivity 
+ #*	in MINOS", 
+ #*	note = "NUMI-L-714 (2001)"
+ #*   }
+ #
  */
 
 $version="1.8.1"

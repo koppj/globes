@@ -18,6 +18,17 @@
  #*     eprint    = "hep-ph/0211300",
  #*     SLACcitation  = "%%CITATION = HEP-PH 0211300;%%"
  #* }
+ #
+ #* %This file approximates the following LOI
+ #* @Article{Ayres:2002nm,
+ #*    author    = "Ayres, D. and others",
+ #*    collaboration = "Nova",
+ #*    title     = "Letter of intent to build an off-axis detector to study
+ #*                 nu/mu --> nu/e oscillations with the NuMI neutrino beam",
+ #*    year      = "2002",
+ #*    eprint    = "hep-ex/0210005",
+ #*    SLACcitation  = "%%CITATION = HEP-EX 0210005;%%"
+ #* }
  */
 
 $version="1.8.1"

@@ -5,6 +5,9 @@
 # If you are using this file for producing a scientific publication
 # or a talk please cite the following references.
 #
+#* %This flux is taken from
+#* http://proj-cngs.web.cern.ch/proj-cngs/Menu/CNGS.htm
+#
 0.                    0.                      0.                      0.   0.   0.                      0.
 0.203                 2.2137646758399992e13   6.136115396159997e15    0.   0.   1.8902148659199992e15   0.
 0.40599999999999997   5.826219806719998e13    1.4327959649279994e16   0.   0.   4.868385167359998e15    0.
