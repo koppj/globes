@@ -269,6 +269,9 @@ double glbGetFilterInExperiment(int experiment);
 int glbNameToValue(int exp, const char* context, const char *name);
 const char *glbValueToName(int exp,const char* context, int value);
 
+/* Adding user defined priors */
+int glbRegisterPriorFunction(double (*f)(const glb_params in));
+
 #ifdef GLB_EXPERIMENTAL
 /* These functions are part of the user-defined chi^2 interface and will
  * not be documented in this release. I you want to use this feature

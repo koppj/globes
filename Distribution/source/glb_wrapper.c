@@ -1342,10 +1342,15 @@ final_clean()
 }
 
 
+
+
 void 
 glbInit(char *name)
 {
   int i;
+  fprintf(stderr,"\n************************************\n");
+  fprintf(stderr,"* This is a beta version of GLoBES *\n");
+  fprintf(stderr,"************************************\n\n");
   atexit(final_clean);
   glb_prog_name_init(name);
   glb_setup_path();
@@ -1355,6 +1360,7 @@ glbInit(char *name)
   obstack_init(&glb_rate_stack);
   glbSetPrintDelimiters("","\t","\n");
   glbSetChannelPrintFunction(glb_builtin_channel_printf);
+  glbRegisterPriorFunction(NULL);
 }
 
 /* Toggle Systemtatics */

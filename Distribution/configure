@@ -705,7 +705,7 @@ fi
 
 PACKAGE=globes
 
-VERSION=2.0.0
+VERSION=2.1.0
 
 if test "`cd $srcdir && pwd`" != "`pwd`" && test -f $srcdir/config.status; then
   { echo "configure: error: source directory already configured; run "make distclean" there first" 1>&2; exit 1; }
@@ -812,7 +812,7 @@ fi
   
 
 
-GLBLIBVERSION="4:2:1"
+GLBLIBVERSION="5:0:2"
 
 
 cat >> confdefs.h <<EOF

@@ -746,12 +746,33 @@ static double sglb_prior(double x, double center, double sigma)
   return (x-center)*(x-center)/sigma/sigma;
 }  
 
+// the pointer to the userdefined prior function
+static double (*glb_user_defined_prior)(const glb_params in);
+
+static double my_default_prior(const glb_params in)
+{
+  return 0;
+}
+
+// the user interface to register such a function ...
+int glbRegisterPriorFunction(double (*f)(const glb_params in))
+{
+  if(f==NULL) {
+    glb_user_defined_prior=my_default_prior;
+    return 0;
+  }
+  glb_user_defined_prior=f;
+  return 0;
+}
+
 // multi-experiment functions MDglbXSection
 static double MD_chi_NP(double x[])
 {
+  glb_params prior_input;
   double erg2;
   double y[37];
   int i; 
+  prior_input=glbAllocParams();
   count = count +1;
   for(i=0;i<n_free;i++) y[index_tab[i]]=x[i+1];  
   // This basically is superflous, however it appears to be safer not
@@ -769,7 +790,15 @@ static double MD_chi_NP(double x[])
     }
   
   erg2=ChiS();
+  // adding  the user defined prior
+  // shoufling the parameter vector y into an glb_params structure
+  for (i=0;i<GLB_OSCP;i++) glbSetOscParams(prior_input,y[i],i);
+  for (i=0;i<glb_num_of_exps;i++) glbSetDensityParams(prior_input,
+						      y[i+GLB_OSCP],i);
+  glbSetIteration(prior_input,count);
   
+  erg2 = erg2 + glb_user_defined_prior(prior_input); 
+
   // adding the glb_priors
   for(i=0;i<n_free;i++)
     {
@@ -786,12 +815,12 @@ static double MD_chi_NP(double x[])
 	       (glb_experiment_list[index_tab[i]-6])->density_error);
 	}
     }
-  
+  glbFreeParams(prior_input);
   return erg2;
 }
  
 
-// single-experiment functions ChiglbXSection
+// single-experiment functions ChiXXXSection
 //This serves for ChiNP
 
 static double s_fix_params[7];
@@ -841,9 +870,11 @@ static void single_SelectProjection(int set)
 
 static double chi_NP(double x[])
 {
+  glb_params prior_input;
   double erg2;
   double y[7];
   int i; 
+  prior_input=glbAllocParams();
   count = count +1;
   for(i=0;i<s_n_free;i++) y[s_index_tab[i]]=x[i+1];  
   // This basically is superflous, however it appears to be safer not
@@ -862,6 +893,13 @@ static double chi_NP(double x[])
   
   erg2=ChiS0(errordim);
   
+  // adding  the user defined prior
+  // shoufling the parameter vector y into an glb_params structure
+  for (i=0;i<GLB_OSCP;i++) glbSetOscParams(prior_input,y[i],i);
+  glbSetDensityParams(prior_input,y[GLB_OSCP],glb_single_experiment_number);
+  glbSetIteration(prior_input,count);
+  erg2 = erg2 + glb_user_defined_prior(prior_input); 
+
   
   // adding the glb_priors
   for(i=0;i<s_n_free;i++)
@@ -879,7 +917,7 @@ static double chi_NP(double x[])
 	       (glb_experiment_list[glb_single_experiment_number])->density_error);
 	}
     }
-  
+  glbFreeParams(prior_input);
   return erg2;
 }
  

@@ -1,0 +1,30 @@
+11/08/04
+******** Version 2.1.0
+	Added (minimal) support for user defined priors. The interface is
+
+		int glbRegisterPriorFunction( double (*f)(const glb_params) )
+
+	Thus the user defines a function which returns `double' and takes
+	as argument a `glb_params' pointer with qualifier `const', ie.
+	the function may not change the values stored in this pointer. Example
+	
+		double my_prior(const glb_params in)
+			{
+				some code
+			}
+	
+	To use this prior one would just call
+	
+		glbRegisterPriorFunction(my_prior)
+	
+	If the prior nows the difference between true and fitted values, the
+	true values can be accessed within the prior function by virtue of
+	`glbGetStartingValues'. The user defined prior is co-added with
+	the builtin parabolib priors, if this behaviour is unwanted set
+	the input errors to zero. 
+
+	Nice sideffect: This mechansim can be easily adapted to have a detailed
+	look at the steps the minimizer takes. Just write a prior which
+	prints its input parameters to some file. To make life easier the
+	argument passed to the user defined prior function has the value
+	of `iterations' correctly set to the current value.
