@@ -40,9 +40,9 @@ Wolfram Research.
 
 (*NotebookFileLineBreakTest
 NotebookFileLineBreakTest*)
-(*NotebookOptionsPosition[    156469,       3637]*)
-(*NotebookOutlinePosition[    157501,       3669]*)
-(*  CellTagsIndexPosition[    157457,       3665]*)
+(*NotebookOptionsPosition[    167408,       3975]*)
+(*NotebookOutlinePosition[    168440,       4007]*)
+(*  CellTagsIndexPosition[    168396,       4003]*)
 (*WindowFrame->Normal*)
 
 
@@ -355,8 +355,9 @@ to Signal or Background rule, the third to the normalization and \
 normalization error, the fourth to the tilt and tilt error, the fifth and \
 higher to the efficiency, the polarity of the source (particle or \
 antiparticle decay), the measured neutrino type (neutrino or antineutrino), \
-the oscillation channel, and the event type each (c.f., hep-ph/0205352, \
-appendices).  A summary of the rules can also be obtained by:"
+the oscillation channel, and the event type each (c.f., hep-ph/",
+  "0204352",
+  ", appendices).  A summary of the rules can also be obtained by:"
 }], "Text"],
 
 Cell[CellGroupData[{
@@ -801,7 +802,9 @@ Cell[TextData[{
   Cell[BoxData[
       \(TraditionalForm\`\[Chi]\^2\)]],
   " function is minimized over all systematical priors as described in the \
-appendix of hep-ph/0205352. For example,"
+appendix of hep-ph/",
+  "0204352",
+  ". For example,"
 }], "Text"],
 
 Cell[CellGroupData[{
@@ -2245,8 +2248,8 @@ oooo0480oooo00<000000?ooo`3oool01@3oool00`000000oooo0?ooo`030?ooo`001P3oool00`00
 o`3ooona0?ooo`00o`3ooona0?ooo`00o`3ooona0?ooo`00o`3ooona0?ooo`00o`3ooona0?ooo`00
 o`3ooona0?ooo`00\
 \>"],
-  ImageRangeCache->{{{0, 431}, {431, 0}} -> {0.392291, 0.763022, 0.00432743, \
-0.00157361}}],
+  ImageRangeCache->{{{91.5625, 320.938}, {459.875, 230.5}} -> {-0.104326, \
+1.21743, 0.00433759, 0.0015773}}],
 
 Cell[BoxData[
     TagBox[\(\[SkeletonIndicator]  ContourGraphics  \[SkeletonIndicator]\),
@@ -2293,7 +2296,7 @@ minimum ",
 information, i.e., to limit certain quantities by adding a Gaussian",
   Cell[BoxData[
       \(TraditionalForm\`\[Chi]\^2\)]],
-  " (cf., appendix of hep-ph/0205352) .  However, such a method cannot run \
+  " (cf., appendix of hep-ph/0204352) .  However, such a method cannot run \
 completely independently, i.e., needs external expert knowledge about the \
 general contour topology.  The minimization algorithm will usually find the \
 correct minimum, but in special cases it jumps do a different contour. This \
@@ -3571,8 +3574,8 @@ ogd0oooo00<000000?ooo`3oool0503oool001X0oooo00<000000?ooo`3oool0o`3ooomn0?ooo`03
 ooooU03oool001X0oooo00<000000?ooo`3oool0o`3ooonD0?ooo`006P3oool00`000000oooo0?oo
 o`3o0?oooi@0oooo0000\
 \>"],
-  ImageRangeCache->{{{0, 431}, {265.875, 0}} -> {-0.000202997, -3.00723, \
-1.16863*^-5, 0.207423}}],
+  ImageRangeCache->{{{91.5625, 320.938}, {238.5, 97.1875}} -> {-0.00154408, \
+22.2682, 1.1714*^-5, 0.207914}}],
 
 Cell[BoxData[
     TagBox[\(\[SkeletonIndicator]  Graphics  \[SkeletonIndicator]\),
@@ -3608,10 +3611,345 @@ Cell[TextData[{
     FontFamily->"Courier"]
 }], "Section"],
 
-Cell["ChiAll: alle laufen (globaler Minimizer)", "Text"]
+Cell[TextData[{
+  "In the last section, one parameter (",
+  Cell[BoxData[
+      \(TraditionalForm\`\[Theta]\_13\)]],
+  " or \[Delta]) was kept fixed and the ",
+  Cell[BoxData[
+      \(TraditionalForm\`\[Chi]\^2\)]],
+  " was minimized with respect to all the other parameter values. In this \
+section, we introduce ",
+  StyleBox["ChiAll",
+    FontFamily->"Courier"],
+  ", which minimizes over ",
+  StyleBox["all",
+    FontSlant->"Italic"],
+  " parameters. This function is especially used to find degenerate solutions \
+with some input expert knowledge from the respective papers (e.g., \
+hep-ph/0112119). After setting some starting values within ",
+  StyleBox["ChiAll",
+    FontFamily->"Courier"],
+  ", it runs into the local minimum in the direction of the strongiest \
+gradient. Thus, a fortunate topology assumed, knowing the",
+  StyleBox[" approximate",
+    FontSlant->"Italic"],
+  " position of the degeneracy, such as from analytical approximations at the \
+peak of the spectrum, allows us to find the ",
+  StyleBox["exact",
+    FontSlant->"Italic"],
+  " position with ",
+  StyleBox["ChiAll",
+    FontFamily->"Courier"],
+  ". This knowledge can then be used for further evaluations."
+}], "Text"],
+
+Cell[TextData[{
+  StyleBox["ChiAll",
+    FontFamily->"Courier"],
+  " requires the same preparations as the other minimziers in the last \
+section:"
+}], "Text"],
+
+Cell[BoxData[{
+    \(\(SetVacuumParameters[N[9999], N[ArcSin[Sqrt[0.01]]/2], 
+        N[\[Pi]/4 - 0.2], N[\(-\[Pi]\)/4]];\)\), "\[IndentingNewLine]", 
+    \(\(SetMasses[N[RescaledSMD], 
+        N[3.0*10^\(-3\)]];\)\), "\[IndentingNewLine]", 
+    \(\(SetDensity[DENSITY];\)\), "\[IndentingNewLine]", 
+    \(\(SetRates[];\)\), "\[IndentingNewLine]", 
+    \(\(SetInputErrors[N[10], N[10], N[10], N[RescaledSMD\ 0.15], N[1], 
+        N[DENSITY*0.05]];\)\), "\[IndentingNewLine]", 
+    \(\(SetStartingValues[ArcSin[Sqrt[0.01]]/2, N[\[Pi]/4 - 0.2], 
+        N[\(-\[Pi]\)/4], N[RescaledSMD], N[3.0*10^\(-3\)], 
+        DENSITY];\)\)}], "Input"],
+
+Cell[TextData[{
+  "Note that we used ",
+  Cell[BoxData[
+      \(TraditionalForm\`\[Theta]\_23 = \[Pi]/4 - 0.2\)]],
+  " and \[Delta]=\[Pi]/4 (sign change because of \[Delta]-big!) here, since \
+otherwise we couldn't observe all degeneracies."
+}], "Text"],
+
+Cell[TextData[{
+  "The following function call demonstrates how to find the sgn(",
+  Cell[BoxData[
+      StyleBox[\(\[CapitalDelta]m\_31\%2\),
+        "Text",
+        FontFamily->"Times",
+        FontWeight->"Plain"]],
+    FontWeight->"Bold"],
+  ") degeneracy with setting the starting values at the best-fit values with \
+the sign of ",
+  Cell[BoxData[
+      StyleBox[\(\[CapitalDelta]m\_31\%2\),
+        "Text",
+        FontFamily->"Times",
+        FontWeight->"Plain"]],
+    FontWeight->"Bold"],
+  "inverted, using the fact that the degenerate solution essentially close to \
+the best-fit point except from the \[Delta]-value.  ",
+  StyleBox["ChiAll",
+    FontFamily->"Courier"],
+  " requires the parameter list ",
+  StyleBox["{Log[10,",
+    FontWeight->"Bold"],
+  Cell[BoxData[
+      \(TraditionalForm\`\(sin\^2\)(2  \[Theta]\_13)\)],
+    FontWeight->"Bold"],
+  StyleBox["], ",
+    FontWeight->"Bold"],
+  Cell[BoxData[
+      \(TraditionalForm\`\[Theta]\_23\)],
+    FontWeight->"Bold"],
+  StyleBox[", \[Delta], ",
+    FontWeight->"Bold"],
+  Cell[BoxData[
+      StyleBox[\(\[CapitalDelta]m\_21\%2\),
+        "Text",
+        FontFamily->"Times"]],
+    FontWeight->"Bold"],
+  StyleBox[", ",
+    FontWeight->"Bold"],
+  Cell[BoxData[
+      StyleBox[\(\[CapitalDelta]m\_31\%2\),
+        "Text",
+        FontFamily->"Times"]],
+    FontWeight->"Bold"],
+  StyleBox[", \[Rho]} ",
+    FontWeight->"Bold"],
+  "as the starting vector for the minimizor",
+  ":"
+}], "Text"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+    \(ChiAll[{Log[10, 0.01], \[Pi]/4 - 0.2, \(-\[Pi]\)/4, 
+          RescaledSMD, \(-3\)*10^\(-3\), DENSITY} // N]\)], "Input"],
+
+Cell[BoxData[
+    \({31.5903857632362`, \(-1.934913977042906`\), 
+      0.5861877681682914`, \(-1.7159860262162938`\), 
+      0.000049935156689806985`, \(-0.003040710417285849`\), 
+      3.2925766660550564`, 1335.`}\)], "Output"]
 }, Open  ]],
 
-Cell["Returning rates", "Section"],
+Cell[TextData[{
+  "The result again comes as vector of the form ",
+  StyleBox["{",
+    FontWeight->"Bold"],
+  Cell[BoxData[
+      \(TraditionalForm\`\[Chi]\^2\)],
+    FontWeight->"Bold"],
+  StyleBox[",",
+    FontWeight->"Bold"],
+  Cell[BoxData[
+      FormBox[
+        RowBox[{" ", 
+          RowBox[{
+            StyleBox["Log",
+              FontWeight->"Bold"], 
+            StyleBox["[",
+              FontWeight->"Bold"], 
+            RowBox[{
+              StyleBox["10",
+                FontWeight->"Bold"], 
+              StyleBox[",",
+                FontWeight->"Bold"], 
+              FormBox[\(\(sin\^2\)(2  \[Theta]\_13)\),
+                "TraditionalForm"]}], 
+            StyleBox["]",
+              FontWeight->"Bold"]}]}], TraditionalForm]],
+    FontWeight->"Bold"],
+  StyleBox[", ",
+    FontWeight->"Bold"],
+  Cell[BoxData[
+      \(TraditionalForm\`\[Theta]\_23\)],
+    FontWeight->"Bold"],
+  StyleBox[" \[Delta], ",
+    FontWeight->"Bold"],
+  Cell[BoxData[
+      StyleBox[\(\[CapitalDelta]m\_21\%2\),
+        "Text",
+        FontFamily->"Times"]],
+    FontWeight->"Bold"],
+  StyleBox[", ",
+    FontWeight->"Bold"],
+  Cell[BoxData[
+      StyleBox[\(\[CapitalDelta]m\_31\%2\),
+        "Text",
+        FontFamily->"Times"]],
+    FontWeight->"Bold"],
+  StyleBox[", \[Rho], Iterations}",
+    FontWeight->"Bold"],
+  ". In this case, the ",
+  Cell[BoxData[
+      \(TraditionalForm\`\[Chi]\^2\)]],
+  "-",
+  "value tells us that the degeneracy will not be observable at the 3\[Sigma] \
+level with the neutrino factory chosen."
+}], "Text"],
+
+Cell[TextData[{
+  "Similarly, we can try to find the (",
+  Cell[BoxData[
+      FormBox[
+        StyleBox[\(\[Theta]\_23\),
+          FontWeight->"Plain"], TraditionalForm]],
+    FontWeight->"Bold"],
+  ", \[Pi]/2-",
+  Cell[BoxData[
+      FormBox[
+        StyleBox[\(\[Theta]\_23\),
+          FontWeight->"Plain"], TraditionalForm]],
+    FontWeight->"Bold"],
+  ") degeneracy using an estimated starting value of 1.0 for ",
+  Cell[BoxData[
+      FormBox[
+        StyleBox[\(\[Theta]\_23\),
+          FontWeight->"Plain"], TraditionalForm]],
+    FontWeight->"Bold"],
+  ":"
+}], "Text"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+    \(\(SetVacuumParameters[N[9999], N[ArcSin[Sqrt[0.01]]/2], 
+        N[\[Pi]/4 - 0.2], N[\(-\[Pi]\)/4]];\)\), "\[IndentingNewLine]", 
+    \(\(SetMasses[N[RescaledSMD], 
+        N[3.0*10^\(-3\)]];\)\), "\[IndentingNewLine]", 
+    \(\(SetDensity[DENSITY];\)\), "\[IndentingNewLine]", 
+    \(\(SetRates[];\)\), "\[IndentingNewLine]", 
+    \(\(SetInputErrors[N[10], N[10], N[10], N[RescaledSMD\ 0.15], N[1], 
+        N[DENSITY*0.05]];\)\), "\[IndentingNewLine]", 
+    \(\(SetStartingValues[ArcSin[Sqrt[0.01]]/2, N[\[Pi]/4 - 0.2], 
+        N[\(-\[Pi]\)/4], N[RescaledSMD], N[3.0*10^\(-3\)], 
+        DENSITY];\)\[IndentingNewLine]\), "\[IndentingNewLine]", 
+    \(ChiAll[{Log[10, 0.01], 1.0, \(-\[Pi]\)/4, RescaledSMD, 3*10^\(-3\), 
+          DENSITY} // N]\)}], "Input"],
+
+Cell[BoxData[
+    \({0.019773438847506767`, \(-2.309053605725235`\), 
+      0.9881268843549805`, \(-0.8822262397836624`\), 0.00004105611296040998`, 
+      0.003002125969547311`, 3.4999569653071405`, 1491.`}\)], "Output"]
+}, Open  ]],
+
+Cell[TextData[{
+  "This result demonstrates that we can observe this ambiguity with the \
+chosen neutrino factory and that it appears at approximately the same value \
+of \[Delta] with a different value of ",
+  Cell[BoxData[
+      \(TraditionalForm\`\[Theta]\_13\)]],
+  ", what is quite characteristic for this degeneracy. "
+}], "Text"],
+
+Cell[TextData[{
+  "The (\[Delta], ",
+  Cell[BoxData[
+      \(TraditionalForm\`\[Theta]\_13\)]],
+  ") can be found with a different method, which will be described in the \
+next section."
+}], "Text"],
+
+Cell[TextData[{
+  "In summary, we can write a routine to find the two introduced \
+degeneracies. It requires as a parameter the mode (1=sgn(",
+  Cell[BoxData[
+      StyleBox[\(\[CapitalDelta]m\_31\%2\),
+        "Text",
+        FontFamily->"Times",
+        FontWeight->"Plain"]],
+    FontWeight->"Bold"],
+  "), 2=(",
+  Cell[BoxData[
+      FormBox[
+        StyleBox[\(\[Theta]\_23\),
+          FontWeight->"Plain"], TraditionalForm]],
+    FontWeight->"Bold"],
+  ", \[Pi]/2-",
+  Cell[BoxData[
+      FormBox[
+        StyleBox[\(\[Theta]\_23\),
+          FontWeight->"Plain"], TraditionalForm]],
+    FontWeight->"Bold"],
+  ")) and the values of ",
+  Cell[BoxData[
+      \(TraditionalForm\`\(sin\^2\)(2  \[Theta]\_13)\)]],
+  ", \[Delta], and ",
+  Cell[BoxData[
+      FormBox[
+        StyleBox[\(\[Theta]\_23\),
+          FontWeight->"Plain"], TraditionalForm]],
+    FontWeight->"Bold"],
+  ". As results, it returns the vector obtained from ",
+  StyleBox["ChiAll",
+    FontFamily->"Courier"],
+  ":"
+}], "Text"],
+
+Cell[BoxData[
+    \(FindDeg[mode_, \ thes22\[Theta]13_, \ the\[Delta]_, \ 
+        the\[Theta]23_]\  := \ 
+      Module[{}, \[IndentingNewLine]SetVacuumParameters[N[9999], 
+          N[ArcSin[Sqrt[thes22\[Theta]13]]/2], N[the\[Theta]23], 
+          N[the\[Delta]]]; \[IndentingNewLine]SetMasses[N[RescaledSMD], 
+          N[3.0*10^\(-3\)]]; \[IndentingNewLine]SetDensity[
+          DENSITY]; \[IndentingNewLine]SetRates[]; \
+\[IndentingNewLine]SetInputErrors[N[10], N[10], N[10], N[RescaledSMD\ 0.15], 
+          N[1], N[DENSITY*0.05]]; \[IndentingNewLine]SetStartingValues[
+          ArcSin[Sqrt[thes22\[Theta]13]]/2, N[the\[Theta]23], 
+          N[\(-\[Pi]\)/4], N[RescaledSMD], N[3.0*10^\(-3\)], 
+          DENSITY]; \[IndentingNewLine]If[mode \[Equal] 1, 
+          ChiAll[{Log[10, thes22\[Theta]13], the\[Theta]23, the\[Delta], 
+                RescaledSMD, \(-3\)*10^\(-3\), DENSITY} // 
+              N], \[IndentingNewLine]ChiAll[{Log[10, 
+                  thes22\[Theta]13], \[Pi]/2 - the\[Theta]23, the\[Delta], 
+                RescaledSMD, 3*10^\(-3\), DENSITY} // 
+              N]]\[IndentingNewLine]]\)], "Input"],
+
+Cell[CellGroupData[{
+
+Cell["Example", "Subsubsection"],
+
+Cell[TextData[{
+  "In this example, we demonstrate the effect of the  (",
+  Cell[BoxData[
+      FormBox[
+        StyleBox[\(\[Theta]\_23\),
+          FontWeight->"Plain"], TraditionalForm]],
+    FontWeight->"Bold"],
+  ", \[Pi]/2-",
+  Cell[BoxData[
+      FormBox[
+        StyleBox[\(\[Theta]\_23\),
+          FontWeight->"Plain"], TraditionalForm]],
+    FontWeight->"Bold"],
+  ") degeneracy on the sensitivity limit of our initial stage neutrino \
+factory."
+}], "Text"]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[TextData[{
+  "Returning rates/total rates and the (\[Delta], ",
+  Cell[BoxData[
+      \(TraditionalForm\`\[Theta]\_13\)]],
+  ")",
+  " ambiguity"
+}], "Section"],
+
+Cell[BoxData[
+    RowBox[{"Describe", " ", "how", " ", "to", " ", "find", " ", "the", " ", 
+      RowBox[{"(", 
+        RowBox[{"\[Delta]", ",", 
+          FormBox[\(\[Theta]\_13\),
+            "TraditionalForm"]}], ")"}], \(ambiguity!\)}]], "Text"]
+}, Open  ]],
 
 Cell[CellGroupData[{
 
@@ -3695,135 +4033,164 @@ Cell[3294, 112, 159, 3, 71, "Text"],
 
 Cell[CellGroupData[{
 Cell[3478, 119, 55, 1, 39, "Input"],
-Cell[3536, 122, 9196, 194, 431, "Output"]
+Cell[3536, 122, 9196, 194, 412, "Output"]
 }, Open  ]],
 Cell[12747, 319, 720, 22, 195, "Text"],
-Cell[13470, 343, 1041, 16, 221, "Text"],
+Cell[13470, 343, 1051, 17, 221, "Text"],
 
 Cell[CellGroupData[{
-Cell[14536, 363, 47, 1, 39, "Input"],
-Cell[14586, 366, 966, 24, 163, "Output"]
+Cell[14546, 364, 47, 1, 39, "Input"],
+Cell[14596, 367, 966, 24, 144, "Output"]
 }, Open  ]],
-Cell[15567, 393, 514, 15, 120, "Text"],
-Cell[16084, 410, 65, 0, 46, "Text"],
-Cell[16152, 412, 45, 1, 39, "Input"],
-Cell[16200, 415, 617, 13, 146, "Text"],
+Cell[15577, 394, 514, 15, 120, "Text"],
+Cell[16094, 411, 65, 0, 46, "Text"],
+Cell[16162, 413, 45, 1, 39, "Input"],
+Cell[16210, 416, 617, 13, 146, "Text"],
 
 Cell[CellGroupData[{
-Cell[16842, 432, 71, 1, 39, "Input"],
-Cell[16916, 435, 6637, 173, 982, "Output"]
+Cell[16852, 433, 71, 1, 39, "Input"],
+Cell[16926, 436, 6637, 173, 982, "Output"]
 }, Open  ]],
-Cell[23568, 611, 261, 5, 71, "Text"]
-}, Open  ]],
-
-Cell[CellGroupData[{
-Cell[23866, 621, 53, 0, 87, "Section"],
-Cell[23922, 623, 2496, 67, 196, "Text"],
-
-Cell[CellGroupData[{
-Cell[26443, 694, 103, 2, 39, "Input"],
-Cell[26549, 698, 58, 1, 39, "Output"]
-}, Open  ]],
-Cell[26622, 702, 76, 0, 46, "Text"],
-Cell[26701, 704, 111, 2, 39, "Input"],
-Cell[26815, 708, 1065, 32, 121, "Text"],
-Cell[27883, 742, 76, 1, 39, "Input"],
-Cell[27962, 745, 498, 17, 71, "Text"],
-Cell[28463, 764, 52, 1, 39, "Input"],
-Cell[28518, 767, 420, 8, 121, "Text"],
-Cell[28941, 777, 43, 1, 39, "Input"]
+Cell[23578, 612, 261, 5, 71, "Text"]
 }, Open  ]],
 
 Cell[CellGroupData[{
-Cell[29021, 783, 176, 7, 87, "Section"],
-Cell[29200, 792, 466, 12, 96, "Text"],
+Cell[23876, 622, 53, 0, 87, "Section"],
+Cell[23932, 624, 2496, 67, 196, "Text"],
 
 Cell[CellGroupData[{
-Cell[29691, 808, 146, 3, 39, "Input"],
-Cell[29840, 813, 56, 1, 43, "Output"]
+Cell[26453, 695, 103, 2, 39, "Input"],
+Cell[26559, 699, 58, 1, 39, "Output"]
 }, Open  ]],
-Cell[29911, 817, 1407, 45, 171, "Text"],
-
-Cell[CellGroupData[{
-Cell[31343, 866, 116, 2, 39, "Input"],
-Cell[31462, 870, 83, 1, 39, "Output"]
+Cell[26632, 703, 76, 0, 46, "Text"],
+Cell[26711, 705, 111, 2, 39, "Input"],
+Cell[26825, 709, 1065, 32, 121, "Text"],
+Cell[27893, 743, 76, 1, 39, "Input"],
+Cell[27972, 746, 498, 17, 71, "Text"],
+Cell[28473, 765, 52, 1, 39, "Input"],
+Cell[28528, 768, 420, 8, 121, "Text"],
+Cell[28951, 778, 43, 1, 39, "Input"]
 }, Open  ]],
 
 Cell[CellGroupData[{
-Cell[31582, 876, 424, 7, 154, "Input"],
-Cell[32009, 885, 68012, 1363, 444, 9845, 640, "GraphicsData", "PostScript", \
+Cell[29031, 784, 176, 7, 87, "Section"],
+Cell[29210, 793, 478, 14, 96, "Text"],
+
+Cell[CellGroupData[{
+Cell[29713, 811, 146, 3, 39, "Input"],
+Cell[29862, 816, 56, 1, 43, "Output"]
+}, Open  ]],
+Cell[29933, 820, 1407, 45, 171, "Text"],
+
+Cell[CellGroupData[{
+Cell[31365, 869, 116, 2, 39, "Input"],
+Cell[31484, 873, 83, 1, 39, "Output"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+Cell[31604, 879, 424, 7, 154, "Input"],
+Cell[32031, 888, 68029, 1363, 444, 9845, 640, "GraphicsData", "PostScript", \
 "Graphics"],
-Cell[100024, 2250, 137, 3, 39, "Output"]
+Cell[100063, 2253, 137, 3, 39, "Output"]
 }, Open  ]]
 }, Open  ]],
 
 Cell[CellGroupData[{
-Cell[100210, 2259, 274, 10, 126, "Section"],
-Cell[100487, 2271, 1558, 36, 246, "Text"],
-Cell[102048, 2309, 2402, 65, 346, "Text"],
-Cell[104453, 2376, 1367, 36, 171, "Text"],
-Cell[105823, 2414, 127, 2, 39, "Input"],
-Cell[105953, 2418, 1554, 47, 196, "Text"],
-Cell[107510, 2467, 147, 2, 62, "Input"],
-Cell[107660, 2471, 1713, 51, 196, "Text"],
+Cell[100249, 2262, 274, 10, 126, "Section"],
+Cell[100526, 2274, 1558, 36, 246, "Text"],
+Cell[102087, 2312, 2402, 65, 346, "Text"],
+Cell[104492, 2379, 1367, 36, 171, "Text"],
+Cell[105862, 2417, 127, 2, 39, "Input"],
+Cell[105992, 2421, 1554, 47, 196, "Text"],
+Cell[107549, 2470, 147, 2, 62, "Input"],
+Cell[107699, 2474, 1713, 51, 196, "Text"],
 
 Cell[CellGroupData[{
-Cell[109398, 2526, 144, 3, 39, "Input"],
-Cell[109545, 2531, 186, 3, 39, "Output"]
+Cell[109437, 2529, 144, 3, 39, "Input"],
+Cell[109584, 2534, 186, 3, 39, "Output"]
 }, Open  ]],
-Cell[109746, 2537, 1382, 39, 171, "Text"],
-Cell[111131, 2578, 128, 3, 46, "Text"],
-Cell[111262, 2583, 318, 6, 108, "Input"],
-Cell[111583, 2591, 929, 33, 71, "Text"],
+Cell[109785, 2540, 1382, 39, 171, "Text"],
+Cell[111170, 2581, 128, 3, 46, "Text"],
+Cell[111301, 2586, 318, 6, 108, "Input"],
+Cell[111622, 2594, 929, 33, 71, "Text"],
 
 Cell[CellGroupData[{
-Cell[112537, 2628, 132, 3, 39, "Input"],
-Cell[112672, 2633, 192, 3, 39, "Output"]
+Cell[112576, 2631, 132, 3, 39, "Input"],
+Cell[112711, 2636, 192, 3, 39, "Output"]
 }, Open  ]],
-Cell[112879, 2639, 1380, 45, 146, "Text"],
-Cell[114262, 2686, 317, 7, 95, "Text"],
+Cell[112918, 2642, 1380, 45, 146, "Text"],
+Cell[114301, 2689, 317, 7, 95, "Text"],
 
 Cell[CellGroupData[{
-Cell[114604, 2697, 32, 0, 60, "Subsubsection"],
-Cell[114639, 2699, 661, 14, 121, "Text"],
-Cell[115303, 2715, 867, 14, 292, "Input"],
+Cell[114643, 2700, 32, 0, 60, "Subsubsection"],
+Cell[114678, 2702, 661, 14, 121, "Text"],
+Cell[115342, 2718, 867, 14, 292, "Input"],
 
 Cell[CellGroupData[{
-Cell[116195, 2733, 129, 3, 39, "Input"],
-Cell[116327, 2738, 278, 4, 75, "Output"]
+Cell[116234, 2736, 129, 3, 39, "Input"],
+Cell[116366, 2741, 278, 4, 75, "Output"]
 }, Open  ]],
 
 Cell[CellGroupData[{
-Cell[116642, 2747, 71, 1, 39, "Input"],
-Cell[116716, 2750, 38418, 824, 279, 7614, 439, "GraphicsData", "PostScript", \
+Cell[116681, 2750, 71, 1, 39, "Input"],
+Cell[116755, 2753, 38429, 824, 279, 7614, 439, "GraphicsData", "PostScript", \
 "Graphics"],
-Cell[155137, 3576, 130, 3, 39, "Output"]
+Cell[155187, 3579, 130, 3, 39, "Output"]
 }, Open  ]],
-Cell[155282, 3582, 191, 5, 46, "Text"],
+Cell[155332, 3585, 191, 5, 46, "Text"],
 
 Cell[CellGroupData[{
-Cell[155498, 3591, 148, 3, 39, "Input"],
-Cell[155649, 3596, 55, 1, 39, "Output"]
+Cell[155548, 3594, 148, 3, 39, "Input"],
+Cell[155699, 3599, 55, 1, 39, "Output"]
 }, Open  ]]
 }, Open  ]]
 }, Open  ]],
 
 Cell[CellGroupData[{
-Cell[155765, 3604, 114, 4, 87, "Section"],
-Cell[155882, 3610, 56, 0, 46, "Text"]
-}, Open  ]],
-Cell[155953, 3613, 34, 0, 87, "Section"],
+Cell[155815, 3607, 114, 4, 87, "Section"],
+Cell[155932, 3613, 1202, 31, 196, "Text"],
+Cell[157137, 3646, 159, 5, 46, "Text"],
+Cell[157299, 3653, 637, 11, 177, "Input"],
+Cell[157939, 3666, 253, 6, 71, "Text"],
+Cell[158195, 3674, 1461, 49, 121, "Text"],
 
 Cell[CellGroupData[{
-Cell[156012, 3617, 44, 0, 87, "Section"],
-Cell[156059, 3619, 215, 4, 71, "Text"]
+Cell[159681, 3727, 141, 2, 39, "Input"],
+Cell[159825, 3731, 229, 4, 62, "Output"]
 }, Open  ]],
-Cell[156289, 3626, 36, 0, 87, "Section"]
+Cell[160069, 3738, 1548, 54, 71, "Text"],
+Cell[161620, 3794, 580, 20, 46, "Text"],
+
+Cell[CellGroupData[{
+Cell[162225, 3818, 783, 13, 223, "Input"],
+Cell[163011, 3833, 220, 3, 62, "Output"]
+}, Open  ]],
+Cell[163246, 3839, 336, 7, 71, "Text"],
+Cell[163585, 3848, 198, 6, 46, "Text"],
+Cell[163786, 3856, 1003, 34, 96, "Text"],
+Cell[164792, 3892, 1129, 18, 384, "Input"],
+
+Cell[CellGroupData[{
+Cell[165946, 3914, 32, 0, 60, "Subsubsection"],
+Cell[165981, 3916, 468, 15, 71, "Text"]
+}, Open  ]]
 }, Open  ]],
 
 Cell[CellGroupData[{
-Cell[156362, 3631, 46, 0, 99, "Subtitle"],
-Cell[156411, 3633, 30, 0, 99, "Subtitle"]
+Cell[166498, 3937, 164, 6, 87, "Section"],
+Cell[166665, 3945, 249, 5, 42, "Text"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+Cell[166951, 3955, 44, 0, 87, "Section"],
+Cell[166998, 3957, 215, 4, 71, "Text"]
+}, Open  ]],
+Cell[167228, 3964, 36, 0, 87, "Section"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+Cell[167301, 3969, 46, 0, 99, "Subtitle"],
+Cell[167350, 3971, 30, 0, 99, "Subtitle"]
 }, Open  ]]
 }, Open  ]]
 }
