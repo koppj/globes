@@ -75,7 +75,24 @@ AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_YACC
 AC_PROG_LEX
+
+dnl Trying to get support for libtdl
+dnl the following lines are taken from the libtool manual
+dnl Enable building of the convenience library
+dnl and set LIBLTDL accordingly
+AC_LIBLTDL_CONVENIENCE
+dnl Substitute LTDLINCL and LIBLTDL in the Makefiles
+AC_SUBST(LTDLINCL)
+AC_SUBST(LIBLTDL)
+dnl Check for dlopen support
+AC_LIBTOOL_DLOPEN
+dnl Configure libtool
 AC_PROG_LIBTOOL
+dnl Configure libltdl
+AC_CONFIG_SUBDIRS(libltdl)
+
+
+
 
 dnl Checks for libraries.
 AC_CHECK_LIB(m,main,[],AC_MSG_ERROR([libm not found]))

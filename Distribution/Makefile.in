@@ -110,10 +110,12 @@ LDFLAGS = @LDFLAGS@
 LEX = @LEX@
 LEXLIB = @LEXLIB@
 LEX_OUTPUT_ROOT = @LEX_OUTPUT_ROOT@
+LIBLTDL = @LIBLTDL@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
 LN_S = @LN_S@
+LTDLINCL = @LTDLINCL@
 LTLIBOBJS = @LTLIBOBJS@
 MAINT = @MAINT@
 MAINTAINER_MODE_FALSE = @MAINTAINER_MODE_FALSE@
@@ -174,10 +176,12 @@ prefix = @prefix@
 program_transform_name = @program_transform_name@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
+subdirs = @subdirs@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
-DIST_SUBDIRS = source data
-SUBDIRS = source data 
+DIST_SUBDIRS = source data libltdl
+SUBDIRS = source data libltdl
+INCLUDES = $(LTDLINCL)
 EXTRA_DIST = globes/globes.h\
 examples/Makefile.in examples/example1.c  examples/example3.c examples/myio.c\
 examples/example-tour.c  examples/example2.c  examples/example4.c\
