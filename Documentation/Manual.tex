@@ -100,13 +100,13 @@
 % Always use GLB when mentioning a command in text!
 \newcommand{\GLB}[1]{{\tt glb#1}\index{api}{#1@{\tt #1}}}
 % Always use GLBNS when adding a command to the index without showing it!
-\newcommand{\GLBNS}[1]{\index{api}{#1@{\tt \protect{#1}}}}
+\newcommand{\GLBNS}[1]{\index{api}{#1@{\tt #1}}}
 
 % Set as GLoBES command and add to index:
 % Always use GLB when mentioning a command in text!
-\newcommand{\GLBC}[1]{{\tt #1}\index{constants}{\protect{\tt{#1}}}}
+\newcommand{\GLBC}[1]{{\tt #1}\index{constants}{\tt{#1}}}
 % Always use GLBNS when adding a command to the index without showing it!
-\newcommand{\GLBNSC}[1]{\index{constants}{{\protect{\tt #1}}}}
+\newcommand{\GLBNSC}[1]{\index{constants}{{\tt #1}}}
 \newcommand{\gq}[1]{\begin{quote} {\tt #1} \end{quote}}
 \newcommand{\go}[1]{$\rightarrow$ Output: \begin{quote} {\sf #1} \end{quote}}
 \newcommand{\bugs}{{\tt globes@ph.tum.de}}
@@ -170,6 +170,7 @@
 
 \begin{document} 
 
+\frontmatter
 \pagenumbering{Roman}
 \thispagestyle{empty}
 {
@@ -242,6 +243,7 @@ Version from \today
 
 }
 
+
 \clearpage
 \thispagestyle{empty}
 \bigskip
@@ -250,7 +252,8 @@ Version from \today
     Permission is granted to copy, distribute and/or modify this document
     under the terms of the GNU Free Documentation License, Version 1.2
     or any later version published by the Free Software Foundation;
-    with no Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
+    with the invariant Sections ``Terms of usage of \GLOBES" 
+    and ``Acknowledgments'', no Front-Cover Texts, and no Back-Cover Texts.
     A copy of the license is included in the section entitled "GNU
     Free Documentation License".
 \end{quote}
@@ -265,14 +268,15 @@ Version from \today
 
 \GLOBES\ (``General Long Baseline Experiment Simulator'') is a flexible
 software package to simulate neutrino oscillation 
-long baseline experiments. On the
+long baseline and reactor experiments. On the
 one hand, it contains a comprehensive abstract experiment definition
-language, which allows to describe most classes of long baseline experiments
+language (AEDL), which allows to describe most classes 
+of long baseline experiments
 at an abstract level. On the other hand, it provides a C-library to 
 process the experiment information in order to obtain oscillation
 probabilities, rate vectors, and $\Delta \chi^2$-values. Currently, 
-\GLOBES\ is available for Linux. Since the source code is included,
-the modifications to other operating systems should be doable.
+\GLOBES\ is available for GNU/Linux. Since the source code is included,
+the port to other operating systems is in principle possible.
 
 \GLOBES\ allows to simulate experiments with stationary neutrino point sources, where each experiment is assumed to have only one neutrino source.
 Such experiments are neutrino beam experiments and reactor experiments. 
@@ -309,6 +313,26 @@ This approach allows the inclusion of multi-parameter-correlations,
 where external input (\eg, from solar parameters) can be imposed, too.
 Applications of the projection mechanism include the projections onto the $\stheta$-axis and the $\stheta$-$\deltacp$-plane. In addition, all oscillation parameters can be kept free to precisely localize 
 degenerate solutions.
+
+\chapter*{Terms of usage of \GLOBES}
+
+\GLOBES\ is mainly developed for academic use. Thus The \GLOBES\ Team would
+appreciate being given academic credit for it. Whenever you use \GLOBES\
+to produce a publication or a talk indicate that you have used \GLOBES\ and
+please cite the following reference
+\begin{quote}
+P. Huber, M. Lindner and W. Winter ... 
+\end{quote}
+and \emph{not} this manual. This manual does not constitute a scientific 
+publication and will not be submitted to any scientific journal. 
+It will evolve during time since it is intendend for 
+regular revision.
+Besides, many of the data which is used by \GLOBES\ and distributed together
+with it should be correctly referenced where possible. For details see the
+???.
+
+Apart from that, \GLOBES\ is free software and open source, as such it is 
+licensed under the GNU Public License.
 
 \cleardoublepage
 \tableofcontents
@@ -393,15 +417,25 @@ In \Part~\ref{part:2} of the manual, \AEDL\ is described. After an
 introductory chapter, all functions are defined in greater detail.
 This part might be more interesting for the experimental users who
 want to modify or create \AEDL\ files. A useful tool in this context
-is the software program ``globes'', which returns event rates and other
+is the software program \verb+globes+, which returns event rates and other
 information for individual \AEDL\ files without further programming. 
 For example, flux normalizations can with this tool be easily adjusted 
 to reproduce the event rates of a specific experiment. It is described
 in the last chapter of \Part~\ref{part:2}.
 
+
+\paragraph{Note:} All examples for application software in C do require
+a C++ compiler to be properly compiled. For pedagogical reasons, variable
+declarations are done at that place where the variable is needed for the
+first time, which is at variance with C syntax but not with C++ syntax.
+That is the only way in which the examples deviate form ISO C. 
+
 %Finally, \Part~\ref{part:3} of this manual serves as reference manual,
 %and the appendix contains further supplementary information.
 
+
+
+\mainmatter
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % PART I: User's manual
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -424,6 +458,23 @@ in the last chapter of \Part~\ref{part:2}.
 % Appendix
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\backmatter
+\chapter*{Acknowledgments}
+\addcontentsline{toc}{chapter}{Acknowledgments}
+
+We would like to thank Martin Freund, who wrote the very first
+version of a three-flavour matter profile treatment many years ago.
+PH is especially thankful for the invaluable advice of Thomas Fischbacher on
+many design issues. 
+In addition, we would like to thank
+Mark Rolinec for his help to translate the experiment descriptions
+into \AEDL , and for creating the illustrations in this manuscript.
+Finally, thanks to all the people who have been pushing this project
+for many years, to the ones who have been continuing asking for the 
+publication of the software, and the referees of several of our
+papers for suggestions which lead to improvements in the software.
+
+
 \input{appendix}
 
 % Bibliography:
@@ -433,9 +484,13 @@ in the last chapter of \Part~\ref{part:2}.
 
 % Index:
 
+\chapter{Indices}
 \printindex{api}{API functions}
+
 \printindex{constants}{API constants \& macros}
+
 \printindex{aedl}{AEDL reference}
+
 \printindex{norm}{Index}
 
 \end{document}
