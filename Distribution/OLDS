@@ -498,4 +498,8 @@
 	Renamed this file to OLDS ;-) The stuff in here is not intended
 	for publication.
 
-	 	
+	As a consequence of Manfred`s aclocal/libtool problems, I added
+	AM_MAINTAINER_MODE to configure.in
+
+	Checked that the CVS contains all necessary files to roll a tar-ball
+ 	
