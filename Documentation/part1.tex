@@ -114,34 +114,6 @@ int main(int argc, char *argv[]) \\
 
 }
 
-\begin{table}[t]
-\begin{center}
-\begin{tabular}{llp{7cm}}
-\hline
-Quantities & Examples & Units \\
-\hline
-Angles & $\theta_{13}$, $\theta_{12}$, $\theta_{23}$, $\deltacp$ & Radians  \\
-Mass squared differences & $\sdm$, $\ldm$ & $\mathrm{eV}^2$ \\
-Matter densitities & $\rho_i$ & $\mathrm{g}/\mathrm{cm}^3$ \\
-Baseline lengths & $L_i$ & $\mathrm{km}$ \\
-Energies & $E_\nu$ & $\mathrm{GeV}$ \\  
-Fiducial masses & $m_{\mathrm{Det}}$ & $\mathrm{t}$ (reactor exp.) or $\mathrm{kt}$ (accelerator exp.), \newline  depends on experiment definition \\
-Time intervals & $t_{\mathrm{run}}$ & $\mathrm{yr}$ \\
-Source powers & $P_{\mathrm{Source}}$ & Useful parent particle decays/$\mathrm{yr}$ \newline (Neutrino factory, $\beta$-Beam), \newline $\mathrm{GW}$ thermal power (reactor exps.), \newline or
-$\mathrm{MW}$ target power (superbeams); \newline
-depends on flux definition
- \\
-% Integrated luminosities & $m_{\mathrm{Det}} \, t_{\mathrm{run}}$ & $\mathrm{kt \cdot yr}$ \\
-Cross sections/E & $\sigma_{\mathrm{CC}}/E$ & $10^{-38} \, \mathrm{cm^2}/\mathrm{GeV^2}$ \\
-\hline
-\end{tabular}
-\mycaption{\label{tab:units} \index{Units in \GLOBES } Quantities used in \GLOBES , examples of these quantities, and their standard units in the application software.}
-\end{center}
-\end{table}
-
-WW CONTINUE HERE:
-
-Throughout the programming interface of \GLOBES , the software needs to transfer parameters to and from the software core. Unless the Experiment Definition Module \EDM , the programming interface only uses one set of units for each type of quantity in order to avoid confusion about the definition of individual parameters. \tabl{units} summarizes the units of the most important quantities used in \GLOBES .
 
 \begin{table}[t]
 \begin{center}
@@ -180,19 +152,110 @@ Experiment & Filename & Short description & Refs. \\
 \hline
 \end{tabular}
 \end{center}
-\mycaption{\label{tab:experiments} \index{Experiment data files (table)} Different pre-defined experiments, their filenames (to be used in {\tt LoadExperiment}), their short description, and the references in which they are defined. Note that all experiments use in their standard configurations one year of running time. Details about the experiment parameters can be obtained with {\tt InfoExperiment}(Experiment number) after they have been loaded.}
+\mycaption{\label{tab:experiments} \index{Experiment data files (table)} NEEDS TO BE ADJUSTED WHEN PROTOTYPES ARE AVAILABLE! Different pre-defined experiments, their filenames (to be used in {\tt LoadExperiment}), their short description, and the references in which they are defined. Note that all experiments use in their standard configurations one year of running time. Details about the experiment parameters can be obtained with {\tt InfoExperiment}(Experiment number) after they have been loaded.}
 \end{table}
 
-In principle, \GLOBES\ can handle any number of different long-baseline experiments simultaneously. This means that their $\chi^2$-values are added {\em after} the minimization over the independent systematics parameters and {\em before} any minimization over the oscillation parameters. Though the simplest case of only one experiment may be most often used, more experiments are useful in many cases. For example, running a superbeam some years in the neutrino mode and some years in the antineutrino mode can be, to a first approximation, simulated by the combination of two such experiments.\footnote{Note that in this case the systematics parameters are minimized over independently, which means that this approach does not allow correlations among the systematics parameters. Therefore, the neutrino factory with the symmetric operation of both polarities is encapsulated into a single experiment.} Another example is the test of synergetic effects among different experiment types. Thus, \GLOBES\ has an internal (initially empty) list of currently initialized experiments. To add a pre-defined experiment to this list, one can use the function {\tt LoadExperiment}:
+Before one can use \GLOBES , one has to initialize the \GLOBES\
+library \GLB{libglobes}:
+\begin{function}
+\index{Initialization of {\tt libglobes}}
+\index{glbInit} {\tt void glbInit(char *name)} initializes the library {\tt libglobes} and has
+to be called in the beginning of each \GLOBES\ program. It takes the
+name {\tt name} of the program as a string to initialize the error handling
+functions. In many cases, it is sufficient to use the first
+argument from the command line as the program name (such as in example on page~\pageref{ex:c}).
+\end{function}
+
+\index{Number of experiments}
+In principle, the \GLOBES\ user interface can currently handle up to 32 of different long-baseline experiments simultaneously, where the number
+of existing experiment definition files can, of course, be unlimited. This means that their $\Delta \chi^2$-values are added {\em after} the minimization over the systematics parameters, and {\em before} any minimization over the oscillation parameters. Note that each experiment
+assumes a specific matter density profile for all of its rules, which means
+that it makes sense to simulate different operation modes within one
+experiment definition, and physically different baselines in different
+definitions. For details of the rate computation and
+simulation techniques, we refer at this place to \Part~\ref{part:2}. Though
+ the simplest case of simulating one experiment may be most often used, 
+ using more than one experiments are useful in many cases. For example, combinations of experiments can be tested for
+complementarity and competitiveness by equal means within one program.
+In general, many \GLOBES\ functions take the experiment number as
+a parameter, which runs from $0$ to \GLB{glb\_num\_of\_exps}-1 in the order of their initialization in the program.\footnote{Note that
+the global variable {\tt glb\_num\_of\_exps} must not be modified by the
+user.} In addition, using the parameter value \GLB{GLB\_ALL} as
+experiment number initiates a combined analysis of all loaded experiments.
+ 
+For storing the experiments, \GLOBES\ uses the initially empty list of experiments \GLB{glb\_experiment\_list}. To add a pre-defined experiment to this list, one can use the function {\tt glbInitExperiment}:
 \begin{function}
 \index{Experiment initialization}
-\GLB{LoadExperiment}$($``filename'' $)$ adds a single experiment to the list of currently loaded experiments. All currently loaded experiments are evaluated simultaneously (if not explicitely stated otherwise), \ie , their $\chi^2$-values are added.
+\index{glbInitExperiment}
+{\tt int glbInitExperiment(char *inf, glb\_exp *in, int *counter)}
+ adds a single experiment with the filename {\tt inf} to the list of currently loaded experiments. The {\tt counter} is a pointer to the 
+ variable containg the number of experiments, and the experiment {\tt in}
+ points to the beginning of the experiment list. The function returns
+ zero if it was successful. 
 \end{function}
-A list of pre-defined experiment types, their filenames, their short descriptions, and the references of their definitions can be found in \tabl{experiments}. To remove all experiments from the evaluation list, one uses {\tt ClearExp}:
+Normally, a typical  call of {\tt glbInitExperiment} is 
+\begin{quote}
+{\tt glbInitExperiment("NuFact.glb",\&glb\_experiment\_list[0],\\  \hspace*{8cm} \&glb\_num\_of\_exps); }
+\end{quote}
+In this case, the experiment in the file {\tt NuFact.glb} is added to the internal global list of experiments, and the experiment counter is increased. The
+experiment then has the number {\tt glb\_num\_of\_exps}-1. The elements
+of the experiment list have the type \GLB{glb\_exp}, which the
+user will not need to access directly in most cases. The experiment definition files, which usually end with {\tt .glb}, and any
+supporting files, are first of all searched in the current directory, and then in the global path variable \GLB{GLB\_PATH} set in your environment.
+A list of pre-defined experiment prototypes, their filenames, their short descriptions, and the references of their definitions can be found in \tabl{experiments}. If the program cannot find these files, or some of them are syntactially not correct, it will break at this place. 
+
+One can also remove all experiments from the evaluation list at running
+ time:
 \begin{function}
-\GLB{ClearExp}$()$ removes all experiments from the evaluation list.   
+\index{glbClearExperimentList}
+{\tt void ClearExperimentList()} removes all experiments from the internal list and resets all counters.   
 \end{function}
-Both functions do not return anything. Thus, one can either add an experiment to the internal evaluation list, or remove all experiments from this list. After adding an experiment, it gets an internal experiment number $N_{\mathrm{exp}}$ assigned in the order of the addition, which is starting from zero and running to the number of experiments minus one. Therefore, one will be able to access the individual experiment by its number later.
+Note that changing the number of experiments requires a new initialization
+of all parameters of the types \GLB{glb\_params} and \GLB{glb\_projection}
+if the number of experiments changes, since these parameter structures internally carry lists for the matter densities of all experiments. Similarly, once should never call {\tt glbAlloc...} before the
+experiment initialization.
+
+\begin{table}[t]
+\begin{center}
+\begin{tabular}{llp{7cm}}
+\hline
+Quantities & Examples & Units \\
+\hline
+Angles & $\theta_{13}$, $\theta_{12}$, $\theta_{23}$, $\deltacp$ & Radians  \\
+Mass squared differences & $\sdm$, $\ldm$ & $\mathrm{eV}^2$ \\
+Matter densitities & $\rho_i$ & $\mathrm{g}/\mathrm{cm}^3$ \\
+Baseline lengths & $L_i$ & $\mathrm{km}$ \\
+Energies & $E_\nu$ & $\mathrm{GeV}$ \\  
+Fiducial masses & $m_{\mathrm{Det}}$ & $\mathrm{t}$ (reactor exp.) or $\mathrm{kt}$ (accelerator exp.), \newline  depends on experiment definition \\
+Time intervals & $t_{\mathrm{run}}$ & $\mathrm{yr}$ \\
+Source powers & $P_{\mathrm{Source}}$ & Useful parent particle decays/$\mathrm{yr}$ \newline (Neutrino factory, $\beta$-Beam), \newline $\mathrm{GW}$ thermal power (reactor exps.), \newline or
+$\mathrm{MW}$ target power (superbeams); \newline
+depends on flux definition
+ \\
+% Integrated luminosities & $m_{\mathrm{Det}} \, t_{\mathrm{run}}$ & $\mathrm{kt \cdot yr}$ \\
+Cross sections/E & $\sigma_{\mathrm{CC}}/E$ & $10^{-38} \, \mathrm{cm^2}/\mathrm{GeV^2}$ \\
+\hline
+\end{tabular}
+\mycaption{\label{tab:units} \index{Units in \GLOBES } Quantities used in \GLOBES , examples of these quantities, and their standard units in the application software.}
+\end{center}
+\end{table}
+
+While interacting with the user interface of \GLOBES , parameters are transferred to and from the \GLOBES\ library. In \GLOBES , one set of units 
+for each type of quantity is used in order to avoid confusion about the definition of individual parameters. \tabl{units} summarizes the units of the most important quantities. In principle, the event rates are
+proportional to the product of source power $\times$ target mass $\times$
+ running time, which we call ``integrated luminosity''. Since especially the
+ definition of the source power depends on the experiment type, the quantities of the three luminosity components
+ are not unique and depend on the experiment definition. Usually,
+ one uses detector masses in kilotons for beam experiments,
+ and detector masses in tons for reactor experiments. Running times
+ are normally given in years, where it is often assumed that the 
+ experiment runs $100\%$ of the year. Thus, for shorter running periods,
+ the running times need to be renormalized. Source powers are
+ usually useful parent particle decays per year (neutrino factories,
+ $\beta$-beams), target power in megawatts (superbeams), or thermal
+ reactor power in gigawatts (reactor experiments).
+
+WW: WEITER FROM HERE:
 
 Since the pre-defined experiments in \tabl{experiments} are given for one year running time, specific target masses, and specific source powers, it is useful to change these parameters of the individual experiments:
 \begin{function}
