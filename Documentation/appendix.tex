@@ -6,6 +6,260 @@
 
 \chapter{\GLOBES\ installation}
 \label{app:installation}
+\index{norm}{Installation|(}
+
+
+The installation of \GLOBES\ is highly automated and there should not be
+any problems on a decently up-to-date GNU/Linux system. The installation
+has however only been tested on a limited number of platforms, mainly
+running with various versions of SuSE Linux. Thus we would appreciate
+to know your experiences with installation on different platforms, please
+send e-mail to <\bugs>.
+
+\section*{Prerequisites for installation of \GLOBES}
+\index{norm}{Installation!prerequisites}
+
+Besides the usual things like a working libc you need to have
+\begin{itemize}
+\item[gcc] The GNU compiler collection\\
+\verb+gcc.gnu.org+
+\item[BLAS] Basic Linear Algebra Subprograms\\
+\verb+www.netlib.org/blas/+    
+\item[LAPACK] Linear Algebra PACKage\\
+\verb+www.netlib.org/lapack/+
+\item[f2c] Fortran to C\\ 
+\verb+www.netlib.org/f2c/+
+\item[GSL] The GNU Scientific Library\\
+\verb+www.gnu.org/software/gsl/+
+\end{itemize}
+The library \verb+libglobes+ should in principle compile with any
+ANSI C/C++ compiler but the \verb+globes+ binary uses the 
+\verb+argp+ facility of \verb+glibc+ to parse its command line options.
+
+All those libraries are also available as rpm's from the various
+distributors of GNU/Linux, see their web sites for downloads. Due to
+the rather difficult nature of the build process of BLAS and LAPACK
+it is recommended to use a suitable rpm instead. Chances are that
+gcc, f2c and GSL are already part of your installation. Furthmore you need
+a working \verb+make+ to build and install \GLOBES.
+
+In future releases it is planed to at least get rid of LAPACK, because
+then also BLAS and f2c would drop out. Furthemore there is no prinicipal
+reason why not also to get rid of any C++ parts. This will greatly simplify
+the build process and ease the requirements for installation.
+
+\section*{Installation Instructions}
+
+\GLOBES\ follows the standard GNU installation procedure.  To compile \GLOBES\
+you will need gcc.  After unpacking the distribution
+the Makefiles can be prepared using the configure command,
+\begin{quote}
+{\tt
+./configure
+}
+\end{quote}
+You can then build the library by typing,
+\begin{quote}
+{\tt
+make
+}
+\end{quote}
+A shared  version of the library will be compiled by
+default. 
+ 
+The library can be installed using the command,
+\begin{quote}
+{\tt
+make install
+}
+\end{quote}
+The default install directory prefix is \verb+/usr/local+.  Consult the
+"Further Information" section below for instructions on installing the
+library in another location or changing other default compilation
+options.
+
+The install target also will install a program with name \verb+globes+ to
+\verb+$prefix+.
+
+If you are not using \verb+make install+ you will find the static libary
+at \verb+source/.lib/libglobes.a+ which you can copy to any destination.
+However keep in mind that the linking command will be somewhat different,
+\ie\ you have to specify all the dynamically linked objects besides libglobes,
+which are
+\begin{quote}
+{\tt
+         -lm -lgsl -lgslcblas -lf2c -llapack -lblas
+}
+\end{quote}
+
+In general it is preferable to use the shared libraries, in case you don't
+have root privileges see the corresponding section of this file.
+ 
+\section*{Basic Installation}
+
+   The \verb+configure+ shell script attempts to guess correct values for
+various system-dependent variables used during compilation.  It uses
+those values to create a \verb+Makefile+ in each directory of the package.
+Finally, it creates a shell script \verb+config.status+ that
+you can run in the future to recreate the current configuration, a file
+\verb+config.cache+ that saves the results of its tests to speed up
+reconfiguring, and a file \verb+config.log+ containing compiler output
+(useful mainly for debugging \verb+configure+).
+
+   If you need to do unusual things to compile the package, please try
+to figure out how \verb+configure+ could check whether to do them, and mail
+diffs or instructions to \bugs\ so they can
+be considered for the next release.  If at some point \verb+config.cache+
+contains results you don't want to keep, you may remove or edit it.
+
+   The file \verb+configure.in+ is used to create \verb+configure+ by a program
+called \verb+autoconf+.  You only need \verb+configure.in+ 
+if you want to change it or regenerate \verb+configure+ using a newer 
+version of \verb+autoconf+.
+
+The simplest way to compile this package is:
+\begin{enumerate}
+\item \verb+cd+ to the directory containing the package's source code and type
+     \verb+./configure+ to configure the package for your system.  If you're
+     using \verb+csh+ on an old version of System V, you might need to type
+     \verb+sh ./configure+ instead to prevent \verb+csh+ from trying to execute
+     \verb+configure+ itself.
+
+     Running \verb+configure+ takes awhile.  While running, it prints some
+     messages telling which features it is checking for. It also prints
+     a reminder for things to do after installation.
+
+\item Type \verb+make+ to compile the package.
+
+\item Type \verb+make install+ to install the programs and any data files and
+     documentation.
+
+\item You can remove the program binaries and object files from the
+     source code directory by typing \verb+make clean+.  To also remove the
+     files that \verb+configure+ created (so you can compile the package for
+     a different kind of computer), type \verb+make distclean+.  There is
+     also a \verb+make maintainer-clean+ target, but that is intended mainly
+     for the package's developers.  If you use it, you may have to get
+     all sorts of other programs in order to regenerate files that came
+     with the distribution.
+
+\item Since you've installed a library don't forget to run \verb+ldconfig+ !
+\end{enumerate}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{Installation without root privilege}
+\index{norm}{Installation!w/o root privilege}
+
+Install \GLOBES\ to a directory of your choice \verb+GLB_DIR+. This is done by
+\begin{quote}
+\verb+configure --prefix=GLB_DIR+
+\end{quote}
+and then follow the usual installation guide. The only remaining problem
+is that you have to tell the compiler where to find the header files, and 
+the linker where to find the library. Furthermore you have to make sure 
+that the shared object files are found during execution. Running 
+\verb+configure+
+also produces a \verb+Makefile+ in the \verb+examples+ 
+subdirectory which can serve as
+a template for the compilation and linking process, since all necessary
+flags are correctly filled in. 
+
+Another solution is to set the environment variable \verb+LD_RUN_PATH+
+during linking to \verb+GLB_DIR/lib+ . Best thing is to add this to your
+shell dot-file (e.g. \verb+.bashrc+). Then you can use:
+A typical compiler command like
+\begin{quote}
+\verb+gcc -c my_program.c -IGLB_DIR/include/+
+\end{quote}
+and a typical linker command like
+\begin{quote}
+\verb#g++ my_program.o -lglobes -LGLB_DIR/lib/ -o my_executable#
+\end{quote}
+More information on this issue can be obtained by having a look 
+into the aforementioned  \verb+Makefile+ in \verb+examples+. 
+
+\begin{itemize}
+\item[CAVEAT] It is in principle possible to have many installations 
+on one machine,
+especially the situation of having an installation by root and by a user at
+the same time might occur. However it is strictly warned against this 
+possibility since it is \emph{extremely} likely to create some 
+versioning problem at some time!
+\end{itemize}
+
+\section*{Advanced topics}
+
+\subsection*{Compilers and Options}
+
+
+   Some systems require unusual options for compilation or linking that
+the \verb+configure+ script does not know about.  You can give \verb+configure+
+initial values for variables by setting them in the environment.  Using
+a Bourne-compatible shell, you can do that on the command line like
+this
+\begin{quote}
+\verb+CC=c89 CFLAGS=-O2 LIBS=-lposix ./configure+
+\end{quote}
+Or on systems that have the `env' program, you can do it like this
+\begin{quote}
+\verb+env CPPFLAGS=-I/usr/local/include LDFLAGS=-s ./configure+
+\end{quote}
+
+\subsection*{Compiling For Multiple Architectures}
+
+   You can compile the package for more than one kind of computer at the
+same time, by placing the object files for each architecture in their
+own directory.  To do this, you must use a version of \verb+make+ that
+supports the \verb+VPATH+ variable, such as GNU \verb+make+.  `cd' to the
+directory where you want the object files and executables to go and run
+the \verb+configure+ script.  \verb+configure+ automatically checks for the
+source code in the directory that \verb+configure+ is in and in `..'.
+
+   If you have to use a \verb+make+ that does not supports the \verb+VPATH+
+variable, you have to compile the package for one architecture at a time
+in the source code directory.  After you have installed the package for
+one architecture, use `make distclean' before reconfiguring for another
+architecture.
+
+\subsection*{Installation Names}
+
+By default, \verb+make install+ will install the package's files in
+\verb+/usr/local/bin+, \verb+/usr/local/include+, etc.  You can specify an
+installation prefix other than \verb+/usr/local+ by giving \verb+configure+ the
+option \verb+--prefix=PATH+.
+
+
+
+\subsection*{Specifying the System Type}
+
+
+   There may be some features \verb+configure+ can not figure out
+automatically, but needs to determine by the type of host the package
+will run on.  Usually \verb+configure+ can figure that out, but if it prints
+a message saying it can not guess the host type, give it the
+\verb+--host=TYPE+ option.  TYPE can either be a short name for the system
+type, such as `sun4', or a canonical name with three fields: 
+\verb+CPU-COMPANY-SYSTEM+
+
+See the file \verb+config.sub+ for the possible values of each field. 
+ 
+   If you are building compiler tools for cross-compiling, you can also
+use the \verb+--target=TYPE+ option to select the type of system they will
+produce code for and the \verb+--build=TYPE+ option to select the type of
+system on which you are compiling the package.
+
+\subsection*{Sharing Defaults}
+   If you want to set default values for \verb+configure+ scripts to share,
+you can create a site shell script called \verb+config.site+ that gives
+default values for variables like \verb+CC+,  \verb+cache_file+, and 
+\verb+prefix+.
+\verb+configure+ looks for \verb+PREFIX/share/config.site+ if it exists, then
+\verb+PREFIX/etc/config.site+ if it exists.  Or, you can set the
+\verb+CONFIG_SITE+ environment variable to the location of the site script.
+A warning: not all \verb+configure+ scripts look for a site script.
+
+\index{norm}{Installation|)}
+
+
 
 \input{gpl}
 
@@ -15,3 +269,8 @@
 \addcontentsline{toc}{chapter}{Acknowledgments}
 
 \end{appendix}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: Manual.tex
+%%% End:

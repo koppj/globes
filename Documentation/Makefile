@@ -1,6 +1,6 @@
 all: Manual.ps
 
-Manual.tex : part1.tex part2.tex part3.tex references.bib 
+Manual.tex : part1.tex part2.tex part3.tex references.bib appendix.tex
 	touch Manual.tex
 
 Manual.dvi : Manual.tex
@@ -20,8 +20,11 @@ Manual.dvi : Manual.tex
 Manual.ps : Manual.dvi
 	dvips Manual.dvi
 
-.PHONY: clean
+.PHONY: clean fast
 
 clean:
 	rm -f *.aux *.log *.ind *.bbl *.ilg *.blg Manual.dvi Manual.ps *.toc 
 
+fast: 
+	latex Manual
+	dvips Manual
