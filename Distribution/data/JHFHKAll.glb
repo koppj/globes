@@ -70,7 +70,7 @@ $filter_value = 1000000
 
 energy(#ERES)<
 	@type = 1
-	@sigma_e = {0.085,0.0,0.0}
+	@sigma_e = {0.0,0.0,0.085}
 >
 
 

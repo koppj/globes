@@ -17,6 +17,7 @@
  #*     eprint    = "hep-ph/0204352",
  #*     SLACcitation  = "%%CITATION = HEP-PH 0204352;%%"
  #* }
+ * Last modified 14/03/2005
  */
 
 $version="1.8.1"
@@ -45,7 +46,7 @@ $bins = 		20
 $emin = 	         4
 $emax = 	        50
 
-$sampling_points = 20
+$sampling_points = 	20
 $sampling_min =          4
 $sampling_max =         50
 
@@ -70,40 +71,53 @@ cross(#CC)<
 	@cross_file = "XCC.dat"
 >
 
+cross(#NC)<
+	@cross_file = "XNC.dat"
+	
+>
+
+
 /* 	 Channels 	 */
 
-channel(#ch0)<
+channel(#nu_mu_appearance)<
 	@channel = 	#two:	+:	e:	m:	#CC:    #sm0
 
 	@post_smearing_efficiencies={0.071875, 0.215625, 0.359375, 0.503125,
 	0.646875, 0.790625, 0.934375, 1, 1,1, 1, 1, 1, 1,1, 1, 1, 1, 1, 1}
 >
 
-channel(#ch1)<
+channel(#nu_mu_bar_appearance)<
 	@channel = 	#one:	-:	e:	m:	#CC:    #sm0
 	@post_smearing_efficiencies={0.071875, 0.215625, 0.359375, 0.503125, 
 	0.646875, 0.790625, 0.934375, 1, 1,1,1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
 >
 
-channel(#ch2)<
+channel(#nu_mu_bar_disappearance)<
 	@channel = 	#two:	-:	m:	m:	#CC:    #sm0
 	@post_smearing_efficiencies={0.071875, 0.215625, 0.359375, 0.503125, 
 	0.646875, 0.790625, 0.934375, 1, 1,1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
 >
 
-channel(#ch3)<
+channel(#nu_mu_disappearance)<
 	@channel = 	#one:	+:	m:	m:	#CC:    #sm0
 	@post_smearing_efficiencies={0.071875, 0.215625, 0.359375, 0.503125, 
 	0.646875, 0.790625, 0.934375, 1, 1,1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
 >
 
+channel(#nu_NC_bckg)<
+	@channel = 	#one:	+:	NOSC_m:	NOSC_m:	#NC:    #sm0
+>
+
+channel(#nu_bar_NC_bckg)<
+	@channel = 	#two:	-:	NOSC_m:	NOSC_m:	#NC:    #sm0
+>
 
 /* 	 Rules 		 */
-rule(#rule0)<
-	@signal =	      0.45@#ch0
+rule(#Nu_Mu_Disappearance)<
+	@signal =	      0.45@#nu_mu_disappearance
 	@signalerror =	     0.001  :	    0.0001
 
-	@background =	         1@#ch2
+	@background =	         1@#nu_NC_bckg
 	@backgrounderror = 	     2e-06  :	    0.0001
 	@backgroundcenter = 	     1e-05  :	         0
 
@@ -113,11 +127,11 @@ rule(#rule0)<
 
 >
 
-rule(#rule1)<
-	@signal =	      0.35@#ch1
+rule(#Nu_Mu_Bar_Disappearance)<
+	@signal =	      0.35@#nu_mu_bar_disappearance
 	@signalerror =	     0.001  :	    0.0001
 
-	@background =	         1@#ch3
+	@background =	         1@#nu_bar_NC_bckg
 	@backgrounderror = 	     2e-06  :	    0.0001
 	@backgroundcenter = 	     1e-05  :	         0
 
@@ -126,11 +140,11 @@ rule(#rule1)<
 	@energy_window = 	         4  :	        50
 >
 
-rule(#rule2)<
-	@signal =	      0.45@#ch2
+rule(#Nu_Mu_Bar_Appearance)<
+	@signal =	      0.35@#nu_mu_bar_appearance
 	@signalerror =	     0.001  :	    0.0001
 
-	@background =	     1e-05@#ch0
+	@background =	     5e-06@#nu_NC_bckg : 5e-06@#nu_mu_disappearance
 	@backgrounderror = 	     0.001  :	    0.0001
 	@backgroundcenter = 	         1  :	         0
 
@@ -139,11 +153,11 @@ rule(#rule2)<
 	@energy_window = 	         4  :	        50
 >
 
-rule(#rule3)<
-	@signal =	      0.35@#ch3
+rule(#Nu_Mu_Appearance)<
+	@signal =	      0.45@#nu_mu_appearance
 	@signalerror =	     0.001  :	    0.0001
 
-	@background =	     1e-05@#ch1
+	@background =	     5e-06@#nu_bar_NC_bckg : 5e-06@#nu_mu_bar_disappearance
 	@backgrounderror = 	     0.001  :	    0.0001
 	@backgroundcenter = 	         1  :	         0
 
