@@ -18,13 +18,13 @@ Manual.dvi : Manual.tex
 	latex Manual.tex
 
 Manual.ps : Manual.dvi
-	dvips Manual.dvi
+	dvips Manual -o Manual.ps
 
 .PHONY: clean fast
 
 clean:
-	rm -f *.aux *.log *.ind *.bbl *.ilg *.blg Manual.dvi Manual.ps *.toc 
+	rm -f *.aux *.log *.ind *.bbl *.ilg *.blg Manual.dvi Manual.ps *.toc
 
-fast: 
+fast:
 	latex Manual
-	dvips Manual
+	dvips Manual -o Manual.ps
