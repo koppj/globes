@@ -308,10 +308,7 @@ If you want to have several experiments in one file, separate the different
 \end{quote}
 This command resets the counters for channels, rules and energy resolution
 functions. All variables have their scope limited 
-by either {\tt \%!GLoBES, \#NEXT\#} or {\tt EOF}. The only exception are 
-the counters defined by {\tt cross} and {\tt flux}. They are valid for 
-the complete session, since one does not want too overload the flux and 
-cross section information when using more than one experiment. This allows 
+by either {\tt \%!GLoBES, \#NEXT\#} or {\tt EOF}.  This allows 
 a consistent treatment of various experiments in one file.
 
 As another feature of AEDL one can use include files with the {\tt include} command. Includes can be nested up to {\tt MAX\_INCLUSION\_DEPTH}, which is currently set to $10$. Error reporting works 
@@ -331,10 +328,8 @@ in order to initialize a combined analysis of the experiments defined in the fil
 Even if one uses the
 automatic variable {\tt \#CC} in both experiments, 
 but the cross section data are different (for example, because of different target nuclei), the correct 
-cross section data will be applied to each of the experiments in the 
-application software. In this case, {\tt \#CC} in {\tt NuFact.gls} has 
-the value $0$ and in {\tt JHFHK.gls} it has the value $1$, 
-which means that no shadowing occurs. Note that, alternatively, one can 
+cross section data will be applied to each of the experiments. 
+Note that, alternatively, one can 
 also load both files successively. 
 
 Furthermore, one can define constants such as
@@ -518,22 +513,6 @@ a specific matter density:
 \end{quote}
 The possible options for matter density profiles are summarized in \Tab~\ref{tab:profiletypes}.
 
-In addition to the matter density profile, \GLOBES\ implements a simple treatment of matter density uncertainties by a scaling factor $\hat{\rho}$
-of the matter density profile:
-\begin{equation}
-\label{eq:density_error}
-\rho(x)=\hat{\rho} \cdot\rho_0(x)\,\left[\frac{\mathrm{g}}{\mathrm{cm}^3}\right] \, .
-\end{equation}
-Here $\rho_0(x)$ is the matter profile chosen by the user, and $\rho(x)$ is
-the one used in the calculation of the oscillation probabilities. As it is described in \Sec~\ref{sec:externalinput}, the matter density uncertainty is implemented by using $\hat{\rho}$ as an additional oscillation parameter for each experiment, and by assuming to know $\hat{\rho}$ with an external precision. Thus, the central value of $\hat{\rho}$ (default value $1.0$) and its error $\delta \hat{\rho}$ have to be defined. The following code assumes a matter density uncertainty of $5\%$:\index{Density error}\index{Density center}
-\begin{quote}
- {\tt \$densitycenter=1.0} \\
- {\tt \$densityerror=0.05}
-\end{quote}
-In most cases, this is in combination with a constant profile a very good approximation to take into account the realistic structure of the profile as well as its uncertainty~\cite{Ohlsson:2003ip}. 
- If one does not want to take into account  matter density uncertainties, 
-one can either a very small value of $\hat{\rho}$, or the minimizer {\tt ChiNP} with $\hat{\rho}$ fixed in the application software.
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Cross sections}
@@ -568,7 +547,8 @@ $\mathrm{log}_{10} E\quad
 Here the logarithms of the energy values have to be equidistant. For 
 arbitrary energies, linear interpolation is used. If the energy leaves the
 range of values given in the file, $0.0$ will be assumed. In general, it is advisable to provide the cross sections in the range between {\tt \$sampling\_min} and {\tt \$sampling\_max} (\cf, \Sec~\ref{sec:energy}).
-Unused cross sections have to be filled with zeros, and can not be just omitted.
+Unused cross sections have to be filled with zeros, and can not
+ be just omitted.
 
 \section{Oscillation channels}
 \label{sec:channel}
@@ -759,7 +739,15 @@ For a manual definition of the sampling points (depends on algorithm), use
 }
 \end{quote}
 for equidistant sampling points. Arbitrarily spaced sampling points can 
-be specified analogously to the energy bins below. 
+be specified with \GLB{\$sampling\_stepsize}
+\begin{quote}
+{\tt
+\$sampling\_stepsize=\{1.0,2.0,3.0,4.0,5.0,...\}
+}
+\end{quote}
+
+
+ 
 Note that the algorithm expects to 
 have at least as many sampling points as energy bins, since otherwise 
 the number of (unphysical) sampling constrains the experiment performance.
@@ -897,7 +885,7 @@ which only uses the parameter $\alpha$. It is defined by
 \sigma(E)= \left\{\begin{array}{cl}
  \alpha \cdot \sqrt{1000}^{-1}\,\sqrt{x-8\cdot10^{-4}}\,,&\mathrm{for}\,\, 
 x>1.8\cdot10^{-3}\\
-5\cdot10^{-5} \,,&\mathrm{for}\,\, x \leq 1.8\cdot10^{-3}
+\alpha\cdot10^{-3} \,,&\mathrm{for}\,\, x \leq 1.8\cdot10^{-3}
 \end{array} \right.
 \end{equation}
 In the actual implementation of the algorithm,  the sum in \eq~(\ref{eq:algo_one}) is only computed for the $E_j$'s where $K(E_j)$ 
@@ -1229,20 +1217,26 @@ is $0$.
 
 The user has the possibility to choose the set $\{\zeta_i\}$ of nuisance 
 parameters which are minimized over. This choice is specified with the 
-error dimension variable\index{Error dimension}, and the different possibilities are shown in
-\Tab~\ref{tab:error_dim}. The error dimensions can be chosen for each rule 
-by {\tt @errordim}. For example, 
+error dimension variable\index{Error dimension}, and the different 
+possibilities are shown in
+\Tab~\ref{tab:error_dim}. Since the error dimension defines the treatement
+of systematics it is useful to have define a matched pair of error dimensions
+for each rule, where on value describes how the event rate is computed
+for \emph{no} systematics and the other one is with systematics 
+(see also~\Sec~\ref{sec:systematics}).
+The error dimensions for the case of no systematics is set for each rule 
+by the value of \GLB{@errordim\_sys\_off}, whereas the error dimension
+for systematics on is given by \GLB{@errordim\_sys\_on}. Thus, for example,
+the complete error dimension definition could look like  
 \begin{quote}
 {\tt 
-\tb @errordim = 1
+\tb @errordim\_sys\_off = 2\\
+\tb @errordim\_sys\_on = 0
 }
 \end{quote}
-In general, it is possible to extend the set of error dimensions or the 
-set of possible systematical errors, but this requires C programming, 
-compiling and linking with \GLOBES. 
-%The interface for user defined error 
-%dimensions is described in detail in section~\ref{sec:ud_error_dim}.
-
+It is foreseen to add the possiblity to extend the set 
+of error dimensions or the set of possible systematical errors in one
+of the next versions of \GLOBES.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{center}
 \begin{table}[t!]
