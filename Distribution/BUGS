@@ -11,3 +11,24 @@ Date: 19.07.04
 	in one of the experiment structures. The problem may have its roots in
 	copy_buff in the parser.
 -------------------------------------------------------------------------------
+
+BUG#2 glbCopyParams is leaking memory
+
+From: Walter Winter
+Date: 04.08.04
+	
+	glbCopyParams allocates the memory needed for the oscillation	
+	parameters and the densities erraneously for a second time in the
+	destination glb_params structure. This memory has been already 
+	allocated by a previous call to glbAllocParams. The leak rate
+	is typically only a few tens of bytes in each call. Thus, no
+	serious trouble is expected. 
+-------------------------------------------------------------------------------
+
+BUG#3 glbCopyProjection is leaking memory
+
+From: Patrick Huber
+Date: 04.08.04
+	
+	see BUG#3
+-------------------------------------------------------------------------------
