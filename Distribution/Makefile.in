@@ -82,7 +82,7 @@ YACC = @YACC@
 DIST_SUBDIRS = source data
 SUBDIRS = source data 
 
-EXTRA_DIST = globes/globes.h examples/Makefile.in examples/example1.c  examples/example3.c examples/myio.c examples/example-tour.c  examples/example2.c  examples/example4.c examples/myio.h examples/XCC.dat examples/NuFact.glb BUGS test/test-run test/.r1 test/.r2 test/.r3 test/.r4 test/.r5 test/.r6 test/.r7 test/.r8 test/test-mem data/test-file
+EXTRA_DIST = globes/globes.h examples/Makefile.in examples/example1.c  examples/example3.c examples/myio.c examples/example-tour.c  examples/example2.c  examples/example4.c examples/myio.h examples/XCC.dat examples/NuFact.glb BUGS 
 
 
 AM_YFLAGS = -d 
@@ -248,8 +248,7 @@ distdir: $(DISTFILES)
 	distdir=`cd $(distdir) && pwd`; \
 	cd $(top_srcdir) \
 	  && $(AUTOMAKE) --include-deps --build-dir=$$here --srcdir-name=$(top_srcdir) --output-dir=$$top_distdir --gnu Makefile
-	$(mkinstalldirs) $(distdir)/data $(distdir)/examples $(distdir)/globes \
-	   $(distdir)/test
+	$(mkinstalldirs) $(distdir)/examples $(distdir)/globes
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \
