@@ -29,6 +29,10 @@ dnl middle digit: increment when features have been introduced/removed
 dnl first digit: major improvements/rewrites
 AM_INIT_AUTOMAKE(globes,1.8.2)
 
+dnl To avoid problems due to clock skew and/or lacking autotools on
+dnl user system
+AM_MAINTAINER_MODE
+
 dnl Versioning of libglobes.so
 dnl code changed: c:r+1:a
 dnl API changed: c+1:0:a
@@ -139,6 +143,17 @@ AC_TYPE_SIZE_T
 dnl Checks for library functions.
 AC_CHECK_FUNCS(strdup)
 
+
+dnl pretty printing
+stars=""
+emtpy=""
+while [[  ${#stars} != ${#prefix} ]]
+do
+	stars="${stars}*"
+	empty="${empty} "
+done
+
+
 dnl Remind the user of things he might need ;-)
 if test $prefix = NONE; then
  echo "********************************************"
@@ -146,11 +161,11 @@ if test $prefix = NONE; then
  echo "* Do not forget to run 'ldconfig' as root! *"
  echo "********************************************"	
 else
- echo "****************************************************" 
- echo "*              After 'make install':               *"
+ echo "***********************${stars}********************" 
+ echo "*              After 'make install':   ${empty}   *"
  echo "* Do not forget to add ${prefix}/bin to your path! *"
- echo "****************************************************"
+ echo "***********************${stars}********************"
 fi
 
 AC_OUTPUT([Makefile source/Makefile examples/Makefile\
- data/Makefile test/Makefile])
+ data/Makefile])

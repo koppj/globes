@@ -1,5 +1,5 @@
-DIST_SUBDIRS = source data test
-SUBDIRS = source data test
+DIST_SUBDIRS = source data
+SUBDIRS = source data 
 
 
 EXTRA_DIST =  globes/globes.h\
