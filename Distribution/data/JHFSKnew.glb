@@ -56,52 +56,42 @@ cross(#QE)<
 
 channel(#nu_mu_disappearance_CC)<
 	@channel = 	#JHFplus:	+:	m:	m:	#CC:    #ERES
-	@post_smearing_efficiencies = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
 >
 
 channel(#nu_mu_disappearance_QE)<
 	@channel = 	#JHFplus:	+:	m:	m:	#QE:    #ERES
-	@post_smearing_efficiencies = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
 >
 
 channel(#nu_mu_disappearance_NC)<
 	@channel = 	#JHFplus:	+:	m:	m:	#NC:    #ERES
-	@post_smearing_efficiencies = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
 >
 
 channel(#nu_mu_disappearance_QE)<
 	@channel = 	#JHFplus:	+:	m:	m:	#QE:    #ERES
-	@post_smearing_efficiencies = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
 >
 
 channel(#nu_e_beam)<
 	@channel = 	#JHFplus:	+:	e:	e:	#CC:    #ERES
-	@post_smearing_efficiencies = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
 >
 
 channel(#nu_e_bar_beam)<
 	@channel = 	#JHFplus:	-:	e:	e:	#CC:    #ERES
-	@post_smearing_efficiencies = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
 >
 
 channel(#nu_e_appearance_CC)<
 	@channel = 	#JHFplus:	+:	m:	e:	#CC:    #ERES
-	@post_smearing_efficiencies = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
 >
 
 channel(#nu_e_appearance_QE)<
 	@channel = 	#JHFplus:	+:	m:	e:	#QE:    #ERES
-	@post_smearing_efficiencies = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
 >
 
 channel(#nu_e_appearance_NC)<
 	@channel = 	#JHFplus:	+:	m:	e:	#NC:    #ERES
-	@post_smearing_efficiencies = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
 >
 
 channel(#nu_tau_appearance_NC)<
 	@channel = 	#JHFplus:	+:	m:	t:	#NC:    #ERES
-	@post_smearing_efficiencies = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
 >
 
 /* 	 Rules 		 */

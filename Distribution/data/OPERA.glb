@@ -56,27 +56,22 @@ cross(#NC)<
 
 channel(#disappearance)<
 	@channel = 	#CNGS:	+:	m:	m:	#CNGS_CC:    #OPERA
-	@post_smearing_efficiencies = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
 >
 
 channel(#nu_e_appearance)<
 	@channel = 	#CNGS:	+:	m:	e:	#CNGS_CC:    #OPERA
-	@post_smearing_efficiencies = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
 >
 
 channel(#nu_tau_appearance)<
 	@channel = 	#CNGS:	+:	m:	t:	#CNGS_CC:    #OPERA
-	@post_smearing_efficiencies = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
 >
 
 channel(#nu_e_beam)<
 	@channel = 	#CNGS:	+:	e:	e:	#CNGS_CC:    #OPERA
-	@post_smearing_efficiencies = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
 >
 
 channel(#NC_background)<
 	@channel = 	#CNGS:	+:	NOSC_m:	NOSC_m:	#NC:    #OPERA
-	@post_smearing_efficiencies = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
 >
 
 

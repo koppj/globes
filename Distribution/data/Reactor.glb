@@ -49,7 +49,6 @@ cross(#Reactor_CC)<
 
 channel(#nu_e_disappearance_CC)<
 	@channel = 	#Reactor:	-:	e:	e:	#Reactor_CC:    #ERES
-	@post_smearing_efficiencies = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
 >
 
 /* 	 Rules 		 */

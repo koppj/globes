@@ -77,12 +77,10 @@ channel(#NC_background)<
 
 channel(#disappearanceWOS)<
 	@channel = 	#NUMI:	+:	m:	m:	#CC:    #ERES
-	@post_smearing_efficiencies = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
 >
 
 channel(#NC_backgroundWOS)<
 	@channel = 	#NUMI:	+:	NOSC_m:	NOSC_m:	#NC:    #ERES
-	@post_smearing_efficiencies = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
 >
 
 

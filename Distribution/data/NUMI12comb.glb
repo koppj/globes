@@ -68,76 +68,62 @@ cross(#QE)<
 
 channel(#nu_mu_disappearance_CC)<
 	@channel = 	#NUMI12plus:	+:	m:	m:	#CC:    #ERES
-	@post_smearing_efficiencies={1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
-	>
+>
 
 
 channel(#nu_mu_disappearance_NC)<
 	@channel = 	#NUMI12plus:	+:	m:	m:	#NC:    #ERES
-	@post_smearing_efficiencies={1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
-	>
+>
 
 channel(#nu_e_beam_CC)<
 	@channel = 	#NUMI12plus:	+:	e:	e:	#CC:    #ERES
-	@post_smearing_efficiencies={1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
-	>
+>
 
 channel(#nu_e_appearance_CC)<
 	@channel = 	#NUMI12plus:	+:	m:	e:	#CC:    #ERES	
-	@post_smearing_efficiencies={1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
-	>
+>
 
 channel(#nu_mu_disappearance_QE)<
 	@channel = 	#NUMI12plus:	+:	m:	m:	#NC:    #ERES
-	@post_smearing_efficiencies={1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
-	>
+>
 
 channel(#nu_e_appearance_NC)<
 	@channel = 	#NUMI12plus:	+:	m:	e:	#NC:    #ERES	
-	@post_smearing_efficiencies={1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
-	>
+>
 
 channel(#nu_tau_appearance_NC)<
 	@channel = 	#NUMI12plus:	+:	m:	t:	#NC:    #ERES
-	@post_smearing_efficiencies={1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
-	> 
+> 
 
 
 
 channel(#ANTI_nu_mu_disappearance_CC)<
 	@channel = 	#NUMI12minus:	-:	m:	m:	#CC:    #ERES
-	@post_smearing_efficiencies={1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
-	>
+>
 
 channel(#ANTI_nu_mu_disappearance_NC)<
 	@channel = 	#NUMI12minus:	-:	m:	m:	#NC:    #ERES
-	@post_smearing_efficiencies={1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
-	>
+>
 
 channel(#ANTI_nu_e_beam_CC)<
 	@channel = 	#NUMI12minus:	-:	e:	e:	#CC:    #ERES
-	@post_smearing_efficiencies={1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
-	>
+>
 
 channel(#ANTI_nu_e_appearance_CC)<
 	@channel = 	#NUMI12minus:	-:	m:	e:	#CC:    #ERES	
-	@post_smearing_efficiencies={1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
-	>
+>
 
 channel(#ANTI_nu_mu_disappearance_QE)<
 	@channel = 	#NUMI12minus:	-:	m:	m:	#NC:    #ERES
-	@post_smearing_efficiencies={1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
-	>
+>
 
 channel(#ANTI_nu_e_appearance_NC)<
 	@channel = 	#NUMI12minus:	-:	m:	e:	#NC:    #ERES	
-	@post_smearing_efficiencies={1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
-	>
+>
 
 channel(#ANTI_nu_tau_appearance_NC)<
 	@channel = 	#NUMI12minus:	-:	m:	t:	#NC:    #ERES
-	@post_smearing_efficiencies={1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
-	> 
+> 
 
 /* 	 Rules 		  */
 

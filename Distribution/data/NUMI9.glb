@@ -62,39 +62,32 @@ cross(#QE)<
 
 channel(#nu_mu_disappearance_CC)<
 	@channel = 	#NUMI9plus:	+:	m:	m:	#CC:    #ERES
-	@post_smearing_efficiencies={1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
-	>
+>
 
 
 channel(#nu_mu_disappearance_NC)<
 	@channel = 	#NUMI9plus:	+:	m:	m:	#NC:    #ERES
-	@post_smearing_efficiencies={1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
-	>
+>
 
 channel(#nu_e_beam_CC)<
 	@channel = 	#NUMI9plus:	+:	e:	e:	#CC:    #ERES
-	@post_smearing_efficiencies={1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
-	>
+>
 
 channel(#nu_e_appearance_CC)<
 	@channel = 	#NUMI9plus:	+:	m:	e:	#CC:    #ERES	
-	@post_smearing_efficiencies={1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
-	>
+>
 
 channel(#nu_mu_disappearance_QE)<
 	@channel = 	#NUMI9plus:	+:	m:	m:	#NC:    #ERES
-	@post_smearing_efficiencies={1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
-	>
+>
 
 channel(#nu_e_appearance_NC)<
 	@channel = 	#NUMI9plus:	+:	m:	e:	#NC:    #ERES	
-	@post_smearing_efficiencies={1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
-	>
+>
 
 channel(#nu_tau_appearance_NC)<
 	@channel = 	#NUMI9plus:	+:	m:	t:	#NC:    #ERES
-	@post_smearing_efficiencies={1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
-	> 
+> 
 
 /* 	 Rules 		  */
 
