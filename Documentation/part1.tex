@@ -581,7 +581,13 @@ In this case, the experiment in the file {\tt NuFact.glb} is added to the intern
 experiment then has the number {\tt glb\_num\_of\_exps}-1. The elements
 of the experiment list have the type \GLB{\_exp}, which the
 user will not need to access directly in most cases. The experiment definition files, which usually end with {\tt .glb}, and any
-supporting files, are first of all searched in the current directory, and then in the global path variable \GLBC{GLB\_PATH} set in your environment.
+supporting files, are first of all searched in the current directory, and then in the global path variable 
+%
+\index{norm}{GLB PATH@{\tt GLB\_PATH}}
+\index{norm}{Environment variables!GLB PATH@{\tt GLB\_PATH}}
+%
+set in your environment.
+\index{norm}{Path resolution}
 A list of pre-defined experiment prototypes, their filenames, their short descriptions, and the references of their definitions can be found in \tabl{experiments}. If the program cannot find these files, or some of them are syntactically not correct, it will break at this place. 
 
 \index{norm}{Clear experiment list}

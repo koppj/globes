@@ -1333,6 +1333,9 @@ Thus, for the background normalization $c$, the value has to be specified
 in \emph{either} case. The values for the normalization and the 
 values of tilt/calibration are always regarded
 as a pairs, \ie, they are given in the form {\tt normalization : tilt}. The errors are treated in the same way. For example, we have
+\index{aedl}{{\tt rule}!signal error@{\tt "@signalerror}}
+\index{aedl}{{\tt rule}!background error@{\tt "@backgrounderror}}
+\index{aedl}{{\tt rule}!background center@{\tt "@backgroundcenter}}
 \begin{quote}
 {\tt
 \tb @signalerror =       0.001  :       0.01\\
@@ -1355,9 +1358,11 @@ for each rule, where on value describes how the event rate is computed
 for \emph{no} systematics and the other one is with systematics 
 (see also~\Sec~\ref{sec:systematics}).
 The error dimensions for the case of no systematics is set for each rule 
-by the value of {\tt @errordim\_sys\_off}\index{aedl}{{\tt rule}!{\tt "@errordim\_sys\_off}}, whereas the error dimension
+by the value of {\tt @errordim\_sys\_off}\index{aedl}{{\tt rule}!errordim 
+sys off@{\tt "@errordim\_sys\_off}}, whereas the error dimension
 for systematics on is given by {\tt @errordim\_sys\_on}
-\index{aedl}{{\tt rule}!{\tt "@errordim\_sys\_on}}. Thus, for example,
+\index{aedl}{{\tt rule}!errordim sys on@{\tt "@errordim\_sys\_on}}. Thus,
+ for example,
 the complete error dimension definition could look like  
 \begin{quote}
 {\tt 
@@ -1395,9 +1400,11 @@ The error dimension~7 ``spectrum only'' leaves the
 normalization free ($\sigma_a=\sigma_c=\infty$), and therefore 
 only the spectral information is used. As a consequence,
 the settings for the normalization error will be ignored (designated 
-with the symbol $\infty$). 
+with the symbol $\infty$).
+ 
  }
-\end{center} 
+\end{center}
+\index{aedl}{{\tt rule}!errordim@{\tt "@errordim}} 
 \end{table} 
 \end{center}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1439,7 +1446,7 @@ This information can be accessed by the versioning functions as described in~\Se
 of different experiments.
 This chapter demonstrates how to test whether a given \AEDL\ file describes
 a given experiment. To this end the \GLOBES\ package also features a program
-called {\tt globes}\index{norm}{{\tt globes}}, which can be seen either as a 
+called {\tt globes}\index{norm}{globes@{\tt globes}}, which can be seen either as a 
 crude \AEDL\ debugger 
 or a simple command line oriented tool to convert the rather 
 abstract \AEDL\ experiment description into more accessible event rates.
@@ -1447,8 +1454,8 @@ abstract \AEDL\ experiment description into more accessible event rates.
 \section{Basic usage of {\tt globes}}
 \label{sec:globes_basics}
 
-The {\tt globes}\index{norm}{{\tt globes}} binary is installed along 
-with the library \index{norm}{{\tt libglobes}}, but
+The {\tt globes}\index{norm}{globes@{\tt globes}} binary is installed along 
+with the library \index{norm}{libglobes@{\tt libglobes}}, but
 into the directory {\tt \$prefix/bin/}. In order to use the {\tt globes} 
 utility this directory\footnote{This is automatically the case, when
 no options have been given to {\tt configure}, and {\tt make install} was 
@@ -1464,7 +1471,7 @@ with a varying degree of detail dependent on the options used to invoke
 is a {\tt \verb+--+help} option which displays all other options 
 along with a short description.
 
-\index{norm}{{\tt globes}!oscillation parameters}
+\index{norm}{globes@{\tt globes}!oscillation parameters}
 Calling {\tt globes} without any options and with a {\tt .glb}-file as argument produces an event summary at rule level, taking into account 
 the full description in the file, \ie\ all efficiencies, backgrounds and resolution effects. Thus, these are the event rates which are actually 
 used to compute the $\chi^2$. By default the oscillation parameters used to
@@ -1479,7 +1486,11 @@ calculate the transition probability are
 \end{eqnarray}
 Of course, it is possible to change these default values either by using the
 option {\tt -p} on a call by call basis or by setting the environment variable
-{\tt GLB\_CENTRAL\_VALUES}\index{norm}{{\tt  GLB\_CENTRAL\_VALUES}}.
+{\tt GLB\_CENTRAL\_VALUES}
+%
+\index{norm}{GLB CENTRAL VALUES@{\tt GLB\_CENTRAL\_VALUES}} 
+\index{norm}{Environment variables!GLB CENTRAL VALUES@{\tt GLB\_CENTRAL\_VALUES}}
+%
 \begin{quote}
 {\tt
 globes -p'0.55,0,0.785,0,0.0008,0.0025'\\
@@ -1499,8 +1510,9 @@ is the same than to prefix all channels with {\tt NOSC\_}.
 
 
 
-\index{norm}{{\tt globes}!warnings}\index{norm}{{\tt globes}!errors}
-\index{norm}{{\tt globes}!verbosity}
+\index{norm}{globes@{\tt globes}!warnings}
+\index{norm}{globes@{\tt globes}!errors}
+\index{norm}{globes@{\tt globes}!verbosity}
 The \AEDL\ parser and interpreter has basically three levels of messages to
 th user: warnings, errors and fatal errors. Fatal errors always are reported
 and the program exits with status '1'. Usually only errors and no warnings
@@ -1527,8 +1539,8 @@ necessary to view the intermediate steps in the event rate calculation. The
 {\tt globes} utility offers many possibilities to do so based on the 
 rate access functions as described in \Sec~\ref{sec:event_rates}.
 
-\index{norm}{{\tt globes}!total rates}
-\index{norm}{{\tt globes}!spectral rates}
+\index{norm}{globes@{\tt globes}!total rates}
+\index{norm}{globes@{\tt globes}!spectral rates}
 By default {\tt globes} returns total rates corresponding to the 
 {\tt -t} option, this can be changed to
 to a full spectrum by using {\tt -s}. The spectral rates are shown in a
@@ -1543,7 +1555,7 @@ as mandatory argument the number of the experiment (starting with zero),
 where {\tt -e0} is the default.
 
 \subsection*{Channel level}
-\index{norm}{{\tt globes}!channel rates}
+\index{norm}{globes@{\tt globes}!channel rates}
 
 As a first step one often wants to check whether each channel produces the 
 desired output. Channel rates are returned when the {\tt -c} option is used.
@@ -1571,7 +1583,7 @@ produces the raw event rate corresponding to the convolution of flux,
 probability and cross section, neglecting all detector effects.
 
 \subsection*{Rule level}
-\index{norm}{{\tt globes}!rule rates}
+\index{norm}{globes@{\tt globes}!rule rates}
 
 The logical step after channels is to check the rule rates. Rule rates 
 are returned with {\tt -r}.
@@ -1594,7 +1606,7 @@ any setting of {\tt @backgroundcenter}.
 
 
 \subsection*{Output}
-\index{norm}{{\tt globes}!output}
+\index{norm}{globes@{\tt globes}!output}
 
 The default output stream is {\tt stdout}. The output can be redirected to 
 a file using the {\tt -o} option which takes as mandatory argument 
@@ -1644,7 +1656,7 @@ own table. Thus one can, by using
 output formats.
 
 \subsection*{\AEDL\ variable substitution}
-\index{norm}{{\tt globes}!variable substitution}
+\index{norm}{globes@{\tt globes}!variable substitution}
 
 Some {\tt .glb}-files use \AEDL\ variable substitution in order to allow
 special purpose studies like of baseline dependence. If no special care is
