@@ -212,15 +212,6 @@ distdir: $(DISTFILES)
 	    || cp -p $$d/$$file $(distdir)/$$file || :; \
 	  fi; \
 	done
-brent.lo brent.o : brent.c
-f1dim.lo f1dim.o : f1dim.c
-linmin.lo linmin.o : linmin.c
-linmin2.lo linmin2.o : linmin2.c
-mnbrak.lo mnbrak.o : mnbrak.c
-nrutil.lo nrutil.o : nrutil.c
-powell.lo powell.o : powell.c
-powell2.lo powell2.o : powell2.c
-
 info-am:
 info: info-am
 dvi-am:

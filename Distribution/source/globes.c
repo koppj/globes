@@ -346,7 +346,7 @@ int main(int argc, char *argv[])
     }
  
 #ifdef TEST
-  glb_add_sys();
+  
   glbDefineAEDLVariable("REP",1.0);
 
 #endif /* TEST */
@@ -358,7 +358,8 @@ int main(int argc, char *argv[])
 #ifdef TEST
   
   
-
+  fprintf(stdout,"x-sec %lf\n",glbXSection(0,0,0.005,1,-1));
+  fprintf(stdout,"x-sec %lf\n",glbXSection(0,0,0.01,1,-1));
 #endif /* TEST */
 
 
@@ -372,13 +373,11 @@ int main(int argc, char *argv[])
   glbSetRates();
 
 #ifdef TEST
-  //glbSetBaselineInExperiment(0,3001);
- 
- glbAverageDensityProfile(3000,&ll,&dd);
- glbStaceyProfile(3010,10,&ll,&dd);
+fprintf(stdout,"total signal rate %g\n",
+	glbTotalRuleRate(0,0,0,GLB_W_EFF,GLB_W_BG,GLB_W_COEFF,GLB_SIG));
 
- glbSetProfileDataInExperiment(0,10,ll,dd);
- glbSetRates();
+fprintf(stdout,"total background rate %g\n",
+	  glbTotalRuleRate(GLB_ALL,GLB_ALL,GLB_ALL,GLB_W_EFF,GLB_W_BG,GLB_W_COEFF,GLB_BG));
 #endif /* TEST */
 
   /* Chosing the right outputformat */

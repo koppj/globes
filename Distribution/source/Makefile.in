@@ -318,44 +318,6 @@ distdir: $(DISTFILES)
 	    || cp -p $$d/$$file $(distdir)/$$file || :; \
 	  fi; \
 	done
-glb_error.lo glb_error.o : glb_error.c ../globes/globes.h
-glb_fluxes.lo glb_fluxes.o : glb_fluxes.c glb_types.h glb_error.h \
-	glb_multiex.h
-glb_lexer.lo glb_lexer.o : glb_lexer.c glb_parser_type.h glb_types.h \
-	glb_parser.h glb_error.h
-glb_minimize.lo glb_minimize.o : glb_minimize.c ../globes/globes.h \
-	glb_probability.h glb_fluxes.h glb_types.h glb_rate_engine.h \
-	nrutil.h glb_multiex.h glb_error.h glb_wrapper.h
-glb_multiex.lo glb_multiex.o : glb_multiex.c ../globes/globes.h \
-	glb_probability.h glb_fluxes.h glb_types.h glb_rate_engine.h \
-	nrutil.h glb_error.h glb_minimize.h glb_smear.h glb_multiex.h \
-	glb_version.h
-glb_parser.lo glb_parser.o : glb_parser.c ../globes/globes.h glb_smear.h \
-	glb_types.h glb_multiex.h glb_error.h glb_lexer.h \
-	glb_parser_type.h glb_fluxes.h
-glb_path.lo glb_path.o : glb_path.c glb_error.h ../globes/globes.h
-glb_probability.lo glb_probability.o : glb_probability.cc glb_error.h
-glb_profile.lo glb_profile.o : glb_profile.c ../globes/globes.h \
-	glb_types.h glb_error.h glb_probability.h
-glb_rate_engine.lo glb_rate_engine.o : glb_rate_engine.c \
-	../globes/globes.h glb_types.h glb_smear.h glb_probability.h \
-	glb_fluxes.h glb_error.h
-glb_smear.lo glb_smear.o : glb_smear.c glb_error.h glb_types.h \
-	glb_smear.h
-glb_version.lo glb_version.o : glb_version.c glb_error.h
-glb_wrapper.lo glb_wrapper.o : glb_wrapper.c ../globes/globes.h \
-	glb_probability.h glb_fluxes.h glb_types.h glb_rate_engine.h \
-	nrutil.h glb_minimize.h glb_multiex.h glb_version.h glb_error.h \
-	glb_smear.h glb_lexer.h glb_parser_addons.h glb_path.h \
-	glb_wrapper.h
-globes.o: globes.c ../globes/globes.h
-gls_parser.lo gls_parser.o : gls_parser.c ../globes/globes.h glb_smear.h \
-	glb_types.h glb_multiex.h parser.h glb_error.h glb_lexer.h \
-	parser_data.h glb_fluxes.h
-parser.lo parser.o : parser.c glb_error.h constants.h glb_types.h \
-	glb_multiex.h
-user_chi.lo user_chi.o : user_chi.c
-
 info-am:
 info: info-am
 dvi-am:

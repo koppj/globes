@@ -54,7 +54,7 @@ static double stored_muons = 2.0E20;  // stored muons per year
 static double power;
 static int    channel = 1;            // channel
 static int NFLUX = 500;
-static double xsec[32][1001][7];
+
 
 void glb_flux_loader(glb_flux *data, int number, int polarity);
 
@@ -348,7 +348,14 @@ void glb_flux_loader(glb_flux *data, int ident, int polarity)
   data->flux_storage=glb_alloc_flux_storage(501);
       if (fp!=NULL)
 	{
-	  for (i=0; i<=NFLUX; i++) fscanf(fp,"%lf %lf %lf %lf %lf %lf %lf",&data->flux_storage[i][0],&data->flux_storage[i][1],&data->flux_storage[i][2], &data->flux_storage[i][3],&data->flux_storage[i][4],&data->flux_storage[i][5],&data->flux_storage[i][6]);
+	  for (i=0; i<=NFLUX; i++) fscanf(fp,"%lf %lf %lf %lf %lf %lf %lf",
+					  &data->flux_storage[i][0],
+					  &data->flux_storage[i][1],
+					  &data->flux_storage[i][2], 
+					  &data->flux_storage[i][3],
+					  &data->flux_storage[i][4],
+					  &data->flux_storage[i][5],
+					  &data->flux_storage[i][6]);
 	  fclose(fp);
 	}
       else
@@ -357,46 +364,63 @@ void glb_flux_loader(glb_flux *data, int ident, int polarity)
 	} 
 }
 
-void glb_X_section_loader(char filename[], int ident)
+void glb_X_section_loader(glb_xsec *data)
 {
   int i,number;
   FILE* fp;
-  number=ident;
-  if (number>31) number=31;
-  fp = glb_fopen(filename, "r");
+  fp = glb_fopen(data->file_name, "r");
+  data->xsec_storage=glb_alloc_xsec_storage(1001);
   if (fp!=NULL)
   {
-    for (i=0; i<=1000; i++) fscanf(fp,"%lf %lf %lf %lf %lf %lf %lf",&xsec[number][i][0],&xsec[number][i][1],&xsec[number][i][2], &xsec[number][i][3],&xsec[number][i][4],&xsec[number][i][5],&xsec[number][i][6]);
+    for (i=0; i<1001; i++) fscanf(fp,"%lf %lf %lf %lf %lf %lf %lf",
+				  &data->xsec_storage[i][0],
+				  &data->xsec_storage[i][1],
+				  &data->xsec_storage[i][2], 
+				  &data->xsec_storage[i][3],
+				  &data->xsec_storage[i][4],
+				  &data->xsec_storage[i][5],
+				  &data->xsec_storage[i][6]);
   }
   else
   {
-    fprintf(stderr,"Error: Could not open %s\n",filename);
+    fprintf(stderr,"Error: Could not open %s\n",data->file_name);
   }
 
   fclose(fp);
 }
 
-double glbXSection(int ident, double enl, int l, int anti)
+double glb_xsec_calc(double enl,int l, int anti, const glb_xsec *data)
 {
   double incre;
   double ergebnis;
   double en;
   int lowerind;
   int higherind;
+
   int part;
 
   en = log10(enl);
   part = (int) l + 3*(1-anti)/2;
 
-  incre = (xsec[ident][1000][0]-xsec[ident][0][0])/1000.0;
-  lowerind = floor((en-xsec[ident][0][0])/incre); 
+  incre = (data->xsec_storage[1000][0]-data->xsec_storage[0][0])/1000.0;
+  lowerind = floor((en-data->xsec_storage[0][0])/incre); 
   higherind = lowerind + 1;
 
   if (lowerind<0 || higherind>1000) ergebnis=0.0; 
   else
   {
-    ergebnis=((xsec[ident][higherind][part]-xsec[ident][lowerind][part])*(((en-xsec[ident][0][0])/incre)-lowerind)+xsec[ident][lowerind][part]);
+    ergebnis=((data->xsec_storage[higherind][part]-
+	       data->xsec_storage[lowerind][part])*
+	      (((en-data->xsec_storage[0][0])/incre)-lowerind)
+	      +data->xsec_storage[lowerind][part]);
   }
   return ergebnis*enl;
 }
 
+
+void glb_init_xsectables(glb_xsec *data)
+{
+  
+  if(data->builtin==0) glb_X_section_loader(data);
+  
+}

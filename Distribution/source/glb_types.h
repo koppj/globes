@@ -38,6 +38,15 @@ typedef struct {
   double** flux_storage;
 } glb_flux;
 
+/* Data structure for handling X-sections and built-in X-sections,
+ * which will be added later.
+ */
+typedef struct {
+  int builtin;
+  char* file_name;
+  double** xsec_storage;
+} glb_xsec;
+
 
 
 /* This are the additional data needed for type B matrices */
@@ -61,7 +70,7 @@ typedef double (*sigfun)(double, double* );
 
 #define GLB_TYPE_A 1
 #define GLB_TYPE_B 2
-#define GLB_TYPE_C 3
+#define GLB_TYPE_C 2 /* That is correct since there are now only two types */
 
 typedef struct {
   int type;
@@ -71,6 +80,8 @@ typedef struct {
   double e_max;
   double e_sim_min;
   double e_sim_max;
+
+    
 
   /* Pointer to the paramters for sig_f */
   double *sigma;
@@ -132,11 +143,19 @@ struct experiment {
 
   /** That is a new way to define and load fluxes */
   glb_flux *fluxes[32];
-
   int num_of_fluxes;
 
+  /** That is a new way to define and load x-sections */
+  glb_xsec *xsecs[32];
+  int num_of_xsecs;
+
  
- 
+  /* This is the binsize array. */
+  
+  double *binsize;
+
+  double *simbinsize; 
+
   /** errordim describes how the systematical errors are handled and
   * also how the low level chi^2 function is computed (at event rate level).
   * right now it ranges from 0 to 9. errordim can be defined for each
@@ -334,17 +353,11 @@ struct experiment {
   int simbins; 
 
   /** Changed.
-  * filter_state is either "ON" or "OFF".
-  * \todo This is now only the user-defined mode. Need implemenation
-  * for computing this matrix and the other quantities. Also
-  * the meta information for this process has to go in here.
+  * filter_state is either "GLB_ON" or "GLB_OFF".
   */
   int filter_state;
 
   /** Positive number.
-   * \todo This is now only the user-defined mode. Need implemenation
-  * for computing this matrix and the other quantities. Also
-  * the meta information for this process has to go in here.
    */
   double filter_value;
 

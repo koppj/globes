@@ -60,6 +60,7 @@
 #define FUN 13
 #define DOUBLE_LIST_INDEXED_SL 14
 #define DOUBLE_LIST_INDEXED_BL 15
+#define COUNTER 16
   
   static int exp_count=1;
   static int energy_len;
@@ -72,6 +73,7 @@
   static glb_smear ibf;
   static glb_option_type opt;
   static glb_flux flt;
+  static glb_xsec xsc;
   static char *context;
 
 
@@ -104,10 +106,12 @@
     
     {"$baseline",DOUBLE,0,2*GLB_EARTH_RADIUS,&buff.baseline,NULL,"global"},
     {"$profiletype",INT,1,3,&buff.density_profile_type,NULL,"global"},
- 
+    {"$binsize",DOUBLE_LIST,0,1E8,&buff.binsize,&buff.numofbins,"global"}, 
+    {"$simbinsize",DOUBLE_LIST,0,1E8,&buff.simbinsize,
+     &buff.simbins,"global"}, 
 
    
-   {"$numofbins",INT,0,500,&buff.numofbins,NULL,"global"},
+   {"$numofbins",COUNTER,0,500,&buff.numofbins,NULL,"global"},
    {"$densitytab",DOUBLE_LIST,0,100,&buff.densitytab,&buff.psteps,"global"},
    {"$lengthtab",DOUBLE_LIST,0,13000,&buff.lengthtab,&buff.psteps,"global"},
    {"rulechannellist",INT_LIST_INDEXED,0,10E8,&buff.rulechannellist[0],
@@ -159,21 +163,21 @@
 
    {"@energy_window" ,DOUBLE_INDEXED_PAIR_INV,0,100,&buff.energy_window[0],
     &loc_count,"rule"},
-   {"$densitysteps",INT,1,200,&buff.psteps,NULL,"global"},
+   {"$densitysteps",COUNTER,1,200,&buff.psteps,NULL,"global"},
   
    {"$errorfunction",INT,0,1,&buff.errorfunction,NULL,"global"},
 
    {"$filter_state",INT,0,1,&buff.filter_state,NULL,"global"},
    {"$filter_value",DOUBLE,0,1E8,&buff.filter_value,NULL,"global"},
-   {"$simbins" ,INT,0,500,&buff.simbins,NULL,"global"}, 
+   {"$simbins" ,COUNTER,0,500,&buff.simbins,NULL,"global"}, 
    {"$simtresh" ,DOUBLE,0,1E8,&buff.simtresh,NULL,"global"},
    {"$simbeam" ,DOUBLE,0,1E8,&buff.simbeam,NULL,"global"},
 
-   {"$numofbins",INT,0,250,&buff.numofbins,NULL,"global"},
+
    {"$emin",DOUBLE,0,1E8,&buff.emin,NULL,"global"}, 
    {"$emax",DOUBLE,0,1E8,&buff.emax,NULL,"global"},
-   {"cross",UNTYPE,0,20,NULL,&cross_count,"global"},
-   {"@cross_file",CHAR,0,20,NULL,&cross_count,"cross"},
+   {"cross",UNTYPE,0,20,NULL,&buff.num_of_xsecs,"global"},
+   {"@cross_file",CHAR,0,20,&xsc.file_name,NULL,"cross"},
 
 
    {"flux",UNTYPE,0,20,NULL,&buff.num_of_fluxes,"global"},
@@ -192,11 +196,7 @@
    {"@sigma_e" ,DOUBLE_LIST,0,10,&ibf.sigma,&ibf.num_of_params,"energy"},
    {"@sigma_function" ,FUN,0,1000,&ibf.sig_f,NULL,"energy"},
     
-   {"@correction",DOUBLE,0,1,&opt.corr_fac,NULL,"energy"}, 
-   {"@area",DOUBLE,0,1,&opt.confidence_level,NULL,"energy"},
-   {"@comp_low" ,DOUBLE,0,1000,&opt.low_bound,NULL,"energy"},
-   {"@comp_up" ,DOUBLE,0,1000,&opt.up_bound,NULL,"energy"},
-   {"@offset",INT,0,150,&opt.offset,NULL,"energy"},
+  
 
    {NULL,UNTYPE,0,0,NULL,NULL,"global"}
 
@@ -215,7 +215,8 @@ static void grp_end(char* name)
 	   {
 	     ibf.options=glb_option_type_alloc();
 	     ibf.options=(glb_option_type *) memmove(ibf.options,&opt,
-					     sizeof(glb_option_type));    
+					     sizeof(glb_option_type));
+	     
 	     if(buff.smear_data[buff.num_of_sm-1]==NULL)
 	       buff.smear_data[buff.num_of_sm-1]=glb_smear_alloc();
 	     buff.smear_data[buff.num_of_sm-1]=
@@ -241,6 +242,18 @@ static void grp_end(char* name)
 	   }
        }  
 
+     if(strncmp(name,"cross",4)==0 )
+       {
+	 if(buff.num_of_xsecs > 0)   
+	   {
+	     if(buff.xsecs[buff.num_of_xsecs-1]==NULL)
+	       buff.xsecs[buff.num_of_xsecs-1]=glb_xsec_alloc();
+	     buff.xsecs[buff.num_of_xsecs-1]=
+	       cpy_glb_xsec(buff.xsecs[buff.num_of_xsecs-1],&xsc);
+	     glb_xsec_reset(&xsc);
+	   }
+       }  
+
      glb_free(context);
      context = (char *) strdup("global");
      
@@ -262,14 +275,6 @@ static int set_channel_data(int x[6],int loc_count)
 
      return 0;
    } 
-
-static int load_cross(char *file, int count)
-   {
-     
-     glb_X_section_loader(file, count);
-     return 0;
-   }
-
 
 
 static int step_counter(char *name)
@@ -363,6 +368,29 @@ static int set_exp(char *name,double value,int scalar)
 		 if(value >= token_list[i].rl && value <= token_list[i].ru)
 		   {
 		     ibf=(int*) token_list[i].ptr;
+		     *ibf=value;
+		     return 0;
+		   }
+		 else       
+		   {
+		     fprintf(stderr,"Error: Value for %s out of range\n",
+			     token_list[i].token);
+		     return 2;
+		   }
+	       }
+
+	     if(token_list[i].scalar==COUNTER) //counter
+	       {
+		 if(value >= token_list[i].rl && value <= token_list[i].ru)
+		   {
+		     
+		     ibf=(int*) token_list[i].ptr;
+		     if(!((*ibf == -1) || (*ibf == (int) value))) {
+		       glb_warning("Given length does not"
+				   " match actual length");
+		       return 2;
+
+		     }
 		     *ibf=value;
 		     return 0;
 		   }
@@ -938,7 +966,8 @@ version: VERS '=' FNAME {
 }
 
 cross: CROSS '=' FNAME {
-  load_cross($3,loc_count-1);
+  //load_cross($3,loc_count-1);
+  xsc.file_name=strdup($3);
   $$=$3;
 }
 ;

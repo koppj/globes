@@ -283,10 +283,15 @@ extern "C" FLOAT glbVacuumProbability(int pl, int pm, int panti,double pen, doub
 
 extern "C" void glb_set_filter(double x)
 {
-  filter = x;
+  filter = M_SQRT2/x;
 }
 
-
+extern "C" double glb_get_filter()
+{
+  double out;
+  out=M_SQRT2/filter;
+  return out;
+}
 
 
 extern "C" FLOAT glb_filtered_vac_probability(int pl, int pm, int panti,double pen, double plength)
@@ -786,6 +791,13 @@ static void MultiplyAmplitudeMatrix(complex<FLOAT> amp[3][3], int panti, FLOAT l
 extern "C" void glb_switch_filter(int on)
 {
   filter_state=on;
+}
+
+extern "C" int glb_check_filter()
+{
+  int i;
+  i=filter_state;
+  return i;
 }
 
 extern "C" void glb_probability_matrix(FLOAT prob[3][3], int panti, double pen)

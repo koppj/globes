@@ -57,8 +57,8 @@
 #define GLB_DELTA_CP 3
 #define GLB_DM_SOL 4
 #define GLB_DM_ATM 5
-#define GLB_ON 2
-#define GLB_OFF 3
+#define GLB_ON 1
+#define GLB_OFF 0
 
 #define GLB_EARTH_RADIUS 6371.0
 
@@ -129,8 +129,9 @@ double glbProfileProbability(int pl, int pm, int panti,double pen);
 
 
 /* Fluxes and X-sections */
-double glbXSection(int ident, double enl, int l, int anti);
 
+double glbXSection(int experiment, int xsec_ident,double energy,int flavour, 
+		   int anti);
 
 /* Chi^2 including systematics */
 
@@ -212,6 +213,8 @@ int glbGetUserData(double **data, size_t *length,
 		   int exp, int channel,int smearing, int bgeff);
 
 /* Rule Access */
+double glbTotalRuleRate(int exp, int rule, int pos,int effi, 
+			int bgi, int coeffi, int signal);
 int glbGetNumberOfRules(int exp);
 int glbGetLengthOfRule(int exp, int rule, int signal);
 double glbGetNormalizationInRule(int exp, int rule, int signal);
@@ -228,6 +231,7 @@ void glbSetPrintDelimiters(const char *left,const char *middle,
 
 
 /* Matter profile access */
+int glbGetProfileTypeInExperiment(int exp);
 int glbLoadProfileData(const char* filename, size_t *layers, double **length, 
 		       double **density );
 int glbStaceyProfile(double baseline, size_t layers, double **length, 
@@ -250,6 +254,17 @@ int glbTestReleaseVersion(const char *version);
 int glbTestLibraryVersion(const char *version);
 const char *glbVersionOfExperiment(int experiment);
 
+/* Filter feature access */
+
+
+int glbSetFilterState(int on_off);
+int glbGetFilterState();
+int glbSetFilterStateInExperiment(int experiment,int on_off);
+int glbGetFilterStateInExperiment(int experiment);
+int glbSetFilter(double filter);
+double glbGetFilter();
+int glbSetFilterInExperiment(int experiment,double filter);
+double glbGetFilterInExperiment(int experiment);
 
 
 #ifdef GLB_EXPERIMENTAL

@@ -136,6 +136,7 @@ double* glb_calc_glb_calc_ratevec_bg[32];
 glb_smear *glb_calc_smear_data[32];
 
 glb_flux *glb_calc_fluxes[32];
+glb_xsec *glb_calc_xsecs[32];
 
 double *glb_calc_buffer;
 double *glb_calc_chrb[32];

@@ -150,6 +150,91 @@ glb_flux  *cpy_glb_flux(glb_flux *dest, const glb_flux *src)
 }
 
 
+/* here come the glb_xsec functions */
+
+/* Dynamically allocating flux storage */
+double** glb_alloc_xsec_storage(size_t lines)
+{
+  double **temp;
+  size_t k;
+  temp = (double **) glb_malloc(sizeof(double *)*(lines+1));
+  for(k=0;k<lines;k++)
+    {
+      temp[k]=(double *) glb_malloc(sizeof(double)*7);
+    }
+  temp[lines]=NULL;
+  return temp;  
+}
+ 
+void glb_free_xsec_storage(double **stale)
+{
+  size_t i;
+  if(stale!=NULL){
+  for(i=0;stale[i]!=NULL;i++) glb_free(stale[i]);
+  glb_free(stale);
+  stale=NULL;
+  }
+}
+
+glb_xsec *glb_xsec_alloc()
+{
+  glb_xsec *temp;
+  temp=(glb_xsec *) glb_malloc(sizeof(glb_xsec));
+  temp->builtin=-1;
+  temp->file_name=NULL;
+  temp->xsec_storage=NULL;
+  return temp;
+}
+
+glb_xsec *glb_xsec_reset(glb_xsec *temp)
+{
+  temp->builtin=-1;
+  /* FIXME memory leak */
+  temp->file_name=NULL;
+  glb_free_xsec_storage(temp->xsec_storage);
+  return temp;
+}
+
+
+
+void glb_xsec_free(glb_xsec *stale)
+{
+  if(stale!=NULL)
+    {
+      if(stale->file_name!=NULL) glb_free(stale->file_name);
+      if(stale->xsec_storage!=NULL) glb_free_xsec_storage(stale->xsec_storage);
+      glb_free(stale);
+    }
+}
+
+int glb_default_xsec(glb_xsec *in)
+{
+  int s=0;
+  if(in->builtin==-1) in->builtin=0;
+  /* if(in->xsec_storage==NULL) {glb_error("No storage for X-section allocated");
+     s=-1;}*/
+  if(s!=0) glb_error("glb_xsec not properly setup");
+  return s;
+}
+
+glb_xsec  *cpy_glb_xsec(glb_xsec *dest, const glb_xsec *src)
+{
+  size_t i;
+  dest=(glb_xsec *) memcpy(dest,src,sizeof(glb_xsec)); 
+  if(src->file_name!=NULL)
+    {
+      dest->file_name=(char *) strdup(src->file_name);
+      if(dest->file_name==NULL) glb_fatal("Error in strdup");
+    }
+  if(src->xsec_storage!=NULL)
+    {
+      dest->xsec_storage=glb_alloc_xsec_storage(1001);
+      for(i=0;i<1001;i++) dest->xsec_storage[i]=src->xsec_storage[i];
+    } 
+  return dest;	  
+}
+
+
 //this structure contains all information needed for implementing
 //the systematics for each rule and experiment. Should be roughly
 //equivalent to a class in C++
@@ -158,6 +243,7 @@ glb_flux  *cpy_glb_flux(glb_flux *dest, const glb_flux *src)
  * struct systematic glb_init_systematic
  * in Mminimize.c
  */
+
 
 static void init_struct_systematic(struct glb_systematic *in)
 {
@@ -181,7 +267,12 @@ void glbInitExp(glb_exp ins)
   in->density_profile_type=-1;
   /* FIXME - a potential memory leak */
   for(i=0;i<32;i++) in->fluxes[i]=NULL;
+  in->num_of_xsecs=-1;
+  /* FIXME - a potential memory leak */
+  for(i=0;i<32;i++) in->xsecs[i]=NULL;
 
+  in->binsize=NULL;
+  in->simbinsize=NULL;
   for(i=0;i<32;i++) in->errordim[i]=-1;
   for(i=0;i<32;i++) in->errordim_sys_off[i]=-1;
   for(i=0;i<32;i++) in->errordim_sys_on[i]=-1;
@@ -273,7 +364,11 @@ void glbFreeExp(glb_exp ins)
   
   glb_free(in->version);
   for(i=0;i<32;i++)glb_flux_free(in->fluxes[i]);
+  for(i=0;i<32;i++)glb_xsec_free(in->xsecs[i]);
+
   for(i=0;i<6;i++) my_free(in->listofchannels[i]);
+  my_free(in->binsize);
+  my_free(in->simbinsize);
 
  
   for(i=0;i<in->numofrules;i++)
@@ -437,6 +532,9 @@ int glbDefaultExp(glb_exp ins)
     glb_warning("AEDL file has a more recent version number than the"
 		" installed globes package");}
    
+
+  if(in->num_of_xsecs<1)  {glb_error("No X-section selected!");status=-1;}
+  if(in->num_of_xsecs>31)  {glb_error("To many X-sections!");status=-1;}
   if(in->num_of_fluxes<1)  {glb_error("No flux selected!");status=-1;}
   if(in->num_of_fluxes>31)  {glb_error("To many fluxes!");status=-1;}
   if(in->num_of_fluxes>0&&in->num_of_fluxes<32)
@@ -446,9 +544,24 @@ int glbDefaultExp(glb_exp ins)
 	  if(in->fluxes[i]==NULL) {glb_error("Flux specs missing");status=-1;}
 	  else
 	    {
-	      /* FIXME flux overloading with MES */
 	      if(glb_default_flux(in->fluxes[i])==0)
 		glb_init_fluxtables(in->fluxes[i],i);
+	      else
+		status=-1;
+	    }
+	}
+    }
+
+  if(in->num_of_xsecs>0&&in->num_of_xsecs<32)
+    {
+      for(i=0;i<in->num_of_xsecs;i++)
+	{
+	  if(in->xsecs[i]==NULL) {glb_error("X-section specs missing")
+				    ;status=-1;}
+	  else
+	    {
+	      if(glb_default_xsec(in->xsecs[i])==0)
+		glb_init_xsectables(in->xsecs[i]);
 	      else
 		status=-1;
 	    }
@@ -482,6 +595,10 @@ int glbDefaultExp(glb_exp ins)
   if(in->numofbins==-1){glb_error("numofbins is not set!");status=-1;}
   if(in->numofbins<=0) { glb_error("Too few bins defined!");status=-1;}
 
+  /* It's okay if they are NULL or anything else ;-) */
+  if(in->binsize==NULL) {in->binsize=NULL;}
+  if(in->simbinsize==NULL) {in->simbinsize=NULL;}
+  
   if(in->targetmass==-1){glb_error("No targetmass specified!");status=-1;}
  
   if(in->numofchannels==-1){
@@ -528,18 +645,19 @@ int glbDefaultExp(glb_exp ins)
     }
  
 
- 
+  if(in->filter_state==-1){in->filter_state=1;def=-1;}
+  if(in->filter_value==-1){in->filter_value=0;def=-1;}
   
   if(in->num_of_sm==-1){
     glb_error("No smearing data specified!");status=-1;}
   
   for(i=0;i<in->num_of_sm;i++) 
     {
-     
+      
       if(in->smear[i]!=NULL)
 	{
 	  glb_set_up_smear_data(in->smear_data[i],in);
-	  glb_default_smear(in->smear_data[i]);
+	  glb_default_smear(in->smear_data[i],in);
 	}
       /* Here the smear_data is used to produce a smear matrix */
       if(in->smear[i]==NULL)
@@ -552,7 +670,8 @@ int glbDefaultExp(glb_exp ins)
 	  in->smear_data[i]->e_max=in->emax;
 
 
-	  if(glb_default_smear(in->smear_data[i])==1) def=-1;  
+	  if(glb_default_smear(in->smear_data[i],in)==1) def=-1;  
+
 	  glb_compute_smearing_matrix(&in->smear[i], 
 				&in->lowrange[i],&in->uprange[i],
 				in->smear_data[i],in);
@@ -584,8 +703,7 @@ int glbDefaultExp(glb_exp ins)
 
   //-------------------------------------------------------
 
-  if(in->filter_state==-1){in->filter_state=1;def=-1;}
-  if(in->filter_value==-1){in->filter_value=0;def=-1;}
+  
   if(in->density_center==-1){in->density_center=1;def=-1;}
   if(in->density_error==-1){in->density_error=0.05;def=-1;}
   if(in->psteps==-1){glb_error("psteps not defined!");status=-1;}
@@ -777,6 +895,7 @@ static void MMovePointers(struct experiment *in)
     }
   
   for(k=0;k<in->num_of_fluxes;k++) glb_calc_fluxes[k]=in->fluxes[k];
+  for(k=0;k<in->num_of_xsecs;k++) glb_calc_xsecs[k]=in->xsecs[k];
   glb_chirate = in->chirate;
   glb_calc_energy_tab = in->energy_tab;
   glb_calc_buffer=in->buffer;

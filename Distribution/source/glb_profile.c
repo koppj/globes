@@ -296,6 +296,18 @@ int glbGetProfileDataInExperiment(int exp,
 
 }
 
+int glbGetProfileTypeInExperiment(int exp)
+{
+  int i=1;
+  if((exp<0)||(exp>=glb_num_of_exps))
+    {
+      glb_error("Experiment number out of range");
+      return -1;
+    }
+  i= glb_experiment_list[exp]->density_profile_type;
+  return i;
+}
+
 int glbSetProfileDataInExperiment(int exp,
 				  size_t layers, 
 				  const double* length, 
@@ -310,7 +322,7 @@ int glbSetProfileDataInExperiment(int exp,
     }
   
   glb_experiment_list[exp]->psteps=layers;
-  
+  glb_experiment_list[exp]->density_profile_type = 3;
   if(layers>0)
     {
       ll=(double*) glb_malloc(layers*sizeof(double));

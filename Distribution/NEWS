@@ -359,4 +359,38 @@
 
 	**********
 
+07/07/04
+******** Version 1.8.0
+	
+	Removed the old TYPE_B algorithm for smearing (was used by
+	our old Reactor-setups in Mathematica) and replaced it by
+	a simpler version still using the filter feature.
 
+	Added filter feature Set/Get functions and tested them.
+
+	Added a counter qualifier in the parser declaration, which
+	helps to produce useful warnings if a list and its length
+	are given in an AEDL file and do not match.
+
+	$binsize and $simbinsize now work as expected.
+
+08/07/04 X-sections are now dynamically allocated within each experiment.
+	There should be no confusion of counters whatsoever, since every
+	experiment keeps track of the fluxes and X-sections on its own.
+
+	As a result glbXSection has changed to
+	
+	double glbXSection(int experiment, 
+		           int xsec_ident,double energy,int flavour, 
+			   int anti)
+
+
+	A call to glbSetProfileDataInExperiment sets profile_type to
+	3 user_defined.
+
+	Added glbGetProfileTypeInExperiment(int exp).
+
+	Added 	
+	   glbTotalRuleRate(0,0,GLB_ALL,GLB_W_EFF,GLB_W_BG,GLB_W_COEFF,GLB_SIG)
+	works like glbShowRuleRates, just has no stream argument and returns 
+	'double'.

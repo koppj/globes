@@ -1181,6 +1181,73 @@ glbShowRuleRates(FILE *stream,
 }
 
 
+
+
+double 
+glbTotalRuleRate(
+		 int exp, int rule, int pos,
+		 int effi, int bgi, int coeffi, 
+		 int signal)
+{
+  double out;
+  int i,s,cc,channel;
+  size_t k,l,m,c,bins;
+  double *ch,*bg,*eff,*temp,*ceff,**res,*energy,sum,coeff;
+  glb_smear *smt;
+  s=0;
+  sum=0.0;
+  bins=glb_experiment_list[exp]->numofbins;
+  cc=(size_t) glbGetLengthOfRule(exp,rule,signal);
+  if(pos!=GLB_ALL)
+    {
+      res=(double **) obstack_alloc(&glb_rate_stack,sizeof(double *)*2);
+      channel=glbGetChannelInRule(exp,rule,pos,signal);
+      coeff=glbGetCoefficientInRule(exp,rule,pos,signal)*
+	glbGetNormalizationInRule(exp,rule,signal);
+      s+=glbGetChannelRates(&ch,&l,exp,channel,GLB_POST);
+      s+=glbGetUserData(&bg,&k,exp,channel,GLB_POST,GLB_BG);
+      s+=glbGetUserData(&eff,&m,exp,channel,GLB_POST,GLB_EFF);
+      if(s!=0) return -1;
+      if(!((l==k)&&(k==m))) return -1;
+      s+=channel_bg(ch,bg,&temp,bgi);
+      s+=channel_eff(temp,eff,&ceff,effi);
+      s+=rule_coeff(ceff,coeff,&res[0],coeffi);
+      res[1]=NULL;
+      c=1;
+    }
+  else
+    { 
+      res=(double **) obstack_alloc(&glb_rate_stack,sizeof(double *)*(cc+1));
+      for(i=0;i<cc;i++)
+	{
+	  channel=glbGetChannelInRule(exp,rule,i,signal);
+	  coeff=glbGetCoefficientInRule(exp,rule,i,signal)*
+	    glbGetNormalizationInRule(exp,rule,signal);
+	 
+	  s+=glbGetChannelRates(&ch,&l,exp,channel,GLB_POST);
+	  s+=glbGetUserData(&bg,&k,exp,channel,GLB_POST,GLB_BG);
+	  s+=glbGetUserData(&eff,&m,exp,channel,GLB_POST,GLB_EFF);
+	  if(s!=0) return -1;
+	  if(!((l==k)&&(k==m))) return -1;
+	  s+=channel_bg(ch,bg,&temp,bgi);
+	  s+=channel_eff(temp,eff,&ceff,effi);
+	  s+=rule_coeff(ceff,coeff,&res[i],coeffi);
+	}
+      res[cc]=NULL;
+      c=cc;
+    }
+
+
+  if(s!=0) return -1;
+  out=0;
+  for(i=0;i<c;i++)
+    for(k=0;res[i][k]!=-1;k++) out += res[i][k];
+
+  obstack_free(&glb_rate_stack,ch);
+  return out;
+}
+
+
 static char *printf_left=NULL;
 static char *printf_middle=NULL;
 static char *printf_right=NULL;
@@ -1817,6 +1884,24 @@ glbFlux(int experiment, int flux_ident,
   return out;
 }
 
+double glbXSection(int experiment, int xsec_ident, 
+	double energy, int flavour, int anti)
+{
+  double out;
+  struct experiment *in;
+  if(!(((experiment >= 0)&&(experiment < glb_num_of_exps)))) { 
+    glb_error("Invalid value for experiment number");
+    return -1;}
+  in=(struct experiment *) glb_experiment_list[experiment];
+  if(!(((xsec_ident >= 0)&&(xsec_ident < in->num_of_xsecs)))) { 
+    glb_error("Invalid value for X-section number");
+    return -1;}  
+
+  out=glb_xsec_calc(energy,flavour, anti,in->xsecs[xsec_ident]); 
+
+  return out;
+}
+
 int
 glbSetSourcePower(int experiment, int flux_ident, double power)
 {
@@ -1929,3 +2014,136 @@ glbGetRunningTime(int experiment, int flux_ident)
  
   return out;
 }
+
+/* Access to the filter feature */
+
+int
+glbSetFilterState(int on_off)
+{
+  if (on_off==GLB_ON) {glb_switch_filter(GLB_ON);}
+  if (on_off==GLB_OFF) {glb_switch_filter(GLB_OFF);}
+  if((on_off!=GLB_ON)&&(on_off!=GLB_OFF)) 
+    {glb_error("On/Off was not GLB_ON/GLB_OFF");return -1;}
+  return 0;
+}
+
+int
+glbGetFilterState()
+{
+  int i;
+  i=glb_check_filter();
+  return i;
+}
+
+
+int
+glbSetFilterStateInExperiment(int experiment,int on_off)
+{
+  int i;
+  struct experiment *in;
+  /* Testing the experiment number */
+  if(!(((experiment >= 0)&&(experiment < glb_num_of_exps))
+       ||(experiment==GLB_ALL))) { 
+    glb_error("Invalid value for experiment number");
+    return -1;}
+  if((on_off!=GLB_ON)&&(on_off!=GLB_OFF))  
+    {glb_error("on_off must be either GLB_ON or GLB_OFF");return -1;}
+  
+  for(i=0;i<glb_num_of_exps;i++)
+    {
+      if(experiment!=GLB_ALL) i=experiment;
+      in=(struct experiment *) glb_experiment_list[i];
+      
+      in->filter_state=on_off;
+
+      if(experiment!=GLB_ALL) break;
+    }
+  return 0;
+}
+
+int
+glbGetFilterStateInExperiment(int experiment)
+{
+  int i,out=-1;
+  struct experiment *in;
+  /* Testing the experiment number */
+  if(!(((experiment >= 0)&&(experiment < glb_num_of_exps)))) { 
+    glb_error("Invalid value for experiment number");
+    return -1;}
+  
+  for(i=0;i<glb_num_of_exps;i++)
+    {
+      if(experiment!=GLB_ALL) i=experiment;
+      in=(struct experiment *) glb_experiment_list[i];
+      
+      out=in->filter_state;
+
+      if(experiment!=GLB_ALL) break;
+    }
+  return out;
+}
+
+
+int
+glbSetFilter(double filter)
+{
+  if(filter<0) {glb_error("Filter must be positive");return -1;}
+  glb_set_filter(filter);
+  return 0;
+}
+
+double
+glbGetFilter()
+{
+  double out;
+  out=glb_get_filter();
+  return out;
+}
+
+int
+glbSetFilterInExperiment(int experiment,double filter)
+{
+  int i;
+  struct experiment *in;
+  /* Testing the experiment number */
+  if(!(((experiment >= 0)&&(experiment < glb_num_of_exps))
+       ||(experiment==GLB_ALL))) { 
+    glb_error("Invalid value for experiment number");
+    return -1;}
+  if(filter<0) {glb_error("Filter must be positive");return -1;}
+  
+  for(i=0;i<glb_num_of_exps;i++)
+    {
+      if(experiment!=GLB_ALL) i=experiment;
+      in=(struct experiment *) glb_experiment_list[i];
+      
+      in->filter_value=filter;
+
+      if(experiment!=GLB_ALL) break;
+    }
+  return 0;
+}
+
+
+double
+glbGetFilterInExperiment(int experiment)
+{
+  int i,out=-1;
+  struct experiment *in;
+  /* Testing the experiment number */
+  if(!(((experiment >= 0)&&(experiment < glb_num_of_exps)))) { 
+    glb_error("Invalid value for experiment number");
+    return -1;}
+
+  for(i=0;i<glb_num_of_exps;i++)
+    {
+      if(experiment!=GLB_ALL) i=experiment;
+      in=(struct experiment *) glb_experiment_list[i];
+      
+      out=in->filter_value;
+
+      if(experiment!=GLB_ALL) break;
+    }
+  return out;
+}
+

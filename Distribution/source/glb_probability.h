@@ -46,12 +46,14 @@ void glb_set_c_vacuum_parameters(double pt12, double pt13, double pt23, double p
  void glb_set_length_ptr(double *l);
  int glb_set_psteps(int p);
 
-void glb_set_filter(double x);
+
 double glb_filtered_vac_probability(int pl, int pm, int panti, double pen, double plength);
 double glb_filtered_const_density_probability(int pl, int pm, int panti,double pen);
+
 void glb_switch_filter(int on);
-
-
+int glb_check_filter();
+void glb_set_filter(double x);
+double glb_get_filter();
 
 
 #endif /* GLS_OSZPROB_H */

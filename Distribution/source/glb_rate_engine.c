@@ -145,6 +145,7 @@ glb_smear *glb_calc_smear_data[32];
 
 
 glb_flux *glb_calc_fluxes[32];
+glb_xsec *glb_calc_xsecs[32];
 
 
 
@@ -384,8 +385,9 @@ static void CalcAllProbs(double en, double baseline)
 static double RatesSXX(double en, double baseline, int polarity, int anti, int l, int m,int ident)
 {
   double ergebnis;
+  /*glbXSection(ident,en,m,anti)*/
   
-  ergebnis=glbXSection(ident,en,m,anti)*
+  ergebnis=glb_xsec_calc(en,m,anti,glb_calc_xsecs[ident])*
     (glb_flux_calc(en,baseline,polarity,1,anti,glb_calc_fluxes[polarity])+
      glb_flux_calc(en,baseline,polarity,2,anti,glb_calc_fluxes[polarity])+
      glb_flux_calc(en,baseline,polarity,3,anti,glb_calc_fluxes[polarity]))
@@ -400,7 +402,7 @@ static double RatesNOSC(double en, double baseline,
 {
   double ergebnis;
  
-  ergebnis=glbXSection(ident,en,m,anti)*
+  ergebnis=glb_xsec_calc(en,m,anti,glb_calc_xsecs[ident])*
     glb_flux_calc(en,baseline,polarity,l,anti,glb_calc_fluxes[polarity])
     *target_mass;
  
@@ -414,13 +416,13 @@ static double RatesXX(double en, double baseline, int polarity, int anti, int l,
   double ergebnis;
   if (anti == 1) 
     {
-      ergebnis=glbXSection(ident,en,m,anti)*
+      ergebnis=glb_xsec_calc(en,m,anti,glb_calc_xsecs[ident])*
 	glb_flux_calc(en,baseline,polarity,l,anti,glb_calc_fluxes[polarity])
 	*Probs[l-1][m-1]*target_mass;
     }
   else
     {
-      ergebnis=glbXSection(ident,en,m,anti)
+      ergebnis=glb_xsec_calc(en,m,anti,glb_calc_xsecs[ident])
 	*glb_flux_calc(en,baseline,polarity,l,anti,glb_calc_fluxes[polarity])
 	*ProbsAnti[l-1][m-1]*target_mass;
       

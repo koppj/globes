@@ -39,7 +39,9 @@ double glb_flux_calc(double en, double baseline,
 
 void glb_init_fluxtables(glb_flux *data,int pos);
 
+double glb_xsec_calc(double enl,int l, int anti, const glb_xsec *data);
+void glb_init_xsectables(glb_xsec *data);
 void glb_flux_loader(glb_flux *data, int number, int polarity);
-void glb_X_section_loader(char filename[], int ident);
-double glbXSection(int ident, double enl, int l, int anti);
+void glb_X_section_loader(glb_xsec *data);
+
 #endif /* GLB_NUFACT_H */

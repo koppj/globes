@@ -43,6 +43,15 @@ glb_flux *glb_flux_reset(glb_flux *temp);
 double** glb_alloc_flux_storage(size_t lines);
 void glb_free_flux_storage(double **stale);
 
+glb_xsec *glb_xsec_alloc();
+void glb_xsec_free(glb_xsec *stale);
+int glb_default_xsec(glb_xsec *in);
+glb_xsec  *cpy_glb_xsec(glb_xsec *dest, const glb_xsec *src);
+
+glb_xsec *glb_xsec_reset(glb_xsec *temp);
+double** glb_alloc_xsec_storage(size_t lines);
+void glb_free_xsec_storage(double **stale);
+
 
 
 #endif /* GLB_MULTIEX_H */
