@@ -1064,19 +1064,33 @@ according to the energy resolution function.
 \label{sec:rules}
 
 The set of rules\index{Rule} for an experiment is the final 
-link between the event rate
-computation and the statistical analysis. The information given by the rules
-specifies how the $\chi^2$ is computed based on the raw event rates as 
-described by the channels including possible systematical errors. 
-Therefore a rule has two parts: the first part describes how signal and 
-background events are composed out of the channels and the second part
-specifies which systematical errors are considered and what the size
-of the relevant errors is.
+link between the event rate computation and the statistical analysis. 
+The information in the rules
+specifies how the $\chi^2$ is computed based upon the raw event rates 
+given by the channels and possible systematical errors. 
+Therefore a rule has two parts: The first part describes how signal and 
+background events are composed out of the channels, and the second part
+specifies which systematical errors are considered, as well as their values.
+%
+For a rule, the splitting
+in signal and background is useful for simplicity and the treatment of systematics, as we will se later. Each rule will lead to a $\chi^2$-value,
+which means that all $\chi^2$'s of the different rules will be added
+for the whole experiment. Within each rule, the event rates are added, and
+the systematics is considered to be independent of the other rules.
+Thus, it is convenient to combine the above defined channels for different
+oscillation patterns and interaction types into one logical construction,
+which is the rule. For example, a superbeam usually has two rules: One for
+the $\nu_e$-appearance rates, and one for the $\nu_\mu$-disappearance rates.
+ In each case, contributions of several interaction types, as well as from
+ the $\nu_e$-contamination of the beam will lead to a number of contributing signal and background event channels.
+
+
+% WEITER:
 
 Based on the definition of channels it is possible to assemble the 
 signal and background event numbers for each bin.  
 The signal $s_i$ in one bin for a rule now can be composed out of 
-several channels by
+several channels by (OFTEN ONLY ONE) 
 \begin{equation}
 s_i=\epsilon_{c_1}\cdot n_i^{c_1}\,+\,\epsilon_{c_2}\cdot n_i^{c_2}\,+\,\ldots
 \end{equation}
