@@ -1,7 +1,7 @@
 dnl Here follow some house-made macros to solve the SUSE libf2c problem
 
 dnl Check for g2c
-AC_DEFUN([AC_CHECK_G2C]),[
+AC_DEFUN([AC_CHECK_G2C],[
 AC_CHECK_LIB(g2c,main,[],[NOF2C="no"])
 ])
 
@@ -128,7 +128,7 @@ if test $f2c_convenience = "no"; then
 	F2CINC=""
 	if test $NOF2C = "no"; then
 		F2CCONVENIENCE="\$(top_builddir)/libf2c/libf2c.la"
-		F2CINC="\$(top_builddir)/libf2c"
+		F2CINC="-I\$(top_builddir)/libf2c"
 	fi
 
 	if test -n "$F2CCONVENIENCE"; then
@@ -138,7 +138,7 @@ if test $f2c_convenience = "no"; then
 	fi
 else
 	F2CCONVENIENCE="\$(top_builddir)/libf2c/libf2c.la"
-	F2CINC="\$(top_builddir)/libf2c"
+	F2CINC="-I\$(top_builddir)/libf2c"
 fi
 dnl This control wether the stuff in `libf2c' is built
 AM_CONDITIONAL(WANT_LIBF2C,test x$f2c_convenience = xyes)
@@ -147,6 +147,13 @@ AC_DEFINE(USE_STRLEN,[],[Needed by convenience libf2c])
 AC_DEFINE(NON_ANSI_RW_MODES,[],[Needed by convenience libf2c])
 AC_DEFINE(UIOLEN_int,[],[Needed by convenience libf2c])
 AC_DEFINE(NON_UNIX_STDIO,[],[Needed by convenience libf2c])
+dnl fixing the silly header installation policy on red hat
+if test -z "$F2CINC" ; then
+AC_CHECK_HEADER(f2c.h,[],[
+F2CINC="-I\$(top_builddir)/libf2c"
+])
+fi
+
 dnl This contains the correct linker flag for using the convience library
 AC_SUBST(F2CCONVENIENCE)
 AC_SUBST(F2CINC)
