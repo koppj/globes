@@ -44,7 +44,8 @@ $version="1.8.1"
 flux(#NUMI)<
 	@flux_file="MINOS_Spectra.dat"
 	@time = 5
-	@norm = 1.174e-12
+	@power = 3.7e20 /* pot per year */
+	@norm = 3.17297e-33
 >
 
 $target_mass = 	        5.4

@@ -37,11 +37,12 @@ $version="1.8.1"
 
 flux(#NUMI9plus)<
 	@flux_file="NUMI9plus.dat"
-	@time = 1
-	@norm = 1
+	@time = 5
+	@power = 0.4
+	@norm = 2.42857
 >
 
-$target_mass = 	        85.
+$target_mass = 	        17.5
 
 $bins = 		20
 

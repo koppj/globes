@@ -27,10 +27,11 @@ $version="1.8.1"
 flux(#Reactor)<
 	@flux_file="Reactor.dat"
 	@time = 5
-	@norm = 2*1.1584e-10 
+	@power = 4
+	@norm = 1.1584e-13 
 >
 
-$target_mass = 	        0.04
+$target_mass = 	        20  /* tons */
 
 $bins = 		62
 

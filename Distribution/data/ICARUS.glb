@@ -36,7 +36,8 @@ $version="1.8.1"
 flux(#CNGS)<
 	@flux_file= "CNGS_Spectra.dat"
 	@time = 5
-	@norm = 1.173e-12 
+	@power = 4.5e19 /* pot per year */
+	@norm = 2.60667e-32
 >
 
 $target_mass = 	        2.35

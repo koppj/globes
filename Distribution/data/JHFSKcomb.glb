@@ -37,16 +37,18 @@ $version="1.8.1"
 flux(#JHFplus)<
 	@flux_file="JHFplus.dat"
 	@time = 2
-	@norm = 0.125
+	@power = 0.77
+	@norm = 0.811688
 >
 
 flux(#JHFminus)<
 	@flux_file="JHFminus.dat"
 	@time = 6
-	@norm = 0.125
+	@power = 0.77
+	@norm = 0.811688
 >
 
-$target_mass = 	112.5
+$target_mass = 	22.5
 
 $bins = 	20
 
