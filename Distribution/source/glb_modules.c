@@ -242,27 +242,26 @@ void *glbSymModule(glb_dlhandle module,const char *symbol_name)
   return generic;
 }
 
-/* The first module loader - try to load and register user defined priors */
-glb_dlhandle glbLoadPrior(const char *module_name)
+/*****************************************************************************/
+/****************** End of general module support ****************************/
+/*****************************************************************************/
+
+/* Register the priors as defined in module */
+int glbUsePrior(glb_dlhandle module)
 {
-  int magic;
+  int magic,*id;
   double (*f)(const glb_params);
   int (*g)(const glb_params);
   int (*h)(const glb_params);
   const char *error;
-  glb_dlhandle module;
   int s=0;
 
-  /* Probing the existence of the module and wether it is a globes module*/
-  magic=glbProbeModule(module_name,3);
-
+  id=lt_dlsym(module,"glb_module_id"); 
+  magic=*id;
+  
   /* Probing wether it is designed as prior module */
   if(magic!=GLB_PRIOR_MODULE_ID) {glb_error("Not a prior module!");
-  return NULL;}
-
-  /* opening the module */
-  module = glbOpenModule(module_name);
-  if(!module) return NULL;
+  return -1;}
 
   /* getting the correct symbol */
   f=glbSymModule(module,"glb_module_prior");
@@ -272,6 +271,5 @@ glb_dlhandle glbLoadPrior(const char *module_name)
   /* Register the new prior */
   glbRegisterPriorFunction(f,g,h);
   
-  /* Return the handle on the module to the user */
-  return (glb_dlhandle) module;
+  return 0;
 }

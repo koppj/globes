@@ -29,8 +29,9 @@ gcc, f2c and GSL are already part of your installation. For building
 GLoBES from source, however, not only working libaries for above packages
 are needed but also the headers, especially for GSL. Depending on your
 installation, eg. on RedHat/Fedora, of GSL this may require to 
-additionally install a rpm-package named `gsl-devel'. Furthmore you need
-a working `make' to build and install GLoBES.
+additionally install a rpm-package named `gsl-devel'. If GSL has been 
+installed from the tar-ball as provided by gnu.org no problems should occur. 
+Furthmore you need a working `make' to build and install GLoBES.
 
 In future releases it is planed to at least get rid of LAPACK, because
 then also BLAS and f2c would drop out. Furthemore there is no prinicipal
@@ -175,18 +176,9 @@ linking.
 linked version of a program using GLoBES. To get this working together with
 loadable module support it is necessary to have libtool installed on your 
 system. Thus it is possible also for your programs to use the 
-lt_preload-mechanism. The Autobook says on this issue:
-
-`This feature is extremely useful for debugging, allowing you to make a fully 
-statically linked application from the executable and module objects, 
-without changing any source code to work around the module loading calls. As 
-far as the code outside the libltdl API can tell, these modules really are 
-being loaded dynamically. Driving a symbolic debugger across module 
-boundaries is however much easier when blocks of code aren't moving in and out
-of memory during execution.' 
-
-... description to follow ...
-... module linkage ...
+lt_preload-mechanism. For details, please, see the manual of GLoBES.
+For general information on lt_preload and related issues the documenation
+of libtool and the Autobook may prove usefool.
 
 Compilers and Options
 =====================

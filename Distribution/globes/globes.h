@@ -278,14 +278,18 @@ const char *glbValueToName(int exp,const char* context, int value);
 /* Trying to get a tree-like linkage */
 void glbInit(char *name);
 
+/* General Module support */
+int glbProbeModule(const char *module_name, int verbosity);
+glb_dlhandle glbOpenModule(const char *module_name);
+int glbCloseModule(glb_dlhandle stale);
+void *glbSymModule(glb_dlhandle module,const char *symbol_name);
 
 /* Adding user defined priors */
 int glbRegisterPriorFunction(double (*prior)(const glb_params),
 			     int (*starting)(const glb_params),
 			     int (*error)(const glb_params));
+int glbUsePrior(glb_dlhandle module);
 
-/* Module support */
-glb_dlhandle glbLoadPrior(const char *module_name);
 
 #ifdef GLB_EXPERIMENTAL
 /* These functions are part of the user-defined chi^2 interface and will
