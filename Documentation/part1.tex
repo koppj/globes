@@ -5,14 +5,16 @@
 \part{User's manual}
 \label{part:1}
 
-\chapter{A short \GLOBES\ tour}
+\chapter{A \GLOBES\ tour}
 \label{chapter:tour}
 
-To be written later: Short introduction such as ``With the following lines we obtain ...''
-without detailed description of parameters. Should contain all most important functions of \GLOBES\ --
-overview of main functions in \tabl{stdfunctions}.
-Maybe: in form of long example which involves everything
-and can be compiled.
+In this first chapter, we show a \GLOBES\ tour illustrating the
+main features of \GLOBES . The complete example  
+can be found as {\tt example-tour.c} in the example subdirectory of your \GLOBES\ distribution.
+The output is written to {\tt stream}, which can be either {\tt stdout},
+or a file. Details about how to use \GLOBES\ with C can found in \Chapt~\ref{chapt:gettingstarted} and the following chapters.
+You can also find a summary of the most important \GLOBES\ $\chi^2$-functions in \tabl{stdfunctions}. Note that this chapter
+can be skipped without loss of relevant information.
 
 \begin{table}[tpb]
 \begin{center}
@@ -43,6 +45,361 @@ can either be \GLB{GLB\_ALL} for all initialized experiment or the
 experiment number ($0$ to \GLB{glb\_num\_of\_exps}-1) for a specific experiment. The format of \GLB{glb\_params} is discussed in detail in \Chapt~\ref{chapt:gettingstarted}. Note that all functions but {\tt ChiSys}
   are using minimizers which have to be initialized with \GLB{glbSetInputErrors} and \GLB{glbSetStartingValues} first.}
 \end{table}
+
+\vspace*{0.5cm}
+
+\noindent Initialize the \GLOBES\ library:
+\gq{
+glbInit(argv[0]);
+} 
+Define my standard oscillation parameters:
+\gq{
+double theta12 = asin(sqrt(0.8))/2; \\
+double theta13 = asin(sqrt(0.001))/2;\\
+double theta23 = M\_PI/4;\\
+double deltacp = M\_PI/2;\\
+double sdm = 7e-5;\\
+double ldm = 2e-3;
+}
+Load one neutrino factory experiment:
+\gq{
+glbInitExperiment("NuFact.glb",\&glb\_experiment\_list[0], \\ \hspace*{4cm} \&glb\_num\_of\_exps);
+} 
+Initialize a number of parameter vectors we are going to use later:
+\gq{
+glb\_params true\_values = glbAllocParams();\\
+glb\_params fit\_values = glbAllocParams();\\
+glb\_params starting\_values = glbAllocParams();\\
+glb\_params input\_errors = glbAllocParams();\\
+glb\_params minimum = glbAllocParams();
+}
+Assign values to our standard oscillation parameters:
+\gq{
+ glbDefineParams(true\_values,theta12,theta13,theta23,deltacp,sdm,ldm);
+}
+Compute the simulated data with our standard parameters:
+\gq{
+ glbSetOscillationParameters(true\_values); \\
+ glbSetRates();
+}
+Return the oscillation probabilities in vacuum and matter for the
+electron neutrino as initial flavor:
+\gq{
+ int i; \\
+ fprintf(stream,"$\backslash$nOscillation probabilities in vacuum: ");\\
+ for(i=1;i<4;i++) fprintf(stream,"1->\%i: \%g",i, \\
+ \hspace*{4cm} glbVacuumProbability(1,i,+1,50,3000)); \\ 
+ fprintf(stream,"$\backslash$nOscillation probabilities in matter: ");\\
+ for(i=1;i<4;i++) fprintf(stream,"1->\%i: \%g ",i,\\ \hspace*{4cm} glbProfileProbability(1,i,+1,50)); \\
+}
+\go{
+Oscillation probabilities in vacuum: 1->1: 0.999953 1->2: 2.69441e-05 1->3: 1.98019e-05 \\
+Oscillation probabilities in matter: 1->1: 0.999965 1->2: 2.02573e-05 1->3: 1.49021e-05 
+}
+Now assign fit values, where we will test the fit value $\stheta=0.0015$:
+\gq{
+ glbCopyParams(true\_values,fit\_values); \\
+ glbSetOscParams(fit\_values,asin(sqrt(0.0015))/2,GLB\_THETA\_13);
+}
+Compute $\chi^2$ with systematics only for all experiments and rules:
+\gq{
+  chi2 = glbChiSys(fit\_values,GLB\_ALL,GLB\_ALL); \\
+  fprintf(stream,"chi2 with systematics only: \%g$\backslash$n$\backslash$n",chi2);
+}
+\go{
+chi2 with systematics only: 22.3984
+}
+This we would obtain from the first appearance channel only:
+\gq{
+ chi2 = glbChiSys(fit\_values,0,0);\\
+ fprintf(stream,"This we would have from the CP-even appearance channel only: \%g$\backslash$n$\backslash$n",chi2);
+}
+\go{
+This we would have from the CP-even appearance channel only: 21.6223
+}
+The sum over all rules again gives:
+\gq{
+ chi2 = glbChiSys(fit\_values,GLB\_ALL,0)+ 
+        glbChiSys(fit\_values,GLB\_ALL,1)+ \\  
+\hspace*{1.3cm} glbChiSys(fit\_values,GLB\_ALL,2)+          glbChiSys(fit\_values,GLB\_ALL,3); \\ 
+\mbox{fprintf(stream,"The sum over all rules gives again: \%g$\backslash$n$\backslash$n",chi2);}
+}
+\go{
+The sum over all rules gives again: 22.3984
+}
+Let's prepare the minimizers for taking into account correlations.
+Set errors for external parameters, too: 10\% for each of the solar parameters, and 5\% for the matter density. 
+\gq{
+ glbDefineParams(input\_errors,theta12*0.1,0,0,0,sdm*0.1,0); \\
+ glbSetDensityParams(input\_errors,0.05,GLB\_ALL); \\
+ glbSetStartingValues(true\_values); \\
+ glbSetInputErrors(input\_errors);
+}
+Then we can calculate $\chi^2$ including the full multi-parameter
+correlation, and show where \GLOBES\ actually found the minimum
+(note that this takes somewhat longer than systematics only). 
+This corresponds to a projection onto the $\stheta$-axis:
+\gq{
+ chi2 = glbChiTheta(fit\_values,minimum,GLB\_ALL); \\ 
+ fprintf(stream,"chi2 with correlations: \%g $\backslash$n",chi2); \\
+ fprintf(stream,"Position of minimum: theta12, theta13, theta23, \\ \hspace*{0.5cm} delta, sdm, ldm, rho$\backslash$n"); \\
+ glbPrintParams(stream,minimum); \\ 
+ fprintf(stream,"Note that s22theta13 is unchanged/kept fixed: \\
+ \hspace*{0.5cm} \%g! $\backslash$n$\backslash$n",    pow(sin(2*glbGetOscParams(minimum,GLB\_THETA\_13)),2));
+}
+\go{
+chi2 with correlations: 2.1038 \\
+Position of minimum: theta12,theta13,theta23,delta,sdm,ldm,rho \\
+0.542002 0.0193698 0.747915 1.77688 6.66156e-05 0.00200817 \\
+1.00434 \\
+Iterations: 1693 \\
+Note that s22theta13 is unchanged/kept fixed: 0.0015! 
+}
+Instead of including the full correlation, we can take the
+correlation with every parameter except from $\deltacp$, \ie,
+we keep (in addition to $\theta_{13}$) $\deltacp$ fixed.
+This corresponds to projection onto the $\stheta$-$\deltacp$-plane:
+\gq{
+ chi2 = glbChiThetaDelta(fit\_values,minimum,GLB\_ALL); \\
+fprintf(stream,"chi2 with correlations other than with deltacp: \%g $\backslash$n$\backslash$n",chi2); 
+}
+\go{
+chi2 with correlations other than with deltacp: 4.32831 
+}
+Similarly, we can only take into account the correlation with $\deltacp$.
+For this, we need to define our own (user-defined) projection, where
+only $\deltacp$ is a free parameter:
+\gq{
+ glb\_projection myprojection = glbAllocProjection(); \\
+ glbDefineProjection(myprojection,GLB\_FIXED, GLB\_FIXED, GLB\_FIXED, \\
+ \hspace*{0.5cm} GLB\_FREE, GLB\_FIXED, GLB\_FIXED); \\
+ glbSetProjection(myprojection); \\
+ chi2 = glbChiNP(fit\_values,minimum,GLB\_ALL); \\
+ fprintf(stream,"chi2 with correlation only with deltacp: \\
+ \hspace*{0.5cm} \%g $\backslash$n$\backslash$n",chi2); \\
+ glbFreeProjection(myprojection); 
+}  
+\go{
+chi2 with correlation only with deltacp: 2.80651 
+}
+We can also switch of the systematics and compute the
+statistics $\chi^2$ only:
+\gq{
+ glbSwitchSystematics(GLB\_ALL,GLB\_ALL,GLB\_OFF); \\   
+ chi2 = glbChiSys(fit\_values,GLB\_ALL,GLB\_ALL); \\
+ glbSwitchSystematics(GLB\_ALL,GLB\_ALL,GLB\_ON); \\   
+ fprintf(stream,"chi2 with statistics only: \\ 
+ \hspace*{0.5cm} \%g$\backslash$n$\backslash$n",chi2);
+}
+\go{
+chi2 with statistics only: 39.143
+}
+Let us now locate the exact position of the sgn-degeneracy:
+\gq{
+  glbDefineParams(input\_errors,theta12*0.1,0,0,0,sdm*0.1,ldm/3); \\
+  glbDefineParams(starting\_values,theta12,theta13,theta23, \\
+  \hspace*{0.5cm} deltacp,sdm,-ldm); \\
+  glbSetDensityParams(input\_errors,0.05,GLB\_ALL); \\
+  glbSetStartingValues(starting\_values);\\
+  glbSetInputErrors(input\_errors);\\
+  chi2=glbChiAll(starting\_values,minimum,GLB\_ALL);\\ 
+  fprintf(stream,"chi2 at minimum: \%g $\backslash$n",chi2);\\
+  fprintf(stream,"Position of minimum: \\ \hspace*{0.5cm} theta12,theta13,theta23,delta,sdm,ldm,rho$\backslash$n"); \\
+  glbPrintParams(stream,minimum); 
+}
+\go{
+chi2 at minimum: 6.20025 \\
+Position of minimum: theta12,theta13,theta23,delta,sdm,ldm,rho \\
+0.591812 0.0264717 0.72763 1.08709 8.0004e-05 -0.00206094 \\
+0.970685  \\
+Iterations: 1946 \\
+}
+After testing these functions with only one experiment, let us now
+go to a two-experiment setup with two different neutrino factory baselines.
+Since the \GLOBES\ parameter vectors depend on the number of experiments,
+we have to destroy them first:
+\gq{
+ glbFreeParams(true\_values); \\
+ glbFreeParams(fit\_values); \\ 
+ glbFreeParams(starting\_values);\\
+ glbFreeParams(input\_errors);\\
+ glbFreeParams(minimum);
+}
+Then we clear the experiment list and load the new experiments:
+\gq{
+ fprintf(stream,"$\backslash$nNOW: TWO-EXPERIMENT SETUP \\
+ \hspace*{0.5cm} NuFact at 3000km+NuFact at 7500km$\backslash$n$\backslash$n"); \\
+ \\
+  glbClearExperimentList(); \\
+\\
+ glbInitExperiment("NuFact.glb",\&glb\_experiment\_list[0], \\
+ \hspace*{0.5cm} \&glb\_num\_of\_exps);\\
+  glbInitExperiment("NuFact.glb",\&glb\_experiment\_list[0], \\
+ \hspace*{0.5cm} \&glb\_num\_of\_exps);
+}
+\go{
+NOW: TWO-EXPERIMENT SETUP NuFact at 3000km+NuFact at 7500km
+}
+Then we need to change the baseline of the second experiment, where
+we set the density to the average density of this baseline:
+\gq{
+  double* lengths;  \\
+  double* densities; \\
+ glbAverageDensityProfile(7500,\&lengths,\&densities);\\
+  fprintf(stream,"Magic baseline length: \%g, \\
+  \hspace*{0.5cm} Density: \%g$\backslash$n$\backslash$n",lengths[0],densities[0]); \\
+ glbSetProfileDataInExperiment(1,1,lengths,densities); \\
+   free(lengths); \\
+   free(densities);
+}
+\go{
+ Magic baseline length: 7500, Density: 4.25286
+}
+Now we can re-initialize our parameter vectors again:
+\gq{
+ true\_values = glbAllocParams();\\
+ fit\_values = glbAllocParams(); \\
+ starting\_values = glbAllocParams(); \\
+ input\_errors = glbAllocParams(); \\
+ minimum = glbAllocParams(); \\
+ glb\_params minimum2 = glbAllocParams(); 
+}
+In addition, we repeat the procedure for the simulated rates and
+the fit parameter vector:
+\gq{
+  glbDefineParams(true\_values,theta12,theta13,theta23,deltacp,sdm,ldm); \\
+  glbSetOscillationParameters(true\_values); \\
+  glbSetRates();\\
+  \\
+  glbCopyParams(true\_values,fit\_values);\\
+  glbSetOscParams(fit\_values,asin(sqrt(0.0015))/2,GLB\_THETA\_13);
+} 
+Here comes the $\chi^2$ with systematics only for all experiments and
+rules:
+\gq{
+ chi2 = glbChiSys(fit\_values,GLB\_ALL,GLB\_ALL); \\
+ fprintf(stream,"chi2 with systematics for all exps: \\ 
+ \hspace*{0.5cm} \%g$\backslash$n",chi2); 
+}
+\go{
+ chi2 with systematics for all exps: 31.0797
+}
+Compute $\chi^2$ for each experiment and compute the sum:
+\gq{
+  chi2 = glbChiSys(fit\_values,0,GLB\_ALL); \\
+ fprintf(stream,"chi2 with systematics for 3000km: \%g$\backslash$n",chi2); \\
+ chi2b = glbChiSys(fit\_values,1,GLB\_ALL); \\
+ fprintf(stream,"chi2 with systematics for 7500km: \%g$\backslash$n",chi2b);
+ \\
+  fprintf(stream,"The two add again to: \newline
+  \hspace*{0.5cm} \%g$\backslash$n$\backslash$n",chi2+chi2b);
+}
+\go{
+chi2 with systematics for 3000km: 22.3984 \\
+chi2 with systematics for 7500km: 8.68131 \\
+The two add again to: 31.0797
+}
+Similarly, compute the $\chi^2$ with correlations for each experiment
+and their combination. Compare it to the $\chi^2$ for all experiments:
+the sum of the individual results is not equal to the $\chi^2$ of the
+combination anymore. Note that there are now two densities in the
+output vectors. 
+\gq{
+ glbDefineParams(input\_errors,theta12*0.1,0,0,0,sdm*0.1,0); \\
+ glbSetDensityParams(input\_errors,0.05,GLB\_ALL); \\
+ glbSetStartingValues(true\_values); \\
+ glbSetInputErrors(input\_errors); \\
+ chi2 = glbChiTheta(fit\_values,minimum,0);\\ 
+  fprintf(stream,"chi2 with correlations for 3000km: \%g $\backslash$n",chi2); \\
+ glbPrintParams(stream,minimum); \\ 
+  chi2b = glbChiTheta(fit\_values,minimum,1); \\ 
+ fprintf(stream,"$\backslash$nchi2 with correlations for 7500km: \\
+  \hspace*{0.5cm}  \%g $\backslash$n",chi2b); \\
+  glbPrintParams(stream,minimum); \\ 
+ chi2sum = glbChiTheta(fit\_values,minimum,GLB\_ALL); \\ 
+ fprintf(stream,"$\backslash$nchi2 with correlations for combination: \\
+  \hspace*{0.5cm} \%g $\backslash$n",chi2sum); \\
+ glbPrintParams(stream,minimum); \\ 
+  fprintf(stream,"$\backslash$nThe sum of the two chi2s is \%g,  \\
+  \hspace*{0.5cm} whereas the total chi2 is \%g !$\backslash$n$\backslash$n",chi2+chi2b,chi2sum); 
+}
+\go{
+chi2 with correlations for 3000km: 2.1038 \\
+0.542002 0.0193698 0.747915 1.77688 6.66156e-05 0.00200817 \\ 
+1.00434 1 \\
+Iterations: 1693 \\
+\\
+chi2 with correlations for 7500km: 1.08421 \\
+0.557356 0.0193698 0.771359 4.77751 7.00762e-05 0.00200105 \\
+1 1.01517 \\
+Iterations: 661 \\
+\\
+chi2 with correlations for combination: 3.90835  \\
+0.544432 0.0193698 0.770175 1.78502 6.61621e-05 0.00200303 \\ 
+1.00431 1.03679 \\
+Iterations: 1636 \\
+\\
+The sum of the two chi2s is 3.18801, whereas the total chi2 is 3.90835!
+}
+Now find the $\mathrm{sgn}(\ldm)$-degeneracies for both individual
+experiments and test if they are still there in the combination of the
+experiments. Note that a minimum at a negative value of $\theta_{13}$ is unphysical. However, if there can be no degeneracy found at a positive value, there is probably none at a low confidence level.  
+\gq{
+ glbDefineParams(input\_errors,theta12*0.1,theta13,theta23, \\
+ \hspace*{0.5cm} deltacp,sdm*0.1,ldm/3); \\
+glbDefineParams(starting\_values,theta12,theta13,theta23, \\
+\hspace*{0.5cm} deltacp,sdm,-ldm);\\
+  glbSetDensityParams(input\_errors,0.05,GLB\_ALL);\\
+  glbSetStartingValues(starting\_values);\\
+  glbSetInputErrors(input\_errors);\\
+  \\
+  chi2=glbChiAll(starting\_values,minimum,0); \\ 
+  fprintf(stream,"chi2 at minimum, L=3000km: \%g $\backslash$n",chi2); \\
+  glbPrintParams(stream,minimum);   \\
+  \\
+  chi2b=glbChiAll(starting\_values,minimum2,1);  \\
+  \mbox{fprintf(stream,"$\backslash$nchi2 at minimum, L=7500km: \%g \\ $\backslash$n",chi2b);} \\
+  glbPrintParams(stream,minimum2);  \\
+  \\
+  chi2=glbChiAll(minimum,minimum,GLB\_ALL); \\
+  fprintf(stream,"$\backslash$nchi2 for combination at minimum of Exp. 1:\\ \hspace*{0.5cm} \%g $\backslash$n",chi2); \\
+  glbPrintParams(stream,minimum);  \\
+  \\
+  chi2b=glbChiAll(minimum2,minimum2,GLB\_ALL); \\
+  fprintf(stream,"$\backslash$nchi2 for combination at minimum of Exp. 2: \\
+  \hspace*{0.5cm} \%g $\backslash$n",chi2b); \\
+  glbPrintParams(stream,minimum2);  
+}
+\go{
+chi2 at minimum, L=3000km: 6.71794 \\
+0.591497 0.0257396 0.729058 1.11537 7.98867e-05 -0.00206005 \\
+0.970499 1 \\
+Iterations: 2104\\
+\\
+chi2 at minimum, L=7500km: 47.1013 \\
+0.590347 0.0018489 0.768372 0.984827 8.23415e-05 -0.00204588 \\
+1 0.780995 \\
+Iterations: 1270\\
+\\
+chi2 for combination at minimum of Exp. 1: 70.6353 \\
+0.607988 0.0165985 0.767682 1.41422 8.44573e-05 -0.00204853 \\
+0.96147 1.1831 \\
+Iterations: 1549 \\
+\\
+chi2 for combination at minimum of Exp. 2: 70.6357 \\
+0.608454 0.0165823 0.767757 1.41481 8.43864e-05 -0.00204853 \\
+0.961129 1.18304 \\
+Iterations: 1447 
+}
+Finally, we have to destroy the parameter vectors again:
+\gq{
+ glbFreeParams(true\_values); \\
+ glbFreeParams(fit\_values); \\
+ glbFreeParams(starting\_values); \\
+ glbFreeParams(input\_errors); \\
+ glbFreeParams(minimum); \\
+ glbFreeParams(minimum2); \\
+}
 
 \chapter{\GLOBES\ basics}
 \label{chapt:gettingstarted}
@@ -951,11 +1308,11 @@ In this case, only the correlation with $\deltacp$ is taken into account.
 Note that in the  example on page~\pageref{ex:corrproj} this projection
 is compared with the result including the full multi-parameter correlation.
 
-\chapter{Finding degenerate solutions}
+\chapter{Locating degenerate solutions}
 \index{Degenerate solutions}
 
-In the last chapter, we introduced the projection of any set of $k$ parameter onto any $n-k$ dimensional hyperplane, which was done by the minimization over the $k$ free fit parameters. Similarly, one can minimize over {\em all} $n$ parameters to find the local minimum close to any starting point. This approach is very useful for the exact numerical location of a degenerate if its approximate position is known. For the determination of the approximate positon, one can use analytical approaches, such as in \Refs~TO BE ENTERED, or an educated guess. 
-Though the usage of the all-parameter minimizers is quite simple, one should keep in mind that they are local minimizers. Therefore, one may need a very sophisticated application software to actually find all degenerate solutions.
+In the last chapter, we introduced the projection of any set of $k$ parameter onto any $n-k$ dimensional hyperplane, which was done by the minimization over the $k$ free fit parameters. Similarly, one can minimize over {\em all} $n$ parameters to find the local minimum close to any starting point. This approach is very useful for the exact numerical location of a degeneracy if its approximate position is known. For the determination of the approximate positon, one can use analytical approaches or an educated guess. 
+Though the usage of the all-parameter minimizers is quite simple, one should keep in mind that they are local minimizers. Therefore, one may need a very sophisticated application software to find all degenerate solutions.
 
 \example{Finding the $\mathrm{sgn}(\ldm)$-degeneracy}{
 \label{ex:sgndeg}
@@ -994,25 +1351,41 @@ $\stheta$-$\deltacp$-plane (\cf, {\tt example3.c}), one can plot it as a contour
 }
 
 \index{All-parameter minimization}
-The functions to perform the all-parameter minimization are {\tt ChiAll} and {\tt SingleChiAll}:
+The function to perform the all-parameter minimization is {\tt glbChiAll}:
 \begin{function}
-\GLB{ChiAll}$(\{ \theta_{13}, \, \theta_{12}, \, \theta_{23}, \, \deltacp , \, \sdm , \, \ldm,  \, \hat{\rho_1}, \, \hdots , \, \hat{\rho_n} \})$ finds the local minimum close to the given starting point (list) for all initialized experiments. It returns the list  $\{ \chi^2, \, \theta_{13}, \, \theta_{12}, \, \theta_{23}, \, \deltacp , \, \sdm , \,  \ldm,  \, \hat{\rho_1}, \, \hdots , \hat{\rho_n} , \, N_{\mathrm{Iter}} \}$ with the minimum $\chi^2$-value, the actual position of the local minimum, and the number of iterations $N_{\mathrm{Iter}}$ used.
-\end{function}
-\begin{function}
-\GLB{SingleChiAll}$( \{ \theta_{13}, \, \theta_{12}, \, \theta_{23}, \, \deltacp , \, \sdm , \, \ldm, \,   \hat{\rho}_{N_{\mathrm{exp}}} \}, \, \, N_{\mathrm{exp}})$ finds the local minimum close to the given starting point (list) for the experiment $N_{\mathrm{exp}}$ only. It returns the list
- $\{ \chi^2, \, \theta_{13}, \, \theta_{12}, \, \theta_{23}, \, \deltacp , \, \sdm , \, \ldm, \, \hat{\rho}_{N_{\mathrm{exp}}} ,  \, N_{\mathrm{Iter}} \}$ with the minimum $\chi^2$-value, the actual position of the local minimum, and the number of iterations $N_{\mathrm{Iter}}$ used.
+\GLBNS{glbChiAll} 
+{\tt double glbChiAll(const glb\_params in, glb\_params out, int exp)}
+  returns the minimized $\chi^2$ over all parameters for the  experiment {\tt exp}. For the simulation of all initialized experiments,
+use {\tt GLB\_ALL} for {\tt exp}. The values in {\tt in} are the guessed fit values for the minimizer. The actually determined parameters at the minimum are returned in {\tt out}. If {\tt out} is set to {\tt NULL}, this information will not be returned.
 \end{function}
 %
-Both functions take the suspected position of the local minimum and return its true position. The application of  {\tt SingleChiAll} can be especially usefull for many different experiments evaluated simultaneously: It turns out to be useful to find the positions of the degeneracies for the individual experiments first, and then test all of these with the combination of all experiments in order not to miss a degenerate solution. The example on page~\pageref{ex:sgndeg} illustrates how to locate the $\mathrm{sgn}(\ldm)$-degeneracy and show the corresponding degenerate solution in the $\stheta$-$\deltacp$-plane together with the original solution.
-In this case, the position of the degeneracy can be easily guessed to be at the best-fit parameter values but the $\ldm$ inverted. The minimizer then runs off the plane of the best-fit parameters into the local minimum. It is very important to take into account the position of the degeneracy off this plane, since the actual $\chi^2$ in the minimum is certainly lower than on the plane of the best-fit parameter values. Thus, the degeneracy may not even appear at the chosen confidence level on the plane, but it does appear at the true minimum. The two cuts\footnote{The discussed figure on page~\pageref{ex:sgndeg} is produced by  {\tt Chi} and thus only represents a cut through the fit manifold. For the projection including correlations, one may rather want to use {\tt ChiThetaDelta}.} through the fit manifold shown in the figure on page~\pageref{ex:sgndeg} therefore do not have the same oscillation parameter values (except from the ones shown in the figure). 
+This function takes the suspected position of the local minimum and returns its actual position in {\tt out}, as well as the $\chi^2$-value 
+at the minimum as return value. Thus, the return value can be immediately
+used to judge wether the located degeneracy appears at the chosen
+confidence level.
 
-In practice, a number of tricks can be useful for the treatment of degenerate solutions:
+The example on page~\pageref{ex:sgndeg} illustrates how to locate the $\mathrm{sgn}(\ldm)$-degeneracy and show the corresponding degenerate solution in the $\stheta$-$\deltacp$-plane together with the original solution.
+In this case, the position of the degeneracy can be easily guessed to be at the best-fit parameter values but the $\ldm$ inverted. The minimizer then runs off the plane of the best-fit parameters into the local minimum. It is very important to take into account the position of the degeneracy off this plane, since the actual $\chi^2$ in the minimum is certainly lower than on the plane of the best-fit parameter values. Thus, the degeneracy may not even appear at the chosen confidence level on the plane, but it does appear at the true minimum. The two sections\footnote{The discussed figure on page~\pageref{ex:sgndeg} is produced by  {\tt glbChiSys} and thus only represents a section through the fit manifold. For the projection including correlations, one may rather want to use {\tt glbChiThetaDelta}.} through the fit manifold shown in the figure on page~\pageref{ex:sgndeg} therefore do not appear at the same oscillation parameter values (except from the ones shown in the figure). 
+
+For the more advanced reader, a number of tricks can be useful for the numerical localization of degenerate solutions:
 \begin{description}
 \item[Minimum $\boldsymbol{\chi^2}$ larger than threshold.] If a located degeneracy has a minimum $\chi^2$ larger than the corresponding confidence level threshold for the discussed quantity of interest, the degeneracy can be immediately ignored. This saves a lot of computation time.
-\item[Locating degeneracies with more complicated topologies.] For more complicated topologies, such as for neutrino factories, it is often useful to use multi-step location procedures or analytical knowledge. For example, for a numerical procedure, one may first of all switch off the systematics and keep $\stheta$ or $\deltacp$ fixed, \ie, use {\tt SingleChiTheta} or {\tt SingleChiDelta}, where $\stheta$ or $\deltacp$ is fixed to the best-fit value. The result can then be used as a starting point for {\tt SingleChiAll} with the systematics switched on again. In addition to switching off the systematics, it can be useful to reduce the input errors during the first steps in order to make the minimizer not to run away too much from the true solution.
-\item[Finding degeneracies with multiple experiments.] For multiple experiments, the degeneracies should be located for each of the individual experiments first. Then, all of the found degeneracies below the threshold can be tested for the combination of experiments.  
+\item[Locating degeneracies in more complicated topologies.] For more complicated topologies, such as for neutrino factories, it is often useful to use multi-step location procedures or analytical knowledge. For example, for a numerical procedure, one may first of all switch off the systematics and keep $\stheta$ or $\deltacp$ fixed, \ie, use {\tt glbChiTheta}, where $\stheta$ or $\deltacp$ is fixed at the best-fit value. The result can then be used as a starting point for {\tt glbChiAll} for the individual experiments with the systematics switched on again. 
+\item[Forcing the minimizer into the targeted solution.]
+In addition to switching off the systematics, it can be useful to reduce the input errors during some steps of the localization process in order to make the minimizer not to run away too much from the targeted solution.
+The example on page~\pageref{ex:sgndeg} illustrates this with the
+input error for $\ldm$: Since the guessed starting point might be
+quite far away from the real degeneracy, the algorithm may in some cases
+find the original solution instead of the degeneracy (which can
+be immediately seen from the output vector). The input error
+for $\ldm$ gives the algorithm a ``bias'' against the original solution.
+However, note that the input error must not be too small in order
+to avoid a significant contribution of the prior to the final $\chi^2$.
+Alternatively, one could run {\tt glbChiAll} again with the located minimum
+as {\tt in} vector and $\ldm$ kept free.
+\item[Finding degeneracies with multiple experiments.] For multiple experiments, it turns out to be useful to locate the degeneracies for individual experiments first. Then, all of the found degeneracies below the threshold can be tested for the combination of all experiments.
 \end{description}
-Finally, note that any degenerate solution below the confidence level threshold which can not be located makes the result appear better than it actually is. Thus, one should be careful with the determination of the degenerate solutions.
+Finally, note that any degenerate solution below the confidence level threshold which can not be located makes the result appear better than it actually is. Thus, one should be careful with the determination of the degenerate solutions in order to find all of them.
 
 \chapter{Obtaining low-level information}
 
