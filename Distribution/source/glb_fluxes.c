@@ -448,6 +448,7 @@ void glb_X_section_loader(glb_xsec *data)
 		     &data->xsec_storage[i][4],
 		     &data->xsec_storage[i][5],
 		     &data->xsec_storage[i][6]);
+	
 	    if(s!=7) 
 	      fprintf(stderr,"Error: Wrong format in file %s\n",
 		      data->file_name);
