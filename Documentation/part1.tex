@@ -7,6 +7,67 @@
 
 Also: which units, which order of parameters (table for different functions!) etc. (somewhere)
 
+\begin{table}[t]
+\begin{center}
+\begin{tabular}{lll}
+\hline
+Quantities & Examples & Units \\
+\hline
+Angles & $\theta_{13}$, $\theta_{12}$, $\theta_{23}$ & Radians  \\
+Mass squared differences & $\sdm$, $\ldm$ & $\mathrm{eV}^2$ \\
+Matter densitities & $\rho_i$ & $\mathrm{g}/\mathrm{cm}^3$ \\
+Baseline lengths & $L_i$ & $\mathrm{km}$ \\
+Energies & $E_\nu$ & $\mathrm{GeV}$ \\  
+Fiducial masses & $m_{\mathrm{Det}}$ & $\mathrm{kt}$ \\
+Time intervals & $t_{\mathrm{run}}$ & $\mathrm{yr}$ \\
+Integrated luminosities & $m_{\mathrm{Det}} \, t_{\mathrm{run}}$ & $\mathrm{kt \cdot yr}$ \\
+Cross sections & $\sigma_{\mathrm{CC}}$ &  ???? \\
+\hline
+\end{tabular}
+\mycaption{\label{tab:units} Quantities used in \GLOBES , examples of these quantities, and their standard units in the application software.}
+\end{center}
+\end{table}
+
+\begin{table}[t]
+\begin{center}
+\begin{tabular}{llp{7cm}c}
+\hline
+Experiment & Filename & Short description & Refs. \\
+\hline 
+\multicolumn{3}{l}{\underline{Conventional beams:}} \\
+??? & & \\[0.1cm]
+
+\multicolumn{3}{l}{\underline{First-generation superbeams:}} \\
+\JHFSK\ ($\nu$) & {\tt JHFSK.exp} & JHF (J-PARC) to Super-Kamiokande, neutrino running &  \cite{Huber:2002mx,Huber:2002rs} \\
+\JHFSK\ ($\bar\nu$)& {\tt JHFSKanti.exp} & JHF (J-PARC) to Super-Kamiokande, antineutrino running &  \cite{Huber:2002rs} \\
+\NUMI\  ($\nu$), OA $9 \, \mathrm{km}$ & {\tt NUMI9.exp} & NuMI with off-axis angle of $9 \, \mathrm{km}$ for $L=712 \, \mathrm{km}$, neutrino running & \cite{Huber:2002rs} \\
+\NUMI\  ($\bar{\nu}$), OA $9 \, \mathrm{km}$ & {\tt NUMI9anti.exp} & NuMI with off-axis angle of $9 \, \mathrm{km}$ for $L=712 \, \mathrm{km}$, antineutrino running & \cite{Huber:2002rs} \\
+\NUMI\  ($\nu$), OA $12 \, \mathrm{km}$ & {\tt NUMI12.exp} & NuMI with off-axis angle of $12 \, \mathrm{km}$ for $L=712 \, \mathrm{km}$, neutrino running & \cite{Huber:2002rs} \\
+\NUMI\  ($\bar{\nu}$), OA $12 \, \mathrm{km}$ & {\tt NUMI12anti.exp} & NuMI with off-axis angle of $12 \, \mathrm{km}$ for $L=712 \, \mathrm{km}$, antineutrino running & \cite{Huber:2002rs} \\
+\SPL\  ($\nu$) & {\tt SPL.exp} & SPL (CERN), neutrino running &  ??? \\
+\SPL\  ($\bar\nu$) & {\tt SPLanti.exp} & SPL (CERN), antineutrino running & ??? \\[0.1cm]
+ 
+\multicolumn{3}{l}{\underline{Superbeam upgrades:}} \\
+\JHFHK\ ($\nu$) & {\tt JHFHK.exp} & JHF (J-PARC) to Hyper-Kamiokande superbeam upgrade, neutrino running &  \cite{Huber:2002mx,Huber:2002rs} \\
+\JHFHK\ ($\bar\nu$)& {\tt JHFHKanti.exp} & JHF (J-PARC) to Hyper-Kamiokande superbeam upgrade, antineutrino running &  \cite{Huber:2002mx,Huber:2002rs} \\[0.1cm]
+
+\multicolumn{3}{l}{\underline{Neutrino factories:}} \\
+\NuFactI\ & {\tt NuFact.exp} & Initial stage neutrino factory, symmetric operation in both polarities & \cite{Huber:2002mx} \\
+\NuFactII\  & {\tt NuFact2.exp} & Advanced stage neutrino factory, symmetric operation in both polarities & \cite{Huber:2002mx,Huber:2003ak} \\[0.1cm]
+
+\multicolumn{3}{l}{\underline{Reactor experiments:}} \\
+\ReactorI\ & {\tt Reactor.exp} & Small reactor experiment with identical near and far detectors & \cite{Huber:2003pm} \\
+\ReactorII\ & {\tt Reactor2.exp} & Large reactor experiment with identical near and far detectors & \cite{Huber:2003pm} \\[0.1cm]
+
+\multicolumn{3}{l}{\underline{$\beta$-Beams:}} \\
+\Beta\ ($\nu$) & {\tt BETA.exp} & $\beta$-Beam, neutrino running & ??? \\
+\Beta\ ($\bar\nu$) & {\tt BETAanti.exp} & $\beta$-Beam, antineutrino running & ??? \\
+\hline
+\end{tabular}
+\end{center}
+\mycaption{\label{tab:experiments} Different pre-defined experiments, their filenames (to be used in {\tt LoadExperiment}), their short description, and the references in which they are defined. Note that all experiments use in their standard configurations one year of running time. Details about the experiment parameters can be obtained with {\tt InfoExperiment}(Experiment number) after they have been loaded.}
+\end{table}
+
 \chapter{Setting up \GLOBES }
 
 \bi
