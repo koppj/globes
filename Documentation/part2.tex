@@ -105,27 +105,40 @@ AEDL. The first line of every experiment definition file is
 \end{quote}
 
 We tell \GLOBES\ that we want to use the built-in neutrino factory
-flux, by setting the beam type variable to $1$. The target mass 
-is $50\,\mathrm{kt}$ and a total of $ 4.264\cdot10^{21}$
-muons is stored. The data is divided into 20 energy bins ranging from
-$4\,\mathrm{GeV}$ to $50\,\mathrm{GeV}$. 
+flux originating from stored $\mu^+$'s. This is achieved by setting 
+the builtin variable to $1$.  Next the energy of the muons is specified
+to be $50\,\mathrm{GeV}$ by the parent energy variable. It is assumed
+that there will be $5.33\cdot 10^{20}$ useful muon decays per year
+and that this luminosity is available for $8$ years.
 \begin{quote}
 {\tt /* beam */}\\
-{\tt \$beam\_type = 1}\\
+{\tt flux(\#mu\_plus)<\\
+\tb  @builtin = 1\\
+\tb  @parent\_energy = 50.0\\
+\tb  @stored\_muons = 5.33e+20\\
+\tb  @time = 8.0\\
+>}\\
+\end{quote}
+This specific flux can be later on refered to as {\tt \#mu\_plus}. 
+
+\begin{quote}
 {\tt \$target\_mass = 50}\\
-{\tt \$time = 8}\\
-{\tt \$stored\_muons = 5.33e+20}\\
 {\tt \$numofbins = 20}\\
 {\tt \$emin = 4.0}\\
 {\tt \$emax = 50.0}
 \end{quote}
+The target mass 
+is $50\,\mathrm{kt}$ and a total of $ 4.264\cdot10^{21}$
+muons is stored. The data is divided into 20 energy bins ranging from
+$4\,\mathrm{GeV}$ to $50\,\mathrm{GeV}$. 
+
 
 Next a file has to be specified which contains the cross section we want to 
 use.
 \begin{quote}
 {\tt /* cross section */}\\
 {\tt cross(\#CC)<}\\
-{\tt \hspace*{3ex}@cross\_file = XCC.dat}\\
+{\tt \tb @cross\_file = XCC.dat}\\
 {\tt >}
 \end{quote}
 The command {\tt cross} tells the parser that a cross section environment
@@ -153,11 +166,8 @@ The energy resolution function can easily be specified with
 \begin{quote}
 {\tt /* energy resolution */}\\
 {\tt energy(\#MINOS)<}\\
-{\tt \hspace*{3ex}@algorithm = 1}\\
-{\tt \hspace*{3ex}@bins = 20}\\
-{\tt \hspace*{3ex}@emin = 4.0}\\
-{\tt \hspace*{3ex}@emax = 50.0}\\
-{\tt \hspace*{3ex}@energy\_resolution = \{0.15,0.0,0.0\}}\\
+{\tt \tb @type = 1}\\
+{\tt \tb @sigma\_e = \{0.15,0.0,0.0\}}\\
 {\tt >}
 \end{quote}
 The {\tt energy} command opens the corresponding energy environment and
@@ -175,14 +185,15 @@ $\nu_e\rightarrow\nu_\mu$  and $\bar\nu_\mu\rightarrow\bar\nu_\mu$
 \begin{quote}
 {\tt /* channels */}\\
 {\tt channel(\#appearance)<}\\
-{\tt \hspace*{3ex}@channel = +: +: electron: muon: \#CC: \#MINOS}\\
+{\tt \tb @channel = \#mu\_plus: +: electron: muon: \#CC: \#MINOS}\\
 {\tt >}\\
 {\tt channel(\#disappearance)<}\\
-{\tt \hspace*{3ex}@channel = +: -: muon: muon: \#CC: \#MINOS}\\
+{\tt \tb @channel = \#mu\_plus: -: muon: muon: \#CC: \#MINOS}\\
 {\tt >}
 \end{quote}
-The first $\pm$ selects the polarity, \ie\ wether $\mu^+$ or $\mu^-$ are 
-stored. The second $\pm$ determines whether neutrinos or anti-neutrinos are
+The first element is the name of the flux as defined previously, here we use
+the flux named {\tt \#mu\_plus}. The second element $\pm$ determines whether 
+neutrinos or anti-neutrinos are
 taken from the flux table. The third position defines the initial flavour
 and the forth position the final flavour, followed by the name of the cross
 section and energy resolution function.
@@ -191,13 +202,13 @@ The last step is to assemble the channels into a rule.
 \begin{quote}
 {\tt /* rules */}\\
 {\tt rule(\#rule1)<}\\
-{\tt \hspace*{3ex}@signal = 0.45 @ \#appearance}\\
-{\tt \hspace*{3ex}@signalerror = 0.001 : 0.0001}\\
-{\tt \hspace*{3ex}@background = 1.0e-05 @ \#disappearance}\\
-{\tt \hspace*{3ex}@backgroundcenter = 1 : 0.0}\\
-{\tt \hspace*{3ex}@backgrounderror = 0.05 : 0.0001}\\
-{\tt \hspace*{3ex}@errordim = 0}\\
-{\tt \hspace*{3ex}@energy\_window = 4.0 : 50.0}\\
+{\tt \tb @signal = 0.45 @ \#appearance}\\
+{\tt \tb @signalerror = 0.001 : 0.0001}\\
+{\tt \tb @background = 1.0e-05 @ \#disappearance}\\
+{\tt \tb @backgroundcenter = 1 : 0.0}\\
+{\tt \tb @backgrounderror = 0.05 : 0.0001}\\
+{\tt \tb @errordim = 0}\\
+{\tt \tb @energy\_window = 4.0 : 50.0}\\
 {\tt >}
 \end{quote}
 The signal variable says that the signal in our experiment is the 
@@ -226,6 +237,146 @@ and of course the channels and rules for the operation with $\mu^-$ stored
 \chapter{Features of the  AEDL}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Syntax and types of  AEDL}
+\label{sec:syntax}
+
+ The first eight characters have to be {\tt \%!GLoBES} 
+ this serves to protect from parsing MBytes of chunk
+ and cluttering the screen with error messages. 
+
+Comments
+ are entered like this one -- everything between the 
+ delimiters is ignored. 
+\begin{quote}
+{\tt /* This starts a comment\\
+ and here the comment ends */
+}
+\end{quote}
+thus the comments in AEDL work like in C
+
+There are so called  named quantities, they all start with {\tt \$} 
+and are predefined. They are checked for being within range, \eg\ {\tt 
+\$bins} can be only in between 0 and 150. If you give a {\tt float} where
+ an {\tt int} is expected the {\tt float} gets converted to an {\tt int} 
+in the usual way in C.  We have named scalar quantities
+\begin{quote}
+{\tt
+\$bins = 10\\
+\$baseline = 1200.0
+}
+\end{quote}
+as well as named simple lists
+\begin{quote}
+{\tt
+\$densitytab=\{1.0,2.2343,3.3432\}
+}
+\end{quote}
+
+Since there are some very special data to parse, some special
+provisions have been made so called named environments. This is illustrated 
+with the channel definition part
+\begin{quote}
+{\tt channel(\#ch1)<\\
+\tb  $\ldots$\\
+>
+}
+\end{quote}
+
+The first part tells the type of environment, here it is {\tt channel}. 
+There are the following types 
+\begin{quote}
+{\tt flux\\
+cross\\
+channel\\
+energy\\
+rule
+}
+\end{quote}
+Besides the type there is a user-defined name beginning with {\tt \#}, in the
+above example {\tt \#ch1}, which can be used later on to refer to the 
+channel defined in between {\tt <$\ldots$>}. Those names are so called
+automatic variables. They start all with {\tt \#} and do not behave as 
+usual variables. New names can only be
+created within the above construction. Only names which have been created
+can be refered to. Using the same name for different types of environments 
+does not work.  Each type has its own counter, \eg\ for channel the counter is 
+{\tt numofchannels}. The counter keeps track of how many different names 
+there are for one type, \ie\ they count the number of channels, 
+the number of rules, the number of energy resolution functions asf. 
+The value of those automatic variables is the number which can be used 
+to refer to them in your C code. You can create a variable for later use by
+\begin{quote}
+{\tt    channel(\#ch2)<>}
+\end{quote}
+Now you can refer to {\tt \#ch2} without any trouble and you now could define
+a rule using {\tt \#ch2}. Later on of course you still have to specify the
+actual channel as described in section~\ref{sec:channel}.
+
+Variables beginning with {\tt @} are named and can be used only within the 
+appropriate type of environment, since we have to keep track where 
+they belong to. Moreover many of them have a special syntax, like 
+{\tt @channel}.          
+
+You can have several experiments in one file, just separate the different
+ experiments by 
+\begin{quote}
+{\tt    \#NEXT\#}
+\end{quote}
+This command resets the counters for channels, rules and energy resolution
+functions. All variables have their scope only within a region delimited
+by either {\tt \%!GLoBES, \#NEXT\#} or {\tt EOF}. The only exception are 
+the counters defined with {\tt cross} and {\tt flux}. They are valid for 
+the complete session, since you never must overload the flux and 
+cross section information. This ensures  a consistent treatment of various 
+experiments in one file - there is no  shadowing of any variables.
+
+Using multiple files to keep things clean and clear is supported by 
+ an {\tt include} command. Includes can be nested up 
+ to {\tt MAX\_INCLUSION\_DEPTH}, which is set to 10. Error reporting works 
+ also for nested includes. The included file is not required to begin 
+ with {\tt \%!GLoBES} to facilitate cut and paste
+\begin{quote}
+{\tt include ./file\_1}
+\end{quote}
+
+Thus it is possible and advised to use constructs as the following
+\begin{quote}
+{\tt    include NuFact.gls\\
+        \#NEXT\#\\
+        include JHFHK.gls
+}
+\end{quote}
+to define a combined analysis of the experiments defined in the files 
+{\tt NuFact.gls} and {\tt JHFHK.gls}. Even if you use the named 
+variable {\tt \#CC} in both experiments, but the cross section data used 
+is different (\eg\ because of different target nuclei), the correct 
+cross section data is used for each of the experiments, since {\tt \#CC} 
+in {\tt NuFact.gls} has the value $0$ and
+in {\tt JHFHK.gls} it has the value $1$, thus no shadowing occurs.
+
+Furthermore you can store numbers in variables
+\begin{quote}
+{\tt
+Pi = 3.141
+}
+\end{quote}
+And additionally we have some simple calculator functionality like
+\begin{quote}
+{\tt
+Pi+1\\
+\verb+Pi^2+\\
+sin(Pi/2)\\
+}
+\end{quote}
+The following mathematical functions from {\tt <math.h>} are available 
+{\tt sin}, {\tt cos}, {\tt atan}, {\tt ln}, {\tt exp}, {\tt sqrt}. 
+Those calculations work everywhere, where
+a simple number could stand. However threading over lists does not
+ work, \eg\ {\tt sin(\{1,2,3\})} will not work. 
+
+One nasty thing is that a line feed character \verb+\n+ is necessary at
+ the end of input, alternatively you can put a comment at the end.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Source properties}
 \label{sec:source}
 
@@ -237,45 +388,44 @@ to simulate multiple source experiments like KamLAND. All neutrino
 sources usable within \GLOBES\ therefore can be specified by the
 flux spectra for each flavour and CP sign and the total luminosity
 of the source. There are two principal ways to provide a flux:
-use a built-in source or a file provided by the user. Built-in sources
-as well as user defined fluxes are referred to internally by the
- {\tt \$beam\_type} variable. Certain values of  {\tt \$beam\_type} are
-pre-defined and used for the built-in fluxes, \eg\ {\tt \$beam\_type = 1}
-selects the neutrino factory flux.
+use a built-in source or a file provided by the user. In both cases
+a flux is defined by a named environment.
+\begin{quote}
+  {\tt flux(\#name)<\\
+\tb $\ldots$\\
+>}
+\end{quote}
 
-The built-in source is muon decay, since the neutrino
-spectra and flavour composition are known analytically in that case. For 
-this sources the energy of the parent particle has to be specified
+
+In case a built-in source is used the user has to specify which
+built-in spectrum is used. Currently two built-in fluxes are available:
+$\mu^+$-decay ({\tt @builtin = 1}) and $\mu^-$-decay ({\tt @builtin = 2}).
+In any case  the energy of the parent particle has to be specified
 and the number of useful decays per year. Thus the sequence for setting
 up a neutrino factory is
+{\tt flux(\#mu\_plus)<\\
+\tb  @builtin = 1\\
+\tb  @parent\_energy = 50.0\\
+\tb  @stored\_muons = 5.33e+20\\
+\tb  @time = 8.0\\
+>}\\
+
+Alternatively user defined fluxes may used like this
 \begin{quote}
-{\tt \$beam\_type = 1}\\
-{\tt \$parent\_energy = 50.0}\\
-{\tt \$stored\_muons = 5.33e+20}\\
+{\tt flux(\#user)<}\\
+{\tt \tb @flux\_file = user\_file\_1.dat\\
+\tb @time = 2.0\\
+\tb @power = 4.0\\
+\tb @norm = 1e+8}\\
+{\tt >}
 \end{quote}
-The values of {\tt \$parent\_energy} and {\tt emax} are always the same.
-
-
-User defined fluxes are dealt with a little different at initialization
-and the value of {\tt \$beam\_type} is automatically assigned. This is
-necessary to avoid any problems with multiple experiments, since the fluxes
-are read only once. Reading a flux file looks like
-\begin{quote}
-{\tt flux(\#dummy)<}\\
-{\tt \hspace*{3ex}@flux\_file\_p = user\_file\_1.dat}\\
-{\tt \hspace*{3ex}@flux\_file\_m = user\_file\_2.dat}\\
-{\tt >}\\
-{\tt \$target\_power = 4.0 }
-\end{quote} 
-
-Since many sources have two modes of operation, it is possible to define
-a pair of fluxes by using the polarity flag when loading the files. Usually
-files connected in this way use the suffixes ``plus'' and ``minus'' in the 
-file names. The individual members of the pair can be accessed by the polarity
-variable. Also the built-in fluxes provide this choice.
-The flux read by {\tt @flux\_file\_p} can be accesed by selecting positive
-polarity, whereas the flux read by {\tt @flux\_file\_m} is selected by a 
-negative value of the polarity.
+ 
+The norm variable allows to set the conversion factor from the fluxes in
+the file to the units in \GLOBES. The power variable allows to
+specify a target or reactor power. The units used for power are determined
+by the units in the flux file and by the value of the norm variable. It is
+recommended to use $\mathrm{MW}$ in case a proton based beam is used and
+$\mathrm{GW}_\mathrm{thermal}$ for the reactor experiments.
 
 
 
@@ -307,13 +457,13 @@ where the energy values are evenly spaced.
 For accessing fluxes at 
 arbitrary energies linear interpolation is used. Once the energy leaves the
 range of values given in the file $0.0$ is returned. The units used for the
-fluxes are not specified and right now each flux has its own fudge factor
-which is hard encoded in the file {\tt nufact.c}. The problem is that
+fluxes are not specified and right now each flux has its own normalization 
+factor as specified by {\tt norm}. The problem is that
 in computing the normalization one has to know things like number of target
-particles per unit mass asf. which is not always straightforward. Thus a fudge
-factor will be useful in any case. Right now however this is not the only 
-fudge factor since for some experiments the definition of their target mass
-involves another fudge factor. 
+particles per unit mass asf. which is not always straightforward. The fluxes
+will be rescaled by $1/L^2$, thus the normalization must contain a factor
+$L_0^2$, when $L_0$ is the distance from the source for which the flux is
+given.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Oscillation properties}
 
@@ -385,10 +535,6 @@ its value is defined by
 \begin{quote}
 {\tt \$target\_mass = 50.0 }
 \end{quote}
-Furthermore the running time has to be specified by
-\begin{quote}
-{\tt \$time = 8.0 }
-\end{quote}
 
 \subsection{Cross section}
 \label{sec:cross_section}
@@ -420,7 +566,7 @@ range of values given in the file $0.0$ is returned.
 A cross section file is read by 
 \begin{quote}
 {\tt flux(\#name)<}\\
-{\tt \hspace*{3ex}@cross\_file =user\_file\_1.dat}\\
+{\tt \tb @cross\_file =user\_file\_1.dat}\\
 {\tt >}
 \end{quote}  
 and can later be refered to by {\tt \#name}.
@@ -491,7 +637,7 @@ R_\beta^{\text{IT}}(E,E')\,\epsilon_\beta^{\text{IT}}(E')
  \equiv
 \int d\hat{E} \quad T_\beta(\hat{E})\,k_\beta^{\text{IT}}(E-\hat{E})
 \,V_\beta(\hat{E}-E')\,, 
-\end{eqnarray}
+e\end{eqnarray}
 
 
 Thus $R_\beta^{\text{IT}}(E,E')$ describes the energy response of 
@@ -502,6 +648,52 @@ as energy resolution function or smearing matrix in its actual representation
 in the program\index{Energy resolution}\index{Smear matrix}. The detailed
 definition and initialization of the energy resolution function is described
 in section~\ref{sec:energy}.
+
+
+
+The number of events in one channel and  in one bin\index{Bin} $i$ is given by
+\begin{equation}
+\label{eq:channel}
+n_i^c=\int_{E_i-\Delta E/2}^{E_i+\Delta E/2} dE' \quad
+\frac{dn_{\beta}^{\text{IT}}}{dE'} (E')
+\end{equation}
+where $c$ is the channel index.
+Note that the events are binned according to their \emph{reconstructed} energy.
+In order to perform the computation \GLOBES\ needs to know the flux,
+the CP-sign of the initial state, the initial flavour, the final flavour,
+the cross section and the energy resolution function. Employing the notation
+of section~\ref{sec:energy} the full formula is
+
+
+Thus the actual definition of a channel looks like
+\begin{quote}
+{\tt channel(\#channel\_1)<\\
+\tb @channel = \#flux : $+$: muon: muon: \#cross: \#energy\\
+>}
+\end{quote}
+Furthermore is is possible to define energy dependent efficiencies and
+backgrounds (non-beam). These additional components can be either added
+before the convolution in with $R(E,E')$ is done, \ie\ the integration with
+respect to $E$ in equation~\ref{eq:e_res}. This is called 
+{\tt @pre\_smearing\_$\ldots$}. The pre-smearing efficiencies and backgrounds
+have to have as many elements as there are sampling points 
+(see section~\ref{sec:energy}). In same cases the number of sampling points
+is determined automatically by \GLOBES and the number of elements in the 
+pre-smearing vectors has to be adjusted in the second run.
+Of course, it is possible after all
+integrations been performed to have similar factors  and this is called  
+{\tt @post\_smearing\_$\ldots$}. All post-smearing factors have to have as 
+many elements as there are bins. Efficiencies are multiplicative and their
+default value is $1$ whereas backgrounds are additive and thus their default
+value is $0$. Thus a more elaborate channel looks like
+\begin{quote}
+{\tt channel(\#channel\_1)<\\
+\tb @channel = \#flux : $+$: muon: muon: \#cross: \#energy\\
+\tb @pre\_smearing\_background = \{1,2,3,4,5,6,7,8,9,10\}\\
+\tb @post\_smearing\_efficiencies = \{0.1,0.2,0.3,0.4,0.5\}\\
+>}
+\end{quote}
+This experiment obviously uses $10$ sampling points and $5$ bins.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -520,13 +712,6 @@ of the relevant errors is.
 
 Based on the definition of channels it is possible to assemble the 
 signal and background event numbers for each bin.  
-The number of events in one channel and  in one bin\index{Bin} $i$ is given by
-\begin{equation}
-n_i^c=\int_{E_i-\Delta E/2}^{E_i+\Delta E/2} dE' \quad
-\frac{dn_{\beta}^{\text{IT}}}{dE'} (E')
-\end{equation}
-where $c$ is the channel index.
-Note that the events are binned according to their \emph{reconstructed} energy.
 The signal $s_i$ in one bin for a rule now can be composed out of 
 several channels by
 \begin{equation}
@@ -538,6 +723,13 @@ Similarly the background in one bin $i$ can be specified by
 \begin{equation}
 b_i=\epsilon_{c_1}\cdot n_i^{c_1}\,+\,\epsilon_{c_2}\cdot n_i^{c_2}\,+\,\ldots
 \end{equation}
+This basic building blocks of a rule are specified by
+\begin{quote}
+{\tt \tb @signal = 0.5 @ \#channel\_1\\
+\tb @background = 0.001 @ \#channel\_2 :  0.005 @ \#channel\_3
+}
+\end{quote}
+
 Quite often it is not sufficient to have constant efficiencies and therefore
 it is possible to define efficiencies for each bin and channel $\alpha_i^c$
 and thus the event rates in one bin become
@@ -573,8 +765,9 @@ calibration error, which basically amounts to replacing the reconstructed
 energy $E'$ by $(1+b)\cdot E'$ and we use following approximation
 \begin{eqnarray}
 s_i(b)&=& (1+b)\cdot(s_{k+1}-s_k)\cdot\delta+s_i\,,\\
-\delta&=&b\cdot(i+\Delta E+ 1/2)+i\,,\nonumber\\
-k&=&\mod(\delta,1)\,.\nonumber
+\delta&=&b\cdot(i+t_0+ 1/2)+i\,,\nonumber\\
+k&=&\mod(\delta,1)\,,\nonumber\\
+t_0&=&E_\mathrm{min}/\Delta E_0\,.\nonumber
 \end{eqnarray}
 Special care is required at the boundaries when $k<1$ or $k+1>N_\mathrm{bins}$,
 since there $s_k$ or $s_{k+1}$ may not have been calculated. One possibility
@@ -589,7 +782,13 @@ $k$ is within the range $1,\ldots, N_\mathrm{bins}-1$.
 In order to perform this fine tuning, it is possible to constrain 
 the energy range from which the data are taken for the 
 analysis\index{Energy window}. This is achieved by setting the energy window
-variable. The purpose is mainly to allow a fine tuning of the description
+variable. 
+\begin{quote}
+{\tt 
+\tb @energy\_window = 4.0 : 50.0 
+}
+\end{quote}
+The purpose is mainly to allow a fine tuning of the description
 of an energy calibration error. The default setting is that the energy window
 coincides with the range defined by the minimal and maximal reconstructed 
 energy. For the error dimension using the calibration method (C) it is 
@@ -611,7 +810,19 @@ background tilt/calibration ($d$). The default values are
 a=1\,,\quad b=0\,,\quad c={\tt NaN}\,,\quad d=0\,,
 \end{equation}
 thus for the background normalization $c$ a value has to be specified in 
-\emph{all} cases.
+\emph{all} cases. The central values for the normalization and the 
+corresponding central value of tilt/calibration are regarded
+as a pair. The errors are treated in the same way.
+\begin{quote}
+{\tt
+\tb @signalerror =       0.001  :       0.01\\
+\tb @backgroundcenter =  0.1 :       0.0\\
+\tb @backgrounderror =   0.001 :       0.01
+}
+\end{quote}
+There is no {\tt @signalcenter} since by default the central value for the
+signal normalization is $1$ and the central value for the tilt/calibration 
+is $0$.  
 
 The four parameters $a,b,c,d$ have been introduced in order to describe
 systematical uncertainties, they are so called nuisance parameters.
@@ -703,7 +914,25 @@ Values of the error dimension variable and their meaning.
 \end{center}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+The error dimensions can be chosen for each rule by
+\begin{quote}
+{\tt 
+\tb @errordim = 1
+}
+\end{quote}
 
+Next we can assemble the various pieces into one rule
+\begin{quote}
+{\tt rule(\#rule\_1)<\\
+\tb @signal = 0.5 @ \#channel\_1\\
+\tb @background = 0.001 @ \#channel\_2 :  0.005 @ \#channel\_3\\
+\tb @signalerror =       0.001  :       0.01\\
+\tb @backgroundcenter =  0.1 :       0.0\\
+\tb @backgrounderror =   0.001 :       0.01\\
+\tb @errordim = 1\\
+\tb @energy\_window = 4.0 : 50.0\\ 
+>}
+\end{quote}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Energy resolution function}
@@ -726,7 +955,25 @@ to $E_\mathrm{max}$ is divided in a certain number of bins $N_\mathrm{bins}$.
 These bins form a partition, which not necessarily is equidistant. The 
 partition is any case completely defined by specifying $E_\mathrm{min}$
 and $E_\mathrm{max}$ and the size of each bin  $\Delta E_i$. It is also
-straightforward to compute the midpoint of each bin $E_i$.
+straightforward to compute the midpoint of each bin $E_i$. This information
+has to be provided by the user. Equidistant bins are obtained by
+\begin{quote}
+{\tt
+\$emin = 4.0\\
+\$emax = 50.0\\
+\$bins = 20
+}
+\end{quote}
+Another possibility is to specify arbitrary bin sizes and to leave out
+the number of bins itself, by
+\begin{quote}
+{\tt
+\$emin = 4.0\\
+\$emax = 50.0\\
+\$binsize = \{  15.0 , 5.0 , 20.0, 6.0 \} 
+}
+\end{quote}
+ 
 In order to obtain the number of events 
 $n_i^c$ from one channel $c$ in one bin $i$ one has to solve this integral
 %
@@ -753,8 +1000,8 @@ by
 \quad R^c(E,E')\,.
 \end{equation}
 These  $\hat\epsilon_i$ are refered to as so called 
-``post-smearing'' efficiencies.
-
+``post-smearing'' efficiencies and set within the corresponding {\tt channel}
+environment.
 The integration with respect to the reconstructed energy $E'$ can be
 performed independently of the oscillation parameters and we define
 the bin kernel for the $i$th bin $K_i^c$
@@ -775,9 +1022,36 @@ K_i^c(E)\,}_{f(E)}.
 There is no basic reason why one could not evaluate this integral directly
 by the usual numerical methods. However it turns out that this may be rather
 slow, therefore we introduce two different approximation schemes which have
-a varying degree of accuracy and speed. 
+a varying degree of accuracy and speed. In any case each scheme to evaluate this
+integral involves a the evaluation of the integrand at fixed sampling points.
+These sampling points can be either defined by the user or be computed by
+\GLOBES, the choice between these possibilities also depends on the algorithm
+which is used for the actual calculation, as explained in the following.
+If the user chooses to set the sampling points the procedure is analogous
+to the one setting the bins. For equidistant sampling points use
+\begin{quote}
+{\tt
+\$simbins = 20\\
+\$simtresh =          4.0\\
+\$simbeam =         50.0
+}
+\end{quote}
+The advantage in setting the sampling points in this way is that in case many
+different energy resolution functions are used the user has the control
+how the different sampling requirements are fulfilled. In case a user-defined
+smear matrix is used this data is mandatory.
 
-The simplest, fastest and
+All energy resolution function are defined within an {\tt energy} environment
+and can be refered to by {\tt \#name}.
+\begin{quote}
+  {\tt energy(\#name)<\\
+\tb $\ldots$\\
+>}
+\end{quote}
+
+
+
+First we discuss the builtin algorithms. The simplest, fastest and
 least accurate is algorithm A. The key idea is to choose a set of assumptions
 which allow to evaluate the integrand of equation~\ref{eq:simple_int}
 at fixed values of the energy $E$ and to use the same number of points $N$ in
@@ -804,8 +1078,12 @@ made by violating this assumption nearly cancel between the simulated
 data and the fitted data. This algorithm is the fastest which \GLOBES\ offers
 and is suitable whenever there are no fast oscillations. Otherwise severe
 aliasing effects may occur which usually lead to a failure of one of the 
-minimizing routines. The computation of the bin kernel $K_i^c$ is performed
-by \GLOBES. To this end it requires the specification of the number of bins
+minimizing routines. This algorithm is selected by
+\begin{quote}
+{\tt \tb @type = 1}
+\end{quote}
+The computation of the bin kernel $K_i^c$ is performed
+by \GLOBES. To this end it requires  the number of bins
  $N_\mathrm{bins}$
 and the minimum $E_\mathrm{min}$ and maximum energy $E_\mathrm{max}$. 
 Furthermore following parameterization
@@ -813,20 +1091,45 @@ for $R^c(E,E')$ is used
 \begin{equation}
 R^c(E,E')=\frac{1}{\sigma(E)\,\sqrt{2\pi}}\,e^{-\frac{(E-E')^2}{2\sigma^2(E)}}
 \end{equation} 
-where the energy resolution $\sigma(E)$ is defined by
+There are several energy resolution functions available and by default
+{\tt \#standard} is used. They can be chosen
+by
+\begin{quote}
+{\tt \tb @sigma\_function = \#standard}
+\end{quote}
+where the energy resolution function named {\tt \#standard} is defined by
 \begin{equation}
 \label{eq:sigma_e}
 \sigma(E)=\alpha\cdot E + \beta \cdot \sqrt{E} +\gamma\,.
 \end{equation}
 The parameters $\alpha, \beta$ and $\gamma$ are provided by the user.
-Furthermore the user has the possibility to provide 
-$\epsilon(E')$ by specifying
-the value of  $\epsilon(E')$ at each $E_j$. Thus the  $\epsilon(E')$ are
-also taken as constant within one bin\footnote{since algorithm A assumes
-everything else to be constant within one bin}. In the actual implementation 
+\begin{quote}
+{\tt \tb @sigma\_e = \{ 0.15, 0.0, 0.0\}}
+\end{quote}
+The other possible choice for {\tt @sigma\_function} is {\tt \#inverse\_beta}
+which has only one parameter $\alpha$ and is defined by
+\begin{equation}
+\sigma(E)= \left\{\begin{array}{cl}
+ \alpha \cdot \sqrt{1000}^{-1}\,\sqrt{x-8\cdot10^{-4}}\,,&\mathrm{for}\,\, 
+x>1.8\cdot10^{-3}\\
+5\cdot10^{-5} \,,&\mathrm{for}\,\, x \leq 1.8\cdot10^{-3}
+\end{array} \right.
+\end{equation}
+
+
+In the actual implementation 
 the sum in equation one only extends over those $E_j$ where $K(E_j)$ 
 is above a certain threshold, by default $10^{-7}$. This threshold is 
-defined at compile time.
+defined at compile time. Thus a complete energy resolution definition of this 
+type looks like
+\begin{quote}
+{\tt energy(\#name)<\\
+\tb @type = 1\\
+\tb @sigma\_function = \#standard\\
+\tb @sigma\_e = \{ 0.15 ,0.0 ,0.0\}\\
+>
+}
+\end{quote}
 
 
 
@@ -960,7 +1263,22 @@ The format requires to provide $k_l^i$ and $k_u^i$ for each bin, the number of
 bins, the number of sampling points, the lower and upper limit of the sampling
 range. Furthermore the numbers $K_i(E_j)^c$ have to provide for all values
 in between $k_l^i$ and $k_u^i$. The convolution is then performed according to
-equation~\ref{eq:algo_one}.
+equation~\ref{eq:algo_one}. Thus a complete example for this case would be
+\begin{quote}
+{\tt
+\$simbins = 20\\
+\$simtresh =          4.0\\
+\$simbeam =         50.0\\
+}
+
+{\tt 
+energy(\#name)<\\
+\tb @energy =   \{0,2, 0.8634265, 0.0682827,     4e-06\}:\\
+\tb\tb \{0,4, 0.1507103, 0.6965592, 0.1507103,   0.00101,     1e-07\}:\\
+\tb\tb $\ldots$\\
+>
+}
+\end{quote}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{User-defined systematics}
 \label{sec:ud_error_dim}.
