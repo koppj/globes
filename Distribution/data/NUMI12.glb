@@ -1,0 +1,136 @@
+%!GLoBES
+
+$version="1.7.5"
+
+/* 	 Beam data 	 */
+
+flux(#NUMI12plus)<
+	@flux_file="NUMI12plus.dat"
+	@time = 1
+	@norm = 1
+>
+
+flux(#NUMI12minus)<
+	@flux_file="NUMI12minus.dat"
+	@time = 1
+	@norm = 1
+>
+
+$target_mass = 	        85.
+
+$numofbins = 		20
+
+$emin = 	        1.2
+$emax = 	        2.5
+
+$simbins = 		20
+$simtresh =    		1.2
+$simbeam =         	2.5
+
+
+/* 	 Baseline 	 */
+
+$profiletype = 		3 
+$densitytab = 		{2.8}
+$lengthtab = 		{712}
+
+
+/* 	 Technical information 	 */
+
+$filter_state = 0 
+$filter_value = 1000000 
+$errorfunction = 0 
+
+/*       Energy Resolution       */
+
+energy(#ERES)<
+	@type = 1
+	@sigma_e = {0.16,0,0}
+>
+
+
+/* 	 Cross sections 	 */
+
+cross(#CC)<
+	@cross_file = "XCC.dat"
+>
+
+
+cross(#NC)<
+	@cross_file = "XNC.dat"
+>
+
+cross(#QE)<
+	@cross_file = "XQE.dat"
+>
+
+/* 	 Channels 	 */
+
+channel(#nu_mu_disappearance_CC)<
+	@channel = 	#NUMI12plus:	+:	m:	m:	#CC:    #ERES
+	@post_smearing_efficiencies={1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
+	>
+
+
+channel(#nu_mu_disappearance_NC)<
+	@channel = 	#NUMI12plus:	+:	m:	m:	#NC:    #ERES
+	@post_smearing_efficiencies={1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
+	>
+
+channel(#nu_e_beam_CC)<
+	@channel = 	#NUMI12plus:	+:	e:	e:	#CC:    #ERES
+	@post_smearing_efficiencies={1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
+	>
+
+channel(#nu_e_appearance_CC)<
+	@channel = 	#NUMI12plus:	+:	m:	e:	#CC:    #ERES	
+	@post_smearing_efficiencies={1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
+	>
+
+channel(#nu_mu_disappearance_QE)<
+	@channel = 	#NUMI12plus:	+:	m:	m:	#NC:    #ERES
+	@post_smearing_efficiencies={1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
+	>
+
+channel(#nu_e_appearance_NC)<
+	@channel = 	#NUMI12plus:	+:	m:	e:	#NC:    #ERES	
+	@post_smearing_efficiencies={1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
+	>
+
+channel(#nu_tau_appearance_NC)<
+	@channel = 	#NUMI12plus:	+:	m:	t:	#NC:    #ERES
+	@post_smearing_efficiencies={1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
+	> 
+
+/* 	 Rules 		  */
+
+rule(#rule0)<
+ 	@signal = 0.4@#nu_e_appearance_CC
+	@signalerror = 0.0001 : 0.0001
+	
+	@background =  0.0003267@#nu_mu_disappearance_CC : 0.005@#nu_mu_disappearance_NC : 0.005@#nu_e_appearance_NC : 0.005@#nu_tau_appearance_NC : 0.4@#nu_e_beam_CC 
+	@backgrounderror = 0.1 : 0.0001
+	@backgroundcenter = 1.0 : 0.0
+	
+	@errordim_sys_on = 0
+	@errordim_sys_off = 2
+	@energy_window = 1.2 : 2.5
+>
+
+
+rule(#rule1)<
+	@signal = 0.9@#nu_mu_disappearance_CC
+	@signalerror = 0.025 : 0.0001
+	
+	@background = 0.005@#nu_mu_disappearance_NC : 0.005@#nu_e_appearance_NC : 0.005@#nu_tau_appearance_NC 
+	@backgrounderror = 0.2 : 0.001
+	@backgroundcenter = 1.0 : 0.0
+	
+	@errordim_sys_on = 0
+	@errordim_sys_off = 2
+	@energy_window = 1.2 : 2.5
+>
+
+
+
+/**********************END**********************/

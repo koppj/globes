@@ -1,0 +1,482 @@
+/* GLoBES -- General LOng Baseline Experiment Simulator
+ * (C) 2002 - 2004,  The GLoBES Team
+ *
+ * GLoBES is mainly intended for academic purposes. Proper
+ * credit must be given if you use GLoBES or parts of it. Please
+ * read the section 'Credit' in the README file.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+
+
+
+#ifndef GLB_TYPES_H
+#define GLB_TYPES_H 1
+
+
+/* Data structure for handling fluxes and built-in fluxes */
+typedef struct {
+  int builtin;
+  char* file_name;
+  double time;
+  double parent_energy;
+  double stored_muons;
+  double target_power;
+  double norm;
+  double** flux_storage;
+} glb_flux;
+
+
+
+/* This are the additional data needed for type B matrices */
+
+typedef struct {
+  double corr_fac;
+  double confidence_level;
+  int offset;
+  double low_bound;
+  double up_bound;
+} glb_option_type;
+
+
+/* This is a pointer to the function which computes sigma(E,params) */
+typedef double (*sigfun)(double, double* );
+
+/* That is a first attempt for a data structure containing all
+   the necessary information for computing a smear matrix. Right
+   now it is sufficient for Type A matrices but lacks support
+   for type B matrices */
+
+#define GLB_TYPE_A 1
+#define GLB_TYPE_B 2
+#define GLB_TYPE_C 3
+
+typedef struct {
+  int type;
+  int numofbins;
+  int simbins;
+  double e_min; 
+  double e_max;
+  double e_sim_min;
+  double e_sim_max;
+
+  /* Pointer to the paramters for sig_f */
+  double *sigma;
+  int num_of_params;
+  /* Here is the pointer to sigma(E,params) */
+  sigfun sig_f;
+  
+  /* This is the binsize array -- unused so far.
+   * In any case it is probably more useful to store the bin sizes
+   * in a simple array.
+   */
+  
+  double *binsize;
+
+  double *simbinsize;
+
+  /* Lookup tables */
+  double *bincenter;
+  double *simbincenter;
+
+  /* Options for type B matrices */
+  glb_option_type *options;
+} glb_smear;
+
+
+struct glb_systematic
+{
+  double (*chi_func)();
+  int dimension;
+  double *sp; 
+  double *errors;
+  double (*evalf)();
+  char *info;
+};
+
+
+
+/** This structure contains a large part of the information for defining
+ * an experiment.
+ * It has fixed size since it contains only pointers to dynamic objects.
+ * You have to  make sure that the memory for dynamic objects is allocated
+ * (and freed !) elsewhere !
+ * Since this structure is large and will grow, care should be taken to pass
+ * only pointers to it (esp. in functions which are called in each step or 
+ * cycle).
+ * The plan is, that it should at some point contain really all information
+ * for describing an experiment like fluxes etc. ( or at least pointers to
+ * the place where those things are)
+ */
+
+struct experiment {
+
+  /* Version string */
+
+  char *version;
+
+  /** The beam spectrum is loaded with glb_flux_loader(file_name, flux_ident)
+   */
+
+  /** That is a new way to define and load fluxes */
+  glb_flux *fluxes[32];
+
+  int num_of_fluxes;
+
+ 
+ 
+  /** errordim describes how the systematical errors are handled and
+  * also how the low level chi^2 function is computed (at event rate level).
+  * right now it ranges from 0 to 9. errordim can be defined for each
+  * rule independently, that´s why it is a vector. In any case this
+  * flag is probably going to change! The default right now is 0.
+  */
+  int errordim[32];
+  
+  /** Two more values for storing the errordims. One for the value which 
+   * corresponds to 'systematics on' and the other to 'systematics off'.
+   * A function called glbSwitchSystematics will copy either value to
+   * errordim, which then is used by glbSetExperiment.
+   */
+  int errordim_sys_on[32];
+  int errordim_sys_off[32];
+
+  /** errorfunction is a rather strange construct and probably will become
+  * obsolete. The default is 1.
+  */
+  int errorfunction;
+
+  /** set the way a profile is computed or the baseline is changed */
+  int density_profile_type;
+
+  /** baseline is the baseline. It is a positive number. The unit
+  * is km. For most cases it should not exceed 2*EARTHRADIUS.
+  */
+  double baseline;
+  
+  /** emin is the lower bound on the energy for the events used in the 
+  * analysis.
+  * It is a positive number and the unit is GeV.
+  */ 
+  double emin;
+
+  /** emax is the upper bound on the energy for the  events in the analysis.
+  * It is a positive number and the unit is GeV. It has to be larger than
+  * emin.
+  */
+  double emax;
+
+  /** Number of bins which divide the range from emin to emax for the analysis.
+  * It is larger than zero.
+  */
+  int numofbins;
+
+
+
+  /** Target mass in units of kt (=1000 tons). It is positive.
+   */
+  double targetmass;
+
+  
+  /** Number of channels. It is a number between 1 and 32.
+   */
+  int numofchannels;
+
+  /** Strange construct. Holds the channel definition ( 5 int`s)
+  * describing: beam polarity, initial state, final state, CP sign
+  * cross section. The length was 5*numofchannnels. Not very nice!
+  * will be changed for two reasons:
+  * - it is ugly and the channel definition will be enlarged at least
+  * by one number 
+  * - the energy resolution function identifier.
+  * This new defintion has now get numofchannels*sizeof(int) of memory.
+  *
+  * malloc!
+  */
+  int* listofchannels[6];
+
+  /** Number of rules. Ranges from 1 to 32.
+   */
+  int numofrules;
+
+  /** Tells for each rule how many channels are added to form the signal.
+  * Ranges from 1 to 32.
+  */
+  int lengthofrules[32];
+
+  /** Contains the pre-factor for each channel and rule which is applied to
+  * each channel in computing the signal. Has length 
+  * lengthofrules*sizeof(double). malloc!
+  */
+  double* rulescoeff[32];
+
+  /** Contains the identifying number for each channel used in this rule.
+  * Has got length lengthofrules*sizeof(int). Range is 0 to lengthofrule-1.
+  * malloc!
+  */
+  int* rulechannellist[32];
+
+  /** Contains the 1 sigma errors on normalization and energy calibration
+  * of the signal for each rule. It is zero or positive. Default is zero.
+  */
+  double signalruleerror[2][32];
+
+  /** Tells for each rule how many channels are added to form the background.
+  * Ranges from 1 to 32.
+  */
+  int lengthofbgrules[32];
+
+  /** Contains the pre-factor for each channel and rule which is applied to
+  * each channel in computing the background. Has length 
+  * lengthofrules*sizeof(double). malloc!
+  */
+  double* bgrulescoeff[32];
+
+  /** Contains the identifying number for each channel used in this rule.
+  * Has got length lengthofrules*sizeof(int). Range is 0 to lengthofrule-1.
+  * malloc!
+  */
+  int* bgrulechannellist[32];
+
+  /** Relative weight of the background, divided into to parts.
+  * bgcenter[0] is usually 1 and bgcenter[1] is usually 0 (default).
+  */
+  double bgcenter[2][32];
+
+  /** Contains the 1 sigma errors on normalization and energy calibration
+  * of the signal for each rule. It is zero or positive. Default is zero.
+  */
+  double bgerror[2][32];
+
+  /** Parmeters necessary if errorfunction is not default, i.e. not 1.
+   */
+  double bgtcenter[2][32];
+
+  /** Contains the 1 sigma errors on bgtcenter
+  * It is zero or positive. Default is zero.
+  */
+  double bgterror[2][32];
+
+  /** Number of smearing data types stored */
+  int num_of_sm;
+
+  /** Meta information for computing the smear matrix for each rule */
+  
+  glb_smear *smear_data[32];
+
+  /** Thus holds the pointer to the place where the energy resolution
+  * function is stored. The energy resolution function is stored as
+  * a matrix where only the non-zero elements are used. This and the
+  * fact that there is a numer of bins in the analysis which can be
+  * different from the bins used in the calculation makes the game
+  * a little tricky. Be careful! smear contains for each different
+  * energy resolution numofbins pointers which point each to vector
+  * of length simbins and at this point in the memory you will find
+  * a double.
+  *
+  * \todo This is now only the user-defined mode. Need implemenation
+  * for computing this matrix and the other quantities. Also
+  * the meta information for this process has to go in here.
+  */
+  double** smear[32];
+
+  /** For each analysis bin (numofbins) exists a lower index in the
+  * range given by simbins for which smear contains non-zero entries
+  * (remember only those are stored). Thus lowrange is positive (including
+  * zero) and smaller than simbins and smaller than uprange (see below)
+  * \todo This is now only the user-defined mode. Need implemenation
+  * for computing this matrix and the other quantities. Also
+  * the meta information for this process has to go in here.
+  */
+  int* lowrange[32];
+
+  /** For each analysis bin (numofbins) exists a upper index in the
+  * range given by simbins for which smear contains non-zero entries
+  * (remember only those are stored). Thus uprange is positive and 
+  * smaller than simbins and bigger than uprange.
+  * \todo This is now only the user-defined mode. Need implemenation
+  * for computing this matrix and the other quantities. Also
+  * the meta information for this process has to go in here.
+  */
+  int* uprange[32];
+  
+  /** simtresh has the same function for the computation of events than
+  * emin for the analysis. simtresh has to be positive and smaller than 
+  * emin. The unit is GeV. 
+  */ 
+  double simtresh;
+
+  /** simbeam has the same function for the computation of events than
+  * emax for the analysis. simtresh has to be positive and bigger than 
+  * emax and bigger than simtresh. The unit is GeV.
+  */ 
+  double simbeam;
+
+  /** simbins is the number of bins dividing (equi-distant) 
+  * the range from simtresh to
+  * simbeam. It is a positive number.
+  * \todo This is now only the user-defined mode. Need implemenation
+  * for computing this matrix and the other quantities. Also
+  * the meta information for this process has to go in here.
+  */
+  int simbins; 
+
+  /** Changed.
+  * filter_state is either "ON" or "OFF".
+  * \todo This is now only the user-defined mode. Need implemenation
+  * for computing this matrix and the other quantities. Also
+  * the meta information for this process has to go in here.
+  */
+  int filter_state;
+
+  /** Positive number.
+   * \todo This is now only the user-defined mode. Need implemenation
+  * for computing this matrix and the other quantities. Also
+  * the meta information for this process has to go in here.
+   */
+  double filter_value;
+
+
+  /** The central value of the scaling factor for the matter density.
+  * It is a positive (incl. zero) number. The default is 1.
+  */
+  double density_center;
+
+  /** The relative 1 sigma error on the density. It is a positive 
+  * (incl. zero) number. The default is 0.
+  */ 
+  double density_error;
+
+  /** The number of layers for the matter profile. It is a number greater
+  * than 0. Default is 1.
+  */
+  int psteps;
+
+  /** glb_List of the thickness of each matter layer. Unit is km and positive. 
+  * Has length
+  * psteps. The sum of all length in lengthtab should equal baseline.
+  * Here a mechanism for ensuring this relation has to be implemented.
+  * 
+  */
+  double* lengthtab;
+
+  /** glb_List of the matter densities for each layer. It is a positive number
+  * and the unit is g cm^-3. Has length psteps.
+  * 
+  */
+  double* densitytab;
+
+  /** A buffer needed in the computation of the matter profile uncertainty.
+  * Does not appear in any config-file, but has to be malloced on
+  * initialization. Has length psteps. Determined internally.
+  */
+  double* densitybuffer;
+
+  /** New.
+  * Contains a number for each simbin which is multiplied with each
+  * channel before doing the smearing. Has length simbins. Positive
+  * including zero.
+  */
+  double* user_pre_smearing_channel[32];
+
+  /** New.
+  * Contains a number for each bin which is multiplied with each
+  * channel after doing the smearing. Has length bins. Positive
+  * including zero.
+  */
+  double* user_post_smearing_channel[32];
+
+  /** New.
+  * Contains a number for each bin which is added to each
+  * bin before doing the smearing. Has length simbins. Positive
+  * including zero.
+  */
+  double* user_pre_smearing_background[32];
+
+  /** New.
+  * Contains a number for each bin which is added to each
+  * bin after doing the smearing. Has length bins. Positive
+  * including zero.
+  */
+  double* user_post_smearing_background[32];
+
+
+ 
+
+  /** Energy range for each rule in which the events are used to compute
+  * the chi^2. Lower limit and upper limit.
+  */
+  double energy_window[32][2];
+
+  /** One more buffer of length numofbins. Needed to access shifted
+  * rate vector.
+  */
+  double* chirate;
+
+  /** Now comes a bunch of pointers which finally are vectors containing
+  * the different parts of event vectors needed during computation.
+  * All mallocing has to be done at intialization of a given experiment!
+  * Has length simbins 
+  */
+  double* SignalRates[32];
+
+  /** Has length simbins */
+  double* BackgroundRates[32]; 
+
+  /** Has length numofbins */
+  double* rates0[32];
+
+  /** Has length numofbins */
+  double* rates1[32];
+
+  /** Has length numofbins */
+  double* rates1T[32];
+
+  /** Has length numofbins */
+  double* rates1BG[32];
+
+  /** Has length numofbins */
+  double* rates1BGT[32];
+
+  /** Has length numofbins */
+  double* ratevec[32];
+
+  /** Has length numofbins */
+  double* ratevecBG[32];
+
+  /** Has length numofbins */
+  double* energy_tab;
+
+  /** New.
+  * Store pre-computed background. Has length numofbins. 
+  * Determined internally.
+  */
+  double* no_osc_background[32];
+
+  /** New.
+   * All crucial for the chi^2 interface
+   */
+  struct glb_systematic sys[32]; 
+
+  /* Additional work spaces */  
+
+  double *buffer;
+  double *chrb[32];
+  double *chra[32];
+
+
+};
+
+#endif /* GLB_TYPES_H 1 */

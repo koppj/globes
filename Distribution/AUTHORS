@@ -1,0 +1,17 @@
+The GLoBES Team (currently active authors):
+
+Patrick Huber <phuber@ph.tum.de>
+	most of the C programs
+Manfred Lindner <mlindner@ph.tum.de>
+	web page & testing
+Walter Winter <wwinter@ph.tum.de>
+	documentation & examples
+
+Former contributors:
+
+Martin Freund 
+	probability code & interfaces
+
+
+Please do *not* send bug reports to above email addresses, 
+use instead <globes@ph.tum.de>.

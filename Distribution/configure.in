@@ -1,0 +1,111 @@
+dnl Process this file with autoconf to produce a configure script.
+AC_INIT(source/globes.c)
+
+dnl Versioning of GLoBES
+dnl last digit: increment whenever code has changed
+dnl middle digit: increment when features have been introduced/removed
+dnl first digit: major improvements/rewrites
+AM_INIT_AUTOMAKE(globes,1.7.7)
+
+dnl Versioning of libglobes.so
+dnl code changed: c:r+1:a
+dnl API changed: c+1:0:a
+dnl -> API extended: c:0:a+1
+dnl -> API shrunken: c:0:0
+GLBLIBVERSION="4:0:0"
+
+dnl From here no editing !
+AC_SUBST(GLBLIBVERSION)
+AC_DEFINE_UNQUOTED(GLB_LIBVERSION,"$GLBLIBVERSION")
+
+dnl Checks for programs.
+AC_PROG_AWK
+AC_PROG_CC
+AC_PROG_CXX
+AC_PROG_CPP
+AC_PROG_INSTALL
+AC_PROG_LN_S
+AC_PROG_YACC
+AM_PROG_LEX
+AM_PROG_LIBTOOL
+dnl Checks for libraries.
+
+
+
+AC_CHECK_LIB(m,main,[],AC_MSG_ERROR([libm not found]))
+AC_CHECK_LIB(gslcblas,main,[],AC_MSG_ERROR([libgslcblas not found]))
+AC_CHECK_LIB(gsl,main,[],AC_MSG_ERROR([libgsl not found]))
+
+dnl Check for libf2c and taking care of the SUSE libf2c problem 
+AC_CHECK_LIB(f2c,main,[],[
+globes_temp_lib="$LIBS"
+LIBS="-lf2c $LIBS"
+AC_CACHE_CHECK([for libf2c on SUSE],globes_cv_libf2c,
+[AC_TRY_LINK([int MAIN__;],[
+int main (void) 
+{ 
+ exit(0);
+}],
+globes_cv_libf2c="yes",globes_cv_libf2c="no",globes_cv_libf2c="no")
+])
+if test $globes_cv_libf2c = yes; then
+ AC_DEFINE(HAVE_LIBF2C)
+else
+ LIBS="$globes_temp_lib" && AC_MSG_ERROR([libf2c not found])
+fi
+])
+
+dnl Check for blas and taking care of the SUSE libf2c problem 
+AC_CHECK_LIB(blas,main,[],[
+globes_temp_lib="$LIBS"
+LIBS="-lblas $LIBS"
+AC_CACHE_CHECK([blas on SUSE],globes_cv_libblas,
+[AC_TRY_LINK([int MAIN__;],[
+int main (void) 
+{ 
+ exit(0);
+}],
+globes_cv_libblas="yes",globes_cv_libblas="no",globes_cv_libblas="no")
+])
+if test $globes_cv_libblas = yes; then
+ AC_DEFINE(HAVE_LIBBLAS)
+else
+ LIBS=$globes_temp_lib && AC_MSG_ERROR([libblas not found])
+fi
+])
+
+dnl Check for blas and taking care of the SUSE libf2c problem 
+AC_CHECK_LIB(lapack,main,[],[
+globes_temp_lib="$LIBS"
+LIBS="-llapack $LIBS"
+AC_CACHE_CHECK([lapack on SUSE],globes_cv_liblapack,
+[AC_TRY_LINK([int MAIN__;],[
+int main (void) 
+{ 
+ exit(0);
+}],
+globes_cv_liblapack="yes",globes_cv_liblapack="no",globes_cv_liblapack="no")
+])
+if test $globes_cv_liblapack = yes; then
+ AC_DEFINE(HAVE_LIBLAPACK)
+else
+ LIBS="$globes_temp_lib" && AC_MSG_ERROR([liblapack not found])
+fi
+])
+
+
+
+
+
+dnl Checks for header files.
+AC_HEADER_STDC
+
+dnl Checks for typedefs, structures, and compiler characteristics.
+AC_C_CONST
+AC_TYPE_SIZE_T
+
+dnl Checks for library functions.
+AC_CHECK_FUNCS(strdup)
+
+
+AC_OUTPUT(Makefile source/Makefile nrc/Makefile)

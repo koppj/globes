@@ -1,0 +1,136 @@
+%!GLoBES
+
+$version="1.7.5"
+
+/* 	 Beam data 	 */
+
+flux(#NUMI9plus)<
+	@flux_file="NUMI9plus.dat"
+	@time = 1
+	@norm = 1
+>
+
+flux(#NUMI9minus)<
+	@flux_file="NUMI9minus.dat"
+	@time = 1
+	@norm = 1
+>
+
+$target_mass = 	        85.
+
+$numofbins = 		20
+
+$emin = 	        1.6
+$emax = 	        2.8
+
+$simbins = 		20
+$simtresh =    		1.6
+$simbeam =         	2.8
+
+
+/* 	 Baseline 	 */
+
+$profiletype = 		3 
+$densitytab = 		{2.8}
+$lengthtab = 		{712}
+
+
+/* 	 Technical information 	 */
+
+$filter_state = 0 
+$filter_value = 1000000 
+$errorfunction = 0 
+
+/*       Energy Resolution       */
+
+energy(#ERES)<
+	@type = 1
+	@sigma_e = {0.16,0,0}
+>
+
+
+/* 	 Cross sections 	 */
+
+cross(#CC)<
+	@cross_file = "XCC.dat"
+>
+
+
+cross(#NC)<
+	@cross_file = "XNC.dat"
+>
+
+cross(#QE)<
+	@cross_file = "XQE.dat"
+>
+
+/* 	 Channels 	 */
+
+channel(#ANTI_nu_mu_disappearance_CC)<
+	@channel = 	#NUMI9minus:	-:	m:	m:	#CC:    #ERES
+	@post_smearing_efficiencies={1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
+	>
+
+
+channel(#ANTI_nu_mu_disappearance_NC)<
+	@channel = 	#NUMI9minus:	-:	m:	m:	#NC:    #ERES
+	@post_smearing_efficiencies={1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
+	>
+
+channel(#ANTI_nu_e_beam_CC)<
+	@channel = 	#NUMI9minus:	-:	e:	e:	#CC:    #ERES
+	@post_smearing_efficiencies={1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
+	>
+
+channel(#ANTI_nu_e_appearance_CC)<
+	@channel = 	#NUMI9minus:	-:	m:	e:	#CC:    #ERES	
+	@post_smearing_efficiencies={1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
+	>
+
+channel(#ANTI_nu_mu_disappearance_QE)<
+	@channel = 	#NUMI9minus:	-:	m:	m:	#NC:    #ERES
+	@post_smearing_efficiencies={1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
+	>
+
+channel(#ANTI_nu_e_appearance_NC)<
+	@channel = 	#NUMI9minus:	-:	m:	e:	#NC:    #ERES	
+	@post_smearing_efficiencies={1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
+	>
+
+channel(#ANTI_nu_tau_appearance_NC)<
+	@channel = 	#NUMI9minus:	-:	m:	t:	#NC:    #ERES
+	@post_smearing_efficiencies={1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
+	> 
+
+/* 	 Rules 		  */
+
+rule(#rule0)<
+ 	@signal = 0.4@#ANTI_nu_e_appearance_CC
+	@signalerror = 0.0001 : 0.0001
+	
+	@background =  0.0003267@#ANTI_nu_mu_disappearance_CC : 0.005@#ANTI_nu_mu_disappearance_NC : 0.005@#ANTI_nu_e_appearance_NC : 0.005@#ANTI_nu_tau_appearance_NC : 0.4@#ANTI_nu_e_beam_CC 
+	@backgrounderror = 0.1 : 0.0001
+	@backgroundcenter = 1.0 : 0.0
+	
+	@errordim_sys_on = 0
+	@errordim_sys_off = 2
+	@energy_window = 1.6 : 2.8
+>
+
+
+rule(#rule1)<
+	@signal = 0.9@#ANTI_nu_mu_disappearance_CC
+	@signalerror = 0.025 : 0.0001
+	
+	@background = 0.005@#ANTI_nu_mu_disappearance_NC : 0.005@#ANTI_nu_e_appearance_NC : 0.005@#ANTI_nu_tau_appearance_NC 
+	@backgrounderror = 0.2 : 0.001
+	@backgroundcenter = 1.0 : 0.0
+	
+	@errordim_sys_on = 0
+	@errordim_sys_off = 2
+	@energy_window = 1.6 : 2.8
+>
+
+
+
+/**********************END**********************/

@@ -1,0 +1,127 @@
+%!GLoBES
+
+$version="1.7.5"
+
+/* 	 Beam data 	 */
+
+flux(#CNGS)<
+	@flux_file= "CNGS_Spectra.dat"
+	@time = 5
+	@norm = 1.173e-12 
+>
+
+$target_mass = 	        2.35
+
+$numofbins = 		29
+$emin = 	         1.0
+$emax = 	        30.0
+
+
+/* 	 Baseline 	 */
+
+$profiletype =		3
+$densitytab = 		{2.7}
+$lengthtab = 		{732.0}
+
+
+
+/* 	 Technical information 	 */
+
+$filter_state = 0 
+$filter_value = 1000000 
+$errorfunction = 0 
+
+
+/*       Energy Resolution       */
+
+energy(#ERES)<
+	@type = 1
+	@sigma_e = {0.15,0,0}
+>
+
+
+/* 	 Cross sections 	 */
+
+cross(#CC)<
+	@cross_file = "XCC.dat"
+>
+
+cross(#CNGS_CC)<
+	@cross_file = "XCC_CNGS.dat"
+>
+
+cross(#NC)<
+	@cross_file = "XNC.dat"
+>
+
+/* 	 Channels 	 */
+
+channel(#nu_e_appearance)<
+	@channel = 	#CNGS:	+:	m:	e:	#CNGS_CC:    #ERES
+	@post_smearing_efficiencies = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
+>
+
+channel(#nu_e_beam)<
+	@channel = 	#CNGS:	+:	e:	e:	#CNGS_CC:    #ERES
+	@post_smearing_efficiencies = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
+>
+
+channel(#nu_tau_appearance)<
+	@channel = 	#CNGS:	+:	m:	t:	#CNGS_CC:    #ERES
+	@post_smearing_efficiencies = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
+>
+
+channel(#disappearance)<
+	@channel = 	#CNGS:	+:	m:	m:	#CNGS_CC:    #ERES
+	@post_smearing_efficiencies = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
+>
+
+channel(#NC_background)<
+	@channel = 	#CNGS:	+:	NOSC_m:	NOSC_m:	#NC:    #ERES
+	@post_smearing_efficiencies = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
+>
+
+/* 	 Rules 		 */
+
+rule(#rule0)<
+ 	@signal = 0.7975@#nu_e_appearance
+	@signalerror = 0.05 : 0.0001
+	
+	@background = 0.5736@#nu_e_beam : 0.1533@#nu_tau_appearance 
+	@backgrounderror = 0.05 : 0.0001
+	@backgroundcenter = 1.0 : 0.0
+	
+	@errordim_sys_on = 0
+	@errordim_sys_off = 2
+	@energy_window = 1 : 30
+> 
+
+
+rule(#rule1)<
+	@signal = 0.0758@#nu_tau_appearance
+	@signalerror = 0.05 : 0.0001
+	
+	@background = 0.00008502@#NC_background 
+	@backgrounderror = 0.05 : 0.0001
+	@backgroundcenter = 1.0 : 0.0
+	
+	@errordim_sys_on = 0
+	@errordim_sys_off = 2
+	@energy_window = 1 : 30
+>
+
+rule(#rule2)<
+	@signal = 0.9@#disappearance
+	@signalerror = 0.05 : 0.0001
+	
+	@background = 0.05@#NC_background  
+	@backgrounderror = 0.05 : 0.0001
+	@backgroundcenter = 1.0 : 0.0
+	
+	@errordim_sys_on = 0
+	@errordim_sys_off = 2
+	@energy_window = 1 : 30
+>
+
+
+/**********************END***********************************************************************************************************************************************************************************************************************************/
