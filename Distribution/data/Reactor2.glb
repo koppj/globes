@@ -27,7 +27,7 @@ $version="1.8.1"
 flux(#Reactor)<
 	@flux_file="Reactor.dat"
 	@time = 8
-	@power = 10
+	@power = 10 /* GW thermal */
 	@norm = 1.1584e-13 
 >
 

@@ -36,12 +36,12 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 host_triplet = @host@
 DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
-	$(srcdir)/Makefile.in $(srcdir)/globes-config.src.in \
-	$(srcdir)/globes-module.src.in $(srcdir)/globes.spec.in \
-	$(top_srcdir)/configure $(top_srcdir)/examples/Makefile.in \
-	AUTHORS COPYING ChangeLog INSTALL NEWS compile config.guess \
-	config.sub depcomp install-sh ltconfig ltmain.sh missing \
-	mkinstalldirs ylwrap
+	$(srcdir)/Makefile.in $(srcdir)/config-h.in \
+	$(srcdir)/globes-config.src.in $(srcdir)/globes-module.src.in \
+	$(srcdir)/globes.spec.in $(top_srcdir)/configure \
+	$(top_srcdir)/examples/Makefile.in AUTHORS COPYING ChangeLog \
+	INSTALL NEWS compile config.guess config.sub depcomp \
+	install-sh ltconfig ltmain.sh missing mkinstalldirs ylwrap
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
@@ -51,6 +51,7 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno configure.status.lineno
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
+CONFIG_HEADER = config.h
 CONFIG_CLEAN_FILES = globes.spec examples/Makefile globes-config.src \
 	globes-module.src
 am__installdirs = "$(DESTDIR)$(bindir)"
@@ -82,6 +83,7 @@ AMDEP_FALSE = @AMDEP_FALSE@
 AMDEP_TRUE = @AMDEP_TRUE@
 AMTAR = @AMTAR@
 AR = @AR@
+AS = @AS@
 AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
@@ -90,6 +92,8 @@ BLCONVENIENCE = @BLCONVENIENCE@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
+CONVENIENCE_LTDL_FALSE = @CONVENIENCE_LTDL_FALSE@
+CONVENIENCE_LTDL_TRUE = @CONVENIENCE_LTDL_TRUE@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
 CXX = @CXX@
@@ -99,6 +103,7 @@ CXXFLAGS = @CXXFLAGS@
 CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
+DLLTOOL = @DLLTOOL@
 ECHO = @ECHO@
 ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
@@ -106,6 +111,7 @@ ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 F2CCONVENIENCE = @F2CCONVENIENCE@
+F2CINC = @F2CINC@
 F77 = @F77@
 FFLAGS = @FFLAGS@
 GLBINC = @GLBINC@
@@ -115,6 +121,8 @@ GLBMLDF = @GLBMLDF@
 GLBMODULES = @GLBMODULES@
 HAVE_LIBTOOL = @HAVE_LIBTOOL@
 INSTALL_DATA = @INSTALL_DATA@
+INSTALL_LTDL_FALSE = @INSTALL_LTDL_FALSE@
+INSTALL_LTDL_TRUE = @INSTALL_LTDL_TRUE@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
@@ -122,10 +130,12 @@ LDFLAGS = @LDFLAGS@
 LEX = @LEX@
 LEXLIB = @LEXLIB@
 LEX_OUTPUT_ROOT = @LEX_OUTPUT_ROOT@
+LIBADD_DL = @LIBADD_DL@
 LIBLTDL = @LIBLTDL@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
+LIBTOOL_DEPS = @LIBTOOL_DEPS@
 LN_S = @LN_S@
 LTDLINCL = @LTDLINCL@
 LTLIBOBJS = @LTLIBOBJS@
@@ -135,6 +145,7 @@ MAINTAINER_MODE_TRUE = @MAINTAINER_MODE_TRUE@
 MAKEINFO = @MAKEINFO@
 MAKE_RPMS_FALSE = @MAKE_RPMS_FALSE@
 MAKE_RPMS_TRUE = @MAKE_RPMS_TRUE@
+OBJDUMP = @OBJDUMP@
 OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
@@ -147,11 +158,14 @@ RANLIB = @RANLIB@
 RPM_ARCHS = @RPM_ARCHS@
 RPM_ARGS = @RPM_ARGS@
 RPM_BUILD_DIR = @RPM_BUILD_DIR@
+RPM_CLEAN_NAMES = @RPM_CLEAN_NAMES@
 RPM_CONFIGURE_ARGS = @RPM_CONFIGURE_ARGS@
 RPM_DIR = @RPM_DIR@
 RPM_PROG = @RPM_PROG@
 RPM_RELEASE = @RPM_RELEASE@
 RPM_SOURCE_DIR = @RPM_SOURCE_DIR@
+RPM_SRC_DIR = @RPM_SRC_DIR@
+RPM_SRPM_NAME = @RPM_SRPM_NAME@
 RPM_TARBALL = @RPM_TARBALL@
 RPM_TARGET = @RPM_TARGET@
 RPM_VERSION = @RPM_VERSION@
@@ -165,9 +179,12 @@ WANT_LIBF2C_FALSE = @WANT_LIBF2C_FALSE@
 WANT_LIBF2C_TRUE = @WANT_LIBF2C_TRUE@
 YACC = @YACC@
 ac_ct_AR = @ac_ct_AR@
+ac_ct_AS = @ac_ct_AS@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
+ac_ct_DLLTOOL = @ac_ct_DLLTOOL@
 ac_ct_F77 = @ac_ct_F77@
+ac_ct_OBJDUMP = @ac_ct_OBJDUMP@
 ac_ct_RANLIB = @ac_ct_RANLIB@
 ac_ct_STRIP = @ac_ct_STRIP@
 am__fastdepCC_FALSE = @am__fastdepCC_FALSE@
@@ -205,23 +222,23 @@ prefix = @prefix@
 program_transform_name = @program_transform_name@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
-subdirs = @subdirs@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 DIST_SUBDIRS = lapack source data libltdl modules globes libf2c
 SUBDIRS = libf2c lapack libltdl source data modules globes 
-INCLUDES = $(LTDLINCL)
+INCLUDES = $(LTDLINCL) $(F2CINCL)
 EXTRA_DIST = examples/Makefile.in examples/example1.c\
   examples/example3.c examples/myio.c\
 examples/example-tour.c  examples/example2.c  examples/example4.c\
 examples/myio.h examples/XCC.dat examples/NuFact.glb\
-BUGS globes-script lapack/COPYING
+BUGS globes-script lapack/Notice libf2c/Notice
 
 nodist_bin_SCRIPTS = globes-config globes-module
 noinst_SCRIPTS = globes-script
 CLEANFILES = globes-module globes-config
 AM_YFLAGS = -d 
-all: all-recursive
+all: config.h
+	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
 .SUFFIXES:
 am--refresh:
@@ -257,6 +274,23 @@ $(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 	cd $(srcdir) && $(AUTOCONF)
 $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	cd $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
+
+config.h: stamp-h1
+	@if test ! -f $@; then \
+	  rm -f stamp-h1; \
+	  $(MAKE) stamp-h1; \
+	else :; fi
+
+stamp-h1: $(srcdir)/config-h.in $(top_builddir)/config.status
+	@rm -f stamp-h1
+	cd $(top_builddir) && $(SHELL) ./config.status config.h
+$(srcdir)/config-h.in: @MAINTAINER_MODE_TRUE@ $(am__configure_deps) 
+	cd $(top_srcdir) && $(AUTOHEADER)
+	rm -f stamp-h1
+	touch $@
+
+distclean-hdr:
+	-rm -f config.h stamp-h1
 globes.spec: $(top_builddir)/config.status $(srcdir)/globes.spec.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 examples/Makefile: $(top_builddir)/config.status $(top_srcdir)/examples/Makefile.in
@@ -364,7 +398,7 @@ ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	mkid -fID $$unique
 tags: TAGS
 
-TAGS: tags-recursive $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
+TAGS: tags-recursive $(HEADERS) $(SOURCES) config-h.in $(TAGS_DEPENDENCIES) \
 		$(TAGS_FILES) $(LISP)
 	tags=; \
 	here=`pwd`; \
@@ -381,7 +415,7 @@ TAGS: tags-recursive $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
 	      tags="$$tags $$include_option=$$here/$$subdir/TAGS"; \
 	  fi; \
 	done; \
-	list='$(SOURCES) $(HEADERS)  $(LISP) $(TAGS_FILES)'; \
+	list='$(SOURCES) $(HEADERS) config-h.in $(LISP) $(TAGS_FILES)'; \
 	unique=`for i in $$list; do \
 	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
 	  done | \
@@ -393,11 +427,11 @@ TAGS: tags-recursive $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
 	    $$tags $$unique; \
 	fi
 ctags: CTAGS
-CTAGS: ctags-recursive $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
+CTAGS: ctags-recursive $(HEADERS) $(SOURCES) config-h.in $(TAGS_DEPENDENCIES) \
 		$(TAGS_FILES) $(LISP)
 	tags=; \
 	here=`pwd`; \
-	list='$(SOURCES) $(HEADERS)  $(LISP) $(TAGS_FILES)'; \
+	list='$(SOURCES) $(HEADERS) config-h.in $(LISP) $(TAGS_FILES)'; \
 	unique=`for i in $$list; do \
 	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
 	  done | \
@@ -418,7 +452,7 @@ distclean-tags:
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkdir_p) $(distdir)/. $(distdir)/examples $(distdir)/lapack $(distdir)/modules
+	$(mkdir_p) $(distdir)/. $(distdir)/examples $(distdir)/lapack $(distdir)/libf2c $(distdir)/modules
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \
@@ -559,7 +593,7 @@ distcleancheck: distclean
 	       exit 1; } >&2
 check-am: all-am
 check: check-recursive
-all-am: Makefile $(SCRIPTS)
+all-am: Makefile $(SCRIPTS) config.h
 installdirs: installdirs-recursive
 installdirs-am:
 	for dir in "$(DESTDIR)$(bindir)"; do \
@@ -597,8 +631,8 @@ clean-am: clean-generic clean-libtool mostlyclean-am
 distclean: distclean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -f Makefile
-distclean-am: clean-am distclean-generic distclean-libtool \
-	distclean-tags
+distclean-am: clean-am distclean-generic distclean-hdr \
+	distclean-libtool distclean-tags
 
 dvi: dvi-recursive
 
@@ -646,11 +680,11 @@ uninstall-info: uninstall-info-recursive
 	check-am clean clean-generic clean-libtool clean-recursive \
 	ctags ctags-recursive dist dist-all dist-bzip2 dist-gzip \
 	dist-shar dist-tarZ dist-zip distcheck distclean \
-	distclean-generic distclean-libtool distclean-recursive \
-	distclean-tags distcleancheck distdir distuninstallcheck dvi \
-	dvi-am html html-am info info-am install install-am \
-	install-data install-data-am install-exec install-exec-am \
-	install-info install-info-am install-man \
+	distclean-generic distclean-hdr distclean-libtool \
+	distclean-recursive distclean-tags distcleancheck distdir \
+	distuninstallcheck dvi dvi-am html html-am info info-am \
+	install install-am install-data install-data-am install-exec \
+	install-exec-am install-info install-info-am install-man \
 	install-nodist_binSCRIPTS install-strip installcheck \
 	installcheck-am installdirs installdirs-am maintainer-clean \
 	maintainer-clean-generic maintainer-clean-recursive \
@@ -672,11 +706,18 @@ globes-module: globes-module.src
 @MAKE_RPMS_TRUE@	cp $(RPM_TARBALL) $(RPM_SOURCE_DIR)/
 @MAKE_RPMS_TRUE@	$(RPM_PROG) $(RPM_ARGS) --clean @PACKAGE@.spec
 @MAKE_RPMS_TRUE@	$(RPM_PROG) --rmsource @PACKAGE@.spec
-@MAKE_RPMS_TRUE@	@echo =================================
-@MAKE_RPMS_TRUE@	@echo Congratulations, $(RPM_TARGET) "(and friends)" should now exist.
-@MAKE_RPMS_TRUE@	@echo =================================
+@MAKE_RPMS_TRUE@	cp $(RPM_SRPM_NAME) ./
+@MAKE_RPMS_TRUE@	cp $(RPM_TARGET) ./
+@MAKE_RPMS_TRUE@	rm -f $(RPM_SRPM_NAME)
+@MAKE_RPMS_TRUE@	rm -f $(RPM_SOURCE_DIR)/$(RPM_TARBALL)
+@MAKE_RPMS_TRUE@	rm -rf $(RPM_BUILD_DIR)/$(RPM_VERSION)
+@MAKE_RPMS_TRUE@	rm -f $(RPM_TARGET)
+@MAKE_RPMS_TRUE@	@(echo "$(distdir) rpms ready for distribution: "; \
+@MAKE_RPMS_TRUE@          list='$(RPM_CLEAN_NAMES)'; for i in $$list; do echo $$i; done) | \
+@MAKE_RPMS_TRUE@          sed -e '1{h;s/./=/g;p;x;}' -e '$${p;x;}'
 
 @MAKE_RPMS_TRUE@rpm-clean:
+@MAKE_RPMS_TRUE@	rm -f $(RPM_SRPM_NAME)
 @MAKE_RPMS_TRUE@	rm -f $(RPM_SOURCE_DIR)/$(RPM_TARBALL)
 @MAKE_RPMS_TRUE@	rm -rf $(RPM_BUILD_DIR)/$(RPM_VERSION)
 @MAKE_RPMS_TRUE@	rm -f $(RPM_TARGET)

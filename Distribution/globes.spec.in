@@ -39,11 +39,7 @@ and analysis of neutrino oscillation experiments.
 
 %build
 CFLAGS="$RPM_OPT_FLAGS"
-./configure --prefix=%{_prefix} \
-    --bindir=%{_bindir} --mandir=%{_mandir} \
-    --localstatedir=%{_localstatedir} --libdir=%{_libdir} \
-    --datadir=%{_datadir} --includedir=%{_includedir} \
-    --sysconfdir=%{_sysconfdir}
+./configure --prefix=%{prefix}
 make
 
 

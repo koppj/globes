@@ -36,6 +36,11 @@
 
 #include <globes/globes.h>
 
+#if HAVE_CONFIG_H
+#  include "config.h"
+#endif
+
+
 #ifdef TEST
 #include "glb_modules.h"
 #endif /* TEST */

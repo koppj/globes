@@ -113,4 +113,17 @@ documented!
 	which linker flags are needed to link with GLoBES or which version
 	of GLoBES currently is installed.
 	
-	
+20/09/04 Now libf2c, BLAS and LAPACK are embedded and can be used in a
+	convenience mode, i.e. they are no longer required to be installed
+	on a system in order to compile GLoBES. If they are installed, the
+	installed versions will be used otherwise the embedded versions are
+	used. One can specifiy the options `--enable-lapack-convenience'
+	and/or 	 `--enable-libf2c-convenience' to configure in order to
+	avoid using any installed versions. This is useful when compiling
+	things for a target installation which is lacking those libraries.
+
+	Improved configury. Now only one configure exists in the top level
+	directory. Especially the lengthy configure step in the libltdl 
+	subdirectory has been removed, the neccessary checks have been moved 
+	to the top level configure. We now use autoheader, which greatly 
+	improves the output of make. The new configury is much faster.

@@ -26,6 +26,11 @@
 #include <stdio.h>
 #include <ctype.h>
 
+#if HAVE_CONFIG_H
+#  include "config.h"
+#endif
+
+
 #include "glb_error.h"
 
 const char *glb_release_version = VERSION;

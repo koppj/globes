@@ -8,8 +8,6 @@ Besides the usual things like a working libc you need to have
  
 	gcc	The GNU compiler collection
  			gcc.gnu.org
-	f2c	Fortran to C
-			www.netlib.org/f2c/
 	GSL 	The GNU Scientific Library
 			www.gnu.org/software/gsl/
 
@@ -19,14 +17,13 @@ parse its command line options.
 
 All those libraries are also available as rpm's from the various
 distributors of GNU/Linux, see their web sites for downloads. Chances are 
-that gcc, f2c and GSL are already part of your installation. f2c is on some
-systems called g2c, the configury of GLoBES will notice this and should take 
-care of this problem. For building GLoBES from source, however, not only 
-working libaries for above packages are needed but also the headers, 
-especially for GSL. Depending on your installation, eg. on RedHat/Fedora, of 
-GSL this may require to additionally install a rpm-package named `gsl-devel'. 
-If GSL has been installed from the tar-ball as provided by gnu.org no problems
-should occur. Furthmore you need a working `make' to build and install GLoBES.
+that gcc and GSL are already part of your installation.  For building GLoBES 
+from source, however, not only working libaries for above packages are 
+needed but also the headers,  especially for GSL. Depending on your
+installation, eg. on RedHat/Fedora, of GSL this may require to additionally 
+install a rpm-package named `gsl-devel'. If GSL has been installed from the 
+tar-ball as provided by gnu.org no problems should occur. Furthmore you need 
+a working `make' to build and install GLoBES.
 
 
 Installation Instructions
@@ -183,7 +180,13 @@ been translated to C with `f2c'. In case your system has a working installation
 of BLAS/LAPACK GLoBES will use it. However, if your system is lacking BLAS/
 LAPACK the convenience version will be compiled and linked into GLoBES. If
 for some reason BLAS/LAPACK is installed on the system and one still wishes
-to use the convience version use `--enable-lapack-convenience'.
+to use the convience version use `--enable-lapack-convenience'. Using Fortran
+code which has been translated to C with `f2c' requires a run-time library
+called `libf2c' (on some systems it is called `libg2c'). The configury of 
+GLoBES detects the presence of either of the two takes care of this problem.
+If none of the two is present, a convience library is used. If
+for some reason `libf2c' is installed on the system and one still wishes
+to use the convience version use `--enable-libf2c-convenience'.
 
 Compilers and Options
 =====================

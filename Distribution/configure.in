@@ -34,7 +34,7 @@ AC_CONFIG_SRCDIR([source/glb_wrapper.c])
 
 dnl Tellin autoconf we are going to use automake
 AM_INIT_AUTOMAKE
-
+AC_CONFIG_HEADERS([config.h:config-h.in])
 dnl To avoid problems due to clock skew and/or lacking autotools on
 dnl user system
 AM_MAINTAINER_MODE
@@ -48,7 +48,7 @@ GLBLIBVERSION="5:0:2"
 
 dnl From here no editing !
 AC_SUBST(GLBLIBVERSION)
-AC_DEFINE_UNQUOTED(GLB_LIBVERSION,"$GLBLIBVERSION")
+AC_DEFINE_UNQUOTED(GLB_LIBVERSION,"$GLBLIBVERSION",[The version of libglb in libtool format c:r:a])
 
 dnl This part serves to convert Makefile.in in examples to a
 dnl Makefile which works automagically 
@@ -110,16 +110,35 @@ dnl Trying to get support for libtdl
 dnl the following lines are taken from the libtool manual
 dnl Enable building of the convenience library
 dnl and set LIBLTDL accordingly
-AC_LIBLTDL_CONVENIENCE
-dnl Substitute LTDLINCL and LIBLTDL in the Makefiles
-AC_SUBST(LTDLINCL)
-AC_SUBST(LIBLTDL)
+AC_LIBLTDL_CONVENIENCE(libltdl)
+
+if test -z "$enable_ltdl_install$enable_ltdl_convenience"; then
+  if test -f ${srcdir}/ltmain.sh; then
+    # if libltdl is libtoolized, it is assumed to be stand-alone and
+    # installed unless the command line overrides it (tested above)
+    enable_ltdl_install=yes
+  else
+    AC_MSG_WARN([*** The top-level configure must select either])
+    AC_MSG_WARN([*** [A""C_LIBLTDL_INSTALLABLE] or [A""C_LIBLTDL_CONVENIENCE].])
+    AC_MSG_ERROR([*** Maybe you want to --enable-ltdl-install?])
+  fi
+fi
+
 dnl Check for dlopen support
 AC_LIBTOOL_DLOPEN
+AC_LIBTOOL_WIN32_DLL
 dnl Configure libtool
 AC_PROG_LIBTOOL
 dnl Configure libltdl
-AC_CONFIG_SUBDIRS(libltdl)
+dnl AC_CONFIG_SUBDIRS(libltdl)
+AC_C_INLINE
+AC_LIB_LTDL([libltdl])
+dnl AC_PROG_LIBTOOL
+AC_SUBST([LIBTOOL_DEPS])
+dnl Substitute LTDLINCL and LIBLTDL in the Makefiles
+AC_SUBST(LTDLINCL)
+AC_SUBST(LIBLTDL)
+
 
 dnl Checks for libraries.
 AC_CHECK_LIB(m,main,[],AC_MSG_ERROR([libm not found]))
@@ -155,7 +174,7 @@ AC_CONFIG_FILES([Makefile libf2c/Makefile lapack/Makefile\
  globes/Makefile source/Makefile\
  examples/Makefile\
  data/Makefile modules/MakefileExample modules/Makefile globes-config.src\
- globes-module.src])
+ globes-module.src libltdl/Makefile])
 
 AC_OUTPUT
 

@@ -72,6 +72,7 @@ fi
 ])
 ])
 
+dnl FIXME caching would be really nice !
 dnl This macro serves to make it possible to use a convenience version
 dnl of the BLAS and LAPACK functions GLoBES needs (zgeev_). By
 dnl default it looks for an installed BLAS/LAPACK and if found they
@@ -142,10 +143,10 @@ fi
 dnl This control wether the stuff in `libf2c' is built
 AM_CONDITIONAL(WANT_LIBF2C,test x$f2c_convenience = xyes)
 dnl These defines are needed for proper compilation of the convenienece library
-AC_DEFINE(USE_STRLEN)
-AC_DEFINE(NON_ANSI_RW_MODES)
-AC_DEFINE(UIOLEN_int)
-AC_DEFINE(NON_UNIX_STDIO)
+AC_DEFINE(USE_STRLEN,[],[Needed by convenience libf2c])
+AC_DEFINE(NON_ANSI_RW_MODES,[],[Needed by convenience libf2c])
+AC_DEFINE(UIOLEN_int,[],[Needed by convenience libf2c])
+AC_DEFINE(NON_UNIX_STDIO,[],[Needed by convenience libf2c])
 dnl This contains the correct linker flag for using the convience library
 AC_SUBST(F2CCONVENIENCE)
 AC_SUBST(F2CINC)
@@ -231,19 +232,40 @@ echo "*** --with-rpm-prog=rpm"
       	rpmfilename_list="$rpmfilename_list $rpmdir/`rpm --eval %{_rpmfilename} | sed "s/%{ARCH}/${arch}/g" | sed "s/%{NAME}/$PACKAGE/g" | sed "s/%{VERSION}/${VERSION}/g" | sed "s/%{RELEASE}/${RPM_RELEASE}/g"`"
 	done
       AC_MSG_RESULT([$rpmfilename_list])
+
+dnl the filenames which are rpmbuilt without path
+	rpmcleanfilename_list=""
+	for arch in `echo $rpm_targets`
+	do
+      	rpmcleanfilename_list="$rpmcleanfilename_list `rpm --eval %{_rpmfilename} | sed "s/%{ARCH}\///" | sed "s/%{ARCH}/${arch}/g" | sed "s/%{NAME}/$PACKAGE/g" | sed "s/%{VERSION}/${VERSION}/g" | sed "s/%{RELEASE}/${RPM_RELEASE}/g"`"
+	done
+dnl not forgettint the srpm
+	rpmcleanfilename_list="$rpmcleanfilename_list `rpm --eval %{_rpmfilename} | sed "s/%{ARCH}\///" | sed "s/%{ARCH}/src/g" | sed "s/%{NAME}/$PACKAGE/g" | sed "s/%{VERSION}/${VERSION}/g" | sed "s/%{RELEASE}/${RPM_RELEASE}/g"`"
+	RPM_CLEAN_NAMES=$rpmcleanfilename_list
+
 AC_MSG_CHECKING(handling different build archs)	
 
 dnl checking the rpm source directory where the tar-ball will end up...
-     	AC_MSG_CHECKING(how rpm sets %{_sourcedir})
+     	AC_MSG_CHECKING([how rpm sets %{_sourcedir}])
 	rpmsourcedir=`rpm --eval %{_sourcedir}`
 	AC_MSG_RESULT([$rpmsourcedir])	
 
 	RPM_SOURCE_DIR=${rpmsourcedir}
-	dnl checking the rpm buil directory where the tar-ball will end up...
-     	AC_MSG_CHECKING(how rpm sets %{_builddir})
+dnl checking where the source rpm will end up
+	AC_MSG_CHECKING([how rpm sets %{_srcrpmdir}])
+	rpmsrcdir=`rpm --eval %{_srcrpmdir}`
+	AC_MSG_RESULT([$rpmsrcdir])	
+	RPM_SRC_DIR=${rpmsrcdir}
+
+dnl figuring out the name of the source rpm
+	AC_MSG_CHECKING([how rpm names the source rpm])
+	srpmfilename="$rpmsrcdir/`rpm --eval %{_rpmfilename} | sed "s/%{ARCH}\///" | sed "s/%{ARCH}/src/g" | sed "s/%{NAME}/$PACKAGE/g" | sed "s/%{VERSION}/${VERSION}/g" | sed "s/%{RELEASE}/${RPM_RELEASE}/g"`"
+	RPM_SRPM_NAME=$srpmfilename
+        AC_MSG_RESULT([$srpmfilename])	
+dnl checking the rpm build directory where the tar-ball will be build...
+     	AC_MSG_CHECKING([how rpm sets %{_builddir}])
 	rpmbuilddir=`rpm --eval %{_builddir}`
 	AC_MSG_RESULT([$rpmbuilddir])	
-
 	RPM_BUILD_DIR=${rpmbuilddir}
       RPM_DIR=${rpmdir}
       RPM_TARGET=$rpmfilename_list
@@ -259,7 +281,10 @@ dnl checking the rpm source directory where the tar-ball will end up...
     *) AC_MSG_WARN([bad value ${no_rpm} for no_rpm (not making rpms)])
        make_rpms=false;;
   esac
-
+dnl RPM_ARGS="$RPM_ARGS --target $rpm_targets"
+AC_SUBST(RPM_CLEAN_NAMES)
+AC_SUBST(RPM_SRC_DIR)
+AC_SUBST(RPM_SRPM_NAME)
 AC_SUBST(RPM_SOURCE_DIR)
 AC_SUBST(RPM_BUILD_DIR)	
   AC_SUBST(RPM_DIR)

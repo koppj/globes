@@ -69,9 +69,9 @@ cp -p ${members} ../../Web/pages/download/glb/
 cp -p ${name}.tar.gz ../../Web/pages/download/glb/
 
 echo "...done!"
-echo "********************************************************"
-echo "Don't forget to commit your changes in the Web directory"
-echo "********************************************************"
+echo "*********************************************************"
+echo "Don't forget to commit your changes in the Web directory!"
+echo "*********************************************************"
 exit
 
 else
