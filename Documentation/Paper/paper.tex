@@ -139,7 +139,6 @@
 \vspace*{-3.cm}
 \begin{flushright}
 TUM-HEP-5XX/04\\
-MPP-2004-YY\\
 %hep-ph/
 \end{flushright}
 
@@ -185,16 +184,18 @@ experiments with GLoBES}
 
 \begin{abstract}
 We present the \GLOBES\ (``General Long Baseline Experiment Simulator'')
-software package, which allows the simulation of future long-baseline
+software package, which allows the simulation of long-baseline and reactor
 neutrino oscillation experiments. One part of the software is the
 abstract experiment definition language to define experiments with
-beam and full detector simulations as accurate as possible. For the
-definition of experiments, a new transparent building block concept is introduced. In addition, a binary provides the possibility to test
-new experiment definitions quickly.
+beam and full detector descriptions as accurate as possible. For the
+definition of experiments, a new transparent building block concept is 
+introduced. In addition, an additional program provides the possibility 
+to develop and test new experiment definitions quickly.
 %
 Another
-part of \GLOBES\ is the user's interface, which provides probability, rate, and $\Delta \chi^2$ information for a given experiment or any
-combination of up to 32 experiments. Especially, the
+part of \GLOBES\ is the user's interface, which provides probability, rate, 
+and $\Delta \chi^2$ information for a given experiment or any
+combination of up to 32 experiments in C. Especially, the
 $\Delta \chi^2$ functions allow a simulation with statistics only,
 systematics, correlations, and degeneracies. In particular, \GLOBES\
 can handle the full multi-parameter correlation among the oscillation
@@ -223,43 +224,55 @@ information.
 \section{Introduction}
 
 Neutrino oscillations are now established as the leading flavor
-transition mechanism for neutrinos. By the existing experiments, 
+transition mechanism for neutrinos. In a long history of many experiments, see
+\eg~\cite{Barger:2003qi}, 
 two oscillation
-frequencies have been found: The fast ``atmospheric'' and the
+frequencies have been identified: The fast ``atmospheric'' and the
 slow ``solar'' oscillations, which are driven by the respective
 mass squared differences.  In addition, there could be interference
-effects between these two oscillations, provided that the coupling given by the small mixing angle $\theta_{13}$ is large enough. Such interference
+effects between these two oscillations, provided that the coupling given by 
+the small mixing angle $\theta_{13}$ is large enough. Such interference
 effects include, for example, leptonic CP violation.  In order to
-test the unknown oscillation parameters, \ie, the mixing angle $\theta_{13}$, the leptonic CP phase, and the
-neutrino mass hierarchy, future long-baseline experiments are proposed.
+test the unknown oscillation parameters, \ie, the mixing angle $\theta_{13}$,
+ the leptonic CP phase, and the
+neutrino mass hierarchy, new long-baseline and reactor experiments 
+are proposed.
 These experiments send an artificial neutrino beam to a detector, or
 detect the neutrinos produced by a nuclear fission reactor. However,
-instrinsic degenerate solutions in the neutrino oscillation
-probabilities affect these measurements and require optimization
-strategies for the experiments to maximally exploit complementary
-information. Therefore, a modern complete experiment simulation
-does not only need to have a beam and detector simulations, which are
-as accurate as possible, but also powerful tools to analyze correlations
-and degeneracies. In this study, we present the \GLOBES\ software package
+the presence of multiple solutions which are intrinsic to
+ neutrino oscillation probabilities~\cite{Fogli:1996pv,
+Burguet-Castell:2001ez,Minakata:2001qm,Barger:2001yr} 
+affect these measurements.
+Thus optimization strategies are required which maximally exploit 
+complementarity between experiments. Therefore, a modern complete experiment 
+simulation  and analysis tool does not only need to have 
+a highly accurate beam and detector simulation but also powerful 
+means to analyze correlations and degeneracies, especially for the combination
+of several experiments.
+In this paper, we present the \GLOBES\ software package
 as such a tool.
 
 \GLOBES\ (``General Long Baseline Experiment Simulator'') is a flexible
-software tool to simulate neutrino oscillation long-baseline experiments using a complete three-flavor analysis. On the
+software tool to simulate and analyze neutrino oscillation 
+long-baseline and reactor experiments using a 
+complete three-flavor description. On the
 one hand, it contains a comprehensive abstract experiment definition
-language, which allows to describe most classes of long baseline experiments
+language (AEDL), which allows to describe 
+most classes of long baseline and reactor experiments
 at an abstract level. On the other hand, it provides a C-library to 
 process the experiment information in order to obtain oscillation
-probabilities, rate vectors, and $\Delta \chi^2$-values (\cf, \figu{GLOBES}). In addition, it provides a binary to test experiment
+probabilities, rate vectors, and $\Delta \chi^2$-values (\cf, \figu{GLOBES}). 
+In addition, it provides a binary program to test experiment
 definitions very quickly, before they are used by the application software.
-Currently, \GLOBES\ is available for Linux. Since the source code is included, the modifications to other operating systems should be doable.
+Currently, \GLOBES\ is available for GNU/Linux. Since the source code is 
+included, the modifications to other operating systems should be doable.
 
-\GLOBES\ allows to simulate experiments with stationary neutrino point sources, where each experiment is assumed to have only one neutrino source.
+\GLOBES\ allows to simulate experiments with stationary neutrino point 
+sources, where each experiment is assumed to have only one neutrino source.
 Such experiments are neutrino beam experiments and reactor experiments. 
 Geometrical effects of a source distribution, such as in the sun or the 
 atmosphere, can not be described. In addition, sources with a physically 
-significant time dependencies  can not be studied, such as  supernov\ae. It 
-is, however, possible to simulate beams with bunch structure, since the 
-time dependence of the neutrino source is physically only important to suppress backgrounds. 
+significant time dependencies  can not be studied, such as  supernov\ae. 
 
 \begin{figure}[t]
 \begin{center}
@@ -269,15 +282,16 @@ time dependence of the neutrino source is physically only important to suppress 
 \end{figure}
 
 On the experiment definition side, either built-in neutrino fluxes
-(\eg, neutrino factory) or arbitrary fluxes can be used. Similarly,
-arbitrary cross sections, energy dependent efficiencies, the
-energy resolution function, the considered oscillation channels, 
-backgrounds, and many other features can be specified. 
+(\eg, neutrino factory) or arbitrary, user defined fluxes can be used. 
+Similarly,
+arbitrary cross sections, energy dependent efficiencies,
+energy resolution functions as well as the considered oscillation channels 
+backgrounds, and many other properties can be specified. 
 For the systematics, energy
 normalization and calibration errors can be simulated. Note that
-the energy ranges and windows, as well as the bin widths can be
-(almost) arbitrarily chosen, which means that variable bin
-widths are allowed. Together with \GLOBES\ comes a number of
+energy ranges and windows and bin widths can be
+(almost) arbitrarily chosen, including bins of different
+widths. Together with \GLOBES\ comes a number of
 pre-defined experiments in order to demonstrate the capabilities
 of \GLOBES\ and to provide prototypes for new experiments.
 Examples for these prototypes are the \MINOS , \ICARUS , and
@@ -300,15 +314,17 @@ advanced features of \GLOBES , it provides the technology to
 project the $\Delta \chi^2$, which is a function of all oscillation
 parameters, onto any subspace of parameters by local minimization. 
 This approach allows the inclusion of multi-parameter-correlations,
-where external input (\eg, from solar parameters) can be imposed, too.
-Applications of the projection mechanism include the projections onto the $\stheta$-axis and the $\stheta$-$\deltacp$-plane. In addition, all oscillation parameters can be kept free to precisely localize 
+where external constraints (\eg, on the solar parameters) can be imposed, too.
+Applications of the projection mechanism include the projections onto 
+the $\stheta$-axis and the $\stheta$-$\deltacp$-plane. In addition, 
+all oscillation parameters can be kept free to precisely localize 
 degenerate solutions.
 
 \section{The computation of raw event rates}
 
 In this section, we sketch the computation of 
 the event rates, which is on of the core parts of the \GLOBES\
-software. However, because of the compecity of this issue,
+software. However, because of the complexity of this issue,
 we refer to the \GLOBES\ manual~\cite{Manual} for
 details.  
 
@@ -369,9 +385,12 @@ $R_\beta^{\text{IT}}(E,E') dE'$. The function $R(E,E')$ is also often called ``e
 in the software is a smearing matrix. The function $\epsilon_\beta^{\text{IT}}(E')$ will be refered to as ``post-smearing efficiencies'', since it will allow us to define cuts and threshold functions {\em after} the smearing is performed, \ie, as function of $E'$. 
 In addition, \GLOBES\ uses ``pre-smearing efficiencies'', which are 
 evaluated {\em before} the smearing is performed, \ie, as function of $E$.
-Similarly, constant event rates can be added to the event rates before or after the energy smearing, which are refered to as ``pre-smearing backgrounds'' and ``post-smearing beackground''. These types of 
-efficiencies an backgrounds allow a very accurate modeling of
-many factors, such as geoneutrino backgrounds, energy cuts, or
+Similarly, constant\footnote{with respect to the oscillation parameters, 
+not the energy} event rates can be added to the event rates before or 
+after the energy smearing, which are refered to as 
+``pre-smearing backgrounds'' and ``post-smearing background''. These types of 
+efficiencies and backgrounds allow a very accurate modeling of
+many factors, such as atmospheric or geoneutrino backgrounds, energy cuts, or
 energy threshold functions.
 
 Eventually, we can write down the number of events per bin $i$ \index{Bin} and channel $c$ as
@@ -401,8 +420,8 @@ smearing matrix $R^c(E,E') = R^c_{ij} $ can be given manually. In addition, it i
 to define a low-pass filter to avoid aliasing effects for neutrino
 oscillations faster that the sampling width.
 
-\section{Definition of experiments with \AEDL\ (Abstract Experiment 
-Defintion Language)}
+\section{Definition of experiments with \AEDL\\ (Abstract Experiment 
+Definition Language)}
 
 \begin{figure}[t]
 \begin{center}
@@ -418,11 +437,21 @@ Channels, rules, and experiments.}
 
 In order to define experiments, \GLOBES\ uses \AEDL\ (``Abstract
 Experiment Definition Language''). An experiment normally corresponds
-to an \AEDL\ file, which is a text file written in \AEDL\ syntax.
+to an \AEDL\ file, which is a human readable text file written 
+in \AEDL\ syntax.
+
+The key concept of \AEDL\ is to regard a detector as an abstract system
+which maps the true properties of a neutrino into the reconstructed properties
+of the neutrino which subsequently are used in the fit of the oscillation
+parameters. Within \GLOBES\ only the energy and flavour are used as 
+observables, which is
+sufficient for long baseline and reactor experiments. In  other
+experiments, like \eg\ atmospheric experiments, more observables like
+direction may have to be considered.
 
 The main parts of any \AEDL\ experiment definition are channels,
-rules, and experiments (\cf, \figu{aedl}). A channel corresponds to a neutrino oscillation channel including flux, cross section (for one specific interaction type), energy resolution function, initial and final neutrino flavors, their polarity (neutrinos or antineutrinos), and efficiencies. The channel raw event rates are computated according to \equ{events_bin}. Each channel leads to the raw event rates for a 
-specfifc interaction type. In \AEDL , many of the channel components
+rules, and experiments (\cf, \figu{aedl}). A channel corresponds to a neutrino oscillation channel including flux, cross section (for one specific interaction type), energy resolution function, initial and final neutrino flavors, their polarity (neutrinos or antineutrinos), and efficiencies. The channel raw event rates are computed according to \equ{events_bin}. Each channel leads to the raw event rates for a 
+specific interaction type. In \AEDL , many of the channel components
 have to be defined or loaded from files before, such as fluxes, 
 cross sections, or the energy resolution function. For the
 different options, see the \GLOBES\ manual~\cite{Manual}.
@@ -433,9 +462,11 @@ background is arbitrary, but all of the signal and background components
 are defined to have a common systematics. The event rates of all 
 signal and background components add up to the total event rate of the
 rule, which leads to a $(\Delta \chi^2)_r$. The signal or background
-within each rule allows the specification of signal and background normalization errors and energy tilt or calibration errors. 
-These systematical errors will be evaluated with the ``pull method''
-with the help of nuisance parameters REFERENCE. In addition to these
+within each rule allows the specification of signal and background 
+normalization errors and energy tilt or calibration errors. 
+These systematical errors are evaluated with the ``pull method'' like 
+in~\cite{Huber:2002mx,Fogli:2002pt}.  
+In addition to these
 systematics errors, an overall evaluation strategy is assigned 
 to each rule, which specifies the type of systematics (tilt or calibration
 error), and the use of spectral information or total event rates.   
@@ -443,21 +474,22 @@ error), and the use of spectral information or total event rates.
 Finally, one ore more rules add up to an experiment, where the
 total $\Delta \chi^2$ is obtained as the sum of the $\Delta \chi^2$
 of all rules. This approach allows the definition of 
-appearance and disappearance channels, neutrino and antineutrino running, or interaction types with different systematics (spectral information
+appearance and disappearance channels, neutrino and antineutrino running, 
+or interaction types with different systematics (spectral information
 versus counting rate) within one experiment. The \GLOBES\ user interface
 allows the simulation of one or more experiment simultaneously, which
 means that one could also use different experiments for different
 oscillation channels. However, there is still one component missing
 in the experiment definition, which is the matter density profile.
-For an experiment, an arbitrary matter density profiles can be specified, which is evaluated with the evolution operator method REFERENCES.
-In addition, the matter density profile is multiplied by the matter
-density scaling factor, which is treated as an independent parameter
+For an experiment, an arbitrary matter density profiles can be specified, 
+which is evaluated with the evolution operator method REFERENCES.
+In addition, the matter density profile is multiplied by a scaling factor, 
+which is treated as an independent parameter
 with a relative (matter density) uncertainty. With this
-approach, one can take into account that the matter density profile along a specific baseline is only known to about $3\%-5\%$. Therefore, it makes
-sense to combine the rules of one baseline in one experiment,
-since for all of these rules the matter density profile is equal.
+approach, one can take into account that the matter density profile along a 
+specific baseline is only known to about $3\%-5\%$. 
 
-\section{Simulation of experiments: The C user's interface}
+\section{Analysis of experiments: The C user's interface}
 
 \begin{figure}[t]
 \begin{center}
@@ -466,7 +498,7 @@ since for all of these rules the matter density profile is equal.
 \mycaption{\label{fig:projex} Left plot: Example for a  correlation between $\stheta$ and $\deltacp$ (for 1 d.o.f. only). Right plot: The $\chi^2$-value of the projection onto the $\stheta$-axis as function of $\stheta$. The projection onto the  $\stheta$-axis is obtained by finding the minimum $\chi^2$-value for each fixed value of $\stheta$ in the left-hand plot, \ie, along the gray vertical lines. The thick gray curve marks the position of these minima in the left-hand plot. The arrows mark the obtained fit ranges for $\stheta$ at the $3 \sigma$ confidence level (1 d.o.f.), \ie , the precision of $\stheta$.}
 \end{figure}
 
-In order to use \GLOBES , a C~library is linked with the application
+In order to use \GLOBES , a C-library is linked with the application
 software. This library provides the user's interface functions.
 It allows to load \AEDL\ files, initialize the experiments, and
 have access to various $\Delta \chi^2$-functions including any combination
@@ -484,23 +516,24 @@ needs to be projected onto the $\stheta$-axis. One can easily imagine
 that the computation of the full multi-parameter correlation is
 very expensive with a grid-based method. However, the topology
 of the neutrino oscillation parameter space is well investigated and
-rather fortunate. Therefore, we use local minimization for each
-solution in the parameter space at the chosen confidence level,
-where tools for the location of (disconnected) degenerate solutions 
-are provided. For this process, the $6+N$-dimensional local minimizer
-is started at the ``guessed'' solution (such as from analytical 
-knowledge) and runs into the local minimum. In \figu{projex},
+rather smooth. Therefore, it is feasible to use local minimization for each
+solution in the parameter space.  For this process, 
+a $6+N$-dimensional local minimizer
+is started at the ``guessed'' position for the solution
+(such as from analytical knowledge) and then runs into a
+local minimum. This exercise has to be repeated till all local 
+minima, \ie\ degenerate solutions, are found. In \figu{projex},
 this minimization is illustrated at the simple example of a 
 two-parameter correlation at a neutrino factory.
 
 As we have discussed in the last section, the matter density of
-each experiment is treated as an addition parameter, which is known
+each experiment is treated as an additional parameter, which is known
 from external measurement with a certain precision. In principle, 
 the \GLOBES\ user's interface allows such externally imposed
 precisions for all oscillation parameters. This feature turns out
 to be especially useful for input from the solar neutrino experiments,
 since they provide better precisions for the solar neutrino
-osillation parameters $\sdm$ and $\theta_{13}$ than the long-baseline
+oscillation parameters $\sdm$ and $\theta_{12}$ than long-baseline
  experiments themselves.
 
 \section{Complexity and computational issues}
@@ -535,7 +568,7 @@ where $n$ is the number of steps to be evaluated for each oscillation
 parameter, and $N_{\mathrm{exp}}$ is the number of experiments
 (since the matter densities of all experiments appear as parameters). 
 Though it is, in principle, possible to use such a method with \GLOBES ,
-it is impractiable in most cases, since it would involve at least 
+it is impracticable in most cases, since it would involve at least 
 billions of
 steps for the complete multi-parameter correlation. The local $6+N_{\mathrm{exp}}$-dimensional minimization reduces this effort
 to 
@@ -544,7 +577,7 @@ to
 N_{\mathrm{Deg}} \,  \times \, \mathrm{t_{sys}}
 \end{equation}
 steps, where $N_{\mathrm{Deg}}$ is the number of (disconnected) 
-local minima at the chosen confidence level, \ie, the number of
+local minima, \ie, the number of
 degeneracies.
 
 Eventually, \GLOBES\ needs about $10$ to $15$ seconds to compute
@@ -555,26 +588,36 @@ $\deltacp$ can be obtained in several hours.
 
 \section{Use of package}
 
-The \GLOBES\ package~\cite{Globes} is a tar-Ball which consists of the
-C-library for the user's interface, a binary to test
-\AEDL\ files, example files, 
-experiment prototypes with supporting flux and cross 
-section files, and other 
+The \GLOBES\ package~\cite{Globes} is a tar-ball which consists of the
+source code for the C-library providing the user's interface, the source code
+ for a program to test
+\AEDL\ files, example C-files illustrating the use of the library, 
+experiment prototypes in \AEDL\ with supporting flux and cross 
+section files, and the usual 
 supporting files for installation and compilation.
-Currently, the C-library is only provided for Linux.
-In addition, the user's interface and \AEDL\ manual~\cite{Manual} 
-can be obtained separately. Upon extracting the tar-ball,
-the \GLOBES\ user's interface library needs to be configured, 
-compiled, and installed as 
-described in the {\tt INSTALL} file. In principle, it can be
-compiled as a static library or a dynamically-linked shared library
-(which can be installed with superuser rights or only used in one's
-home directory). Then it can be linked against any C program
-containing the application software, such as the examples
-from the manual. \AEDL\ files, such as the experiment protoypes,
+Currently, \GLOBES\ is only provided for GNU/Linux.
+In addition, an extensive manual covering the user's interface and 
+\AEDL~\cite{Manual} 
+can be obtained from the web-site. \GLOBES\ is free software and as such 
+licensed under the GNU Public License.
+
+The installation of \GLOBES\ is highly automated by the use of the
+Autotools family and follows the usual procedures. By default
+a shared library {\tt libglobes.so} is installed but 
+a static version is available
+also. Additionally an executable with name {\tt globes} is installed. 
+Provisions have been made to install \GLOBES\ without
+root privilege into a user's home directory. During the automatic
+configuration process also an example Makefile is produced which can
+serve as a template for compiling and linking own applications against
+{\tt libglobes.so}. This Makefile can be used to directly compile and
+link the examples
+from the manual. 
+
+\AEDL\ files, such as the experiment prototypes,
 can be edited with any text editor, in order to be loaded by the
-users's interface later. In addition, a binary is provided to
-test and create experiment descriptions. For example, event rate
+users's interface later. In addition, the {\tt globes} binary allows to
+develop and test experiment descriptions. For example, event rate
 information can be quickly provided to adjust the neutrino flux
 normalization. For further information, we refer
 at this place to the \GLOBES\ manual~\cite{Manual}.
@@ -582,14 +625,16 @@ at this place to the \GLOBES\ manual~\cite{Manual}.
 \section{Summary and conclusions}
 
 In summary, the \GLOBES\ software package provides powerful tools
-to do a full three-flavor analysis of future long-baseline experiments
+to do a full three-flavor analysis of future long-baseline and reactor
+ experiments
 including systematics, correlations, and degeneracies. In addition,
 the abstract experiment definition language allows to define
-experiments at an abstract level as accurate as possible. 
+experiments at an abstract level in a highly accurate fashion. 
 Some of the major strengths of \GLOBES\ are the ability to quickly
 define new experiments, the potential to take into account the
-full multi-parameter correlation, and the possibilities to include
-external input and matter density uncertainties.
+full multi-parameter correlation, the possibilities to include
+external input and matter density uncertainties and last but not least
+the ability to jointly analyze several experiments.
 
 We conclude that the \GLOBES\ software has two major target groups:
 Experimentalists, who want to quickly evaluate the physics potential
@@ -599,16 +644,27 @@ between experiment descriptions as simple text files (together
 with supporting files) and the application software should allow an
 efficient and lively interaction between those two target groups.
 
+For the future it is planed to further extend the flexibility of
+\GLOBES\ by providing support for dynamically loadable modules, to
+allow completely user defined systematics or non-standard oscillation
+probabilities.
+
 \subsection*{Acknowledgments}
 
-We would like to thank Martin Freund and Andrea Romanino ???
-for initiating this project many years ago with one of the first
-neutrino factory simulations. In addition, we would like to thank
-Marc Rolinec for the help to translate the experiment descriptions
+We would like to thank Martin Freund, who wrote the very first
+version of a three-flavour matter profile treatment many years ago.
+PH is especially thankful for the invaluable advice of Thomas Fischbacher on
+many design issues. 
+In addition, we would like to thank
+Mark Rolinec for his help to translate the experiment descriptions
 into \AEDL , and for creating the illustrations in this manuscript.
 Finally, thanks to all the people who have been pushing this project
-for many years, to the ones who have been continuing asking for the publication of the software, and the referees of several of our
+for many years, to the ones who have been continuing asking for the 
+publication of the software, and the referees of several of our
 papers for suggestions which lead to improvements in the software.
+Parts of this works have been supported by the ``Sonderforschungsbereich
+375 f\"ur Astro-Teilchenphysik der Deutschen Forschungsgemeinschaft''.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%             References                         %%%%%%%%%%%%
