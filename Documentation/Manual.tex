@@ -1,0 +1,259 @@
+\documentclass[a4paper,12pt,twoside]{book}
+
+\sloppy
+% \frenchspacing
+\setlength{\unitlength}{1cm}
+
+\usepackage{cite}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{mathrsfs}
+\usepackage{a4wide}
+\usepackage{fancyheadings}
+\usepackage[footnotesize,bf]{caption}
+\usepackage{ae,aecompl} % only for Type 1 fonts
+
+
+\newcommand{\bi}{\begin{itemize}}
+\newcommand{\ei}{\end{itemize}}
+\newcommand{\ra}{$\rightarrow$}
+\newcommand{\be}{\begin{equation}}
+\newcommand{\ee}{\end{equation}}
+\newcommand{\bea}{\begin{eqnarray}}
+\newcommand{\eea}{\end{eqnarray}}
+\newcommand{\nn}{\nonumber}
+\newcommand{\ldm}{$\Delta m_{31}^2$}
+\newcommand{\sdm}{$\Delta m_{21}^2$}
+\newcommand{\deltacp}{$\delta_{\mathrm{CP}}$}
+\newcommand{\stheta}{$\sin^2 2 \theta_{13}$}
+
+\newcommand{\ie}{{\it i.e.}}
+\newcommand{\Ie}{{\it I.e.}}
+\newcommand{\eg}{{\it e.g.}}
+\newcommand{\Eg}{{\it E.g.}}
+\newcommand{\cf}{{\it cf.}}
+\newcommand{\etc}{{\it etc.}}
+\newcommand{\eq}{Eq.}
+\newcommand{\eqs}{Eqs.}
+\newcommand{\Def}{Definition}
+\newcommand{\fig}{Fig.}
+\newcommand{\Fig}{Fig.}
+\newcommand{\figs}{Figs.}
+\newcommand{\Figs}{Figs.}
+\newcommand{\Ref}{Ref.}
+\newcommand{\Refs}{Refs.}
+\newcommand{\Sec}{Sec.}
+\newcommand{\Secs}{Secs.}
+\newcommand{\App}{the Appendix}
+\newcommand{\Apps}{Appendices}
+\newcommand{\Tab}{Table}
+\newcommand{\Tabs}{Tables}
+
+\newcommand{\JHFSK}{{\sc JHF-SK}}
+\newcommand{\NUMI }{{\sc NuMI}}
+\newcommand{\ReactorI}{{\sc Reactor-I}}
+\newcommand{\ReactorII}{{\sc Reactor-II}}
+\newcommand{\JHFHK}{{\sc JHF-HK}}
+\newcommand{\NuFactI}{{\sc NuFact-I}}
+\newcommand{\NuFactII}{{\sc NuFact-II}}
+
+\newcommand{\GLOBES}{{\sf GLoBES}}
+\newcommand{\EDM}{{\sf EDM}}
+
+\newcommand{\equ}[1]{\eq~(\ref{equ:#1})}
+\newcommand{\figu}[1]{\fig~\ref{fig:#1}}
+
+%-- page parameters -------------------------------------------------
+
+\pagestyle{fancyplain}
+
+% Olddefs:
+
+%\addtolength{\textwidth}{-1truecm}
+%\addtolength{\oddsidemargin}{1.0truecm}
+%\addtolength{\evensidemargin}{-0.3truecm}
+
+% Owndefs:
+
+%\addtolength{\textwidth}{0.0truecm}
+%\addtolength{\textheight}{1.8truecm}
+%\addtolength{\topmargin}{-0.6truecm}
+%\addtolength{\oddsidemargin}{0.65truecm}
+%\addtolength{\evensidemargin}{-1.0truecm}
+
+% Headdefs:
+
+\advance \headheight by 3.0truept       % for 12pt mandatory...
+\lhead[\fancyplain{}{\thepage}]{\fancyplain{}{\rightmark}}
+\rhead[\fancyplain{}{\leftmark}]{\fancyplain{\thepage}{\thepage}}
+\cfoot{}
+
+\renewcommand{\chaptermark}[1]{
+% chapter title im Seitenkopf
+\markboth{\uppercase{\chaptername}\ \thechapter.\ \ #1}
+          {\uppercase{\chaptername}\ \thechapter.\ \ #1}}
+% section title im Seitenkopf
+\renewcommand{\sectionmark}[1]{\markright{\thesection\ \ #1}}
+
+
+
+
+\begin{document} 
+
+\pagenumbering{Roman}
+\thispagestyle{empty}
+{
+\setlength{\parindent}{0cm}
+
+%\begin{titlepage}
+
+\font\fa=cmssbx14 scaled 1440
+\font\fb=cmbx10 scaled 1200
+\font\fc=cmb10 scaled 1200
+\font\fd=cmr10 scaled 1000  
+
+{\setlength{\baselineskip}{1.2cm}}
+
+\input{tumlogo}
+
+\begin{minipage}{7cm}
+\begin{center}
+{\bf Technische Universit{\"a}t M{\"u}nchen} \\
+Physik-Department \\
+Institut f{\"u}r Theoretische Physik, T30d \\
+\end{center}
+\end{minipage}
+
+\vspace{-2cm}
+
+\hfill \oTUM{3.5cm}
+
+\vspace{3cm}
+
+\begin{center}
+{ \Large \bf
+\GLOBES\ 1.X \\
+Global Long Baseline Experiment Simulator \\ }
+\vspace*{0.5cm}
+{\large \bf User's and reference manual }
+\end{center}
+
+\vspace{1cm}
+
+\begin{center}
+{\large Patrick Huber, Manfred Lindner, Walter Winter}
+\end{center}
+
+\vspace{1cm}
+
+\begin{center}
+Here comes our logo!
+\end{center}
+
+\vspace{1cm}
+
+\begin{center}
+Version from \today
+\end{center}
+
+%\end{titlepage}
+
+%\title{}
+%\date{}
+%\author{}
+%\maketitle
+
+}
+
+\clearpage
+\thispagestyle{empty}
+
+\cleardoublepage
+\setcounter{page}{1}
+
+\chapter*{What is \GLOBES\ good for?}
+
+Here comes a maximum of one page what \GLOBES\ is good for and what main features it has.
+\cleardoublepage
+\tableofcontents
+
+\cleardoublepage
+\setcounter{page}{1}
+\pagenumbering{arabic}
+
+\chapter*{How to use this manual}
+\addcontentsline{toc}{chapter}{How to use this manual}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% PART I: User's manual
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\part{User's manual}
+
+\chapter*{Getting started}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% PART II: Experiment definition module
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\part{The Experiment Definition Module (\EDM )}
+
+\chapter{Basics: Source, Oscillation, Detection}
+
+Here comes how a experiment is defined (what is a channel, a rule, how are they treated, ...). Splitting in source, oscillation, and detector, etc.
+
+\chapter{Getting started: Editing existing experiments}
+
+Here comes how to load and modify existing experiments;
+also: how does the main screen work and the most important functions at exampled
+
+\chapter{Features of the \EDM }
+
+\section{Source properties}
+
+\section{Oscillation properties}
+
+\section{Detector properties}
+
+\chapter{Creating new experiments}
+
+Most advanced step: How to create a new experiment from scratch.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% PART III: Reference manual
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\part{Reference manual}
+
+
+Here comes a list of all functions and their function in alphabetical order.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Appendix
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{appendix}
+
+\chapter{\GLOBES\ installation}
+
+\chapter{Statistics and \GLOBES }
+
+Here comes a statistics summary (similar to Superbeams appendix):
+\bi
+\item
+ What $\chi^2$ is used
+\item
+ How channels/rules are treated
+\item
+ How does the flux-folding work
+\item
+ ...
+\ei
+
+\end{appendix}
+\end{document}
