@@ -44,16 +44,15 @@ experiment number ($0$ to \GLB{glb\_num\_of\_exps}-1) for a specific experiment.
   are using minimizers which have to be initialized with \GLB{glbSetInputErrors} and \GLB{glbSetStartingValues} first.}
 \end{table}
 
-\chapter{Getting started with \GLOBES }
+\chapter{\GLOBES\ basics}
 \label{chapt:gettingstarted}
 
 In this first chapter of the user's manual, we assume that the \GLOBES\ software is readily installed on your computer system. For the installation,
 see \App~\ref{app:installation} and the {\tt INSTALL} file in the
 software package. We demonstrate how to load pre-defined experiments 
-and re-obtain important information about them. In addition, we discuss
-some standard concepts of the \GLOBES\ user interface. We do not go
+and introduce the basic concepts of \GLOBES . We do not go
 into details of the programming language, which means that standard parts
-of the program code common to all examples are, in general, omitted.
+of the program code common to all of the examples in the following chapters are, in general, omitted.
 An example of a minimal \GLOBES\ program in C can be found on page~\pageref{ex:c}. Furthermore, the files of the examples in this part can be found in the {\tt Example} subdirectory of your \GLOBES\ distribution. \index{Examples} Since it depends on your installed
 configuration, we refer to the {\tt README} file in the \GLOBES\ main directory, and the comments in the Makefile of the {\tt Example} subdirectory for how to complile the example files.
 
@@ -114,8 +113,7 @@ int main(int argc, char *argv[]) \\
 
 }
 
-
-\begin{table}[t]
+\begin{table}[tbp]
 \begin{center}
 \begin{tabular}{llp{7cm}c}
 \hline
@@ -159,7 +157,7 @@ Before one can use \GLOBES , one has to initialize the \GLOBES\
 library \GLB{libglobes}:
 \begin{function}
 \index{Initialization of {\tt libglobes}}
-\index{glbInit} {\tt void glbInit(char *name)} initializes the library {\tt libglobes} and has
+\GLBNS{glbInit} {\tt void glbInit(char *name)} initializes the library {\tt libglobes} and has
 to be called in the beginning of each \GLOBES\ program. It takes the
 name {\tt name} of the program as a string to initialize the error handling
 functions. In many cases, it is sufficient to use the first
@@ -186,7 +184,7 @@ experiment number initiates a combined analysis of all loaded experiments.
 For storing the experiments, \GLOBES\ uses the initially empty list of experiments \GLB{glb\_experiment\_list}. To add a pre-defined experiment to this list, one can use the function {\tt glbInitExperiment}:
 \begin{function}
 \index{Experiment initialization}
-\index{glbInitExperiment}
+\GLBNS{glbInitExperiment}
 {\tt int glbInitExperiment(char *inf, glb\_exp *in, int *counter)}
  adds a single experiment with the filename {\tt inf} to the list of currently loaded experiments. The {\tt counter} is a pointer to the 
  variable containg the number of experiments, and the experiment {\tt in}
@@ -207,15 +205,15 @@ A list of pre-defined experiment prototypes, their filenames, their short descri
 One can also remove all experiments from the evaluation list at running
  time:
 \begin{function}
-\index{glbClearExperimentList}
-{\tt void ClearExperimentList()} removes all experiments from the internal list and resets all counters.   
+\GLBNS{glbClearExperimentList}
+{\tt void glbClearExperimentList()} removes all experiments from the internal list and resets all counters.   
 \end{function}
 Note that changing the number of experiments requires a new initialization
 of all parameters of the types \GLB{glb\_params} and \GLB{glb\_projection}
 if the number of experiments changes, since these parameter structures internally carry lists for the matter densities of all experiments. Similarly, once should never call {\tt glbAlloc...} before the
 experiment initialization.
 
-\begin{table}[t]
+\begin{table}[tb]
 \begin{center}
 \begin{tabular}{llp{7cm}}
 \hline
@@ -254,51 +252,186 @@ proportional to the product of source power $\times$ target mass $\times$
  usually useful parent particle decays per year (neutrino factories,
  $\beta$-beams), target power in megawatts (superbeams), or thermal
  reactor power in gigawatts (reactor experiments).
+%
+Since the pre-defined experiments in \tabl{experiments} are given for specfific luminosities, it is useful to change these parameters of the
+individual experiments:
+\begin{function}
+\GLBNS{glbSetSourcePower}
+{\tt void glbSetSourcePower(double power, int exp, int fluxno)}
+ sets the source power of experiment number {\tt exp} and flux number
+ {\tt fluxno} to {\tt power}. The definition of the source power depends on the experiment type as described above.
+\end{function}
+\begin{function}
+\GLBNS{glbSetRunningTime}
+{\tt void glbSetRunningTime(double time, int exp, int fluxno)}
+ sets the running time of experiment number {\tt exp} and flux number
+ {\tt fluxno} to {\tt time} years.
+\end{function}
+\begin{function}
+ \GLBNS{glbSetTargetMass}
+{\tt void glbSetTargetMass(double mass,int exp)}
+sets the fiducial detector mass of experiment number {\tt exp} to {\tt mass} tons or kilotons (depending on the experiment definition).
+\end{function}
+Thus, these functions also demonstrate how to use the assigned experiment number and others. These numbers run from $0$ to the number of experiments-1, fluxes-1, \etc, where the individual elements are numbered in the order of their appearance. 
+ Note that the source power and running time are quantities defined
+together with the neutrino flux, whereas the target mass scales the whole
+experiment.
 
-WW: WEITER FROM HERE:
+Before we can set the simulated event rates or access any oscillation
+parameters, we need to become familiar with the concept \GLOBES\ uses
+for oscillation parameters. In order to transfer sets of oscillation
+parameter vectors $(\theta_{12}, \theta_{13}, \theta_{23}, \deltacp, \sdm, \ldm)$, the parameter type \GLB{glb\_params\_type} is used. In general, pointers to this structure are of the type \GLB{glb\_params}, and are often
+transferred to and from \GLOBES\ functions. Therefore, the memory space
+for these vectors has to be reserved before they can be used, and it has
+to be returned afterwards. \GLOBES\ functions usually use the pointers
+of the type {\tt glb\_params} for the input or output to the functions. As
+an input parameter, the pointer has to be created and point towards a valid
+parameter structure, where the oscillation parameters are read from. As
+an output parameter, the pointer has to be created, too, and point towards
+a structure which will contain the return values will be written to.
+This parameter transfer concept seems to be very sophisticated, but, as we
+will see in the next chapters, it hides a lot of complicated parameter 
+mappings which otherwise need to be done by the user. For example, not
+only the oscillation parameters are stored in the pointer structure, but also information on the
+densities of all of the initialized experiments. Since \GLOBES\ treats
+the matter density as a free parameter known with some external precision
+to include matter density uncertainties,
+the minimizers also use fit values and external errors for the matter
+densities of all loaded experiments. More precisely, the matter density
+profile of each experiment $i$ is multiplied by a scaling factor
+$\hat{\rho_i}$, \index{Density scaling factor} 
+which is stored in the density information of {\tt glb\_params}. Each of
+these scaling factors has $1.0$ as pre-defined value. Since it
+is in most cases not necessary to change this value, the user does
+not need to take care of these values.\footnote{For more information,
+we refer to the following chapters.}
+Note that the {\tt glb\_params}
+structures must not be initialized before all experiments are loaded,
+since the number of matter densities can only be determined after the
+experiments are initialized. 
+Similarly, any change in the number of experiments requires that the
+parameter structures be re-initialized, \ie, destroyed and created again.
+Another piece of information returned from the minimizers and transferred
+into the {\tt glb\_params} structure is the number
+of iterations used for the minimization, which is proportional to the
+running time of the minimizer. In general, the user does not need to
+access the elements in {\tt glb\_params} directly. A number of functions
+is provided to handle these parameter structures:
+\begin{function}
+\GLBNS{glbAllocParams}
+{\tt glb\_params glbAllocParams()} allocates the memory space
+needed for a parameter vector and returns a pointer to it.
+\end{function}
+\begin{function}
+\GLBNS{glbAllocParams}
+{\tt void glbFreeParams(glb\_params stale)} destroys the memory space
+needed for a parameter vector {\tt stale} and sets the pointer to {\tt NULL}.
+\end{function}
+\begin{function}
+\GLBNS{glbDefineParams}
+{\tt glb\_params glbDefineParams(glb\_params in, double theta12, double theta13,double theta23, double delta, double dms, double dma)} assigns
+the complete set of oscillation parameters to the vector {\tt in}, which has
+to be allocated before. The return value is the pointer to {\tt in} if 
+the assignment was successful, and {\tt NULL} otherwise.
+\end{function}
+\begin{function}
+ \GLBNS{glbCopyParams}
+ {\tt glb\_params glbCopyParams(const glb\_params source, glb\_params dest)}
+ copies the vector {\tt source} to the vector {\tt destination}. The return
+ value is {\tt NULL} if the assignment was not successful.
+\end{function}
+\begin{function}
+\GLBNS{glbPrintParams}
+{\tt void glbPrintParams(FILE *stream, const glb\_params in)} prints the
+parameters in {\tt in} to the file {\tt stream}. The oscillation
+parameters, all density values, and the number of iterations are
+printed as pretty output.
+\end{function}
+In addition to these basic functions, there are functions to access
+the individual parameters within the parameter vectors:
+\begin{function}
+\GLBNS{glbSetOscParams}
+{\tt glb\_params glbSetOscParams(glb\_params in, double osc, int which)}
+sets the oscillation parameter {\tt which} in the structure {\tt in}
+to the value {\tt osc}. If the assignment was unsuccessful, the 
+function returns {\tt NULL}.
+\end{function}
+\begin{function}
+\GLBNS{glbGetOscParams}
+{\tt double glbGetOscParams(glb\_params in, int which)}
+returns the value of the oscillation parameter {\tt which} in the 
+structure {\tt in}.
+\end{function}
+In both of these functions, the parameter {\tt which} runs from
+$0$ to $5$, where the parameters in \GLOBES\ always have the order $\theta_{12}$, $\theta_{13}$, $\theta_{23}$, $\deltacp$, $\sdm$, $\ldm$.
+Alternatively to the number, the constants \GLB{GLB\_THETA\_12}, \GLB{GLB\_THETA\_13}, \GLB{GLB\_THETA\_23}, \GLB{GLB\_DELTA\_CP}, 
+\GLB{GLB\_DM\_SOL}, or \GLB{GLB\_DM\_ATM} can be used.
 
-Since the pre-defined experiments in \tabl{experiments} are given for one year running time, specific target masses, and specific source powers, it is useful to change these parameters of the individual experiments:
+Similarly, the density parameters or iterations can be accessed:
 \begin{function}
-\GLB{SetRunningTime}$(N_{\mathrm{exp}},t_{\mathrm{run}})$ sets the running time of experiment number $N_{\mathrm{exp}}$ to $t_{\mathrm{run}}$ years.
-\end{function}
- \begin{function}
-\GLB{SetTargetMass}$(N_{\mathrm{exp}},m_{\mathrm{Det}})$ sets the fiducial mass of experiment number $N_{\mathrm{exp}}$ to $m_{\mathrm{Det}}$ kilotons.
-\end{function}
-\begin{function}
-\GLB{SetSourcePower}$(N_{\mathrm{exp}},P_{\mathrm{Source}})$ sets the source power of experiment number $N_{\mathrm{exp}}$ to $P_{\mathrm{source}}$. The definition of the source power depends on the experiment type: ... (MISSING).
-\end{function}
-Thus, these functions also demonstrate how to use the assigned experiment number.
-
-A useful function to re-obtain the information about the initialized experiments is the function {\tt InfoExperiment}:
-\begin{function}
-\GLB{InfoExperiment}$()$ prints a list of the initialized functions with their experiment numbers and their most important parameters to the standard output.
-\end{function} 
-Especially, after changing individual parameters, such as baseline or target mass, this information can be useful to check the changes. Another useful function is {\tt ShowChannels}, which prints the initialized oscillation channels for a specified experiment:
-\begin{function}
-\GLB{ShowChannels}$(N_{\mathrm{exp}})$ prints the information about the oscillation channels of the experiment with the number $N_{\mathrm{exp}}$ to the standard output.
-\end{function}
-
-Compared to an existing experiment, which uses real data, a future experiment uses simulated data. Thus, the {\em true parameter values} and their results in form of the reference rate vectors are simulated. After setting the true parameter values, the {\em fit parameter values} can be varied in order to obtain information on the measurement performance for the given set of true parameter values. Therefore, it is often useful to show the results of a future measurement as function of the true parameter values for which the reference rate vectors are computed -- at least within the currently allowed ranges. The true parameter values for the vacuum neutrino oscillation parameters have to be set by the functions {\tt SetVacuumParameters} and {\tt SetRates} {\em before} any evaluation function is used and {\em after} the experiments have been initialized and the experiment parameters have been adjusted which could change the rates (such as baseline or target mass). Any matter effects are then included automatically depending on the experiment definitions.
-\begin{function}
-\GLB{SetVacuumParameters}$(\{\theta_{12}, \theta_{13}, \theta_{23}, \deltacp , \sdm , \ldm \})$ sets the neutrino oscillation parameters to be used to compute the reference rate vector in vacuum.
+\GLBNS{glbSetDensityParams}
+{\tt glb\_params glbSetDensityParams(glb\_params in, double dens, int which)} sets the density parameter {\tt which} in the structure {\tt in}
+to the value {\tt dens}. If the assignment was unsuccessful, the 
+function returns {\tt NULL}.
 \end{function}
 \begin{function}
-\GLB{SetRates}$( )$ computes the reference rate vector for the neutrino oscillation parameters set with {\tt SetVacuumParameters}. 
+\GLBNS{glbGetDensityParams}
+{\tt double glbGetDensityParams(glb\_params in, int which)}
+returns the value of the density parameter {\tt which} in the 
+structure {\tt in}.
 \end{function}
-Finally, an initialization sequence for \GLOBES\ could look like this:
+\begin{function}
+\GLBNS{glbSetIteration}
+{\tt glb\_params glbSetIteration(glb\_params in, int iter)} sets the number of iterations in the structure {\tt in}
+to the value {\tt iter}. If the assignment was unsuccessful, the 
+function returns {\tt NULL}.
+\end{function}
+\begin{function}
+\GLBNS{glbGetIteration}
+{\tt int glbGetIteration(glb\_params in)}
+returns the value of the number of iterations in the 
+structure {\tt in}.
+\end{function}
+In total, the parameter vector handling in a program normally has the
+following order:
 \begin{quote}
 {\tt
-ClearExp(); \\
-InitExperiment("JHFHK.exp"); \\
-SetRunningTime(0, 2.0); \\
-InitExperiment("JHFHKanti.exp"); \\
-SetRunningTime(1, 6.0);\\
-MInfoExperiment(); \\
-SetVacuumParameters(\{0.55, 0.16, 3.14/4, 3.14/2, 7e-5, 2e-3\}); \\
-SetRates();
-} 
+glbInitExperiment(...); \\
+/* ... more initializations ... */ \\
+\\
+glb\_params vector1 = glbAllocParams(); \\
+/* ... more vectors allocated ... */ \\
+\\
+/* Program code: assign and use vectors */ \\
+\\
+glbFreeParams(vector1); \\
+/* ... more vectors destroyed ... */ \\
+\\
+/* ... end of program or glbClearExperimentList ... */ 
+}
 \end{quote}
-This piece of code initializes the JHF (J-PARC) to Hyper-Kamiokande superbeam upgrade with two years of neutrino running and six years of antineutrino running, \ie, an overall running time of eight years. The final configuration is then printed to the standard output and the reference rate vector is set to the chosen parameter values.
+Compared to existing experiments, which use real data, future experiments
+uses simulated data. Thus, the {\em true parameter values} and their results in form of the reference event rate vectors are simulated. After setting the true parameter values, the {\em fit parameter values} can be varied in order to obtain information on the measurement performance for the given set of true parameter values. Therefore, it is often useful to show the results of a future measurement as function of the true parameter values for which the reference rate vectors are computed -- at least within the currently allowed ranges. The true parameter values for the vacuum neutrino oscillation parameters have to be set by the functions \GLB{glbSetOscillationParameters} and \GLB{glbSetRates} {\em before} any evaluation function is used and {\em after} the experiments have been initialized and the experiment parameters have been adjusted which could change the rates (such as baseline or target mass). This means that
+after any change of an experiment parameter, {\tt glbSetRates} has to be called. Matter effects are automatically included as specified in the experiment definition. We have the following functions to assign and
+read out the vacuum oscillation parameters:
+\begin{function}
+\GLBNS{glbSetOscillationParameters}
+{\tt int glbSetOscillationParameters(const glb\_params in)} sets the
+vacuum oscillation parameters to the ones in the vector {\tt in}.
+\end{function}
+\begin{function}
+\GLBNS{glbGetOscillationParameters}
+{\tt int glbGetOscillationParameters(glb\_params out)} returns the
+vacuum oscillation parameters in the vector {\tt out}. The result of
+the function is $0$ if the call was successful.
+\end{function}
+The reference rate vector is then computed with:
+\begin{function}
+\GLBNS{glbSetRates}
+{\tt void glbSetRates()} computes the reference rate vector for the neutrino oscillation parameters set by {\tt glbSetOscillationParameters}. 
+\end{function}
+A complete example for a minimal \GLOBES\ program can be found on
+Page~\pageref{ex:c}.
 
 \chapter[Calculating $\chi^2$ with systematics only]{Calculating $\boldsymbol{\chi^2}$ with systematics only}
 
@@ -589,6 +722,8 @@ Finally, note that any degenerate solution below the confidence level threshold 
  ``Check''-functions
 \ei
 
+\chapter{Changing experiment parameters at running time}
+
 \example{The impact of systematics, correlations, and degeneracies}{
 \label{ex:corrproj}
 \index{Bar charts}
@@ -634,8 +769,6 @@ limits at the $3 \sigma$ confidence level, where we do not include the
 \colorbox{white}{\includegraphics[width=6.5cm]{barsex}}
 \end{center}
 }
-
-\chapter{Changing experiment parameters at running time}
 
 \bi
 \item

@@ -16,7 +16,7 @@
 \usepackage{fancyheadings}
 \usepackage[footnotesize,bf]{caption}
 \usepackage{makeidx}
-\usepackage{ae,aecompl} % only for Type 1 fonts
+\usepackage{ae,aecompl} % only for Type 1 fonts for readable pdf convert
 
 \newcommand{\capdef}{}
 \newcommand{\mycaption}[2][\capdef]{\renewcommand{\capdef}{#2}%
@@ -90,6 +90,8 @@
 % Set as GLoBES command and add to index:
 % Always use GLB when mentioning a command in text!
 \newcommand{\GLB}[1]{{\tt #1}\index{{\tt #1}}}
+% Always use GLBNS when adding a command to the index without showing it!
+\newcommand{\GLBNS}[1]{\index{{\tt #1}}}
 
 \definecolor{light}{gray}{0.93}
 \definecolor{heavy}{gray}{0.35}
