@@ -187,21 +187,21 @@ We present the \GLOBES\ (``General Long Baseline Experiment Simulator'')
 software package, which allows the simulation of long-baseline and reactor
 neutrino oscillation experiments. One part of the software is the
 abstract experiment definition language to define experiments with
-beam and full detector descriptions as accurate as possible. Many systematics options are provided, such as normalization and energy
-calibration errors, or the choice between spectral or total rate 
-information. For the 
-definition of experiments, a new transparent building block concept is 
-introduced. In addition, an additional program provides the possibility 
+beam and full detector descriptions as accurately as possible. Many systematics options are provided, such as normalization and energy
+calibration errors, or the choice between spectral or total rate
+information. For the
+definition of experiments, a new transparent building block concept is
+introduced. In addition, an additional program provides the possibility
 to develop and test new experiment definitions quickly.
 %
 Another
-part of \GLOBES\ is the user's interface, which provides probability, rate, 
+part of \GLOBES\ is the user's interface, which provides probability, rate,
 and $\Delta \chi^2$ information for a given experiment or any
 combination of up to 32 experiments in C. Especially, the
 $\Delta \chi^2$ functions allow a simulation with statistics only,
 systematics, correlations, and degeneracies. In particular, \GLOBES\
 can handle the full multi-parameter correlation among the oscillation
-parameters, external input, and matter density uncertainties. 
+parameters, external input, and matter density uncertainties.
 \end{abstract}
 
 
@@ -588,17 +588,17 @@ more sophisticated applications, such as a two dimensional plot
 for CP violation as function of the simulated values of $\stheta$ and
 $\deltacp$ can be obtained in several hours.
 
-\section{Use of package}
+\section{Use of the package}
 
 The \GLOBES\ package~\cite{Globes} is a tar-ball which consists of the
 source code for the C-library providing the user's interface, the source code
  for a program to test
-\AEDL\ files, example C-files illustrating the use of the library, 
-experiment prototypes in \AEDL\ with supporting flux and cross 
-section files, and the usual 
+\AEDL\ files, example C-files illustrating the use of the library,
+experiment prototypes in \AEDL\ with supporting flux and cross
+section files, and the usual
 supporting files for installation and compilation.
 Currently, \GLOBES\ is only provided for GNU/Linux.
-In addition, an extensive manual covering the user's interface and 
+In addition, an extensive manual covering the user's interface and
 \AEDL~\cite{Manual} 
 can be obtained from the web-site. \GLOBES\ is free software and as such 
 licensed under the GNU Public License.
@@ -606,7 +606,7 @@ licensed under the GNU Public License.
 The installation of \GLOBES\ is highly automated by the use of the
 Autotools family and follows the usual procedures. By default
 a shared library {\tt libglobes.so} is installed, but 
-a static version is available, too. In addition, an executable named {\tt globes} is installed. It is another possibility to install \GLOBES\ without
+a static version is available, too. In addition, an executable named {\tt globes} is installed. It possible to install \GLOBES\ without
 root privilege into a user's home directory. During the automatic
 configuration process also an example Makefile is produced which can
 serve as a template for compiling and linking own applications against
