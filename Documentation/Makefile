@@ -1,5 +1,12 @@
 all: Manual.ps
 
+pdfpics := $(patsubst %.eps,%.pdf,$(wildcard *.eps))
+
+$(pdfpics) : %.pdf : %.eps
+	epstopdf $< --outfile=$@ 
+
+epspdf : $(pdfpics)
+
 Manual.tex : part1.tex part2.tex part3.tex references.bib appendix.tex
 	touch Manual.tex
 
@@ -17,13 +24,17 @@ Manual.dvi : Manual.tex
 	latex Manual.tex
 	latex Manual.tex
 
+Manual.pdf : Manual.dvi epspdf
+	pdfmanual
+
 Manual.ps : Manual.dvi
 	dvips Manual -o Manual.ps
 
-.PHONY: clean fast
+.PHONY: clean fast epspdf
 
 clean:
-	rm -f *.aux *.log *.ind *.bbl *.ilg *.blg Manual.dvi Manual.ps *.toc
+	rm -f *.aux *.log *.ind *.bbl *.ilg *.blg Manual.dvi Manual.ps *.toc\
+Manual.pdf *.idx
 
 fast:
 	latex Manual

@@ -3,10 +3,12 @@
 \sloppy
 % \frenchspacing
 \setlength{\unitlength}{1cm}
-
+% Do not change following line pdfmanual depends on it!
+\input{pdfswitch}
+%\usepackage{pdfcolmk}
 \usepackage{verbatim}
 \usepackage{cite}
-\usepackage[dvips]{color}
+
 \usepackage{graphicx}
 \usepackage{amsmath}
 \usepackage{amssymb}
@@ -228,7 +230,7 @@ General Long Baseline Experiment Simulator \\ }
 \vspace{1cm}
 
 \begin{center}
-Version from \today\ for \GLOBES\ 2.0
+Version from \today\ for \GLOBES\ 2.1
 \end{center}
 
 
@@ -488,10 +490,10 @@ from the ones in this manual.
 \input{part2}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% PART III: Reference manual
+% PART III: Module Support
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% \input{part3}
+\input{part3}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Appendix

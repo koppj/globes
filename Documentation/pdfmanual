@@ -1,0 +1,8 @@
+#! /bin/sh
+# This script is my private solution to make pdf and ps files out of
+# one latex file using pdflatex or latex respectively.
+# 2004 Patrick Huber
+# 
+echo "\\usepackage[pdftex]{color}" > pdfswitch.tex
+pdflatex Manual.tex
+echo "\\usepackage[dvips]{color}" > pdfswitch.tex
