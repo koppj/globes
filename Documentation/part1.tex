@@ -3,7 +3,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \part{User's manual}
-\chapter{Getting started: A short \GLOBES\ tour}
+\chapter{A short \GLOBES\ tour}
 
 \begin{table}[t]
 \begin{center}
@@ -31,9 +31,15 @@ Function & Purpose & Parameters \ra\ Result \\
 \caption{\label{tab:stdfunctions} The \GLOBES\ standard function to obtain a $\chi^2$-value for all or one of the initialized experiments. The curly brackets refer to the parameters to be transferred in form of a list. Note that all functions but {\tt Chi} and {\tt SingleChi} are using minimizers which have to be initialiued with {\tt SetInputErrors} and {\tt SetStartingValues} first.}
 \end{table}
 
-\chapter{Setting up \GLOBES }
-\textsc{} 
-Also: which units, which order of parameters (table for different functions!) etc. (somewhere)
+\chapter{Getting started with \GLOBES }
+
+In this first chapter of the user's manual, we assume that the \GLOBES\ software is readily installed on your computer system. We demonstrate how to load pre-defined experiments and re-obtain information about them. However, we only secondarily discuss the usage of \GLOBES\ in your specific programming language, such as C, Mathematica, or others. Thus, you should be familiar of how to load \GLOBES\ on your computer system before reading this chapter. An example of how to use \GLOBES\ with C can be found on page~\pageref{ex:c}. 
+
+\example{Using \GLOBES\ with C}{\label{ex:c}
+
+Here comes some complete C-code with a very simple example of how to use \GLOBES .
+ 
+}
 
 \begin{table}[t]
 \begin{center}
@@ -48,13 +54,16 @@ Baseline lengths & $L_i$ & $\mathrm{km}$ \\
 Energies & $E_\nu$ & $\mathrm{GeV}$ \\  
 Fiducial masses & $m_{\mathrm{Det}}$ & $\mathrm{kt}$ \\
 Time intervals & $t_{\mathrm{run}}$ & $\mathrm{yr}$ \\
-Integrated luminosities & $m_{\mathrm{Det}} \, t_{\mathrm{run}}$ & $\mathrm{kt \cdot yr}$ \\
+Source powers & $P_{\mathrm{Source}}$ & ??? \\
+% Integrated luminosities & $m_{\mathrm{Det}} \, t_{\mathrm{run}}$ & $\mathrm{kt \cdot yr}$ \\
 Cross sections & $\sigma_{\mathrm{CC}}$ &  ???? \\
 \hline
 \end{tabular}
 \mycaption{\label{tab:units} Quantities used in \GLOBES , examples of these quantities, and their standard units in the application software.}
 \end{center}
 \end{table}
+
+Throughout the programming interface of \GLOBES , the software needs to transfer parameters to and from the software core. Unless the Experiment Definition Module \EDM , the programming interface only uses one set of units for each type of quantity in order to avoid confusion about the definition of individual parameters. \tabl{units} summarizes the units of the most important quantities used in \GLOBES .
 
 \begin{table}[t]
 \begin{center}
@@ -96,20 +105,56 @@ Experiment & Filename & Short description & Refs. \\
 \mycaption{\label{tab:experiments} Different pre-defined experiments, their filenames (to be used in {\tt LoadExperiment}), their short description, and the references in which they are defined. Note that all experiments use in their standard configurations one year of running time. Details about the experiment parameters can be obtained with {\tt InfoExperiment}(Experiment number) after they have been loaded.}
 \end{table}
 
-\bi
-\item
- How to install and start \GLOBES
-\item
- How to set the vacuum parameters 
-\item
- Which units
-\item
- How to load one or more experiments and re-obtain formation about them
-\item
-Table: pre-defined experiment types
-\item
- How to clear experiments
-\ei
+In principle, \GLOBES\ can handle any number of different long-baseline experiments simultaneously. This means that their $\chi^2$-values are added {\em after} the minimization over the independent systematics parameters and {\em before} any minimization over the oscillation parameters. Though the simplest case of only one experiment may be most often used, more experiments are useful in many cases. For example, running a superbeam some years in the neutrino mode and some years in the antineutrino mode can be, to a first approximation, simulated by the combination of two such experiments.\footnote{Note that in this case the systematics parameters are minimized over independently, which means that this approach does not allow correlations among the systematics parameters. Therefore, the neutrino factory with the symmetric operation of both polarities is encapsulated into a single experiment.} Another example is the test of synergetic effects among different experiment types. Thus, \GLOBES\ has an internal (initially empty) list of currently initialized experiments. To add a pre-defined experiment to this list, one can use the function {\tt LoadExperiment}:
+\begin{function}
+{\tt LoadExperiment}$($``filename'' $)$ adds a single experiment to the list of currently loaded experiments. All currently loaded experiments are evaluated simultaneously (if not explicitely stated otherwise), \ie , their $\chi^2$-values are added.
+\end{function}
+A list of pre-defined experiment types, their filenames, their short descriptions, and the references of their definitions can be found in \tabl{experiments}. To remove all experiments from the evaluation list, one uses {\tt ClearExp}:
+\begin{function}
+{\tt ClearExp}$()$ removes all experiments from the evaluation list.   
+\end{function}
+Both functions do not return anything. Thus, one can either add an experiment to the internal evaluation list, or remove all experiments from this list. After adding an experiment, it gets an internal experiment number $N_{\mathrm{exp}}$ assigned in the order of the addition, which is starting from zero and running to the number of experiments minus one. Therefore, one will be able to access the individual experiment by its number later.
+
+Since the pre-defined experiments in \tabl{experiments} are given for one year running time, specific target masses, and specific source powers, it is useful to change these parameters of the individual experiments:
+\begin{function}
+{\tt SetRunningTime}$(N_{\mathrm{exp}},t_{\mathrm{run}})$ sets the running time of experiment number $N_{\mathrm{exp}}$ to $t_{\mathrm{run}}$ years.
+\end{function}
+ \begin{function}
+{\tt SetTargetMass}$(N_{\mathrm{exp}},m_{\mathrm{Det}})$ sets the fiducial mass of experiment number $N_{\mathrm{exp}}$ to $m_{\mathrm{Det}}$ kilotons.
+\end{function}
+\begin{function}
+{\tt SetSourcePower}$(N_{\mathrm{exp}},P_{\mathrm{Source}})$ sets the source power of experiment number $N_{\mathrm{exp}}$ to $P_{\mathrm{source}}$. The definition of the source power depends on the experiment type: ... (MISSING).
+\end{function}
+Thus, these functions also demonstrate how to use the assigned experiment number.
+
+A useful function to re-obtain the information about the initialized experiments is the function {\tt InfoExperiment}:
+\begin{function}
+{\tt InfoExperiment}$()$ prints a list of the initialized functions with their experiment numbers and their most important parameters to the standard output.
+\end{function} 
+Especially, after changing individual parameters, such as baseline or target mass, this information can be useful to check the changes. Another useful function is {\tt ShowChannels}, which prints the initialized oscillation channels for a specified experiment:
+\begin{function}
+{\tt ShowChannels}$(N_{\mathrm{exp}})$ prints the information about the oscillation channels of the experiment with the number $N_{\mathrm{exp}}$ to the standard output.
+\end{function}
+
+Compared to an existing experiment, which uses real data, a future experiment uses simulated data. Thus, the {\em true parameter values} and their results in form of the reference rate vectors are simulated. After setting the true parameter values, the {\em fit parameter values} can be varied in order to obtain information on the measurement performance for the given set of true parameter values. Therefore, it is often useful to show the results of a future measurement as function of the true parameter values for which the reference rate vectors are computed -- at least within the currently allowed ranges. The true parameter values for the vacuum neutrino oscillation parameters have to be set by the functions {\tt SetVacuumParameters} and {\tt SetRates} {\em before} any evaluation function is used and {\em after} the experiments have been initialized and the experiment parameters have been adjusted which could change the rates (such as baseline or target mass). Any matter effects are then included automatically depending on the experiment definitions.
+\begin{function}
+{\tt SetVacuumParameters}$(\{\theta_{12}, \theta_{13}, \theta_{23}, \deltacp , \sdm , \ldm \})$ sets the neutrino oscillation parameters to be used to compute the reference rate vector in vacuum.
+\end{function}
+\begin{function}
+{\tt SetRates}$( )$ computes the reference rate vector for the neutrino oscillation parameters set with {\tt SetVacuumParameters}. 
+\end{function}
+Finally, an initialization sequence for \GLOBES\ could look like this:
+\begin{quote}
+{\tt ClearExp}$()$; \\
+{\tt InitExperiment}$($``{\tt JHFHK.exp}''$)$; \\
+{\tt SetRunningTime}$(0,2.0)$; \\
+{\tt InitExperiment}$($``{\tt JHFHKanti.exp}''$)$; \\
+{\tt SetRunningTime}$(1,6.0)$;\\
+{\tt MInfoExperiment}$()$; \\
+{\tt SetVacuumParameters}$(\{ 0.55, \, 0.16, \, 3.14/4, \, 3.14/2, \, 7e-5 , \, 2e-3 \} )$; \\
+{\tt SetRates();} 
+\end{quote}
+This piece of code initializes the JHF (J-PARC) to Hyper-Kamiokande superbeam upgrade with two years of neutrino running and six years of antineutrino running, \ie, an overall running time of eight years. The final configuration is then printed to the standard output and the reference rate vector is set to the chosen parameter values.
 
 \chapter[Calculating $\chi^2$ with systematics only]{Calculating $\boldsymbol{\chi^2}$ with systematics only}
 
@@ -120,6 +165,8 @@ Table: pre-defined experiment types
 \item
  Advanced topic: Changing the systematics treatment (SetErrorDim)
 \ei
+
+\example{Correlation between $\stheta$ and $\deltacp$}{Text}
 
 \chapter[Calculating $\chi^2$-projections: how to include correlations]{Calculating $\boldsymbol{\chi^2}$-projections: how to include correlations}
 
@@ -164,7 +211,7 @@ General form and especially: DeltaTheta-Minimizer; mention calculation time!
 
 \bi
 \item
- Baseline, Target mass
+ Baseline, Target mass, Source power, running time
 \item
  Matter density profile
 \item

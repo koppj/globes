@@ -5,6 +5,7 @@
 \setlength{\unitlength}{1cm}
 
 \usepackage{cite}
+\usepackage[dvips]{color}
 \usepackage{graphicx}
 \usepackage{amsmath}
 \usepackage{amssymb}
@@ -74,7 +75,31 @@
 
 \newcommand{\equ}[1]{\eq~(\ref{equ:#1})}
 \newcommand{\figu}[1]{\fig~\ref{fig:#1}}
+\newcommand{\tabl}[1]{\Tab~\ref{tab:#1}}
 
+
+\definecolor{light}{gray}{0.93}
+\definecolor{heavy}{gray}{0.35}
+\setlength{\fboxrule}{0.1cm}
+\newcommand{\example}[2]{
+\begin{table}[p]
+\begin{center}
+\fcolorbox{heavy}{light}{
+\begin{minipage}[t][\textheight][t]{15.5cm}
+{\em \underline{Example:} #1}
+
+\vspace*{0.3cm}
+
+#2
+
+\end{minipage}
+}
+\end{center}
+\end{table}
+}
+
+
+\newtheorem{function}{Function}
 
 %-- page parameters -------------------------------------------------
 
