@@ -40,9 +40,9 @@ Wolfram Research.
 
 (*NotebookFileLineBreakTest
 NotebookFileLineBreakTest*)
-(*NotebookOptionsPosition[    396921,       9733]*)
-(*NotebookOutlinePosition[    397987,       9766]*)
-(*  CellTagsIndexPosition[    397943,       9762]*)
+(*NotebookOptionsPosition[    398043,       9769]*)
+(*NotebookOutlinePosition[    399109,       9802]*)
+(*  CellTagsIndexPosition[    399065,       9798]*)
 (*WindowFrame->Normal*)
 
 
@@ -9717,13 +9717,49 @@ Cell[BoxData[
 
 Cell[CellGroupData[{
 
+Cell["Bug notes:", "Section"],
+
+Cell[TextData[{
+  "The sign of ",
+  Cell[BoxData[
+      \(TraditionalForm\`\[CapitalDelta]m\_31\%2\)]],
+  "-degeneracy should, due to the definitions used, be looked up at - ",
+  Cell[BoxData[
+      \(TraditionalForm\`\[CapitalDelta]m\_31\%2\)]],
+  "-RescaledSMD or ",
+  Cell[BoxData[
+      \(TraditionalForm\`\(+\[CapitalDelta]m\_31\%2\)\)]],
+  "-RescaledSMD, respectively. This is only relevant for large values of the \
+solar mass squared difference."
+}], "Text",
+  CellFrame->True,
+  Background->GrayLevel[0.849989]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
 Cell["Update notes:", "Section"],
 
 Cell[TextData[{
   "In ",
   StyleBox["SetVacuumParameters",
     FontFamily->"Courier"],
-  " the solar mixing angle has to be given now!"
+  " the solar mixing angle has to be given explicitely now! (implemented in \
+October 2002)\nThe usage of ",
+  StyleBox["RescaledSMD",
+    FontFamily->"Courier"],
+  " becomes obsolete then. It will also become obsolete for bi-maximal \
+mixing."
+}], "Text",
+  CellFrame->True,
+  Background->GrayLevel[0.849989]],
+
+Cell[TextData[{
+  "New database: For the off-axis superbeams the new database database \
+\"databaseOffAxis\" can be used by ",
+  StyleBox["Get[\"databaseOffAxis\"]",
+    FontFamily->"Courier"],
+  " with several beams with corresponding off-axis angles. (October 2002)"
 }], "Text",
   CellFrame->True,
   Background->GrayLevel[0.849989]]
@@ -10163,7 +10199,7 @@ Cell[CellGroupData[{
 Cell[265140, 6426, 159, 5, 87, "Section"],
 Cell[265302, 6433, 334, 9, 71, "Text"],
 Cell[265639, 6444, 122, 2, 39, "Input"],
-Cell[265764, 6448, 145, 2, 62, "Input"],
+Cell[265764, 6448, 145, 2, 39, "Input"],
 Cell[265912, 6452, 154, 3, 46, "Text"],
 Cell[266069, 6457, 217, 5, 71, "Text"],
 
@@ -10258,8 +10294,14 @@ Cell[373344, 8901, 23252, 812, 2246, "Output"]
 }, Open  ]],
 
 Cell[CellGroupData[{
-Cell[396645, 9719, 32, 0, 87, "Section"],
-Cell[396680, 9721, 201, 7, 70, "Text"]
+Cell[396645, 9719, 29, 0, 87, "Section"],
+Cell[396677, 9721, 520, 14, 95, "Text"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+Cell[397234, 9740, 32, 0, 87, "Section"],
+Cell[397269, 9742, 397, 12, 95, "Text"],
+Cell[397669, 9756, 334, 8, 95, "Text"]
 }, Open  ]]
 }, Open  ]]
 }, Open  ]]
