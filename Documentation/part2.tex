@@ -153,7 +153,7 @@ As another ingredient, we have to define the energy resolution function:
 {\tt \tb @sigma\_e = \{0.15,0.0,0.0\}}\\
 {\tt >}
 \end{quote}
-The {\tt energy} command opens the energy environmen, which has the name 
+The {\tt energy} command starts the energy environment, which has the name 
 {\tt \#MINOS} here. Out of several possibilities, it uses algorithm one,
 the simplest and fastest one. The actual energy resolution is specified
 by the energy resolution variable, which is a list of three elements. Each 
@@ -297,14 +297,15 @@ With this include mechanism, one can use constructions such as
         include JHFHK.gls
 }
 \end{quote}
-in order to be able to initialize a combined analysis of the experiments defined in the files {\tt NuFact.gls} and {\tt JHFHK.gls} later. 
+in order to initialize a combined analysis of the experiments defined in the files {\tt NuFact.gls} and {\tt JHFHK.gls}. 
 Even if one uses the
-automatic variable {\tt \#CC} in both experiments 
+automatic variable {\tt \#CC} in both experiments, 
 but the cross section data are different (for example, because of different target nuclei), the correct 
 cross section data will be applied to each of the experiments in the 
 application software. In this case, {\tt \#CC} in {\tt NuFact.gls} has 
 the value $0$ and in {\tt JHFHK.gls} it has the value $1$, 
-which means that no shadowing occurs.
+which means that no shadowing occurs. Note that, alternatively, one can 
+also load both files successively. 
 
 Furthermore, one can define constants such as
 \begin{quote}
@@ -330,51 +331,68 @@ Finally, note that a line feed character \verb+\n+ is necessary at
  the end of the input -- alternatively you can put a comment at the end.
 
 
-% Continue here (WW):
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Experiment definition with AEDL}
 
-In this chapter, we give a detailed definition of the AEDL features. We also show the underlying mathematical concepts in parallel, where applicable. We do not exactly follow the separation of source, oscillation, and detection properties, since most issues more or less involve the detection. Instead,
-we illustrate many of the features of the \GLOBES\ simulation by successively
-evolving the underlying statistical picture, and demonstrating how it translates into AEDL .
+In this chapter, we give a detailed definition of the AEDL features. We also show the underlying mathematical concepts, where applicable. We do not exactly follow the separation of source, oscillation, and detection properties, since most issues more or less involve the detection. Instead,
+we illustrate many of the features of the \GLOBES\ simulation successively
+in the logical order of their definition, and demonstrate how they translate into AEDL .
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Source properties and luminosity}
+\section{Source properties and integrated luminosity}
 \label{sec:source}
 
-\GLOBES\ handles only point sources, thus it is not possible
-to study effects from the finite size of the neutrino production
-region like in the Sun. Furthermore only one source for each experiment
-is possible, this make it impossible\footnote{at least rather tricky} 
-to simulate multiple source experiments like KamLAND. All neutrino
-sources usable within \GLOBES\ therefore can be specified by the
-flux spectra for each flavour and CP sign and the total luminosity
-of the source. There are two principal ways to provide a flux:
-use a built-in source or a file provided by the user. In both cases
-a flux is defined by a named environment.
+As we have disussed before, \GLOBES\ can only deal with point sources. Thus,  it is not possible to study effects from the finite size of the neutrino production region, such as in the Sun or in reactor experiments with many
+neutrino sources (\eg, KamLAND). Therefore, a neutrino source in \GLOBES\ can, in general, be characterized by the flux spectrum for each neutrino flavor, the CP sign (neutrinos or antineutrinos), and the total luminosity
+of the source.
+
+Before we come to the definition of the source properties, let us discuss
+the total integrated luminosity of the experiment. In \GLOBES , the total number of events is in general proportional to the product of
+\begin{equation}
+\mathrm{Fid.~detector~mass}\,\left[\mathrm{kt/t}\right]\times 
+\mathrm{Running~time} \,\left[\mathrm{yr}\right]\times\left\{ \begin{array}{c}
+\mathrm{Source~power}\,\left[\mathrm{MW/GW}\right]\\
+\mathrm{Useful~muon~decays}\,\left[\mathrm{yr}^{-1}\right]
+\end{array}\right.\,.
+\end{equation}
+Thus, the source power corresponds to either the amount of energy produced per time frame in the target (such as for nuclear reactors or sources based on pion decay), or the useful muon decays per time frame (neutrino factories). In addition, the definition of the source power makes only sense together with the flux normalization, the running time, and fiducial detector mass in order to define the total integrated luminosity. Therefore, one can, in principle, use arbitrary units for these components as long as their product gives the wanted neutrino flux. However, it is
+recommended to use normalizations such that the source power units are $\mathrm{MW}$ for a proton-based beam, and $\mathrm{GW}_\mathrm{thermal}$ for a reactor experiment. Correspondingly, the detector mass units should be kilotons for a proton-based beam, and tons for a reactor experiment.
+
+The quantity which can be used to scale the overall integrated luminosity of an experiment, is the fiducial detector mass. For example,
+\begin{quote}
+{\tt \$target\_mass = 50.0 }
+\end{quote}
+defines a $50 \, \mathrm{kt}$ detector for a neutrino factory.
+
+There are two principal ways to initialize a neutrino flux: 
+Either one can use 
+a built-in source, or one can provide a file. In both cases,
+a flux is defined by the environment {\tt flux}, such as
 \begin{quote}
   {\tt flux(\#name)<\\
 \tb $\ldots$\\
+\tb @time = 8.0 \\
 >}
 \end{quote}
+with a running time of $8$ years. Note that the running time is used within
+the {\tt flux} environment. This feature can be used to load the neutrino and antineutrino fluxes separately, in order to combine them with different
+running times within one experiment. The name of the flux {\tt \#name} will later be refered to in the channel definitions.
 
-
-In case a built-in source is used the user has to specify which
-built-in spectrum is used. Currently two built-in fluxes are available:
-$\mu^+$-decay ({\tt @builtin = 1}) and $\mu^-$-decay ({\tt @builtin = 2}).
-In any case  the energy of the parent particle has to be specified
-and the number of useful decays per year. Thus the sequence for setting
-up a neutrino factory is
+For a built-in neutrino source, one has to specify which
+built-in spectrum has to be used, as well as its parameters. The software
+will then automatically calculate the neutrino spectrum. Note that in this
+case, there is no degree of freedom in the choice of the source units.
+Currently, two built-in fluxes are available: $\mu^+$-decay ({\tt @builtin = 1}) and $\mu^-$-decay ({\tt @builtin = 2}). In these cases, the muon energy (enery of the parent particle) has to be specified together with the number of useful decays  per year. Thus, an example to set up a neutrino factory flux is
+\begin{quote}
 {\tt flux(\#mu\_plus)<\\
 \tb  @builtin = 1\\
 \tb  @parent\_energy = 50.0\\
 \tb  @stored\_muons = 5.33e+20\\
 \tb  @time = 8.0\\
->}\\
-
-
-Alternatively user defined fluxes may used like this
+>}
+\end{quote}
+%
+For a user-defined flux, one has to give it the file name:
 \begin{quote}
 {\tt flux(\#user)<}\\
 {\tt \tb @flux\_file = user\_file\_1.dat\\
@@ -383,31 +401,17 @@ Alternatively user defined fluxes may used like this
 \tb @norm = 1e+8}\\
 {\tt >}
 \end{quote}
- 
-The norm variable allows to set the conversion factor from the fluxes in
-the file to the units in \GLOBES. The power variable allows to
-specify a target or reactor power. The units used for power are determined
-by the units in the flux file and by the value of the norm variable. It is
-recommended to use $\mathrm{MW}$ in case a proton based beam is used and
-$\mathrm{GW}_\mathrm{thermal}$ for the reactor experiments.
+In this case, the {\tt @norm} variable is an overall normalization which defines a conversion factor from the fluxes in the file to the units in \GLOBES . In general, there are many ways to give the source power of a 
+neutrino source, such as neutrinos per proton on target per area per time frame. Right now, each flux has its own normalization factor, which is
+not always straightfoward to calculate. Often, one has to take into account
+many things, such as the number of target particles per unit mass. 
+In addition, the fluxes will be rescaled by $1/L^2$, which means that the
+normalization must contain a factor $L_0^2$. Here $L_0$ is the distance from the source for which the flux is given to the actual neutrino production region. At the end, it is left to the user to ensure that the 
+numbers in the flux file give, after the multiplication with {\tt @norm}, 
+the proper numbers of produced neutrinos corresponding to the chosen target power {\tt @power}. Usually this adjustment of {\tt @norm} is performed by comparison with known energy spectra for a specific experiment.
 
-
-
-For sources based on $\pi$-decay and nuclear reactors the total power
-involved defines how many neutrinos are produced therefore this variable is
-used to define the luminosity. Furthermore it is useful to define 
-the operation time of an experiment in years. Note however that the 
-number of events used in analysis only depends on the product of
-\begin{equation}
-\mathrm{mass}\,\left[10^6\,\mathrm{kg}\right]\times \mathrm{time}
-\,\left[\mathrm{years}\right]\times\left\{ \begin{array}{c}
-\mathrm{source~power}\,\left[\mathrm{MWy}\right]\\
-\mathrm{useful~decays}\,\left[\mathrm{year}^{-1}\right]
-\end{array}\right.\,.
-\end{equation}
-
-The format of the flux files is seven rows and
-501 lines.
+The software assumes that the given flux file has seven columns and
+501 lines with equidistant energies. The format is:
 \begin{quotation}
 $ E\quad
 \Phi_{\nu_e}\quad
@@ -417,102 +421,113 @@ $ E\quad
 \Phi_{\bar\nu_\mu}\quad
 \Phi_{\bar\nu_\tau}$
 \end{quotation}
-where the energy values are evenly spaced. 
-For accessing fluxes at 
-arbitrary energies linear interpolation is used. Once the energy leaves the
-range of values given in the file $0.0$ is returned. The units used for the
-fluxes are not specified and right now each flux has its own normalization 
-factor as specified by {\tt norm}. The problem is that
-in computing the normalization one has to know things like number of target
-particles per unit mass asf. which is not always straightforward. The fluxes
-will be rescaled by $1/L^2$, thus the normalization must contain a factor
-$L_0^2$, when $L_0$ is the distance from the source for which the flux is
-given.
+In order to access fluxes at arbitrary energies, linear interpolation 
+is used by the software. In general, it is advisable to provide the flux between {\tt \$sampling\_min} and {\tt \$sampling\_max} (\cf, \Sec~\ref{sec:energy}), since these values are used by the software. However, if the energy leaves the range of values given in the file, zero is returned. 
+Note that unused (and therefore often unknown) fluxes can be initialized with zeros, but can not just be omitted. For example, if one wants to define an experiment with different running times with neutrinos and antineutrinos, one can just use the same flux file in two different {\tt flux} environments with two different running times {\tt @time}. The unused fluxes in each case will then just be ignored.
 
-
-The most obvious property of the neutrino detection is the total
-active mass of the target as already defined in section~\ref{sec:source} and
-its value is defined by 
-\begin{quote}
-{\tt \$target\_mass = 50.0 }
-\end{quote}
+% Continue here (WW)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Baseline and matter density profile}
 
-The purpose of this module is to specify the path the neutrinos
-are traveling. The central piece of information is the total length
-of the path - the baseline\index{Baseline}
-\begin{equation}
-L\,\left[\mathrm{km}\right]
-\end{equation} 
-The baseline is set by 
+The baseline and matter density profile determine, besides energy and
+involved flavors, the neutrino oscillation physics at the experiment
+description level. All of the neutrino oscillation parameters are defined at running time.
+
+The baseline\index{Baseline} is given by
 \begin{quote}
 {\tt \$baseline = 3000.0 }
 \end{quote}
+Note that baseline lengths are always assumed to be in
+kilometers.
 
+\begin{table}[t!]
+\begin{tabular}{|clp{7cm}|}
+\hline
+{\tt \$profiletype} & Additional variables & Description \\ 
+\hline
+$1$ & - & Average density (constant) \\
+$2$ & {\tt \$densitysteps} & PREM profile with given number of equidistant steps \\
+$3$ & {\tt \$lengthtab},  {\tt \$densitytab} & Arbitrary profile (table of layer thicknesses, table of densities) \\
+\hline
+\end{tabular}
+\caption{\label{tab:profiletypes} Different matter density profiles which can be used with \GLOBES .}
+\end{table}
 
-
-
-Furthermore there is
-the matter profile encountered along the baseline which can be set in
-several ways. The simplest way is to use a constant density corresponding
-to the average density along the baseline calculated using the 
-PREM\cite{Stacey} onion shell model of the 
-Earth\index{PREM}\index{Earth matter density}.
+Furthermore, the matter density profile along the baseline
+has to be specified. The simplest matter density profile is a constant matter density profile with the average matter density from the PREM\cite{Stacey} onion shell model of the Earth\index{PREM}\index{Earth matter density}:
 \begin{quote}
-TBD
+{\tt \$profiletype=1 }
 \end{quote}
-
-
-Another possibility is to use several layers of constant density each in 
-order to improve the approximation to the actual Earth matter profile. In this
-case the user specifies the total baseline and the number of layers. The
-time consumed in computing the oscillation probabilities is directly 
+%
+For a better approximation of the realistic Earth matter density profile, one can use an arbitrary number of equidistant steps of the PREM profile:
+\begin{quote}
+{\tt \$profiletype=2 } \\
+{\tt \$densitysteps=20 }
+\end{quote}
+Note that the value of {\tt \$densitysteps} is time-critical, since the
+computation time of oscillation probabilities is directly 
 proportional to the number of layers.
+%
+As a  third possibility, one can specify the matter density profile 
+manually with a list of thicknesses and densities of the matter density layers. This example uses two density steps with two different densities:
 \begin{quote}
-TBD
+{\tt \$profiletype=3 } \\
+{\tt \$densitytab=\{2.8, 3.5\}}\\
+{\tt \$lengthtab=\{1000.0, 2000.0\}}\\
 \end{quote}
-
-
-The third possibility to specify the matter profile is to provide a list
-of thicknesses and densities for the layers. 
+It is important that both lists habe the same length and that the  thicknesses given in  {\tt \$lengthtab} add up to the value of
+{\tt \$baseline}. In addition, matter densities are always given in $g/cm^3$.
+%
+This approach can also be used for a constant matter density profile with
+a specific matter density:
 \begin{quote}
-{\tt \$densitytab=\{ 2.8, 3.5\}}\\
-{\tt \$lengthtab=\{ 1000.0, 2000.0\}}\\
+{\tt \$profiletype=3 } \\
+{\tt \$densitytab=\{3.5\}}\\
+{\tt \$lengthtab=\{3000.0\}}\\
 \end{quote}
-It is important that both list are of equal length and that the sum
-of the thicknesses given in  {\tt \$lengthtab} add up to the value of
-{\tt \$baseline}.
+The possible options for matter density profiles are summarized in \Tab~\ref{tab:profiletypes}.
 
-For any type of profile a central value $a$ and a corresponding error 
-$\delta a$ have to be specified\index{Density error}\index{Density center}.
+In addition to the matter density profile, \GLOBES\ implements a simple treatment of matter density uncertainties by a scaling factor $\hat{\rho}$
+of the matter density profile:
 \begin{equation}
 \label{eq:density_error}
-\rho(x)=a\cdot\rho_0(x)\,\left[\frac{\mathrm{g}}{\mathrm{cm}^2}\right]\,
+\rho(x)=\hat{\rho} \cdot\rho_0(x)\,\left[\frac{\mathrm{g}}{\mathrm{cm}^3}\right] \, .
 \end{equation}
-where $\rho_0(x)$ is the matter profile as chosen by the user and $\rho(x)$ is
-the one used in the calculation of the oscillation probabilities. The default
-value for $a$ is $1$ and a typical value for $\delta a = 0.05$. 
-
+Here $\rho_0(x)$ is the matter profile chosen by the user, and $\rho(x)$ is
+the one used in the calculation of the oscillation probabilities. As it is described in \Sec~\ref{sec:externalinput}, the matter density uncertainty is implemented by using $\hat{\rho}$ as an additional oscillation parameter for each experiment, and by assuming to know $\hat{\rho}$ with an external precision. Thus, the central value of $\hat{\rho}$ (default value $1.0$) and its error $\delta \hat{\rho}$ have to be defined. The following code assumes a matter density uncertainty of $5\%$:\index{Density error}\index{Density center}
+\begin{quote}
+ {\tt \$densitycenter=1.0} \\
+ {\tt \$densityerror=0.05}
+\end{quote}
+In most cases, this is in combination with a constant profile a very good approximation to take into account the realistic structure of the profile as well as its uncertainty~\cite{Ohlsson:2003ip}. 
+ If one does not want to take into account  matter density uncertainties, 
+one can either a very small value of $\hat{\rho}$, or the minimizer {\tt ChiNP} with $\hat{\rho}$ fixed in the application software.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Cross sections}
 \label{sec:cross_section}
 
-Cross sections\index{Cross sections} are used as part of the 
-channel definition 
-(see section~\ref{sec:channel}) and have to be provided by the user in form
-of a file. Cross section are in general given as differential cross section
-divided by the energy
+Cross sections\index{Cross sections} will later be used as part of the 
+channel definition (see \Sec~\ref{sec:channel}). Similar to the source 
+fluxes, they are provided by the user as a data file:
+\begin{quote}
+{\tt cross(\#name)<}\\
+{\tt \tb @cross\_file =user\_file\_1.dat}\\
+{\tt >}
+\end{quote}  
+This cross section can later be refered to by {\tt \#name}.
+
+Cross sections are in \GLOBES\ given as differential cross section per energy:
 \begin{equation}
 \hat\sigma(E)=\sigma(E)/E\,\left[ 10^{-38}\,
 \frac{\mathrm{cm}^2}{\mathrm{GeV}^2} \right]
 \end{equation}
-The cross section files have seven rows and $1001$ lines.
+The software assumes that the cross section files are text files with 
+seven columns and $1001$ lines of the form
 \begin{quotation}
-$log_{10} E\quad
+$\mathrm{log}_{10} E\quad
 \hat\sigma_{\nu_e}\quad
 \hat\sigma_{\nu_\mu}\quad
 \hat\sigma_{\nu_\tau}\quad
@@ -520,18 +535,13 @@ $log_{10} E\quad
 \hat\sigma_{\bar\nu_\mu}\quad
 \hat\sigma_{\bar\nu_\tau}$
 \end{quotation}
-where the logarithm of the energy values is evenly spaced. 
-For accessing cross section at 
-arbitrary energies linear interpolation is used. Once the energy leaves the
-range of values given in the file $0.0$ is returned.
+Here the logarithms of the energy values have to be equidistant. For 
+arbitrary energies, linear interpolation is used. If the energy leaves the
+range of values given in the file, $0.0$ will be assumed. In general, it is advisable to provide the cross sections in the range between {\tt \$sampling\_min} and {\tt \$sampling\_max} (\cf, \Sec~\ref{sec:energy}).
+Unused cross sections have to be filled with zeros, and can not be just omitted.
 
-A cross section file is read by 
-\begin{quote}
-{\tt flux(\#name)<}\\
-{\tt \tb @cross\_file =user\_file\_1.dat}\\
-{\tt >}
-\end{quote}  
-and can later be refered to by {\tt \#name}.
+% WW: CONTINUE HERE:
+
 
 \section{Oscillation channels}
 \label{sec:channel}
