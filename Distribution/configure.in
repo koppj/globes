@@ -27,7 +27,7 @@ dnl Versioning of GLoBES
 dnl last digit: increment whenever code has changed
 dnl middle digit: increment when features have been introduced/removed
 dnl first digit: major improvements/rewrites
-AM_INIT_AUTOMAKE(globes,1.8.2)
+AM_INIT_AUTOMAKE(globes,2.0.0)
 
 dnl To avoid problems due to clock skew and/or lacking autotools on
 dnl user system

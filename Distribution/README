@@ -30,7 +30,9 @@ appreciate being given academic credit for it. Whenever you use GLoBES
 to produce a publication or a talk indicate that you have used GLoBES and
 please cite the following reference:
 
-P. Huber, M. Lindner and W. Winter ... 
+P. Huber, M. Lindner and W. Winter
+Simulation of long-baseline neutrino oscillation experiments with GLoBES
+arXiv: hep-ph/0407333.
 
 Besides, many of the data which is used by GLoBES and distributed together
 with it should be correctly referenced where possible. For details see the
@@ -39,8 +41,8 @@ documentation.
 Availability
 ============
 
-The current stable version of GLoBES is always available from 
-http://www.ph.tum.de/~globes/
+The current stable version of GLoBES as well as the manual is always available
+from http://www.ph.tum.de/~globes/
 
 Installation
 ============
