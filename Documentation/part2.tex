@@ -203,56 +203,48 @@ simultaneously. It is only useful if there is more than one background component
 The here defined experiment represents a first simplified version of a neutrino factory experiment. It still lacks the correct energy dependence of the efficiencies, the antineutrino disappearance channel, and the channels and rules for the symmetric operation with $\mu^-$ stored. However, it may serve as a simple, introductory example. In the next chapter, we will demonstrate that the AEDL is much more powerful than illustrated here.
 
 
-% continue here (WW):
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Introduction to the syntax of AEDL}
 \label{sec:syntax}
 
- The first eight characters have to be {\tt \%!GLoBES} 
- this serves to protect from parsing MBytes of chunk
- and cluttering the screen with error messages. 
-
-Comments
- are entered like this one -- everything between the 
- delimiters is ignored. 
+We now give a short introduction to the syntax of AEDL.
+ The first eight characters have to be {\tt \%!GLoBES}
+in order to avoid parsing megabytes of chunk
+ and producing thousands of error messages. 
+%
+Comments can be used such as in C:
 \begin{quote}
 {\tt /* This starts a comment\\
  and here the comment ends */
 }
 \end{quote}
-thus the comments in AEDL work like in C
-
-There are so called  named quantities, they all start with {\tt \$} 
-and are predefined. They are checked for being within range, \eg\ {\tt 
-\$bins} can be only in between 0 and 150. If you give a {\tt float} where
- an {\tt int} is expected the {\tt float} gets converted to an {\tt int} 
-in the usual way in C.  We have named scalar quantities
+There are pre-defined variables which all start with {\tt \$}. Their range
+is also checked. For example,  {\tt 
+\$bins} can be only between $0$ and $150$. If one uses a {\tt float} quantity where  an {\tt int} is expected, the {\tt float} will be converted to an {\tt int} in the same way as in C.  For example, we have scalar variables
 \begin{quote}
 {\tt
 \$bins = 10\\
 \$baseline = 1200.0
 }
 \end{quote}
-as well as named simple lists
+and simple lists
 \begin{quote}
 {\tt
-\$densitytab=\{1.0,2.2343,3.3432\}
+\$densitytab=\{1.0,2.2343,3.3432\} 
 }
 \end{quote}
-
-Since there are some very special data to parse, some special
-provisions have been made so called named environments. This is illustrated 
-with the channel definition part
+%
+Since there are often groups of data which we want to refer to later,
+environments can be used. This is illustrated 
+with the channel definition part:
 \begin{quote}
 {\tt channel(\#ch1)<\\
 \tb  $\ldots$\\
 >
 }
 \end{quote}
-
-The first part tells the type of environment, here it is {\tt channel}. 
-There are the following types 
+The first part is the type of environment, which is {\tt channel} here. 
+There are the following types of environment in AEDL:
 \begin{quote}
 {\tt flux\\
 cross\\
@@ -261,75 +253,66 @@ energy\\
 rule
 }
 \end{quote}
-Besides the type there is a user-defined name beginning with {\tt \#}, in the
-above example {\tt \#ch1}, which can be used later on to refer to the 
-channel defined in between {\tt <$\ldots$>}. Those names are so called
-automatic variables. They start all with {\tt \#} and do not behave as 
-usual variables. New names can only be
-created within the above construction. Only names which have been created
-can be refered to. Using the same name for different types of environments 
-does not work.  Each type has its own counter, \eg\ for channel the counter is 
-{\tt numofchannels}. The counter keeps track of how many different names 
-there are for one type, \ie\ they count the number of channels, 
-the number of rules, the number of energy resolution functions asf. 
-The value of those automatic variables is the number which can be used 
-to refer to them in your C code. You can create a variable for later use by
+Besides the environment type, there is a user-defined name 
+beginning with {\tt \#}
+in the above example: {\tt \#ch1}. It can be used later to refer to the 
+channel defined in {\tt <$\ldots$>}. Those names are so-called 
+``automatic variables'' and have to start with {\tt \#}. Note that these names have to be unique and can only be refered to after their definition.
+However, similar to C, one can give a header definition before:
 \begin{quote}
 {\tt    channel(\#ch2)<>}
 \end{quote}
-Now you can refer to {\tt \#ch2} without any trouble and you now could define
-a rule using {\tt \#ch2}. Later on of course you still have to specify the
-actual channel as described in section~\ref{sec:channel}.
+Now one can refer to the name {\tt \#ch2}, while the actual channel definition comes later. The internal representation of this automatic
+variable is a number, which obtains its value from a counter for each type of environment. For example, for {\tt channel} the counter is {\tt numofchannels}. The counter keeps track of how many different names 
+there are for one type of environment, which means that it counts the number of channels, rules, energy resolution functions \etc . Thus, the automatic
+variables are numbered in the order of their definition, and the number
+can later be used to refer to them in the C code (from $0$ to {\tt numof...}$-1$). Within each environment type, there are several 
+variables beginning with {\tt @}, which can only be used within the 
+appropriate type of environment. In many cases, 
+they have a special syntax, such as {\tt @channel}.          
 
-Variables beginning with {\tt @} are named and can be used only within the 
-appropriate type of environment, since we have to keep track where 
-they belong to. Moreover many of them have a special syntax, like 
-{\tt @channel}.          
-
-You can have several experiments in one file, just separate the different
+If you want to have several experiments in one file, separate the different
  experiments by 
 \begin{quote}
 {\tt    \#NEXT\#}
 \end{quote}
 This command resets the counters for channels, rules and energy resolution
-functions. All variables have their scope only within a region delimited
+functions. All variables have their scope limited 
 by either {\tt \%!GLoBES, \#NEXT\#} or {\tt EOF}. The only exception are 
-the counters defined with {\tt cross} and {\tt flux}. They are valid for 
-the complete session, since you never must overload the flux and 
-cross section information. This ensures  a consistent treatment of various 
-experiments in one file - there is no  shadowing of any variables.
+the counters defined by {\tt cross} and {\tt flux}. They are valid for 
+the complete session, since one does not want too overload the flux and 
+cross section information when using more than one experiment. This allows 
+a consistent treatment of various experiments in one file.
 
-Using multiple files to keep things clean and clear is supported by 
- an {\tt include} command. Includes can be nested up 
- to {\tt MAX\_INCLUSION\_DEPTH}, which is set to 10. Error reporting works 
- also for nested includes. The included file is not required to begin 
- with {\tt \%!GLoBES} to facilitate cut and paste
+As another feature of AEDL one can use include files with the {\tt include} command. Includes can be nested up to {\tt MAX\_INCLUSION\_DEPTH}, which is currently set to $10$. Error reporting works 
+ for nested includes, too. The included file is not required to begin 
+ with {\tt \%!GLoBES} to facilitate cut and paste:
 \begin{quote}
 {\tt include ./file\_1}
 \end{quote}
-
-Thus it is possible and advised to use constructs as the following
+With this include mechanism, one can use constructions such as 
 \begin{quote}
 {\tt    include NuFact.gls\\
         \#NEXT\#\\
         include JHFHK.gls
 }
 \end{quote}
-to define a combined analysis of the experiments defined in the files 
-{\tt NuFact.gls} and {\tt JHFHK.gls}. Even if you use the named 
-variable {\tt \#CC} in both experiments, but the cross section data used 
-is different (\eg\ because of different target nuclei), the correct 
-cross section data is used for each of the experiments, since {\tt \#CC} 
-in {\tt NuFact.gls} has the value $0$ and
-in {\tt JHFHK.gls} it has the value $1$, thus no shadowing occurs.
+in order to be able to initialize a combined analysis of the experiments defined in the files {\tt NuFact.gls} and {\tt JHFHK.gls} later. 
+Even if one uses the
+automatic variable {\tt \#CC} in both experiments 
+but the cross section data are different (for example, because of different target nuclei), the correct 
+cross section data will be applied to each of the experiments in the 
+application software. In this case, {\tt \#CC} in {\tt NuFact.gls} has 
+the value $0$ and in {\tt JHFHK.gls} it has the value $1$, 
+which means that no shadowing occurs.
 
-Furthermore you can store numbers in variables
+Furthermore, one can define constants such as
 \begin{quote}
 {\tt
 Pi = 3.141
 }
 \end{quote}
-And additionally we have some simple calculator functionality like
+and use some simple algebraic manipulations such as
 \begin{quote}
 {\tt
 Pi+1\\
@@ -337,22 +320,27 @@ Pi+1\\
 sin(Pi/2)\\
 }
 \end{quote}
-The following mathematical functions from {\tt <math.h>} are available 
+The following mathematical functions from {\tt <math.h>} are available: 
 {\tt sin}, {\tt cos}, {\tt atan}, {\tt ln}, {\tt exp}, {\tt sqrt}. 
-Those calculations work everywhere, where
-a simple number could stand. However threading over lists does not
- work, \eg\ {\tt sin(\{1,2,3\})} will not work. 
+These functions can be used everywhere, where
+otherwise only a scalar number would appear. However, they can not be
+applied to lists, such as {\tt sin(\{1,2,3\})} will not work. 
 
-One nasty thing is that a line feed character \verb+\n+ is necessary at
- the end of input, alternatively you can put a comment at the end.
+Finally, note that a line feed character \verb+\n+ is necessary at
+ the end of the input -- alternatively you can put a comment at the end.
 
+
+% Continue here (WW):
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Experiment definition with AEDL}
 
+In this chapter, we give a detailed definition of the AEDL features. We also show the underlying mathematical concepts in parallel, where applicable. We do not exactly follow the separation of source, oscillation, and detection properties, since most issues more or less involve the detection. Instead,
+we illustrate many of the features of the \GLOBES\ simulation by successively
+evolving the underlying statistical picture, and demonstrating how it translates into AEDL .
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Source properties}
+\section{Source properties and luminosity}
 \label{sec:source}
 
 \GLOBES\ handles only point sources, thus it is not possible
@@ -384,6 +372,7 @@ up a neutrino factory is
 \tb  @stored\_muons = 5.33e+20\\
 \tb  @time = 8.0\\
 >}\\
+
 
 Alternatively user defined fluxes may used like this
 \begin{quote}
@@ -439,12 +428,18 @@ particles per unit mass asf. which is not always straightforward. The fluxes
 will be rescaled by $1/L^2$, thus the normalization must contain a factor
 $L_0^2$, when $L_0$ is the distance from the source for which the flux is
 given.
+
+
+The most obvious property of the neutrino detection is the total
+active mass of the target as already defined in section~\ref{sec:source} and
+its value is defined by 
+\begin{quote}
+{\tt \$target\_mass = 50.0 }
+\end{quote}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Oscillation properties}
+\section{Baseline and matter density profile}
 
-
-
-\subsection{Baseline \& matter profile}
 The purpose of this module is to specify the path the neutrinos
 are traveling. The central piece of information is the total length
 of the path - the baseline\index{Baseline}
@@ -502,16 +497,8 @@ value for $a$ is $1$ and a typical value for $\delta a = 0.05$.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Detection properties}
 
-The most obvious property of the neutrino detection is the total
-active mass of the target as already defined in section~\ref{sec:source} and
-its value is defined by 
-\begin{quote}
-{\tt \$target\_mass = 50.0 }
-\end{quote}
-
-\subsection{Cross section}
+\section{Cross sections}
 \label{sec:cross_section}
 
 Cross sections\index{Cross sections} are used as part of the 
@@ -546,8 +533,7 @@ A cross section file is read by
 \end{quote}  
 and can later be refered to by {\tt \#name}.
 
-
-\subsection{Channels}
+\section{Oscillation channels}
 \label{sec:channel}
 
 Channels\index{Channel} represent an intermediate level in between 
@@ -570,6 +556,7 @@ effects coming from
 the insufficient knowledge used in the event reconstruction. We combine these
 two steps in order to obtain the differential event rate spectrum for each
 flavor and IT as seen by the detector, which we call a ``channel''. 
+
 The master formula for the differential event rate for each channel 
 is given by
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -670,247 +657,8 @@ value is $0$. Thus a more elaborate channel looks like
 \end{quote}
 This experiment obviously uses $10$ sampling points and $5$ bins.
 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Rules}
-\label{sec:rules}
-
-The set of rules\index{Rule} for an experiment is the final 
-link between the event rate
-computation and the statistical analysis. The information given by the rules
-specifies how the $\chi^2$ is computed based on the raw event rates as 
-described by the channels including possible systematical errors. 
-Therefore a rule has two parts: the first part describes how signal and 
-background events are composed out of the channels and the second part
-specifies which systematical errors are considered and what the size
-of the relevant errors is.
-
-Based on the definition of channels it is possible to assemble the 
-signal and background event numbers for each bin.  
-The signal $s_i$ in one bin for a rule now can be composed out of 
-several channels by
-\begin{equation}
-s_i=\epsilon_{c_1}\cdot n_i^{c_1}\,+\,\epsilon_{c_2}\cdot n_i^{c_2}\,+\,\ldots
-\end{equation}
-where the $\epsilon$'s are weight factors determined by the properties
-of the detector.
-Similarly the background in one bin $i$ can be specified by
-\begin{equation}
-b_i=\epsilon_{c_1}\cdot n_i^{c_1}\,+\,\epsilon_{c_2}\cdot n_i^{c_2}\,+\,\ldots
-\end{equation}
-This basic building blocks of a rule are specified by
-\begin{quote}
-{\tt \tb @signal = 0.5 @ \#channel\_1\\
-\tb @background = 0.001 @ \#channel\_2 :  0.005 @ \#channel\_3
-}
-\end{quote}
-
-Quite often it is not sufficient to have constant efficiencies and therefore
-it is possible to define efficiencies for each bin and channel $\alpha_i^c$
-and thus the event rates in one bin become
-\begin{equation}
-s_i=\epsilon_{c_1}\alpha_i^{c_1}\cdot n_i^{c_1}\,+
-\,\epsilon_{c_2}\alpha_i^{c_2}\cdot n_i^{c_2}\,+\,\ldots\,,
-\end{equation}
-and analogous for $b_i$.
-
-
-
-The set of all $s_i$'s and $b_i$'s now can be composed in a form that takes
-some types of systematical error into account. The two most important and
-most easily parameterized systematics are a normalization and an energy
-calibration error. These error are considered separately for the signal events
-and the background events. The implementation of the normalization error
-is straight forward
-\begin{equation}
-s_i(a):=a\cdot s_i
-\end{equation} 
-with an analogous definition for the background events.
-
-For the parameterization of an energy calibration error two possibilities
-are implemented. The first one being somewhat simpler, whereas the second one
-is more accurate but requires a careful choice of parameters. The first 
-option is
-\begin{equation}
-s_i(a,b):=s_i(a)+b\cdot s_i\, E_i/(E_\mathrm{max}-E_\mathrm{min})
-\end{equation}
-and it is refered to as tilt since it describes a linear distortion, a tilt
-of the event rate spectrum. The second option is closer to an actual energy
-calibration error, which basically amounts to replacing the reconstructed 
-energy $E'$ by $(1+b)\cdot E'$ and we use following approximation
-\begin{eqnarray}
-s_i(b)&=& (1+b)\cdot(s_{k+1}-s_k)\cdot\delta+s_i\,,\\
-\delta&=&b\cdot(i+t_0+ 1/2)+i\,,\nonumber\\
-k&=&\mod(\delta,1)\,,\nonumber\\
-t_0&=&E_\mathrm{min}/\Delta E_0\,.\nonumber
-\end{eqnarray}
-Special care is required at the boundaries when $k<1$ or $k+1>N_\mathrm{bins}$,
-since there $s_k$ or $s_{k+1}$ may not have been calculated. One possibility
-to deal with those cases is to assume that for those values of $k$ $s_k$ is
-zero. This is the default. In cases where $s$ at the boundary is however still
-sizeable this may lead to intolerable errors and subsequently to a wrong
-estimate of the impact of a calibration error. Therefore in those cases it
-is advisable to truncate the analysis range by a few bins at the boundary
-and therefore ensure in this way that only those $s_i$ are used whose index
-$k$ is within the range $1,\ldots, N_\mathrm{bins}-1$. 
-
-In order to perform this fine tuning, it is possible to constrain 
-the energy range from which the data are taken for the 
-analysis\index{Energy window}. This is achieved by setting the energy window
-variable. 
-\begin{quote}
-{\tt 
-\tb @energy\_window = 4.0 : 50.0 
-}
-\end{quote}
-The purpose is mainly to allow a fine tuning of the description
-of an energy calibration error. The default setting is that the energy window
-coincides with the range defined by the minimal and maximal reconstructed 
-energy. For the error dimension using the calibration method (C) it is 
-advisable to reduce the energy window by two or three bins at both the lower
-and upper end. As a rule of
-thumb consider the three standard deviations error on the calibration and
-evaluate the corresponding shift in $E'$ at the lower and upper energy limit 
-and reduce the analysis range by this amount.
-
-Thus the total event rate $x_i$ in a bin $i$ is given by
-\begin{equation}
-x_i(a,b,c,d)=s_i(a,b)+b_i(c,d)
-\end{equation}
-and thus a function of four parameters. The central values for all of
-the four parameters are always needed. They are called signal normalization
-($a$), signal tilt/calibration ($b$), background  normalization ($c$) and
-background tilt/calibration ($d$). The default values are
-\begin{equation}
-a=1\,,\quad b=0\,,\quad c={\tt NaN}\,,\quad d=0\,,
-\end{equation}
-thus for the background normalization $c$ a value has to be specified in 
-\emph{all} cases. The central values for the normalization and the 
-corresponding central value of tilt/calibration are regarded
-as a pair. The errors are treated in the same way.
-\begin{quote}
-{\tt
-\tb @signalerror =       0.001  :       0.01\\
-\tb @backgroundcenter =  0.1 :       0.0\\
-\tb @backgrounderror =   0.001 :       0.01
-}
-\end{quote}
-There is no {\tt @signalcenter} since by default the central value for the
-signal normalization is $1$ and the central value for the tilt/calibration 
-is $0$.  
-
-The four parameters $a,b,c,d$ have been introduced in order to describe
-systematical uncertainties, they are so called nuisance parameters.
-For the analysis of the systematical errors the so called 
- pull method is 
-used~\cite{Fogli:2002pt}\footnote{In fact the pull method
-was employed already in~\cite{Huber:2002mx} before 
-\cite{Fogli:2002pt} appeared.}. 
-In the  pull method $k$ systematical errors are included by introducing 
-$k$ additional variables $\zeta_k$, which will  be called 
-nuisance parameters in the following. 
-The nuisance parameters describe the dependence of the event rates on the 
-various sources of systematical errors, \eg\ an error on the total 
-normalization is included by multiplying the expected number of events in 
-each bin by a factor $(1+\zeta_1)$. The variation of $\zeta_1$ in the fit 
-is constrained by adding a penalty $p_1$ to the $\chi^2$-function. In case 
-of a  Gau\ss ian distributed systematical error this penalty is 
-given by
-\begin{equation}
-\label{eq:penalty}
-p_i=\frac{(\zeta_i-\zeta_i^0)^2}{\sigma_{\zeta_i}^2}\,,
-\end{equation}
-where $\zeta_i^0$ denotes the mean and $\sigma_{\zeta_i}$ the standard 
-deviation of the corresponding nuisance parameter, \ie\ the amount of 
-systematical uncertainty. 
-The resulting $\chi^2$ is then minimized with respect to all nuisance 
-parameters $\zeta_i$ and this yields $\chi^2_\mathrm{pull}$
-\begin{equation}
-\chi^2_\mathrm{pull}(\boldsymbol{\lambda}):=\min_{\{\zeta_i\} } \,\, \left( 
-\chi^2(\boldsymbol{\lambda},
-\zeta_1, \ldots, \zeta_k)+ \sum_{j=1}^{k} p_j(\zeta_j)\right)\,,
-\end{equation}
-where $\boldsymbol{\lambda}$ denotes the oscillation parameters 
-including the matter density
-$\rho$. One advantage of the pull method is that whenever the number $N$ of 
-data points is much larger than $k$, it is numerically easier to compute 
-$\chi^2_\mathrm{pull}$ than to invert the $N\times N$ covariance matrix. For
-the experiments considered here $N$ is typically $20$ and $k\sim 4$, thus
-the pull method is numerically much faster. Moreover it is more flexible and 
-allows the inclusion of systematical errors also for a 
-Poissonian $\chi^2$-function.
-In~\cite{Fogli:2002pt} it was shown that the pull method and the covariance
-based approach are equivalent for a Gau\ss ian and linear model. In general
-there is a separate $(\chi^2_\mathrm{pull})^\alpha$ for each rule $\alpha$, 
-\ie\ pair of signal and background spectra, with a separate set of 
-nuisance parameters $\zeta_i^\alpha$. In this case $\chi^2_\mathrm{pull}$
-is the sum of all individual  $(\chi^2_\mathrm{pull})^\alpha$.
-In this way the dependence on the $k$ nuisance parameters has been eliminated 
-from $\chi^2_\mathrm{pull}$. 
-
-The user has the possibility to choose the set $\{\zeta_i\}$ of nuisance 
-parameters which are marginalized. This achieved with the error dimension 
-variable\index{Error dimension}, and the different possibilities are shown in
-table~\ref{tab:error_dim}. If a parameter is designated with $+$, it will
-be marginalized and therefore the corresponding error needs to have a non-zero
-value. In the cases labeled (number 4 and 8) ``total rates'' 
-the summation over the bins is performed \emph{before} computing 
-the $\chi^2$. The case labeled (number 7) ``spectrum only'' leaves the 
-normalization free ($\sigma_a=\sigma_c=\infty$) and therefore counts only the 
-spectral information in the data. As a consequence
-the settings for the normalization error will be ignored. It is furthermore
-possible to extend the set of error dimensions and thus the set of possible 
-systematical errors to be studied, but this requires proper C programing, 
-compiling and linking with \GLOBES. The interface for user defined error 
-dimensions is described in detail in section~\ref{sec:ud_error_dim}.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{center}
-\begin{table}[hbt!]
-\begin{center}
-\begin{tabular}[h]{|c|cccc|c|c|}
-\hline
-Error dimension&$a$&$b$&$c$&$d$&Tilt/Calibration&Remarks\\
-\hline
-\hline
-0&+&+&+&+&T&\\
-2&-&-&-&-&-&\\
-4&+&+&+&+&T&total rates\\
-7&o&-&o&-&-&spectrum only\\
-8&-&-&-&-&-&total rates\\
-9&+&+&+&+&C&\\
-\hline
-\end{tabular}
-\caption[Table of error dimensions]{\label{tab:error_dim}
-Values of the error dimension variable and their meaning.
- }
-\end{center} 
-\end{table} 
-\end{center}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-The error dimensions can be chosen for each rule by
-\begin{quote}
-{\tt 
-\tb @errordim = 1
-}
-\end{quote}
-
-Next we can assemble the various pieces into one rule
-\begin{quote}
-{\tt rule(\#rule\_1)<\\
-\tb @signal = 0.5 @ \#channel\_1\\
-\tb @background = 0.001 @ \#channel\_2 :  0.005 @ \#channel\_3\\
-\tb @signalerror =       0.001  :       0.01\\
-\tb @backgroundcenter =  0.1 :       0.0\\
-\tb @backgrounderror =   0.001 :       0.01\\
-\tb @errordim = 1\\
-\tb @energy\_window = 4.0 : 50.0\\ 
->}
-\end{quote}
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Energy resolution function}
+\section{Energy resolution function}
 \label{sec:energy}
 
 The origin and meaning of the energy resolution function 
@@ -1254,9 +1002,249 @@ energy(\#name)<\\
 >
 }
 \end{quote}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Rules and the treatment of systematics}
+\label{sec:rules}
+
+The set of rules\index{Rule} for an experiment is the final 
+link between the event rate
+computation and the statistical analysis. The information given by the rules
+specifies how the $\chi^2$ is computed based on the raw event rates as 
+described by the channels including possible systematical errors. 
+Therefore a rule has two parts: the first part describes how signal and 
+background events are composed out of the channels and the second part
+specifies which systematical errors are considered and what the size
+of the relevant errors is.
+
+Based on the definition of channels it is possible to assemble the 
+signal and background event numbers for each bin.  
+The signal $s_i$ in one bin for a rule now can be composed out of 
+several channels by
+\begin{equation}
+s_i=\epsilon_{c_1}\cdot n_i^{c_1}\,+\,\epsilon_{c_2}\cdot n_i^{c_2}\,+\,\ldots
+\end{equation}
+where the $\epsilon$'s are weight factors determined by the properties
+of the detector.
+Similarly the background in one bin $i$ can be specified by
+\begin{equation}
+b_i=\epsilon_{c_1}\cdot n_i^{c_1}\,+\,\epsilon_{c_2}\cdot n_i^{c_2}\,+\,\ldots
+\end{equation}
+This basic building blocks of a rule are specified by
+\begin{quote}
+{\tt \tb @signal = 0.5 @ \#channel\_1\\
+\tb @background = 0.001 @ \#channel\_2 :  0.005 @ \#channel\_3
+}
+\end{quote}
+
+Quite often it is not sufficient to have constant efficiencies and therefore
+it is possible to define efficiencies for each bin and channel $\alpha_i^c$
+and thus the event rates in one bin become
+\begin{equation}
+s_i=\epsilon_{c_1}\alpha_i^{c_1}\cdot n_i^{c_1}\,+
+\,\epsilon_{c_2}\alpha_i^{c_2}\cdot n_i^{c_2}\,+\,\ldots\,,
+\end{equation}
+and analogous for $b_i$.
+
+
+
+The set of all $s_i$'s and $b_i$'s now can be composed in a form that takes
+some types of systematical error into account. The two most important and
+most easily parameterized systematics are a normalization and an energy
+calibration error. These error are considered separately for the signal events
+and the background events. The implementation of the normalization error
+is straight forward
+\begin{equation}
+s_i(a):=a\cdot s_i
+\end{equation} 
+with an analogous definition for the background events.
+
+For the parameterization of an energy calibration error two possibilities
+are implemented. The first one being somewhat simpler, whereas the second one
+is more accurate but requires a careful choice of parameters. The first 
+option is
+\begin{equation}
+s_i(a,b):=s_i(a)+b\cdot s_i\, E_i/(E_\mathrm{max}-E_\mathrm{min})
+\end{equation}
+and it is refered to as tilt since it describes a linear distortion, a tilt
+of the event rate spectrum. The second option is closer to an actual energy
+calibration error, which basically amounts to replacing the reconstructed 
+energy $E'$ by $(1+b)\cdot E'$ and we use following approximation
+\begin{eqnarray}
+s_i(b)&=& (1+b)\cdot(s_{k+1}-s_k)\cdot\delta+s_i\,,\\
+\delta&=&b\cdot(i+t_0+ 1/2)+i\,,\nonumber\\
+k&=&\mod(\delta,1)\,,\nonumber\\
+t_0&=&E_\mathrm{min}/\Delta E_0\,.\nonumber
+\end{eqnarray}
+Special care is required at the boundaries when $k<1$ or $k+1>N_\mathrm{bins}$,
+since there $s_k$ or $s_{k+1}$ may not have been calculated. One possibility
+to deal with those cases is to assume that for those values of $k$ $s_k$ is
+zero. This is the default. In cases where $s$ at the boundary is however still
+sizeable this may lead to intolerable errors and subsequently to a wrong
+estimate of the impact of a calibration error. Therefore in those cases it
+is advisable to truncate the analysis range by a few bins at the boundary
+and therefore ensure in this way that only those $s_i$ are used whose index
+$k$ is within the range $1,\ldots, N_\mathrm{bins}-1$. 
+
+In order to perform this fine tuning, it is possible to constrain 
+the energy range from which the data are taken for the 
+analysis\index{Energy window}. This is achieved by setting the energy window
+variable. 
+\begin{quote}
+{\tt 
+\tb @energy\_window = 4.0 : 50.0 
+}
+\end{quote}
+The purpose is mainly to allow a fine tuning of the description
+of an energy calibration error. The default setting is that the energy window
+coincides with the range defined by the minimal and maximal reconstructed 
+energy. For the error dimension using the calibration method (C) it is 
+advisable to reduce the energy window by two or three bins at both the lower
+and upper end. As a rule of
+thumb consider the three standard deviations error on the calibration and
+evaluate the corresponding shift in $E'$ at the lower and upper energy limit 
+and reduce the analysis range by this amount.
+
+Thus the total event rate $x_i$ in a bin $i$ is given by
+\begin{equation}
+x_i(a,b,c,d)=s_i(a,b)+b_i(c,d)
+\end{equation}
+and thus a function of four parameters. The central values for all of
+the four parameters are always needed. They are called signal normalization
+($a$), signal tilt/calibration ($b$), background  normalization ($c$) and
+background tilt/calibration ($d$). The default values are
+\begin{equation}
+a=1\,,\quad b=0\,,\quad c={\tt NaN}\,,\quad d=0\,,
+\end{equation}
+thus for the background normalization $c$ a value has to be specified in 
+\emph{all} cases. The central values for the normalization and the 
+corresponding central value of tilt/calibration are regarded
+as a pair. The errors are treated in the same way.
+\begin{quote}
+{\tt
+\tb @signalerror =       0.001  :       0.01\\
+\tb @backgroundcenter =  0.1 :       0.0\\
+\tb @backgrounderror =   0.001 :       0.01
+}
+\end{quote}
+There is no {\tt @signalcenter} since by default the central value for the
+signal normalization is $1$ and the central value for the tilt/calibration 
+is $0$.  
+
+The four parameters $a,b,c,d$ have been introduced in order to describe
+systematical uncertainties, they are so called nuisance parameters.
+For the analysis of the systematical errors the so called 
+ pull method is 
+used~\cite{Fogli:2002pt}\footnote{In fact the pull method
+was employed already in~\cite{Huber:2002mx} before 
+\cite{Fogli:2002pt} appeared.}. 
+In the  pull method $k$ systematical errors are included by introducing 
+$k$ additional variables $\zeta_k$, which will  be called 
+nuisance parameters in the following. 
+The nuisance parameters describe the dependence of the event rates on the 
+various sources of systematical errors, \eg\ an error on the total 
+normalization is included by multiplying the expected number of events in 
+each bin by a factor $(1+\zeta_1)$. The variation of $\zeta_1$ in the fit 
+is constrained by adding a penalty $p_1$ to the $\chi^2$-function. In case 
+of a  Gau\ss ian distributed systematical error this penalty is 
+given by
+\begin{equation}
+\label{eq:penalty}
+p_i=\frac{(\zeta_i-\zeta_i^0)^2}{\sigma_{\zeta_i}^2}\,,
+\end{equation}
+where $\zeta_i^0$ denotes the mean and $\sigma_{\zeta_i}$ the standard 
+deviation of the corresponding nuisance parameter, \ie\ the amount of 
+systematical uncertainty. 
+The resulting $\chi^2$ is then minimized with respect to all nuisance 
+parameters $\zeta_i$ and this yields $\chi^2_\mathrm{pull}$
+\begin{equation}
+\chi^2_\mathrm{pull}(\boldsymbol{\lambda}):=\min_{\{\zeta_i\} } \,\, \left( 
+\chi^2(\boldsymbol{\lambda},
+\zeta_1, \ldots, \zeta_k)+ \sum_{j=1}^{k} p_j(\zeta_j)\right)\,,
+\end{equation}
+where $\boldsymbol{\lambda}$ denotes the oscillation parameters 
+including the matter density
+$\rho$. One advantage of the pull method is that whenever the number $N$ of 
+data points is much larger than $k$, it is numerically easier to compute 
+$\chi^2_\mathrm{pull}$ than to invert the $N\times N$ covariance matrix. For
+the experiments considered here $N$ is typically $20$ and $k\sim 4$, thus
+the pull method is numerically much faster. Moreover it is more flexible and 
+allows the inclusion of systematical errors also for a 
+Poissonian $\chi^2$-function.
+In~\cite{Fogli:2002pt} it was shown that the pull method and the covariance
+based approach are equivalent for a Gau\ss ian and linear model. In general
+there is a separate $(\chi^2_\mathrm{pull})^\alpha$ for each rule $\alpha$, 
+\ie\ pair of signal and background spectra, with a separate set of 
+nuisance parameters $\zeta_i^\alpha$. In this case $\chi^2_\mathrm{pull}$
+is the sum of all individual  $(\chi^2_\mathrm{pull})^\alpha$.
+In this way the dependence on the $k$ nuisance parameters has been eliminated 
+from $\chi^2_\mathrm{pull}$. 
+
+The user has the possibility to choose the set $\{\zeta_i\}$ of nuisance 
+parameters which are marginalized. This achieved with the error dimension 
+variable\index{Error dimension}, and the different possibilities are shown in
+table~\ref{tab:error_dim}. If a parameter is designated with $+$, it will
+be marginalized and therefore the corresponding error needs to have a non-zero
+value. In the cases labeled (number 4 and 8) ``total rates'' 
+the summation over the bins is performed \emph{before} computing 
+the $\chi^2$. The case labeled (number 7) ``spectrum only'' leaves the 
+normalization free ($\sigma_a=\sigma_c=\infty$) and therefore counts only the 
+spectral information in the data. As a consequence
+the settings for the normalization error will be ignored. It is furthermore
+possible to extend the set of error dimensions and thus the set of possible 
+systematical errors to be studied, but this requires proper C programing, 
+compiling and linking with \GLOBES. The interface for user defined error 
+dimensions is described in detail in section~\ref{sec:ud_error_dim}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{center}
+\begin{table}[hbt!]
+\begin{center}
+\begin{tabular}[h]{|c|cccc|c|c|}
+\hline
+Error dimension&$a$&$b$&$c$&$d$&Tilt/Calibration&Remarks\\
+\hline
+\hline
+0&+&+&+&+&T&\\
+2&-&-&-&-&-&\\
+4&+&+&+&+&T&total rates\\
+7&o&-&o&-&-&spectrum only\\
+8&-&-&-&-&-&total rates\\
+9&+&+&+&+&C&\\
+\hline
+\end{tabular}
+\caption[Table of error dimensions]{\label{tab:error_dim}
+Values of the error dimension variable and their meaning.
+ }
+\end{center} 
+\end{table} 
+\end{center}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The error dimensions can be chosen for each rule by
+\begin{quote}
+{\tt 
+\tb @errordim = 1
+}
+\end{quote}
+
+Next we can assemble the various pieces into one rule
+\begin{quote}
+{\tt rule(\#rule\_1)<\\
+\tb @signal = 0.5 @ \#channel\_1\\
+\tb @background = 0.001 @ \#channel\_2 :  0.005 @ \#channel\_3\\
+\tb @signalerror =       0.001  :       0.01\\
+\tb @backgroundcenter =  0.1 :       0.0\\
+\tb @backgrounderror =   0.001 :       0.01\\
+\tb @errordim = 1\\
+\tb @energy\_window = 4.0 : 50.0\\ 
+>}
+\end{quote}
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{User-defined systematics}
-\label{sec:ud_error_dim}.
+%\section{User-defined systematics}
+%\label{sec:ud_error_dim}.
 
 
 %%% Local Variables: 
