@@ -14,6 +14,7 @@
 \usepackage{a4wide}
 \usepackage{fancyheadings}
 \usepackage[footnotesize,bf]{caption}
+\usepackage{makeidx}
 \usepackage{ae,aecompl} % only for Type 1 fonts
 
 \newcommand{\capdef}{}
@@ -24,6 +25,9 @@
 \renewcommand{\fnum@table}{\textbf{\tablename~\thetable}}
 \renewcommand{\fnum@figure}{\textbf{\figurename~\thefigure}}
 \makeatother
+
+% Index: use "makeindex Manual" to create .ind file
+\makeindex
 
 \newcommand{\bi}{\begin{itemize}}
 \newcommand{\ei}{\end{itemize}}
@@ -251,5 +255,9 @@ Here comes a maximum of one page what \GLOBES\ is good for and what main feature
 
 \bibliographystyle{unsrt}
 \bibliography{references}
+
+% Index:
+
+\printindex
 
 \end{document}
