@@ -74,8 +74,8 @@ int main(int argc, char *argv[])
   {
       /* Set vector of test values */
       thetheta13=asin(sqrt(pow(10,x)))/2;
-      glbSetOscParams(test_values,thetheta13,1);
-      glbSetOscParams(test_values,y*M_PI/180.0,3);
+      glbSetOscParams(test_values,thetheta13,GLB_THETA_13);
+      glbSetOscParams(test_values,y*M_PI/180.0,GLB_DELTA_CP);
   
       /* Compute Chi^2 for all loaded experiments and all rules */
       res=glbChiSys(test_values,GLB_ALL,GLB_ALL);

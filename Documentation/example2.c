@@ -85,10 +85,10 @@ int main(int argc, char *argv[])
   {
       /* Set vector of test=fit values */
       thetheta13=asin(sqrt(pow(10,x)))/2;
-      glbSetOscParams(test_values,thetheta13,1);
+      glbSetOscParams(test_values,thetheta13,GLB_THETA_13);
      
       /* Guess fit value for deltacp in order to safely find minimum */
-      glbSetOscParams(test_values,200.0/2*(x+4)*M_PI/180,3);
+      glbSetOscParams(test_values,200.0/2*(x+4)*M_PI/180,GLB_DELTA_CP);
  
       /* Compute Chi^2 for two-parameter correlation: minimize over deltacp only */
       res1=glbChiNP(test_values,NULL,GLB_ALL);

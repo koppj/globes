@@ -76,10 +76,9 @@ double CalcNoSystematics(double theldm,double thex)
 {
  int rules=glbGetNumberOfRules(0);
  int j;
-  /* Later with glbSwitchSystematics(GLB_ALL,GLB_ALL,GLB_OFF) */
- for(j=0;j<rules;j++) glbSetErrorDim(2,0,j);
+ glbSwitchSystematics(GLB_ALL,GLB_ALL,GLB_OFF);
  double res=CalcSystematics(theldm,thex);
- for(j=0;j<rules;j++) glbSetErrorDim(0,0,j);
+ glbSwitchSystematics(GLB_ALL,GLB_ALL,GLB_ON);
  return res; 
 }
 
@@ -89,7 +88,7 @@ double CalcProjection(double theldm,double thex,glb_params start_vector)
   SetOscParams(theldm);
 
   double thetheta13=asin(sqrt(pow(10,thex)))/2;
-  double thesign=Sign(glbGetOscParams(start_vector,5));
+  double thesign=Sign(glbGetOscParams(start_vector,GLB_DM_ATM));
 
   glb_params input_errors = glbAllocParams();
   glb_params starting_values = glbAllocParams();
@@ -105,12 +104,12 @@ double CalcProjection(double theldm,double thex,glb_params start_vector)
   glbSetStartingValues(starting_values);
   glbSetInputErrors(input_errors);
 
-  start_vector=glbSetOscParams(start_vector,thetheta13,1);
+  start_vector=glbSetOscParams(start_vector,thetheta13,GLB_THETA_13);
   double res=glbChiTheta(start_vector,minimum,GLB_ALL);
   
   /* Trick for next run: Find position of minimum better by using deltacp of prior 
-     calculation; note that this modifies the org/deg-vectors in the main routine! */
-  glbSetOscParams(start_vector,glbGetOscParams(minimum,3),3);
+     calculation; note that this modifies the vectors in the main routine! */
+  glbSetOscParams(start_vector,glbGetOscParams(minimum,GLB_DELTA_CP),GLB_DELTA_CP);
  
   glbFreeParams(input_errors);
   glbFreeParams(starting_values);

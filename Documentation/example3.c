@@ -75,7 +75,7 @@ int main(int argc, char *argv[])
   double CL=glbChiAll(starting_values,deg_pos,GLB_ALL);
    
   printf("Position of degeneracy: s22th13=%g, deltacp=%g; Confidence level: %g \n",
-    glbGetOscParams(deg_pos,1),glbGetOscParams(deg_pos,3),CL);
+    glbGetOscParams(deg_pos,GLB_THETA_13),glbGetOscParams(deg_pos,GLB_DELTA_CP),CL);
   
   /* If degeneracy at low enough confidence level: compute section */
   if(CL<9.0)
@@ -86,8 +86,8 @@ int main(int argc, char *argv[])
     {
         /* Set vector of test values */
         thetheta13=asin(sqrt(pow(10,x)))/2;
-        glbSetOscParams(deg_pos,thetheta13,1);
-        glbSetOscParams(deg_pos,y*M_PI/180.0,3);
+        glbSetOscParams(deg_pos,thetheta13,GLB_THETA_13);
+        glbSetOscParams(deg_pos,y*M_PI/180.0,GLB_DELTA_CP);
     
         /* Compute Chi^2 for all loaded experiments and all rules */
         res=glbChiSys(deg_pos,GLB_ALL,GLB_ALL);

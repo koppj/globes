@@ -253,13 +253,19 @@ proportional to the product of source power $\times$ target mass $\times$
  $\beta$-beams), target power in megawatts (superbeams), or thermal
  reactor power in gigawatts (reactor experiments).
 %
-Since the pre-defined experiments in \tabl{experiments} are given for specfific luminosities, it is useful to change these parameters of the
-individual experiments:
+Since the pre-defined experiments in \tabl{experiments} are given for specfific luminosities, it is useful to read out and change these
+ parameters of the individual experiments:
 \begin{function}
 \GLBNS{glbSetSourcePower}
 {\tt void glbSetSourcePower(double power, int exp, int fluxno)}
  sets the source power of experiment number {\tt exp} and flux number
  {\tt fluxno} to {\tt power}. The definition of the source power depends on the experiment type as described above.
+\end{function}
+\begin{function}
+\GLBNS{glbGetSourcePower}
+{\tt double glbGetSourcePower(int exp, int fluxno)}
+ returns the source power of experiment number {\tt exp} and flux number
+ {\tt fluxno}. 
 \end{function}
 \begin{function}
 \GLBNS{glbSetRunningTime}
@@ -268,9 +274,20 @@ individual experiments:
  {\tt fluxno} to {\tt time} years.
 \end{function}
 \begin{function}
+\GLBNS{glbGetRunningTime}
+{\tt double glbGetRunningTime(int exp, int fluxno)}
+ returns the running time of experiment number {\tt exp} and flux number
+ {\tt fluxno}.
+\end{function}
+\begin{function}
  \GLBNS{glbSetTargetMass}
 {\tt void glbSetTargetMass(double mass,int exp)}
 sets the fiducial detector mass of experiment number {\tt exp} to {\tt mass} tons or kilotons (depending on the experiment definition).
+\end{function}
+\begin{function}
+ \GLBNS{glbGetTargetMass}
+{\tt double glbGetTargetMass(int exp)}
+returns the fiducial detector mass of experiment number {\tt exp}.
 \end{function}
 Thus, these functions also demonstrate how to use the assigned experiment number and others. These numbers run from $0$ to the number of experiments-1, fluxes-1, \etc, where the individual elements are numbered in the order of their appearance. 
  Note that the source power and running time are quantities defined
