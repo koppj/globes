@@ -276,7 +276,7 @@ int glbNameToValue(int exp, const char* context, const char *name);
 const char *glbValueToName(int exp,const char* context, int value);
 
 /* Trying to get a tree-like linkage */
-void glbSuperInit(char *name);
+void glbInit(char *name);
 
 
 /* Adding user defined priors */

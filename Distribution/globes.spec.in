@@ -86,7 +86,7 @@ fi
 %files
 
 # Your application file list goes here
-%{prefix}/lib/libglobes.so*
+%{prefix}/lib/libglobes.*
 %{prefix}/lib/globes
 %{prefix}/bin/globes
 %{prefix}/bin/globes-config

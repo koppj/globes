@@ -82,5 +82,6 @@ glb_density_proj_type *glb_alloc_density_proj_type();
 
 void glb_free_density_proj_type(glb_density_proj_type *stale);
 
+void glb_init(char *name);
 
 #endif /* GLB_WRAPPER_H 1 */

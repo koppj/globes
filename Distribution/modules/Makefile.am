@@ -24,5 +24,5 @@ globes_DEPENDENCIES = libglobes.la
 
 noinst_PROGRAMS = module-example
 module_example_SOURCES = module-example.c
-module_example_LDADD =  $(top_builddir)/source/libglb.la @LIBS@ @LIBLTDL@\
+module_example_LDADD =  libglobes.la @LIBS@ @LIBLTDL@\
  -lstdc++

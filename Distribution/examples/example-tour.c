@@ -45,9 +45,7 @@ int main(int argc, char *argv[])
   else stream = stdout;
   stream=stdout;
   /* Initialize libglobes */
-  
- 
-   glbSuperInit(argv[0]);
+  glbInit(argv[0]);
   
 
   /* Define my standard oscillation parameters */

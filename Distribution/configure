@@ -464,7 +464,7 @@ ac_includes_default="\
 #endif"
 
 ac_subdirs_all="$ac_subdirs_all libltdl"
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT GLBLIBVERSION GLBLDF GLBINC GLBMODULES CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE CXX CXXFLAGS ac_ct_CXX CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE CPP LN_S YACC LEX LEXLIB LEX_OUTPUT_ROOT HAVE_LIBTOOL LTDLINCL LIBLTDL build build_cpu build_vendor build_os host host_cpu host_vendor host_os EGREP ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL subdirs RPM_RELEASE RPM_ARCHS RPM_PROG RPM_SOURCE_DIR RPM_BUILD_DIR RPM_DIR RPM_TARGET RPM_ARGS RPM_TARBALL RPM_VERSION RPM_CONFIGURE_ARGS MAKE_RPMS_TRUE MAKE_RPMS_FALSE LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT GLBLIBVERSION GLBMLDF GLBLDF GLBINC GLBMODULES CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE CXX CXXFLAGS ac_ct_CXX CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE CPP LN_S YACC LEX LEXLIB LEX_OUTPUT_ROOT HAVE_LIBTOOL LTDLINCL LIBLTDL build build_cpu build_vendor build_os host host_cpu host_vendor host_os EGREP ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL subdirs RPM_RELEASE RPM_ARCHS RPM_PROG RPM_SOURCE_DIR RPM_BUILD_DIR RPM_DIR RPM_TARGET RPM_ARGS RPM_TARBALL RPM_VERSION RPM_CONFIGURE_ARGS MAKE_RPMS_TRUE MAKE_RPMS_FALSE LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -1989,11 +1989,14 @@ _ACEOF
 
 if test $prefix = NONE; then
  GLBLDF="-lglobes -lglb"
+ GLBMLDF="-lglb"
 else
  GLBLDR="${prefix}/lib"
  GLBLDF="${GLBLDR}/libglobes.so -Wl,--rpath -Wl,${GLBLDR} ${GLBLDR}/globes/libglb.so -Wl,--rpath -Wl,${GLBLDR}/globes"
+ GLBMLDF="${GLBLDR}/globes/libglb.so -Wl,--rpath -Wl,${GLBLDR}/globes"
  GLBINC="-I${prefix}/include/"
 fi
+
 
 
 
@@ -4289,6 +4292,8 @@ echo "${ECHO_T}no" >&6
 fi
 
 
+
+
   case $enable_ltdl_convenience in
   no) { { echo "$as_me:$LINENO: error: this package needs a convenience libltdl" >&5
 echo "$as_me: error: this package needs a convenience libltdl" >&2;}
@@ -4908,7 +4913,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 4911 "configure"' > conftest.$ac_ext
+  echo '#line 4916 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -5782,7 +5787,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:5785:" \
+echo "$as_me:5790:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -6832,11 +6837,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:6835: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:6840: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:6839: \$? = $ac_status" >&5
+   echo "$as_me:6844: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -7075,11 +7080,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:7078: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:7083: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:7082: \$? = $ac_status" >&5
+   echo "$as_me:7087: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -7135,11 +7140,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:7138: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:7143: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:7142: \$? = $ac_status" >&5
+   echo "$as_me:7147: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -9320,7 +9325,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 9323 "configure"
+#line 9328 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -9418,7 +9423,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 9421 "configure"
+#line 9426 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11607,11 +11612,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:11610: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:11615: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:11614: \$? = $ac_status" >&5
+   echo "$as_me:11619: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -11667,11 +11672,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:11670: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:11675: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:11674: \$? = $ac_status" >&5
+   echo "$as_me:11679: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -13028,7 +13033,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 13031 "configure"
+#line 13036 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -13126,7 +13131,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 13129 "configure"
+#line 13134 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -13963,11 +13968,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13966: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13971: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:13970: \$? = $ac_status" >&5
+   echo "$as_me:13975: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -14023,11 +14028,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14026: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14031: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:14030: \$? = $ac_status" >&5
+   echo "$as_me:14035: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -16058,11 +16063,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:16061: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:16066: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:16065: \$? = $ac_status" >&5
+   echo "$as_me:16070: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -16301,11 +16306,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:16304: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:16309: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:16308: \$? = $ac_status" >&5
+   echo "$as_me:16313: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -16361,11 +16366,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:16364: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:16369: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:16368: \$? = $ac_status" >&5
+   echo "$as_me:16373: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -18546,7 +18551,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 18549 "configure"
+#line 18554 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -18644,7 +18649,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 18647 "configure"
+#line 18652 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -20762,6 +20767,8 @@ fi
 done
 
 
+
+
 RPM_RELEASE=0
 
 
@@ -20771,7 +20778,7 @@ if test "${with_rpm_prog+set}" = set; then
   withval="$with_rpm_prog"
   rpm_prog="$withval"
 else
-  rpm_prog=""
+  rpm_prog="rpmbuild"
 fi;
 
 # Check whether --enable-rpm-rules or --disable-rpm-rules was given.
@@ -20816,9 +20823,8 @@ RPM_ARCHS=$rpm_targets
           RPM_PROG=$rpm_prog
        fi
     fi
-
-    # Extract the first word of "rpm", so it can be a program name with args.
-set dummy rpm; ac_word=$2
+    # Extract the first word of "$rpm_prog", so it can be a program name with args.
+set dummy $rpm_prog; ac_word=$2
 echo "$as_me:$LINENO: checking for $ac_word" >&5
 echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
 if test "${ac_cv_path_RPM_PROG+set}" = set; then
@@ -20859,9 +20865,14 @@ fi
 
     no_rpm=no
     if test "$RPM_PROG" = "no" ; then
-echo *** RPM Configuration Failed
-echo *** Failed to find the rpm program.  If you want to build rpm packages
-echo *** indicate the path to the rpm program using  --with-rpm-prog=PROG
+echo "*** RPM Configuration Failed"
+echo "*** Failed to find the rpmbuild program."
+echo "*** If you want to build rpm packages indicate the path to the rpmbuild"
+echo "*** program using --with-rpm-prog=PROG"
+echo "*** On older systems rpmbuild may be replaced by rpm itself."
+echo "*** You can test this by calling rpm -ba, if rpm recognizes this option"
+echo "*** rpm can be used instead of rpmbuild, just re-run configure using"
+echo "*** --with-rpm-prog=rpm"
       no_rpm=yes
       RPM_MAKE_RULES=""
     else
@@ -21691,6 +21702,7 @@ s,@MAINTAINER_MODE_TRUE@,$MAINTAINER_MODE_TRUE,;t t
 s,@MAINTAINER_MODE_FALSE@,$MAINTAINER_MODE_FALSE,;t t
 s,@MAINT@,$MAINT,;t t
 s,@GLBLIBVERSION@,$GLBLIBVERSION,;t t
+s,@GLBMLDF@,$GLBMLDF,;t t
 s,@GLBLDF@,$GLBLDF,;t t
 s,@GLBINC@,$GLBINC,;t t
 s,@GLBMODULES@,$GLBMODULES,;t t

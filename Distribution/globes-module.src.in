@@ -66,9 +66,9 @@ then
     gcc -c -g -O4 -I@includedir@ -DPIC -fPIC -DUSE_NO_LIBTOOL $1
 
     # Linking the object file with all the neccesary stuff
-    echo "gcc -g -shared ${1%.c}.o @GLBLDF@ GLB_LINKER_FLAGS -Wl,-soname -Wl,${1%.c}.so -o ${1%.c}.so"
+    echo "gcc -g -shared ${1%.c}.o @GLBMLDF@ GLB_LINKER_FLAGS -Wl,-soname -Wl,${1%.c}.so -o ${1%.c}.so"
 
-    gcc -g -shared ${1%.c}.o @GLBLDF@ GLB_LINKER_FLAGS\
+    gcc -g -shared ${1%.c}.o @GLBMLDF@ GLB_LINKER_FLAGS\
     -Wl,-soname -Wl,${1%.c}.so -o ${1%.c}.so
 
 else
@@ -81,6 +81,6 @@ else
     # Link the libtool-object
     libtool --mode=link --tag=CC gcc -g -o ${1%.c*}.la -rpath `pwd`\
     -no-undefined -module -avoid-version ${1%.c*}.lo \
-    @libdir@/libglobes.la
+    @libdir@/globes/libglb.la
 
 fi

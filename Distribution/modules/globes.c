@@ -419,7 +419,7 @@ int main(int argc, char *argv[])
   argp_parse (&argp, argc, argv, 0, 0, &arguments);  
 
   /* Initialize libglobes */
-  glbSuperInit(argv[0]);
+  glbInit(argv[0]);
   glbSetPrintDelimiters(arguments.left,arguments.middle,arguments.right);
   glbSetVerbosityLevel(arguments.verbosity);
   

@@ -223,7 +223,7 @@ dnl
 dnl   # end of file
 dnl   ---------- >8 ----------
 dnl
-dnl @version $Id: acinclude.m4,v 1.2 2004/09/15 09:10:50 globes Exp $
+dnl @version $Id: acinclude.m4,v 1.3 2004/09/15 12:29:42 globes Exp $
 dnl @author Dale K. Hawkins <dhawkins@cdrgts.com>
 
 dnl AM_RPM_INIT
@@ -233,9 +233,9 @@ dnl automake target
 AC_DEFUN([AM_RPM_INIT],
 [dnl
 AC_REQUIRE([AC_CANONICAL_HOST])
-dnl Find the RPM program
+dnl Find the RPM (rpmbuild) program
 AC_ARG_WITH(rpm-prog,[  --with-rpm-prog=PROG   Which rpm to use (optional)],
-            rpm_prog="$withval", rpm_prog="")
+            rpm_prog="$withval", rpm_prog="rpmbuild")
 
 AC_ARG_ENABLE(rpm-rules, [  --enable-rpm-rules       Try to create rpm make rules (defaults to yes for Linux)],
                 enable_rpm_rules="$withval",enable_rpm_rules=no)
@@ -264,13 +264,20 @@ AC_SUBST(RPM_ARCHS)
           RPM_PROG=$rpm_prog
        fi
     fi
-
-    AC_PATH_PROG(RPM_PROG, rpm, no)
+dnl update to rpmbuild -- PH
+dnl echo "RPM_PROG is $RPM_PROG"
+dnl replace rpm with $rpm_prog in the next line -- PH
+    AC_PATH_PROG(RPM_PROG, $rpm_prog, no)
     no_rpm=no
     if test "$RPM_PROG" = "no" ; then
-echo *** RPM Configuration Failed
-echo *** Failed to find the rpm program.  If you want to build rpm packages
-echo *** indicate the path to the rpm program using  --with-rpm-prog=PROG
+echo "*** RPM Configuration Failed"
+echo "*** Failed to find the rpmbuild program." 
+echo "*** If you want to build rpm packages indicate the path to the rpmbuild"
+echo "*** program using --with-rpm-prog=PROG"
+echo "*** On older systems rpmbuild may be replaced by rpm itself."
+echo "*** You can test this by calling rpm -ba, if rpm recognizes this option"
+echo "*** rpm can be used instead of rpmbuild, just re-run configure using"
+echo "*** --with-rpm-prog=rpm"
       no_rpm=yes
       RPM_MAKE_RULES=""
     else

@@ -27,6 +27,8 @@ AC_PREREQ(2.50)
 AC_INIT([libltdl], [1.2], [bug-libtool@gnu.org])
 AC_CONFIG_SRCDIR([ltdl.c])
 
+# fixing any problems with cvs ... :-<
+AM_MAINTAINER_MODE
 
 ## ------------------------------- ##
 ## Libltdl specific configuration. ##

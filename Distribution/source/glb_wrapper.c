@@ -1347,10 +1347,10 @@ final_clean()
 
 
 
-/* The all important Init function */
+/* The all important init function */
 
 void 
-glbInit(char *name)
+glb_init(char *name)
 {
   int i;
   fprintf(stderr,"\n************************************\n");

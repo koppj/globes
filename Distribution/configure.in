@@ -55,12 +55,15 @@ dnl Makefile which works automagically
 
 if test $prefix = NONE; then
  GLBLDF="-lglobes -lglb"
+ GLBMLDF="-lglb"
 else
  GLBLDR="${prefix}/lib"
  GLBLDF="${GLBLDR}/libglobes.so -Wl,--rpath -Wl,${GLBLDR} ${GLBLDR}/globes/libglb.so -Wl,--rpath -Wl,${GLBLDR}/globes"
+ GLBMLDF="${GLBLDR}/globes/libglb.so -Wl,--rpath -Wl,${GLBLDR}/globes"
  GLBINC="-I${prefix}/include/"
 fi
 
+AC_SUBST(GLBMLDF)
 AC_SUBST(GLBLDF)
 AC_SUBST(GLBINC)
 
@@ -84,6 +87,8 @@ AC_PROG_LEX
 dnl Checks wether libtool exists on this machine
 dnl in the user path (needed for globes-module to work properly)
 AC_CHECK_PROG([HAVE_LIBTOOL],[libtool],yes,no)
+
+
 
 dnl Trying to get support for libtdl
 dnl the following lines are taken from the libtool manual
@@ -123,6 +128,8 @@ AC_TYPE_SIZE_T
 
 dnl Checks for library functions.
 AC_CHECK_FUNCS(strdup)
+
+
 
 dnl Experimental rpm-builing support
 dnl For my rpm.m4 macros

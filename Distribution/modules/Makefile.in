@@ -72,7 +72,7 @@ am_globes_OBJECTS = globes.$(OBJEXT)
 globes_OBJECTS = $(am_globes_OBJECTS)
 am_module_example_OBJECTS = module-example.$(OBJEXT)
 module_example_OBJECTS = $(am_module_example_OBJECTS)
-module_example_DEPENDENCIES = $(top_builddir)/source/libglb.la
+module_example_DEPENDENCIES = libglobes.la
 DEFAULT_INCLUDES = -I. -I$(srcdir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -123,6 +123,7 @@ FFLAGS = @FFLAGS@
 GLBINC = @GLBINC@
 GLBLDF = @GLBLDF@
 GLBLIBVERSION = @GLBLIBVERSION@
+GLBMLDF = @GLBMLDF@
 GLBMODULES = @GLBMODULES@
 HAVE_LIBTOOL = @HAVE_LIBTOOL@
 INSTALL_DATA = @INSTALL_DATA@
@@ -235,7 +236,7 @@ globes_SOURCES = globes.c
 globes_LDADD = libglobes.la @LIBS@  @LIBLTDL@ -lstdc++ -dlopen @GLBMODULES@
 globes_DEPENDENCIES = libglobes.la
 module_example_SOURCES = module-example.c
-module_example_LDADD = $(top_builddir)/source/libglb.la @LIBS@ @LIBLTDL@\
+module_example_LDADD = libglobes.la @LIBS@ @LIBLTDL@\
  -lstdc++
 
 all: all-am
