@@ -156,7 +156,7 @@ use:
 \begin{quote}
 {\tt /* cross section */}\\
 {\tt cross(\#CC)<}\\
-{\tt \tb @cross\_file = XCC.dat}\\
+{\tt \tb @cross\_file = "XCC.dat"}\\
 {\tt >}
 \end{quote}
 The command {\tt cross} tells the parser that a cross section environment
@@ -250,7 +250,8 @@ Comments can be used such as in C:
 \end{quote}
 There are pre-defined variables which all start with {\tt \$}. Their range
 is also checked. For example,  {\tt 
-\$bins} can be only between $0$ and $150$. If one uses a {\tt float} quantity where  an {\tt int} is expected, the {\tt float} will be converted to an {\tt int} in the same way as in C.  For example, we have scalar variables
+\$bins} can be only between $0$ and $500$~\footnote{The upper limit is 
+there only for safety reasons, the memory is allocated dynamically.}. If one uses a {\tt float} quantity where  an {\tt int} is expected, the {\tt float} will be converted to an {\tt int} in the same way as in C.  For example, we have scalar variables
 \begin{quote}
 {\tt
 \$bins = 10\\
@@ -315,16 +316,17 @@ As another feature of AEDL one can use include files with the {\tt include} comm
  for nested includes, too. The included file is not required to begin 
  with {\tt \%!GLoBES} to facilitate cut and paste:
 \begin{quote}
-{\tt include ./file\_1}
+{\tt include "./file\_1"}
 \end{quote}
 With this include mechanism, one can use constructions such as 
 \begin{quote}
-{\tt    include NuFact.gls\\
+{\tt    include  "NuFact.gls"\\
         \#NEXT\#\\
-        include JHFHK.gls
+        include   "JHFHK.gls"
 }
 \end{quote}
-in order to initialize a combined analysis of the experiments defined in the files {\tt NuFact.gls} and {\tt JHFHK.gls}. 
+in order to initialize a combined analysis of the experiments defined in the files {\tt NuFact.gls} and {\tt JHFHK.gls}. As one sees from the example above
+file names are always quoted in \AEDL.\index{File names}
 Even if one uses the
 automatic variable {\tt \#CC} in both experiments, 
 but the cross section data are different (for example, because of different target nuclei), the correct 
@@ -338,7 +340,12 @@ Furthermore, one can define constants such as
 Pi = 3.141
 }
 \end{quote}
-and use some simple algebraic manipulations such as
+These constants can not only be defined within one \AEDL\ file but also
+by the calling C program, which allows to use a simple but powerful variable
+substitution mechanism as described in~\Sec~\ref{sec:aedlparams}.
+\index{External \AEDL\ parameters}
+
+Alos some simple algebraic manipulations are possible, such as
 \begin{quote}
 {\tt
 Pi+1\\
@@ -347,7 +354,8 @@ sin(Pi/2)\\
 }
 \end{quote}
 The following mathematical functions from {\tt <math.h>} are available: 
-{\tt sin}, {\tt cos}, {\tt atan}, {\tt ln}, {\tt exp}, {\tt sqrt}. 
+{\tt sin}, {\tt cos}, {\tt tan}, {\tt asin}, {\tt acos}, {\tt atan}, 
+{\tt log}, {\tt log10}, {\tt exp}, {\tt sqrt}. 
 These functions can be used everywhere, where
 otherwise only a scalar number would appear. However, they can not be
 applied to lists, such as {\tt sin(\{1,2,3\})} will not work. 
@@ -420,7 +428,7 @@ Currently, two built-in fluxes are available: $\mu^+$-decay ({\tt @builtin = 1})
 For a user-defined flux, one has to give it the file name:
 \begin{quote}
 {\tt flux(\#user)<}\\
-{\tt \tb @flux\_file = user\_file\_1.dat\\
+{\tt \tb @flux\_file = "user\_file\_1.dat"\\
 \tb @time = 2.0\\
 \tb @power = 4.0\\
 \tb @norm = 1e+8}\\
@@ -523,7 +531,7 @@ channel definition (see \Sec~\ref{sec:channel}). Similar to the source
 fluxes, they are provided by the user as a data file:
 \begin{quote}
 {\tt cross(\#name)<}\\
-{\tt \tb @cross\_file =user\_file\_1.dat}\\
+{\tt \tb @cross\_file ="user\_file\_1.dat"}\\
 {\tt >}
 \end{quote}  
 This cross section can later be refered to by {\tt \#name}.
@@ -654,6 +662,32 @@ Thus, a simple definition of a channel is
 \tb @channel = \#flux : $+$: muon: muon: \#cross: \#energy\\
 >}
 \end{quote}
+
+\index{Oscillation!switching off}
+It is also possible to define a channel as no-oscillation by using the
+prefix \GLB{NOSC\_} in either the initial  flavour or 
+the final flavour, like this
+\begin{quote}
+{\tt channel(\#channel\_1)<\\
+\tb @channel = \#flux : $+$: NOSC\_muon: muon: \#cross: \#energy\\
+>}
+\end{quote}
+
+ In that case
+all diagonal probabilities $P_{\alpha\alpha}$ are unity and all off-diagonal
+probablities  $P_{\alpha\beta}$ are zero. This is \eg\ especially useful for
+neutral current events since they do not depend on any oscillation 
+parameters\footnote{at least in the absence of sterile neutrinos}. The channels
+marked as \GLB{NOSC\_} are only computed by a call to \GLB{glbSetRates}
+and not recomputed in the subsequent fit (which calls \GLB{glbSetNewRates}).
+Therefore this feature can be used to speed up the rate 
+computation considerably, especially in cases where a large set
+of channels exist which are only used for the computation of backgrounds.
+Usually it is an excellent approximation to treat backgrounds as if they
+would not be affected by oscillations.
+
+
+
 Note that the energy environment will be described in the next section. 
 In addition, one can define pre- and post-smearing effects together
 with the channels, which will also be introduced together with the
@@ -1280,15 +1314,25 @@ Eventually, a rule looks like
 \tb @signalerror =       0.001  :       0.01\\
 \tb @backgroundcenter =  0.1 :       0.0\\
 \tb @backgrounderror =   0.001 :       0.01\\
-\tb @errordim = 1\\
+\tb @errordim\_sys\_off = 2\\
+\tb @errordim\_sys\_on = 0\\
 \tb @energy\_window = 4.0 : 50.0\\ 
 >}
 \end{quote}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Versioning of \AEDL\ files}
+\label{sec:aedl_versioning}
+\index{Version control}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%\section{User-defined systematics}
-%\label{sec:ud_error_dim}.
+In order to provide a handle on problems which may arise due to different
+versions of \GLOBES\ and \AEDL\ files, it is possible to stamp each 
+\AEDL\ file with the corresponding version number of the \GLOBES\ package with
+\GLB{\$version} by
+\begin{quote}
+{\tt \$version="1.8.1"}
+\end{quote}
+This information can be accesed by the versioning functions as described in~\Sec~\ref{sec:versioning}.
 
 
 %%% Local Variables: 
