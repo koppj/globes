@@ -189,16 +189,16 @@ th13=arcsin(sqrt(0.001))/2; dcp=3.14/2; \\
  SetRates(); \\
 \\
 /\% Compute chi-square matrix: \%/ \\
-for (float x=-2; x<-4; x=x+2/50) \\
+for (float x=-4; x<-2; x=x+2/50) \\
 \hspace*{0.5cm} for (float y=0; y<200; y=y+200/50) \{ \\
 \hspace*{1cm} theth13 = arcsin(sqrt(10$\hat{\, \, \,}$x))/2; \\
-\hspace*{1cm} res[x,y]=Chi(\{th12, theth13,  th23,  y, sdm, ldm, 1.0\}) \};
+\mbox{\hspace*{1cm} Print(\{x,y,Chi(\{th12, theth13,  th23,  y, sdm, ldm, 1.0\}) \}) \};}
 }
 \end{quote}
 
-The result {\tt res[x,y]} can then be plotted as a contour plot (2 d.o.f.):
+The resulting matrix can then be plotted as a contour plot (2 d.o.f.):
 \begin{center}
-\includegraphics[width=8cm]{correx}
+\colorbox{white}{\includegraphics[width=8cm]{correx}}
 \end{center}
 
 }
@@ -230,20 +230,96 @@ The systematics minimization of an experiment can be easily switched on and off,
 This function can be especially useful for the test of the impact of systematics.
 ??? Wie einzelne Systematik-Parameter ein und ausschalten? Sonst individuell nicht testbar! ??? Verweis auf appendix? 
 
-\chapter[Calculating $\chi^2$-projections: how to include correlations]{Calculating $\boldsymbol{\chi^2}$-projections: how to include correlations}
+\chapter[Calculating $\chi^2$-projections: how one can include correlations]{Calculating $\boldsymbol{\chi^2}$-projections: how one can include correlations}
 
-\section[Projection onto $\theta_{13}$ or $\delta$]{Projection onto $\boldsymbol{\theta_{13}}$ or $\boldsymbol{\delta}$}
+This chapter deals with the rather complicated issue of $n$-parameter correlations. Since it has before this software  not been possible to include the full $n$-parameter correlations in the high-dimensional parameter space with reasonable effort, it is the core part of this software  -- as well as its strength. Of course, calculating $\chi^2$-projections is somewhat more complicated than using systematics only. Therefore, we use a simple step by step introduction to the problem. 
+
+\section{Introduction}
+
+In principle, the precision of an individual parameter measurement including correlations can be obtained as the projection of the $n$-dimensional fit manifold onto the respective axis. Similarly, one can project the fit manifold onto a plane, such as the $\stheta$-$\deltacp$-plane, if one wants to explicitely show this correlation with all the other parameter correlations included. In practice, this projection is very difficult: a grid-based method would need $(N_{\mathrm{grid}})^n$ function calls of {\tt Chi} or {\tt SingleChi} to calculate the precision including the full $n$-parameter correlation, where $N_{\mathrm{grid}}$ is the number of points in each direction of the lattice. For example, taking only $N_{\mathrm{grid}}=20$ and $n=7$ (six oscillation parameters and matter density) would mean more than one billion function calls of {\tt Chi} or {\tt SingleChi}. One can easily image that this is too much for any sophisticated application.
+
+The solution to this problem is using a local $n$-dimensional minimizer instead of a grid-based method. It turns out that such a minimizer can include a full $6$-parameter correlation with of the order of $1\, 000$ function calls of {\tt Chi} or {\tt ChiNew}. It is a standard method which can be found in every good book for standard numerical calculation routines. Thus, for each point on the projection axis/plane, one can obtain a result within about $10$ to $30$ seconds on a modern computer, which means that the complete measurement precision for one fixed true parameter set can be obtained in as much as $10$ to $15$ minutes. One can easily imagine that such a minimizer makes more sophisticated applications possible with the help of overnight calculations, such as showing the dependencies on the true parameter values.
+
+This approach also has a major disadvantage: One can not simply program a robust grid-based code and let it run, since using a local minimizer always means that one may end up in an unwanted local minimum and not in the investigated one. Thus, one has to use some (analytical or numerical) knowledge on the topology of the fit manifold and start the local minimizer close enough to the investigated solution. Fortunately, this can be done quite straightfoward in most cases, since the structure of the neutrino oscillation formulas does not cause very complicated topologies of the fit manifolds. Especially, the are plenty of analytical discussions of this issue, which means that one can implicitely use this knowledge to obtain better predictions for the measurement performances. Note that, since one can easily find the global fit minimum at the best-fit values, any solution found with the local minimizer makes the measurement performance worse. Thus, one can only run the danger to obtain a too optimistic solution if one does not find the other local minima below the chosen confidence level.
+
+In many cases, the fit manifold is restricted by the knowledge from earlier experiments. For example, the knowledge on the solar parameters will in most cases be supplied by the solar neutrino experiments. If the external precision of a parameter is at the time of the measurement better than the one of the experiment itself, one has to impose some external knowledge on this parameter. This external knowledge may reduce the $n$-dimensional fit manifold in the respective direction. In the most extreme case, keeping all parameters but the measured one fixed in the analysis means that all parameters are determined externally with infinitively high precisions. Thus, using the projection method on the axis/plane of interest is a reasonable approach. The inclusion of external input in \GLOBES\ is done by the use of Gaussian {\em priors}: We assume that an external measurement has determined the measured parameter to be at the central value (called {\em starting value}) with a $1 \sigma$ Gaussian error (called {\em input error}). The explicit definition of these priors will be shown in the next section.
+
+\begin{figure}[t]
+\begin{center}
+\includegraphics[width=16cm]{projex}
+\end{center}
+\mycaption{\label{fig:projex} Left plot: The correlation between $\stheta$ and $\deltacp$ as calculated in the example on page~\pageref{ex:corrth13dcp}, but for 1 d.o.f. only. Right plot: The $\chi^2$-value of the projection onto the $\stheta$-axis as function of $\stheta$. The projection onto the  $\stheta$-axis is obtained by finding the minimum $\chi^2$-value for each fixed value of $\stheta$ in the left-hand plot, \ie, along the gray vertical lines. The thick gray curve marks the position of these minima in the left-hand plot. The arrows mark the obtained fit ranges for $\stheta$ at the $3 \sigma$ confidence level (1 d.o.f.), \ie , the precision of $\stheta$.}
+\end{figure}
+
+\example{Projection of two- and $n$-dimensional manifold onto $\stheta$-axis}{
+\label{ex:corrproj}
+
+This example demonstrates how to use  {\tt ChiTheta} to project the fit manifold onto the $\stheta$-axis, \ie, how one can include correlations. We compute two sets of data: one for keeping all parameters but $\deltacp$ fixed (two-parameter correlations), and one for keeping all parameters free (multi-parameter correlation), but some external input for the solar parameters and $\rho$. Note that fixing all parameters but $\deltacp$ corresponds to imposing external knowledge on these parameters.
+
+\begin{quote}
+{\tt {\footnotesize
+/\% Experiment initialization, set reference rate vector: \%/ \\
+\mbox{ClearExp(); InitExperiment("{\tt NuFact2.exp}"); SetRunningTime(0,4.0); }\\
+th12=arcsin(sqrt(0.8))/2; sdm=7e-5; th23=3.14/4; ldm=2e-3; \\
+th13=arcsin(sqrt(0.001))/2; dcp=3.14/2; \\
+\mbox{SetVacuumParameters(\{th12, th13, th23, dcp, sdm, ldm\}); SetRates();}\\
+\\
+/\%  Compute chi-square list with all but dcp fixed: \%/ \\
+SetStartingValues(\{th12, th13, th23, dcp, sdm, ldm, 1.0\}); \\
+\mbox{SetInputErrors(\{th12*0.001, 10, th23*0.001, 10, sdm*0.001, ldm*0.001, 0.001\});} \\
+for (float x=-4; x<-2; x=x+2/20) \\
+\mbox{\hspace*{0.5cm} Print(\{x,ChiDelta(x,\{th12, th13, th23, dcp, sdm, ldm, 1.0\}) \}); }\\
+\\
+/\% Compute chi-square list with all parameters free: \%/ \\
+\mbox{/\% (but: 10\% prec. for solar params, 5\% for matter density) \%/} \\
+SetStartingValues(\{th12, th13, th23, dcp, sdm, ldm, 1.0\}); \\
+SetInputErrors(\{th12*0.1, 10, 10, 10, sdm*0.1, ldm, 0.05\}); \\
+for (float x=-4; x<-2; x=x+2/20) \\
+\mbox{\hspace*{0.5cm} Print(\{x,ChiDelta(x,\{th12, th13, th23, dcp, sdm, ldm, 1.0\}) \});}
+}}
+\end{quote}
+The two lists of data then represent the $\stheta$ precisions with two-parameter correlations (gray-shaded) and multi-parameter correlations (arrows):
+\begin{center}
+\colorbox{white}{\includegraphics[width=6cm]{projallex}}
+
+\vspace*{0.1cm}
+
+\footnotesize{(Same parameters as on page~\pageref{ex:corrth13dcp} and in \figu{projex}, but 1 d.o.f.)}
+\end{center}
+}
+
+\section{The treatment of external input}
 
 \bi
 \item
- Single and multiple experiments
+ Treatment of external input: short introduction to priors
 \item
- Figure: how does that work: local routine
+ The effect of the starting values and input errors
 \item
- Treatment of external input
+ Functions SetStartingValues, SetInputErrors to be called first
+\item
+ What for negative hierarchy? Defintion of $-\ldm - \sdm$?
 \ei
 
-\section[Projection onto any set of $N \ge 1$ parameters]{Projection onto any set of $\boldsymbol{N \ge 1}$ parameters}
+\section[Projection onto the $\theta_{13}$-axis or $\deltacp$-axis]{Projection onto the $\boldsymbol{\theta_{13}}$- or $\boldsymbol{\deltacp}$-axis}
+
+\bi
+\item
+ Call SetStartingValues and InputErrors first \ra\ three sets of parameters 
+\item
+ Single and multiple experiments: ChiDelta and ChiTheta + single funtions \ra\ return values;
+mention that $\chi^2$ does not add anymore; general parameter transfer concept
+\item
+ The effect of the starting point of the minimizer
+\item
+ What these functions do \ra\ figure
+\item
+ Refer to example: code
+\item
+ When does it not work: jumps \ra\ modify starting point accordingly
+\ei
+
+\section[Projection onto any hyperplane]{Projection onto any  hyperplane}
 
 General form and especially: DeltaTheta-Minimizer; mention calculation time!
 
@@ -252,6 +328,8 @@ General form and especially: DeltaTheta-Minimizer; mention calculation time!
 \bi
 \item
  Single- and multiple experiment support
+\item 
+Example: Finding degenerate solutions with multiple experiments!?
 \item
  What does that do?
 \item
@@ -269,7 +347,7 @@ General form and especially: DeltaTheta-Minimizer; mention calculation time!
  ``Check''-functions
 \ei
 
-\chapter{Changing experiment parameters at the running time}
+\chapter{Changing experiment parameters at running time}
 
 \bi
 \item
