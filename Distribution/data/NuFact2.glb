@@ -8,16 +8,16 @@ flux(#one)<
 @builtin = 2
 @parent_energy = 50
 @stored_muons = 5.33e+20 
-@time = 5
-@norm = 1.6
+@time = 4
+@norm = 2
 >
 
 flux(#two)<
 @builtin = 1
 @parent_energy = 50
 @stored_muons = 5.33e+20
-@time = 5
-@norm = 1.6
+@time = 4
+@norm = 2
 >
 
 
