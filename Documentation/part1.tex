@@ -411,7 +411,17 @@ and introduce the basic concepts of \GLOBES . We do not go
 into details of the programming language, which means that standard parts
 of the program code common to all of the examples in the following chapters are, in general, omitted.
 An example of a minimal \GLOBES\ program in C can be found on page~\pageref{ex:c}. Furthermore, the files of the examples in this part can be found in the {\tt Example} subdirectory of your \GLOBES\ distribution. \index{Examples} Since it depends on your installed
-configuration, we refer to the {\tt README} file in the \GLOBES\ main directory, and the comments in the Makefile of the {\tt Example} subdirectory for how to complile the example files.
+configuration, we refer to the {\tt README} file in the \GLOBES\ main directory, and the comments in the Makefile of the {\tt Example} subdirectory for how to complile the example files. Make sure that
+the data files (\AEDL\ and supporting files) in the {\tt data} 
+subdirectory can be found by the
+examples. In case of doubt, you can simply copy the necessary files
+into the working directory where the examples are executed.
+
+We will in this part not go into details of the experiment
+definition. The pre-defined experiment prototypes in the {\tt data}
+subdirectory are summarized in \tabl{experiments}. They correspond
+(except from minor modifications) to the experiments in the
+respective references in the table.
 
 \example{Using \GLOBES\ with C}{\label{ex:c}
 \index{C-Code}
@@ -472,42 +482,47 @@ int main(int argc, char *argv[]) \\
 
 \begin{table}[tbp]
 \begin{center}
-\begin{tabular}{llp{7cm}c}
+\begin{tabular}{llp{7.5cm}c}
 \hline
-Experiment & Filename & Short description & Refs. \\
+Experiment & Filename & Short description &  Ref. \\
 \hline 
-\multicolumn{3}{l}{\underline{Conventional beams:}} \\
-??? & & \\[0.1cm]
+\multicolumn{4}{l}{\underline{Conventional beams:}} \\
+MINOS & {\tt MINOS.glb} & MINOS exp., 5~yr running time & \cite{Huber:2004ug}\\
+OPERA & {\tt OPERA.glb} & OPERA exp., 5~yr running time & \cite{Huber:2004ug}\\
+ICARUS & {\tt ICARUS.glb} & ICARUS exp., 5~yr running time & \cite{Huber:2004ug}\\[0.1cm]
 
-\multicolumn{3}{l}{\underline{First-generation superbeams:}} \\
-\JHFSK\ ($\nu$) & {\tt JHFSK.exp} & JHF (J-PARC) to Super-Kamiokande, neutrino running &  \cite{Huber:2002mx,Huber:2002rs} \\
-\JHFSK\ ($\bar\nu$)& {\tt JHFSKanti.exp} & JHF (J-PARC) to Super-Kamiokande, antineutrino running &  \cite{Huber:2002rs} \\
-\NUMI\  ($\nu$), OA $9 \, \mathrm{km}$ & {\tt NUMI9.exp} & NuMI with off-axis angle of $9 \, \mathrm{km}$ for $L=712 \, \mathrm{km}$, neutrino running & \cite{Huber:2002rs} \\
-\NUMI\  ($\bar{\nu}$), OA $9 \, \mathrm{km}$ & {\tt NUMI9anti.exp} & NuMI with off-axis angle of $9 \, \mathrm{km}$ for $L=712 \, \mathrm{km}$, antineutrino running & \cite{Huber:2002rs} \\
-\NUMI\  ($\nu$), OA $12 \, \mathrm{km}$ & {\tt NUMI12.exp} & NuMI with off-axis angle of $12 \, \mathrm{km}$ for $L=712 \, \mathrm{km}$, neutrino running & \cite{Huber:2002rs} \\
-\NUMI\  ($\bar{\nu}$), OA $12 \, \mathrm{km}$ & {\tt NUMI12anti.exp} & NuMI with off-axis angle of $12 \, \mathrm{km}$ for $L=712 \, \mathrm{km}$, antineutrino running & \cite{Huber:2002rs} \\
-\SPL\  ($\nu$) & {\tt SPL.exp} & SPL (CERN), neutrino running &  ??? \\
-\SPL\  ($\bar\nu$) & {\tt SPLanti.exp} & SPL (CERN), antineutrino running & ??? \\[0.1cm]
+\multicolumn{4}{l}{\underline{First-generation superbeams:}} \\
+T2K & {\tt JHFSKnew.glb} & J-PARC to Super-K, 5~yr $\nu$-running &  \cite{Huber:2002rs} \\
+ & {\tt JHFSKantinew.glb} & J-PARC to Super-K, 5~yr $\bar{\nu}$-running &  \cite{Huber:2002rs} \\
+ & {\tt JHFSKcomb.glb} & Same, but 1.25~yr $\nu$- and 3.75~yr $\bar{\nu}$-running &  \cite{Huber:2002rs} \\[0.1cm]
+NO$\nu$A & {\tt NUMI9.glb} & NuMI OA $9 \, \mathrm{km}/712 \, \mathrm{km}$, 5~yr $\nu$-running & \cite{Huber:2002rs} \\
+& {\tt NUMI9anti.glb} & NuMI OA $9 \, \mathrm{km}/712 \, \mathrm{km}$, 5~yr $\bar{\nu}$-running & \cite{Huber:2002rs} \\
+& {\tt NUMI9comb.glb} & NuMI OA $9 \, \mathrm{km}/712 \, \mathrm{km}$, 1.43~yr $\nu$- and 3.57~yr $\bar{\nu}$-running & \cite{Huber:2002rs} \\
+& {\tt NUMI12.glb} & NuMI OA $12 \, \mathrm{km}/712 \, \mathrm{km}$, 5~yr $\nu$-running & \cite{Huber:2002rs} \\
+& {\tt NUMI12anti.glb} & NuMI OA $12 \, \mathrm{km}/712 \, \mathrm{km}$, 5~yr $\bar{\nu}$-running & \cite{Huber:2002rs} \\
+& {\tt NUMI12comb.glb} & NuMI OA $12 \, \mathrm{km}/712 \, \mathrm{km}$, 1.43~yr $\nu$- and 3.57~yr $\bar{\nu}$-running & \cite{Huber:2002rs} \\[0.1cm]
  
-\multicolumn{3}{l}{\underline{Superbeam upgrades:}} \\
-\JHFHK\ ($\nu$) & {\tt JHFHK.exp} & JHF (J-PARC) to Hyper-Kamiokande superbeam upgrade, neutrino running &  \cite{Huber:2002mx,Huber:2002rs} \\
-\JHFHK\ ($\bar\nu$)& {\tt JHFHKanti.exp} & JHF (J-PARC) to Hyper-Kamiokande superbeam upgrade, antineutrino running &  \cite{Huber:2002mx,Huber:2002rs} \\[0.1cm]
+\multicolumn{4}{l}{\underline{Superbeam upgrade:}} \\
+J-PARC-HK & {\tt JHFHKAll.glb} & J-PARC to Hyper-K, 2~yr $\nu$- and 6~yr $\bar{\nu}$-running &  \cite{Huber:2002mx} \\[0.1cm]
 
-\multicolumn{3}{l}{\underline{Neutrino factories:}} \\
-\NuFactI\ & {\tt NuFact.exp} & Initial stage neutrino factory, symmetric operation in both polarities & \cite{Huber:2002mx} \\
-\NuFactII\  & {\tt NuFact2.exp} & Advanced stage neutrino factory, symmetric operation in both polarities & \cite{Huber:2002mx,Huber:2003ak} \\[0.1cm]
+\multicolumn{4}{l}{\underline{Neutrino factories:}} \\
+\NuFactI\ & {\tt NuFact1.glb} & Initial stage NF, 2$\times$2.5~yr running time (each pol.), $m_{\mathrm{Det}} = 10 \, \mathrm{kt}$,
+$P_{\mathrm{Tg}} \simeq 0.75 \, \mathrm{MW}$ & \cite{Huber:2002mx} \\
+\NuFactII\  & {\tt NuFact2.glb} & Advanced stage NF, 2$\times$4~yr running time (each pol.), $m_{\mathrm{Det}} = 50 \, \mathrm{kt}$,
+$P_{\mathrm{Tg}} \simeq  4 \, \mathrm{MW}$ & \cite{Huber:2002mx} \\[0.1cm]
 
-\multicolumn{3}{l}{\underline{Reactor experiments:}} \\
-\ReactorI\ & {\tt Reactor.exp} & Small reactor experiment with identical near and far detectors & \cite{Huber:2003pm} \\
-\ReactorII\ & {\tt Reactor2.exp} & Large reactor experiment with identical near and far detectors & \cite{Huber:2003pm} \\[0.1cm]
+\multicolumn{4}{l}{\underline{Reactor experiments:}} \\
+\ReactorI\ & {\tt Reactor1.glb} & Small reactor exp., $\mathcal{L} = 400 \, \mathrm{t} \, \mathrm{GW} \, \mathrm{yr}$ & \cite{Huber:2003pm} \\
+\ReactorII\ & {\tt Reactor2.glb} & Large reactor exp., $\mathcal{L} = 8\, 000 \, \mathrm{t} \, \mathrm{GW} \, \mathrm{yr}$ & \cite{Huber:2003pm} \\[0.1cm]
 
-\multicolumn{3}{l}{\underline{$\beta$-Beams:}} \\
-\Beta\ ($\nu$) & {\tt BETA.exp} & $\beta$-Beam, neutrino running & ??? \\
-\Beta\ ($\bar\nu$) & {\tt BETAanti.exp} & $\beta$-Beam, antineutrino running & ??? \\
+\underline{$\beta$-Beams:} & \multicolumn{3}{l}{In preparation} \\[0.1cm]
 \hline
 \end{tabular}
 \end{center}
-\mycaption{\label{tab:experiments} \index{Experiment data files (table)} NEEDS TO BE ADJUSTED WHEN PROTOTYPES ARE AVAILABLE! Different pre-defined experiments, their filenames (to be used in {\tt LoadExperiment}), their short description, and the references in which they are defined. Note that all experiments use in their standard configurations one year of running time. Details about the experiment parameters can be obtained with {\tt InfoExperiment}(Experiment number) after they have been loaded.}
+\mycaption{\label{tab:experiments} \index{Experiment data files (table)} Pre-defined experiment prototypes, their filenames (to be used in \GLB{glbInitExperiment}), their short descriptions, and the references in which they are originally used and discussed (except from minor modifications, such as a
+different implementation of the energy threshold function). Note that
+some of these experiments are outdated in terms of integrated luminosities,
+baseline, fluxes, efficiencies, or other factors.}
 \end{table}
 
 \section{Initialization of \GLOBES}
@@ -849,20 +864,20 @@ The functions in \GLOBES\ for version control are:
 \GLBNS{glbTestReleaseVersion}
 {\tt int glbTestReleaseVersion(const char *version)} returns $0$ if
 the {\tt version} string of the format ``X.Y.Z'' is exactly the
-used \GLOBES\ version, $1$ if it is newer, and $-1$ if it is older. 
+used \GLOBES\ version, $1$ if it is older, and $-1$ if it is newer. 
 \end{function}
 \begin{function}
 \GLBNS{glbTestLibraryVersion}
 {\tt int glbTestLibraryVersion(const char *version)} returns $0$ if
 the {\tt version} string of the format ``X.Y.Z'' is exactly the
-used \GLOBES\ version, $1$ if it is newer, and $-1$ if it is older.
+used \GLOBES\ version, $1$ if it is older, and $-1$ if it is newer.
 Note that the library and \GLOBES\ versions are not the same. 
 \end{function}
 \begin{function}
 \GLBNS{glbTestLibraryVersion}
 {\tt int glbTestLibraryVersion(const char *version)} returns $0$ if
 the {\tt version} string of the format ``X.Y.Z'' is exactly the
-used \GLOBES\ version, $1$ if it is newer, and $-1$ if it is older.
+used \GLOBES\ version, $1$ if it is older, and $-1$ if it is newer.
 Note that the library and \GLOBES\ versions are not the same. 
 \end{function}
 \begin{function}
@@ -1916,17 +1931,104 @@ As usual, all these functions return $-1$ if they were not successful.
 \section{External parameters in \AEDL\ files}
 \label{sec:aedlparams}
 
-\bi
-\item
- Baseline, Target mass, Source power, running time
-\item
- Matter density profile
-\item
- Systematics
-\item
- Threshold function, efficiencies etc.
-\ei
+Using external parameters in \AEDL\ files is a very powerful feature
+to change experiment parameters at running time which require that
+the experiment be re-initialized. For example, one can change the
+energy resolution function or the number of energy bins. However,
+in some cases there might be complications, such that the number
+of pre- or post-smearing efficiencies does not correspond to the number
+of energy bins anymore. Therefore, this feature needs to be 
+used with care.
+
+In order to use external parameters in \AEDL\ files, one simply
+introduces them. For example, an energy resolution function
+\begin{quote}
+{\tt
+energy(\#EnergyResolution1)< \\
+\hspace*{1cm} type = 1 \\
+\hspace*{1cm} @sigma\_e = \{ myres ,0,0 \} \\
+> \\
+}
+\end{quote}
+might be defined in \AEDL , where the energy resolution is proportional
+to {\tt myres} $\times$ energy. 
+
+In order to use the user-defined variable, one has to assign it 
+with {\tt glbDefineAEDLVariable} {\em before} the experiment is initialized with \GLB{glbInitExperiment}:
+\begin{function}
+\GLBNS{glbDefineAEDLVariable}
+{\tt void glbDefineAEDLVariable(const char* name, double value)}
+assigns the value {\tt value} to the \AEDL\ variable {\tt name}.
+\end{function}
+In our energy resolution example, one could now loop over the
+energy resolution such as with
+\begin{quote}
+{\tt
+int i; \\
+for(i=5;i<20;i++) \\
+\{ \\	 
+\hspace*{1cm} glbClearExperimentList(); \\
+\hspace*{1cm} glbDefineAEDLVariable("myres",0.01*i); \\
+\hspace*{1cm} glbInitExperiment(...); \\
+\\
+\hspace*{1cm} /* do something */ \\
+\}
+}
+\end{quote}
+Note that one does not have do re-initialize the oscillation
+parameter vectors every time within the loop as long as the
+number of experiments does not change.
+
+In order to clear the external variable stack if one is
+excessively using it, one can use
+\begin{function}
+\GLBNS{glbClearAEDLVariables}
+{\tt void glbClearAEDLVariables()}
+clears the \AEDL\ variable list.
+\end{function}
+This function is called automatically upon exit of the program.
 
 \section{Algorithm parameters: Filter functions}
 
-Here come the filter functions
+The oscillation frequency filters to filter fast oscillations
+can also be accessed by the user interface. For details of
+the filter functions, we refer to \Sec~\ref{sec:energy} of
+the \AEDL\ manual.
+
+In particular, there are a number of functions:
+\begin{function}
+\GLBNS{glbSetFilterState}
+{\tt int glbSetFilterState(int on\_off)} sets the filter state to
+on (\GLB{GLB\_ON}) or off (\GLB{GLB\_OFF}).
+\end{function}
+\begin{function}
+\GLBNS{glbGetFilterState}
+{\tt int glbGetFilterState()} returns the filter state.
+\end{function}
+\begin{function}
+\GLBNS{glbSetFilterStateInExperiment}
+{\tt int glbSetFilterStateInExperiment(int exp, int on\_off)} sets the filter state in experiment {\tt exp} to on (\GLB{GLB\_ON}) or off (\GLB{GLB\_OFF}).
+\end{function}
+\begin{function}
+\GLBNS{glbGetFilterStateInExperiment}
+{\tt int glbGetFilterStateInExperiment(int exp)} returns the filter state of experiment {\tt exp}.
+\end{function}
+Analogously, the filter value can be accessed:
+\begin{function}
+\GLBNS{glbSetFilter}
+{\tt int glbSetFilter(double filter)} sets the filter to the
+value {\tt filter}.
+\end{function}
+\begin{function}
+\GLBNS{glbGetFilter}
+{\tt double glbGetFilter()} returns the filter value.
+\end{function}
+\begin{function}
+\GLBNS{glbSetFilterInExperiment}
+{\tt int glbSetFilterInExperiment(int exp, double filter)} sets the filter  in experiment {\tt exp} to the value {\tt value}.
+\end{function}
+\begin{function}
+\GLBNS{glbGetFilterInExperiment}
+{\tt double glbGetFilterInExperiment(int exp)} returns the filter value of experiment {\tt exp}.
+\end{function}
+The return value of all {\tt Set-} functions is $-1$ if they were not successful.
