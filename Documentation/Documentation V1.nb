@@ -40,9 +40,9 @@ Wolfram Research.
 
 (*NotebookFileLineBreakTest
 NotebookFileLineBreakTest*)
-(*NotebookOptionsPosition[    396648,       9719]*)
-(*NotebookOutlinePosition[    397714,       9752]*)
-(*  CellTagsIndexPosition[    397670,       9748]*)
+(*NotebookOptionsPosition[    396921,       9733]*)
+(*NotebookOutlinePosition[    397987,       9766]*)
+(*  CellTagsIndexPosition[    397943,       9762]*)
 (*WindowFrame->Normal*)
 
 
@@ -9713,6 +9713,20 @@ Cell[BoxData[
             Pattern[ anti, 
               Blank[ Integer]]]]}]]], "Output"]
 }, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Update notes:", "Section"],
+
+Cell[TextData[{
+  "In ",
+  StyleBox["SetVacuumParameters",
+    FontFamily->"Courier"],
+  " the solar mixing angle has to be given now!"
+}], "Text",
+  CellFrame->True,
+  Background->GrayLevel[0.849989]]
 }, Open  ]]
 }, Open  ]]
 }, Open  ]]
@@ -10241,6 +10255,11 @@ Cell[CellGroupData[{
 Cell[373267, 8898, 74, 1, 39, "Input"],
 Cell[373344, 8901, 23252, 812, 2246, "Output"]
 }, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+Cell[396645, 9719, 32, 0, 87, "Section"],
+Cell[396680, 9721, 201, 7, 70, "Text"]
 }, Open  ]]
 }, Open  ]]
 }, Open  ]]
