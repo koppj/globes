@@ -11,44 +11,37 @@
 
 The installation of \GLOBES\ is highly automated and there should not be
 any problems on a decently up-to-date GNU/Linux system. The installation
-has, however, only been tested on a limited number of platforms, mainly
-running with various versions of SuSE Linux. Thus we would appreciate
-to know your experiences with the installation on different platforms.
+has, however, only been tested on a limited number of platforms. The 
+current version has been tested for SuSE, Red Hat, Fedora Core and
+a 64bit version of SuSE. It should also compile and work on Mac OS. We 
+would appreciate to know your experiences with the installation on different platforms.
 Please send an e-mail to <\bugs>.
 
 \section*{Prerequisites for the installation of \GLOBES}
 \index{norm}{Installation!prerequisites}
 
-Besides the usual things such as a working libc, you need to have
+Besides the usual things such as a working \verb`libc`, you need to have
 \begin{itemize}
 \item[gcc] The GNU compiler collection\\
 \verb+gcc.gnu.org+
-\item[BLAS] Basic Linear Algebra Subprograms\\
-\verb+www.netlib.org/blas/+    
-\item[LAPACK] Linear Algebra PACKage\\
-\verb+www.netlib.org/lapack/+
-\item[f2c] Fortran to C\\ 
-\verb+www.netlib.org/f2c/+
 \item[GSL] The GNU Scientific Library\\
 \verb+www.gnu.org/software/gsl/+
 \end{itemize}
 The library \verb+libglobes+ should in principle compile with any
 ANSI C/C++ compiler, but the \verb+globes+ binary uses the 
 \verb+argp+ facility of \verb+glibc+ to parse its command line options.
+However, on platforms where \verb+argp+ is lacking \GLOBES\ has replacement code, 
+thus it should also work there.
 
 All those libraries are also available as rpm's from the various
-distributors of GNU/Linux: See their web sites for downloads. Due to
-the rather difficult nature of the build process of BLAS and LAPACK,
-it is recommended that one uses a suitable rpm instead. In addition,
-there is a good chance that
-gcc, f2c and GSL are already part of your installation. Furthmore, you need
+distributors of GNU/Linux, see their web sites for downloads. Chances are 
+that \verb+gcc+ and GSL are already part of your installation.  For building \GLOBES\ 
+from source, however, not only working libaries for above packages are 
+needed but also the headers,  especially for GSL. Depending on your
+installation, eg. on RedHat/Fedora, of GSL this may require to additionally 
+install a rpm-package named \verb+gsl-devel+. If GSL has been installed from the 
+tar-ball as provided by \verb`gnu.org` no problems should occur. Furthmore you need 
 a working \verb+make+ to build and install \GLOBES.
-
-In future releases, it is planned to at least make LAPACK obsolete, because
-then also BLAS and f2c would drop out. Furthemore, there is no priniciple
-reason why one should not get rid of any C++ parts. 
-This will greatly simplify
-the build process and reduce the requirements for installation.
 
 \section*{Installation Instructions}
 
@@ -88,20 +81,18 @@ to \verb+$prefix/share/globes+.
 If you are not using \verb+make install+ you will find the static libary
 at \verb+source/.lib/libglobes.a+ which you can copy to any destination.
 However keep in mind that the linking command will be somewhat different,
-\ie\ you have to specify all the dynamically linked objects besides libglobes,
-which are
-\begin{quote}
-{\tt
-         -lm -lgsl -lgslcblas -lf2c -llapack -lblas
-}
-\end{quote}
+\ie\ you have to specify all the dynamically linked objects besides libglobes.
 
-In general it is advisable to use the shared libraries. If you don't
-have root privileges, see the corresponding section 
-(page~\pageref{inst_noroot}).
-If you install \GLOBES\ with root privileges, do not forget to run 
-{\tt ldconfig} after installation.
- 
+The default install directory prefix is \verb+/usr/local+.  Consult the
+"Further Information" section below for instructions on installing the
+library in another location or changing other default compilation
+options.
+
+Moreover a config-script called \verb+globes-config+ will be installed. This
+script displays all information necessary to link any program with GLoBES.
+For building static libaries and linking against them see the corresponding
+section of this file.
+
 \section*{Basic Installation}
 
    The \verb+configure+ shell script attempts to guess correct values for
@@ -190,7 +181,116 @@ into the mentioned  \verb+Makefile+ in \verb+examples+.
 on one machine. Especially the situation of having an installation by root and by a user at the same time might occur. However, it is strictly warned against this possibility, since it is \emph{extremely} likely to create some versioning problem at some time!
 \end{itemize}
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{LAPACK \& BLAS requirements}
+
+
+GLoBES uses one single routine out of LAPACK (\verb^www.netlib.org/lapack/^) named
+\verb^zgeev^ to diagonalize the oscillation Hamiltonian in matter. Since LAPACK
+is not part of the standard installation of many distributions and we need
+only one function, \GLOBES\ comes with a convenience version of the required
+routines, which are taken from LAPACK and BLAS (\verb^www.netlib.org/blas^) and have
+been translated to C with \verb^f2c^. In case your system has a working installation
+of BLAS/LAPACK \GLOBES\ will use it. However, if your system is lacking BLAS/
+LAPACK the convenience version will be compiled and linked into \GLOBES. If
+for some reason BLAS/LAPACK is installed on the system and one still wishes
+to use the convience version use \verb^--enable-lapack-convenience^. Using Fortran
+code which has been translated to C with \verb^f2c^ requires a run-time library
+called \verb^libf2c^ (on some systems it is called \verb^libg2c^). The configury of 
+\GLOBES\ detects the presence of either of the two and takes care of it.
+If none of the two is present, a convience library is used. If
+for some reason \verb^libf2c^ is installed on the system and one still wishes
+to use the convience version use \verb^--enable-libf2c-convenience^.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{GSL requirements}
+
+
+Sometimes the GNU scientific library is not available or is installed in a non-standard
+location. This situation can arise in an installation without root privileges. In this 
+case one can specify \verb^--with-gsl-prefix=path_to_gsl^ as option to the \verb^configure^ script.
+If one wants to use a shared version of \verb^libgsl^ then one has to make sure that the
+linker finds the library at run-time. This can be achieved by setting the environment variable
+\verb^LD_LIBRARY_PATH^ correctly, \ie\ (in bash)
+\begin{quote} 
+\verb^export LD_LIBRARY_PATH=path_to_gsl^
+\end{quote}
+You also can use a static version of GSL by either building \GLOBES\ with \verb^LDFLAG=-all-static^
+or by configuring GSL with \verb^--disable-shared^. In both cases no further actions like setting
+any environment variables is necessary.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{Distributions}
+
+\subsection*{Fedora Core 3}
+
+FC3 is shipped with a non working version of LAPACK. Thus to
+make \GLOBES\ work on FC3, configure \GLOBES\ with \verb'--enable-lapack-convenience', which
+replaces the defunct LAPACK with \GLOBES' own version thereof. You can diagnose a 
+non-working LAPACK by compiling one of the examples in the \verb^examples^ directory and 
+trying to run it. It will hang forever in the function \GLB{SetRates()}. 
+
+\subsection*{RedHat -- all versions}
+
+The standard rpm-based installation of GSL does not provide any header files for GSL, 
+which are however needed to compile \GLOBES. You have to install an additional rpm-package
+called \verb'gsl-devel'. Altnernatively you can install GSL from a tar-ball and use the 
+verb'--with-gsl-prefix' option to the configure script of \GLOBES.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section*{Advanced topics}
+
+
+\subsection*{Building and Using static versions of \GLOBES}
+
+In certain circumstances it may be useful to use a static version of libglobes
+or any of the binaries, \eg\ when running on a cluster.
+
+   The \verb+configure+ script accepts the option \verb+--disable-shared+, in which
+case only static objects are built, i.e. only a static version of libglobes. 
+In case your system does not support shared libraries the \verb+configure+ script 
+recognizes this. If you give no options to \verb+configure+, both shared and static 
+versions are built and will be installed. All binaries, however, will use dynamic 
+linking. If you want to build static binaries, use \verb+LDFLAGS=-all-static+ for building
+them.
+
+   Sometimes it is convenient, eg. for debugging purposes, to have a statically
+linked version of a program using \GLOBES\, which is easiest achieved by just linking
+with \verb+libglobes.a+. If you need a completely statically linked version, please, have
+a look at the Makefile in the \verb+examples+ directory.
+\begin{quote}
+\verb#make example-static#
+\end{quote}
+produces a statically linked program that should in principle run on most Linuxes.
+It should be straightforward to adapt this example to your needs.
+
+All these options rely on \verb+libtool+ and a working \verb`gcc` installation. It seems that \verb`gcc 3.x`
+is broken in subtle way which makes it necessary to add a symbolic link in the \verb`gcc` library
+directory. The diagnostic for this requirement is that building static programs fails with
+the error message \verb+cannot find -lgcc_s+. In those cases, find \verb+libgcc.a+ and add a symbolic 
+link in the same directory where you found it (this requires probably root privileges)
+\begin{quote}
+\verb#ln -s libgcc.a libgcc_s.a#
+\end{quote}
+
+If you can not write to this directory just use the following work around. Add the same link  
+as above to the directory where you installed \GLOBES\ into
+\begin{quote}
+\verb#cd prefix/lib#
+\verb#ln -s path_to_libgcc.a/libgcc.a libgcc_s.a#
+\end{quote}
+and then change back into the \verb+examples+ directory and type
+\begin{quote}
+\verb#make LDFLAGS=-Lprefix/lib example-static#
+\end{quote}
+and you are done.
+
+If you don't have libtool on your system either, then you just can use the libtool script in
+the \GLOBES\ tar-ball instead. Make sure it is in a place where it is found by \verb+make+.
+
+
 
 \subsection*{Compilers and Options}
 
@@ -276,4 +376,5 @@ A warning: not all \verb+configure+ scripts look for a site script.
 %%% Local Variables: 
 %%% mode: latex
 %%% TeX-master: Manual.tex
+%%% TeX-master: "Manual"
 %%% End:
