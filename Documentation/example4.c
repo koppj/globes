@@ -94,7 +94,7 @@ double CalcProjection(double theldm,double thex,glb_params start_vector)
   glb_params starting_values = glbAllocParams();
   glb_params minimum = glbAllocParams();
 
-  glbDefineParams(input_errors,theta12*0.1,10,10,10,sdm*0.1,theldm/3);  
+  glbDefineParams(input_errors,theta12*0.1,0,0,0,sdm*0.1,theldm/3);  
   glbSetDensityParams(input_errors,0.05,GLB_ALL);
   /* Set starting values to respective +-dm31^2 to avoid falling into unwanted solution;
      Note that the error on dm31^2 should not be too small in order to avoid large
@@ -127,7 +127,7 @@ double FindDeg(glb_params deg_pos,double theldm)
   glb_params starting_values = glbAllocParams();
 
   glbDefineParams(starting_values,theta12,theta13,theta23,deltacp,sdm,-theldm);  
-  glbDefineParams(input_errors,theta12*0.1,10,10,10,sdm*0.1,theldm/3);  
+  glbDefineParams(input_errors,theta12*0.1,0,0,0,sdm*0.1,theldm/3);  
   glbSetDensityParams(input_errors,0.05,GLB_ALL);
   glbSetStartingValues(starting_values);
   glbSetInputErrors(input_errors);

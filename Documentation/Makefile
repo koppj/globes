@@ -42,8 +42,11 @@ CFLAGS =
 LDFLAGS = ${LD_RUN_PATH}/libglobes.so -lstdc++ 
 INCLFLAGS = -I${GLB_INCLUDE_PATH}/ 
 
-BIN = example1 example2 example3 example4
-OBJ = example1.o example2.o example3.o example4.o myio.o
+BIN = example-tour example1 example2 example3 example4
+OBJ = example-tour.o example1.o example2.o example3.o example4.o myio.o
+
+example-tour: example-tour.o
+	gcc $(CFLAGS) example-tour.o -o example-tour $(LDFLAGS)
 
 example1: example1.o myio.o
 	gcc $(CFLAGS) example1.o myio.o -o example1 $(LDFLAGS)

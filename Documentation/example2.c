@@ -69,7 +69,7 @@ int main(int argc, char *argv[])
   glbSetRates();
 
   /* Set starting values and input errors for all projections */  
-  glbDefineParams(input_errors,theta12*0.1,10,10,10,sdm*0.1,ldm);  
+  glbDefineParams(input_errors,theta12*0.1,0,0,0,sdm*0.1,0);  
   glbSetDensityParams(input_errors,0.05,GLB_ALL);
   glbSetStartingValues(true_values);
   glbSetInputErrors(input_errors);

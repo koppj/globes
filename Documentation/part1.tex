@@ -153,6 +153,8 @@ Experiment & Filename & Short description & Refs. \\
 \mycaption{\label{tab:experiments} \index{Experiment data files (table)} NEEDS TO BE ADJUSTED WHEN PROTOTYPES ARE AVAILABLE! Different pre-defined experiments, their filenames (to be used in {\tt LoadExperiment}), their short description, and the references in which they are defined. Note that all experiments use in their standard configurations one year of running time. Details about the experiment parameters can be obtained with {\tt InfoExperiment}(Experiment number) after they have been loaded.}
 \end{table}
 
+\section{Initialization of \GLOBES}
+
 Before one can use \GLOBES , one has to initialize the \GLOBES\
 library \GLB{libglobes}:
 \begin{function}
@@ -238,6 +240,8 @@ Cross sections/E & $\sigma_{\mathrm{CC}}/E$ & $10^{-38} \, \mathrm{cm^2}/\mathrm
 \end{center}
 \end{table}
 
+\section{Units in \GLOBES\ and the integrated luminosity}
+
 While interacting with the user interface of \GLOBES , parameters are transferred to and from the \GLOBES\ library. In \GLOBES , one set of units 
 for each type of quantity is used in order to avoid confusion about the definition of individual parameters. \tabl{units} summarizes the units of the most important quantities. In principle, the event rates are
 proportional to the product of source power $\times$ target mass $\times$
@@ -294,6 +298,8 @@ Thus, these functions also demonstrate how to use the assigned experiment number
 together with the neutrino flux, whereas the target mass scales the whole
 experiment.
 
+\section{Handling oscillation parameter vectors}
+
 Before we can set the simulated event rates or access any oscillation
 parameters, we need to become familiar with the concept \GLOBES\ uses
 for oscillation parameters. In order to transfer sets of oscillation
@@ -309,26 +315,31 @@ a structure which will contain the return values will be written to.
 This parameter transfer concept seems to be very sophisticated, but, as we
 will see in the next chapters, it hides a lot of complicated parameter 
 mappings which otherwise need to be done by the user. For example, not
-only the oscillation parameters are stored in the pointer structure, but also information on the
+only the oscillation parameters are stored in the pointer structure, but also information on the matter
 densities of all of the initialized experiments. Since \GLOBES\ treats
 the matter density as a free parameter known with some external precision
 to include matter density uncertainties,
 the minimizers also use fit values and external errors for the matter
 densities of all loaded experiments. More precisely, the matter density
 profile of each experiment $i$ is multiplied by a scaling factor
-$\hat{\rho_i}$, \index{Density scaling factor} 
-which is stored in the density information of {\tt glb\_params}. Each of
+$\hat{\rho_i}$, \index{Matter density scaling factor} 
+which is stored in the density information of {\tt glb\_params}. 
+Each of
 these scaling factors has $1.0$ as pre-defined value. Since it
 is in most cases not necessary to change this value, the user does
-not need to take care of these values.\footnote{For more information,
-we refer to the following chapters.}
+not need to take care of it. For a constant matter density, it is simply the ratio of the matter density and the average matter density specified in the experiment definition, \ie , $\hat{\rho_i} \equiv \rho_i/\bar{\rho}_i$. For a matter density profile, it acts as an overall normalization factor: The matter density in each layer is multiplied by this factor. In most cases one wants to take a scaling factor of $1.0$ here, which simply means taking the matter density profile as it is given in the experiment definition. For the treatment of correlations, however,
+an external precision of the scaling factor might be used to include the
+correlations with the matter density uncertainty. For more details, we
+refer to the following sections.
 Note that the {\tt glb\_params}
 structures must not be initialized before all experiments are loaded,
 since the number of matter densities can only be determined after the
 experiments are initialized. 
 Similarly, any change in the number of experiments requires that the
 parameter structures be re-initialized, \ie, destroyed and created again.
-Another piece of information returned from the minimizers and transferred
+
+Another piece of information will be returned from the minimizers 
+(\cf, \Chapt~\ref{chapt:correlations}) and transferred
 into the {\tt glb\_params} structure is the number
 of iterations used for the minimization, which is proportional to the
 running time of the minimizer. In general, the user does not need to
@@ -428,6 +439,9 @@ glbFreeParams(vector1); \\
 /* ... end of program or glbClearExperimentList ... */ 
 }
 \end{quote}
+
+\section{Computing the simulated data}
+
 Compared to existing experiments, which use real data, future experiments
 uses simulated data. Thus, the {\em true parameter values} and their results in form of the reference event rate vectors are simulated. After setting the true parameter values, the {\em fit parameter values} can be varied in order to obtain information on the measurement performance for the given set of true parameter values. Therefore, it is often useful to show the results of a future measurement as function of the true parameter values for which the reference rate vectors are computed -- at least within the currently allowed ranges. The true parameter values for the vacuum neutrino oscillation parameters have to be set by the functions \GLB{glbSetOscillationParameters} and \GLB{glbSetRates} {\em before} any evaluation function is used and {\em after} the experiments have been initialized and the experiment parameters have been adjusted which could change the rates (such as baseline or target mass). This means that
 after any change of an experiment parameter, {\tt glbSetRates} has to be called. Matter effects are automatically included as specified in the experiment definition. We have the following functions to assign and
@@ -454,13 +468,28 @@ Page~\pageref{ex:c}.
 \chapter[Calculating $\chi^2$ with systematics only]{Calculating $\boldsymbol{\chi^2}$ with systematics only}
 
 \index{Systematics}
-Calculating a $\chi^2$-value with or without systematics, but no correlations and degeneracies, is the simplest and fastest possibility to obtain high-level information on an experiment. I general, \GLOBES\ uses the six independent oscillation parameters $\theta_{12}$, $\theta_{13}$, $\theta_{23}$, $\deltacp$, $\sdm$, $\ldm$, as well as the matter density of each experiment. Thus, there are six plus the number of experiments parameters determining the rate vectors. Using the matter densities in addition to the oscillation parameters will allow the simulation of matter density uncertainties: In this approach, the matter densities can be treated as parameters to be measured by the experiments within certain limits, where the limits are given by the observed precision of the matter density profile. Defining a independent matter density for each experiment is necessary if the baselines are completely uncorrelated. For correlated or even identical baselines, one may rather want to encapsulate the experiments into a single experiment definition. 
+Calculating a $\chi^2$-value with or without systematics, but no correlations and degeneracies, is the simplest and fastest possibility to obtain high-level information on an experiment. In general, \GLOBES\ uses the six independent oscillation parameters $\theta_{12}$, $\theta_{13}$, $\theta_{23}$, $\deltacp$, $\sdm$, $\ldm$, as well as the matter density 
+scaling factor $\hat{\rho}$ of each experiment.\index{Matter density
+scaling factor} Thus, there are six plus the number of experiments parameters determining the rate vectors. Using the matter density scaling factors  in addition to the oscillation parameters will allow the simulation of the correlations with matter density uncertainties: In this
+approach, the matter density profile normalization $\hat{\rho}$ can 
+be treated
+as parameter to be measured by the experiment, where an external precision
+given by observations is imposed (typically up to $5\%$). 
+ For this section, it is important to keep in mind
+that there are more parameters than just the oscillation parameters
+determining the simple $\chi^2$. However, as we have described in the
+last section, the mechanism for the matter density scaling factors
+is hidden in the defintion of \GLB{glb\_params}: Each of the scaling
+factors is initially set to $1.0$. Therefore, for the calculation of
+$\chi^2$ with systematics only, we do not have to care about the
+matter density scaling factors.
 
 \example{Correlation between $\stheta$ and $\deltacp$}{
 \label{ex:corrth13dcp}
 \index{Two-parameter correlation}
 A typical and fast application for \GLB{glbChiSys} is the visualization of
- two-parameter correlations. For example, to calculate the two-parameter 
+ two-parameter correlations using systematics only. For example, to
+  calculate the two-parameter 
  correlation between $\stheta$ and $\deltacp$ at a neutrino factory, one
  can use the following code excerpt from {\tt example1.c}:
 \begin{quote}
@@ -486,6 +515,7 @@ A typical and fast application for \GLB{glbChiSys} is the visualization of
 } }
 \end{quote}
 
+\vspace*{-0.4cm}
 
 The resulting data can then be plotted as a contour plot (2 d.o.f.):
 \begin{center}
@@ -494,17 +524,31 @@ The resulting data can then be plotted as a contour plot (2 d.o.f.):
 
 }
 
-Keeping all oscillation parameters and matter densities fixed, one can use the following functions to obtain the total $\chi^2$ of all specified oscillation channels including systematics:
+Keeping all oscillation parameters and matter density scaling factors fixed,
+ one can use the following functions to obtain the total $\chi^2$ of all 
+ specified oscillation channels including systematics:
 \begin{function} 
-\GLB{Chi}$(\{ \theta_{12}, \theta_{13}, \theta_{23}, \deltacp , \sdm , \ldm, \hat{\rho_1}, \hdots , \hat{\rho_n} \})$  returns the total added $\chi^2$ of all loaded experiments.
+\GLBNS{glbChiSys}
+{\tt double glbChiSys(const glb\_params in,int exp, int rule)} returns
+the $\chi^2$ for the (fixed) oscillation parameters {\tt in}, the
+experiment number {\tt exp}, and the rule number {\tt rule}. For all
+experiments or rules, use \GLB{GLB\_ALL} as parameter value.
 \end{function}
-\begin{function}
- \GLB{SingleChi}$(\{ \theta_{12}, \theta_{13}, \theta_{23}, \deltacp , \sdm , \ldm, \hat{\rho}_{N_{\mathrm{exp}}} \}, \, N_{\mathrm{exp}} )$  returns the total $\chi^2$ of the experiment number $N_{\mathrm{exp}}$.
-\end{function}
-Note that the result of {\tt Chi} corresponds to the sum of all of the {\tt SingleChi}'s of the loaded experiment. This equality will not hold for the minimizors in the next sections anymore. In both functions, one has to give the matter density scaling factor $\hat{\rho_i}$ for each of the used experiments. The effect of this scaling factor depends on the type of the matter density profile, which is given in the  experiment definition. For a constant matter density, it is simply the ratio of the matter density and the average matter density specified in the experiment definition, \ie , $\hat{\rho_i} \equiv \rho_i/\bar{\rho}_i$.\index{Matter scaling factor} For a matter density profile, it is an overall scaling factor: The matter density in each layer is multiplied by this factor. In most cases one wants to take a scaling factor of $1.0$ here, which simply means taking the matter density profile as it is given in the experiment definition. Moreover, note that its effect is in general small for short baselines. An example of how to use  {\tt Chi} (or {\tt SingleChi}) can be found on page~\pageref{ex:corrth13dcp}.  
+Note that the result of {\tt glbChiSys} for all experiments or rules
+corresponds to the sum of all of the individual {\tt glbChiSys} calls. 
+This equality will not hold for the minimizors in the next sections anymore. 
+ An example how to use  {\tt glbChiSys} can be found on page~\pageref{ex:corrth13dcp}.  
 
 \index{Systematics}
-The treatment of systematics is done by the usage of auxiliary systematics parameters, which are taken completely uncorrelated among different oscillation channels, and treated with simple Gaussian statistics. One such example is the signal normalization error, \ie, an error to the overall normalization of the signal. For illustration, we assume that the signal event rate in the $i$th bin $s_i^0$ of one oscillation channel is altered by the overall normalization auxiliary parameter\index{Auxiliary parameter} of this channel, \ie , 
+The treatment of systematics in \GLOBES\ is performed by the so-call
+{\em pull method} with the help of auxiliary systematics parameters.
+They are taken completely uncorrelated among different rules, and treated with simple Gaussian statistics. In general, a rule is a set 
+of signal and background event rates coming from different oscillation
+channels, where the event rates of all rule contributions are added.
+For more details of the rule concept, see \Part~\ref{part:2} of this manual,
+and for the treatment of systematics, see \Sec~\ref{sec:rules}.
+ 
+ One example for a systematics parameter the signal normalization error, \ie, an error to the overall normalization of the signal. For illustration, we assume that the signal event rate in the $i$th bin $s_i^0$ of one oscillation channel is altered by the overall normalization auxiliary parameter\index{Auxiliary parameter} of this channel, \ie , 
 \be
  s_i = s_i(n_s) = s_i^0 \cdot (1 + n_s),
 \ee
@@ -513,32 +557,56 @@ In order to implement an overall signal normalization error $\sigma_{n_s}$,  the
 \be
  \hat{\chi^2} = \underset{n_s}{\mathrm{min}} \left(  \chi^2(n_s, \hdots) + \frac{(n_s)^2}{\sigma_{n_s}^2} \right).
 \ee 
-This minimization is done independently for all auxiliary parameters of this oscillation channel. The total $\chi^2$ for the considered experiment is finally obtained by repreating this procedure for all oscillation channels and adding their $\chi^2$-values. In general, the situation is more complicated because of the usage of many systematical errors. More details about systematics parameters and the definition of signal, background, and oscillation channels can be found in the \EDM\ part of this book, too.
+This minimization is done independently for all auxiliary parameters of the rule. The total $\chi^2$ for the considered experiment is finally obtained by repreating this procedure for all rules and adding their $\chi^2$-values. In general, the situation is more complicated because of the usage of many systematical errors. More details about systematics parameters and the definition of signal, background, and oscillation channels can be found in \Sec~\ref{sec:rules}, too.
 
-The systematics minimization of an experiment can be easily switched on and off, \ie, one can also compute the $\chi^2$ without even taking into account systematics:
-\begin{function}
-\GLB{SetSystematics}$(N_{mathrm{exp}}, \, sys)$ switches the systematics minimization for experiment $N_{\mathrm{exp}}$ on (sys=1) or off (sys=0).
-\end{function}
-This function can be especially useful for the test of the impact of systematics.
-??? Wie einzelne Systematik-Parameter ein und ausschalten? Sonst individuell nicht testbar! ??? Verweis auf appendix? 
+The systematics minimization of an experiment can be easily switched on and off with \GLB{glbSwitchSystematics}, \ie, one can also compute the $\chi^2$ with statistics only. In addition, several options for 
+systematics are available, such as only using total event rates without
+spectral information. For details, we refer to \Chapt~\ref{chapt:running}.
 
 \chapter[Calculating $\chi^2$-projections: how one can include correlations]{Calculating $\boldsymbol{\chi^2}$-projections: how one can include correlations}
+\label{chapt:correlations}
 
 \index{Multi-parameter correlation}
-This chapter deals with the rather complicated issue of $n$-parameter correlations. Since it has before this software  not been possible to include the full $n$-parameter correlations in the high-dimensional parameter space with reasonable effort, it is the core part of this software  -- as well as its strength. Of course, calculating $\chi^2$-projections is somewhat more complicated than using systematics only. Therefore, we use a simple step by step introduction to the problem. 
+This chapter deals with the rather complicated issue of $n$-parameter correlations. It is one of the greatest strengths of this software 
+to include the full $n$-parameter correlation in the high-dimensional parameter space with reasonable effort. Of course, calculating $\chi^2$-projections is somewhat more complicated than using systematics only. Therefore, we use a simple step by step introduction to the problem. 
 
 \section{Introduction}
 
 \index{Projection of manifold}
-In principle, the precision of an individual parameter measurement including correlations can be obtained as the projection of the $n$-dimensional fit manifold onto the respective axis. Similarly, one can project the fit manifold onto a plane, such as the $\stheta$-$\deltacp$-plane, if one wants to explicitely show this correlation with all the other parameter correlations included. In practice, this projection is very difficult: a grid-based method would need $(N_{\mathrm{grid}})^n$ function calls of {\tt Chi} or {\tt SingleChi} to calculate the precision including the full $n$-parameter correlation, where $N_{\mathrm{grid}}$ is the number of points in each direction of the lattice. For example, taking only $N_{\mathrm{grid}}=20$ and $n=7$ (six oscillation parameters and matter density) would mean more than one billion function calls of {\tt Chi} or {\tt SingleChi}. One can easily image that this is too much for any sophisticated application.
+In principle, the precision of an individual parameter measurement including correlations in the $\chi^2$-approach can be obtained as the projection of the $n$-dimensional fit manifold onto the respective axis. Similarly, one can project the fit manifold onto a plane, such as the $\stheta$-$\deltacp$-plane, if one wants to explicitely show the allowed
+region in this plane with all the other parameter correlations included. 
+In practice, this projection is very difficult: a grid-based method would need $(N_{\mathrm{grid}})^n$ function calls of {\tt glbChiSys} to calculate the precision including the full $n$-parameter correlation, where $N_{\mathrm{grid}}$ is the number of points in each direction of the lattice. For example, taking only $N_{\mathrm{grid}}=20$ and $n=7$ (six oscillation parameters and matter density) would mean more than one billion function calls of {\tt glbChiSys}. One can easily image that this is too much for any sophisticated application.
 
 \index{Minimizer}
-The solution to this problem is using a local $n$-dimensional minimizer instead of a grid-based method. It turns out that such a minimizer can include a full $6$-parameter correlation with of the order of $1\, 000$ function calls of {\tt Chi} or {\tt ChiNew}. It is a standard method which can be found in every good book for standard numerical calculation routines. Thus, for each point on the projection axis/plane, one can obtain a result within about $10$ to $30$ seconds on a modern computer, which means that the complete measurement precision for one fixed true parameter set can be obtained in as much as $10$ to $15$ minutes. One can easily imagine that such a minimizer makes more sophisticated applications possible with the help of overnight calculations, such as showing the dependencies on the true parameter values.
+The solution to this problem is using a local $n$-dimensional (local) minimizer for the procection instead of a grid-based method, where we will
+illustrate this minimization process later. It turns out
+that such a minimizer can include a full $6$-parameter correlation with of the order of $1\, 000$ function calls of {\tt glbChiSys}. It is a standard method which can be found in every good book for numerical calculation routines. Thus, for each point on the projection axis/plane, one can obtain a result within about $10$ to $30$ seconds on a modern computer, which means that the complete measurement precision for one fixed true parameter set can be obtained in as much as $10$ to $15$ minutes. One can easily imagine that such a minimizer makes more sophisticated applications possible with the help of overnight calculations, such as showing the dependencies on the true parameter values.
 
-This approach also has a major disadvantage: One can not simply program a robust grid-based code and let it run, since using a local minimizer always means that one may end up in an unwanted local minimum and not in the investigated one. Thus, one has to use some (analytical or numerical) knowledge on the topology of the fit manifold and start the local minimizer close enough to the investigated solution. Fortunately, this can be done quite straightfoward in most cases, since the structure of the neutrino oscillation formulas does not cause very complicated topologies of the fit manifolds. Especially, the are plenty of analytical discussions of this issue, which means that one can implicitely use this knowledge to obtain better predictions for the measurement performances. Note that, since one can easily find the global fit minimum at the best-fit values, any solution found with the local minimizer makes the measurement performance worse. Thus, one can only run the danger to obtain a too optimistic solution if one does not find the other local minima below the chosen confidence level.
+This approach also has one major disadvantage: One can not simply program a robust grid-based code and let it run, since using a local minimizer always means that one may end up in an unwanted local minimum and not in the investigated global one. Thus, one has to use some (analytical or numerical) knowledge on the topology of the fit manifold and start the local minimizer close enough to the investigated solution. Fortunately, this can be done quite straightfoward in most cases, since the structure of the neutrino oscillation formulas does not cause very complicated topologies of the fit manifolds. Especially the simulation of reactor experiments and conventional beams or superbeams is rather simple with purely numerical
+approaches. Neutrino factories have, especially for small values of
+$\theta_{13}$, a much more complicated topology. In this case, results
+of the many analytical discussions of this issue can be used. This means
+ that one can implicitely use the analytical knowledge to obtain better predictions for the measurement performances, since the minimizer has
+ to be started only close enough to the exact solution by an ``educated
+ guess''. One can easily imagine that the used methods then also depend
+ on the region of the parameter space. In this manual, we only use
+ examples with a neutrino factory, since some of these complications
+ can be illustrated there.
+
+Now, some words of warning with respect to the minimization process: 
+Since one can easily find the global fit minimum at the best-fit/simulated values, any additional solution found by the local minimizer makes the measurement performance worse. However, for the real result, the complete
+topology has to be taken into account, which means that {\em all} results
+fitting the simulated data have to be included, and not only the best-fit
+point. Thus, one can only run the danger to obtain a too optimistic solution if one does not find the other local minima appearing below the chosen confidence level. Thus, with this approach and proper usage, it should not possible to produce a too pessimistic solution. 
+However, if one is not careful enough to locate
+all local minima, one can easily produce too optimistic solutions.
+This danger can be summarized as follows:
+\begin{equation}
+\mathrm{Too \, pessimistic \, result} \, < \, \underbrace{\mathrm{Real \, result}}_{\mathrm{Located \, by \, careful \, usage}} \, \le \, \mathrm{GLoBES \, result} \,  < \,  \mathrm{Too \, optimisitic \, result} \nonumber
+\end{equation}
 
 \index{Priors} \index{Input errors} \index{Starting values}
-In many cases, the fit manifold is restricted by the knowledge from earlier experiments. For example, the knowledge on the solar parameters will in most cases be supplied by the solar neutrino experiments. If the external precision of a parameter is at the time of the measurement better than the one of the experiment itself, one has to impose some external knowledge on this parameter. This external knowledge may reduce the $n$-dimensional fit manifold in the respective direction. In the most extreme case, keeping all parameters but the measured one fixed in the analysis means that all parameters are determined externally with infinitively high precisions. Thus, using the projection method on the axis/plane of interest is a reasonable approach. The inclusion of external input in \GLOBES\ is done by the use of Gaussian {\em priors}: We assume that an external measurement has determined the measured parameter to be at the central value (called {\em starting value}) with a $1 \sigma$ Gaussian error (called {\em input error}). The explicit definition of these priors will be shown in the next section.
+In many cases, the fit manifold is restricted by the knowledge from earlier experiments. For example, the knowledge on the solar parameters will in most cases be supplied by the solar neutrino experiments. If the external precision of a parameter is at the time of the measurement better than the one of the experiment itself, one has to impose some external knowledge on this parameter. This external knowledge may reduce the $n$-dimensional fit manifold in the respective direction. In the most extreme case, keeping all parameters but the measured one fixed in the analysis means that all parameters are determined externally with infinitively high precisions. Thus, using the projection method on the axis/plane of interest is a reasonable approach. The inclusion of external input in \GLOBES\ is done by the use of Gaussian {\em priors}: We assume that an external measurement has determined the measured parameter to be at the central value (which we call {\em starting value}) with a $1 \sigma$ Gaussian error (which we call {\em input error}). The explicit definition of these priors will be shown in the next section. 
 
 \section{The treatment of external input}
 \label{sec:externalinput}
@@ -741,6 +809,7 @@ Finally, note that any degenerate solution below the confidence level threshold 
 \ei
 
 \chapter{Changing experiment parameters at running time}
+\label{chapt:running}
 
 \example{The impact of systematics, correlations, and degeneracies}{
 \label{ex:corrproj}

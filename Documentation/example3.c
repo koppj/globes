@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
 
   /* Find sgn-degeneracy */  
   glbDefineParams(starting_values,theta12,theta13,theta23,deltacp,sdm,-ldm);  
-  glbDefineParams(input_errors,theta12*0.1,10,10,10,sdm*0.1,ldm/3);  
+  glbDefineParams(input_errors,theta12*0.1,0,0,0,sdm*0.1,ldm/3);  
   glbSetDensityParams(input_errors,0.05,GLB_ALL);
   glbSetStartingValues(starting_values);
   glbSetInputErrors(input_errors);
