@@ -55,7 +55,7 @@ static char *my_getcwd ()
 }
 
 
-static int break_up_path(char *in_path, char ***pathv, size_t *len)
+int glb_break_up_path(char *in_path, char ***pathv, size_t *len)
 {
   const char *delim=":";
   char *token=NULL;
@@ -103,7 +103,7 @@ int glb_setup_path()
   in_path=getenv("GLB_PATH");
   if(in_path==NULL) path=NULL;
   else path=strdup(in_path);
-  s=break_up_path(path,&glb_path_vector,&glb_path_vector_length);
+  s=glb_break_up_path(path,&glb_path_vector,&glb_path_vector_length);
   glb_free(path);
   return s;
 }

@@ -20,13 +20,14 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#ifndef GLB_MODULES_H
+#define GLB_MODULES_H 1
+
+#include <globes/globes.h>
+
+void glb_init_module_support();
+void glb_close_module_support();
+int glb_setup_module_search_path();
 
 
-
-#ifndef GLB_PATH_H
-#define GLB_PATH_H 1
-
-int glb_break_up_path(char *in_path, char ***pathv, size_t *len);
-int glb_setup_path();
-
-#endif /* GLB_PATH_H */
+#endif /* GLB_MODULES_H */

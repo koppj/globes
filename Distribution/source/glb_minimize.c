@@ -106,7 +106,7 @@ static double inp_errs[7];
 static double start[7];
 static int count=0;
 static int errordim[32];
-int glb_single_experiment_number=0;
+//int glb_single_experiment_number=0;
 static double sysglb_calc_buffer[6];
 
 //-------------------------------------------------------------
@@ -747,7 +747,19 @@ static double sglb_prior(double x, double center, double sigma)
 }  
 
 // the pointer to the userdefined prior function
-static double (*glb_user_defined_prior)(const glb_params in);
+static double (*glb_user_defined_prior)(const glb_params);
+int (*glb_user_defined_starting_values)(const glb_params);
+int (*glb_user_defined_input_errors)(const glb_params);
+
+static int my_default_sv(const glb_params in)
+{
+  return 0;
+}
+
+static int my_default_er(const glb_params in)
+{
+  return 0;
+}
 
 static double my_default_prior(const glb_params in)
 {
@@ -755,13 +767,27 @@ static double my_default_prior(const glb_params in)
 }
 
 // the user interface to register such a function ...
-int glbRegisterPriorFunction(double (*f)(const glb_params in))
+int glbRegisterPriorFunction(double (*prior)(const glb_params),
+			     int (*starting)(const glb_params),
+			     int (*error)(const glb_params))
 {
-  if(f==NULL) {
+  if(prior==NULL) 
     glb_user_defined_prior=my_default_prior;
-    return 0;
-  }
-  glb_user_defined_prior=f;
+  else
+    glb_user_defined_prior=prior;
+
+  if(starting==NULL) 
+    glb_user_defined_starting_values=my_default_sv;
+  else
+     glb_user_defined_starting_values=starting;
+
+  if(error==NULL) 
+    glb_user_defined_input_errors=my_default_er;
+  else
+    glb_user_defined_input_errors=error;
+
+
+
   return 0;
 }
 
@@ -800,7 +826,7 @@ static double MD_chi_NP(double x[])
   erg2 = erg2 + glb_user_defined_prior(prior_input); 
 
   // adding the glb_priors
-  for(i=0;i<n_free;i++)
+  /*for(i=0;i<n_free;i++)
     {
       if(index_tab[i]<6)
 	{
@@ -814,7 +840,8 @@ static double MD_chi_NP(double x[])
 	  	     (glb_experiment_list[index_tab[i]-6])->density_center,
 	       (glb_experiment_list[index_tab[i]-6])->density_error);
 	}
-    }
+	}
+  */
   glbFreeParams(prior_input);
   return erg2;
 }
@@ -862,6 +889,7 @@ static void single_SelectProjection(int set)
 	  fprintf(stderr,"SelectProjection input error\n");
 	} 
     }
+ 
   s_n_free=c;
   s_n_fix=c2;
   return;
@@ -879,7 +907,7 @@ static double chi_NP(double x[])
   for(i=0;i<s_n_free;i++) y[s_index_tab[i]]=x[i+1];  
   // This basically is superflous, however it appears to be safer not
   // change a global (i.e to this file) parameter (fix_params) at this place
-  for(i=s_n_free;i<s_n_free+n_fix;i++) y[s_index_tab[i]]
+  for(i=s_n_free;i<s_n_free+s_n_fix;i++) y[s_index_tab[i]]
 					 =s_fix_params[s_index_tab[i]]; 
 
   //fprintf(stderr,"x2 %f\n",x2[1]); 
@@ -898,11 +926,13 @@ static double chi_NP(double x[])
   for (i=0;i<GLB_OSCP;i++) glbSetOscParams(prior_input,y[i],i);
   glbSetDensityParams(prior_input,y[GLB_OSCP],glb_single_experiment_number);
   glbSetIteration(prior_input,count);
+
   erg2 = erg2 + glb_user_defined_prior(prior_input); 
 
   
   // adding the glb_priors
-  for(i=0;i<s_n_free;i++)
+  /*
+   for(i=0;i<s_n_free;i++)
     {
       if(s_index_tab[i]<6)
 	{
@@ -916,7 +946,8 @@ static double chi_NP(double x[])
 	  	     (glb_experiment_list[glb_single_experiment_number])->density_center,
 	       (glb_experiment_list[glb_single_experiment_number])->density_error);
 	}
-    }
+	}
+  */
   glbFreeParams(prior_input);
   return erg2;
 }
@@ -935,23 +966,37 @@ static double internal_glbSingleChiNP(const glb_params in, glb_params out,
   double *sp2;
   double **mat2;
   double er1;
- 
+  glb_projection fbuf,fnew; 
 
   double x[38];
   int it;
   int i;
   int dim;
+  fbuf=glbAllocProjection();
+  fnew=glbAllocProjection();
   if(exp >=  glb_num_of_exps)
     {
       glb_error("Failure in internal_glbSingleChiNP: exp must be smaller than"
 		" glb_num_of_exps");
       return -1;
     }
+
+  
+
   glb_single_experiment_number=exp;
+  
   //creating memory 
   single_SelectProjection(exp);
+
   dim=s_n_free;
-  
+  /* declaring temporariliy all densities of all other experiments as fixed */
+  glbGetProjection(fbuf);
+  fnew=glbCopyProjection(fbuf,fnew);
+  fnew=glbSetDensityProjectionFlag(fnew,GLB_FIXED,GLB_ALL);
+  fnew=glbSetDensityProjectionFlag(fnew,glbGetDensityProjectionFlag(fbuf,exp)
+			      ,exp);  
+  glbSetProjection(fnew);  
+  /* - finis - */
   mat2=glb_alloc_mat(1,dim,1,dim);
   sp2=glb_alloc_vec(1,dim);
   init_mat(mat2,dim);
@@ -989,8 +1034,12 @@ static double internal_glbSingleChiNP(const glb_params in, glb_params out,
 	}
       out=glbSetIteration(out,count);
     }
+  
   glb_free_vec(sp2,1,dim);
-  glb_free_mat(mat2,1,dim,1,dim);  
+  glb_free_mat(mat2,1,dim,1,dim);
+  glbSetProjection(fbuf);
+  glbFreeProjection(fnew);
+  glbFreeProjection(fbuf);
   return er1;
 }
 
@@ -1217,3 +1266,5 @@ glbGetProjection(glb_projection in)
     in=glbSetDensityProjectionFlag(in,para_tab[i+GLB_OSCP],i);
   return 0;
 }
+
+

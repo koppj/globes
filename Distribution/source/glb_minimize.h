@@ -50,6 +50,9 @@ int glb_set_starting_values(double a,double b, double c,double d,
 		      double e, double f);
 
 
+int (*glb_user_defined_starting_values)(const glb_params);
+int (*glb_user_defined_input_errors)(const glb_params);
+
 double* glb_return_input_errors();
 double* glb_return_input_values();
 

@@ -41,6 +41,7 @@
 #include "glb_lexer.h"
 #include "glb_parser_addons.h"
 #include "glb_path.h"
+#include "glb_modules.h"
 
 #include "glb_wrapper.h"
 
@@ -495,7 +496,7 @@ glbSetOscillationParameters(const glb_params in)
 int
 glbSetStartingValues(const glb_params in)
 {
-  int i;
+  int i,s=0;
   if(in==NULL) return -1;
   
   glb_set_solar_starting_values(glbGetOscParams(in,0));
@@ -505,14 +506,15 @@ glbSetStartingValues(const glb_params in)
 
   for(i=0;i<glb_num_of_exps;i++) 
     glbSetDensityStartingValue(glbGetDensityParams(in,i),i);
-  return 0;
+  s=glb_user_defined_starting_values(in);
+  return s;
 
 }
 
 int
 glbSetInputErrors(const glb_params in)
 {
-  int i;
+  int i,s=0;
   if(in==NULL) return -1;
   
   glb_set_solar_input_errors(glbGetOscParams(in,0));
@@ -525,8 +527,9 @@ glbSetInputErrors(const glb_params in)
    * Furthermore the setting in the gls-file is ignored...!
    */
   for(i=0;i<glb_num_of_exps;i++) 
-    glbSetDensityInputError(glbGetDensityParams(in,i),i);
-  return 0;
+    glbSetDensityInputError(glbGetDensityParams(in,i),i);  
+  s=glb_user_defined_input_errors(in);
+  return s;
 
 }
 
@@ -1327,6 +1330,7 @@ static void
 final_clean()
 {
   int i;
+  glb_close_module_support();
  for(i=0;i<32;i++) glbFreeExp(glb_experiment_list[i]);
  glb_clean_parser();
  glb_lexer_cleanup();
@@ -1343,6 +1347,7 @@ final_clean()
 
 
 
+/* The all important Init function */
 
 void 
 glbInit(char *name)
@@ -1354,13 +1359,17 @@ glbInit(char *name)
   atexit(final_clean);
   glb_prog_name_init(name);
   glb_setup_path();
+  glb_init_module_support();
+  glb_setup_module_search_path();
   for(i=0;i<32;i++) glb_experiment_list[i]=glbAllocExp();
   glb_num_of_exps=0;
   glb_rule_number=0;
   obstack_init(&glb_rate_stack);
   glbSetPrintDelimiters("","\t","\n");
   glbSetChannelPrintFunction(glb_builtin_channel_printf);
-  glbRegisterPriorFunction(NULL);
+  /* this has gone to glbSuperInit 
+   * glbLoadPrior("prior-template");
+   */
 }
 
 /* Toggle Systemtatics */
