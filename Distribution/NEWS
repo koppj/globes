@@ -460,3 +460,6 @@
 	non-standard location. Furthemore 'configure' spits out a reminder for
 	necessary post-install actions, like running 'ldconfig'. Update
 	'INSTALL' accordingly.
+
+	Updated top-level Makefile.am in order to be okay with changed contents
+	in data/
