@@ -15,6 +15,14 @@
 \usepackage[footnotesize,bf]{caption}
 \usepackage{ae,aecompl} % only for Type 1 fonts
 
+\newcommand{\capdef}{}
+\newcommand{\mycaption}[2][\capdef]{\renewcommand{\capdef}{#2}%
+        \caption[#1]{{ %\itshape
+ {\footnotesize #2}}}}
+\makeatletter
+\renewcommand{\fnum@table}{\textbf{\tablename~\thetable}}
+\renewcommand{\fnum@figure}{\textbf{\figurename~\thefigure}}
+\makeatother
 
 \newcommand{\bi}{\begin{itemize}}
 \newcommand{\ei}{\end{itemize}}
@@ -24,10 +32,10 @@
 \newcommand{\bea}{\begin{eqnarray}}
 \newcommand{\eea}{\end{eqnarray}}
 \newcommand{\nn}{\nonumber}
-\newcommand{\ldm}{$\Delta m_{31}^2$}
-\newcommand{\sdm}{$\Delta m_{21}^2$}
-\newcommand{\deltacp}{$\delta_{\mathrm{CP}}$}
-\newcommand{\stheta}{$\sin^2 2 \theta_{13}$}
+\newcommand{\ldm}{\Delta m_{31}^2}
+\newcommand{\sdm}{\Delta m_{21}^2}
+\newcommand{\deltacp}{\delta_{\mathrm{CP}}}
+\newcommand{\stheta}{\sin^2 2 \theta_{13}}
 
 \newcommand{\ie}{{\it i.e.}}
 \newcommand{\Ie}{{\it I.e.}}
@@ -58,12 +66,15 @@
 \newcommand{\JHFHK}{{\sc JHF-HK}}
 \newcommand{\NuFactI}{{\sc NuFact-I}}
 \newcommand{\NuFactII}{{\sc NuFact-II}}
+\newcommand{\SPL}{{\sc SPL}}
+\newcommand{\Beta}{{\sc $\beta$-Beam}}
 
 \newcommand{\GLOBES}{{\sf GLoBES}}
 \newcommand{\EDM}{{\sf EDM}}
 
 \newcommand{\equ}[1]{\eq~(\ref{equ:#1})}
 \newcommand{\figu}[1]{\fig~\ref{fig:#1}}
+
 
 %-- page parameters -------------------------------------------------
 
@@ -210,5 +221,10 @@ Here comes a maximum of one page what \GLOBES\ is good for and what main feature
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \input{appendix}
+
+% Bibliography:
+
+\bibliographystyle{unsrt}
+\bibliography{references}
 
 \end{document}
