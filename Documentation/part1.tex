@@ -18,24 +18,24 @@ complicated in the application software part).
 \hline
 Function & Purpose & Parameters \ra\ Result \\
 \hline
-{\tt Chi} & $\chi^2$ with systematics only \newline (all initialized exps.) & ($\{ \theta_{12}, \theta_{13}, \theta_{23}, \deltacp , \sdm , \ldm, \frac{\rho_1}{\bar{\rho}_1},... , \frac{\rho_n}{\bar{\rho}_n} \}$)  \newline \ra\  $\chi^2$ \\[0.1cm]
-{\tt SingleChi} & $\chi^2$ with systematics only \newline (only one experiment) & $(\{ \theta_{12}, \theta_{13}, \theta_{23}, \deltacp , \sdm , \ldm, \frac{\rho_{N_{\mathrm{exp}}}}{\bar{\rho}_{N_{\mathrm{exp}}}} \}, \, N_{\mathrm{exp}} )$   \newline \ra\ $\chi^2$ \\[0.1cm]
-{\tt ChiTheta} & $\chi^2$ with systematics and correlations: Projection onto $\theta_{13}$-axis (all exps.) &  ($ \theta_{13}, \, \{ \theta_{12}, \theta_{23}, \deltacp , \sdm , \ldm, \frac{\rho_1}{\bar{\rho}_1}, ... , \frac{\rho_n}{\bar{\rho}_n} \}$) \newline \ra\  $\{ \chi^2, \theta_{12}, \theta_{23}, \deltacp , \sdm , \ldm, \frac{\rho_1}{\bar{\rho}_1}, ... , \frac{\rho_n}{\bar{\rho}_n} , N_{\mathrm{Iter}} \}$ \\[0.1cm]
-{\tt Single-} \newline {\tt ChiTheta} & $\chi^2$ with systematics and correlations: Projection onto $\theta_{13}$-axis (one exp.) &  ($ \theta_{13}, \, \{ \theta_{12}, \theta_{23}, \deltacp , \sdm , \ldm,  \frac{\rho_{N_{\mathrm{exp}}}}{\bar{\rho}_{N_{\mathrm{exp}}}} \}, \, N_{\mathrm{exp}}$) \newline \ra\  $\{ \chi^2, \theta_{12}, \theta_{23}, \deltacp , \sdm , \ldm, \frac{\rho_{N_{\mathrm{exp}}}}{\bar{\rho}_{N_{\mathrm{exp}}}} , N_{\mathrm{Iter}} \}$ \\[0.1cm]
-{\tt ChiDelta} & $\chi^2$ with systematics and correlations: Projection onto $\deltacp$-axis (all exps.) &  ($\deltacp, \, \{ \theta_{12}, \theta_{13}, \theta_{23},  \sdm , \ldm, \frac{\rho_1}{\bar{\rho}_1}, ... , \frac{\rho_n}{\bar{\rho}_n} \}$) \newline \ra\  $\{ \chi^2, \theta_{12}, \theta_{13}, \theta_{23}, \sdm , \ldm, \frac{\rho_1}{\bar{\rho}_1}, ... , \frac{\rho_n}{\bar{\rho}_n} , N_{\mathrm{Iter}} \}$ \\[0.1cm]
-{\tt Single-} \newline {\tt ChiDelta} & $\chi^2$ with systematics and correlations: Projection onto $\deltacp$-axis (one exp.) &  ($ \deltacp, \, \{ \theta_{12}, \theta_{13}, \theta_{23}, \sdm , \ldm,  \frac{\rho_{N_{\mathrm{exp}}}}{\bar{\rho}_{N_{\mathrm{exp}}}} \}, \, N_{\mathrm{exp}}$) \newline \ra\  $\{ \chi^2, \theta_{12}, \theta_{13}, \theta_{23},  \sdm , \ldm, \frac{\rho_{N_{\mathrm{exp}}}}{\bar{\rho}_{N_{\mathrm{exp}}}} , N_{\mathrm{Iter}} \}$ \\[0.1cm]
-{\tt ChiTheta-} {\tt Delta} & $\chi^2$ with systematics and correlations: Projection onto $\deltacp$-$\theta_{13}$-plane (all exps.) &  ($\theta_{13}, \, \deltacp, \, \{ \theta_{12}, \theta_{23},  \sdm , \ldm, \frac{\rho_1}{\bar{\rho}_1}, ... , \frac{\rho_n}{\bar{\rho}_n} \}$) \newline \ra\  $\{ \chi^2, \theta_{12}, \theta_{23}, \sdm , \ldm, \frac{\rho_1}{\bar{\rho}_1}, ... , \frac{\rho_n}{\bar{\rho}_n} , N_{\mathrm{Iter}} \}$ \\[0.1cm]
-{\tt SingleChi-} {\tt Theta- } {\tt Delta} & $\chi^2$ with systematics and correlations: Projection onto $\deltacp$-$\theta_{13}$-plane (one exp.) &  ($ \theta_{13}, \, \deltacp, \, \{ \theta_{12}, \theta_{23}, \sdm , \ldm,  \frac{\rho_{N_{\mathrm{exp}}}}{\bar{\rho}_{N_{\mathrm{exp}}}} \}, \, N_{\mathrm{exp}}$) \newline \ra\  $\{ \chi^2, \theta_{12},  \theta_{23},  \sdm , \ldm, \frac{\rho_{N_{\mathrm{exp}}}}{\bar{\rho}_{N_{\mathrm{exp}}}} , N_{\mathrm{Iter}} \}$ \\[0.1cm]
+{\tt Chi} & $\chi^2$ with systematics only \newline (all initialized exps.) & ($\{ \theta_{12}, \theta_{13}, \theta_{23}, \deltacp , \sdm , \ldm, \hat{\rho_1},... , \hat{\rho_n} \}$)  \newline \ra\  $\chi^2$ \\[0.1cm]
+{\tt SingleChi} & $\chi^2$ with systematics only \newline (only one experiment) & $(\{ \theta_{12}, \theta_{13}, \theta_{23}, \deltacp , \sdm , \ldm, \hat{\rho}_{N_{\mathrm{exp}}} \}, \, N_{\mathrm{exp}} )$   \newline \ra\ $\chi^2$ \\[0.1cm]
+{\tt ChiTheta} & $\chi^2$ with systematics and correlations: Projection onto $\theta_{13}$-axis (all exps.) &  ($ \theta_{13}, \, \{ \theta_{12}, \theta_{23}, \deltacp , \sdm , \ldm, \hat{\rho_1}, ... , \hat{\rho_n} \}$) \newline \ra\  $\{ \chi^2, \theta_{12}, \theta_{23}, \deltacp , \sdm , \ldm, \hat{\rho_1}, ... , \hat{\rho_n} , N_{\mathrm{Iter}} \}$ \\[0.1cm]
+{\tt Single-} \newline {\tt ChiTheta} & $\chi^2$ with systematics and correlations: Projection onto $\theta_{13}$-axis (one exp.) &  ($ \theta_{13}, \, \{ \theta_{12}, \theta_{23}, \deltacp , \sdm , \ldm,  \hat{\rho}_{N_{\mathrm{exp}}} \}, \, N_{\mathrm{exp}}$) \newline \ra\  $\{ \chi^2, \theta_{12}, \theta_{23}, \deltacp , \sdm , \ldm, \hat{\rho}_{N_{\mathrm{exp}}} , N_{\mathrm{Iter}} \}$ \\[0.1cm]
+{\tt ChiDelta} & $\chi^2$ with systematics and correlations: Projection onto $\deltacp$-axis (all exps.) &  ($\deltacp, \, \{ \theta_{12}, \theta_{13}, \theta_{23},  \sdm , \ldm, \hat{\rho_1}, ... , \hat{\rho_n} \}$) \newline \ra\  $\{ \chi^2, \theta_{12}, \theta_{13}, \theta_{23}, \sdm , \ldm, \hat{\rho_1}, ... , \hat{\rho_n} , N_{\mathrm{Iter}} \}$ \\[0.1cm]
+{\tt Single-} \newline {\tt ChiDelta} & $\chi^2$ with systematics and correlations: Projection onto $\deltacp$-axis (one exp.) &  ($ \deltacp, \, \{ \theta_{12}, \theta_{13}, \theta_{23}, \sdm , \ldm,  \hat{\rho}_{N_{\mathrm{exp}}}  \}, \, N_{\mathrm{exp}}$) \newline \ra\  $\{ \chi^2, \theta_{12}, \theta_{13}, \theta_{23},  \sdm , \ldm, \hat{\rho}_{N_{\mathrm{exp}}} , N_{\mathrm{Iter}} \}$ \\[0.1cm]
+{\tt ChiTheta-} {\tt Delta} & $\chi^2$ with systematics and correlations: Projection onto $\deltacp$-$\theta_{13}$-plane (all exps.) &  ($\theta_{13}, \, \deltacp, \, \{ \theta_{12}, \theta_{23},  \sdm , \ldm,  \hat{\rho_1}, ... , \hat{\rho_n} \}$) \newline \ra\  $\{ \chi^2, \theta_{12}, \theta_{23}, \sdm , \ldm,  \hat{\rho_1}, ... , \hat{\rho_n} , N_{\mathrm{Iter}} \}$ \\[0.1cm]
+{\tt SingleChi-} {\tt Theta- } {\tt Delta} & $\chi^2$ with systematics and correlations: Projection onto $\deltacp$-$\theta_{13}$-plane (one exp.) &  ($ \theta_{13}, \, \deltacp, \, \{ \theta_{12}, \theta_{23}, \sdm , \ldm,  \hat{\rho}_{N_{\mathrm{exp}}} \}, \, N_{\mathrm{exp}}$) \newline \ra\  $\{ \chi^2, \theta_{12},  \theta_{23},  \sdm , \ldm, \hat{\rho}_{N_{\mathrm{exp}}} , N_{\mathrm{Iter}} \}$ \\[0.1cm]
 {\tt ChiNP} & $\chi^2$ with systematics and correlations: Projection onto $N$-parameter hyper-plane (one exp.) & ??? to be defined \\[0.1cm]
 {\tt Single-} {\tt ChiNP} & $\chi^2$ with systematics and correlations: Projection onto $N$-parameter hyper-plane (one exp.) & ??? to be defined \\[0.1cm]
 {\tt ChiAll} & Lokal minimum of $\chi^2$ with respect to all parameters (all exps.) &
-($ \{ \theta_{13}, \theta_{12}, \theta_{23}, \deltacp , \sdm , \ldm, \frac{\rho_1}{\bar{\rho}_1}, ... , \frac{\rho_n}{\bar{\rho}_n} \}$) \newline \ra\  $\{ \chi^2, \theta_{13}, \theta_{12}, \theta_{23},$ \newline \hspace*{1.4cm} $ \deltacp , \sdm , \ldm, \frac{\rho_1}{\bar{\rho}_1}, ... , \frac{\rho_n}{\bar{\rho}_n} , N_{\mathrm{Iter}} \}$ 
+($ \{ \theta_{13}, \theta_{12}, \theta_{23}, \deltacp , \sdm , \ldm,  \hat{\rho_1}, ... , \hat{\rho_n} \}$) \newline \ra\  $\{ \chi^2, \theta_{13}, \theta_{12}, \theta_{23},$ \newline \hspace*{1.4cm} $ \deltacp , \sdm , \ldm,  \hat{\rho_1}, ... , \hat{\rho_n} , N_{\mathrm{Iter}} \}$ 
 \\[0.1cm]
-{\tt Single-} {\tt ChiAll} & Lokal minimum of $\chi^2$ with respect to all parameters (one exp.) &  ($ \{ \theta_{13}, \theta_{12}, \theta_{23}, \deltacp , \sdm , \ldm,  \frac{\rho_{N_{\mathrm{exp}}}}{\bar{\rho}_{N_{\mathrm{exp}}}} \}, \, N_{\mathrm{exp}}$) \newline \ra\  $\{ \chi^2, \theta_{13}, \theta_{12}, \theta_{23}, \deltacp , \sdm , \ldm, \frac{\rho_{N_{\mathrm{exp}}}}{\bar{\rho}_{N_{\mathrm{exp}}}} , N_{\mathrm{Iter}} \}$ \\[0.1cm]
+{\tt Single-} {\tt ChiAll} & Lokal minimum of $\chi^2$ with respect to all parameters (one exp.) &  ($ \{ \theta_{13}, \theta_{12}, \theta_{23}, \deltacp , \sdm , \ldm,  \hat{\rho}_{N_{\mathrm{exp}}} \}, \, N_{\mathrm{exp}}$) \newline \ra\  $\{ \chi^2, \theta_{13}, \theta_{12}, \theta_{23}, \deltacp , \sdm , \ldm, \hat{\rho}_{N_{\mathrm{exp}}} , N_{\mathrm{Iter}} \}$ \\[0.1cm]
 \hline
 \end{tabular}
 \end{center}
-\caption{\label{tab:stdfunctions} The \GLOBES\ standard function to obtain a $\chi^2$-value for all or one of the initialized experiments. The curly brackets refer to the parameters to be transferred in form of a list. Note that all functions but {\tt Chi} and {\tt SingleChi} are using minimizers which have to be initialiued with {\tt SetInputErrors} and {\tt SetStartingValues} first.}
+\caption{\label{tab:stdfunctions} The \GLOBES\ standard function to obtain a $\chi^2$-value for all or one of the initialized experiments. The curly brackets refer to the parameters to be transferred in form of a list. The parameter $\hat{\rho}_i \equiv \rho_i/\bar{\rho}_i$ refers to the matter density scaling factor, which is $1.0$ for leaving the matter density profile unchanged. Note that all functions but {\tt Chi} and {\tt SingleChi} are using minimizers which have to be initialized with {\tt SetInputErrors} and {\tt SetStartingValues} first.}
 \end{table}
 
 \chapter{Getting started with \GLOBES }
@@ -152,30 +152,83 @@ Compared to an existing experiment, which uses real data, a future experiment us
 \end{function}
 Finally, an initialization sequence for \GLOBES\ could look like this:
 \begin{quote}
-{\tt ClearExp}$()$; \\
-{\tt InitExperiment}$($``{\tt JHFHK.exp}''$)$; \\
-{\tt SetRunningTime}$(0,2.0)$; \\
-{\tt InitExperiment}$($``{\tt JHFHKanti.exp}''$)$; \\
-{\tt SetRunningTime}$(1,6.0)$;\\
-{\tt MInfoExperiment}$()$; \\
-{\tt SetVacuumParameters}$(\{ 0.55, \, 0.16, \, 3.14/4, \, 3.14/2, \, 7e-5 , \, 2e-3 \} )$; \\
-{\tt SetRates();} 
+{\tt
+ClearExp(); \\
+InitExperiment("JHFHK.exp"); \\
+SetRunningTime(0, 2.0); \\
+InitExperiment("JHFHKanti.exp"); \\
+SetRunningTime(1, 6.0);\\
+MInfoExperiment(); \\
+SetVacuumParameters(\{0.55, 0.16, 3.14/4, 3.14/2, 7e-5, 2e-3\}); \\
+SetRates();
+} 
 \end{quote}
 This piece of code initializes the JHF (J-PARC) to Hyper-Kamiokande superbeam upgrade with two years of neutrino running and six years of antineutrino running, \ie, an overall running time of eight years. The final configuration is then printed to the standard output and the reference rate vector is set to the chosen parameter values.
 
 \chapter[Calculating $\chi^2$ with systematics only]{Calculating $\boldsymbol{\chi^2}$ with systematics only}
 
-\bi
-\item
- More technical: what does it do (minimizer); how to imagine (simple example); 
-what functions are there; examples
-\item
- Single/multiple experiments and the connection (sum of individual $\chi$'s )
-\item
- Advanced topic: Changing the systematics treatment (SetSystematics)
-\ei
+Calculating a $\chi^2$-value with or without systematics, but no correlations and degeneracies, is the simplest and fastest possibility to obtain high-level information on an experiment. I general, \GLOBES\ uses the six independent oscillation parameters $\theta_{12}$, $\theta_{13}$, $\theta_{23}$, $\deltacp$, $\sdm$, $\ldm$, as well as the matter density of each experiment. Thus, there are six plus the number of experiments parameters determining the rate vectors. Using the matter densities in addition to the oscillation parameters will allow the simulation of matter density uncertainties: In this approach, the matter densities can be treated as parameters to be measured by the experiments within certain limits, where the limits are given by the observed precision of the matter density profile. Defining a independent matter density for each experiment is necessary if the baselines are completely uncorrelated. For correlated or even identical baselines, one may rather want to encapsulate the experiments into a single experiment definition. 
 
-\example{Correlation between $\stheta$ and $\deltacp$}{Text}
+\example{Correlation between $\stheta$ and $\deltacp$}{
+\label{ex:corrth13dcp}
+
+A typical application for {\tt Chi} and {\tt SingleChi} is the visualization of two-parameter correlations. For example, to show the correlation between $\stheta$ and $\deltacp$ at a large neutrino factory with four years of running time for each polarity, one can use the following code:
+\begin{quote}
+{\tt
+/\% Experiment initialization: \%/ \\
+ClearExp(); \\
+ InitExperiment("{\tt NuFact2.exp}"); \\
+ SetRunningTime(0,4.0); \\
+ MInfoExperiment(); \\
+\\
+/\% Set reference rate vector: \%/ \\
+th12=arcsin(sqrt(0.8))/2; sdm=7e-5; \\
+th23=3.14/4; ldm=2e-3; \\
+th13=arcsin(sqrt(0.001))/2; dcp=3.14/2; \\
+\mbox{SetVacuumParameters(\{th12, \, th13, \, th23, \, dcp, \, sdm, \, ldm\}); }\\
+ SetRates(); \\
+\\
+/\% Compute chi-square matrix: \%/ \\
+for (float x=-2; x<-4; x=x+2/50) \\
+\hspace*{0.5cm} for (float y=0; y<200; y=y+200/50) \{ \\
+\hspace*{1cm} theth13 = arcsin(sqrt(10$\hat{\, \, \,}$x))/2; \\
+\hspace*{1cm} res[x,y]=Chi(\{th12, theth13,  th23,  y, sdm, ldm, 1.0\}) \};
+}
+\end{quote}
+
+The result {\tt res[x,y]} can then be plotted as a contour plot (2 d.o.f.):
+\begin{center}
+\includegraphics[width=8cm]{correx}
+\end{center}
+
+}
+
+Keeping all oscillation parameters and matter densities fixed, one can use the following functions to obtain the total $\chi^2$ of all specified oscillation channels including systematics:
+\begin{function} 
+{\tt Chi}$(\{ \theta_{12}, \theta_{13}, \theta_{23}, \deltacp , \sdm , \ldm, \hat{\rho_1}, \hdots , \hat{\rho_n} \})$  returns the total added $\chi^2$ of all loaded experiments.
+\end{function}
+\begin{function}
+ {\tt SingleChi}$(\{ \theta_{12}, \theta_{13}, \theta_{23}, \deltacp , \sdm , \ldm, \hat{\rho}_{N_{\mathrm{exp}}} \}, \, N_{\mathrm{exp}} )$  returns the total $\chi^2$ of the experiment number $N_{\mathrm{exp}}$.
+\end{function}
+Note that the result of {\tt Chi} corresponds to the sum of all of the {\tt SingleChi}'s of the loaded experiment. This equality will not hold for the minimizors in the next sections anymore. In both functions, one has to give the matter density scaling factor $\hat{\rho_i}$ for each of the used experiments. The effect of this scaling factor depends on the type of the matter density profile, which is given in the  experiment definition. For a constant matter density, it is simply the ratio of the matter density and the average matter density specified in the experiment definition, \ie , $\hat{\rho_i} \equiv \rho_i/\bar{\rho}_i$. For a matter density profile, it is an overall scaling factor: The matter density in each layer is multiplied by this factor. In most cases one wants to take a scaling factor of $1.0$ here, which simply means taking the matter density profile as it is given in the experiment definition. Moreover, note that its effect is in general small for short baselines. An example of how to use  {\tt Chi} (or {\tt SingleChi}) can be found on page~\pageref{ex:corrth13dcp}.  
+
+The treatment of systematics is done by the usage of auxiliary systematics parameters, which are taken completely uncorrelated among different oscillation channels, and treated with simple Gaussian statistics. One such example is the signal normalization error, \ie, an error to the overall normalization of the signal. For illustration, we assume that the signal event rate in the $i$th bin $s_i^0$ of one oscillation channel is altered by the overall normalization auxiliary parameter of this channel, \ie , 
+\be
+ s_i = s_i(n_s) = s_i^0 \cdot (1 + n_s),
+\ee
+where $n_s$ is the signal normalization parameter. The total number of events in the $i$th bin $x_i$ also includes the background event rates $b_i$, \ie, $x_i = s_i + b_i$, which may have their own systematics parameters.
+In order to implement an overall signal normalization error $\sigma_{n_s}$,  the $\chi^2$, which includes all event rates $x_i$ of all bins, is minimized over the auxiliary parameter $n_s$:
+\be
+ \hat{\chi^2} = \underset{n_s}{\mathrm{min}} \left(  \chi^2(n_s, \hdots) + \frac{(n_s)^2}{\sigma_{n_s}^2} \right).
+\ee 
+This minimization is done independently for all auxiliary parameters of this oscillation channel. The total $\chi^2$ for the considered experiment is finally obtained by repreating this procedure for all oscillation channels and adding their $\chi^2$-values. In general, the situation is more complicated because of the usage of many systematical errors. More details about systematics parameters and the definition of signal, background, and oscillation channels can be found in the \EDM\ part of this book, too.
+
+The systematics minimization of an experiment can be easily switched on and off, \ie, one can also compute the $\chi^2$ without even taking into account systematics:
+\begin{function}
+{\tt SetSystematics}$(N_{mathrm{exp}}, \, sys)$ switches the systematics minimization for experiment $N_{\mathrm{exp}}$ on (sys=1) or off (sys=0).
+\end{function}
+This function can be especially useful for the test of the impact of systematics.
+??? Wie einzelne Systematik-Parameter ein und ausschalten? Sonst individuell nicht testbar! ??? Verweis auf appendix? 
 
 \chapter[Calculating $\chi^2$-projections: how to include correlations]{Calculating $\boldsymbol{\chi^2}$-projections: how to include correlations}
 

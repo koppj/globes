@@ -42,8 +42,8 @@ Wolfram Research.
 (*NotebookFileLineBreakTest
 NotebookFileLineBreakTest*)
 (*NotebookOptionsPosition[    105341,       2732]*)
-(*NotebookOutlinePosition[    106337,       2763]*)
-(*  CellTagsIndexPosition[    106293,       2759]*)
+(*NotebookOutlinePosition[    106336,       2763]*)
+(*  CellTagsIndexPosition[    106292,       2759]*)
 (*WindowFrame->Normal*)
 
 
@@ -2736,7 +2736,7 @@ WindowSize->{1016, 710},
 WindowMargins->{{0, Automatic}, {Automatic, 0}},
 PrintingPageRange->{Automatic, Automatic},
 PrintingOptions->{"PaperSize"->{612, 792},
-"PaperOrientation"->"Landscape",
+"PaperOrientation"->"Portrait",
 "FirstPageHeader"->False,
 "FirstPageFooter"->False,
 "PostScriptOutputFile":>FrontEnd`FileName[{$RootDirectory, "home", "wwinter", \
