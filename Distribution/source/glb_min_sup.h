@@ -23,10 +23,15 @@
 #ifndef GLB_MIN_SUP
 #define GLB_MIN_SUP 1
 
-void glb_minimizer_error(char error_text[]);
 double *glb_alloc_vec(int nl,int nh);
 double **glb_alloc_mat(int nrl,int nrh, int ncl,int nch);
 void glb_free_vec(double *v,int nl,int nh);
 void glb_free_mat(double **m,int nrl,int nrh,int ncl,int nch);
+void glb_powell(double p[],double **xi,int n,
+		double ftol,int *iter,double *fret,
+		double (*func)(double*));
+void glb_powell2(double p[],double **xi,int n,double ftol,
+		 int *iter,double *fret,
+		 double (*func)(double*));
 
 #endif /* GLB_MIN_SUP */

@@ -47,7 +47,7 @@
 #define PI 3.1415
 
 
-static struct experiment MInitMemory0(struct experiment in);
+static struct glb_experiment MInitMemory0(struct glb_experiment in);
 
 /* Functions for dealing with glb_naming */
 
@@ -287,8 +287,8 @@ static void init_struct_systematic(struct glb_systematic *in)
 void glbInitExp(glb_exp ins)
 {
   int i;
-  struct experiment *in;
-  in=(struct experiment *) ins;
+  struct glb_experiment *in;
+  in=(struct glb_experiment *) ins;
   in->version=NULL;
   in->names=NULL;
   in->num_of_fluxes=-1;
@@ -387,8 +387,8 @@ static void my_free(void *ptr)
 void glbFreeExp(glb_exp ins)
 {
   int i,j;
-  struct experiment *in;
-  in=(struct experiment *) ins;
+  struct glb_experiment *in;
+  in=(struct glb_experiment *) ins;
   glb_free_names(in->names);
   glb_free(in->version);
   for(i=0;i<32;i++)glb_flux_free(in->fluxes[i]);
@@ -457,8 +457,8 @@ void glbFreeExp(glb_exp ins)
 
 glb_exp glbAllocExp()
 {
-  struct experiment *in; 
-  in=(struct experiment *) glb_malloc(sizeof(struct experiment));
+  struct glb_experiment *in; 
+  in=(struct glb_experiment *) glb_malloc(sizeof(struct glb_experiment));
   glbInitExp((glb_exp) in);
   return (glb_exp) in;
 }
@@ -471,8 +471,8 @@ static int setup_density_profile(glb_exp ins)
   size_t l;
   double ttl=0;
   int i;
-  struct experiment *in;
-  in=(struct experiment *) ins;
+  struct glb_experiment *in;
+  in=(struct glb_experiment *) ins;
   if(ins->density_profile_type==-1) 
     {glb_error("No profile type specified");s=-1;}
   if(ins->density_profile_type==1)
@@ -541,8 +541,8 @@ int glbDefaultExp(glb_exp ins)
   int i,k,status,def,ct;
   
   
-  struct experiment *in;
-  in=(struct experiment *) ins;
+  struct glb_experiment *in;
+  in=(struct glb_experiment *) ins;
  
   
   
@@ -894,7 +894,7 @@ void glbSetSysCenter(double *val, int rule, int experiment)
 // without reprogramming everything !
 // here we pass a pointer for efficiency since this function is used in every step
 
-static void MMovePointers(struct experiment *in)
+static void MMovePointers(struct glb_experiment *in)
 {
   int k;
   for (k=0;k<in->numofrules;k++) 
@@ -932,9 +932,9 @@ static void MMovePointers(struct experiment *in)
 
 // memory allocation for all the ratevecvtors
 
-static struct experiment MInitMemory0(struct experiment in)
+static struct glb_experiment MInitMemory0(struct glb_experiment in)
 {
- struct experiment out;
+ struct glb_experiment out;
   int k;
   int len,l2;
   out=in;
@@ -983,7 +983,7 @@ static struct experiment MInitMemory0(struct experiment in)
 
 
 
-static void glb_set_profile_scaling_sec(struct experiment *in)
+static void glb_set_profile_scaling_sec(struct glb_experiment *in)
 {
   int k;
   glb_set_length_ptr(in->lengthtab);
@@ -999,14 +999,14 @@ static void glb_set_profile_scaling_sec(struct experiment *in)
 
 
 // This function actually sets all switches and parameters to the values specified
-// in an struct experiment object and calls MMovePointers().
+// in an struct glb_experiment object and calls MMovePointers().
 // here we pass a pointer for efficiency since this function is used in every step 
 
 void glbSetExperiment(glb_exp in)
 {
   int i;
-  struct experiment *s;
-  s=(struct experiment *) in;
+  struct glb_experiment *s;
+  s=(struct glb_experiment *) in;
   //  set_type(s->beamtype);
   glb_set_error_function(s->errorfunction);
  
@@ -1121,7 +1121,7 @@ void glbSetNewRates()
 }
 
 // a bunch of comands which allow to modify
-// certain elements of a struct experiment object
+// certain elements of a struct glb_experiment object
 // in glb_experiment_list
 
 

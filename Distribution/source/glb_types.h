@@ -146,7 +146,7 @@ struct glb_systematic
  * the place where those things are)
  */
 
-struct experiment {
+struct glb_experiment {
 
   /* Version string */
 

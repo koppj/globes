@@ -68,7 +68,7 @@ typedef struct glb_params_type  *glb_params;
 
 /* handle for the struct experiment */
 
-typedef struct experiment *glb_exp;
+typedef struct glb_experiment *glb_exp;
 
 char **glb_path_vector;
 size_t glb_path_vector_length;
@@ -124,8 +124,8 @@ int glbGetOscillationParameters(glb_params in);
 /* The probablities */
 double glbVacuumProbability(int pl, int pm, int panti,double pen, 
 			    double plength);
-double glbProfileProbability(int pl, int pm, int panti,double pen);
-
+double glbProfileProbability(int exp,int initial_flavour, int final_flavour,
+			     int panti, double energy);
 
 
 /* Fluxes and X-sections */
@@ -189,7 +189,7 @@ int glbGetBGErrors(int experiment, int rule, double *norm, double *tilt);
 int glbSetBGCenters(int experiment, int rule, double norm, double tilt);
 int glbGetBGCenters(int experiment, int rule, double *norm, double *tilt);
 
-
+int glbGetNumberOfFluxes(int exp);
 double glbFlux(int experiment, int flux_ident, 
 	double energy, double distance, int flavour, int anti);
 int glbSetSourcePower(int experiment, int flux_ident, double power);

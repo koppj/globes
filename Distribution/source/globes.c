@@ -465,7 +465,7 @@ int main(int argc, char *argv[])
 		      &glb_num_of_exps);
 
   
-
+  
 
   /* Testing for failure */
   if(s<-1) {fprintf(stderr,"%s: FATAL: Unrecoverable parse error\n",
@@ -493,6 +493,13 @@ int main(int argc, char *argv[])
   glbSetRates();
 
 #ifdef TEST
+
+  printf("fluxes %d\n",glbGetNumberOfFluxes(0));
+  printf("fluxes %d\n",glbGetNumberOfFluxes(1));
+  printf("fluxes %d\n",glbGetNumberOfFluxes(2));
+
+  printf("probs %g\n",glbProfileProbability(0,1,3,1,10.0));
+  printf("probs %g\n",glbProfileProbability(1,1,3,1,10.0));
   fprintf(stderr,"glbNameToValue ... %d\n",glbNameToValue(0,"channel","#ch0"));
   fprintf(stderr,"glbValueToName ... %s\n",glbValueToName(0,"flux",0));
 #endif /* TEST */

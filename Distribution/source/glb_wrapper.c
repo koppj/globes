@@ -610,7 +610,7 @@ glbGetChannelRates(double **data, size_t *length,
       *length=0;
       return -1;
     }
-  if(channel>= ((struct experiment *) glb_experiment_list[exp])->numofchannels) 
+  if(channel>= ((struct glb_experiment *) glb_experiment_list[exp])->numofchannels) 
     {
       glb_error("Error in glbGetChannelRates: 5th argument is larger than"
 		" numofchannels");
@@ -646,9 +646,9 @@ glbGetChannelRates(double **data, size_t *length,
 
 
   if(smearing==GLB_PRE) l=(size_t)
-			  ((struct experiment *) glb_experiment_list[exp])->simbins;
+			  ((struct glb_experiment *) glb_experiment_list[exp])->simbins;
   else l=(size_t) 
-	 ((struct experiment *) glb_experiment_list[exp])->numofbins;
+	 ((struct glb_experiment *) glb_experiment_list[exp])->numofbins;
   if(l<=0)
     {
       glb_error("Error in glbGetChannelRates: Could not determine rate vector"
@@ -661,10 +661,10 @@ glbGetChannelRates(double **data, size_t *length,
   temp=(double *) obstack_alloc(&glb_rate_stack,(l+1) * sizeof(double));
   if(smearing==GLB_PRE)
     for(i=0;i<l;i++) 
-      temp[i]= ((struct experiment *) glb_experiment_list[exp])->chrb[channel][i];
+      temp[i]= ((struct glb_experiment *) glb_experiment_list[exp])->chrb[channel][i];
   else
     for(i=0;i<l;i++) 
-      temp[i]= ((struct experiment *) glb_experiment_list[exp])->chra[channel][i];
+      temp[i]= ((struct glb_experiment *) glb_experiment_list[exp])->chra[channel][i];
 
   temp[l]=-1.0;
 
@@ -690,7 +690,7 @@ glbGetUserData(double **data, size_t *length,
       *length=0;
       return -1;
     }
-  if(channel>= ((struct experiment *) glb_experiment_list[exp])->numofchannels) 
+  if(channel>= ((struct glb_experiment *) glb_experiment_list[exp])->numofchannels) 
     {
       glb_error("Error in glbGetUserData: 6th argument is larger than"
 		" numofchannels");
@@ -734,9 +734,9 @@ glbGetUserData(double **data, size_t *length,
 
 
   if(smearing==GLB_PRE) l=(size_t)
-			  ((struct experiment *) glb_experiment_list[exp])->simbins;
+			  ((struct glb_experiment *) glb_experiment_list[exp])->simbins;
   else l=(size_t) 
-	 ((struct experiment *) glb_experiment_list[exp])->numofbins;
+	 ((struct glb_experiment *) glb_experiment_list[exp])->numofbins;
   if(l<=0)
     {
       glb_error("Error in glbGetUserData: Could not determine rate vector"
@@ -752,23 +752,23 @@ glbGetUserData(double **data, size_t *length,
       if(bgeff==GLB_EFF)
 	for(i=0;i<l;i++) 
 	  temp[i]= 
-	    ((struct experiment *) 
+	    ((struct glb_experiment *) 
 	     glb_experiment_list[exp])->user_pre_smearing_channel[channel][i];
       else
 	for(i=0;i<l;i++) 
 	  temp[i]= 
-	    ((struct experiment *) 
+	    ((struct glb_experiment *) 
 	     glb_experiment_list[exp])->user_pre_smearing_background[channel][i];
     }  
   else
     { 
       if(bgeff==GLB_EFF)
 	for(i=0;i<l;i++) 
-	  temp[i]= ((struct experiment *) 
+	  temp[i]= ((struct glb_experiment *) 
 		    glb_experiment_list[exp])->user_post_smearing_channel[channel][i];
       else
 	for(i=0;i<l;i++) 
-	  temp[i]= ((struct experiment *) 
+	  temp[i]= ((struct glb_experiment *) 
 		    glb_experiment_list[exp])->user_post_smearing_background[channel][i];
 	
     }
@@ -800,7 +800,7 @@ static int channel_range(int exp, int channel)
 {
   if(exp_range(exp)!=0) return -1;
   if((channel>=0)&&
-     (channel<((struct experiment *) glb_experiment_list[exp])->numofchannels)) return 0;
+     (channel<((struct glb_experiment *) glb_experiment_list[exp])->numofchannels)) return 0;
   glb_error("Channel index out of range");
   return -1;
 }
@@ -818,7 +818,7 @@ static int rule_range(int exp, int rule)
 {
   if(exp_range(exp)!=0) return -1;
   if((rule>=0)&&
-     (rule<((struct experiment *) glb_experiment_list[exp])->numofrules)) return 0;
+     (rule<((struct glb_experiment *) glb_experiment_list[exp])->numofrules)) return 0;
   glb_error("Rule index out of range");
   return -1;
 }
@@ -830,12 +830,12 @@ static int pos_range(int exp, int rule, int pos, int signal)
   if(signal_range(signal)!=0) return -1;
   if(signal==GLB_SIG) 
     if((pos>=0)&&
-       (pos<((struct experiment *) 
+       (pos<((struct glb_experiment *) 
 	    glb_experiment_list[exp])->lengthofrules[rule])) return 0;
   
   if(signal==GLB_BG) 
     if((pos>=0)&&
-       (pos<((struct experiment *) 
+       (pos<((struct glb_experiment *) 
 	     glb_experiment_list[exp])->lengthofbgrules[rule])) return 0;
   
   glb_error("Position index out of range");
@@ -850,7 +850,7 @@ int glbGetNumberOfChannels(int exp)
 {
   int i;
   if(exp_range(exp)!=0) return -1;
-  i=((struct experiment *) glb_experiment_list[exp])->numofchannels;
+  i=((struct glb_experiment *) glb_experiment_list[exp])->numofchannels;
   return i;
 }
 
@@ -858,7 +858,7 @@ int glbGetNumberOfRules(int exp)
 {
   int i;
   if(exp_range(exp)!=0) return -1;
-  i=((struct experiment *) glb_experiment_list[exp])->numofrules; 
+  i=((struct glb_experiment *) glb_experiment_list[exp])->numofrules; 
   return i;
 }
 
@@ -869,10 +869,10 @@ int glbGetLengthOfRule(int exp, int rule, int signal)
   if(rule_range(exp,rule)!=0) return -1;
 
   if(signal==GLB_SIG)
-    i=((struct experiment *) glb_experiment_list[exp])->lengthofrules[rule];
+    i=((struct glb_experiment *) glb_experiment_list[exp])->lengthofrules[rule];
 
   if(signal==GLB_BG)
-    i=((struct experiment *) glb_experiment_list[exp])->lengthofbgrules[rule];
+    i=((struct glb_experiment *) glb_experiment_list[exp])->lengthofbgrules[rule];
   
   return i;
 }
@@ -883,10 +883,10 @@ int glbGetChannelInRule(int exp, int rule, int pos, int signal)
   if(pos_range( exp,  rule,  pos,  signal)!=0) return -1;
  
   if(signal==GLB_SIG)
-    i=((struct experiment *) glb_experiment_list[exp])->rulechannellist[rule][pos];
+    i=((struct glb_experiment *) glb_experiment_list[exp])->rulechannellist[rule][pos];
 
   if(signal==GLB_BG)
-    i=((struct experiment *) glb_experiment_list[exp])->bgrulechannellist[rule][pos];
+    i=((struct glb_experiment *) glb_experiment_list[exp])->bgrulechannellist[rule][pos];
 
   return i;
 } 
@@ -897,10 +897,10 @@ double glbGetCoefficientInRule(int exp, int rule, int pos, int signal)
   if(pos_range(exp,rule,pos,signal)!=0) return -1.0;
 
   if(signal==GLB_SIG)
-    res=((struct experiment *) glb_experiment_list[exp])->rulescoeff[rule][pos];
+    res=((struct glb_experiment *) glb_experiment_list[exp])->rulescoeff[rule][pos];
 
   if(signal==GLB_BG)
-    res=((struct experiment *) glb_experiment_list[exp])->bgrulescoeff[rule][pos];
+    res=((struct glb_experiment *) glb_experiment_list[exp])->bgrulescoeff[rule][pos];
 
   return res;
 } 
@@ -915,7 +915,7 @@ double glbGetNormalizationInRule(int exp, int rule, int signal)
     res=1.0;
 
   if(signal==GLB_BG)
-    res=((struct experiment *) glb_experiment_list[exp])->bgcenter[0][rule];
+    res=((struct glb_experiment *) glb_experiment_list[exp])->bgcenter[0][rule];
 
   return res;
 } 
@@ -1040,8 +1040,8 @@ static glb_smear
   glb_smear *p;
   size_t w;
   if(channel_range(exp,channel)!=0) return NULL;
-  w=(size_t) ((struct experiment *) glb_experiment_list[exp])->listofchannels[5][channel];
-  p=((struct experiment *) glb_experiment_list[exp])->smear_data[w];
+  w=(size_t) ((struct glb_experiment *) glb_experiment_list[exp])->listofchannels[5][channel];
+  p=((struct glb_experiment *) glb_experiment_list[exp])->smear_data[w];
   return p;
 }
 
@@ -1363,13 +1363,13 @@ static int
 glb_switch_systematics(int experiment, int rule, int on_off)
 {
   int i;
-  struct experiment *in;
+  struct glb_experiment *in;
   if((on_off!=GLB_ON)&&(on_off!=GLB_OFF)) {
     glb_error("Invalid value for on_off");
     return -1;
   }
 
-  in=(struct experiment *) glb_experiment_list[experiment];
+  in=(struct glb_experiment *) glb_experiment_list[experiment];
   if(rule==GLB_ALL)
     {
       for(i=0;i<in->numofrules;i++) {
@@ -1416,13 +1416,13 @@ static int
 glb_set_systematics(int experiment, int rule, int on_off, int value)
 {
   int i;
-  struct experiment *in;
+  struct glb_experiment *in;
   if((on_off!=GLB_ON)&&(on_off!=GLB_OFF)) {
     glb_error("Invalid value for on_off");
     return -1;
   }
 
-  in=(struct experiment *) glb_experiment_list[experiment];
+  in=(struct glb_experiment *) glb_experiment_list[experiment];
   if(rule==GLB_ALL)
     {
       for(i=0;i<in->numofrules;i++) {
@@ -1470,14 +1470,14 @@ int
 glbGetErrorDim(int experiment, int rule, int on_off)
 {
   int s=0;
-  struct experiment *in;
+  struct glb_experiment *in;
   if((on_off!=GLB_ON)&&(on_off!=GLB_OFF)) {
     glb_error("Invalid value for on_off");
     return -1;
   }
   if((experiment >= 0)&&(experiment < glb_num_of_exps))
     {
-      in=(struct experiment *) glb_experiment_list[experiment];
+      in=(struct glb_experiment *) glb_experiment_list[experiment];
       if((rule >= 0)&&(rule < in->numofrules )) 
 	{
 	  if(on_off==GLB_ON) s=in->errordim_sys_on[rule];
@@ -1545,7 +1545,7 @@ glbSetProfileScaling(int experiment, double scale)
 int 
 glbSetTargetMass(int experiment,double mass)
 {
-  struct experiment *in;
+  struct glb_experiment *in;
   int i;
   if(experiment==GLB_ALL)
     {
@@ -1553,7 +1553,7 @@ glbSetTargetMass(int experiment,double mass)
 	{
 	  for(i=0;i<glb_num_of_exps;i++)
 	    {
-	      in=(struct experiment *) glb_experiment_list[i];
+	      in=(struct glb_experiment *) glb_experiment_list[i];
 	      in->targetmass = mass;
 	    }  
 	}
@@ -1567,7 +1567,7 @@ glbSetTargetMass(int experiment,double mass)
 
   if((experiment >= 0)&&(experiment < glb_num_of_exps))
     {
-      in=(struct experiment *) glb_experiment_list[experiment];
+      in=(struct glb_experiment *) glb_experiment_list[experiment];
       if(mass > 0)
 	{
 	  in->targetmass = mass;  
@@ -1591,11 +1591,11 @@ glbSetTargetMass(int experiment,double mass)
 double 
 glbGetTargetMass(int experiment)
 {
-  struct experiment *in;
+  struct glb_experiment *in;
   double out;
   if((experiment >= 0)&&(experiment < glb_num_of_exps))
     {
-      in=(struct experiment *) glb_experiment_list[experiment];
+      in=(struct glb_experiment *) glb_experiment_list[experiment];
       out=in->targetmass;
       return out;
     }
@@ -1609,7 +1609,7 @@ glbGetTargetMass(int experiment)
 
 int glbSetSignalErrors(int experiment, int rule, double norm, double tilt)
 {
-  struct experiment *in;
+  struct glb_experiment *in;
   int i,k;
   /* Testing the arguments */
   if((norm <= 0) || (tilt <= 0)) { glb_error("Errors have to be positive");
@@ -1624,7 +1624,7 @@ int glbSetSignalErrors(int experiment, int rule, double norm, double tilt)
   for(i=0;i<glb_num_of_exps;i++)
     {
       if(experiment!=GLB_ALL) i=experiment;
-      in=(struct experiment *) glb_experiment_list[i];
+      in=(struct glb_experiment *) glb_experiment_list[i];
       /* Testing the rule number */
       if(!(((rule >= 0)&&(rule < in->numofrules))
 	   ||(rule==GLB_ALL))) { 
@@ -1650,7 +1650,7 @@ int glbSetSignalErrors(int experiment, int rule, double norm, double tilt)
 int 
 glbGetSignalErrors(int experiment, int rule, double *norm, double *tilt)
 {
-  struct experiment *in;
+  struct glb_experiment *in;
   int i,k;
   /* Testing the arguments */
   if((norm == NULL) || (tilt == NULL)) { 
@@ -1665,7 +1665,7 @@ glbGetSignalErrors(int experiment, int rule, double *norm, double *tilt)
   for(i=0;i<glb_num_of_exps;i++)
     {
       if(experiment!=GLB_ALL) i=experiment;
-      in=(struct experiment *) glb_experiment_list[i];
+      in=(struct glb_experiment *) glb_experiment_list[i];
       /* Testing the rule number */
       if(!(((rule >= 0)&&(rule < in->numofrules)))) { 
 	glb_error("Invalid value for rule number");
@@ -1690,7 +1690,7 @@ glbGetSignalErrors(int experiment, int rule, double *norm, double *tilt)
 
 int glbSetBGErrors(int experiment, int rule, double norm, double tilt)
 {
-  struct experiment *in;
+  struct glb_experiment *in;
   int i,k;
   /* Testing the arguments */
   if((norm <= 0) || (tilt <= 0)) { glb_error("Errors have to be positive");
@@ -1705,7 +1705,7 @@ int glbSetBGErrors(int experiment, int rule, double norm, double tilt)
   for(i=0;i<glb_num_of_exps;i++)
     {
       if(experiment!=GLB_ALL) i=experiment;
-      in=(struct experiment *) glb_experiment_list[i];
+      in=(struct glb_experiment *) glb_experiment_list[i];
       /* Testing the rule number */
       if(!(((rule >= 0)&&(rule < in->numofrules))
 	   ||(rule==GLB_ALL))) { 
@@ -1731,7 +1731,7 @@ int glbSetBGErrors(int experiment, int rule, double norm, double tilt)
 int 
 glbGetBGErrors(int experiment, int rule, double *norm, double *tilt)
 {
-  struct experiment *in;
+  struct glb_experiment *in;
   int i,k;
   /* Testing the arguments */
   if((norm == NULL) || (tilt == NULL)) { 
@@ -1746,7 +1746,7 @@ glbGetBGErrors(int experiment, int rule, double *norm, double *tilt)
   for(i=0;i<glb_num_of_exps;i++)
     {
       if(experiment!=GLB_ALL) i=experiment;
-      in=(struct experiment *) glb_experiment_list[i];
+      in=(struct glb_experiment *) glb_experiment_list[i];
       /* Testing the rule number */
       if(!(((rule >= 0)&&(rule < in->numofrules)))) { 
 	glb_error("Invalid value for rule number");
@@ -1771,7 +1771,7 @@ glbGetBGErrors(int experiment, int rule, double *norm, double *tilt)
 
 int glbSetBGCenters(int experiment, int rule, double norm, double tilt)
 {
-  struct experiment *in;
+  struct glb_experiment *in;
   int i,k;
   /* Testing the arguments */
   if((norm <= 0) || (tilt <= 0)) { glb_error("Errors have to be positive");
@@ -1786,7 +1786,7 @@ int glbSetBGCenters(int experiment, int rule, double norm, double tilt)
   for(i=0;i<glb_num_of_exps;i++)
     {
       if(experiment!=GLB_ALL) i=experiment;
-      in=(struct experiment *) glb_experiment_list[i];
+      in=(struct glb_experiment *) glb_experiment_list[i];
       /* Testing the rule number */
       if(!(((rule >= 0)&&(rule < in->numofrules))
 	   ||(rule==GLB_ALL))) { 
@@ -1812,7 +1812,7 @@ int glbSetBGCenters(int experiment, int rule, double norm, double tilt)
 int 
 glbGetBGCenters(int experiment, int rule, double *norm, double *tilt)
 {
-  struct experiment *in;
+  struct glb_experiment *in;
   int i,k;
   /* Testing the arguments */
   if((norm == NULL) || (tilt == NULL)) { 
@@ -1827,7 +1827,7 @@ glbGetBGCenters(int experiment, int rule, double *norm, double *tilt)
   for(i=0;i<glb_num_of_exps;i++)
     {
       if(experiment!=GLB_ALL) i=experiment;
-      in=(struct experiment *) glb_experiment_list[i];
+      in=(struct glb_experiment *) glb_experiment_list[i];
       /* Testing the rule number */
       if(!(((rule >= 0)&&(rule < in->numofrules)))) { 
 	glb_error("Invalid value for rule number");
@@ -1850,11 +1850,11 @@ glbGetBGCenters(int experiment, int rule, double *norm, double *tilt)
 
 const char *glbVersionOfExperiment(int experiment)
 {
-  struct experiment *in;
+  struct glb_experiment *in;
   if(!(((experiment >= 0)&&(experiment < glb_num_of_exps)))) { 
     glb_error("Invalid value for experiment number");
     return NULL;}
-  in=(struct experiment *) glb_experiment_list[experiment];
+  in=(struct glb_experiment *) glb_experiment_list[experiment];
   return in->version;
 }
 
@@ -1866,11 +1866,11 @@ glbFlux(int experiment, int flux_ident,
 	double energy, double distance, int flavour, int anti)
 {
   double out;
-  struct experiment *in;
+  struct glb_experiment *in;
   if(!(((experiment >= 0)&&(experiment < glb_num_of_exps)))) { 
     glb_error("Invalid value for experiment number");
     return -1;}
-  in=(struct experiment *) glb_experiment_list[experiment];
+  in=(struct glb_experiment *) glb_experiment_list[experiment];
   if(!(((flux_ident >= 0)&&(flux_ident < in->num_of_fluxes)))) { 
     glb_error("Invalid value for flux number");
     return -1;}  
@@ -1887,11 +1887,11 @@ double glbXSection(int experiment, int xsec_ident,
 	double energy, int flavour, int anti)
 {
   double out;
-  struct experiment *in;
+  struct glb_experiment *in;
   if(!(((experiment >= 0)&&(experiment < glb_num_of_exps)))) { 
     glb_error("Invalid value for experiment number");
     return -1;}
-  in=(struct experiment *) glb_experiment_list[experiment];
+  in=(struct glb_experiment *) glb_experiment_list[experiment];
   if(!(((xsec_ident >= 0)&&(xsec_ident < in->num_of_xsecs)))) { 
     glb_error("Invalid value for X-section number");
     return -1;}  
@@ -1905,7 +1905,7 @@ int
 glbSetSourcePower(int experiment, int flux_ident, double power)
 {
   int i,k;
-  struct experiment *in;
+  struct glb_experiment *in;
 
   /* Testing the experiment number */
   if(!(((experiment >= 0)&&(experiment < glb_num_of_exps))
@@ -1917,7 +1917,7 @@ glbSetSourcePower(int experiment, int flux_ident, double power)
   for(i=0;i<glb_num_of_exps;i++)
     {
       if(experiment!=GLB_ALL) i=experiment;
-      in=(struct experiment *) glb_experiment_list[i];
+      in=(struct glb_experiment *) glb_experiment_list[i];
       /* Testing theflux number */
       if(!(((flux_ident >= 0)&&(flux_ident < in->num_of_fluxes))
 	   ||(flux_ident==GLB_ALL))) { 
@@ -1943,11 +1943,11 @@ double
 glbGetSourcePower(int experiment, int flux_ident)
 {
   double out;
-  struct experiment *in;
+  struct glb_experiment *in;
   if(!(((experiment >= 0)&&(experiment < glb_num_of_exps)))) { 
     glb_error("Invalid value for experiment number");
     return -1;}
-  in=(struct experiment *) glb_experiment_list[experiment];
+  in=(struct glb_experiment *) glb_experiment_list[experiment];
   if(!(((flux_ident >= 0)&&(flux_ident < in->num_of_fluxes)))) { 
     glb_error("Invalid value for flux number");
     return -1;}
@@ -1962,7 +1962,7 @@ glbSetRunningTime(int experiment, int flux_ident, double time)
 {
   
  int i,k;
-  struct experiment *in;
+  struct glb_experiment *in;
 
   /* Testing the experiment number */
   if(!(((experiment >= 0)&&(experiment < glb_num_of_exps))
@@ -1974,7 +1974,7 @@ glbSetRunningTime(int experiment, int flux_ident, double time)
   for(i=0;i<glb_num_of_exps;i++)
     {
       if(experiment!=GLB_ALL) i=experiment;
-      in=(struct experiment *) glb_experiment_list[i];
+      in=(struct glb_experiment *) glb_experiment_list[i];
       /* Testing theflux number */
       if(!(((flux_ident >= 0)&&(flux_ident < in->num_of_fluxes))
 	   ||(flux_ident==GLB_ALL))) { 
@@ -2000,11 +2000,11 @@ double
 glbGetRunningTime(int experiment, int flux_ident)
 {
   double out;
-  struct experiment *in;
+  struct glb_experiment *in;
   if(!(((experiment >= 0)&&(experiment < glb_num_of_exps)))) { 
     glb_error("Invalid value for experiment number");
     return -1;}
-  in=(struct experiment *) glb_experiment_list[experiment];
+  in=(struct glb_experiment *) glb_experiment_list[experiment];
   if(!(((flux_ident >= 0)&&(flux_ident < in->num_of_fluxes)))) { 
     glb_error("Invalid value for flux number");
     return -1;}
@@ -2039,7 +2039,7 @@ int
 glbSetFilterStateInExperiment(int experiment,int on_off)
 {
   int i;
-  struct experiment *in;
+  struct glb_experiment *in;
   /* Testing the experiment number */
   if(!(((experiment >= 0)&&(experiment < glb_num_of_exps))
        ||(experiment==GLB_ALL))) { 
@@ -2051,7 +2051,7 @@ glbSetFilterStateInExperiment(int experiment,int on_off)
   for(i=0;i<glb_num_of_exps;i++)
     {
       if(experiment!=GLB_ALL) i=experiment;
-      in=(struct experiment *) glb_experiment_list[i];
+      in=(struct glb_experiment *) glb_experiment_list[i];
       
       in->filter_state=on_off;
 
@@ -2064,7 +2064,7 @@ int
 glbGetFilterStateInExperiment(int experiment)
 {
   int i,out=-1;
-  struct experiment *in;
+  struct glb_experiment *in;
   /* Testing the experiment number */
   if(!(((experiment >= 0)&&(experiment < glb_num_of_exps)))) { 
     glb_error("Invalid value for experiment number");
@@ -2073,7 +2073,7 @@ glbGetFilterStateInExperiment(int experiment)
   for(i=0;i<glb_num_of_exps;i++)
     {
       if(experiment!=GLB_ALL) i=experiment;
-      in=(struct experiment *) glb_experiment_list[i];
+      in=(struct glb_experiment *) glb_experiment_list[i];
       
       out=in->filter_state;
 
@@ -2103,7 +2103,7 @@ int
 glbSetFilterInExperiment(int experiment,double filter)
 {
   int i;
-  struct experiment *in;
+  struct glb_experiment *in;
   /* Testing the experiment number */
   if(!(((experiment >= 0)&&(experiment < glb_num_of_exps))
        ||(experiment==GLB_ALL))) { 
@@ -2114,7 +2114,7 @@ glbSetFilterInExperiment(int experiment,double filter)
   for(i=0;i<glb_num_of_exps;i++)
     {
       if(experiment!=GLB_ALL) i=experiment;
-      in=(struct experiment *) glb_experiment_list[i];
+      in=(struct glb_experiment *) glb_experiment_list[i];
       
       in->filter_value=filter;
 
@@ -2128,7 +2128,7 @@ double
 glbGetFilterInExperiment(int experiment)
 {
   int i,out=-1;
-  struct experiment *in;
+  struct glb_experiment *in;
   /* Testing the experiment number */
   if(!(((experiment >= 0)&&(experiment < glb_num_of_exps)))) { 
     glb_error("Invalid value for experiment number");
@@ -2137,7 +2137,7 @@ glbGetFilterInExperiment(int experiment)
   for(i=0;i<glb_num_of_exps;i++)
     {
       if(experiment!=GLB_ALL) i=experiment;
-      in=(struct experiment *) glb_experiment_list[i];
+      in=(struct glb_experiment *) glb_experiment_list[i];
       
       out=in->filter_value;
 
@@ -2152,12 +2152,12 @@ int
 glbNameToValue(int exp,const char* context, const char *name)
 {
   glb_naming *ptr;
-  struct experiment *in;
+  struct glb_experiment *in;
   /* Testing the experiment number */
   if(!(((exp >= 0)&&(exp < glb_num_of_exps)))) { 
     glb_error("Invalid value for experiment number");
     return -1;}
-  in=(struct experiment *) glb_experiment_list[exp];
+  in=(struct glb_experiment *) glb_experiment_list[exp];
   for (ptr = in->names; ptr != (glb_naming *) NULL;
        ptr = (glb_naming *)ptr->next)
     if (strcmp (ptr->name,name) == 0 && strcmp(ptr->context,context)==0)
@@ -2170,12 +2170,12 @@ const char
 *glbValueToName(int exp,const char* context, int value)
 {
   glb_naming *ptr;
-  struct experiment *in;
+  struct glb_experiment *in;
   /* Testing the experiment number */
   if(!(((exp >= 0)&&(exp < glb_num_of_exps)))) { 
     glb_error("Invalid value for experiment number");
     return NULL;}
-  in=(struct experiment *) glb_experiment_list[exp];
+  in=(struct glb_experiment *) glb_experiment_list[exp];
   for (ptr = in->names; ptr != (glb_naming *) NULL;
        ptr = (glb_naming *)ptr->next)
     {
@@ -2185,3 +2185,33 @@ const char
   return NULL;
 }
 
+
+/* Acces to the more complicated probabilities */
+
+double glbProfileProbability(int exp,int initial_flavour, int final_flavour,
+			    int panti, double energy)
+{
+  double res;
+  if(exp<0||exp>=glb_num_of_exps) {glb_error("Experiment index out of range");
+  return -1;}
+
+  glbSetExperiment(glb_experiment_list[exp]);
+
+  res=glb_profile_probability(initial_flavour,final_flavour,panti,energy);
+  return res;
+}
+
+/* Number of fluxes in an experiment */
+
+int glbGetNumberOfFluxes(int exp)
+{
+  int s;
+  /* Testing the experiment number */
+  if(!(((exp >= 0)&&(exp < glb_num_of_exps)))) { 
+    glb_error("Invalid value for experiment number");
+    return -1;}
+
+  s=glb_experiment_list[exp]->num_of_fluxes;
+  return s;
+
+}

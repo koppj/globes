@@ -1,0 +1,501 @@
+15/06/04 Fixed bug in MMovePointers
+	 The wrong number of pointers was moved for the channel
+	 buffers chra and chrb
+
+25/06/04 Added support for data path
+	 Whenever a file is opened a file path as stored in glb_path_vector
+	 is searched. The local directory (ie. the working directory as
+	 returned by getcwd) always is the first place to look for a file. 
+	 The other entries in the path are taken from the 
+	 environment variable GLB_PATH. This variable can be set in the usual
+	 way in the shell:
+		export GLB_PATH=${GLB_PATH}:path1:path2
+	 This gives a ':' separated list of paths.
+	
+	 Setting verbosity level to 2 (or higher) prints a list of all
+	 opened files with absolute path to stderr.
+
+	 Added a section to INSTALL describing the installation and usage
+	 without root privilege.
+
+	 Added a feature to globes, which allows to pre-define the oscillation
+	 parameters used for event calculation with the environment variable 
+	 GLB_CENTRAL_VALUES. This variable can be set in the usual
+	 way in the shell:
+		export GLB_CENTRAL_VALUES='1,2,3,4,5,6'
+
+
+	 Added -version-info to libtool.
+
+28/06/04 Fixed bug in the path resolution
+
+28/06/04
+*******	Version 1.6.0
+	Changed all names according to following rules:
+
+		function names have been changed to (new)
+			glbFunctionName
+
+		variable names have been changed to (partly new)
+			glb_variable_name
+
+		type names have been changed to	(partly new)
+			glb_type_name
+
+		preprocessor definitions still are
+			GLB_PREPROCESSOR_DEFINITION
+
+	Furthermore the following global variables have changed their name:
+	
+		alphastate -> glb_rule_number
+		numofexps -> glb_num_of_exps
+		singleexptyp -> glb_single_experiment_type
+		ExpList -> glb_experiment_list
+
+	Following functions have been renamed:
+	
+		set_profile -> glbSetProfileScaling
+		MInitExperiment -> glbSetExperiment
+		cpy_params -> glbCopyParams
+		XXX -> glbXSection
+		GLBChiDeltaTheta -> glbChiThetaDelta
+
+	Besides the test directory is gone from the distribution, there will
+	be two new directories:
+		data (already there, with NuFact.glb and XCC.dat)
+		examples
+	in a later version.
+
+	The gbe and globes-test targets and sources have been removed from
+	the distribution.
+
+	The new uniform file headers have been added and the authors file
+	is changed accordingly.
+
+	The functions connected to the filter feature have been removed from
+	the API, for now.
+
+	Added a copyright notice to the globes binary (use globes -V, to 
+	see it).
+
+	Added a remark to INSTALL on having both an ordinary installed and
+	a user installed version at the same time (bad idea ;-)
+
+	Added a section to README to explicitely state that GLoBES is not
+	a safe application like ssh.
+
+	Presumably fixed bug in glbChiALL (check!).
+
+	Fixed bug in glbChi1P concerning the buffering of the
+	projection vector.
+
+	glbCopyParams now accepts identical source and destination and in
+	this case does nothing.
+
+	glbFreeParams now sets the stale pointer to NULL.
+
+	Added macro definitions for each oscillation parameter.
+
+	Priors are indeed added for all free parameters, if the absolute value
+	of the error on a parameter is smaller than 1E-12 the corresponding
+	prior is set to zero.
+
+29/07/04 Added a new opaque structure: glb_projection, it works analogous
+	to glb_params. It serves for handling the projection data, i.e. which
+	parameters are free and which not. It automatically deals with 
+	different numbers of experiments. The default is that all densities
+	are free. Also the corresponding functions for actually setting and
+	getting the projection have been added: glbSetProjection and 
+	glbGetProjection. 
+
+	Added print functions for glb_params and glb_projection, called
+	glbPrintXXX.
+	
+	The matter profile initialization now works as described in chapter 9
+	of the manual. To this end the definition of struct experiment has 
+	been enlarged by density_profile_type. 
+	Furthermore a function named glbSetBaselineInExperiment
+	has been added, it reads density_profile_type and recomputes the
+	profile accordingly. For type 1 profiles it computes the average for
+	the new baseline. For type 2 profiles it computes the PREM profile
+	for the new baseline with the same number of layers. For type 3
+	it rescales all lengths, such that their sum is equal to the 
+	new baseline.
+
+	AEDL has been changed:
+		$density_center -> no longer supported
+		$density_error -> no longer supported
+		$pstesp -> $densitysteps
+	
+29/07/04 
+*******	Version 1.7.0
+	Added support for glbSwitchSystematics:
+		glbSwitchSystematics(GLB_ALL,GLB_ALL,GLB_OFF)
+	produces the left edge of the blue bar and
+		glbSwitchSystematics(GLB_ALL,GLB_ALL,GLB_ON)
+	produces the right edge of the blue bar.
+	In order that this works, I had to change AEDL:
+		@errordim -> @errordim_sys_on
+			     @errordim_sys_off
+	This means that the user (i.e. author of the AEDL file) has
+	to provide now two values for errordim, one corresponding to
+	'systematics on' and the other to 'systematics off'.
+	Furthermore a function for setting the individual errordims is given
+	by glbSetErrorDim and there is also a glbGetErrorDim function.  
+
+30/07/09 Fixed bug in the AEDL lexer. All replacements like 1/2 -> 0.5
+	now also work within the 'flux' and 'cross' environments. In order
+	to achieve this I had to extend AEDL by a string type.
+	AEDL changed:
+		filename -> "filename"
+	No escapes possible, which is not a problem since " can not be part
+	of a valid filename.
+
+	Added glbDefineAEDLVariable. This function allows the C user to 
+	pre-define (i.e. prior to parsing a glb-file) variables, which then
+	will be substituted in the glb-file. Example:
+		in the AEDL we have:
+			$targetmass = my_variable
+		in the C file we have:
+			glbDefineAEDLVariable("my_variable",100.0);
+			glbInitExperiment(...);
+	As a result the experiment initialized has a targetmass of 100.0 kt.
+	This allows to produce loops like:
+
+		for(i=0;i<10;i++)
+		{	 
+			glbClearExperimentList();
+			glbDefineAEDLVariable("my_variable",i);
+			glbInitExperiment(...);
+			
+			do something;	
+	 	}
+
+	You can define arbitrarily many of those variables, they all have
+	storage class 'double'. The variables will be substituted everwhere
+	(I presume...), also in lists etc. This is a powerful feature which
+	allows to do all the neat things we used to do, e.g plot the 
+	sensitivity to theta13 as a function of parent muon energy and 
+	baseline. 
+	The variable list can be cleared by glbClearAEDLVariables() and in any
+	case is cleared at exit.
+
+	Fixed ordering of GLB_THETA_13 and GLB_THETA_23.
+
+	Finally all functions in globes.h now conform to the API, including
+	all of the get/set functions. Still, some set/get functions may 
+	be missing, which in most cases should be no serious problem due to
+	the variable substitution mechanism described above.
+
+	Added support for versioning in C. Two functions:
+		glbTestReleaseVersion("1.4.0")
+	returns -1 if "1.4.0" the binary is more recent than the
+	the calling program, it return 0 if the versions exactly match
+	and +1 if the binary is less recent than the calling program.
+		glbTestLibraryVersions("2:0:0")
+	works accordingly, but now really comparing the library versions
+	in the same way the linker does. The first function should be 
+	sufficient for your purposes... (Probably no need for documentation ?)
+
+	In AEDL versioning looks like this:
+		$version="1.7.0"
+	This information is then stored in struct experiment. A warning is 
+	issued whenever the file is more recent than the calling program or
+	the version information is missing. In the latter case version is
+	set by default to the current version.
+	It can be accessed by glbVersionOfExperiment(experiment). This function
+	has return type 'const char', i.e. its output must *not* be modified.
+	Typical calling sequence:
+		glbTestReleaseVersion(glbVersionOfExperiment(0))
+
+01/07/04 Added a no-oscillation option to AEDL and the rate computation. In
+	the channel definition any flavour now can have the prefix:
+		NOSC_
+	which means that no probability is folded into the spectrum and
+	the rate vanishes if initial and final flavour are not identical.
+	The channel flavour flags are:
+		NOSC_e -> 11
+		NOSC_mu -> 12
+		NOSC_tau -> 13
+	The channels being marked as no-oscillation are computed and smeared
+	only by a call to glbSetRates(), they will *not* be recomputed by a
+	call to glbSetNewRates() since they do not depend on any oscillation
+	parameter (by definition).
+
+	Fluxes are now dynamically allocated and stored in the glb_flux type.
+	The corresponding get/set function have been added for SourcePower and
+	RunningTime. Furthemore the flux itself is accessible by glbFlux.
+
+	Fixed bug in the treatment of the rule argument in glbChiSys (check!).
+
+02/07/04 Fixed some minor memory leaks due to the path resolution. Checked
+	with valgrind, everything okay ;-)
+
+	The API of version 1.7.0 should be a very close approximation to
+	the release version.
+
+	Fixed a new bug in glbChiSys
+
+*******	Version 1.7.1
+	
+	Fixed bug in glbChiSys - finally ;-)
+
+*******	Version 1.7.2
+
+	Fixed bugs in profile access and set functions
+
+	Cleaned up oszprob.cc and oszprob.h.
+
+	Removed a bunch of obsolete functions from Mminimize.c.
+
+	Cleaned up glb_profile.c and glb_profile.h
+
+	Cleaned up globes.c
+
+******* Version 1.7.3
+	
+	Found bug in set_baseline. It must be called after the pointers
+	length and density in calc.c have been redirected to the experiment
+	structure. This should be fixed later on -- but should be fine right
+	now, since nobody should/can call set_baseline ...
+
+	Furthemore the comparison  in set_baseline of two double's is now
+	is safe, i.e. they are considered equal if they differ no more than
+	1E-8.
+
+	Fixed bug in the single experiment mode of glbChiNP. The error was
+	in chi_NP --  glb_single_experiment_number was not updated. This
+	should solve the problem Walter observed with glbPrintParams. 	
+
+	Cleaned up error.c and error.h and renamed them to glb_error.c and
+	glb_error.h to avoid confuison with errno.h and similar stuff.
+
+******* Version 1.7.4
+
+	Found one silly bug glbSetProfileDataInExperiment and one much
+	less serious and fixed them.
+
+05/07/04 Cleaned up nufact.c and nufact.h
+	
+	Cleaned up smear.c and smear.h
+
+	Cleaned up path.c and path.h	
+
+	Renamed oszprob.* to glb_probability.*
+	
+	Renamed path.* to glb_path.*
+
+	Renamed version.* to glb_version.*
+
+	Renamed nufact.* to glb_fluxes.*
+
+	Renamed smear.* to glb_smear.*
+
+	Cleaned up wrapper.c and wrapper.h
+
+	Renamed wrapper.* to glb_wrapper.* 
+
+	Cleaned up calc.c and calc.h. There are many global names,
+	this should be changed, sometime ...
+
+	Renamed calc.* to glb_rate_engine.*
+
+	Cleaned up Mminimize.c and Mminimize.h
+
+	Renamed Mminimize.* to glb_minimize.*
+
+******* Version 1.7.5
+	
+	Minor bug fixed in glb_flux_loader. It did not allocate
+	the memory for th flux correctly.
+
+******* Version 1.7.6
+ 	
+	Cleaned up multiex.c and multiex.h
+
+	Renamed multiex.* to glb_multiex.*
+
+	Cleaned up gls_lexer.l and gls_lexer.h
+
+	Renamed gls_lexer.* to glb_lexer.*
+		
+	Added the glb- and dat-files provided by Mark (Thanks a lot!)
+	to the /data directory.
+
+06/07/04 
+******** Version 1.7.7
+	
+	Cleaned up gls_parser.y and gls_my_parser.h
+
+	Renamed gls_parser.y to glb_parser
+
+	Renamed gls_my_parser.h glb_parser_addons.h
+
+	Cleaned up parser_data.h and renamed it to glb_parser_type.h
+
+	Removed parser.* from tar-ball
+
+	Cleaned up user_chi.c and made the compilation of the
+	functions in there conditional as well as the corresponding
+	functions in globes.h (see globes.h).
+
+	Removed mathlink.h and constant.h from the tar-ball
+
+	**********
+	Important!
+
+	Every function now part of the API (as defined by globes.h)
+	returns now either 0 or a positive number in case of
+	success. '-1' as return value always indicates failure. The only
+	functions that may return negatice values in case of success
+	are the chi^2 function. However their negative values 
+	are always much larger than '-1'.
+
+	Warning: This now also applies to glbXXXVersion function, ie.
+	their output has changed sign!
+
+	All functions which have storage class pointer to something or one
+	of the glb types return NULL in case of failure.
+
+	**********
+
+07/07/04
+******** Version 1.8.0
+	
+	Removed the old TYPE_B algorithm for smearing (was used by
+	our old Reactor-setups in Mathematica) and replaced it by
+	a simpler version still using the filter feature.
+
+	Added filter feature Set/Get functions and tested them.
+
+	Added a counter qualifier in the parser declaration, which
+	helps to produce useful warnings if a list and its length
+	are given in an AEDL file and do not match.
+
+	$binsize and $simbinsize now work as expected.
+
+08/07/04 X-sections are now dynamically allocated within each experiment.
+	There should be no confusion of counters whatsoever, since every
+	experiment keeps track of the fluxes and X-sections on its own.
+
+	As a result glbXSection has changed to
+	
+	double glbXSection(int experiment, 
+		           int xsec_ident,double energy,int flavour, 
+			   int anti)
+
+
+	A call to glbSetProfileDataInExperiment sets profile_type to
+	3 user_defined.
+
+	Added glbGetProfileTypeInExperiment(int exp).
+
+	Added 	
+	   glbTotalRuleRate(0,0,GLB_ALL,GLB_W_EFF,GLB_W_BG,GLB_W_COEFF,GLB_SIG)
+	works like glbShowRuleRates, just has no stream argument and returns 
+	'double'.
+
+******* Version 1.8.1
+	
+	For nufact fluxes the assigemnt of polarities is correct, i.e.
+		@builtin=1 is mu^+
+		@builtin=2 is mu^-
+
+
+	Changed the definition of AEDL in order to match the documentation:
+		$simbins -> $sampling_points
+		$simtresh -> $sampling_min
+		$simbeam -> $sampling_max
+		$numofbins -> $bins
+		$simbinsize -> $sampling_stepsize
+
+	Applied these changes to all glb-files and furthermore removed
+	all efficiencies and backgrounds which have been unity (for clarity).
+
+	If one really has to use old files, it possible to compile
+	GLoBES with -DGLB_OLD_AEDL and then it will parse also old files.
+
+	Changed $version in all glb-files to 1.8.1
+
+	Adjusted the verbosity levels for error reporting and debugging:
+		0 fatal messages are printed
+		1 + error messages (default)
+		2 + warnings
+		3 + all files read
+		4 + all files tried to read
+
+	Fixed an off by one bug in the line counting for reporting parse
+	errors.
+
+12/07/04 Added a name record to struct experiment and the corresponding
+	functions in glb_parser.y to fill this record with the name information
+	obtained during parsing. There are now two new functions which allow
+	to access this feature:
+		glbNameToValue(0,"rule","#rule0")
+		glbValueToName(0,"rule",0)
+	This name record is freed by glbFreeExp.
+
+	Rearranged the return values of glbInitExperiment, the more negative
+	the worse 
+	->  0 only for a flawless file (no defaults used etc.)
+	-> -1 for files which produced a warning but no error
+	-> -2 for file which produced an error
+	does not return for fatal errors.
+	
+	Added pretty printing to globes.
+
+	Added -D option to globes, which allows to define AEDL variables:
+		-DNAME=VALUE
+
+	Added -N No-oscillation to globes.
+
+	inlcude now requires quotes around the file name.
+
+14/07/04 Added subdirectory examples to the tar-ball, which contains the 
+	examples by Walter. I took his Makefile as starting point to write 
+	a Makefile.in which is then processed by 'configure', which in turn
+	yields a Makefile which should work irrespective of the installation 
+	mode. Thus all flags are filled in automatically depending on wether 
+	root has installed GLoBES or a user has it installed to some 
+	non-standard location. Furthemore 'configure' spits out a reminder for
+	necessary post-install actions, like running 'ldconfig'. Update
+	'INSTALL' accordingly.
+
+	Updated top-level Makefile.am in order to be okay with changed contents
+	in data/
+
+19/07/04 Added a BUGS file
+	
+	Added some format checks to glb_X_section_loader and glb_flux_loader.
+	Moreover both functions now accept one-line comments like
+		# this is a comment
+		1 2 3 4 5 6 7 
+		# this is another comment
+	
+	Added a REFERENCES file, the idea is to collect all bibliographical
+	information about *our* glb-files in one place.
+
+20/07/04 The contents of `data' will be installed to $(prefix)/share/globes/
+
+
+
+26/07/04 
+******** Version 1.8.2
+	Mass assignment is now 31 and 21
+
+	NRC code reprogrammed
+
+	glbProfileProbability now conforms to the documentation and takes
+	the experiment number as first argument. Also changed example-tour.c
+	and test-example-tour.cc to work correctly.
+
+	Added glbGetNumberOfFluxes
+
+	Replaced `struct experiment' with `struct glb_experiment'
+	
+	Removed REFERENCES from the distribution again
+
+	Renamed this file to OLDS ;-) The stuff in here is not intended
+	for publication.
+
+	 	

@@ -29,7 +29,7 @@
 
 
 double glbVacuumProbability(int pl, int pm, int panti, double pen, double plength);
-double glbProfileProbability(int pl, int pm, int panti, double pen);
+double glb_profile_probability(int pl, int pm, int panti, double pen);
 void glb_probability_matrix(double prob[3][3], int panti, double pen);
 void glb_set_parameters(double dm21, double dm31, double pt12, double pt13, double pt23, double pdelta1);
 void glb_get_profile_data(double** lval, double** rval, int* n);

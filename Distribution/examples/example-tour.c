@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
   fprintf(stream,"\nOscillation probabilities in vacuum: ");
   for(i=1;i<4;i++) fprintf(stream,"1->%i: %g ",i,glbVacuumProbability(1,i,+1,50,3000)); 
   fprintf(stream,"\nOscillation probabilities in matter: ");
-  for(i=1;i<4;i++) fprintf(stream,"1->%i: %g ",i,glbProfileProbability(1,i,+1,50));
+  for(i=1;i<4;i++) fprintf(stream,"1->%i: %g ",i,glbProfileProbability(0,1,i,+1,50));
   fprintf(stream,"\n\n");    
   
   /* Set test/fit values slightly off true values at s22th13=0.0015 */

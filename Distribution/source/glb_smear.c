@@ -109,7 +109,7 @@ void glb_option_type_free(glb_option_type *in)
 }
 
 int glb_default_option_type(glb_option_type *in, const glb_smear *head,
-const struct experiment *headex)
+const struct glb_experiment *headex)
 {
   int s,d;
   s=0;
@@ -205,7 +205,7 @@ void glb_smear_free(glb_smear *in)
   glb_free(in);
 }
 
-int glb_default_smear(glb_smear *in,const struct experiment *head)
+int glb_default_smear(glb_smear *in,const struct glb_experiment *head)
 {
   double med;
   int s,d,i;
@@ -471,7 +471,7 @@ static double Round(double in)
 
 }
 
-static void SetupSmearMatrixA(glb_smear *test,const struct experiment *head)
+static void SetupSmearMatrixA(glb_smear *test,const struct glb_experiment *head)
 {
   int i;
   double med;
@@ -520,7 +520,7 @@ static void SetupSmearMatrixA(glb_smear *test,const struct experiment *head)
 }
 
 
-void glb_set_up_smear_data(glb_smear *test,const struct experiment *head)
+void glb_set_up_smear_data(glb_smear *test,const struct glb_experiment *head)
 {
   int i;
   double med;
@@ -584,7 +584,7 @@ void glb_set_up_smear_data(glb_smear *test,const struct experiment *head)
 
 
 static double** SmearMatrixA(glb_smear *data, int **lowrange, int **uprange,
-		      const struct experiment *head)
+		      const struct glb_experiment *head)
 {
   int i,j,nonzero,zero,prev;
   double erg;
@@ -674,7 +674,7 @@ static double SmearMatrixElementC(int i, int j, const glb_smear *data)
 
 
 static double** SmearMatrixC(glb_smear *data, int **lowrange, int **uprange,
-		      const struct experiment *head)
+		      const struct glb_experiment *head)
 {
   int i,j,nonzero,zero,prev;
   double erg;
@@ -733,7 +733,7 @@ static double** SmearMatrixC(glb_smear *data, int **lowrange, int **uprange,
 
 void glb_compute_smearing_matrix(double ***matrix, 
 			  int **low, int **up, glb_smear *in
-			   , const struct experiment *head)
+			   , const struct glb_experiment *head)
 {
 
   if(in->type==GLB_TYPE_A) {*matrix=SmearMatrixA(in,low,up,head);return;}
@@ -763,7 +763,7 @@ main (void)
   glb_smear *testR;
   
   /* That is needed for the new defaultizing process */
-  struct experiment inl;
+  struct glb_experiment inl;
   inl.simtresh=0.0017366983295549717;
   inl.simbeam=0.008407625841296241;
   inl.simbins=134;

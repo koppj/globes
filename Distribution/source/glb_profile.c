@@ -361,7 +361,7 @@ int glbSetProfileDataInExperiment(int exp,
 int
 glbSetBaselineInExperiment(int exp, double baseline)
 {
-  struct experiment *ins;
+  struct glb_experiment *ins;
   double *lb,*db,scale;
   size_t l;
   int s=-1,i;
@@ -371,7 +371,7 @@ glbSetBaselineInExperiment(int exp, double baseline)
       glb_error("Experiment number out of range");
       return -1;
     }
-  ins=(struct experiment *) glb_experiment_list[exp];
+  ins=(struct glb_experiment *) glb_experiment_list[exp];
 
   if(ins->density_profile_type==-1) 
     {glb_error("No profile type specified");s=-1;}
@@ -457,7 +457,7 @@ glbSetBaselineInExperiment(int exp, double baseline)
 double
 glbGetBaselineInExperiment(int exp)
 {
-  struct experiment *in;
+  struct glb_experiment *in;
   
   double out;
   if((exp<0)||(exp>=glb_num_of_exps))
@@ -465,7 +465,7 @@ glbGetBaselineInExperiment(int exp)
       glb_error("Experiment number out of range");
       return -1;
     }
-  in=(struct experiment *) glb_experiment_list[exp];
+  in=(struct glb_experiment *) glb_experiment_list[exp];
   
   out=in->baseline;
   

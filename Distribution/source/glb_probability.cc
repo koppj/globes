@@ -697,9 +697,10 @@ extern "C" void glb_set_parameters(double dm21, double dm31, double pt12, double
 // panti     neutrino or antineutrino (1,-1)
 // pen       neutrino energy in GeV
 // -----------------------------------------------------------
-extern "C" FLOAT glbProfileProbability(int pl, int pm, int panti,
+extern "C" FLOAT glb_profile_probability(int pl, int pm, int panti,
 double pen)
 {	
+
 
 	complex<FLOAT> psi0[3];
 	complex<FLOAT> psi1[3];

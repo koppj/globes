@@ -45,22 +45,22 @@ double glb_sbin_center(int bin, const glb_smear *data);
 glb_option_type *glb_option_type_alloc();
 void glb_option_type_free(glb_option_type *in);
 int glb_default_option_type(glb_option_type *in, const glb_smear *head,
-			    const struct experiment *headex);
+			    const struct glb_experiment *headex);
 glb_option_type *glb_option_type_reset(glb_option_type *in);
 
 glb_smear  *glb_smear_alloc();
 void glb_smear_free(glb_smear *in);
-int glb_default_smear(glb_smear *in,const struct experiment *head);
+int glb_default_smear(glb_smear *in,const struct glb_experiment *head);
 glb_smear  *glb_copy_smear(glb_smear *dest, const glb_smear *src);
 glb_smear  *glb_smear_reset(glb_smear *in);
 
 void glb_compute_smearing_matrix(double ***matrix, 
 			   int **low, int **up, glb_smear *in
-			   ,const struct experiment *head);
+			   ,const struct glb_experiment *head);
 
 
 
-void glb_set_up_smear_data(glb_smear *test,const struct experiment *head);
+void glb_set_up_smear_data(glb_smear *test,const struct glb_experiment *head);
 void glb_init_bin_data(glb_smear *in);
 void glb_init_sim_bin_data(glb_smear *in);
 

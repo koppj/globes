@@ -79,8 +79,8 @@
   static int energy_count=-1;
   static int cross_count=-1;
   static int flux_count=-1;
-  static struct experiment buff;
-  static struct experiment buff_list[32];
+  static struct glb_experiment buff;
+  static struct glb_experiment buff_list[32];
   static glb_smear ibf;
   static glb_option_type opt;
   static glb_flux flt;
@@ -98,7 +98,7 @@
     double ru; // allowed range
     void *ptr; // this is a pointer the corresponding part of the exp structure
     void *len; /* this is a pointer which points to the length of the vector
-		*  in a struct experiment. Example: if we parse densitytab, 
+		*  in a struct glb_experiment. Example: if we parse densitytab, 
 		*  this things points
 		*  to psteps 
 		*/
@@ -2673,8 +2673,8 @@ int glbInitExperiment(char *inf,glb_exp *in, int *counter)
   int k,i;
   const char tch[]="%!GLoBES"; 
   char tct[11];
-  struct experiment **ins;
-  ins=(struct experiment **) in;
+  struct glb_experiment **ins;
+  ins=(struct glb_experiment **) in;
   //yydebug=1;
   context=(char *) strdup("global");
   glb_smear_reset(&ibf);
