@@ -224,7 +224,21 @@ This is the abstract.
  \item
   Parts of \GLOBES\
  \item 
-  \figu{GLOBES} and main features
+  \figu{GLOBES} and main features:
+  \bi
+   \item
+    3-flavor analysis
+   \item
+    Matter density profile+uncertainty
+   \item
+    Full detector simulation
+   \item
+    Up to 32 experiments simultaneously
+   \item
+    Full n-parameter correlation
+   \item
+    Localization of degeneracies
+  \ei
 \ei
 
 \section{The computation of raw event rates}
@@ -382,7 +396,49 @@ since for all of these rules the matter density profile is equal.
 
 \section{Simulation of experiments: The C user's interface}
 
-Minimizers?
+\begin{figure}[t]
+\begin{center}
+\includegraphics[width=16cm]{projex}
+\end{center}
+\mycaption{\label{fig:projex} Left plot: Example for a  correlation between $\stheta$ and $\deltacp$ (for 1 d.o.f. only). Right plot: The $\chi^2$-value of the projection onto the $\stheta$-axis as function of $\stheta$. The projection onto the  $\stheta$-axis is obtained by finding the minimum $\chi^2$-value for each fixed value of $\stheta$ in the left-hand plot, \ie, along the gray vertical lines. The thick gray curve marks the position of these minima in the left-hand plot. The arrows mark the obtained fit ranges for $\stheta$ at the $3 \sigma$ confidence level (1 d.o.f.), \ie , the precision of $\stheta$.}
+\end{figure}
+
+In order to use \GLOBES , a C~library is linked with the application
+software. This library provides the user's interface functions.
+It allows to load \AEDL\ files, initialize the experiments, and
+have access to various $\Delta \chi^2$-functions including any combination
+of systematics and correlations. In addition, it provides low-level
+access to oscillation probabilities and event rates, and allows
+the readout and modification of many experiment parameters at running time.
+
+The most sophisticated feature of the user's interface is the
+possibility to include the full multi-parameter correlation among
+all oscillation parameters. Together with the matter densities
+of the $N$ loaded experiments ($N \ge 1$), the neutrino oscillation parameter space in \GLOBES\ has $6+N$ dimensions. In the $\chi^2$-approach,
+the allowed region of $k$ ($1\le k<6+N$) fit parameters (at the chosen confidence level) is obtained as the projection of the $6+N$-dimensional fit manifold onto the $k$-dimensional hyperplane. For example,
+for the precision of the parameter $\stheta$ only, the fit manifold
+needs to be projected onto the $\stheta$-axis. One can easily imagine
+that the computation of the full multi-parameter correlation is
+very expensive with a grid-based method. However, the topology
+of the neutrino oscillation parameter space is well investigated and
+rather fortunate. Therefore, we use local minimization for each
+solution in the parameter space at the chosen confidence level,
+where tools for the location of (disconnected) degenerate solutions 
+are provided. For this process, the $6+N$-dimensional local minimizer
+is started at the ``guessed'' solution (such as from analytical 
+knowledge) and runs into the local minimum. In \figu{projex},
+this minimization is illustrated at the simple example of a 
+two-parameter correlation at a neutrino factory.
+
+As we have discussed in the last section, the matter density of
+each experiment is treated as an addition parameter, which is known
+from external measurement with a certain precision. In principle, 
+the \GLOBES\ user's interface allows such externally imposed
+precisions for all oscillation parameters. This feature turns out
+to be especially useful for input from the solar neutrino experiments,
+since they provide better precisions for the solar neutrino
+osillation parameters $\sdm$ and $\theta_{13}$ than the long-baseline
+ experiments themselves.
 
 \section{Complexity and computational issues}
 
