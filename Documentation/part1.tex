@@ -823,6 +823,56 @@ The reference rate vector is then computed with:
 A complete example for a minimal \GLOBES\ program can be found on
 Page~\pageref{ex:c}.
 
+\section{Version control}
+\index{Version control}
+
+In order to keep track of the used version of \GLOBES , the software
+provides a number of functions to check the \GLOBES\ and experiment
+versions. It is up to the user to implement mechanisms into the
+program and \AEDL\ files to check wether
+\begin{itemize}
+\item
+ The program should only run with this specific version of \GLOBES
+\item
+ The program can only run with a minimum version of \GLOBES
+\item
+ The program can only run up to a certain \GLOBES\ version.
+\end{itemize}
+The same holds for \AEDL\ files: For example, 
+some features may not be supported by earlier versions of \GLOBES\ anymore.
+The program can then check the version of the \AEDL\ file and break if it is
+too old.
+
+The functions in \GLOBES\ for version control are:
+\begin{function}
+\GLBNS{glbTestReleaseVersion}
+{\tt int glbTestReleaseVersion(const char *version)} returns $0$ if
+the {\tt version} string of the format ``X.Y.Z'' is exactly the
+used \GLOBES\ version, $1$ if it is newer, and $-1$ if it is older. 
+\end{function}
+\begin{function}
+\GLBNS{glbTestLibraryVersion}
+{\tt int glbTestLibraryVersion(const char *version)} returns $0$ if
+the {\tt version} string of the format ``X.Y.Z'' is exactly the
+used \GLOBES\ version, $1$ if it is newer, and $-1$ if it is older.
+Note that the library and \GLOBES\ versions are not the same. 
+\end{function}
+\begin{function}
+\GLBNS{glbTestLibraryVersion}
+{\tt int glbTestLibraryVersion(const char *version)} returns $0$ if
+the {\tt version} string of the format ``X.Y.Z'' is exactly the
+used \GLOBES\ version, $1$ if it is newer, and $-1$ if it is older.
+Note that the library and \GLOBES\ versions are not the same. 
+\end{function}
+\begin{function}
+\GLBNS{glbVersionOfExperiment} 
+{\tt const char* glbVersionOfExperiment(int experiment)} returns
+the version string of the experiment number {\tt experiment}.
+The version string points to the experiment structure, which means
+that it cannot be altered and does not have to be destroyed by the
+user.
+\end{function}
+
 \chapter[Calculating $\chi^2$ with systematics only]{Calculating $\boldsymbol{\chi^2}$ with systematics only}
 
 \index{Systematics}
@@ -1389,14 +1439,118 @@ Finally, note that any degenerate solution below the confidence level threshold 
 
 \chapter{Obtaining low-level information}
 
-\bi
-\item
- Obtaining rate vectors
-\item
- Obtaining fluxes/cross sections etc.
-\item
- ``Check''-functions
-\ei
+In this chapter, we discuss possibilities to obtain low-level information
+in \GLOBES , \ie, about oscillation probabilities, rates, and other
+information lower than on the $\chi^2$-level.
+
+\section{Oscillation probabilities}
+\index{Oscillation probabilities}
+
+\GLOBES\ can compute the probabilities in vacuum
+with the following function:
+\begin{function}
+\GLBNS{glbVacuumProbability}
+{\tt double glbVacuumProbability(int l, int m, int panti,double E, double L)} returns the neutrino oscillation probability $\nu_l \rightarrow \nu_m$ for the energy {\tt E} and the baseline {\tt L} in vacuum. The parameter
+{\tt panti} is $+1$ for neutrinos and $-1$ for antineutrinos. 
+\end{function}
+In addition, the oscillation probabilities in matter can be obtained
+with:
+\begin{function}
+\GLBNS{glbProfileProbability}
+{\tt double glbProfileProbability(int l, int m, int panti,double E)}
+ returns the neutrino oscillation probability $\nu_l \rightarrow \nu_m$ for the energy {\tt E} in matter. The parameter
+{\tt panti} is $+1$ for neutrinos and $-1$ for antineutrinos.
+The matter density profile including baseline is the one from the last
+evaluated experiment. 
+\end{function}
+THIS FUNCTION MAY OBTAIN AN EXPERIMENT INDEX (WW).
+\section{Event rates}
+\index{Event rates}
+One can also return event rates in \GLOBES , but this feature
+requires some knowledge about the experiment definition. \GLOBES\
+currently supports rule-based and channel-based event rate functions,
+where the information is in most cases written into a file.
+The rule-based functions are:
+\begin{function}
+\GLBNS{glbShowRuleRates}
+{\tt int glbShowRuleRates(FILE* stream, int exp, int rule, int pos,
+int effi, int bgi, int coeffi, int signal)} prints the binned rule rates as
+list with energy and event rate to the file {\tt stream} (either an
+open file, or {\tt stdout}). A specific experiment {\tt exp} and a 
+specific rule {\tt rule} have to be chosen, as well as the signal
+or background rate {\tt signal} (either \GLB{GLB\_SIG} or \GLB{GLB\_BG}).
+The position {\tt pos} refers to the component within the signal or 
+background, and can also be {\tt GLB\_ALL}. The function may return
+the rates with (\GLB{GLB\_W\_COEFF}) or without (\GLB{GLB\_WO\_COEFF})
+overall efficieny coefficient, as it is specified by {\tt coeffi}. 
+In addition, it may contain the post-smearing efficiencies (set
+{\tt effi} to \GLB{GLB\_W\_EFF} or \GLB{GLB\_WO\_EFF}), and the
+post-smearing backgrounds (set
+{\tt bgi} to \GLB{GLB\_W\_BG} or \GLB{GLB\_WO\_BG}). The pre-smearing
+efficiencies and backgrounds cannot be accessed at the rule level.
+The return value
+is $0$ if successful, and $-1$ if unsuccessful.
+\end{function}
+\begin{function}
+\GLBNS{glbShowTotalRuleRates}
+{\tt double glbShowTotalRuleRates(int exp, int rule, int pos,
+int effi, int bgi, int coeffi, int signal)} returns the total rates with
+the same parameters as {\tt glbShowRuleRates}.
+\end{function}
+(THIS SYNTAX NEEDS TO BE CHECKED, BECAUSE FUNCTION IS NOT YET IMPLEMENTED - WW)
+
+The function {\tt glbShowTotalRuleRates} is especially useful if
+one wants to draw bi-rate graphs with total event rates, or look
+for the $(\deltacp,\theta_{13})$-degeneracy by the intersection of 
+neutrino and antineutrino constant event rate curves.
+
+In addition, \GLOBES\ has a channel-based rate function:
+\begin{function}
+\GLBNS{glbShowChannelRates}
+{\tt int glbShowChannelRates(FILE *stream,
+int exp, int channel, int smearing, int effi, int bgi)}
+prints the binned channel rates as
+list with energy and event rate to the file {\tt stream} (either an
+open file, or {\tt stdout}). A specific experiment {\tt exp} and a 
+specific channel {\tt channel} have to be chosen.
+The function may return
+the rates before (\GLB{GLB\_PRE}) or after (\GLB{GLB\_POST})
+the energy smearing, as it is specified by {\tt smearing}.
+In addition, it may contain the pre- and post-smearing efficiencies (set
+{\tt effi} to \GLB{GLB\_W\_EFF} or \GLB{GLB\_WO\_EFF}), and the
+pre- and post-smearing backgrounds (set
+{\tt bgi} to \GLB{GLB\_W\_BG} or \GLB{GLB\_WO\_BG}). Note that
+the post-smearing efficiencies and backgrounds cannot be taken into
+account if the rates are returned before the energy smearing.
+The return value
+is $0$ if successful, and $-1$ if unsuccessful.
+\end{function}
+
+\section{Fluxes and cross sections}
+\index{Flux} \index{Cross section}
+
+Another piece of low-level information, which can be returned by \GLOBES ,
+are the numbers from the loaded fluxes and cross sections.
+The following functions interpolate on the loaded fluxes and cross 
+sections, \ie, any value in the allowed energy range can be given as input:
+\begin{function}
+\GLBNS{glbFlux}
+{\tt double glbFlux(int exp, int ident, 
+double E, double distance, int l, int anti)} returns
+the flux of flux number {\tt ident} of the experiment {\tt exp}
+for the flavor $\nu_l$ 
+and polarity {\tt anti} ($+1$: neutrinos, $-1$: antineutinos) at the energy {\tt E} and distance {\tt distance}.
+\end{function}
+
+\begin{function}
+\GLBNS{glbXSection}
+{\tt double glbXSection(int ident, double E, int l, int anti)} returns
+the cross section of cross section number {\tt ident} for the flavor $\nu_l$ 
+and polarity {\tt anti} ($+1$: neutrinos, $-1$: antineutinos) at the energy {\tt E}.
+\end{function}
+Note that all flux or flavor numbers run from $0$ to $N-1$ in these functions.
+
+(THIS FUNCTION MAY GET AN EXPERIMENT INDEX IF NOT THROUGH-COUNTED IN AEDL!)
 
 \chapter{Changing experiment parameters at running time}
 \label{chapt:running}
