@@ -27,14 +27,14 @@ dnl Versioning of GLoBES
 dnl last digit: increment whenever code has changed
 dnl middle digit: increment when features have been introduced/removed
 dnl first digit: major improvements/rewrites
-AM_INIT_AUTOMAKE(globes,1.8.1)
+AM_INIT_AUTOMAKE(globes,1.8.2)
 
 dnl Versioning of libglobes.so
 dnl code changed: c:r+1:a
 dnl API changed: c+1:0:a
 dnl -> API extended: c:0:a+1
 dnl -> API shrunken: c:0:0
-GLBLIBVERSION="4:1:1"
+GLBLIBVERSION="4:2:1"
 
 dnl From here no editing !
 AC_SUBST(GLBLIBVERSION)

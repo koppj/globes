@@ -9,12 +9,12 @@ int n;
 {
 	int j;
 	double xx,xmin,fx,fb,fa,bx,ax;
-	double brent(),f1dim(),*vector();
-	void mnbrak(),free_vector();
+	double brent(),f1dim(),*glb_alloc_vec();
+	void mnbrak(),glb_free_vec();
 
 	ncom=n;
-	pcom=vector(1,n);
-	xicom=vector(1,n);
+	pcom=glb_alloc_vec(1,n);
+	xicom=glb_alloc_vec(1,n);
 	nrfunc=func;
 	for (j=1;j<=n;j++) {
 		pcom[j]=p[j];
@@ -29,8 +29,8 @@ int n;
 		xi[j] *= xmin;
 		p[j] += xi[j];
 	}
-	free_vector(xicom,1,n);
-	free_vector(pcom,1,n);
+	glb_free_vec(xicom,1,n);
+	glb_free_vec(pcom,1,n);
 }
 
 #undef TOL

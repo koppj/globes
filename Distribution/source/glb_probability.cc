@@ -886,7 +886,7 @@ extern "C" double* glb_get_squared_masses()
   double* erg;
   erg=(double*) glb_malloc(2*sizeof(double));
   erg[0]=mq[1];
-  erg[1]=mq[2]-mq[1];
+  erg[1]=mq[2];
   return erg;
 	
 } 

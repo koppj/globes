@@ -476,3 +476,9 @@
 	information about *our* glb-files in one place.
 
 20/07/04 The contents of `data' will be installed to $(prefix)/share/globes/
+
+
+
+26/07/04 
+******** Versions 1.8.2
+	Mass assignment is now 31 and 21.

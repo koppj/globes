@@ -5,12 +5,12 @@ double f1dim(x)
 double x;
 {
 	int j;
-	double f,*xt,*vector();
-	void free_vector();
+	double f,*xt,*glb_alloc_vec();
+	void glb_free_vec();
 
-	xt=vector(1,ncom);
+	xt=glb_alloc_vec(1,ncom);
 	for (j=1;j<=ncom;j++) xt[j]=pcom[j]+x*xicom[j];
 	f=(*nrfunc)(xt);
-	free_vector(xt,1,ncom);
+	glb_free_vec(xt,1,ncom);
 	return f;
 }

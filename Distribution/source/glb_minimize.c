@@ -59,7 +59,7 @@
 #include "glb_probability.h"
 #include "glb_fluxes.h"
 #include "glb_rate_engine.h"
-#include "nrutil.h"
+#include "glb_min_sup.h"
 #include "glb_types.h"
 #include "glb_multiex.h"
 #include "glb_error.h"
@@ -224,8 +224,8 @@ static double chi_sys_wrap(double (*chi_func)(), int dimension, int alpha_in)
   double *sp; // stores the coordinates of the minimum
   double result=0; // stores the minimum value
   int it=0; // counts the number of iterations
-  mat=matrix(1,dimension,1,dimension);
-  sp=vector(1,6); // that is the maximal length
+  mat=glb_alloc_mat(1,dimension,1,dimension);
+  sp=glb_alloc_vec(1,6); // that is the maximal length
   glb_rule_number=alpha_in;
   init_mat(mat,dimension);
 
@@ -236,8 +236,8 @@ static double chi_sys_wrap(double (*chi_func)(), int dimension, int alpha_in)
   sp[5]=glb_tre_null_center[alpha_in];
   sp[6]=glb_tre_tilt_center[alpha_in];
   powell(sp,mat,dimension,TOLSYS,&it,&result,chi_func);  
-  free_vector(sp,1,6);
-  free_matrix(mat,1,dimension,1,dimension);
+  glb_free_vec(sp,1,6);
+  glb_free_mat(mat,1,dimension,1,dimension);
   return result;
 }
 //Chi^2 where the systematics are integrated out
@@ -290,8 +290,8 @@ double glb_evaluate_chi(struct glb_systematic *in)
   double *spi; // stores the coordinates of the minimum
   double result=0; // stores the minimum value
   int it=0; // counts the number of iterations
-  mat=matrix(1,in->dimension,1,in->dimension);
-  spi=vector(1,in->dimension); // that is the maximal length
+  mat=glb_alloc_mat(1,in->dimension,1,in->dimension);
+  spi=glb_alloc_vec(1,in->dimension); // that is the maximal length
   init_mat(mat,in->dimension);
   for(i=1;i<in->dimension+1;i++) spi[i]=in->sp[i-1];
   // this part of the unified interface to this quantities
@@ -299,8 +299,8 @@ double glb_evaluate_chi(struct glb_systematic *in)
   glb_sys_errors=in->errors;
   //------------------------
   powell(spi,mat,in->dimension,TOLSYS,&it,&result,in->chi_func);  
-  free_vector(spi,1,in->dimension);
-  free_matrix(mat,1,in->dimension,1,in->dimension);
+  glb_free_vec(spi,1,in->dimension);
+  glb_free_mat(mat,1,in->dimension,1,in->dimension);
   return result;
 }
 
@@ -433,7 +433,7 @@ static double Chi(double x[])
   int i;  
   double erg;
   glb_set_c_vacuum_parameters(x[0],x[1],x[2],x[3]);
-  glb_set_c_squared_masses(0,x[4],x[5]+x[4]); 
+  glb_set_c_squared_masses(0,x[4],x[5]); 
   for (i=0;i<glb_num_of_exps;i++)
     {
       glbSetExperiment(glb_experiment_list[i]);
@@ -458,7 +458,7 @@ static double SingleChi(double x[7],int exp)
 {
   double erg;
   glb_set_c_vacuum_parameters(x[0], x[1],x[2],x[3]);
-  glb_set_c_squared_masses(0,x[4],x[5]+x[4]);
+  glb_set_c_squared_masses(0,x[4],x[5]);
 
       glbSetExperiment(glb_experiment_list[exp]);
       glb_set_profile_scaling(x[6],exp);
@@ -482,7 +482,7 @@ static double SingleRuleChi(double x[7],int exp, int rule)
 {
   double erg;
   glb_set_c_vacuum_parameters(x[0], x[1],x[2],x[3]);
-  glb_set_c_squared_masses(0,x[4],x[5]+x[4]);
+  glb_set_c_squared_masses(0,x[4],x[5]);
 
       glbSetExperiment(glb_experiment_list[exp]);
       glb_set_profile_scaling(x[6],exp);
@@ -760,7 +760,7 @@ static double MD_chi_NP(double x[])
 
   //fprintf(stderr,"x2 %f\n",x2[1]); 
   glb_set_c_vacuum_parameters(y[0],y[1],y[2],y[3]);
-  glb_set_c_squared_masses(0,y[4],y[5]+y[4]);
+  glb_set_c_squared_masses(0,y[4],y[5]);
   for (i=0;i<glb_num_of_exps;i++)
     {
       glbSetExperiment(glb_experiment_list[i]);
@@ -853,7 +853,7 @@ static double chi_NP(double x[])
 
   //fprintf(stderr,"x2 %f\n",x2[1]); 
   glb_set_c_vacuum_parameters(y[0],y[1],y[2],y[3]);
-  glb_set_c_squared_masses(0,y[4],y[5]+y[4]);
+  glb_set_c_squared_masses(0,y[4],y[5]);
   
   glbSetExperiment(glb_experiment_list[glb_single_experiment_number]);
   glb_set_profile_scaling(y[6],glb_single_experiment_number);
@@ -914,8 +914,8 @@ static double internal_glbSingleChiNP(const glb_params in, glb_params out,
   single_SelectProjection(exp);
   dim=s_n_free;
   
-  mat2=matrix(1,dim,1,dim);
-  sp2=vector(1,dim);
+  mat2=glb_alloc_mat(1,dim,1,dim);
+  sp2=glb_alloc_vec(1,dim);
   init_mat(mat2,dim);
   //initializing various things
   count=0;
@@ -951,8 +951,8 @@ static double internal_glbSingleChiNP(const glb_params in, glb_params out,
 	}
       out=glbSetIteration(out,count);
     }
-  free_vector(sp2,1,dim);
-  free_matrix(mat2,1,dim,1,dim);  
+  glb_free_vec(sp2,1,dim);
+  glb_free_mat(mat2,1,dim,1,dim);  
   return er1;
 }
 
@@ -974,8 +974,8 @@ static double internal_glbChiNP(const glb_params in, glb_params out)
   
   dim=n_free;
   
-  mat2=matrix(1,dim,1,dim);
-  sp2=vector(1,dim);
+  mat2=glb_alloc_mat(1,dim,1,dim);
+  sp2=glb_alloc_vec(1,dim);
   init_mat(mat2,dim);
   //initializing various things
   count=0;
@@ -1012,8 +1012,8 @@ static double internal_glbChiNP(const glb_params in, glb_params out)
 	}
       out=glbSetIteration(out,count);
     }
-  free_vector(sp2,1,dim);
-  free_matrix(mat2,1,dim,1,dim);  
+  glb_free_vec(sp2,1,dim);
+  glb_free_mat(mat2,1,dim,1,dim);  
   return er1;
 }
 

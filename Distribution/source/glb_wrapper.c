@@ -32,7 +32,6 @@
 #include "glb_probability.h"
 #include "glb_fluxes.h"
 #include "glb_rate_engine.h"
-#include "nrutil.h"
 #include "glb_minimize.h"
 #include "glb_types.h"
 #include "glb_multiex.h"
@@ -487,8 +486,7 @@ glbSetOscillationParameters(const glb_params in)
   if(in==NULL) return -1;
   glb_set_c_vacuum_parameters(glbGetOscParams(in,0),glbGetOscParams(in,1)
 		       ,glbGetOscParams(in,2),glbGetOscParams(in,3));
-  glb_set_c_squared_masses(0,glbGetOscParams(in,4),glbGetOscParams(in,4)
-		    + glbGetOscParams(in,5));
+  glb_set_c_squared_masses(0,glbGetOscParams(in,4),glbGetOscParams(in,5));
   for(i=0;i<glb_num_of_exps;i++) glb_set_profile_scaling(glbGetDensityParams(in,i),i);
   return 0;
 

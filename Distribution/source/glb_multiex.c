@@ -33,7 +33,7 @@
 #include "glb_probability.h"
 #include "glb_fluxes.h"
 #include "glb_rate_engine.h"
-#include "nrutil.h"
+
 #include "glb_error.h"
 
 #include "glb_minimize.h"

@@ -10,12 +10,12 @@ int n,*iter;
 {
 	int i,ibig,j;
 	double t,fptt,fp,del;
-	double *pt,*ptt,*xit,*vector();
-	void linmin(),nrerror(),free_vector();
+	double *pt,*ptt,*xit,*glb_alloc_vec();
+	void linmin(),glb_minimizer_error(),glb_free_vec();
 
-	pt=vector(1,n);
-	ptt=vector(1,n);
-	xit=vector(1,n);
+	pt=glb_alloc_vec(1,n);
+	ptt=glb_alloc_vec(1,n);
+	xit=glb_alloc_vec(1,n);
 	*fret=(*func)(p);
 	for (j=1;j<=n;j++) pt[j]=p[j];
 	for (*iter=1;;(*iter)++) {
@@ -32,12 +32,12 @@ int n,*iter;
 			}
 		}
 		if (2.0*fabs(fp-(*fret)) <= ftol*(fabs(fp)+fabs(*fret))) {
-			free_vector(xit,1,n);
-			free_vector(ptt,1,n);
-			free_vector(pt,1,n);
+			glb_free_vec(xit,1,n);
+			glb_free_vec(ptt,1,n);
+			glb_free_vec(pt,1,n);
 			return;
 		}
-		if (*iter == ITMAX) nrerror("Too many iterations in routine POWELL");
+		if (*iter == ITMAX) glb_minimizer_error("Too many iterations in routine POWELL");
 		for (j=1;j<=n;j++) {
 			ptt[j]=2.0*p[j]-pt[j];
 			xit[j]=p[j]-pt[j];

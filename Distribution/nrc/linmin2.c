@@ -7,13 +7,13 @@ double f1dim2(x)
 double x;
 {
 	int j;
-	double f,*xt,*vector();
-	void free_vector();
+	double f,*xt,*glb_alloc_vec();
+	void glb_free_vec();
 
-	xt=vector(1,ncom2);
+	xt=glb_alloc_vec(1,ncom2);
 	for (j=1;j<=ncom2;j++) xt[j]=pcom2[j]+x*xicom2[j];
 	f=(*nrfunc2)(xt);
-	free_vector(xt,1,ncom2);
+	glb_free_vec(xt,1,ncom2);
 	return f;
 }
 
@@ -23,12 +23,12 @@ int n;
 {
 	int j;
 	double xx,xmin,fx,fb,fa,bx,ax;
-	double brent(),f1dim2(),*vector();
-	void mnbrak(),free_vector();
+	double brent(),f1dim2(),*glb_alloc_vec();
+	void mnbrak(),glb_free_vec();
 
 	ncom2=n;
-	pcom2=vector(1,n);
-	xicom2=vector(1,n);
+	pcom2=glb_alloc_vec(1,n);
+	xicom2=glb_alloc_vec(1,n);
 	nrfunc2=func;
 	for (j=1;j<=n;j++) {
 		pcom2[j]=p[j];
@@ -43,8 +43,8 @@ int n;
 		xi[j] *= xmin;
 		p[j] += xi[j];
 	}
-	free_vector(xicom2,1,n);
-	free_vector(pcom2,1,n);
+	glb_free_vec(xicom2,1,n);
+	glb_free_vec(pcom2,1,n);
 }
 
 #undef TOL

@@ -13,7 +13,7 @@ double (*f)();	/* ANSI: double (*f)(double); */
 	int iter;
 	double a,b,d,etemp,fu,fv,fw,fx,p,q,r,tol1,tol2,u,v,w,x,xm;
 	double e=0.0;
-	void nrerror();
+	void glb_minimizer_error();
 
 	a=((ax < cx) ? ax : cx);
 	b=((ax > cx) ? ax : cx);
@@ -65,7 +65,7 @@ double (*f)();	/* ANSI: double (*f)(double); */
 			}
 		}
 	}
-	nrerror("Too many iterations in BRENT");
+	glb_minimizer_error("Too many iterations in BRENT");
 	*xmin=x;
 	return fx;
 }
