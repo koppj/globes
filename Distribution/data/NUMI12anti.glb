@@ -4,12 +4,6 @@ $version="1.7.5"
 
 /* 	 Beam data 	 */
 
-flux(#NUMI12plus)<
-	@flux_file="NUMI12plus.dat"
-	@time = 1
-	@norm = 1
->
-
 flux(#NUMI12minus)<
 	@flux_file="NUMI12minus.dat"
 	@time = 1

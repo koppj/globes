@@ -10,12 +10,6 @@ flux(#NUMI9plus)<
 	@norm = 1
 >
 
-flux(#NUMI9minus)<
-	@flux_file="NUMI9minus.dat"
-	@time = 1
-	@norm = 1
->
-
 $target_mass = 	        85.
 
 $numofbins = 		20

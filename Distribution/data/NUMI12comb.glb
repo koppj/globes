@@ -6,14 +6,14 @@ $version="1.7.5"
 
 flux(#NUMI12plus)<
 	@flux_file="NUMI12plus.dat"
-	@time = 2
-	@norm = 0.142857
+	@time = 5
+	@norm = 0.2*2/7
 >
 
 flux(#NUMI12minus)<
 	@flux_file="NUMI12minus.dat"
 	@time = 5
-	@norm = 0.142857
+	@norm = 0.2*5/7
 >
 
 $target_mass = 	        85.
