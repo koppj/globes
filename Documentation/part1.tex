@@ -244,13 +244,33 @@ This approach also has a major disadvantage: One can not simply program a robust
 
 In many cases, the fit manifold is restricted by the knowledge from earlier experiments. For example, the knowledge on the solar parameters will in most cases be supplied by the solar neutrino experiments. If the external precision of a parameter is at the time of the measurement better than the one of the experiment itself, one has to impose some external knowledge on this parameter. This external knowledge may reduce the $n$-dimensional fit manifold in the respective direction. In the most extreme case, keeping all parameters but the measured one fixed in the analysis means that all parameters are determined externally with infinitively high precisions. Thus, using the projection method on the axis/plane of interest is a reasonable approach. The inclusion of external input in \GLOBES\ is done by the use of Gaussian {\em priors}: We assume that an external measurement has determined the measured parameter to be at the central value (called {\em starting value}) with a $1 \sigma$ Gaussian error (called {\em input error}). The explicit definition of these priors will be shown in the next section.
 
-\begin{figure}[t]
-\begin{center}
-\includegraphics[width=16cm]{projex}
-\end{center}
-\mycaption{\label{fig:projex} Left plot: The correlation between $\stheta$ and $\deltacp$ as calculated in the example on page~\pageref{ex:corrth13dcp}, but for 1 d.o.f. only. Right plot: The $\chi^2$-value of the projection onto the $\stheta$-axis as function of $\stheta$. The projection onto the  $\stheta$-axis is obtained by finding the minimum $\chi^2$-value for each fixed value of $\stheta$ in the left-hand plot, \ie, along the gray vertical lines. The thick gray curve marks the position of these minima in the left-hand plot. The arrows mark the obtained fit ranges for $\stheta$ at the $3 \sigma$ confidence level (1 d.o.f.), \ie , the precision of $\stheta$.}
-\end{figure}
+\section{The treatment of external input}
 
+It is one of the strengths of the \GLOBES\ software to use external input to reduce the fit manifold with the knowledge from external (eariler) measurements. The treatment of external input is done by the addition of Gaussian {\em priors} to the final\footnote{After the systematics minimization and after all $\chi^2$'s are added for all channels} $\chi^2$-function  and the minimization over the respective parameters. For example, for the matter density, one obtains as the minimized $\chi^2_F$ after minimzation over $\rho$
+\be
+ \chi^2_F = \underset{\rho}{\mathrm{min}} \left( \chi^2(\rho) + \frac{(\rho - \rho^0)^2}{\sigma_\rho^2} \right).
+\label{equ:priors}
+\ee
+In practice, this minimzation is done simultaneously over all priors and free oscillation parameters, but this example serves as a very simple illustration. In \equ{priors}, $\rho^0$ is the {\em starting value} of the prior, and $\sigma_\rho$ the $1 \sigma$ absolute {\em input error}. Thus, it is assumed that an external measurement has determined the matter density with a precision (input error) $\sigma_\rho$ at the central value $\rho^0$. Usually, the starting value corresponds to the best-fit value and the input error to the $1 \sigma$ half width of the external measurement. For the matter density, $\rho^0$ can be set to the average matter density $\bar{\rho}$ and $\sigma_\rho$ to the matter density uncertainty. Since \GLOBES\ may also use a matter density profile, it actually uses a scaling factor $\hat\rho$ instead of the average matter density (see last section), \ie, $\rho^0=1.0$ is the central value in either case. Thus, $\sigma_\rho$ directly correponds to the uncertainty of this scaling factor. For instance, using the PREM (``Preliminary Reference Earth Model'') profile, $\rho^0 = 1.0$ and $\sigma_\rho = 0.05$ is a conservative estimate of the PREM profile uncertainty.  
+
+In principle, one can set the priors for the matter density and all oscillation parameters. For example, if the disappearance channels of the experiment determine the leading oscillation parameters, once can set very large values for the input errors ($\sigma$'s). If, however, earlier external measurements provide better information, one can set their absolute precisions with the input errors. The starting values are usually set to the best-fit values. In some cases, it may be necessary to adjust them, such as for $\ldm$ and the negative mass hierarchy to $\rho^0_{\ldm} = - |\ldm|$ if some external precision on $| \ldm |$ is imposed and one is investigating the negative-sign solution. In other cases, minor modifications of the starting values can cause a faster convergence of the algorithm.
+In either case, two function have to be called {\em before the usage of any minimizer}:
+\begin{function}
+{\tt SetStartingValues}$(\{\rho^0_{\theta_{12}}, \, \rho^0_{\theta_{13}}, \, \rho^0_{\theta_{23}}, \, \rho^0_{\deltacp}, \, \rho^0_{\sdm}, \, \rho^0_{\ldm}, \, \rho^0_{\hat\rho} \})$ sets the starting values for all of the following minimizer calls.
+\end{function}
+\begin{function}
+{\tt SetInputErrors}$(\{\sigma_{\theta_{12}}, \, \sigma_{\theta_{13}}, \, \sigma_{\theta_{23}}, \, \sigma_{\deltacp}, \, \sigma_{\sdm}, \, \sigma_{\ldm}, \, \sigma_{\hat\rho} \})$ sets the input errors for all of the following minimizer calls.
+\end{function}
+Both functions may take one matter density parameter or as many as there are experiments. Since the assumptions about the matter density profile are usually similar for the loaded experiments, using only one matter density parameter is a useful tool to apply the same starting value  and input error to all loaded experiments.
+Eventually, a typical initialization of the external input may look like this:
+\begin{quote}
+{\tt
+SetStartingValues(\{th12, th13, th23, dcp, sdm, ldm, 1.0\}); \\
+SetInputErrors(\{th12*0.1, 10, 10, 10, sdm*0.1, ldm, 0.05\}); 
+}
+\end{quote}
+In this example, the starting values are set to the best-fit values. The input errors for $\theta_{13}$, $\theta_{23}$, $\deltacp$, and $\ldm$ are kept large, since the experiment measures these parameters itself. However, some precision on $\ldm$ is imposed to avoid ending up in the negative-sign solution. The solar parameters $\theta_{12}$ and $\sdm$ are assumed to be known with $10\%$ precision each.\footnote{In fact, accelerator-based long-baseline experiments are only sensitive to the product $\sin 2 \theta_{12} \cdot \sdm$, which means that these errors effectively add up to an error of this product.} Finally, the matter density uncertainties are assumed to have an amplitude of $5\% \,  \bar\rho$.
+ 
 \example{Projection of two- and $n$-dimensional manifold onto $\stheta$-axis}{
 \label{ex:corrproj}
 
@@ -288,40 +308,48 @@ The two lists of data then represent the $\stheta$ precisions with two-parameter
 \end{center}
 }
 
-\section{The treatment of external input}
+\section[Projection onto the $\stheta$-axis or $\deltacp$-axis]{Projection onto the $\boldsymbol{\stheta}$- or $\boldsymbol{\deltacp}$-axis}
 
-\bi
-\item
- Treatment of external input: short introduction to priors
-\item
- The effect of the starting values and input errors
-\item
- Functions SetStartingValues, SetInputErrors to be called first
-\item
- What for negative hierarchy? Defintion of $-\ldm - \sdm$?
-\ei
+\begin{figure}[t]
+\begin{center}
+\includegraphics[width=16cm]{projex}
+\end{center}
+\mycaption{\label{fig:projex} Left plot: The correlation between $\stheta$ and $\deltacp$ as calculated in the example on page~\pageref{ex:corrth13dcp}, but for 1 d.o.f. only. Right plot: The $\chi^2$-value of the projection onto the $\stheta$-axis as function of $\stheta$. The projection onto the  $\stheta$-axis is obtained by finding the minimum $\chi^2$-value for each fixed value of $\stheta$ in the left-hand plot, \ie, along the gray vertical lines. The thick gray curve marks the position of these minima in the left-hand plot. The arrows mark the obtained fit ranges for $\stheta$ at the $3 \sigma$ confidence level (1 d.o.f.), \ie , the precision of $\stheta$.}
+\end{figure}
 
-\section[Projection onto the $\theta_{13}$-axis or $\deltacp$-axis]{Projection onto the $\boldsymbol{\theta_{13}}$- or $\boldsymbol{\deltacp}$-axis}
+The projection onto the $\stheta$- (or $\deltacp$-) axis is performed by fixing $\stheta$ (or $\deltacp$) and minimizing the $\chi^2$-function over all free fit parameters and the matter densities. We illustrate this method at the example of the projection of the two-dimensional manifold in the $\stheta$-$\deltacp$-plane onto the $\stheta$-axis in \figu{projex}. In this figure, the left-hand plot shows the correlation in the $\stheta$-$\deltacp$-plane computed with {\tt Chi} or {\tt SingleChi}. The right-hand plot shows the projection of this two-dimensional manifold onto the $\stheta$ axis by minimizing $\chi^2$ over $\deltacp$. In this simple example, the minimization is done along the vertical gray lines in the left hand plot. The obtained minima are located on the thick gray curve, which means the the right-hand plot represents the $\chi^2$-value along this curve. In fact, one can easily see that one obtains the correct projected $3 \sigma$ errors in this example (\cf, arrows). This figure illustrates the projection of a two-parameter correlation. In general, the full $n$-parameter correlation is treated similarly by the simultaneous (local) minimization over all free fit parameters. The example on page~\pageref{ex:corrproj} demonstrates how one can obtain \figu{projex} (right) with keeping all parameters but $\deltacp$ fixed, as well as how one can inlcude the full $n$-parameter correlation with external input. It also demonstrates how these two compare to each other.
 
-\bi
-\item
- Call SetStartingValues and InputErrors first \ra\ three sets of parameters 
-\item
- Single and multiple experiments: ChiDelta and ChiTheta + single funtions \ra\ return values;
-mention that $\chi^2$ does not add anymore; general parameter transfer concept
-\item
- The effect of the starting point of the minimizer
-\item
- What these functions do \ra\ figure
-\item
- Refer to example: code
-\item
- When does it not work: jumps \ra\ modify starting point accordingly
-\ei
+One mentioned disadvantage of the local minimizer is the possibility to end up in a local minimum. Usually it works very well to start the minimizer close to the best-fit values. In the example in \figu{projex}, the minimizer is always started at $\deltacp=90^\circ$ and finds its way to the appropriate minimum. In some cases, however, the topology may be more difficult and the true minimum is not correctly found. A strong indication for such a situation are discontinuities in the projected $\chi^2$-function, where the minimizer jumos from one minimum to the other. In such a case, the starting point of the minimizer has to be adjusted to help it find the true minimum. In other cases, the convergence of the minimizer may be infinitively small. Then it usually helps to start the minimizer somewhat off the best-fit values. The following functions are the simplest minimizers provided by \GLOBES :
+\begin{function}
+{\tt ChiTheta}$( \theta_{13}, \, \{ \theta_{12}, \, \theta_{23}, \, \deltacp , \, \sdm , \, \ldm, \, \hat{\rho_1}, \,  \hdots ,  \,\hat{\rho_n} \})$ returns the projection onto the $\theta_{13}$-axis for all experiments. The parameters are the fixed value of $\theta_{13}$ and the starting point of the minimizer including all starting values for the matter density scaling factors (without $\theta_{13}$, which is fixed). The return value is a list $\{ \chi^2, \, \theta_{12}, \, \theta_{23}, \, \deltacp , \, \sdm , \, \ldm, \, \hat{\rho_1}, \, \hdots , \, \hat{\rho_n} , \, N_{\mathrm{Iter}} \}$ with the minimum $\chi^2$ found, the coordinates of the local minimum (without $\theta_{13}$), and the number of iterations $N_{\mathrm{Iter}}$ used by the minimizer (number of function calls of {\tt Chi}).
+\end{function}
+\begin{function}
+{\tt SingleChiTheta}$( \theta_{13}, \, \{ \theta_{12}, \, \theta_{23}, \, \deltacp , \, \sdm , \, \ldm,  \, \hat{\rho}_{N_{\mathrm{exp}}} \}, \, N_{\mathrm{exp}})$ works similar to {\tt ChiTheta}, but only for one of the loaded experiments $N_{\mathrm{exp}}$. It returns the list $\{ \chi^2, \, \theta_{12}, \,  \theta_{23}, \, \deltacp , \, \sdm , \, \ldm, \, \hat{\rho}_{N_{\mathrm{exp}}} , \, N_{\mathrm{Iter}} \}$.
+\end{function}
+\begin{function}
+{\tt ChiDelta}$( \deltacp, \, \{ \theta_{12}, \, \theta_{13}, \, \theta_{23}, \, \sdm , \, \ldm, \, \hat{\rho_1}, \,  \hdots ,  \,\hat{\rho_n} \})$ returns the projection onto the $\deltacp$-axis for all experiments. The parameters are the fixed value of $\deltacp$ and the starting point of the minimizer including all starting values for the matter density scaling factors (without $\deltacp$, which is fixed). The return value is a list $\{ \chi^2, \, \theta_{12}, \, \theta_{13}, \, \theta_{23}, \, \sdm , \, \ldm, \, \hat{\rho_1}, \, \hdots , \, \hat{\rho_n} , \, N_{\mathrm{Iter}} \}$ with the minimum $\chi^2$ found, the coordinates of the local minimum (without $\deltacp$), and the number of iterations $N_{\mathrm{Iter}}$ used by the minimizer (number of function calls of {\tt Chi}).
+\end{function}
+\begin{function}
+{\tt SingleChiDelta}$( \deltacp, \, \{ \theta_{12}, \, \theta_{13}, \, \theta_{23}, \, \sdm , \, \ldm, \,  \hat{\rho}_{N_{\mathrm{exp}}} \}, \, N_{\mathrm{exp}})$ works similar to {\tt ChiDelta}, but only for one of the loaded experiments $N_{\mathrm{exp}}$. It returns the list $\{ \chi^2, \, \theta_{12}, \,  \theta_{13}, \,  \theta_{23}, \, \sdm , \, \ldm, \, \hat{\rho}_{N_{\mathrm{exp}}} , \, N_{\mathrm{Iter}} \}$.
+\end{function}
+All of these function have the same parameter structure: The fixed parameter is not transferred in the list, but as a the first separate parameter. The number of matter density scaling factors corresponds to the number of experiments used, since each experiment may face other matter density conditions. Note that before any of these function calls, {\tt SetStartingValues} and {\tt SetInputErrors} have to be used at least once. In addition, note that the resulting $\chi^2$ of {\tt ChiTheta} (or {\tt ChiDelta}) is not the sum of the $\chi^2$-values over all {\tt Single}-functions of all experiments anymore. This has two reasons: First, the topology of the fit manifold is altered by the addition of $\chi^2$-values of different experiments. Thus, after the minimization, the position of the minimum can be different to the ones of the individual experiments. Second, the priors for the external knowledge on the parameters are only added once -- independent of the number of experiments. A simple application of {\tt ChiTheta} can be found in the example on page~\pageref{ex:corrproj}. 
+
+The return values of these functions do not only contain the minimum $\chi^2$-value found, but also the position of the minimum. This information can often be valuable, since one can often quickly locate irregularities: If one of the parameters is far off the best-fit value, the minimzer may have ended up in a local unwanted minimum. For instance, a negative value of $\ldm$ (with a positive best-fit value) indicates that the minimizer ended up in the opposite-sign solution. Another possibility is that the experiment may not be able to determine the measured parameter at all without external knowledge about the parameter far off its best-fit value. In both cases, an externally imposed precision on the run-off parameter can help to solve the problem. 
 
 \section[Projection onto any hyperplane]{Projection onto any  hyperplane}
 
-General form and especially: DeltaTheta-Minimizer; mention calculation time!
+In general, one can show the measurement result in any $k$-dimensional hyperplane, where $k$ is smaller than the dimension of the parameter space $n$, and thus the dimension of the fit manifold. In this case, $k$ parameters are fixed and $n-k$ parameters are minimized over. One such example is the projection of the fit manifold onto the $\stheta$-$\deltacp$-plane, \ie, $k=2$ here. This projection can be performed with the following functions:
+\begin{function}
+{\tt ChiThetaDelta}$(\theta_{13}, \, \deltacp, \, \{ \theta_{12}, \, \theta_{23},  \, \sdm , \, \ldm, \,   \hat{\rho_1}, ... , \hat{\rho_n} \})$ returns the list  $\{ \chi^2, \, \theta_{12}, \, \theta_{23}, \, \sdm , \, \ldm,  \, \hat{\rho_1}, \, \hdots , \, \hat{\rho_n} , \, N_{\mathrm{Iter}} \}$ for the projection into the $\theta_{13}$-$\deltacp$-plane for all experiments.
+\end{function}
+\begin{function}
+{\tt SingleChiThetaDelta}$( \theta_{13}, \, \deltacp, \, \{ \theta_{12}, \, \theta_{23}, \, \sdm , \, \ldm, \,   \hat{\rho}_{N_{\mathrm{exp}}} \}, \, N_{\mathrm{exp}})$ returns the list $\{ \chi^2, \, \theta_{12}, \,   \theta_{23},  \, \sdm , \, \ldm, \, \hat{\rho}_{N_{\mathrm{exp}}} ,  \, N_{\mathrm{Iter}} \}$ for the projection into the $\theta_{13}$-$\deltacp$-plane for one experiment $N_{\mathrm{exp}}$.
+\end{function}
+These functions work analogously to the ones in the last section. They can, for example, be used to obtain a figure similar to \figu{projex}, left. However, the result would not be a two-dimensional cut through the fit-manifold, but a two-dimensional projection. Though the running time for one call of these functions is somewhat shorter than the one for the $\stheta$- or $\deltacp$-projections, one has to compute a two-dimensional array for such a figure (instead of a one-dimensional list). Therefore, the overall computational effort is much higher.
+
+In principle, one can also use three- or more-dimensional projections. In addition, one may want to use any other set of parameters for single- or two-parameter projections. The functions {\tt ChiNP} and {\tt SingleChiNP} are designed for this purpose:
+
+FUNCTIONS TO BE DEFINED. (WORK IN PROGRESS).
 
 \chapter{Finding degenerate solutions}
 
