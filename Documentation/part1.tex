@@ -871,7 +871,7 @@ the manifold and to adjust the parameter ranges. Then, one can run
 {\tt glbChiThetaDelta} for a complete evaluation of the problem
 including correlations.
 
-\begin{table}[tp]
+\begin{table}[t!]
 \begin{tabular}{p{4.2cm}p{5.5cm}p{5.1cm}}
 \hline
 Function & Purpose & Parameters $\rightarrow$ Result\\
@@ -883,23 +883,73 @@ Function & Purpose & Parameters $\rightarrow$ Result\\
 \GLB{glbPrintProjection} & Print vector {\tt in} to file {\tt stream} & {\tt (FILE* stream, const glb\_projection in)} \\
 \GLB{glbSetProjectionFlag} & Set flag for oscillation parameter {\tt which} in vector {\tt in} to value {\tt flag}. & {\tt (glb\_projection in, int flag, int which)} \\
 \GLB{glbGetProjectionFlag} & Return flag for oscillation parameter {\tt which} in vector {\tt in}. & {\tt (const glb\_projection in, int which)} $\rightarrow$ {\tt int} flag \\
-\GLBNS{glbSetDensityProjectionFlag} {\tt glbSetDensity-} \newline {\tt ProjectionFlag}  & Set flag for density parameter {\tt which} in vector {\tt in} to value {\tt flag}. & {\tt (glb\_projection in, int flag, int which)} \\
-\GLBNS{glbGetDensityProjectionFlag} {\tt glbGetDensity-} \newline {\tt ProjectionFlag} & Return flag for density parameter {\tt which} in vector {\tt in}.  & {\tt (const glb\_projection in, int which)} $\rightarrow$ {\tt int} flag \\
+ {\tt glbSetDensity\-ProjectionFlag} \GLBNS{glbSetDensityProjectionFlag} & Set flag for density parameter {\tt which} in vector {\tt in} to value {\tt flag}. & {\tt (glb\_projection in, int flag, int which)} \\
+{\tt glbGetDensity\-ProjectionFlag} \GLBNS{glbGetDensityProjectionFlag} & Return flag for density parameter {\tt which} in vector {\tt in}.  & {\tt (const glb\_projection in, int which)} $\rightarrow$ {\tt int} flag \\
 \hline
 \end{tabular}
 \caption{\label{tab:defprojection} Different functions handling the
-\GLB{glb\_projection} type. Flags are either \GLB{GLB\_FIXED} or \GLB{GLB\_FREE}.}
+\GLB{glb\_projection} type. Flags are either \GLB{GLB\_FIXED} or \GLB{GLB\_FREE}. The (unshown) return values of the {\tt Set-} and {\tt Define-} functions point either to the assigned vector if successful, or they are {\tt NULL} if unsuccessful.}
 \end{table}
 
-In principle, one can also use three- or more-dimensional projections. In addition, one may want to use any other set of parameters for single- or two-parameter projections. The function \GLB{glbChiNP} is designed for this purpose.
+In principle, one can also use three- or more-dimensional projections. In addition, one may want to use a different set of parameters for single- or two-parameter projections. The very flexible function \GLB{glbChiNP} is
+designed for this purpose. However, because of its flexibility, it 
+involves more sophistication.
 
-WW: CONTINUE HERE
+In order to define arbitrary projections, we introduce the vector
+\GLB{glb\_projection}, which is very similar to the
+oscillation parameter vector {\tt glb\_params}.
+Normally, the user does not need to access this type directly:
+A set of function similar to the ones for {\tt glb\_params} is
+provided. The purpose of {\tt glb\_projection} is to tell \GLOBES\ 
+what parameters are fixed, and what are minimized over. Thus, in
+comparison to {\tt glb\_params}, it does not take values for the
+parameters, but flags \GLB{GLB\_FIXED} or \GLB{GLB\_FREE}.
+For example, the projection onto the $\theta_{13}$-axis {\tt glbChiTheta}
+is nothing else than a special case of {\tt glbChiNP} with $\theta_{13}$
+fixed and all the other parameters free. Similar to {\tt glb\_params},
+the type {\tt glb\_projection} has to be created first, and destroyed
+later. The access functions for {\tt glb\_projection} are summarized in \Tab~\ref{tab:defprojection}. Since the complete set is very similar to
+the one for {\tt glb\_params}, we do not go into greater details here.
 
-glb\_projection type: exactly similar to glb\_params (return values)
-
-Functions in table: komische Aufteilung
-
-Hint on example.
+As soon as we have defined a projection, we can assign it:
+\begin{function}
+\GLBNS{glbSetProjection}
+{\tt int glbSetProjection(const glb\_projection in)} sets the projection
+to {\tt in}. The return value is $0$ if successful, and $-1$ if
+unsuccessful.
+\end{function}
+Similarly, the currenty assigned projection can be returned with:
+\begin{function}
+\GLBNS{glbGetProjection}
+{\tt int glbGetProjection(glb\_projection out)} writes the currently
+set projection to {\tt out}. The return value is $0$ if successful, and $-1$ if unsuccessful.
+\end{function}
+After setting the starting values, input errors, and the projection, 
+we can run the minimizer:
+\begin{function}
+\GLBNS{glbChiNP}
+{\tt double glbChiNP(const glb\_params in, glb\_params out, int exp)} 
+returns the projected $\chi^2$ onto the hyperplane specified by 
+{\tt glbSetProjection} for the  experiment {\tt exp}. 
+For the simulation of all initialized experiments,
+use {\tt GLB\_ALL} for {\tt exp}. The values in {\tt in} are the guessed fit values for the minimizer (all free parameters) and the fit values
+on the hyperplane (all fixed parameters). The actually determined parameters at the minimum are returned in {\tt out}, where the fixed parameters are still at their input values. If {\tt out} is set to {\tt NULL}, this information will not be returned.
+\end{function}
+As an example, the projection sequence for a minimization over
+$\deltacp$ only looks like this:
+\begin{quote}
+{\tt
+  glb\_projection th13\_projection = glbAllocProjection(); \\
+  glbDefineProjection(th13\_projection,GLB\_FIXED,GLB\_FIXED,GLB\_FIXED,\\
+  \hspace*{2cm} GLB\_FREE,GLB\_FIXED,GLB\_FIXED); \\
+  glbSetProjection(th13\_projection); \\ 
+  res1=glbChiNP(test\_values,NULL,GLB\_ALL); \\
+  glbFreeProjection(th13\_projection);
+}
+\end{quote}
+In this case, only the correlation with $\deltacp$ is taken into account.
+Note that in the  example on page~\pageref{ex:corrproj} this projection
+is compared with the result including the full multi-parameter correlation.
 
 \chapter{Finding degenerate solutions}
 \index{Degenerate solutions}
