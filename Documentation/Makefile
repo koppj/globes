@@ -10,10 +10,10 @@ Manual.dvi : Manual.tex
 	makeindex norm.idx
 	makeindex api.idx
 	makeindex constants.idx
-	remove_spaces constants.ind
-	remove_spaces api.ind
-	remove_spaces norm.ind
-	remove_spaces aedl.ind
+	./remove_spaces constants.ind
+	./remove_spaces api.ind
+	./remove_spaces norm.ind
+	./remove_spaces aedl.ind
 	latex Manual.tex
 	latex Manual.tex
 
