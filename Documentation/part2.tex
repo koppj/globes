@@ -6,21 +6,510 @@
 
 \chapter{Basics: Source, Oscillation, Detection}
 
-Here comes how a experiment is defined (what is a channel, a rule, how are they treated, ...). Splitting in source, oscillation, and detector, etc.
+Here comes how a experiment is defined (what is a channel, a rule, how are 
+they treated, ...). Splitting in source, oscillation, and detector, etc.
 
 \chapter{Getting started: Editing existing experiments}
 
 Here comes how to load and modify existing experiments;
-also: how does the main screen work and the most important functions at exampled
+also: how does the main screen work and the most important functions at 
+exampled
 
 \chapter{Features of the \EDM }
 
+
+\chapter{General concept}
 \section{Source properties}
+
+\GLOBES\ handles only point sources, thus it is not possible
+to study effects from the finit size of the neutrino production
+region like in the Sun. Furthermore only one source for each experiment
+is possible, this make it impossible\footnote{at least rather tricky} 
+to simulate multiple source experiments like KamLAND. All neutrino
+sources useable within \GLOBES\ therefore can be specified by the
+flux spectra for each flavour and CP sign and the total luminosity
+of the source. There are two principal ways to provide a flux:
+use a built-in source or a file provided by the user. 
+
+The built-in source is muon decay, since the neutrino
+spectra and flavour composition are knon analytically in that case. For 
+this sources the energy of the parent particle has to be specified
+and the number of useful decays per year.
+
+In the latter case the fluxes are read from a file with seven rows and
+501 lines.
+\begin{quotation}
+$ E\quad
+\Phi_{\nu_e}\quad
+\Phi_{\nu_\mu}\quad
+\Phi_{\nu_\tau}\quad
+\Phi_{\bar\nu_e}\quad
+\Phi_{\bar\nu_\mu}\quad
+\Phi_{\bar\nu_\tau}$
+\end{quotation}
+where the energy values are evenly spaced. 
+For accessing fluxes at 
+arbitrary energies linear interpolation is used. Once the energy leaves the
+range of values given in the file $0.0$ is returned.
+
+Since many sources have two modes of operation, it is possible to define
+a pair of fluxes by using the suffixes ``plus'' and ``minus'' in the file 
+names. The individual members of the pair can be accessed by the polarity
+variable. Also the built-in fluxes provide this choice.
+
+
+For sources based on $\pi$-decay and nuclear reactors the total power
+involved defines how neutrino are produced therefore this variable is
+used to define the luminosity.
+
+Furthemore it is useful to define the operation time of an experiment
+in years.
 
 \section{Oscillation properties}
 
-\section{Detector properties}
 
+
+\subsection{Baseline \& matter profile}
+The purpose of this module is to specify the path the neutrinos
+are traveling. The central piece of information is the total length
+of the path - the baseline\index{Baseline}.
+\begin{equation}
+L\,\left[\mathrm{km}\right]
+\end{equation} 
+
+Furthermore there is
+the matter profile encountered along the baseline which can be set in
+several ways. The simplest way is to use a constant density corresponding
+to the average density along the baseline calculated using the 
+PREM\cite{Stacey} onion shell model of the 
+Earth\index{PREM}\index{Earth matterdensity}.
+
+Another possibility is to use several layers of constant density each in 
+order to improve the approximation to the actual Earth matter profile. In this
+case the user specifies the total baseline and the number of layers. The
+time consumed in computing the oscillation probabilities is directly 
+proportional to number of layers.
+
+The third possibility to specify the matter profile is to provide a list
+of thicknesses and densities for the layers. 
+
+For any type of profile a central value $a$ and a corresponding error 
+$\delta a$ have to be specified\index{Density error}\index{Density center}.
+\begin{equation}
+\label{eq:density_error}
+\rho(x)=a\cdot\rho_0(x)\,\left[\frac{\mathrm{g}}{\mathrm{cm}^2}\right]\,
+\end{equation}
+where $\rho_0(x)$ is the matter profile as chosen by the user and $\rho(x)$ is
+the one used in the calculation of the oscillation probabilities. The default
+value for $a$ is $1$ and a typical value for $\delta a = 0.05$. 
+
+\section{Detection properties}
+
+The most obvious property of the neutrino detection is the total
+active mass of the target.
+
+\subsection{Cross section}
+\label{sec:cross_section}
+
+Cross sections\index{Cross sections} are used as part of the 
+channel definition 
+(see section~\ref{sec:channel}) and have to be provided by the user in form
+of a file. Cross section are in general given as differential cross divided
+by the energy
+\begin{equation}
+\hat\sigma(E)=\sigma(E)/E\,\left[ 10^{-38}\,
+\frac{\mathrm{cm}^2}{\mathrm{GeV}^2} \right]
+\end{equation}
+The cross section files have seven rows and $1001$ lines.
+\begin{quotation}
+$log_{10} E\quad
+\hat\sigma_{\nu_e}\quad
+\hat\sigma_{\nu_\mu}\quad
+\hat\sigma_{\nu_\tau}\quad
+\hat\sigma_{\bar\nu_e}\quad
+\hat\sigma_{\bar\nu_\mu}\quad
+\hat\sigma_{\bar\nu_\tau}$
+\end{quotation}
+where the logarithm of the energy values is evenly spaced. 
+For accessing cross section at 
+arbitrary energies linear interpolation is used. Once the energy leaves the
+range of values given in the file $0.0$ is returned.
+
+
+\subsection{Channels}
+\label{sec:channel}
+
+Channels\index{Channel} represent an intermediate level in bewteen 
+the pure oscillation 
+physics given by the oscillation probablity $P_{\alpha\beta}$ and the
+detected signal and background. A channel basicaly decsribes the path from one
+initial state in the source to one interaction type (IT) in  the detector.  
+Therefore a channel consists of the description of the inital state given 
+by the polarity 
+of the source, \eg\ muons or anti-muons in a neutrino factory, by the CP 
+eigenvalue of the intial state, \ie\ neutrino or anti-neutrino and by the 
+intial flavour. A channel furthermore consists of the interaction type in the
+detector given by the final flavour of the neutrino, the interaction cross
+section and the energy resolution function. 
+ 
+For the calculation of event rates, the first step is to compute the number of
+events for each IT in the fiducial mass of the detector for each 
+neutrino flavor and energy bin. The second step is to include the detector 
+effects coming from
+the insufficient knowledge used in the event reconstruction. We combine these
+two steps in order to obtain the differential event rate spectrum for each
+flavor and IT as seen by the detector, which we call a ``channel''. 
+The channels
+for all ITs then have to be combined in a way which takes into account
+that the ITs or flavors can, either because of
+physical reasons (\eg, the flavor--blindness of NC interactions) or 
+because of detector effects (\eg, charge misidentification), not be 
+ separated cleanly.
+
+The master formula for the differential event rate for each channel 
+is given by
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{eqnarray}
+\label{eq:master_event}
+\frac{dn_{\beta}^{\text{IT}}}{dE'}=&&N\,\int \int dE\,d\hat{E}\quad
+\underbrace{\Phi_{\alpha} (E)}_{\mathrm{Production}} \times \nonumber\\
+&&\underbrace{\frac{1}{L^2} P_{(\alpha\rightarrow\beta)}(E,L,\rho;\theta_{23},
+\theta_{12},\theta_{13},
+\Delta m^2_{31},\Delta m^2_{21},\deltacp)}_{\mathrm{Propagation}}
+\times \nonumber \\ &&\underbrace{\sigma^{\text{IT}}_f(E)
+k_f^{\text{IT}}(E-\hat{E})}_{\mathrm{Interaction}} \times \nonumber \\
+&&\underbrace{ T_f(\hat{E}) V_f(\hat{E}-E')}_{\mathrm{Detection}}\,,
+\end{eqnarray}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+where $\alpha$ is the initial flavor of the neutrino and 
+$\beta$ is the final flavour, 
+$E$ is the incident neutrino energy, $\Phi_{\alpha} (E)$ is the flux of the 
+initial flavor at the
+source, $L$ is the baseline length, $N$ is a normalization factor, and 
+$\rho$ is the matter density. The interaction term is composed of 
+two factors, which are the total cross section 
+$\sigma^{\text{IT}}_\beta(E)$ for the flavor $f$ and
+the interaction type IT, and the energy distribution of the 
+secondary particle $k_\beta^{\text{IT}}(E-\hat{E})$ with 
+$\hat{E}$ the energy of the secondary particle. The detector properties are 
+modeled by the threshold function $T_\beta(\hat{E})$, coming from the the 
+limited resolution or the cuts in the analysis, and the energy resolution 
+function $V_\beta(\hat{E}-E')$ of the secondary particle. Thus, $E'$ is the 
+{\em reconstructed} neutrino energy.
+
+Since it is rather cumbersome to numerically solve this double integral,
+we split the two integration. We first evaluate the integral over
+$\hat{E}$, where the only terms containing $\hat{E}$ are
+$k_\beta^{\text{IT}}(E-\hat{E})$,  $ T_\beta(\hat{E})$, and 
+$ V_\beta(\hat{E}-E')$, and define:
+\begin{eqnarray}
+\label{eq:e_res} 
+R_\beta^{\text{IT}}(E,E')\,\epsilon_\beta^{\text{IT}}(E')
+ \equiv
+\int d\hat{E} \quad T_\beta(\hat{E})\,k_\beta^{\text{IT}}(E-\hat{E})
+\,V_\beta(\hat{E}-E')\,, 
+\end{eqnarray}
+Thus $R_\beta^{\text{IT}}(E,E')$ described the energy response of 
+the detector, \ie\ a neutrino with a (true) energy of $E$ has a probablity
+of $R_\beta^{\text{IT}}(E,E') dE'$ to have a reconstucted energy 
+in bewteen $E'$ and $E'+dE'$. The function $R(E,E')$ is also refered to
+as energy resolution function or smearing matrix in its actual representation
+in the program\index{Energy resolution}\index{Smear matrix}. The detailed
+defintion and initialization of the energy resolution function is described
+in section~\ref{sec:energy}.
+
+\subsection{Rules}
+\label{sec:rules}
+
+The set of rules\index{Rule} for an experiment is the final 
+link between the event rate
+computation and the statistical analysis. The information given by the rules
+specifies how the $\chi^2$ is computed based on the raw event rates as 
+described by the channels including possible systematical errors. 
+Therefore a rule has two parts: the first part describes how signal and 
+background events are composed out of the channels and the second part
+specifies which systematical errors are considered and what the the size
+of the relevant errors is.
+
+Based on the definition of channels it is possible to assemble the 
+signal and background event numbers for each bin.  
+The number of events in one channel and  in one bin\index{Bin} $i$ is given by
+\begin{equation}
+n_i^c=\int_{E_i-\Delta E/2}^{E_i+\Delta E/2} dE' \quad
+\frac{dn_{\beta}^{\text{IT}}}{dE'} (E')
+\end{equation}
+where $c$ is the channel index.
+Note that the events are binned according to their \emph{reconstructed} energy.
+The signal $s_i$ in one bin for a rule now can be composed out of 
+several channels by
+\begin{equation}
+s_i=\epsilon_{c_1}\cdot n_i^{c_1}\,+\,\epsilon_{c_2}\cdot n_i^{c_2}\,+\,\ldots
+\end{equation}
+where the $\epsilon$'s are weight factors determined by the properties
+of the detector.
+Simlarly the background in one bin $i$ can be specified by
+\begin{equation}
+b_i=\epsilon_{c_1}\cdot n_i^{c_1}\,+\,\epsilon_{c_2}\cdot n_i^{c_2}\,+\,\ldots
+\end{equation}
+
+
+The set of all $s_i$'s and $b_i$'s now can be composed in a form that takes
+some types of systematical error into account. The two most important and
+most easily parameterized systematics are a normalization and an energy
+calibration error. These error are considered seperately for the signal events
+and the background events. The implementation of the normalization error
+is straight forward
+\begin{equation}
+s_i(a):=a\cdot s_i
+\end{equation} 
+with an anloguous definition for the background events.
+
+For the parameterization of an energy calibration error two possibilities
+are implemented. The first one being somewhat simpler and second one
+being more accurate. The first option is
+\begin{equation}
+s_i(a,b):=s_i(a)+b\cdot s_i\, E_i/(E_\mathrm{max}-E_\mathrm{min})
+\end{equation}
+and it is refered to as tilt since it describes a linear distortion, a tilt
+of the event rate spectrum. The second option is closer to an actual energy
+calibration error and is an approximation to the exact form
+\begin{equation}
+s_i(b) = \int_{(1+b)(E_i-\Delta E/2)}^{(1+b)(E_i+\Delta E/2)} dE' \quad
+\frac{dn_{\beta}^{\text{IT}}}{dE'} ( E')
+\end{equation}
+or something like this, to be continued ...
+
+Thus the total event rate $x_i$ in a bin $i$ is given by
+\begin{equation}
+x_i(a,b,c,d)=s_i(a,b)+b_i(c,d)
+\end{equation}
+and thus a function of four parameters. The central values for all of
+the four parameters are always needed. They are called signal normalization
+($a$), signal tilt/calibration ($b$), background  normalization ($c$) and
+background tilt/calibration ($d$). The default values are
+\begin{equation}
+a=1\,,\quad b=0\,,\quad c={\tt NaN}\,,\quad d=0\,,
+\end{equation}
+thus for the background normalization $c$ a value has to be specified in 
+\emph{all} cases.
+
+The four parameters $a,b,c,d$ have been introduced in order to describe
+systematical uncertainties, they are so called nuisance parameters.
+For the analysis of the systematical errors the so called 
+ pull method is 
+used~\cite{Fogli:2002pt}\footnote{In fact the pull method
+was employed already in~\cite{SBvNF} before \cite{Fogli:2002pt} appeared.}. 
+In the  pull method $k$ systematical errors are included by introducing 
+$k$ additional variables $\zeta_k$, which will  be called 
+nuisance parameters in the following. 
+The nuisance parameters describe the dependence of the event rates on the 
+various sources of systematical errors, \eg\ an error on the total 
+normalization is included by multiplying the expected number of events in 
+each bin by a factor $(1+\zeta_1)$. The variation of $\zeta_1$ in the fit 
+is constrained by adding a penalty $p_1$ to the $\chi^2$-function. In case 
+of a  Gau\ss ian distributed systematical error this penalty is 
+given by
+\begin{equation}
+\label{eq:penalty}
+p_i=\frac{(\zeta_i-\zeta_i^0)^2}{\sigma_{\zeta_i}^2}\,,
+\end{equation}
+where $\zeta_i^0$ denotes the mean and $\sigma_{\zeta_i}$ the standard 
+deviation of the corresponding nuisance parameter, \ie\ the amount of 
+systematical uncertainty. 
+The resulting $\chi^2$ is then minimized with respect to all nuisance 
+parameters $\zeta_i$ and this yields $\chi^2_\mathrm{pull}$
+\begin{equation}
+\chi^2_\mathrm{pull}(\boldsymbol{\lambda}):=\min_{\{\zeta_i\} } \,\, \left( 
+\chi^2(\boldsymbol{\lambda},
+\zeta_1, \ldots, \zeta_k)+ \sum_{j=1}^{k} p_j(\zeta_j)\right)\,,
+\end{equation}
+where $\boldsymbol{\lambda}$ denotes the oscillation parameters 
+including the matter density
+$\rho$. One advantage of the pull method is that whenever the number $N$ of 
+data points is much larger than $k$, it is numerically easier to compute 
+$\chi^2_\mathrm{pull}$ than to invert the $N\times N$ covariance matrix. For
+the experiments considered here $N$ is typically $20$ and $k\sim 4$, thus
+the pull method is numerically much faster. Moreover it is more flexible and 
+allows the inclusion of systematical errors also for a 
+Poissonian $\chi^2$-function.
+In~\cite{Fogli:2002pt} it was shown that the pull method and the covariance
+based approach are equivalent for a Gau\ss ian and linear model. In general
+there is a separate $(\chi^2_\mathrm{pull})^\alpha$ for each rule $\alpha$, 
+\ie\ pair of signal and background spectra, with a separate set of 
+nuisance parameters $\zeta_i^\alpha$. In this case $\chi^2_\mathrm{pull}$
+is the sum of all individual  $(\chi^2_\mathrm{pull})^\alpha$.
+In this way the dependence on the $k$ nuisance parameters has been eliminated 
+from $\chi^2_\mathrm{pull}$. 
+
+The user has the possibility to choose the set $\{\zeta_i\}$ of nuisance 
+parameters which are marginalized, this achieved with the error dimension 
+variable\index{Error dimension}, the different possibilities are shown in
+table~\ref{tab:error_dim}. If a parameter is desginated with $+$ it will
+be marginalized and therefore the corresponding error needs to have a non-zero
+value. In the cases labeled (number 4 and 8) ``total rates'' 
+the summation over the bins is performed \emph{before} computing 
+the $\chi^2$. The case labeled (number 7) ``spectrum only'' leaves the 
+normalization free ($\sigma_a=\sigma_c=\infty$) and therefore counts only the 
+spectral information in the date, therefore
+the settings for the normalization error will be ignored. It is furthermore
+possible to extend the set of error dimensions and thus the set of possible 
+systematical errors to be studied, but this requires proper C programing
+and recompiling \GLOBES. The interface for user defined error dimensions is
+described in detail in section~\ref{sec:ud_error_dim}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{center}
+\begin{table}[hbt!]
+\begin{center}
+\begin{tabular}[h]{|c|cccc|c|c|}
+\hline
+Error dimension&$a$&$b$&$c$&$d$&Tilt/Calibration&Remarks\\
+\hline
+\hline
+0&+&+&+&+&T&\\
+2&-&-&-&-&-&\\
+4&+&+&+&+&T&total rates\\
+7&o&-&o&-&-&spectrum only\\
+8&-&-&-&-&-&total rates\\
+9&+&+&+&+&C&\\
+\hline
+\end{tabular}
+\caption[Table of error dimensions]{\label{tab:error_dim}
+Values of the error dimension variable and their meaning.
+ }
+\end{center} 
+\end{table} 
+\end{center}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In each rule it is possible to constrain the energy range from which the
+data are taken for the analysis\index{Energy window}. This achieved by 
+setting the energy window
+variable. The purpose is mainly to allow a fine tuning of the description
+
+of an energy calibration error. The default setting is that the energy window
+coincides with the range defined by the minimal and maximal reconstructed 
+energy. For the error dimension using the calibration method (C) it is 
+advisable to reduce the energy window by two or three bins at both the lower
+and upper end. When studying the impact of the energy calibration
+error in detail and it turns out not to be small, make sure that your result
+does not change by reducing the energy window by 1 or 2 bins.
+
+
+\subsection{Energy resolution function}
+\label{sec:energy}
+
+The origin and meaning of the energy resolution function 
+$R^c(E,E')$ was already discussed in 
+section~\ref{sec:channel} and  a mathematical definition
+was given in equation~\ref{eq:e_res}. Here we deal with
+how to tell \GLOBES\ which energy resolution function it should
+use. This also naturally involves the issue how the actual convolution
+of the differntial event rate spectrum with $R_\beta^{\text{IT}}(E,E')$
+is performed. First we will discuss the mathematical structure of
+the problem and then the various algorithms and possibilities which
+\GLOBES\ offers are introduced. In order to obtain the number of events 
+$n_i^c$ from one channel $c$ in one bin $i$ one has to solve this integral
+%
+\begin{eqnarray}
+\label{eq:events_bin}
+n_i^c=N/L^2\,\int_{E_i-\Delta E/2}^{E_i+\Delta E/2} dE' 
+\quad \int dE \,\, \Phi^c(E)\,
+P^c(E)\,
+\sigma^c(E)\,
+R^c(E,E')\,
+\epsilon^c(E')\,.
+\end{eqnarray} 
+%
+The integration with respect to the reconstructed energy $E'$ can be
+performed independently of the oscillation parameters and we define
+the bin kernel for the $i$th bin $K_i^c$
+\begin{equation}
+\label{eq:kernel}
+K_i^c(E):=\int_{E_i-\Delta E/2}^{E_i+\Delta E/2} dE' 
+\quad R^c(E,E')\,
+\epsilon^c(E')\,.
+\end{equation}
+With this definition equation~\ref{eq:events_bin} can be rewritten as
+\begin{equation}
+\label{eq:simple_int}
+n_i^c=N/L^2 \int dE\quad  \underbrace{\Phi^c(E)\,
+P^c(E)\,
+\sigma^c(E)\,
+K_i^c(E)\,}_{f(E)}. 
+\end{equation}
+
+There is no basic reason why one could not evaluate this integral directly
+by the usual numerical methods. However it turns out that this may be rather
+slow therefore we introduce two different approximation schemes which have
+a varying degree of acuracy and speed. The simplest, fastest and
+least acurate is algorithm one. The key idea is to choose a set of assumptions
+which allow to evaluate the integrand of equation~\ref{eq:simple_int}
+at fixed values of the energy $E$ and to use the same number of points $N$ in
+the calculation as there are bins. Thus equation~\ref{eq:simple_int} is reduced
+to
+\begin{equation}
+\label{eq:algo_one}
+n_i^c=N/L^2 \Delta E \sum_{j=1}^N \quad  \Phi^c(E_j)\,
+P^c(E_j)\,
+\sigma^c(E_j)\,
+K_i^c(E_j)\,.
+\end{equation}
+The advantage of using equation~\ref{eq:algo_one} is that all factors
+independent of the oscillation paramters have to be evaluated only at 
+values of $E$ which are known in advance, \ie\ they can be put 
+into a look-up table. Another advantage is that also the probability
+has to be evaluated only at previously known values of the energy, which
+makes it possible to compute the transition amplitudes for all channels
+in one step. The key assumption is that all involved factors are piece-wise
+constant, \ie\ they do not change within one bin. This assumption seems to be
+very restrictive however whenever one is analyzing simulated 
+data\footnote{simulated with the same algorithm} the errors
+made by violating this assumption nearly cancel between the simulated 
+data and the fitted data. This algorithm is the fastest which \GLOBES\ offers
+and is suitable whenever there are no fast oscillations. Otherwise severe
+aliasing effects may occur which usually lead to a failure of one of the 
+minimizing routines. The computation of the bin kernel $K_i^c$ is performed
+by \GLOBES\, to this end it requires the specification of the number of bins
+and the minimum and maximum energy. Furthemore following parameterization
+for $R^c(E,E')$ is used
+\begin{equation}
+R^c(E,E')=\frac{1}{\sigma(E)\,\sqrt{2\pi}}\,e^{-\frac{(E-E')^2}{2\sigma^2(E)}}
+\end{equation} 
+where the energy resolution $\sigma(E)$ is defined by
+\begin{equation}
+\label{eq:sigma_e}
+\sigma(E)=\alpha\cdot E + \beta \cdot \sqrt{E} +\gamma\,.
+\end{equation}
+The parameters $\alpha, \beta$ and $\gamma$ are provided by the user.
+Furthemore the user has the possibility to provide $\epsilon(E')$ by specifying
+the value of  $\epsilon(E')$ at each $E_j$ since this algroithm assumes
+everything else to be constant within one bin, the  $\epsilon(E')$ are
+also taken as constant within one bin. In the actual implementation the sum
+in equation one only extends over those $E_j$ where $K(E_j)$ above a certain
+treshold, by default $10^{-7}$.
+
+The second available algorithm is more complicated, a little slower but
+much more accurate and much less susceptible to aliasing effects. The starting
+point again is equation~\ref{eq:simple_int}. The idea now is to
+ have a good approximation to the integral but still keeping the fixed sampling
+point in $E$. To this end we rewrite the integrand of 
+equation~\ref{eq:simple_int} using the sampling theorem~\cite{NRC,Rybicki}
+\begin{equation}
+f(E)=\sum_{k=-\infty}^{\infty}\,f(E_k) 
+\times \mathrm{sinc}\left(\frac{\pi}{h}(E-E_k)\right)+e(E)
+\end{equation}
+with $\mathrm{sinc}(x):=\sin(x)/x$ and $E_k=E^0+h\cdot k$. 
+This the so called sampling 
+representation of the integrand $f(E)$ and $e(E)$ is the error term.
+ 
+
+  
 \chapter{Creating new experiments}
 
-Most advanced step: How to create a new experiment from scratch.
+Most advanced step: How to create a new experiment from scratch .
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: Manual.tex
+%%% End: 
