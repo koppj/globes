@@ -5,7 +5,7 @@ dnl Versioning of GLoBES
 dnl last digit: increment whenever code has changed
 dnl middle digit: increment when features have been introduced/removed
 dnl first digit: major improvements/rewrites
-AM_INIT_AUTOMAKE(globes,1.7.7)
+AM_INIT_AUTOMAKE(globes,1.8.0)
 
 dnl Versioning of libglobes.so
 dnl code changed: c:r+1:a
