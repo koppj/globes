@@ -27,10 +27,12 @@ Manual.dvi : Manual.tex
 Manual.pdf : Manual.dvi epspdf
 	pdfmanual
 
+pdf: Manual.pdf
+
 Manual.ps : Manual.dvi
 	dvips Manual -o Manual.ps
 
-.PHONY: clean fast epspdf
+.PHONY: clean fast epspdf pdf
 
 clean:
 	rm -f *.aux *.log *.ind *.bbl *.ilg *.blg Manual.dvi Manual.ps *.toc\
