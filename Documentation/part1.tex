@@ -5,6 +5,32 @@
 \part{User's manual}
 \chapter{Getting started: A short \GLOBES\ tour}
 
+\begin{table}[t]
+\begin{center}
+\begin{tabular}{p{1.8cm}p{4.5cm}p{8.6cm}}
+\hline
+Function & Purpose & Parameters \ra\ Result \\
+\hline
+{\tt Chi} & $\chi^2$ with systematics only \newline (all initialized exps.) & ($\{ \theta_{12}, \theta_{13}, \theta_{23}, \deltacp , \sdm , \ldm, \frac{\rho_1}{\bar{\rho}_1},... , \frac{\rho_n}{\bar{\rho}_n} \}$)  \newline \ra\  $\chi^2$ \\[0.1cm]
+{\tt SingleChi} & $\chi^2$ with systematics only \newline (only one experiment) & $(\{ \theta_{12}, \theta_{13}, \theta_{23}, \deltacp , \sdm , \ldm, \frac{\rho_{N_{\mathrm{exp}}}}{\bar{\rho}_{N_{\mathrm{exp}}}} \}, \, N_{\mathrm{exp}} )$   \newline \ra\ $\chi^2$ \\[0.1cm]
+{\tt ChiTheta} & $\chi^2$ with systematics and correlations: Projection onto $\theta_{13}$-axis (all exps.) &  ($ \theta_{13}, \, \{ \theta_{12}, \theta_{23}, \deltacp , \sdm , \ldm, \frac{\rho_1}{\bar{\rho}_1}, ... , \frac{\rho_n}{\bar{\rho}_n} \}$) \newline \ra\  $\{ \chi^2, \theta_{12}, \theta_{23}, \deltacp , \sdm , \ldm, \frac{\rho_1}{\bar{\rho}_1}, ... , \frac{\rho_n}{\bar{\rho}_n} , N_{\mathrm{Iter}} \}$ \\[0.1cm]
+{\tt Single-} \newline {\tt ChiTheta} & $\chi^2$ with systematics and correlations: Projection onto $\theta_{13}$-axis (one exp.) &  ($ \theta_{13}, \, \{ \theta_{12}, \theta_{23}, \deltacp , \sdm , \ldm,  \frac{\rho_{N_{\mathrm{exp}}}}{\bar{\rho}_{N_{\mathrm{exp}}}} \}, \, N_{\mathrm{exp}}$) \newline \ra\  $\{ \chi^2, \theta_{12}, \theta_{23}, \deltacp , \sdm , \ldm, \frac{\rho_{N_{\mathrm{exp}}}}{\bar{\rho}_{N_{\mathrm{exp}}}} , N_{\mathrm{Iter}} \}$ \\[0.1cm]
+{\tt ChiDelta} & $\chi^2$ with systematics and correlations: Projection onto $\deltacp$-axis (all exps.) &  ($\deltacp, \, \{ \theta_{12}, \theta_{13}, \theta_{23},  \sdm , \ldm, \frac{\rho_1}{\bar{\rho}_1}, ... , \frac{\rho_n}{\bar{\rho}_n} \}$) \newline \ra\  $\{ \chi^2, \theta_{12}, \theta_{13}, \theta_{23}, \sdm , \ldm, \frac{\rho_1}{\bar{\rho}_1}, ... , \frac{\rho_n}{\bar{\rho}_n} , N_{\mathrm{Iter}} \}$ \\[0.1cm]
+{\tt Single-} \newline {\tt ChiDelta} & $\chi^2$ with systematics and correlations: Projection onto $\deltacp$-axis (one exp.) &  ($ \deltacp, \, \{ \theta_{12}, \theta_{13}, \theta_{23}, \sdm , \ldm,  \frac{\rho_{N_{\mathrm{exp}}}}{\bar{\rho}_{N_{\mathrm{exp}}}} \}, \, N_{\mathrm{exp}}$) \newline \ra\  $\{ \chi^2, \theta_{12}, \theta_{13}, \theta_{23},  \sdm , \ldm, \frac{\rho_{N_{\mathrm{exp}}}}{\bar{\rho}_{N_{\mathrm{exp}}}} , N_{\mathrm{Iter}} \}$ \\[0.1cm]
+{\tt ChiTheta-} {\tt Delta} & $\chi^2$ with systematics and correlations: Projection onto $\deltacp$-$\theta_{13}$-plane (all exps.) &  ($\theta_{13}, \, \deltacp, \, \{ \theta_{12}, \theta_{23},  \sdm , \ldm, \frac{\rho_1}{\bar{\rho}_1}, ... , \frac{\rho_n}{\bar{\rho}_n} \}$) \newline \ra\  $\{ \chi^2, \theta_{12}, \theta_{23}, \sdm , \ldm, \frac{\rho_1}{\bar{\rho}_1}, ... , \frac{\rho_n}{\bar{\rho}_n} , N_{\mathrm{Iter}} \}$ \\[0.1cm]
+{\tt SingleChi-} {\tt Theta- } {\tt Delta} & $\chi^2$ with systematics and correlations: Projection onto $\deltacp$-$\theta_{13}$-plane (one exp.) &  ($ \theta_{13}, \, \deltacp, \, \{ \theta_{12}, \theta_{23}, \sdm , \ldm,  \frac{\rho_{N_{\mathrm{exp}}}}{\bar{\rho}_{N_{\mathrm{exp}}}} \}, \, N_{\mathrm{exp}}$) \newline \ra\  $\{ \chi^2, \theta_{12},  \theta_{23},  \sdm , \ldm, \frac{\rho_{N_{\mathrm{exp}}}}{\bar{\rho}_{N_{\mathrm{exp}}}} , N_{\mathrm{Iter}} \}$ \\[0.1cm]
+{\tt ChiNP} & $\chi^2$ with systematics and correlations: Projection onto $N$-parameter hyper-plane (one exp.) & ??? to be defined \\[0.1cm]
+{\tt Single-} {\tt ChiNP} & $\chi^2$ with systematics and correlations: Projection onto $N$-parameter hyper-plane (one exp.) & ??? to be defined \\[0.1cm]
+{\tt ChiAll} & Lokal minimum of $\chi^2$ with respect to all parameters (all exps.) &
+($ \{ \theta_{13}, \theta_{12}, \theta_{23}, \deltacp , \sdm , \ldm, \frac{\rho_1}{\bar{\rho}_1}, ... , \frac{\rho_n}{\bar{\rho}_n} \}$) \newline \ra\  $\{ \chi^2, \theta_{13}, \theta_{12}, \theta_{23},$ \newline \hspace*{1.4cm} $ \deltacp , \sdm , \ldm, \frac{\rho_1}{\bar{\rho}_1}, ... , \frac{\rho_n}{\bar{\rho}_n} , N_{\mathrm{Iter}} \}$ 
+\\[0.1cm]
+{\tt Single-} {\tt ChiAll} & Lokal minimum of $\chi^2$ with respect to all parameters (one exp.) &  ($ \{ \theta_{13}, \theta_{12}, \theta_{23}, \deltacp , \sdm , \ldm,  \frac{\rho_{N_{\mathrm{exp}}}}{\bar{\rho}_{N_{\mathrm{exp}}}} \}, \, N_{\mathrm{exp}}$) \newline \ra\  $\{ \chi^2, \theta_{13}, \theta_{12}, \theta_{23}, \deltacp , \sdm , \ldm, \frac{\rho_{N_{\mathrm{exp}}}}{\bar{\rho}_{N_{\mathrm{exp}}}} , N_{\mathrm{Iter}} \}$ \\[0.1cm]
+\hline
+\end{tabular}
+\end{center}
+\caption{\label{tab:stdfunctions} The \GLOBES\ standard function to obtain a $\chi^2$-value for all or one of the initialized experiments. The curly brackets refer to the parameters to be transferred in form of a list. Note that all functions but {\tt Chi} and {\tt SingleChi} are using minimizers which have to be initialiued with {\tt SetInputErrors} and {\tt SetStartingValues} first.}
+\end{table}
+
 \chapter{Setting up \GLOBES }
 \textsc{} 
 Also: which units, which order of parameters (table for different functions!) etc. (somewhere)
@@ -15,7 +41,7 @@ Also: which units, which order of parameters (table for different functions!) et
 \hline
 Quantities & Examples & Units \\
 \hline
-Angles & $\theta_{13}$, $\theta_{12}$, $\theta_{23}$ & Radians  \\
+Angles & $\theta_{13}$, $\theta_{12}$, $\theta_{23}$, $\deltacp$ & Radians  \\
 Mass squared differences & $\sdm$, $\ldm$ & $\mathrm{eV}^2$ \\
 Matter densitities & $\rho_i$ & $\mathrm{g}/\mathrm{cm}^3$ \\
 Baseline lengths & $L_i$ & $\mathrm{km}$ \\
