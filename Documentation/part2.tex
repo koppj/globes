@@ -915,95 +915,10 @@ algorithm is, for example,
 }
 \end{quote}
 
-\subsection{Low-pass filter based automatic energy smearing}
+\subsection{Low-pass filter}
 
-THIS SUBSECTION WILL BE RE-WRITTEN BY PATRICK (WW)
-
-The second available algorithm is more complicated, a little slower but
-much more accurate and much less susceptible to aliasing effects
-\index{Aliasing}. The starting
-point again is equation~\ref{eq:simple_int}. The idea now is to
- have a good approximation to the integral but still keeping the fixed sampling
-point in $E$. To this end we rewrite the integrand of 
-equation~\ref{eq:simple_int} using the sampling theorem~\cite{NRC,Rybicki}
-\begin{equation}
-\label{eq:sampling}
-f(E)=\sum_{k=-\infty}^{\infty}\,f(E_k) 
-\times \mathrm{sinc}\left(\frac{\pi}{h}(E-E_k)\right)+e(E)
-\end{equation}
-with $\mathrm{sinc}(x):=\sin(x)/x$ and $E_k=E^0+h\cdot k$. 
-This the so called sampling 
-representation of the integrand $f(E)$ and $e(E)$ is an error term.
-The error term vanishes if the Fourier transform $\hat f(\omega)$ of $f(E)$
-is zero outside the interval $[-\pi/h,\pi/h]$. Thus one suspects that
-the error term is small once the power beyond $\pi/h$ is low. Furthermore
-the sum in equation~\ref{eq:sampling} can be truncated to a few terms if
-$f(E)$ has a compact support, \ie\ it is different from zero only 
-on a finite interval. Thus the sampling representation is most useful
-for functions which have both a compact support in real \emph{and} Fourier
-space. This of course is impossible, however the function which comes
-most closely to this, is well known -- it is a Gau\ss ian. Our $f(E)$ is not
-exactly a Gau\ss ian  but the convolution of a top hat and a Gau\ss ian, thus
-its real and Fourier space components still behave rather Gau\ss ian 
-especially for large values of $E$ and $\omega$ respectively. The advantage of
-using the sampling representation is that the integration with respect to $E$
-is easily performed analytically
-  \begin{eqnarray}
-\label{eq:int_sampling}
-\int dE \quad f(E)&\simeq& \sum_{k=k_{l}}^{k_{u}}\,f(E_k) 
-\times \mathrm{Si}\left(\frac{\pi}{h}(E-E_k)\right)\,,\\
-\mathrm{Si}(x)&:=&\int_{0}^x dx'\quad \sin(x')/x'\,,\nonumber 
-\end{eqnarray}
-where $k_l$ and $k_u$ are suitable chosen bounds for the summation.
-
-In order to have a good compromise between speed an accuracy the choice
-of $h$, $k_l$ and $k_u$ is crucial. The choice of $h$ is governed by the
-need to sample $f(E)$ at a sufficient rate in order not to produce aliasing.
-For this purpose it useful to consider some properties of the power spectrum
-of $f(E)$. Provided the cross section and flux is smooth enough  the only
-high power components in $\hat f(\omega)$ are due to a fast oscillating
-$P(E)$. We can estimate the largest frequency $\omega_m$ quite easily, it is
-given by the largest $\Delta m^2_m$ and the lowest energy $E_l$
-\begin{equation}
-\omega_m \simeq \frac{\Delta m^2_m \cdot L}{E_l^2}
-\end{equation}
-On the other hand the finite energy resolution of any real detector anyhow
-will act as a low-pass filter eliminating any power beyond $\sim 1/\sigma(E)$.
-For now we assume that there are no frequencies which are not resolved by
-the detector thus the sampling frequency is determined by the energy 
-resolution of the detector. In that case the correct sampling 
-width $h$ is approximately
-\begin{equation}
-h\simeq 1/\sigma(E_l)\,.
-\end{equation} 
-
-The range for the summation $k_l^i$ and $k_u^i$ is given by the range of 
-integration $a_i$ and $b_i$ in equation~\ref{eq:simple_int}, the integration 
-limits there are $0$ to $\infty$. For practical purposes however the range
-can be reduced to $a_i$ and $b_i$. They are  determined by requiring
-that the area under the bin kernel $K_i^c$ has reached a specific 
-value close to one,
-the so called confidence level $c$ (new name would be better). $1-c$ is a 
-small number and specifies the fraction of  events in bin which lie outside
-the summation range, usually $1-c=10^{-3}$ is sufficient. Furthermore the
-value of the bin kernel at the lower and upper boundary should
-be the same
-\begin{eqnarray}
-\int_{a_i}^{b_i} dE\quad K_i^c(E) &=& c\,,\\
-K_i^c(a_i)&=&K_i^c(b_i)\,.
-\end{eqnarray} 
-Knowing $a_i$ and $b_i$ it is easy to obtain $k_l$ and $k_u$ by requiring
-that the summation extends one bin beyond  each $a_i$ and $b_i$. Furthermore
-it is possible to specify an offset which extends the index range on each side
-by its value.
-
-Since the $a_i$'s and $b_i$'s are not known in advance it could be possible
-that $a_0$ and/or $b_{N_\mathrm{bins}}$ lie outside the computational domain,
-\eg\ no cross section or flux is defined at those energies. To remedy this 
-problem the computational domain can be specified. No calculation in \GLOBES\
-will leave this domain. 
-
-In order to ensure that fast oscillating probabilities do not lead to aliasing
+In order to ensure that fast oscillating probabilities do not lead to 
+aliasing\index{Aliasing}
 it is desirable to impose a low-pass filter already during the calculation
 of the probabilities itself. This is possible and implemented has a highly
 experimental feature called ``filter''\index{Filter}. 
@@ -1032,17 +947,45 @@ e^{-\frac{(E-\tilde E)^2}{2\sigma^2_e}}\,.
 The equivalence of equation~\ref{eq:filter_a} and equation~\ref{eq:filter_b}
 is not obvious and connected to the properties of $P_{\alpha\beta}$, 
 see~\cite{Kiers:1996zj,Giunti:2003ax}. This feature works \emph{only} 
-for vacuum and constant densities and controlled
-by the filer state variable and $\sigma_f^0$ is set by the filter value 
-variable. Assuming that $P_{\alpha\beta}$ still is the source for the highest
-frequencies one can split the energy resolution function $\sigma(E)^c$ in
+for vacuum and constant densities and is controlled
+by the filer state variable and $\sigma_e$ is set by the filter value 
+variable:
+\begin{quote}
+{\tt
+\$filter\_state = 1\\
+\$filter\_value = 2.0\\
+}
+\end{quote}
+would switch the filter feature on and set the width to $2.0\,\mathrm{GeV}$.
+The setting of {\tt \$filter\_state} is ignored whenever a density profile
+with more than one layer is used. 
+
+With a type 1 ({\tt @type = 1}) energy resolution 
+function, $\sigma_e$ adds on to the energy resolution function 
+of the detector $\sigma_c(E)$ like
+\begin{equation}
+\sigma_{\mathrm{eff}}(E)^2\simeq \sigma_e^2 + \sigma_c(E)^2\,.
+\end{equation} 
+Sometimes this behaviour is undesirable and therefore one can try to 
+'subtract' the filtering from the energy resolution function by splitting 
+the energy resolution function $\sigma(E)_{\mathrm{eff}}$ in
 two parts by
 \begin{equation}
-\sigma_c^2(E)=\underbrace{\sigma_c^2(E)-\sigma_c^2(E_\mathrm{min})}_
-{\tilde\sigma^2_c(E)}+\underbrace{\sigma_c^2(E_\mathrm{min})}_{\sigma_e^2}\,,
+\sigma_{\mathrm{eff}}(E)^2=\underbrace{\sigma_c(E)^2-\sigma_e^2}_
+{\tilde\sigma^2_c(E)}+\sigma_e^2\,,
 \end{equation}
-where $\tilde\sigma_c(E)$ is used instead of $\sigma_c(E)$ in computing the
-smearing data and $\sigma_e$ is used to determine $\sigma_f^0$.
+where the truncated energy resolution function $\tilde\sigma_c(E)$ 
+is used instead of $\sigma_c(E)$ in computing the
+smearing data. Thus one obtains that
+\begin{equation}
+\sigma_{\mathrm{eff}}(E)^2\simeq \sigma_c(E)^2\,.
+\end{equation} 
+This scheme is enabled by choosing as type for the energy resolution
+\begin{quote}
+{\tt
+@type = 2
+}
+\end{quote}
 
 \subsection{Manual energy smearing}
 
