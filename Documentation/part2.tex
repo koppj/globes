@@ -540,39 +540,28 @@ arbitrary energies, linear interpolation is used. If the energy leaves the
 range of values given in the file, $0.0$ will be assumed. In general, it is advisable to provide the cross sections in the range between {\tt \$sampling\_min} and {\tt \$sampling\_max} (\cf, \Sec~\ref{sec:energy}).
 Unused cross sections have to be filled with zeros, and can not be just omitted.
 
-% WW: CONTINUE HERE:
-
-
 \section{Oscillation channels}
 \label{sec:channel}
 
-Channels\index{Channel} represent an intermediate level in between 
-the pure oscillation 
-physics given by the oscillation probability $P_{\alpha\beta}$ and the
-detected signal and background. A channel basically describes the path from one
-initial state in the source to one interaction type (IT) in  the detector.  
-Therefore a channel consists of the description of the initial state given 
-by the polarity 
-of the source, \eg\ muons or anti-muons in a neutrino factory, by the CP 
-eigenvalue of the initial state, \ie\ neutrino or anti-neutrino and by the 
-initial flavour. A channel furthermore consists of the interaction type in the
-detector given by the final flavour of the neutrino, the interaction cross
-section and the energy resolution function. 
- 
-For the calculation of event rates, the first step is to compute the number of
-events for each IT in the fiducial mass of the detector for each 
-neutrino flavor and energy bin. The second step is to include the detector 
-effects coming from
-the insufficient knowledge used in the event reconstruction. We combine these
-two steps in order to obtain the differential event rate spectrum for each
-flavor and IT as seen by the detector, which we call a ``channel''. 
+Channels\index{Channel} in \GLOBES\ represent an intermediate level 
+between the pure oscillation physics given by the oscillation probability
+$P_{\alpha\beta}$, and the total event rates composed of signal and 
+background. A channel describes the path from one
+initial neutrino flavor in the source to the event rates in the detector for one specific interaction type (IT) and final flavor.  
+Therefore, a channel contains the description of the 
+initial neutrino flavor, its CP eigenvalue (neutrino or antineutrino), 
+the detected neutrino flavor, the interaction cross sections for the chosen interaction type, and the energy resolution function of the detector.
 
-The master formula for the differential event rate for each channel 
-is given by
+Before we come to the definition of the channel in AEDL, we introduce the general concept for the calculation of event rates. The first step is to
+compute the number of events for each IT in the detector for each 
+initial and final neutrino flavor and energy bin. The second step is to include the detector effects coming from the insufficient knowledge in the event reconstruction. These two steps combined lead to the differential event rate spectrum for each initial and final flavor and IT as seen by the detector, which we call the ``channel''. In this section, we focus on the
+ first step, \ie , we discuss the definition of the energy resolution function in the next section, since this is a rather comprehensive issue.
+
+The differential event rate for each channel is given by
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{eqnarray}
 \label{eq:master_event}
-\frac{dn_{\beta}^{\text{IT}}}{dE'}=&&N\,\int \int dE\,d\hat{E}\quad
+\frac{dn_{\beta}^{\text{IT}}}{dE'}=&&N\,\int\limits_0^\infty \int\limits_0^\infty dE\,d\hat{E}\quad
 \underbrace{\Phi_{\alpha} (E)}_{\mathrm{Production}} \times \nonumber\\
 &&\underbrace{\frac{1}{L^2} P_{(\alpha\rightarrow\beta)}(E,L,\rho;\theta_{23},
 \theta_{12},\theta_{13},
@@ -582,94 +571,105 @@ k_f^{\text{IT}}(E-\hat{E})}_{\mathrm{Interaction}} \times \nonumber \\
 &&\underbrace{ T_f(\hat{E}) V_f(\hat{E}-E')}_{\mathrm{Detection}}\,,
 \end{eqnarray}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-where $\alpha$ is the initial flavor of the neutrino and 
-$\beta$ is the final flavour, 
-$E$ is the incident neutrino energy, $\Phi_{\alpha} (E)$ is the flux of the 
+where $\alpha$ is the initial flavor of the neutrino, 
+$\beta$ is the final flavor, $\Phi_{\alpha} (E)$ is the flux of the 
 initial flavor at the
 source, $L$ is the baseline length, $N$ is a normalization factor, and 
-$\rho$ is the matter density. The interaction term is composed of 
+$\rho$ is the matter density. The energies in this formula are given as follows:
+\begin{itemize}
+\item
+ $E$ is the incident neutrino energy, \ie, the actual energy of the 
+incoming neutrino (which is not directly accessible to the experiment)
+\item
+ $\hat{E}$ is the energy of the secondary particle
+\item
+ $E'$ is the reconstructed neutrino energy, \ie, the measured
+neutrino energy as obtained from the experiment
+\end{itemize}
+The interaction term is composed of 
 two factors, which are the total cross section 
 $\sigma^{\text{IT}}_\beta(E)$ for the flavor $f$ and
 the interaction type IT, and the energy distribution of the 
-secondary particle $k_\beta^{\text{IT}}(E-\hat{E})$ with 
-$\hat{E}$ the energy of the secondary particle. The detector properties are 
+secondary particle $k_\beta^{\text{IT}}(E-\hat{E})$.
+The detector properties are 
 modeled by the threshold function $T_\beta(\hat{E})$, coming from the the 
 limited resolution or the cuts in the analysis, and the energy resolution 
-function $V_\beta(\hat{E}-E')$ of the secondary particle. Thus, $E'$ is the 
-{\em reconstructed} neutrino energy.
+function $V_\beta(\hat{E}-E')$ of the secondary particle. 
 
-Since it is rather cumbersome to numerically solve this double integral,
-we split the two integrations. We first evaluate the integral over
+Since it is a lot of effort to solve this double integral numerically,
+we split up the two integrations. First, we evaluate the integral over
 $\hat{E}$, where the only terms containing $\hat{E}$ are
 $k_\beta^{\text{IT}}(E-\hat{E})$,  $ T_\beta(\hat{E})$, and 
-$ V_\beta(\hat{E}-E')$, and define:
+$ V_\beta(\hat{E}-E')$. We define:
 \begin{eqnarray}
 \label{eq:e_res} 
 R_\beta^{\text{IT}}(E,E')\,\epsilon_\beta^{\text{IT}}(E')
  \equiv
-\int d\hat{E} \quad T_\beta(\hat{E})\,k_\beta^{\text{IT}}(E-\hat{E})
-\,V_\beta(\hat{E}-E')\,, 
-e\end{eqnarray}
+\int\limits_0^\infty d\hat{E} \quad T_\beta(\hat{E})\,k_\beta^{\text{IT}}(E-\hat{E})
+\,V_\beta(\hat{E}-E')\,. 
+\end{eqnarray}
+Thus, $R_\beta^{\text{IT}}(E,E')$ describes the energy response of 
+the detector, \ie , a neutrino with a (true) energy $E$ is reconstructed
+with an energy between $E'$ and $E'+dE'$ with a probability
+$R_\beta^{\text{IT}}(E,E') dE'$. The function $R(E,E')$ is also often called ``energy resolution function''. Actually, its internal representation
+in the software is a smearing matrix\index{Energy resolution}\index{Smear matrix}. The function $\epsilon_\beta^{\text{IT}}(E')$ will later be refered to as ``post-smearing efficiencies'', since it will allow us to define cuts and threshold functions {\em after} the smearing is performed, \ie, as function of $E'$. The detailed definition and initialization of the energy resolution function is described in \Sec~\ref{sec:energy}.
 
-
-Thus $R_\beta^{\text{IT}}(E,E')$ describes the energy response of 
-the detector, \ie\ a neutrino with a (true) energy of $E$ has a probability
-of $R_\beta^{\text{IT}}(E,E') dE'$ to have a reconstructed energy 
-in between $E'$ and $E'+dE'$. The function $R(E,E')$ is also refered to
-as energy resolution function or smearing matrix in its actual representation
-in the program\index{Energy resolution}\index{Smear matrix}. The detailed
-definition and initialization of the energy resolution function is described
-in section~\ref{sec:energy}.
-
-
-
-The number of events in one channel and  in one bin\index{Bin} $i$ is given by
+Eventually, we can write down the number of events per bin $i$ \index{Bin} and channel $c$ as
 \begin{equation}
 \label{eq:channel}
-n_i^c=\int_{E_i-\Delta E/2}^{E_i+\Delta E/2} dE' \quad
-\frac{dn_{\beta}^{\text{IT}}}{dE'} (E')
+n_i^c=\int_{E_i-\Delta E_i/2}^{E_i+\Delta E_i/2} dE' \quad
+\frac{dn_{\beta}^{\text{IT}}}{dE'} (E').
 \end{equation}
-where $c$ is the channel index.
+This means that one has to solve this integral
+\begin{eqnarray}
+\label{eq:events_bin}
+n_i^c=N/L^2\,\int_{E_i-\Delta E_i/2}^{E_i+\Delta E_i/2} dE' 
+\quad \int\limits_0^\infty dE \,\, \Phi^c(E)\,
+P^c(E)\,
+\sigma^c(E)\,
+R^c(E,E')\,
+\epsilon^c(E')\,.
+\end{eqnarray} 
 Note that the events are binned according to their \emph{reconstructed} energy.
-In order to perform the computation \GLOBES\ needs to know the flux,
-the CP-sign of the initial state, the initial flavour, the final flavour,
-the cross section and the energy resolution function. Employing the notation
-of section~\ref{sec:energy} the full formula is
 
-
-Thus the actual definition of a channel looks like
+A simple channel definition in \GLOBES\ consists of the flux,
+the CP-sign of the initial state, the initial flavor, the final flavor,
+the cross sections, and the energy resolution function. In order to refer to
+flux, cross sections, and energy resolution functions, they have to be 
+defined before with their {\tt \#name} in the respective environments. 
+Thus, a simple definition of a channel is
 \begin{quote}
 {\tt channel(\#channel\_1)<\\
 \tb @channel = \#flux : $+$: muon: muon: \#cross: \#energy\\
 >}
 \end{quote}
-Furthermore is is possible to define energy dependent efficiencies and
-backgrounds (non-beam). These additional components can be either added
-before the convolution in with $R(E,E')$ is done, \ie\ the integration with
-respect to $E$ in equation~\ref{eq:e_res}. This is called 
-{\tt @pre\_smearing\_$\ldots$}. The pre-smearing efficiencies and backgrounds
-have to have as many elements as there are sampling points 
-(see section~\ref{sec:energy}). In same cases the number of sampling points
-is determined automatically by \GLOBES and the number of elements in the 
-pre-smearing vectors has to be adjusted in the second run.
-Of course, it is possible after all
-integrations been performed to have similar factors  and this is called  
-{\tt @post\_smearing\_$\ldots$}. All post-smearing factors have to have as 
-many elements as there are bins. Efficiencies are multiplicative and their
-default value is $1$ whereas backgrounds are additive and thus their default
-value is $0$. Thus a more elaborate channel looks like
-\begin{quote}
-{\tt channel(\#channel\_1)<\\
-\tb @channel = \#flux : $+$: muon: muon: \#cross: \#energy\\
-\tb @pre\_smearing\_background = \{1,2,3,4,5,6,7,8,9,10\}\\
-\tb @post\_smearing\_efficiencies = \{0.1,0.2,0.3,0.4,0.5\}\\
->}
-\end{quote}
-This experiment obviously uses $10$ sampling points and $5$ bins.
+Note that the energy environment will be described in the next section. 
+
+
+% WW: HIER WEITER
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Energy resolution function}
 \label{sec:energy}
+
+The definition of the energy resolution function is rather sophisticated in 
+\GLOBES . In particular, since this aspect is rather time-critical, several
+algorithms are implemented. The choice of the proper algorithm depends on the
+experiment and the frequencies of the involved neutrino oscillations.
+
+In this section, we first discuss the principles of the energy smearing, where it is assumed that the reader is familiar with \Sec~\ref{sec:channel}. Then we introduce an automatic energy smearing algorithm, which is fairly simple to understand and applicable to most beam-based experiments. 
+In most cases, the reader may want to continue to the next section after reading these two subsections. In the third subsection, we describe a more elaborate (and slower) smearing algorithm, which can be used together with rather fast neutrino oscillations compared to the bin size, such as for reactor experiments. Eventually, we show how one can use a manual smearing matrix instead of using one of the implemented algorithms.
+
+\subsection{Introduction and principles}
+
+\begin{figure}[t!]
+\begin{center}
+\includegraphics[width=15cm]{energies}
+\end{center}
+\caption{\label{fig:energies} The different evaluation levels for the energy smearing in \GLOBES .}
+\end{figure}
+
+DESCRIBE PICTURE!
 
 The origin and meaning of the energy resolution function 
 $R^c(E,E')$ was already discussed in 
@@ -707,19 +707,6 @@ the number of bins itself, by
 }
 \end{quote}
  
-In order to obtain the number of events 
-$n_i^c$ from one channel $c$ in one bin $i$ one has to solve this integral
-%
-\begin{eqnarray}
-\label{eq:events_bin}
-n_i^c=N/L^2\,\int_{E_i-\Delta E_i/2}^{E_i+\Delta E_i/2} dE' 
-\quad \int dE \,\, \Phi^c(E)\,
-P^c(E)\,
-\sigma^c(E)\,
-R^c(E,E')\,
-\epsilon^c(E')\,.
-\end{eqnarray} 
-%
 
 Instead of using directly equation~\ref{eq:e_res} we will use a different
 definition concerning $\epsilon(E')$. In general  $\epsilon(E')$ has to be
@@ -782,7 +769,26 @@ and can be refered to by {\tt \#name}.
 >}
 \end{quote}
 
+ADJUST TO SECTION AND REPLACE:
 
+In combination with the channels, is is possible to define energy 
+dependent efficiencies and (non-beam) backgrounds. Efficiencies are multiplicative factors, whereas backgrounds are added to the event rates. These components can be introduced before or after the convolution in \eq~(\ref{eq:e_res}) is done. If they are introduced before, we call them
+{\tt @pre\_smearing\_efficiencies} or {\tt @pre\_smearing\_background}. 
+If they are introduced after, we call them {\tt @post\_smearing\_efficiencies} or {\tt @post\_smearing\_background}.
+Note that pre-smearing components are always afunction of the incident neutrino energy $E$. Thus, there have to be as  many elements as there are sampling points (see \Sec~\ref{sec:energy}). In same cases, the number of sampling points is determined automatically by \GLOBES , and the number of elements in the  pre-smearing vectors has to be adjusted in the second run.
+Examples for pre-smearing quantities are non-beam backgrounds, such as from geophysical neutrinos. The post-smearing components are always a function of the reconstructed neutrino energy $E'$, such as the post-smearing efficiencies $\epsilon_\beta^{\text{IT}}(E')$ in \eq~(\ref{eq:e_res}). Examples for post-smearing efficiencies are cuts and detection threshold functions. All post-smearing components have to have as 
+many elements as there are energy bins. Efficiencies are multiplicative 
+and their default value is $1$, whereas backgrounds are additive and their default value is $0$. Thus, a more elaborate channel can be defined as
+\begin{quote}
+{\tt channel(\#channel\_1)<\\
+\tb @channel = \#flux : $+$: muon: muon: \#cross: \#energy\\
+\tb @pre\_smearing\_background = \{1,2,3,4,5,6,7,8,9,10\}\\
+\tb @post\_smearing\_efficiencies = \{0.1,0.2,0.3,0.4,0.5\}\\
+>}
+\end{quote}
+This experiment uses $10$ sampling points and $5$ bins.
+
+\subsection{Bin based automatic energy smearing}
 
 First we discuss the builtin algorithms. The simplest, fastest and
 least accurate is algorithm A. The key idea is to choose a set of assumptions
@@ -864,7 +870,7 @@ type looks like
 }
 \end{quote}
 
-
+\subsection{Low-pass filter based automatic energy smearing}
 
 The second available algorithm is more complicated, a little slower but
 much more accurate and much less susceptible to aliasing effects
@@ -990,6 +996,8 @@ two parts by
 \end{equation}
 where $\tilde\sigma_c(E)$ is used instead of $\sigma_c(E)$ in computing the
 smearing data and $\sigma_e$ is used to determine $\sigma_f^0$.
+
+\subsection{Manual energy smearing}
 
 Finally the user has the possibility to directly specify the smearing data.
 The format requires to provide $k_l^i$ and $k_u^i$ for each bin, the number of
