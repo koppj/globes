@@ -5,7 +5,7 @@ Date: 19.07.04
 
 	On some occasions final_clean produces a SEGFAULT. This happens
 	when the program exits after some fatal parse errors, since
-	then some pointers are not correctly setup by glb_default_expirment
+	then some pointers are not correctly setup by glb_default_expirement
 	(it is never called). Then the call of glbFreeExp produces a
 	SEGFAULT in the attempt to free one of the SignalRates pointers
 	in one of the experiment structures. The problem may have its roots in
@@ -31,4 +31,24 @@ From: Patrick Huber
 Date: 04.08.04
 	
 	see BUG#3
+-------------------------------------------------------------------------------
+
+BUG#4 User-defined smearing matrices do not work
+
+From: Mark Rolinec
+Date: 05.08.04
+
+	Parsing an AEDL file with a user defined smear matrix results in
+		
+		globes: ERROR: Smearing type has not been defined!.
+		globes: ERROR: No parameters for the energy resolution 
+		function unspecified!.
+		globes: FATAL: glb_smear not properly set up!.
+
+	Besides the typo in one of the error messages, the problem is, that
+	the function glb_default_smear in glb_smear.c does not properly 
+	recognize that one is trying to use a user-defined smear-matrix.
+	Thus it complains about undefined things (which are undefined because
+	nobody needs them, but the function does not know this ...) and finally
+	bails out.
 -------------------------------------------------------------------------------
