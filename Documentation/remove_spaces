@@ -1,0 +1,15 @@
+#! /bin/sh
+# This solves a problem with makeindex, it replaces '\_ ' with '\_'
+# in a given input file.
+      
+if [ $# -ne 1 ]; then 
+ echo "error"
+ exit 1
+fi
+
+for file in $1
+     do
+        cp $file $file.bak &&
+        sed -e 's|\_ |\_|g' $file.bak >$file
+	rm -f $file.bak   
+     done
