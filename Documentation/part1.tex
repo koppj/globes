@@ -463,6 +463,34 @@ Finally, note that any degenerate solution below the confidence level threshold 
  ``Check''-functions
 \ei
 
+\example{The impact of systematics, correlations, and degeneracies}{
+\label{ex:corrproj}
+\index{Bar charts}
+\index{Systematics on/off}
+
+Here it is shown how one can successively include systematics, correlations,
+and degeneracies at the example of the $\stheta$ sensitivity limit.
+An important part of this example is how two switch the systematics off,
+\ie, how to obtain the sensitivity limit from statistics only. Since
+this example is very advanced, we only show the respective part of the code:
+\begin{quote}
+{\tt 
+Here comes the code excerpt.
+}
+\end{quote}
+The complete code can be found as ``example4.c'' with the software.
+
+The returned lists of data then represent $\Delta \chi^2$ 
+as function of the fit value of $\stheta$. The intersections of these
+curves with the line $\Delta \chi^2 = 9$ give the $\stheta$ sensitivity
+limits, where we do not include the $\mathrm{sgn}(\ldm)$- and $(\deltacp,\theta_{13})$-degeneracies in the sensitivity limit with
+correlations only (green bar):
+\begin{center}
+\colorbox{white}{\includegraphics[width=7cm]{barsex}}
+
+\end{center}
+}
+
 \chapter{Changing experiment parameters at running time}
 
 \bi
@@ -470,6 +498,8 @@ Finally, note that any degenerate solution below the confidence level threshold 
  Baseline, Target mass, Source power, running time
 \item
  Matter density profile
+\item
+ Systematics
 \item
  Threshold function, efficiencies etc.
 \ei
