@@ -11,50 +11,112 @@
 To be written later: Short introduction such as ``With the following lines we obtain ...''
 without detailed description of parameters. Should contain all most important functions of \GLOBES\ --
 overview of main functions in \tabl{stdfunctions}.
-Maybe: in form of long example which involves everything (for example: our famous bar plot, which involves
-systematics, correlations, degeneracies and thus the full set of \GLOBES\ functions without being too
-complicated in the application software part).
+Maybe: in form of long example which involves everything
+and can be compiled.
 
 \begin{table}[t]
 \begin{center}
-\begin{tabular}{p{1.8cm}p{4.5cm}p{8.6cm}}
+\begin{tabular}{p{3.8cm}p{3.8cm}p{7cm}}
 \hline
 Function & Purpose & Parameters \ra\ Result \\
 \hline
-{\tt Chi} & $\chi^2$ with systematics only \newline (all initialized exps.) & ($\{ \theta_{12}, \theta_{13}, \theta_{23}, \deltacp , \sdm , \ldm, \hat{\rho_1},... , \hat{\rho_n} \}$)  \newline \ra\  $\chi^2$ \\[0.1cm]
-{\tt SingleChi} & $\chi^2$ with systematics only \newline (only one experiment) & $(\{ \theta_{12}, \theta_{13}, \theta_{23}, \deltacp , \sdm , \ldm, \hat{\rho}_{N_{\mathrm{exp}}} \}, \, N_{\mathrm{exp}} )$   \newline \ra\ $\chi^2$ \\[0.1cm]
-{\tt ChiTheta} & $\chi^2$ with systematics and correlations: Projection onto $\theta_{13}$-axis (all exps.) &  ($ \theta_{13}, \, \{ \theta_{12}, \theta_{23}, \deltacp , \sdm , \ldm, \hat{\rho_1}, ... , \hat{\rho_n} \}$) \newline \ra\  $\{ \chi^2, \theta_{12}, \theta_{23}, \deltacp , \sdm , \ldm, \hat{\rho_1}, ... , \hat{\rho_n} , N_{\mathrm{Iter}} \}$ \\[0.1cm]
-{\tt Single-} \newline {\tt ChiTheta} & $\chi^2$ with systematics and correlations: Projection onto $\theta_{13}$-axis (one exp.) &  ($ \theta_{13}, \, \{ \theta_{12}, \theta_{23}, \deltacp , \sdm , \ldm,  \hat{\rho}_{N_{\mathrm{exp}}} \}, \, N_{\mathrm{exp}}$) \newline \ra\  $\{ \chi^2, \theta_{12}, \theta_{23}, \deltacp , \sdm , \ldm, \hat{\rho}_{N_{\mathrm{exp}}} , N_{\mathrm{Iter}} \}$ \\[0.1cm]
-{\tt ChiDelta} & $\chi^2$ with systematics and correlations: Projection onto $\deltacp$-axis (all exps.) &  ($\deltacp, \, \{ \theta_{12}, \theta_{13}, \theta_{23},  \sdm , \ldm, \hat{\rho_1}, ... , \hat{\rho_n} \}$) \newline \ra\  $\{ \chi^2, \theta_{12}, \theta_{13}, \theta_{23}, \sdm , \ldm, \hat{\rho_1}, ... , \hat{\rho_n} , N_{\mathrm{Iter}} \}$ \\[0.1cm]
-{\tt Single-} \newline {\tt ChiDelta} & $\chi^2$ with systematics and correlations: Projection onto $\deltacp$-axis (one exp.) &  ($ \deltacp, \, \{ \theta_{12}, \theta_{13}, \theta_{23}, \sdm , \ldm,  \hat{\rho}_{N_{\mathrm{exp}}}  \}, \, N_{\mathrm{exp}}$) \newline \ra\  $\{ \chi^2, \theta_{12}, \theta_{13}, \theta_{23},  \sdm , \ldm, \hat{\rho}_{N_{\mathrm{exp}}} , N_{\mathrm{Iter}} \}$ \\[0.1cm]
-{\tt ChiTheta-} {\tt Delta} & $\chi^2$ with systematics and correlations: Projection onto $\deltacp$-$\theta_{13}$-plane (all exps.) &  ($\theta_{13}, \, \deltacp, \, \{ \theta_{12}, \theta_{23},  \sdm , \ldm,  \hat{\rho_1}, ... , \hat{\rho_n} \}$) \newline \ra\  $\{ \chi^2, \theta_{12}, \theta_{23}, \sdm , \ldm,  \hat{\rho_1}, ... , \hat{\rho_n} , N_{\mathrm{Iter}} \}$ \\[0.1cm]
-{\tt SingleChi-} {\tt Theta- } {\tt Delta} & $\chi^2$ with systematics and correlations: Projection onto $\deltacp$-$\theta_{13}$-plane (one exp.) &  ($ \theta_{13}, \, \deltacp, \, \{ \theta_{12}, \theta_{23}, \sdm , \ldm,  \hat{\rho}_{N_{\mathrm{exp}}} \}, \, N_{\mathrm{exp}}$) \newline \ra\  $\{ \chi^2, \theta_{12},  \theta_{23},  \sdm , \ldm, \hat{\rho}_{N_{\mathrm{exp}}} , N_{\mathrm{Iter}} \}$ \\[0.1cm]
-{\tt ChiNP} & $\chi^2$ with systematics and correlations: Projection onto $N$-parameter hyper-plane (one exp.) & ??? to be defined \\[0.1cm]
-{\tt Single-} {\tt ChiNP} & $\chi^2$ with systematics and correlations: Projection onto $N$-parameter hyper-plane (one exp.) & ??? to be defined \\[0.1cm]
-{\tt ChiAll} & Lokal minimum of $\chi^2$ with respect to all parameters (all exps.) &
-($ \{ \theta_{13}, \theta_{12}, \theta_{23}, \deltacp , \sdm , \ldm,  \hat{\rho_1}, ... , \hat{\rho_n} \}$) \newline \ra\  $\{ \chi^2, \theta_{13}, \theta_{12}, \theta_{23},$ \newline \hspace*{1.4cm} $ \deltacp , \sdm , \ldm,  \hat{\rho_1}, ... , \hat{\rho_n} , N_{\mathrm{Iter}} \}$ 
-\\[0.1cm]
-{\tt Single-} {\tt ChiAll} & Lokal minimum of $\chi^2$ with respect to all parameters (one exp.) &  ($ \{ \theta_{13}, \theta_{12}, \theta_{23}, \deltacp , \sdm , \ldm,  \hat{\rho}_{N_{\mathrm{exp}}} \}, \, N_{\mathrm{exp}}$) \newline \ra\  $\{ \chi^2, \theta_{13}, \theta_{12}, \theta_{23}, \deltacp , \sdm , \ldm, \hat{\rho}_{N_{\mathrm{exp}}} , N_{\mathrm{Iter}} \}$ \\[0.1cm]
+\multicolumn{3}{l}{{\bf Systematics only:}} \\
+\GLB{glbChiSys} & $\chi^2$ with systematics only  & ({\tt glb\_params in, int exp, int rule}) \ra\  {\tt double} $\chi^2$ \\[0.2cm]
+\multicolumn{3}{l}{{\bf Projections onto axes:}} \\
+\GLB{glbChiTheta} & Projection onto $\theta_{13}$-axis  &  ({\tt glb\_params in, glb\_params out, int exp}) \ra\  {\tt double} $\chi^2$ \\[0.1cm]
+\GLB{glbChiDelta} & Projection onto $\deltacp$-axis  &  ({\tt glb\_params in, glb\_params out, int exp}) \ra\  {\tt double} $\chi^2$ \\[0.1cm]
+\GLB{glbChiTheta23} & Projection onto $\theta_{23}$-axis  &  ({\tt glb\_params in, glb\_params out, int exp}) \ra\  {\tt double} $\chi^2$ \\[0.1cm]
+\GLB{glbChiDm} & Projection onto $\ldm$-axis  &  ({\tt glb\_params in, glb\_params out, int exp}) \ra\  {\tt double} $\chi^2$ \\[0.1cm]
+\GLB{glbChiDms} & Projection onto $\sdm$-axis  &  ({\tt glb\_params in, glb\_params out, int exp}) \ra\  {\tt double} $\chi^2$ \\[0.2cm]
+\multicolumn{3}{l}{{\bf Projection onto plane:}} \\
+\GLB{glbChiThetaDelta} & Projection onto $\theta_{13}$-$\deltacp$-plane  &  ({\tt glb\_params in, glb\_params out, int exp}) \ra\  {\tt double} $\chi^2$ \\[0.2cm]
+\multicolumn{3}{l}{{\bf Projection onto any hyper-plane:}} \\
+\GLB{glbChiNP} & Projection onto any $n$-dimensional hyper-plane  &  ({\tt glb\_params in, glb\_params out, int exp}) \ra\  {\tt double} $\chi^2$ \newline
+Needs \GLB{glbSetProjection} before! \\[0.2cm]
+\multicolumn{3}{l}{{\bf Localization of degeneracies:}} \\
+\GLB{glbChiAll} & (Local) Minimization over all parameters  &  ({\tt glb\_params in, glb\_params out, int exp}) \ra\  {\tt double} $\chi^2$ \\
 \hline
 \end{tabular}
 \end{center}
-\caption{\label{tab:stdfunctions} \index{Standard functions (table)} The \GLOBES\ standard function to obtain a $\chi^2$-value for all or one of the initialized experiments. The curly brackets refer to the parameters to be transferred in form of a list. The parameter $\hat{\rho}_i \equiv \rho_i/\bar{\rho}_i$ refers to the matter density scaling factor, which is $1.0$ for leaving the matter density profile unchanged. Note that all functions but {\tt Chi} and {\tt SingleChi} are using minimizers which have to be initialized with {\tt SetInputErrors} and {\tt SetStartingValues} first.}
+\caption{\label{tab:stdfunctions} \index{Standard functions (table)} The \GLOBES\ standard function to obtain a $\chi^2$-value with systematics only or systematics and correlations. The parameters {\tt rule} and {\tt exp}
+can either be \GLB{GLB\_ALL} for all initialized experiment or the
+experiment number ($0$ to \GLB{glb\_num\_of\_exps}-1) for a specific experiment. The format of \GLB{glb\_params} is discussed in detail in \Chapt~\ref{chapt:gettingstarted}. Note that all functions but {\tt ChiSys}
+  are using minimizers which have to be initialized with \GLB{glbSetInputErrors} and \GLB{glbSetStartingValues} first.}
 \end{table}
 
 \chapter{Getting started with \GLOBES }
+\label{chapt:gettingstarted}
 
-In this first chapter of the user's manual, we assume that the \GLOBES\ software is readily installed on your computer system. We demonstrate how to load pre-defined experiments and re-obtain information about them. However, we only secondarily discuss the usage of \GLOBES\ in your specific programming language, such as C, Mathematica, or others. Thus, you should be familiar of how to load \GLOBES\ on your computer system before reading this chapter. An example of how to use \GLOBES\ with C can be found on page~\pageref{ex:c}. 
+In this first chapter of the user's manual, we assume that the \GLOBES\ software is readily installed on your computer system. For the installation,
+see \App~\ref{app:installation} and the {\tt INSTALL} file in the
+software package. We demonstrate how to load pre-defined experiments 
+and re-obtain important information about them. In addition, we discuss
+some standard concepts of the \GLOBES\ user interface. We do not go
+into details of the programming language, which means that standard parts
+of the program code common to all examples are, in general, omitted.
+An example of a minimal \GLOBES\ program in C can be found on page~\pageref{ex:c}. Furthermore, the files of the examples in this part can be found in the {\tt Example} subdirectory of your \GLOBES\ distribution. \index{Examples} Since it depends on your installed
+configuration, we refer to the {\tt README} file in the \GLOBES\ main directory, and the comments in the Makefile of the {\tt Example} subdirectory for how to complile the example files.
 
 \example{Using \GLOBES\ with C}{\label{ex:c}
 \index{C-Code}
-
-Here comes some complete C-code with a very simple example of how to use \GLOBES .
+Here comes the C-code sceleton, which is
+(more or less) common to all of our \GLOBES\ examples:
+\begin{quote}
+{\tt {\footnotesize
+\#include <stdio.h> \\
+\#include <stdlib.h> \\
+\#include <math.h> \\
+\#include <string.h> \\
+\\
+\#include <globes/globes.h> \hspace*{0.5cm} /* Include GLoBES library */ \\
+\\
+\#include "myio.h" \hspace*{0.5cm} /* Include "housemade" I/O-routines */ \\
+\\
+/* If filename given, write to file; if empty, to screen: */ \\
+char MYFILE[]="testX.dat"; \\
+\\
+int main(int argc, char *argv[]) \\
+\{  \\
+\\
+ \hspace*{0.5cm} GLBInit(argv[0]); \hspace*{0.5cm} /* Initialize GLoBES library */ \\
+\\  
+  \hspace*{0.5cm} glbInitExperiment("NuFact.glb",\&glb\_experiment\_list[0], \\
+  \hspace*{1cm} \&glb\_num\_of\_exps); \hspace*{0.5cm} /* Initialize experiment NuFact.glb */\\
+\\  
+  \hspace*{0.5cm}  /* Initialize housemade output function */\\
+  \hspace*{0.5cm} 
+   InitOutput(MYFILE,"Format: ... ... ... $\backslash$n"); \\
+\\  
+  \hspace*{0.5cm} /* Initialize parameter vector(s) */ \\
+  \hspace*{0.5cm} glb\_params true\_values = glbAllocParams(); \\
+  \hspace*{0.5cm} /* ... */ \\
+\\  
+ \hspace*{0.5cm} /* Assign: theta12,theta13,theta23,deltacp,dm2solar,dm2atm */ \\
+   \hspace*{0.5cm}  
+     glbDefineParams(true\_values,\\
+     \hspace*{1.5cm}asin(sqrt(0.8))/2,asin(sqrt(0.001))/2,M\_PI/4,M\_PI/2,7e-5,2e-3); \\
+     
+     \hspace*{0.5cm}  
+   /* The simulated data are computed */ \\
+   \hspace*{0.5cm} glbSetOscillationParameters(true\_values); \\
+   \hspace*{0.5cm} glbSetRates(); \\
+   
+  \hspace*{0.5cm} /* ... CODE ... */ \\
+  
+\hspace*{0.5cm}  /* Destroy parameter vector(s) */ \\
+\hspace*{0.5cm}  glbFreeParams(true\_values); \\
+\hspace*{0.5cm} /* ... */ \\
  
+  \hspace*{0.5cm}   exit(0); \\
+\} 
+}}
+\end{quote}
+
 }
 
 \begin{table}[t]
 \begin{center}
-\begin{tabular}{lll}
+\begin{tabular}{llp{7cm}}
 \hline
 Quantities & Examples & Units \\
 \hline
@@ -63,16 +125,21 @@ Mass squared differences & $\sdm$, $\ldm$ & $\mathrm{eV}^2$ \\
 Matter densitities & $\rho_i$ & $\mathrm{g}/\mathrm{cm}^3$ \\
 Baseline lengths & $L_i$ & $\mathrm{km}$ \\
 Energies & $E_\nu$ & $\mathrm{GeV}$ \\  
-Fiducial masses & $m_{\mathrm{Det}}$ & $\mathrm{kt}$ \\
+Fiducial masses & $m_{\mathrm{Det}}$ & $\mathrm{t}$ (reactor exp.) or $\mathrm{kt}$ (accelerator exp.), \newline  depends on experiment definition \\
 Time intervals & $t_{\mathrm{run}}$ & $\mathrm{yr}$ \\
-Source powers & $P_{\mathrm{Source}}$ & ??? \\
+Source powers & $P_{\mathrm{Source}}$ & Useful parent particle decays/$\mathrm{yr}$ \newline (Neutrino factory, $\beta$-Beam), \newline $\mathrm{GW}$ thermal power (reactor exps.), \newline or
+$\mathrm{MW}$ target power (superbeams); \newline
+depends on flux definition
+ \\
 % Integrated luminosities & $m_{\mathrm{Det}} \, t_{\mathrm{run}}$ & $\mathrm{kt \cdot yr}$ \\
-Cross sections & $\sigma_{\mathrm{CC}}$ &  ???? \\
+Cross sections/E & $\sigma_{\mathrm{CC}}/E$ & $10^{-38} \, \mathrm{cm^2}/\mathrm{GeV^2}$ \\
 \hline
 \end{tabular}
 \mycaption{\label{tab:units} \index{Units in \GLOBES } Quantities used in \GLOBES , examples of these quantities, and their standard units in the application software.}
 \end{center}
 \end{table}
+
+WW CONTINUE HERE:
 
 Throughout the programming interface of \GLOBES , the software needs to transfer parameters to and from the software core. Unless the Experiment Definition Module \EDM , the programming interface only uses one set of units for each type of quantity in order to avoid confusion about the definition of individual parameters. \tabl{units} summarizes the units of the most important quantities used in \GLOBES .
 
@@ -118,51 +185,42 @@ Experiment & Filename & Short description & Refs. \\
 
 In principle, \GLOBES\ can handle any number of different long-baseline experiments simultaneously. This means that their $\chi^2$-values are added {\em after} the minimization over the independent systematics parameters and {\em before} any minimization over the oscillation parameters. Though the simplest case of only one experiment may be most often used, more experiments are useful in many cases. For example, running a superbeam some years in the neutrino mode and some years in the antineutrino mode can be, to a first approximation, simulated by the combination of two such experiments.\footnote{Note that in this case the systematics parameters are minimized over independently, which means that this approach does not allow correlations among the systematics parameters. Therefore, the neutrino factory with the symmetric operation of both polarities is encapsulated into a single experiment.} Another example is the test of synergetic effects among different experiment types. Thus, \GLOBES\ has an internal (initially empty) list of currently initialized experiments. To add a pre-defined experiment to this list, one can use the function {\tt LoadExperiment}:
 \begin{function}
-\index{{\tt LoadExperiment}}
 \index{Experiment initialization}
-{\tt LoadExperiment}$($``filename'' $)$ adds a single experiment to the list of currently loaded experiments. All currently loaded experiments are evaluated simultaneously (if not explicitely stated otherwise), \ie , their $\chi^2$-values are added.
+\GLB{LoadExperiment}$($``filename'' $)$ adds a single experiment to the list of currently loaded experiments. All currently loaded experiments are evaluated simultaneously (if not explicitely stated otherwise), \ie , their $\chi^2$-values are added.
 \end{function}
 A list of pre-defined experiment types, their filenames, their short descriptions, and the references of their definitions can be found in \tabl{experiments}. To remove all experiments from the evaluation list, one uses {\tt ClearExp}:
 \begin{function}
-\index{{\tt ClearExp}}
-{\tt ClearExp}$()$ removes all experiments from the evaluation list.   
+\GLB{ClearExp}$()$ removes all experiments from the evaluation list.   
 \end{function}
 Both functions do not return anything. Thus, one can either add an experiment to the internal evaluation list, or remove all experiments from this list. After adding an experiment, it gets an internal experiment number $N_{\mathrm{exp}}$ assigned in the order of the addition, which is starting from zero and running to the number of experiments minus one. Therefore, one will be able to access the individual experiment by its number later.
 
 Since the pre-defined experiments in \tabl{experiments} are given for one year running time, specific target masses, and specific source powers, it is useful to change these parameters of the individual experiments:
 \begin{function}
-\index{{\tt SetRunningTime}}
-{\tt SetRunningTime}$(N_{\mathrm{exp}},t_{\mathrm{run}})$ sets the running time of experiment number $N_{\mathrm{exp}}$ to $t_{\mathrm{run}}$ years.
+\GLB{SetRunningTime}$(N_{\mathrm{exp}},t_{\mathrm{run}})$ sets the running time of experiment number $N_{\mathrm{exp}}$ to $t_{\mathrm{run}}$ years.
 \end{function}
  \begin{function}
-\index{{\tt SetTargetMass}}
-{\tt SetTargetMass}$(N_{\mathrm{exp}},m_{\mathrm{Det}})$ sets the fiducial mass of experiment number $N_{\mathrm{exp}}$ to $m_{\mathrm{Det}}$ kilotons.
+\GLB{SetTargetMass}$(N_{\mathrm{exp}},m_{\mathrm{Det}})$ sets the fiducial mass of experiment number $N_{\mathrm{exp}}$ to $m_{\mathrm{Det}}$ kilotons.
 \end{function}
 \begin{function}
-\index{{\tt SetSourcePower}}
-{\tt SetSourcePower}$(N_{\mathrm{exp}},P_{\mathrm{Source}})$ sets the source power of experiment number $N_{\mathrm{exp}}$ to $P_{\mathrm{source}}$. The definition of the source power depends on the experiment type: ... (MISSING).
+\GLB{SetSourcePower}$(N_{\mathrm{exp}},P_{\mathrm{Source}})$ sets the source power of experiment number $N_{\mathrm{exp}}$ to $P_{\mathrm{source}}$. The definition of the source power depends on the experiment type: ... (MISSING).
 \end{function}
 Thus, these functions also demonstrate how to use the assigned experiment number.
 
 A useful function to re-obtain the information about the initialized experiments is the function {\tt InfoExperiment}:
 \begin{function}
-\index{{\tt InfoExperiment}}
-{\tt InfoExperiment}$()$ prints a list of the initialized functions with their experiment numbers and their most important parameters to the standard output.
+\GLB{InfoExperiment}$()$ prints a list of the initialized functions with their experiment numbers and their most important parameters to the standard output.
 \end{function} 
 Especially, after changing individual parameters, such as baseline or target mass, this information can be useful to check the changes. Another useful function is {\tt ShowChannels}, which prints the initialized oscillation channels for a specified experiment:
 \begin{function}
-\index{{\tt ShowCannels}}
-{\tt ShowChannels}$(N_{\mathrm{exp}})$ prints the information about the oscillation channels of the experiment with the number $N_{\mathrm{exp}}$ to the standard output.
+\GLB{ShowChannels}$(N_{\mathrm{exp}})$ prints the information about the oscillation channels of the experiment with the number $N_{\mathrm{exp}}$ to the standard output.
 \end{function}
 
 Compared to an existing experiment, which uses real data, a future experiment uses simulated data. Thus, the {\em true parameter values} and their results in form of the reference rate vectors are simulated. After setting the true parameter values, the {\em fit parameter values} can be varied in order to obtain information on the measurement performance for the given set of true parameter values. Therefore, it is often useful to show the results of a future measurement as function of the true parameter values for which the reference rate vectors are computed -- at least within the currently allowed ranges. The true parameter values for the vacuum neutrino oscillation parameters have to be set by the functions {\tt SetVacuumParameters} and {\tt SetRates} {\em before} any evaluation function is used and {\em after} the experiments have been initialized and the experiment parameters have been adjusted which could change the rates (such as baseline or target mass). Any matter effects are then included automatically depending on the experiment definitions.
 \begin{function}
-\index{{\tt SetVacuumParameters}}
-{\tt SetVacuumParameters}$(\{\theta_{12}, \theta_{13}, \theta_{23}, \deltacp , \sdm , \ldm \})$ sets the neutrino oscillation parameters to be used to compute the reference rate vector in vacuum.
+\GLB{SetVacuumParameters}$(\{\theta_{12}, \theta_{13}, \theta_{23}, \deltacp , \sdm , \ldm \})$ sets the neutrino oscillation parameters to be used to compute the reference rate vector in vacuum.
 \end{function}
 \begin{function}
-\index{{\tt SetRates}}
-{\tt SetRates}$( )$ computes the reference rate vector for the neutrino oscillation parameters set with {\tt SetVacuumParameters}. 
+\GLB{SetRates}$( )$ computes the reference rate vector for the neutrino oscillation parameters set with {\tt SetVacuumParameters}. 
 \end{function}
 Finally, an initialization sequence for \GLOBES\ could look like this:
 \begin{quote}
@@ -221,12 +279,10 @@ The resulting matrix can then be plotted as a contour plot (2 d.o.f.):
 
 Keeping all oscillation parameters and matter densities fixed, one can use the following functions to obtain the total $\chi^2$ of all specified oscillation channels including systematics:
 \begin{function} 
-\index{{\tt Chi}}
-{\tt Chi}$(\{ \theta_{12}, \theta_{13}, \theta_{23}, \deltacp , \sdm , \ldm, \hat{\rho_1}, \hdots , \hat{\rho_n} \})$  returns the total added $\chi^2$ of all loaded experiments.
+\GLB{Chi}$(\{ \theta_{12}, \theta_{13}, \theta_{23}, \deltacp , \sdm , \ldm, \hat{\rho_1}, \hdots , \hat{\rho_n} \})$  returns the total added $\chi^2$ of all loaded experiments.
 \end{function}
 \begin{function}
-\index{{\tt SingleChi}}
- {\tt SingleChi}$(\{ \theta_{12}, \theta_{13}, \theta_{23}, \deltacp , \sdm , \ldm, \hat{\rho}_{N_{\mathrm{exp}}} \}, \, N_{\mathrm{exp}} )$  returns the total $\chi^2$ of the experiment number $N_{\mathrm{exp}}$.
+ \GLB{SingleChi}$(\{ \theta_{12}, \theta_{13}, \theta_{23}, \deltacp , \sdm , \ldm, \hat{\rho}_{N_{\mathrm{exp}}} \}, \, N_{\mathrm{exp}} )$  returns the total $\chi^2$ of the experiment number $N_{\mathrm{exp}}$.
 \end{function}
 Note that the result of {\tt Chi} corresponds to the sum of all of the {\tt SingleChi}'s of the loaded experiment. This equality will not hold for the minimizors in the next sections anymore. In both functions, one has to give the matter density scaling factor $\hat{\rho_i}$ for each of the used experiments. The effect of this scaling factor depends on the type of the matter density profile, which is given in the  experiment definition. For a constant matter density, it is simply the ratio of the matter density and the average matter density specified in the experiment definition, \ie , $\hat{\rho_i} \equiv \rho_i/\bar{\rho}_i$.\index{Matter scaling factor} For a matter density profile, it is an overall scaling factor: The matter density in each layer is multiplied by this factor. In most cases one wants to take a scaling factor of $1.0$ here, which simply means taking the matter density profile as it is given in the experiment definition. Moreover, note that its effect is in general small for short baselines. An example of how to use  {\tt Chi} (or {\tt SingleChi}) can be found on page~\pageref{ex:corrth13dcp}.  
 
@@ -244,8 +300,7 @@ This minimization is done independently for all auxiliary parameters of this osc
 
 The systematics minimization of an experiment can be easily switched on and off, \ie, one can also compute the $\chi^2$ without even taking into account systematics:
 \begin{function}
-\index{{\tt SetSystematics}}
-{\tt SetSystematics}$(N_{mathrm{exp}}, \, sys)$ switches the systematics minimization for experiment $N_{\mathrm{exp}}$ on (sys=1) or off (sys=0).
+\GLB{SetSystematics}$(N_{mathrm{exp}}, \, sys)$ switches the systematics minimization for experiment $N_{\mathrm{exp}}$ on (sys=1) or off (sys=0).
 \end{function}
 This function can be especially useful for the test of the impact of systematics.
 ??? Wie einzelne Systematik-Parameter ein und ausschalten? Sonst individuell nicht testbar! ??? Verweis auf appendix? 
@@ -282,12 +337,10 @@ In practice, this minimzation is done simultaneously over all priors and free os
 In principle, one can set the priors for the matter density and all oscillation parameters. For example, if the disappearance channels of the experiment determine the leading oscillation parameters, once can set very large values for the input errors ($\sigma$'s). If, however, earlier external measurements provide better information, one can set their absolute precisions with the input errors. The starting values are usually set to the best-fit values. In some cases, it may be necessary to adjust them, such as for $\ldm$ and the negative mass hierarchy to $\rho^0_{\ldm} = - |\ldm|$ if some external precision on $| \ldm |$ is imposed and one is investigating the negative-sign solution. In other cases, minor modifications of the starting values can cause a faster convergence of the algorithm.
 In either case, two function have to be called {\em before the usage of any minimizer}:
 \begin{function}
-\index{{\tt SetStartingValues}}
-{\tt SetStartingValues}$(\{\rho^0_{\theta_{12}}, \, \rho^0_{\theta_{13}}, \, \rho^0_{\theta_{23}}, \, \rho^0_{\deltacp}, \, \rho^0_{\sdm}, \, \rho^0_{\ldm}, \, \rho^0_{\hat\rho} \})$ sets the starting values for all of the following minimizer calls.
+\GLB{SetStartingValues}$(\{\rho^0_{\theta_{12}}, \, \rho^0_{\theta_{13}}, \, \rho^0_{\theta_{23}}, \, \rho^0_{\deltacp}, \, \rho^0_{\sdm}, \, \rho^0_{\ldm}, \, \rho^0_{\hat\rho} \})$ sets the starting values for all of the following minimizer calls.
 \end{function}
 \begin{function}
-\index{{\tt SetInputErrors}}
-{\tt SetInputErrors}$(\{\sigma_{\theta_{12}}, \, \sigma_{\theta_{13}}, \, \sigma_{\theta_{23}}, \, \sigma_{\deltacp}, \, \sigma_{\sdm}, \, \sigma_{\ldm}, \, \sigma_{\hat\rho} \})$ sets the input errors for all of the following minimizer calls.
+\GLB{SetInputErrors}$(\{\sigma_{\theta_{12}}, \, \sigma_{\theta_{13}}, \, \sigma_{\theta_{23}}, \, \sigma_{\deltacp}, \, \sigma_{\sdm}, \, \sigma_{\ldm}, \, \sigma_{\hat\rho} \})$ sets the input errors for all of the following minimizer calls.
 \end{function}
 Both functions may take one matter density parameter or as many as there are experiments. Since the assumptions about the matter density profile are usually similar for the loaded experiments, using only one matter density parameter is a useful tool to apply the same starting value  and input error to all loaded experiments.
 Eventually, a typical initialization of the external input may look like this:
@@ -353,20 +406,16 @@ The projection onto the $\stheta$- (or $\deltacp$-) axis is performed by fixing 
 
 One mentioned disadvantage of the local minimizer is the possibility to end up in a local minimum. Usually it works very well to start the minimizer close to the best-fit values. In the example in \figu{projex}, the minimizer is always started at $\deltacp=90^\circ$ and finds its way to the appropriate minimum. In some cases, however, the topology may be more difficult and the true minimum is not correctly found. A strong indication for such a situation are discontinuities in the projected $\chi^2$-function, where the minimizer jumps from one minimum to the other. In such a case, the starting point of the minimizer has to be adjusted to help it find the true minimum. In other cases, the convergence of the minimizer may be infinitively small. Then it usually helps to start the minimizer somewhat off the best-fit values. The following functions are the simplest minimizers provided by \GLOBES :
 \begin{function}
-\index{{\tt ChiTheta}}
-{\tt ChiTheta}$( \theta_{13}, \, \{ \theta_{12}, \, \theta_{23}, \, \deltacp , \, \sdm , \, \ldm, \, \hat{\rho_1}, \,  \hdots ,  \,\hat{\rho_n} \})$ returns the projection onto the $\theta_{13}$-axis for all experiments. The parameters are the fixed value of $\theta_{13}$ and the starting point of the minimizer including all starting values for the matter density scaling factors (without $\theta_{13}$, which is fixed). The return value is a list $\{ \chi^2, \, \theta_{12}, \, \theta_{23}, \, \deltacp , \, \sdm , \, \ldm, \, \hat{\rho_1}, \, \hdots , \, \hat{\rho_n} , \, N_{\mathrm{Iter}} \}$ with the minimum $\chi^2$ found, the coordinates of the local minimum (without $\theta_{13}$), and the number of iterations $N_{\mathrm{Iter}}$ used by the minimizer (number of function calls of {\tt Chi}).
+\GLB{ChiTheta}$( \theta_{13}, \, \{ \theta_{12}, \, \theta_{23}, \, \deltacp , \, \sdm , \, \ldm, \, \hat{\rho_1}, \,  \hdots ,  \,\hat{\rho_n} \})$ returns the projection onto the $\theta_{13}$-axis for all experiments. The parameters are the fixed value of $\theta_{13}$ and the starting point of the minimizer including all starting values for the matter density scaling factors (without $\theta_{13}$, which is fixed). The return value is a list $\{ \chi^2, \, \theta_{12}, \, \theta_{23}, \, \deltacp , \, \sdm , \, \ldm, \, \hat{\rho_1}, \, \hdots , \, \hat{\rho_n} , \, N_{\mathrm{Iter}} \}$ with the minimum $\chi^2$ found, the coordinates of the local minimum (without $\theta_{13}$), and the number of iterations $N_{\mathrm{Iter}}$ used by the minimizer (number of function calls of {\tt Chi}).
 \end{function}
 \begin{function}
-\index{{\tt SingleChiTheta}}
-{\tt SingleChiTheta}$( \theta_{13}, \, \{ \theta_{12}, \, \theta_{23}, \, \deltacp , \, \sdm , \, \ldm,  \, \hat{\rho}_{N_{\mathrm{exp}}} \}, \, N_{\mathrm{exp}})$ works similar to {\tt ChiTheta}, but only for one of the loaded experiments $N_{\mathrm{exp}}$. It returns the list $\{ \chi^2, \, \theta_{12}, \,  \theta_{23}, \, \deltacp , \, \sdm , \, \ldm, \, \hat{\rho}_{N_{\mathrm{exp}}} , \, N_{\mathrm{Iter}} \}$.
+\GLB{SingleChiTheta}$( \theta_{13}, \, \{ \theta_{12}, \, \theta_{23}, \, \deltacp , \, \sdm , \, \ldm,  \, \hat{\rho}_{N_{\mathrm{exp}}} \}, \, N_{\mathrm{exp}})$ works similar to {\tt ChiTheta}, but only for one of the loaded experiments $N_{\mathrm{exp}}$. It returns the list $\{ \chi^2, \, \theta_{12}, \,  \theta_{23}, \, \deltacp , \, \sdm , \, \ldm, \, \hat{\rho}_{N_{\mathrm{exp}}} , \, N_{\mathrm{Iter}} \}$.
 \end{function}
 \begin{function}
-\index{{\tt ChiDelta}}
-{\tt ChiDelta}$( \deltacp, \, \{ \theta_{12}, \, \theta_{13}, \, \theta_{23}, \, \sdm , \, \ldm, \, \hat{\rho_1}, \,  \hdots ,  \,\hat{\rho_n} \})$ returns the projection onto the $\deltacp$-axis for all experiments. The parameters are the fixed value of $\deltacp$ and the starting point of the minimizer including all starting values for the matter density scaling factors (without $\deltacp$, which is fixed). The return value is a list $\{ \chi^2, \, \theta_{12}, \, \theta_{13}, \, \theta_{23}, \, \sdm , \, \ldm, \, \hat{\rho_1}, \, \hdots , \, \hat{\rho_n} , \, N_{\mathrm{Iter}} \}$ with the minimum $\chi^2$ found, the coordinates of the local minimum (without $\deltacp$), and the number of iterations $N_{\mathrm{Iter}}$ used by the minimizer (number of function calls of {\tt Chi}).
+\GLB{ChiDelta}$( \deltacp, \, \{ \theta_{12}, \, \theta_{13}, \, \theta_{23}, \, \sdm , \, \ldm, \, \hat{\rho_1}, \,  \hdots ,  \,\hat{\rho_n} \})$ returns the projection onto the $\deltacp$-axis for all experiments. The parameters are the fixed value of $\deltacp$ and the starting point of the minimizer including all starting values for the matter density scaling factors (without $\deltacp$, which is fixed). The return value is a list $\{ \chi^2, \, \theta_{12}, \, \theta_{13}, \, \theta_{23}, \, \sdm , \, \ldm, \, \hat{\rho_1}, \, \hdots , \, \hat{\rho_n} , \, N_{\mathrm{Iter}} \}$ with the minimum $\chi^2$ found, the coordinates of the local minimum (without $\deltacp$), and the number of iterations $N_{\mathrm{Iter}}$ used by the minimizer (number of function calls of {\tt Chi}).
 \end{function}
 \begin{function}
-\index{{\tt SingleChiDelta}}
-{\tt SingleChiDelta}$( \deltacp, \, \{ \theta_{12}, \, \theta_{13}, \, \theta_{23}, \, \sdm , \, \ldm, \,  \hat{\rho}_{N_{\mathrm{exp}}} \}, \, N_{\mathrm{exp}})$ works similar to {\tt ChiDelta}, but only for one of the loaded experiments $N_{\mathrm{exp}}$. It returns the list $\{ \chi^2, \, \theta_{12}, \,  \theta_{13}, \,  \theta_{23}, \, \sdm , \, \ldm, \, \hat{\rho}_{N_{\mathrm{exp}}} , \, N_{\mathrm{Iter}} \}$.
+\GLB{SingleChiDelta}$( \deltacp, \, \{ \theta_{12}, \, \theta_{13}, \, \theta_{23}, \, \sdm , \, \ldm, \,  \hat{\rho}_{N_{\mathrm{exp}}} \}, \, N_{\mathrm{exp}})$ works similar to {\tt ChiDelta}, but only for one of the loaded experiments $N_{\mathrm{exp}}$. It returns the list $\{ \chi^2, \, \theta_{12}, \,  \theta_{13}, \,  \theta_{23}, \, \sdm , \, \ldm, \, \hat{\rho}_{N_{\mathrm{exp}}} , \, N_{\mathrm{Iter}} \}$.
 \end{function}
 All of these function have the same parameter structure: The fixed parameter is not transferred in the list, but as a the first separate parameter. The number of matter density scaling factors corresponds to the number of experiments used, since each experiment may face other matter density conditions. Note that before any of these function calls, {\tt SetStartingValues} and {\tt SetInputErrors} have to be used at least once. In addition, note that the resulting $\chi^2$ of {\tt ChiTheta} (or {\tt ChiDelta}) is not the sum of the $\chi^2$-values over all {\tt Single}-functions of all experiments anymore. This has two reasons: First, the topology of the fit manifold is altered by the addition of $\chi^2$-values of different experiments. Thus, after the minimization, the position of the minimum can be different to the ones of the individual experiments. Second, the priors for the external knowledge on the parameters are only added once -- independent of the number of experiments. A simple application of {\tt ChiTheta} can be found in the example on page~\pageref{ex:corrproj}. 
 
@@ -377,12 +426,10 @@ The return values of these functions do not only contain the minimum $\chi^2$-va
 
 In general, one can show the measurement result in any $k$-dimensional hyperplane, where $k$ is smaller than the dimension of the parameter space $n$, and thus the dimension of the fit manifold. In this case, $k$ parameters are fixed and $n-k$ parameters are minimized over. One such example is the projection of the fit manifold onto the $\stheta$-$\deltacp$-plane, \ie, $k=2$ here. This projection can be performed with the following functions:
 \begin{function}
-\index{{\tt ChiThetaDelta}}
-{\tt ChiThetaDelta}$(\theta_{13}, \, \deltacp, \, \{ \theta_{12}, \, \theta_{23},  \, \sdm , \, \ldm, \,   \hat{\rho_1}, ... , \hat{\rho_n} \})$ returns the list  $\{ \chi^2, \, \theta_{12}, \, \theta_{23}, \, \sdm , \, \ldm,  \, \hat{\rho_1}, \, \hdots , \, \hat{\rho_n} , \, N_{\mathrm{Iter}} \}$ for the projection into the $\theta_{13}$-$\deltacp$-plane for all experiments.
+\GLB{ChiThetaDelta}$(\theta_{13}, \, \deltacp, \, \{ \theta_{12}, \, \theta_{23},  \, \sdm , \, \ldm, \,   \hat{\rho_1}, ... , \hat{\rho_n} \})$ returns the list  $\{ \chi^2, \, \theta_{12}, \, \theta_{23}, \, \sdm , \, \ldm,  \, \hat{\rho_1}, \, \hdots , \, \hat{\rho_n} , \, N_{\mathrm{Iter}} \}$ for the projection into the $\theta_{13}$-$\deltacp$-plane for all experiments.
 \end{function}
 \begin{function}
-\index{{\tt SingleChiThetaDelta}}
-{\tt SingleChiThetaDelta}$( \theta_{13}, \, \deltacp, \, \{ \theta_{12}, \, \theta_{23}, \, \sdm , \, \ldm, \,   \hat{\rho}_{N_{\mathrm{exp}}} \}, \, N_{\mathrm{exp}})$ returns the list $\{ \chi^2, \, \theta_{12}, \,   \theta_{23},  \, \sdm , \, \ldm, \, \hat{\rho}_{N_{\mathrm{exp}}} ,  \, N_{\mathrm{Iter}} \}$ for the projection into the $\theta_{13}$-$\deltacp$-plane for one experiment $N_{\mathrm{exp}}$.
+\GLB{SingleChiThetaDelta}$( \theta_{13}, \, \deltacp, \, \{ \theta_{12}, \, \theta_{23}, \, \sdm , \, \ldm, \,   \hat{\rho}_{N_{\mathrm{exp}}} \}, \, N_{\mathrm{exp}})$ returns the list $\{ \chi^2, \, \theta_{12}, \,   \theta_{23},  \, \sdm , \, \ldm, \, \hat{\rho}_{N_{\mathrm{exp}}} ,  \, N_{\mathrm{Iter}} \}$ for the projection into the $\theta_{13}$-$\deltacp$-plane for one experiment $N_{\mathrm{exp}}$.
 \end{function}
 These functions work analogously to the ones in the last section. They can, for example, be used to obtain a figure similar to \figu{projex}, left. However, the result would not be a two-dimensional cut through the fit-manifold, but a two-dimensional projection. Though the running time for one call of these functions is somewhat shorter than the one for the $\stheta$- or $\deltacp$-projections, one has to compute a two-dimensional array for such a figure (instead of a one-dimensional list). Therefore, the overall computational effort is much higher.
 
@@ -435,12 +482,10 @@ The resulting matrix can then be plotted as a contour plot in addition to the or
 \index{All-parameter minimization}
 The functions to perform the all-parameter minimization are {\tt ChiAll} and {\tt SingleChiAll}:
 \begin{function}
-\index{{\tt ChiAll}}
-{\tt ChiAll}$(\{ \theta_{13}, \, \theta_{12}, \, \theta_{23}, \, \deltacp , \, \sdm , \, \ldm,  \, \hat{\rho_1}, \, \hdots , \, \hat{\rho_n} \})$ finds the local minimum close to the given starting point (list) for all initialized experiments. It returns the list  $\{ \chi^2, \, \theta_{13}, \, \theta_{12}, \, \theta_{23}, \, \deltacp , \, \sdm , \,  \ldm,  \, \hat{\rho_1}, \, \hdots , \hat{\rho_n} , \, N_{\mathrm{Iter}} \}$ with the minimum $\chi^2$-value, the actual position of the local minimum, and the number of iterations $N_{\mathrm{Iter}}$ used.
+\GLB{ChiAll}$(\{ \theta_{13}, \, \theta_{12}, \, \theta_{23}, \, \deltacp , \, \sdm , \, \ldm,  \, \hat{\rho_1}, \, \hdots , \, \hat{\rho_n} \})$ finds the local minimum close to the given starting point (list) for all initialized experiments. It returns the list  $\{ \chi^2, \, \theta_{13}, \, \theta_{12}, \, \theta_{23}, \, \deltacp , \, \sdm , \,  \ldm,  \, \hat{\rho_1}, \, \hdots , \hat{\rho_n} , \, N_{\mathrm{Iter}} \}$ with the minimum $\chi^2$-value, the actual position of the local minimum, and the number of iterations $N_{\mathrm{Iter}}$ used.
 \end{function}
 \begin{function}
-\index{{\tt SingleChiAll}} 
-{\tt SingleChiAll}$( \{ \theta_{13}, \, \theta_{12}, \, \theta_{23}, \, \deltacp , \, \sdm , \, \ldm, \,   \hat{\rho}_{N_{\mathrm{exp}}} \}, \, \, N_{\mathrm{exp}})$ finds the local minimum close to the given starting point (list) for the experiment $N_{\mathrm{exp}}$ only. It returns the list
+\GLB{SingleChiAll}$( \{ \theta_{13}, \, \theta_{12}, \, \theta_{23}, \, \deltacp , \, \sdm , \, \ldm, \,   \hat{\rho}_{N_{\mathrm{exp}}} \}, \, \, N_{\mathrm{exp}})$ finds the local minimum close to the given starting point (list) for the experiment $N_{\mathrm{exp}}$ only. It returns the list
  $\{ \chi^2, \, \theta_{13}, \, \theta_{12}, \, \theta_{23}, \, \deltacp , \, \sdm , \, \ldm, \, \hat{\rho}_{N_{\mathrm{exp}}} ,  \, N_{\mathrm{Iter}} \}$ with the minimum $\chi^2$-value, the actual position of the local minimum, and the number of iterations $N_{\mathrm{Iter}}$ used.
 \end{function}
 %

@@ -63,26 +63,55 @@ and a set $D(F,F')$ for the flavor variable $F$. In general, $D(E,E')$ also depe
 full detector simulation and can be obtained by using as input 
 distribution $f(x)$ a delta distribution $\delta(x-x_0)$.
 
+\begin{figure}[t]
+\begin{center}
+\includegraphics[width=13cm]{AEDL1}
+\end{center}
+\caption{\label{fig:channel} General concept of a ``channel''.}
+\end{figure}
+
 In order to implement a experiment definition including various
 sources of systematical errors, we use several abstraction levels. 
 The first level is the so-called ``channel'', which is the link between 
-the oscillation physics and the detection properties for a specfific oscillation pattern. A channel specifies the mapping of a specific neutrino flavor produced by the source onto a reconstructed neutrino flavor.
+the oscillation physics and the detection properties for a specfific oscillation pattern (\cf, \figu{channel}). A channel specifies the mapping of a specific neutrino flavor produced by the source onto a reconstructed neutrino flavor.
 For example, a muon neutrino oscillates into an electron neutrino and subsequently interacts via quasi-elastic charged current scattering. The measured energy and direction of
 the secondary electron in the detector then allows to reconstruct the neutrino energy. The connection from the source flux of the muon neutrino, via the  probability to appear as a electron neutrino, to its detection properties (such as cross sections and energy smearing) is encapsulated into the channel.
 
-The channels are the building blocks for the so-called ``rules''. In general, a rule consists of one or more ``signal'' and ``background'' oscillation channels, which are normalized with efficiencies. The event numbers from these channels are added {\em before} the $\chi^2$-value is calculated. In addition, each rule implements an {\em independent} systematics, such as signal and background normalization errors. Eventually, each rule gives a $\chi^2$-value, and the total $\chi^2$ is obtained by adding the $\chi^2$'s of all rules. 
- An example for a rule could look like this: We want to detect electron neutrino appearance (``signal''), where the overall efficiency for quasi-elastics electron neutrino events is $0.4$. There is a fraction of $0.01$ of all neutral current events which are mis-identified as quasi-elastic electron neutrino events (``background''). The neutral current fraction is only known within $10\%$ (``background uncertainty'') and there is
+\begin{figure}[t]
+\begin{center}
+\includegraphics[width=8cm]{SignalBackground}
+\end{center}
+\caption{\label{fig:rule} General concept of a ``rule''.}
+\end{figure}
+
+\begin{figure}[t]
+\begin{center}
+\includegraphics[width=9cm]{Rules}
+\end{center}
+\caption{\label{fig:experiment} General concept of an ``experiment''.}
+\end{figure}
+
+The channels are the building blocks for the so-called ``rules''. In general, a rule consists of one or more ``signal'' and ``background'' oscillation channels, which are normalized with efficiencies
+(\cf, \figu{rule}). The event numbers from these channels are added {\em before} the $\Delta \chi^2$-value is calculated.\footnote{Note that
+in this manual, we $\chi^2$ and $\Delta \chi^2$ are equal, since
+for simulated data $\Delta \chi^2 = 0$ at the best-fit point. Thus, we
+are using $\chi^2$ and $\Delta \chi^2$ as equal quantities.} In addition, each rule implements an {\em independent} systematics, such as signal and background normalization errors. Eventually, each rule gives a $\Delta \chi^2$-value, and the total $\Delta \chi^2$ of one experiment is obtained by adding the $\Delta \chi^2$'s of all rules (\cf, \figu{experiment}). 
+ An example for a rule could look like this: We want to detect electron
+  neutrino appearance (``signal''), where the overall efficiency for 
+  quasi-elastics electron neutrino events is $0.4$. There is a fraction of 
+  $0.01$ of all neutral current events which are mis-identified as 
+  quasi-elastic electron neutrino events (``background''). The neutral 
+  current fraction is only known within $10\%$ (``background uncertainty'') 
+  and there is
 an energy scale uncertainty of $100\,\mathrm{MeV}$ (``energy calibration error'').
-All this systematics is independent of the other rules.  Thus, a rule connects the event rates to the calculation of a $\chi^2$ which properly includes 
-systematical errors. The resulting $\chi^2$ is then the starting point for the
-oscillation physics analysis. Note again that
+All this systematics is independent of the other rules.  Thus, a rule connects the event rates to the calculation of a $\Delta \chi^2$ which properly includes systematical errors. The resulting $\Delta \chi^2$ is then the starting point for the oscillation physics analysis. Note again that
 \begin{itemize}
 \item
  Within each rule the event numbers are added.
 \item
  Within each rule the systematics is treated independently from the other rules.
 \item
- For each rule the $\chi^2$ is computed; the $\chi^2$'s from all rules are added.
+ For each rule the $\Delta \chi^2$ is computed; the $\Delta \chi^2$'s from all rules are added.
 \end{itemize}
 
 Of course, an abstract experiment definition language can not simulate all possible types of experiments. As we have seen, there are several assumptions for source and detector. However, it turns out that \GLOBES\ can be applied to a large number of experiment types, such as conventional beams, superbeams, neutrino factories, $\beta$-Beams, and reactor experiments.

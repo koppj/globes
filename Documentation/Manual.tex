@@ -63,7 +63,7 @@
 \newcommand{\Chapt}{Chapter}
 \newcommand{\Chapts}{Chapters}
 \newcommand{\Part}{Part}
-\newcommand{\App}{the Appendix}
+\newcommand{\App}{Appendix}
 \newcommand{\Apps}{Appendices}
 \newcommand{\Tab}{Table}
 \newcommand{\Tabs}{Tables}
@@ -86,6 +86,10 @@
 \newcommand{\figu}[1]{\fig~\ref{fig:#1}}
 \newcommand{\tabl}[1]{\Tab~\ref{tab:#1}}
 \newcommand{\tb}{\hspace*{3ex}}
+
+% Set as GLoBES command and add to index:
+% Always use GLB when mentioning a command in text!
+\newcommand{\GLB}[1]{{\tt #1} \index{{\tt #1}}}
 
 \definecolor{light}{gray}{0.93}
 \definecolor{heavy}{gray}{0.35}
@@ -245,8 +249,9 @@ time dependence of the neutrino source is physically only important to suppress 
 On the experiment definition side, either built-in neutrino fluxes
 (\eg, neutrino factory) or arbitrary fluxes can be used. Similarly,
 arbitrary cross sections, energy dependent efficiencies, the
-energy resolution function, the considered oscillation channels, and
-many other features can be specified. For the systematics, energy
+energy resolution function, the considered oscillation channels, 
+backgrounds, and many other features can be specified. 
+For the systematics, energy
 normalization and calibration errors can be simulated. Note that
 the energy ranges and windows, as well as the bin widths can be
 (almost) arbitrarily chosen, which means that variable bin
