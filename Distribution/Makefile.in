@@ -13,6 +13,7 @@
 # PARTICULAR PURPOSE.
 
 @SET_MAKE@
+
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
 VPATH = @srcdir@
@@ -35,10 +36,12 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 host_triplet = @host@
 DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
-	$(srcdir)/Makefile.in $(top_srcdir)/configure \
-	$(top_srcdir)/examples/Makefile.in AUTHORS COPYING ChangeLog \
-	INSTALL NEWS compile config.guess config.sub depcomp \
-	install-sh ltconfig ltmain.sh missing mkinstalldirs ylwrap
+	$(srcdir)/Makefile.in $(srcdir)/globes-config.src.in \
+	$(srcdir)/globes-module.src.in $(srcdir)/globes.spec.in \
+	$(top_srcdir)/configure $(top_srcdir)/examples/Makefile.in \
+	AUTHORS COPYING ChangeLog INSTALL NEWS compile config.guess \
+	config.sub depcomp install-sh ltconfig ltmain.sh missing \
+	mkinstalldirs ylwrap
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
@@ -48,7 +51,11 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno configure.status.lineno
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
-CONFIG_CLEAN_FILES = examples/Makefile
+CONFIG_CLEAN_FILES = globes.spec examples/Makefile globes-config.src \
+	globes-module.src
+am__installdirs = "$(DESTDIR)$(bindir)"
+nodist_binSCRIPT_INSTALL = $(INSTALL_SCRIPT)
+SCRIPTS = $(nodist_bin_SCRIPTS) $(noinst_SCRIPTS)
 SOURCES =
 DIST_SOURCES =
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
@@ -102,6 +109,8 @@ FFLAGS = @FFLAGS@
 GLBINC = @GLBINC@
 GLBLDF = @GLBLDF@
 GLBLIBVERSION = @GLBLIBVERSION@
+GLBMODULES = @GLBMODULES@
+HAVE_LIBTOOL = @HAVE_LIBTOOL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
@@ -121,6 +130,8 @@ MAINT = @MAINT@
 MAINTAINER_MODE_FALSE = @MAINTAINER_MODE_FALSE@
 MAINTAINER_MODE_TRUE = @MAINTAINER_MODE_TRUE@
 MAKEINFO = @MAKEINFO@
+MAKE_RPMS_FALSE = @MAKE_RPMS_FALSE@
+MAKE_RPMS_TRUE = @MAKE_RPMS_TRUE@
 OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
@@ -130,6 +141,17 @@ PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 RANLIB = @RANLIB@
+RPM_ARCHS = @RPM_ARCHS@
+RPM_ARGS = @RPM_ARGS@
+RPM_BUILD_DIR = @RPM_BUILD_DIR@
+RPM_CONFIGURE_ARGS = @RPM_CONFIGURE_ARGS@
+RPM_DIR = @RPM_DIR@
+RPM_PROG = @RPM_PROG@
+RPM_RELEASE = @RPM_RELEASE@
+RPM_SOURCE_DIR = @RPM_SOURCE_DIR@
+RPM_TARBALL = @RPM_TARBALL@
+RPM_TARGET = @RPM_TARGET@
+RPM_VERSION = @RPM_VERSION@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
@@ -179,15 +201,18 @@ sharedstatedir = @sharedstatedir@
 subdirs = @subdirs@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
-DIST_SUBDIRS = source data libltdl
-SUBDIRS = source data libltdl
+DIST_SUBDIRS = source data libltdl modules globes
+SUBDIRS = libltdl source data modules globes
 INCLUDES = $(LTDLINCL)
-EXTRA_DIST = globes/globes.h\
-examples/Makefile.in examples/example1.c  examples/example3.c examples/myio.c\
+EXTRA_DIST = examples/Makefile.in examples/example1.c\
+  examples/example3.c examples/myio.c\
 examples/example-tour.c  examples/example2.c  examples/example4.c\
 examples/myio.h examples/XCC.dat examples/NuFact.glb\
-BUGS 
+BUGS globes-script
 
+nodist_bin_SCRIPTS = globes-config globes-module
+noinst_SCRIPTS = globes-script
+CLEANFILES = globes-module globes-config
 AM_YFLAGS = -d 
 all: all-recursive
 
@@ -225,8 +250,33 @@ $(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 	cd $(srcdir) && $(AUTOCONF)
 $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	cd $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
+globes.spec: $(top_builddir)/config.status $(srcdir)/globes.spec.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
 examples/Makefile: $(top_builddir)/config.status $(top_srcdir)/examples/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
+globes-config.src: $(top_builddir)/config.status $(srcdir)/globes-config.src.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+globes-module.src: $(top_builddir)/config.status $(srcdir)/globes-module.src.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+install-nodist_binSCRIPTS: $(nodist_bin_SCRIPTS)
+	@$(NORMAL_INSTALL)
+	test -z "$(bindir)" || $(mkdir_p) "$(DESTDIR)$(bindir)"
+	@list='$(nodist_bin_SCRIPTS)'; for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  if test -f $$d$$p; then \
+	    f=`echo "$$p" | sed 's|^.*/||;$(transform)'`; \
+	    echo " $(nodist_binSCRIPT_INSTALL) '$$d$$p' '$(DESTDIR)$(bindir)/$$f'"; \
+	    $(nodist_binSCRIPT_INSTALL) "$$d$$p" "$(DESTDIR)$(bindir)/$$f"; \
+	  else :; fi; \
+	done
+
+uninstall-nodist_binSCRIPTS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(nodist_bin_SCRIPTS)'; for p in $$list; do \
+	  f=`echo "$$p" | sed 's|^.*/||;$(transform)'`; \
+	  echo " rm -f '$(DESTDIR)$(bindir)/$$f'"; \
+	  rm -f "$(DESTDIR)$(bindir)/$$f"; \
+	done
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -361,7 +411,7 @@ distclean-tags:
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkdir_p) $(distdir)/examples $(distdir)/globes
+	$(mkdir_p) $(distdir)/. $(distdir)/examples $(distdir)/modules
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \
@@ -502,9 +552,12 @@ distcleancheck: distclean
 	       exit 1; } >&2
 check-am: all-am
 check: check-recursive
-all-am: Makefile
+all-am: Makefile $(SCRIPTS)
 installdirs: installdirs-recursive
 installdirs-am:
+	for dir in "$(DESTDIR)$(bindir)"; do \
+	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
+	done
 install: install-recursive
 install-exec: install-exec-recursive
 install-data: install-data-recursive
@@ -522,6 +575,7 @@ install-strip:
 mostlyclean-generic:
 
 clean-generic:
+	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
 
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
@@ -551,7 +605,7 @@ info-am:
 
 install-data-am:
 
-install-exec-am:
+install-exec-am: install-nodist_binSCRIPTS
 
 install-info: install-info-recursive
 
@@ -577,7 +631,7 @@ ps: ps-recursive
 
 ps-am:
 
-uninstall-am: uninstall-info-am
+uninstall-am: uninstall-info-am uninstall-nodist_binSCRIPTS
 
 uninstall-info: uninstall-info-recursive
 
@@ -589,13 +643,38 @@ uninstall-info: uninstall-info-recursive
 	distclean-tags distcleancheck distdir distuninstallcheck dvi \
 	dvi-am html html-am info info-am install install-am \
 	install-data install-data-am install-exec install-exec-am \
-	install-info install-info-am install-man install-strip \
-	installcheck installcheck-am installdirs installdirs-am \
-	maintainer-clean maintainer-clean-generic \
-	maintainer-clean-recursive mostlyclean mostlyclean-generic \
-	mostlyclean-libtool mostlyclean-recursive pdf pdf-am ps ps-am \
-	tags tags-recursive uninstall uninstall-am uninstall-info-am
+	install-info install-info-am install-man \
+	install-nodist_binSCRIPTS install-strip installcheck \
+	installcheck-am installdirs installdirs-am maintainer-clean \
+	maintainer-clean-generic maintainer-clean-recursive \
+	mostlyclean mostlyclean-generic mostlyclean-libtool \
+	mostlyclean-recursive pdf pdf-am ps ps-am tags tags-recursive \
+	uninstall uninstall-am uninstall-info-am \
+	uninstall-nodist_binSCRIPTS
 
+
+globes-config: globes-config.src
+	$(top_srcdir)/globes-script globes-config.src globes-config
+
+globes-module: globes-module.src
+	$(top_srcdir)/globes-script globes-module.src globes-module 
+
+@MAKE_RPMS_TRUE@rpm: $(DISTFILES) 
+@MAKE_RPMS_TRUE@	${MAKE} dist
+# adding my own helpless stuff ...
+@MAKE_RPMS_TRUE@	cp $(RPM_TARBALL) $(RPM_SOURCE_DIR)/
+@MAKE_RPMS_TRUE@	$(RPM_PROG) $(RPM_ARGS) --clean @PACKAGE@.spec
+@MAKE_RPMS_TRUE@	$(RPM_PROG) --rmsource @PACKAGE@.spec
+@MAKE_RPMS_TRUE@	@echo =================================
+@MAKE_RPMS_TRUE@	@echo Congratulations, $(RPM_TARGET) "(and friends)" should now exist.
+@MAKE_RPMS_TRUE@	@echo =================================
+
+@MAKE_RPMS_TRUE@rpm-clean:
+@MAKE_RPMS_TRUE@	rm -f $(RPM_SOURCE_DIR)/$(RPM_TARBALL)
+@MAKE_RPMS_TRUE@	rm -rf $(RPM_BUILD_DIR)/$(RPM_VERSION)
+@MAKE_RPMS_TRUE@	rm -f $(RPM_TARGET)
+
+@MAKE_RPMS_TRUE@.PHONY: rpm rpm-clean
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

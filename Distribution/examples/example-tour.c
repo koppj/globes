@@ -29,19 +29,26 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
+//#include <ltdl.h>
 
 #include <globes/globes.h>   /* GLoBES library */
 
+
 int main(int argc, char *argv[])
-{ 
+{
+ 
+  //LTDL_SET_PRELOADED_SYMBOLS();
   /* char* MYFILE=""; */ 
   char* MYFILE="gl-tour.dat"; /* if empty, write to screen */
   FILE* stream;
   if(strlen(MYFILE)>0) stream=fopen(MYFILE, "w");
   else stream = stdout;
-  
+  stream=stdout;
   /* Initialize libglobes */
-  glbInit(argv[0]); 
+  
+ 
+   glbSuperInit(argv[0]);
+  
 
   /* Define my standard oscillation parameters */
   double theta12 = asin(sqrt(0.8))/2;
@@ -54,7 +61,7 @@ int main(int argc, char *argv[])
   /* Initialize one experiment NuFact.glb */
   glbInitExperiment("NuFact.glb",&glb_experiment_list[0],&glb_num_of_exps); 
    
-	/* Initialize a number of parameter vector(s) */
+  /* Initialize a number of parameter vector(s) */
   glb_params true_values = glbAllocParams();
   glb_params fit_values = glbAllocParams();
   glb_params starting_values = glbAllocParams();

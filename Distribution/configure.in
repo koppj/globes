@@ -30,7 +30,7 @@ dnl first digit: major improvements/rewrites
 dnl In contrast to the result of autoupdate I had to swap the
 dnl the AC_INIT and AC_CONFIG_SRCDIR
 AC_INIT([globes],[2.1.0])
-AC_CONFIG_SRCDIR([source/globes.c])
+AC_CONFIG_SRCDIR([source/glb_wrapper.c])
 
 dnl Tellin autoconf we are going to use automake
 AM_INIT_AUTOMAKE
@@ -54,10 +54,10 @@ dnl This part serves to convert Makefile.in in examples to a
 dnl Makefile which works automagically 
 
 if test $prefix = NONE; then
- GLBLDF="-lglobes"
+ GLBLDF="-lglobes -lglb"
 else
  GLBLDR="${prefix}/lib"
- GLBLDF="${GLBLDR}/libglobes.so -Wl,--rpath -Wl,${GLBLDR}"
+ GLBLDF="${GLBLDR}/libglobes.so -Wl,--rpath -Wl,${GLBLDR} ${GLBLDR}/globes/libglb.so -Wl,--rpath -Wl,${GLBLDR}/globes"
  GLBINC="-I${prefix}/include/"
 fi
 
@@ -65,6 +65,11 @@ AC_SUBST(GLBLDF)
 AC_SUBST(GLBINC)
 
 
+dnl Keeping track of modules which should be preloaded
+dnl if necessary
+
+GLBMODULES="glb_prior_module.la"
+AC_SUBST(GLBMODULES)
 
 dnl Checks for programs.
 AC_PROG_AWK
@@ -75,6 +80,10 @@ AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_YACC
 AC_PROG_LEX
+
+dnl Checks wether libtool exists on this machine
+dnl in the user path (needed for globes-module to work properly)
+AC_CHECK_PROG([HAVE_LIBTOOL],[libtool],yes,no)
 
 dnl Trying to get support for libtdl
 dnl the following lines are taken from the libtool manual
@@ -99,59 +108,11 @@ AC_CHECK_LIB(m,main,[],AC_MSG_ERROR([libm not found]))
 AC_CHECK_LIB(gslcblas,main,[],AC_MSG_ERROR([libgslcblas not found]))
 AC_CHECK_LIB(gsl,main,[],AC_MSG_ERROR([libgsl not found]))
 
-dnl Check for libf2c and taking care of the SUSE libf2c problem 
-AC_CHECK_LIB(f2c,main,[],[
-globes_temp_lib="$LIBS"
-LIBS="-lf2c $LIBS"
-AC_CACHE_CHECK([for libf2c on SUSE],globes_cv_libf2c,
-[AC_LINK_IFELSE([AC_LANG_PROGRAM([[int MAIN__;]], [[
-int main (void) 
-{ 
- exit(0);
-}]])],[globes_cv_libf2c="yes"],[globes_cv_libf2c="no"])
-])
-if test $globes_cv_libf2c = yes; then
- AC_DEFINE(HAVE_LIBF2C)
-else
- LIBS="$globes_temp_lib" && AC_MSG_ERROR([libf2c not found])
-fi
-])
+AC_CHECK_SUSE_f2c
+AC_CHECK_SUSE_blas
+AC_CHECK_SUSE_lapack
 
-dnl Check for blas and taking care of the SUSE libf2c problem 
-AC_CHECK_LIB(blas,main,[],[
-globes_temp_lib="$LIBS"
-LIBS="-lblas $LIBS"
-AC_CACHE_CHECK([blas on SUSE],globes_cv_libblas,
-[AC_LINK_IFELSE([AC_LANG_PROGRAM([[int MAIN__;]], [[
-int main (void) 
-{ 
- exit(0);
-}]])],[globes_cv_libblas="yes"],[globes_cv_libblas="no"])
-])
-if test $globes_cv_libblas = yes; then
- AC_DEFINE(HAVE_LIBBLAS)
-else
- LIBS=$globes_temp_lib && AC_MSG_ERROR([libblas not found])
-fi
-])
 
-dnl Check for blas and taking care of the SUSE libf2c problem 
-AC_CHECK_LIB(lapack,main,[],[
-globes_temp_lib="$LIBS"
-LIBS="-llapack $LIBS"
-AC_CACHE_CHECK([lapack on SUSE],globes_cv_liblapack,
-[AC_LINK_IFELSE([AC_LANG_PROGRAM([[int MAIN__;]], [[
-int main (void) 
-{ 
- exit(0);
-}]])],[globes_cv_liblapack="yes"],[globes_cv_liblapack="no"])
-])
-if test $globes_cv_liblapack = yes; then
- AC_DEFINE(HAVE_LIBLAPACK)
-else
- LIBS="$globes_temp_lib" && AC_MSG_ERROR([liblapack not found])
-fi
-])
 
 dnl Checks for header files.
 AC_HEADER_STDC
@@ -163,6 +124,15 @@ AC_TYPE_SIZE_T
 dnl Checks for library functions.
 AC_CHECK_FUNCS(strdup)
 
+dnl Experimental rpm-builing support
+dnl For my rpm.m4 macros
+RPM_RELEASE=0
+AC_SUBST(RPM_RELEASE)
+dnl
+AM_RPM_INIT
+dnl   dnl Enable or disable the rpm making rules in Makefile.am
+AM_CONDITIONAL(MAKE_RPMS, test x$make_rpms = xtrue)
+AC_CONFIG_FILES(globes.spec)
 
 dnl pretty printing
 stars=""
@@ -172,6 +142,8 @@ do
 	stars="${stars}*"
 	empty="${empty} "
 done
+
+
 
 
 dnl Remind the user of things he might need ;-)
@@ -187,6 +159,7 @@ else
  echo "***********************${stars}********************"
 fi
 
-AC_CONFIG_FILES([Makefile source/Makefile examples/Makefile\
- data/Makefile])
+AC_CONFIG_FILES([Makefile globes/Makefile source/Makefile examples/Makefile\
+ data/Makefile modules/MakefileExample modules/Makefile globes-config.src\
+ globes-module.src])
 AC_OUTPUT

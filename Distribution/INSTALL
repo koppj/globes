@@ -25,7 +25,11 @@ All those libraries are also available as rpm's from the various
 distributors of GNU/Linux, see their web sites for downloads. Due to
 the rather difficult nature of the build process of BLAS and LAPACK
 it is recommended to use a suitable rpm instead. Chances are that
-gcc, f2c and GSL are already part of your installation. Furthmore you need
+gcc, f2c and GSL are already part of your installation. For building
+GLoBES from source, however, not only working libaries for above packages
+are needed but also the headers, especially for GSL. Depending on your
+installation, eg. on RedHat/Fedora, of GSL this may require to 
+additionally install a rpm-package named `gsl-devel'. Furthmore you need
 a working `make' to build and install GLoBES.
 
 In future releases it is planed to at least get rid of LAPACK, because
@@ -49,26 +53,22 @@ You can then build the library by typing,
 A shared  version of the library will be compiled by
 default. 
  
-The library can be installed using the command,
+The libraries and modules can be installed using the command,
 
   make install
 
 The install target also will install a program with name globes to
-/usr/local/bin.
+/usr/local/bin. 
 
 The default install directory prefix is /usr/local.  Consult the
 "Further Information" section below for instructions on installing the
 library in another location or changing other default compilation
 options.
 
-If you are not using 'make install' you will find the static libary
-at source/.lib/libglobes.a which you can copy to any destination.
-However keep in mind that the linking command will be somewhat different,
-ie. you have to specify all the dynamically linked objects besides libglobes,
-which are:
-	 -lm -lgsl -lgslcblas -lf2c -llapack -lblas
-In general it is preferable to use the shared libraries, in case you don't
-have root privileges see the corresponding section of this file.
+Moreover a config-script called `globes-config' will be installed. This
+script displays all information necessary to link any program with GLoBES.
+For building static libaries and linking against them see the corresponding
+section of this file.
  
                     ------------------------------
 
@@ -144,7 +144,7 @@ A typical compiler command like
 	gcc -c my_program.c -IGLB_DIR/include/
 
 and a typical linker command like
-	g++ my_program.o -lglobes -LGLB_DIR/lib/ -o my_executable
+	g++ my_program.o -lglobes -lglb -LGLB_DIR/lib/ -o my_executable
 
 More information on this issue can be obtained by having a look into the output
 of make install. 
@@ -154,6 +154,39 @@ especially the situation of having an installation by root and by a user at
 the same time might occur. However it is strictly warned against this 
 possibility since it is *extremely* likely to create some versioning problem
 at some time!
+
+Building and Using static versions of GLoBES
+============================================
+
+   Due to the fact the GLoBES relies on dynamically loadable modules for
+some of its core functionality, it requires some extra attention to build
+and use static versions of the library.
+
+   The `configure' script accepts the option `--disable-shared', in which
+case only static objects are built. The binaries which come along with GLoBES
+are statically linked and all subleties concerning module support are taken
+care of, thanks to the lt_preload-mechanism provided by libtool. In case your
+system does not support shared libraries the `configure' script recognizes 
+this. If you give no options to `configure', both shared and static versions
+are built and will be installed. All binaries, however, will use dynamic 
+linking.
+
+   Sometimes it is convenient, eg. for debugging purposes, to have a statically
+linked version of a program using GLoBES. To get this working together with
+loadable module support it is necessary to have libtool installed on your 
+system. Thus it is possible also for your programs to use the 
+lt_preload-mechanism. The Autobook says on this issue:
+
+`This feature is extremely useful for debugging, allowing you to make a fully 
+statically linked application from the executable and module objects, 
+without changing any source code to work around the module loading calls. As 
+far as the code outside the libltdl API can tell, these modules really are 
+being loaded dynamically. Driving a symbolic debugger across module 
+boundaries is however much easier when blocks of code aren't moving in and out
+of memory during execution.' 
+
+... description to follow ...
+... module linkage ...
 
 Compilers and Options
 =====================

@@ -1,0 +1,102 @@
+#! /bin/sh
+# This script is based an the gsl-config script of the GNU scientific
+# library
+
+
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+includedir=@includedir@
+libdir=@libdir@
+pkglibdir=@libdir@/globes
+
+# FIXME
+# The usual way to access the depencies of libglobes seems to have
+# problems to keep track of `-ldl', thus we now completely rely on
+# libtool's ability to get this right
+depenlib="GLB_LINKER_FLAGS"
+
+usage()
+{
+    cat <<EOF
+Usage: globes-config [OPTION]
+
+Known values for OPTION are:
+
+  --prefix		show GLoBES installation prefix 
+  --libs		print library linking information
+  --ltlibs              print linking information for use with libtool
+  --dlopen              list of modules, which should be dlopened
+  --cflags		print pre-processor and compiler flags
+  --help		display this help and exit
+  --version		output version information
+
+EOF
+
+    exit $1
+}
+
+if test $# -eq 0; then
+    usage 1
+fi
+
+cflags=false
+libs=false
+
+while test $# -gt 0; do
+    case "$1" in
+    -*=*) optarg=`echo "$1" | sed 's/[-_a-zA-Z0-9]*=//'` ;;
+    *) optarg= ;;
+    esac
+
+    case "$1" in
+    --prefix=*)
+	prefix=$optarg
+	;;
+
+    --prefix)
+	echo $prefix
+	;;
+
+    --version)
+	echo "Package "@VERSION@
+	echo "Library "@GLBLIBVERSION@
+	exit 0
+	;;
+
+    --help)
+	usage 0
+	;;
+
+    --cflags)
+       	echo @CFLAGS@ 
+       	;;
+
+    --libs)
+	# this simplistic approach turns out not to handle -ldl correctly
+	#   	echo @GLBLDF@ @LIBS@
+	    echo @GLBLDF@ $depenlib 
+       	;;
+
+    --ltlibs)
+	echo "$libdir/libglobes.la -lstdc++"
+
+	;;
+
+    --dlopen)
+	for name in @GLBMODULES@
+	do
+	echo -n $pkglibdir/$name" " 
+	done
+	echo
+    
+	;;
+
+    *)
+	usage
+	exit 1
+	;;
+    esac
+    shift
+done
+
+exit 0

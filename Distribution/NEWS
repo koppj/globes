@@ -1,5 +1,5 @@
 11/08/04
-******** Version 2.1.0
+******** Version 2.1.0 beta
 	Added (minimal) support for user defined priors. The interface is
 
 		int glbRegisterPriorFunction( double (*f)(const glb_params) )
@@ -17,7 +17,7 @@
 	
 		glbRegisterPriorFunction(my_prior)
 	
-	If the prior nows the difference between true and fitted values, the
+	If the prior knows the difference between true and fitted values, the
 	true values can be accessed within the prior function by virtue of
 	`glbGetStartingValues'. The user defined prior is co-added with
 	the builtin parabolib priors, if this behaviour is unwanted set
@@ -28,3 +28,89 @@
 	prints its input parameters to some file. To make life easier the
 	argument passed to the user defined prior function has the value
 	of `iterations' correctly set to the current value.
+
+##############################################################################
+In the mean time I've done a lot for module support which still has to be
+documented!
+##############################################################################
+
+16/08/04
+	Fixed BUG#5.
+
+19/08/04
+	Added support for building rpm's automatically. Use
+		configure --enable-rpm-rules
+	and then type 
+		make rpm
+	and when done 
+		make rpm-clean
+	It is also possible to use different build-archs (targets) with
+		configure --enable-rpm-rules --with-rpm-targets='i386 i486'
+	The obtained binary rpm should be relocatable and a source rpm is
+	also build.
+
+15/09/04
+	Added a comment on gsl-devel and RedHat/Fedora in the INSTALL file.
+
+	In order to have module support and to keep the ability to have a
+	all-static version of GLoBES I had to restructure the linkage a bit.
+	The problem is that a module for GLoBES usually also will use 
+	functionality of GLoBES, if we kept the scheme as it was, we would
+	obtain following link graph:
+
+				my_program.c
+				     |
+			       +-->--+--<--+ 
+			       |           |
+			my_module.so <-- libglobes.so
+
+	which obviously is cyclic. Moreover if I migrate some core
+	functionality to a module, I would obtain, even worse this:
+
+			       +-----> libglobes.so
+			       |           |
+			core_module.so <---+
+
+	Therefore libglobes is divided into two parts, libglobes
+	and libglb, where libglobes carries the functionality of
+	the former libglobes and libglb links in the modules, yielding:
+
+				libglobes.so
+				      |	
+               			core_module.so
+				      |
+				  libglb.so
+
+	Unfortunately this requires for all non-standard installations,
+	eg. without root-privilege, to use a new linker command, which
+	can be found in the Makefile in the `example' directory. In any
+	case it makes necessary to re-link any application which uses 
+	GLoBES. Sorry for that!
+
+	libglb and all modules are to be found in ${prefix}/lib/globes.
+
+	If an all-static version is required it is neccessary to have
+	libtool installed (only on the machine where the linking is done).
+	How this works in detail will be described elsewhere. The advantage
+	of a all-static program are two-fold: debugging is much easier and
+	it is possible to run the program on machines which are lacking
+	important things, like LAPACK. Just compile and link and all-static
+	version on a machine which has everthing GLoBES needs and then copy
+	the binary and all `.la'-files in  ${prefix}/lib/globes to the other
+	machine and you`re done ;-)
+
+	To complete module support it is of course foreseen to have 
+	user-supplied modules. To this end a documentation of the module
+	API is required, which still is lacking, partly because the API
+	has not finally been defined yet... What already is there, is a
+	helper-script `globes-module' which should make it straightforward
+	to compile and link own modules (which involves building shared 
+	obejcts).
+
+	Finally I have also added `globes-config' which is a config-script
+	in the style of `gsl-config'. This script knows everything about
+	the actual installation of GLoBES and provides information like
+	which linker flags are needed to link with GLoBES or which version
+	of GLoBES currently is installed.
+	
+	

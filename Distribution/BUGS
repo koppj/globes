@@ -52,3 +52,15 @@ Date: 05.08.04
 	nobody needs them, but the function does not know this ...) and finally
 	bails out.
 -------------------------------------------------------------------------------
+
+BUG#5 Error in density parameter handling in chi_NP (glb_minimize.c)
+
+From: Patrick Huber
+Date: 16.08.04
+
+	If one of the density projection parameters is set to GLB_FIXED
+	the glbChiXXX functions (with exception of glbChiSys) will not work
+	properly (which easily will go unnoticed). The reason is that the
+	index range in one of the for loops is `n_s_free+n_fixed' whereas
+	the correct value is `n_s_free+n_s_fixed'. 
+-------------------------------------------------------------------------------

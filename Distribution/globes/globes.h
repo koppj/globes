@@ -55,16 +55,22 @@
 #define GLB_THETA_13 1
 #define GLB_THETA_23 2
 #define GLB_DELTA_CP 3
-#define GLB_DM_SOL 4
+#define GLB_DM_SOL 4 
 #define GLB_DM_ATM 5
 #define GLB_ON 1
 #define GLB_OFF 0
 
 #define GLB_EARTH_RADIUS 6371.0
 
+/* In the application software we only need a handle for the
+ * any lt_dlopen`ed module ...
+ */
+typedef struct lt_dlhandle_struct *glb_dlhandle;
 
 typedef struct glb_projection_type *glb_projection;
 typedef struct glb_params_type  *glb_params;
+
+
 
 /* handle for the struct experiment */
 
@@ -269,8 +275,17 @@ double glbGetFilterInExperiment(int experiment);
 int glbNameToValue(int exp, const char* context, const char *name);
 const char *glbValueToName(int exp,const char* context, int value);
 
+/* Trying to get a tree-like linkage */
+void glbSuperInit(char *name);
+
+
 /* Adding user defined priors */
-int glbRegisterPriorFunction(double (*f)(const glb_params in));
+int glbRegisterPriorFunction(double (*prior)(const glb_params),
+			     int (*starting)(const glb_params),
+			     int (*error)(const glb_params));
+
+/* Module support */
+glb_dlhandle glbLoadPrior(const char *module_name);
 
 #ifdef GLB_EXPERIMENTAL
 /* These functions are part of the user-defined chi^2 interface and will
