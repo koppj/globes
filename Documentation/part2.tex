@@ -645,6 +645,9 @@ Thus, a simple definition of a channel is
 >}
 \end{quote}
 Note that the energy environment will be described in the next section. 
+In addition, one can define pre- and post-smearing effects together
+with the channels, which will also be introduced together with the
+energy resolution function in the next section.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -677,7 +680,7 @@ reconstructed energy $E'$. Therefore, one simplify \eq~(\ref{eq:events_bin}) by
 \quad R^c(E,E')\,.
 \end{equation}
 Here the  $\hat\epsilon_i^c$ are the 
-``post-smearing'' efficiencies, which will be set within the corresponding {\tt channel} environment (see below).
+binned ``post-smearing'' efficiencies, which will be set within the corresponding {\tt channel} environment (see below).
 From \eq~(\ref{eq:events_bin}) it is obvious that the integration with respect to the reconstructed energy $E'$ can be
 performed independently of the oscillation parameters. We define
 the ``bin kernel'' $K_i^c$ for the $i$th bin as
@@ -689,10 +692,10 @@ K_i^c(E) \equiv \int_{E_i-\Delta E_i/2}^{E_i+\Delta E_i/2} dE'
 With this definition, \eq~(\ref{eq:events_bin}) can be re-written as
 \begin{equation}
 \label{eq:simple_int}
-n_i^c=N/L^2 \int\limits_0^\infty dE\quad  \underbrace{\Phi^c(E)\,
+n_i^c=N/L^2 \,
+\hat\epsilon_i^c \, \int\limits_0^\infty dE\quad  \underbrace{\Phi^c(E)\,
 P^c(E)\,
-\sigma^c(E)\,
-K_i^c(E)\,}_{f(E)}. 
+\sigma^c(E) \, K_i^c(E)\,}_{f(E)}. 
 \end{equation}
 
 There is no principle reason why one should not evaluate this integral directly by the usual numerical methods. However, it turns out that this 
@@ -714,8 +717,9 @@ the general evaluation algorithm. As it is illustrated in \figu{energies},
 \GLOBES\ uses several levels with respect to the energy ranges:
 \begin{description}
 \item[Sampling point level]
- This level is used internally to evaluate the integrand in \eq~(\ref{eq:simple_int}) at all sampling points. The energy scale is the actual incident neutrino energy $E$. Note that the sampling range should exceed the energy bin range by about the energy resolution error, since these sampling points need to be evaluated by the algorithm. However, this is only
-necessary to avoid aliasing effects if the integrand in \eq~(\ref{eq:simple_int}) is large at the limits of the sampling range.
+ This level is used internally to evaluate the integrand in \eq~(\ref{eq:simple_int}) at all sampling points. The energy scale is the actual incident neutrino energy $E$. Note that the sampling range should exceed the energy bin range by about the energy resolution error, since the corresponding sampling points have to be evaluated by the algorithm. 
+However, this exceeding is only
+necessary to avoid aliasing effects, if the integrand in \eq~(\ref{eq:simple_int}) is large at the limits of the sampling range.
 For a manual definition of the sampling points (depends on algorithm), use
 \begin{quote}
 {\tt
@@ -724,7 +728,11 @@ For a manual definition of the sampling points (depends on algorithm), use
 \$sampling\_max =         50.0
 }
 \end{quote}
-for equidistant sampling points. Arbitrary sampling points can be specified analogously to the bins (see below).
+for equidistant sampling points. Arbitrarily spaced sampling points can 
+be specified analogously to the energy bins below. 
+Note that the algorithm expects to 
+have at least as many sampling points as energy bins, since otherwise 
+the number of (unphysical) sampling constrains the experiment performance.
 \item[Bin level] This level is determined by the experiment. Note than energy
 bin sizes much smaller than the energy resolution will not improve the results. The energy bin range and the number of energy bins do always have to be specified. For the case of large values of the integrand in \eq~(\ref{eq:simple_int}) at the energy range limits, it is recommended to exceed the analysis energy window by about the energy calibration error in order to avoid aliasing effects.
 
@@ -749,10 +757,6 @@ and $E_\mathrm{max}$ and the size of each bin  $\Delta E_i$:
 \end{quote}
 The number of bins will be automatically computed by \GLOBES . Note that the
 bin sizes have to add up to the energy range {\tt \$emax}-{\tt \$emin}.
-%
-It is also
-straightforward to compute the midpoint of each bin $E_i$. This information
-has to be provided by the user ???? HOW ????. 
 \item[Analysis level]
 On the analysis level, an energy window can be defined within each rule. For
 details, see next chapter.
@@ -761,11 +765,11 @@ In general, the energy smearing happens between the sampling point and bin level
 
 As illustrated in the figure, an interesting feature in combination with the
 channels are pre- and post-smearing effects. Pre-smearing effects are taken into account on the sampling point level, and post-smearing effects on the bin level. Examples for these effects are energy 
-dependent efficiencies and (non-beam) backgrounds. Efficiencies are multiplicative factors, whereas backgrounds are added to the event rates. These components can be introduced before or after the convolution in \eq~(\ref{eq:post_smearing}) is done. If they are introduced before, 
+dependent efficiencies and (non-beam) backgrounds. Efficiencies are multiplicative factors, whereas backgrounds are added to the event rates. These components can be introduced before or after the integration in \eq~(\ref{eq:simple_int}) is done. If they are introduced before, 
 we call them
 {\tt @pre\_smearing\_efficiencies} or {\tt @pre\_smearing\_background}. 
 If they are introduced after, we call them {\tt @post\_smearing\_efficiencies} or {\tt @post\_smearing\_background}.
-Note that pre-smearing components are always afunction of the incident neutrino energy $E$. Thus, there have to be as  many elements as there are sampling points (see \Sec~\ref{sec:energy}). In same cases, the number of sampling points is determined automatically by \GLOBES , and the number of elements in the  pre-smearing vectors has to be adjusted in the second run.
+Note that pre-smearing components are always a function of the incident neutrino energy $E$. Thus, there have to be as  many elements as there are sampling points. For some algorithms, the number of sampling points is determined automatically by \GLOBES , and the number of elements in the  pre-smearing vectors has to be adjusted in the second run.
 Examples for pre-smearing quantities are non-beam backgrounds, such as from geophysical neutrinos. The post-smearing components are always a function of the reconstructed neutrino energy $E'$, such as the post-smearing efficiencies $\epsilon_\beta^{\text{IT}}(E')$ in \eq~(\ref{eq:e_res}). Examples for post-smearing efficiencies are cuts and detection threshold functions. All post-smearing components have to have as 
 many elements as there are energy bins. Efficiencies are multiplicative 
 and their default value is $1$, whereas backgrounds are additive and their default value is $0$. Thus, a more elaborate channel can be defined as
@@ -785,68 +789,81 @@ All energy resolution functions are defined within an {\tt energy} environment a
 \tb $\ldots$\\
 >}
 \end{quote}
+The individual parameters of the environment will be defined below and depend on the algorithm used.
 
-%% WW: CONTINUE HERE
+\subsection{Bin-based automatic energy smearing}
 
-\subsection{Bin based automatic energy smearing}
+This algorithm is the simplest of the built-in algorithms for the evaluation
+of \eq~(\ref{eq:simple_int}). It is applicable to most of the
+ accelerator-based experiments which can be simulated with \GLOBES .
 
-First we discuss the builtin algorithms. The simplest, fastest and
-least accurate is algorithm A. The key idea is to choose a set of assumptions
-which allow to evaluate the integrand of equation~\ref{eq:simple_int}
-at fixed values of the energy $E$ and to use the same number of points $N$ in
-the calculation as there are bins. Thus equation~\ref{eq:simple_int} is reduced
-to
+The key idea is to use a ``flat'' model with sampling points identical to 
+the bins (\cf, \figu{energies}). This is a good approximation as long as
+\begin{itemize}
+\item
+ The number of bins is larger than the energy resolution.
+\item
+ The integrand in \eq~(\ref{eq:simple_int}) is small at the bin range limits
+{\tt \$emin} and {\tt \$emax} (in order to avoid aliasing effects).
+\item
+ The neutrino oscillations are slow on a scale of the bin distance.
+\end{itemize}
+In this case, \eq~(\ref{eq:simple_int}) is reduced to
 \begin{equation}
 \label{eq:algo_one}
-n_i^c=N/L^2 \Delta E_i \sum_{j=1}^N \quad  \Phi^c(E_j)\,
+n_i^c=N/L^2 \, \sum_{j=1}^N \,  \Phi^c(E_j)\,
 P^c(E_j)\,
 \sigma^c(E_j)\,
-K_i^c(E_j)\,.
+K_i^c(E_j) \, \Delta E_j \,.
 \end{equation}
-The advantage of using equation~\ref{eq:algo_one} is that all factors
-independent of the oscillation parameters have to be evaluated only at 
-values of $E$ which are known in advance, \ie\ they can be put 
-into a look-up table. Another advantage is that also the probability
-has to be evaluated only at previously known values of the energy, which
+The advantages of this algorithm are obvious: All factors
+independent of the oscillation parameters have to be only evaluated once
+at values of $E$ which are known in advance, which means that they can be put 
+into a look-up table. In addition, the probability
+has to be only evaluated at previously known values of the energy, which
 makes it possible to compute the transition amplitudes for all channels
-in one step. The key assumption is that all involved factors are piece-wise
-constant, \ie\ they do not change within one bin. This assumption seems to be
-very restrictive, note however whenever one is analyzing simulated 
-data\footnote{simulated with the same algorithm} the errors
-made by violating this assumption nearly cancel between the simulated 
-data and the fitted data. This algorithm is the fastest which \GLOBES\ offers
-and is suitable whenever there are no fast oscillations. Otherwise severe
-aliasing effects may occur which usually lead to a failure of one of the 
-minimizing routines. This algorithm is selected by
+simultaneously. One assumption is that all involved factors are piece-wise
+constant, \ie, they hardly change within each bin. This 
+assumption seems to be very restrictive. Note, however, if one analyzes simulated data (which are simulated with the same algorithm), the errors
+will cancel between the simulated and fitted data. 
+%
+Furthermore, we will demonstrate in the next subsection that the assumption
+is rather good. ??? COMES THERE ???
+%
+This algorithm is the fastest which \GLOBES\ offers, and is selected by
 \begin{quote}
 {\tt \tb @type = 1}
 \end{quote}
+within the {\tt \#energy} environment.
 The computation of the bin kernel $K_i^c$ is performed
-by \GLOBES. To this end it requires  the number of bins
+by \GLOBES. Thus, it requires  the number of bins
  $N_\mathrm{bins}$
-and the minimum $E_\mathrm{min}$ and maximum energy $E_\mathrm{max}$. 
-Furthermore following parameterization
-for $R^c(E,E')$ is used
+and the minimum $E_\mathrm{min}$ and maximum energy $E_\mathrm{max}$
+for equidistant bins.
+ 
+As far as the parameterization for the energy resolution function 
+$R^c(E,E')$ in \eq~(\ref{eq:kernel}) is concerned, the algorithm uses
+the Gaussian
 \begin{equation}
-R^c(E,E')=\frac{1}{\sigma(E)\,\sqrt{2\pi}}\,e^{-\frac{(E-E')^2}{2\sigma^2(E)}}
+R^c(E,E')=\frac{1}{\sigma(E)\,\sqrt{2\pi}}\,e^{-\frac{(E-E')^2}{2\sigma^2(E)}} \, .
 \end{equation} 
-There are several energy resolution functions available and by default
-{\tt \#standard} is used. They can be chosen
-by
+CHECK FACTOR OF TWO IN DENOMINATOR WITH SOFTWARE (IMPORTANT)!!! (NORMALIZATION IS OK!)
+There are several energy resolution functions available, where by default
+{\tt \#standard} is used:
 \begin{quote}
-{\tt \tb @sigma\_function = \#standard}
+{\tt \tb @sigma\_function = \#standard} 
 \end{quote}
-where the energy resolution function named {\tt \#standard} is defined by
+The energy resolution function {\tt \#standard} is defined by
 \begin{equation}
 \label{eq:sigma_e}
-\sigma(E)=\alpha\cdot E + \beta \cdot \sqrt{E} +\gamma\,.
+\sigma(E)=\alpha\cdot E + \beta \cdot \sqrt{E} +\gamma\, ,
 \end{equation}
-The parameters $\alpha, \beta$ and $\gamma$ are provided by the user.
+where the parameters $\alpha, \beta$ and $\gamma$ are provided by the user:
 \begin{quote}
-{\tt \tb @sigma\_e = \{ 0.15, 0.0, 0.0\}}
+{\tt \tb @sigma\_e = \{0.15, 0.0, 0.0\}}
 \end{quote}
-The other possible choice for {\tt @sigma\_function} is {\tt \#inverse\_beta}
-which has only one parameter $\alpha$ and is defined by
+Currently, another possible choice for {\tt @sigma\_function} is {\tt \#inverse\_beta},
+which only uses the parameter $\alpha$. It is defined by
 \begin{equation}
 \sigma(E)= \left\{\begin{array}{cl}
  \alpha \cdot \sqrt{1000}^{-1}\,\sqrt{x-8\cdot10^{-4}}\,,&\mathrm{for}\,\, 
@@ -854,23 +871,24 @@ x>1.8\cdot10^{-3}\\
 5\cdot10^{-5} \,,&\mathrm{for}\,\, x \leq 1.8\cdot10^{-3}
 \end{array} \right.
 \end{equation}
+In the actual implementation of the algorithm,  the sum in \eq~(\ref{eq:algo_one}) is only computed for the $E_j$'s where $K(E_j)$ 
+is above a certain threshold, which is by default $10^{-7}$. 
+This threshold is defined at the compiling time. 
 
-
-In the actual implementation 
-the sum in equation one only extends over those $E_j$ where $K(E_j)$ 
-is above a certain threshold, by default $10^{-7}$. This threshold is 
-defined at compile time. Thus a complete energy resolution definition of this 
-type looks like
+Eventually,  a complete energy resolution definition of this 
+algorithm is, for example,
 \begin{quote}
 {\tt energy(\#name)<\\
 \tb @type = 1\\
 \tb @sigma\_function = \#standard\\
-\tb @sigma\_e = \{ 0.15 ,0.0 ,0.0\}\\
+\tb @sigma\_e = \{0.15 ,0.0 ,0.0\}\\
 >
 }
 \end{quote}
 
 \subsection{Low-pass filter based automatic energy smearing}
+
+THIS SUBSECTION WILL BE RE-WRITTEN BY PATRICK (WW)
 
 The second available algorithm is more complicated, a little slower but
 much more accurate and much less susceptible to aliasing effects
@@ -999,19 +1017,33 @@ smearing data and $\sigma_e$ is used to determine $\sigma_f^0$.
 
 \subsection{Manual energy smearing}
 
-Finally the user has the possibility to directly specify the smearing data.
-The format requires to provide $k_l^i$ and $k_u^i$ for each bin, the number of
-bins, the number of sampling points, the lower and upper limit of the sampling
-range. Furthermore the numbers $K_i(E_j)^c$ have to provide for all values
-in between $k_l^i$ and $k_u^i$. The convolution is then performed according to
-equation~\ref{eq:algo_one}. Thus a complete example for this case would be
-\begin{quote}
-{\tt
-\$simbins = 20\\
-\$simtresh =          4.0\\
-\$simbeam =         50.0\\
-}
+In some cases, one may use the output of a detector Monte Carlo simulation
+directly. Then one can use manual energy smearing instead of one of the
+automatic energy smearing algorithms. 
 
+The energy smearing matrix $K_{ij}$ has {\tt \$bins} rows and {\tt \$sampling\_points} columns, which are numbered from $0$ to {\tt \$bins}$-1$ or {\tt \$sampling\_points}$-1$. It is equivalent to the 
+bin- and sampling-point-based kernel in \eq~(\ref{eq:kernel}):
+\begin{equation}
+K_{ij} = K_i^c(E) |_{E=E_j},
+\label{equ:ematrix}
+\end{equation}
+where $E_j$ is the energy of the $j$th sampling point. In general, many of the entries in this matrix are zero, which means that it is convenient to evaluate the integrand in \eq~(\ref{eq:simple_int}) only at positions where
+$K_{ij}$ is non-zero. The corresponding ``sampling range'' range of non-zero matrix entries  in $K_{ij}$ for the $i$th energy bin is defined to run from
+column $k_l^i$ (``lower index'') to column $k_u^i$ (``upper index'').
+An example for a smearing matrix is
+\begin{equation}
+K_{ij} =   \underbrace{ \left( \begin{array}{cccccccccc} 
+a_{00} & a_{01} & a_{02} & a_{03} &  &  &  &  &  & \\
+a_{10} & a_{11} & a_{12} & a_{13} & a_{14} &  &  &  &  &  \\
+ & a_{21} & a_{22} & a_{23} & a_{24} & a_{25} &  &  &  &  \\
+ &  & a_{32} & a_{33} & a_{34} & a_{35} & a_{36} &  &  &  \\
+ &  &  & a_{43} & a_{44} & a_{45} & a_{46} & a_{47} &  &  \\
+& & & \uparrow  & & \ddots & & \uparrow & & \\
+& & & k_l^i & & & & k_u^i & & \\ 
+\end{array}\right) }_{\mathtt{\$sampling\_points}  \, \, \mathrm{columns}} \quad \leftarrow \quad \footnotesize{\mathtt{\$bins} \, \, \mathrm{rows}} \, ,
+\end{equation}
+where the unshown entries are zero. Thus, the values of $K_{ij}$ have to be specified between $k_l^i$ and $k_u^i$ in the form $\{ k_l^i,k_u^i, K_{i \, k_l^i}, K_{i k_l^i+1} , \hdots , K_{i k_u^i} \}$:
+\begin{quote}
 {\tt 
 energy(\#name)<\\
 \tb @energy =   \{0,2, 0.8634265, 0.0682827,     4e-06\}:\\
@@ -1020,6 +1052,12 @@ energy(\#name)<\\
 >
 }
 \end{quote}
+Note that the sum of all entries in each {\em column} should be equal 
+to unity,
+since all of the incoming neutrinos should be assigned to energy bins. In many practical cases, however, the definition of the energy smearing can
+lead to sums smaller than unity, such as in the case of truncated Gaussian
+distributions. The sum of entries in each {\em row} is not defined, since the events might be unevently distributed into the energy bins
+according to the energy resolution function.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Rules and the treatment of systematics}
