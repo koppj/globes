@@ -60,6 +60,9 @@
 \newcommand{\Refs}{Refs.}
 \newcommand{\Sec}{Sec.}
 \newcommand{\Secs}{Secs.}
+\newcommand{\Chapt}{Chapter}
+\newcommand{\Chapts}{Chapters}
+\newcommand{\Part}{Part}
 \newcommand{\App}{the Appendix}
 \newcommand{\Apps}{Appendices}
 \newcommand{\Tab}{Table}
@@ -76,6 +79,7 @@
 \newcommand{\Beta}{{\sc $\beta$-Beam}}
 
 \newcommand{\GLOBES}{{\sf GLoBES}}
+\newcommand{\AEDL}{{\sf AEDL}}
 \newcommand{\EDM}{{\sf EDM}}
 
 \newcommand{\equ}[1]{\eq~(\ref{equ:#1})}
@@ -190,7 +194,11 @@ General Long Baseline Experiment Simulator \\ }
 \vspace{1cm}
 
 \begin{center}
-Here comes our logo!
+\colorbox{black}{\includegraphics[width=7cm]{earthint}}
+
+\vspace*{-1cm}
+
+{\Huge \textcolor{yellow}{GLoBES}}
 \end{center}
 
 \vspace{1cm}
@@ -214,9 +222,53 @@ Version from \today
 \cleardoublepage
 \setcounter{page}{1}
 
-\chapter*{What is \GLOBES\ good for?}
+\chapter*{What is \GLOBES ?}
 
-Here comes a maximum of one page what \GLOBES\ is good for and what main features it has.
+\GLOBES\ (``General Long Baseline Experiment Simulator'') is a flexible
+software package to simulate neutrino long baseline experiments. On the
+one hand, it contains a comprehensive abstract experiment definition
+language, which allows to describe most classes of long baseline experinents
+at an abstract level. On the other hand, it provides a C-library to 
+process the experiment information in order to obtain oscillation
+probabilities, rate vectors, and $\Delta \chi^2$-values. Currently, 
+\GLOBES\ is available for Linux. Since the source code is included,
+the modifications to other operating systems should be doable.
+
+\GLOBES\ allows to simulate experiments with stationary neutrino point sources, where each experiment is assumed to have only one neutrino source.
+Such experiments are neutrino beam experiments and reactor experiments. 
+Geometrical effects of a source distribution, such as in the sun or the 
+atmosphere, can not be described. In addition, sources with a physically 
+significant time dependencies  can not be studied, such as  supernov\ae. It 
+is, however, possible to simulate beams with bunch structure, since the 
+time dependence of the neutrino source is physically only important to suppress backgrounds. 
+
+On the experiment definition side, either built-in neutrino fluxes
+(\eg, neutrino factory) or arbitrary fluxes can be used. Similarly,
+arbitrary cross sections, energy dependent efficiencies, the
+energy resolution function, the considered oscillation channels, and
+many other features can be specified. For the systematics, energy
+normalization and calibration errors can be simulated. Note that
+the energy ranges and windows, as well as the bin widths can be
+(almost) arbitrarily chosen, which means that variable bin
+widths are allowed. Together with \GLOBES\ comes a number of
+pre-defined experiments in order to demonstrate the capabilities
+of \GLOBES\ and to provide prototypes for new experiments.
+
+With the C-library, one can extract the $\Delta \chi^2$ for all defined 
+oscillation channels for an experiment or any combination of experiments.
+Of course, also low-level information, such as oscillation
+probabilities or event rates, can be obtained. \GLOBES\ includes the
+simulation of neutrino oscillations in matter with arbitrary matter 
+density profiles, as well as it allows to simulate the matter density
+uncertainty. As one of the most
+advanced features of \GLOBES , it provides the technology to 
+project the $\Delta \chi^2$, which is a function of all oscillation
+parameters, onto any subspace of parameters by local minimization. 
+This approach allows the inclusion of multi-parameter-correlations,
+where external input (\eg, from solar parameters) can be imposed, too.
+Applications of the projection mechanism include the projections onto the $\stheta$-axis and the $\stheta$-$\deltacp$-plane. In addition, all oscillation parameters can be kept free to precicely localize 
+degenerate solutions.
+
 \cleardoublepage
 \tableofcontents
 
@@ -224,12 +276,89 @@ Here comes a maximum of one page what \GLOBES\ is good for and what main feature
 \setcounter{page}{1}
 \pagenumbering{arabic}
 
-\chapter*{How to use this manual: Different layers in \GLOBES }
+\chapter*{How to use this manual}
 \addcontentsline{toc}{chapter}{How to use this manual}
 
-What is in which part ...
+As it is illustrated in \figu{GLOBES}, \GLOBES\ consists 
+of several modules.
+%
+\begin{figure}[bht]
+\begin{center}
+\includegraphics[width=16cm]{GLOBES}
+\end{center}
+\caption{\label{fig:GLOBES} Different modules in \GLOBES .}
+\end{figure}
+%
+\AEDL (``Abstract Experiment Definition Language'') is a language
+to define experiments in form of normal text files. One or more of 
+the resulting \AEDL\ files can then be processed together with supporting 
+flux or cross section files by the user interface. The user interface
+is a C-library, which loads one or more \AEDL\ file(s)
+containing the experiment definition(s). The user interface is linked 
+against the application software, which calls the user interface functions
+for the intended experiment simulation. 
 
-Graphics: Different layers/modules in \GLOBES 
+The application 
+software is, except from some example files, not part of \GLOBES , since
+the evaluation of the experiment performance is often a matter of taste
+and definition. In addition, the algorithms depend, especially for
+high-precision instruments, very much on the oscillation parameters.
+In general, it is quite simple to simulate superbeams and reactor
+experiments. However, because of the more complicated topology, the
+simulation of neutrino factories is much more difficult. In order
+to demonstrate some of these difficulties, we show in this manual only
+examples with neutrino factories. These examples can be found in
+\Part~\ref{part:1} within the boxed pages. As complete files, they
+are also available in the \GLOBES\ software package.
+
+The \GLOBES\ software may have two target groups: 
+Physicists, who are mainly interested in optimizing the potential
+of specific experimental setups, and others, who are mainly
+interested in the physics potential of different experiment types
+from a theoretical point of view.
+For the first group, \AEDL\ could be the most interesting aspect of
+\GLOBES , where the user interface is only a tool to obtain specific
+parameter sensitivities. In this case, \GLOBES\ could, serve as a
+unified tool for the comparison and optimization of different experiment
+ setups on equal footing, where
+it is the primary objective to simulate the experiments as accurate
+as possible. In addition, changes in experimental parameters, such as
+efficiences or the energy resolutions, can quickly be tested.
+%
+For the second user group, the pre-defined 
+experiment definition files might already be sufficient to test
+new conceptual approaches, and the user interface is the most interesting
+aspect for sophisticated applications including correlations,
+degeneracies, and multi-experiment setups. In either case, the \GLOBES\
+software could serve as a platform for the exchange of experiment
+definitions, and for an efficient splitting of work between
+experimentalists and theorists.
+
+The user interface functions are described in \Part~\ref{part:1} of 
+this manual, which is the ``user's manual''. In there, first of all a 
+short \GLOBES\ tour is given in \Chapt~\ref{chapter:tour} in order to 
+have an overview over \GLOBES . 
+After that, the user
+interface is successively introduced from very basic to more sophisticated
+function. Eventually, it is demonstrated how one can change many
+experiment parameters at running time (such as baseline or target mass), and how one can ontain low-level
+information. We recommend that everybody interested in \GLOBES\ should
+become familiar at least with the concepts in \Chapt~\ref{chapter:tour}
+ and some of the examples on the boxed pages. The examples can be 
+ directly compiled 
+ from the respective directory in the \GLOBES\ software package.
+
+In \Part~\ref{part:2} of the manual, \AEDL\ is described. After an
+introductory chapter, all functions are defined in greater detail.
+This part might be more interesting for the experimental users who
+want to modify or create \AEDL\ files. A useful tool in this context
+is the software program ``globes'', which returns event rates and other
+information for individual \AEDL\ files without further programming. 
+For example, flux normalizations can with this tool be easily adjusted 
+to reproduce the event rates of a specific experiment.
+
+Finally, \Part~\ref{part:3} of this manual serves as reference manual,
+and the appendix contains further supplementary information.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % PART I: User's manual
