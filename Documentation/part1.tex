@@ -695,7 +695,7 @@ Since the pre-defined experiments in \tabl{experiments} are given for specific l
  parameters of the individual experiments:
 \begin{function}
 \GLBNS{SetSourcePower}
-{\tt void glbSetSourcePower(double power, int exp, int fluxno)}
+{\tt void glbSetSourcePower(int exp, int fluxno, double power)}
  sets the source power of experiment number {\tt exp} and flux number
  {\tt fluxno} to {\tt power}. The definition of the source power depends on the experiment type as described above.
 \end{function}
@@ -703,11 +703,11 @@ Since the pre-defined experiments in \tabl{experiments} are given for specific l
 \GLBNS{GetSourcePower}
 {\tt double glbGetSourcePower(int exp, int fluxno)}
  returns the source power of experiment number {\tt exp} and flux number
- {\tt fluxno}. 
+ {\tt fluxno}.
 \end{function}
 \begin{function}
 \GLBNS{SetRunningTime}
-{\tt void glbSetRunningTime(double time, int exp, int fluxno)}
+{\tt void glbSetRunningTime(int exp, int fluxno, double time)}
  sets the running time of experiment number {\tt exp} and flux number
  {\tt fluxno} to {\tt time} years.
 \end{function}
@@ -719,7 +719,7 @@ Since the pre-defined experiments in \tabl{experiments} are given for specific l
 \end{function}
 \begin{function}
  \GLBNS{SetTargetMass}
-{\tt void glbSetTargetMass(double mass,int exp)}
+{\tt void glbSetTargetMass(int exp, double mass)}
 sets the fiducial detector mass of experiment number {\tt exp} to {\tt mass} tons or kilotons (depending on the experiment definition).
 \end{function}
 \begin{function}
