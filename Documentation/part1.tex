@@ -78,7 +78,7 @@ char MYFILE[]="testX.dat"; \\
 int main(int argc, char *argv[]) \\
 \{  \\
 \\
- \hspace*{0.5cm} GLBInit(argv[0]); \hspace*{0.5cm} /* Initialize GLoBES library */ \\
+ \hspace*{0.5cm} glbInit(argv[0]); \hspace*{0.5cm} /* Initialize GLoBES library */ \\
 \\  
   \hspace*{0.5cm} glbInitExperiment("NuFact.glb",\&glb\_experiment\_list[0], \\
   \hspace*{1cm} \&glb\_num\_of\_exps); \hspace*{0.5cm} /* Initialize experiment NuFact.glb */\\
@@ -244,33 +244,36 @@ Calculating a $\chi^2$-value with or without systematics, but no correlations an
 
 \example{Correlation between $\stheta$ and $\deltacp$}{
 \label{ex:corrth13dcp}
-
 \index{Two-parameter correlation}
-A typical application for {\tt Chi} and {\tt SingleChi} is the visualization of two-parameter correlations. For example, to show the correlation between $\stheta$ and $\deltacp$ at a large neutrino factory with four years of running time for each polarity, one can use the following code:
+A typical and fast application for \GLB{glbChiSys} is the visualization of
+ two-parameter correlations. For example, to calculate the two-parameter 
+ correlation between $\stheta$ and $\deltacp$ at a neutrino factory, one
+ can use the following code excerpt from {\tt example1.c}:
 \begin{quote}
-{\tt
-/\% Experiment initialization: \%/ \\
-ClearExp(); \\
- InitExperiment("{\tt NuFact2.exp}"); \\
- SetRunningTime(0,4.0); \\
- MInfoExperiment(); \\
+{\tt {\footnotesize
+  /* Initialize parameter vector(s) and compute simulated data */ \\
+  glbDefineParams(true\_values,theta12,theta13,theta23,deltacp,sdm,ldm); \\
+  glbDefineParams(test\_values,theta12,theta13,theta23,deltacp,sdm,ldm);  \\
+  glbSetOscillationParameters(true\_values); glbSetRates(); \\
 \\
-/\% Set reference rate vector: \%/ \\
-th12=arcsin(sqrt(0.8))/2; sdm=7e-5; \\
-th23=3.14/4; ldm=2e-3; \\
-th13=arcsin(sqrt(0.001))/2; dcp=3.14/2; \\
-\mbox{SetVacuumParameters(\{th12, \, th13, \, th23, \, dcp, \, sdm, \, ldm\}); }\\
- SetRates(); \\
-\\
-/\% Compute chi-square matrix: \%/ \\
-for (float x=-4; x<-2; x=x+2/50) \\
-\hspace*{0.5cm} for (float y=0; y<200; y=y+200/50) \{ \\
-\hspace*{1cm} theth13 = arcsin(sqrt(10$\hat{\, \, \,}$x))/2; \\
-\mbox{\hspace*{1cm} Print(\{x,y,Chi(\{th12, theth13,  th23,  y, sdm, ldm, 1.0\}) \}) \};}
-}
+  /* Iteration over all values to be computed */ \\
+  double x,y,res; \\   
+  for(x=-4.0;x<-2.0+0.01;x=x+2.0/50) \\
+  for(y=0.0;y<200.0+0.01;y=y+200.0/50) \\
+  \{ \\
+\hspace*{0.5cm} /* Set parameters in vector of test values */ \\
+\hspace*{0.5cm} glbSetOscParams(test\_values,asin(sqrt(pow(10,x)))/2,GLB\_THETA\_13); \\
+\hspace*{0.5cm} glbSetOscParams(test\_values,y*M\_PI/180.0,GLB\_DELTA\_CP); \\
+  \\
+\hspace*{0.5cm} /* Compute Chi2 for all loaded experiments and all rules */ \\
+\hspace*{0.5cm} res=glbChiSys(test\_values,GLB\_ALL,GLB\_ALL); \\
+\hspace*{0.5cm} AddToOutput(x,y,res); \\
+  \} \\
+} }
 \end{quote}
 
-The resulting matrix can then be plotted as a contour plot (2 d.o.f.):
+
+The resulting data can then be plotted as a contour plot (2 d.o.f.):
 \begin{center}
 \colorbox{white}{\includegraphics[width=8cm]{correx}}
 \end{center}
@@ -358,28 +361,40 @@ In this example, the starting values are set to the best-fit values. The input e
 \index{Two-parameter correlation}
 \index{Multi-parameter correlation}
 
-This example demonstrates how to use  {\tt ChiTheta} to project the fit manifold onto the $\stheta$-axis, \ie, how one can include correlations. We compute two sets of data: one for keeping all parameters but $\deltacp$ fixed (two-parameter correlations), and one for keeping all parameters free (multi-parameter correlation), but some external input for the solar parameters and $\rho$. Note that fixing all parameters but $\deltacp$ corresponds to imposing external knowledge on these parameters.
+This example demonstrates how to project the fit manifold onto the $\stheta$-axis, \ie, how one can include correlations. We compute two sets of data: one for keeping all parameters but $\deltacp$ fixed (two-parameter correlation), and one for keeping all parameters free (multi-parameter correlation). However, we impose external precisions for the solar parameters and the matter density. The following code excerpt is from 
+{\tt example2.c}:
 
 \begin{quote}
-{\tt {\footnotesize
-/\% Experiment initialization, set reference rate vector: \%/ \\
-\mbox{ClearExp(); InitExperiment("{\tt NuFact2.exp}"); SetRunningTime(0,4.0); }\\
-th12=arcsin(sqrt(0.8))/2; sdm=7e-5; th23=3.14/4; ldm=2e-3; \\
-th13=arcsin(sqrt(0.001))/2; dcp=3.14/2; \\
-\mbox{SetVacuumParameters(\{th12, th13, th23, dcp, sdm, ldm\}); SetRates();}\\
+{\tt {\scriptsize
+  /* Set starting values and input errors for all projections */  \\
+  glbDefineParams(input\_errors,theta12*0.1,10,10,10,sdm*0.1,ldm);\\  
+  glbSetDensityParams(input\_errors,0.05,GLB\_ALL);\\
+  glbSetStartingValues(true\_values);\\
+  glbSetInputErrors(input\_errors);\\
 \\
-/\%  Compute chi-square list with all but dcp fixed: \%/ \\
-SetStartingValues(\{th12, th13, th23, dcp, sdm, ldm, 1.0\}); \\
-\mbox{SetInputErrors(\{th12*0.001, 10, th23*0.001, 10, sdm*0.001, ldm*0.001, 0.001\});} \\
-for (float x=-4; x<-2; x=x+2/20) \\
-\mbox{\hspace*{0.5cm} Print(\{x,ChiDelta(x,\{th12, th13, th23, dcp, sdm, ldm, 1.0\}) \}); }\\
+  /* Define two-parameter projection: Only deltacp is free! */ \\
+  glbDefineProjection(th13\_projection,GLB\_FIXED,GLB\_FIXED,GLB\_FIXED,GLB\_FREE,GLB\_FIXED,GLB\_FIXED); \\
+  glbSetProjection(th13\_projection); \\ 
 \\
-/\% Compute chi-square list with all parameters free: \%/ \\
-\mbox{/\% (but: 10\% prec. for solar params, 5\% for matter density) \%/} \\
-SetStartingValues(\{th12, th13, th23, dcp, sdm, ldm, 1.0\}); \\
-SetInputErrors(\{th12*0.1, 10, 10, 10, sdm*0.1, ldm, 0.05\}); \\
-for (float x=-4; x<-2; x=x+2/20) \\
-\mbox{\hspace*{0.5cm} Print(\{x,ChiDelta(x,\{th12, th13, th23, dcp, sdm, ldm, 1.0\}) \});}
+  /* Iteration over all values to be computed */ \\
+  double x,res1,res2;     \\
+  for(x=-4;x<-2.0+0.001;x=x+2.0/50) \\
+  \{ \\
+\hspace*{0.5cm}  /* Set fit value of stheta */ \\
+\hspace*{0.5cm} glbSetOscParams(test\_values,asin(sqrt(pow(10,x)))/2,1); \\
+    \\
+\hspace*{0.5cm} /* Guess fit value for deltacp in order to safely find minimum */ \\
+\hspace*{0.5cm} glbSetOscParams(test\_values,200.0/2*(x+4)*M\_PI/180,3); \\
+ \\
+\hspace*{0.5cm} /* Compute Chi2 for user-defined two-parameter correlation */ \\
+\hspace*{0.5cm} res1=glbChiNP(test\_values,NULL,GLB\_ALL); \\
+      \\
+\hspace*{0.5cm} /* Compute Chi2 for full correlation: minimize over all but theta13 */ \\
+\hspace*{0.5cm} res2=glbChiTheta(test\_values,NULL,GLB\_ALL); \\
+  \\
+\hspace*{0.5cm} AddToOutput(x,res1,res2);\\
+  \} \\
+  
 }}
 \end{quote}
 The two lists of data then represent the $\stheta$ precisions with two-parameter correlations (gray-shaded) and multi-parameter correlations (arrows):
@@ -446,33 +461,33 @@ Though the usage of the all-parameter minimizers is quite simple, one should kee
 \example{Finding the $\mathrm{sgn}(\ldm)$-degeneracy}{
 \label{ex:sgndeg}
 
-In many cases, one can find the $\mathrm{sgn}(\ldm)$-degeneracy with {\tt ChiAll}: One lets the local minimizer start at the position of the suspected solution at the opposite sign of $\ldm$.  The following example corresponds to finding the degenerate solution for the example on page~\pageref{ex:corrth13dcp}.
+In many cases, one can find the exact position of the $\mathrm{sgn}(\ldm)$-degeneracy with \GLB{glbChiAll}, where one starts 
+the local minimizer at the suspected position 
+and let it converge into the minimum.  The following code excerpt  corresponds to finding the degenerate solution for the example on
+  page~\pageref{ex:corrth13dcp}, and it is from {\tt example3.c}: 
 \begin{quote}
 {\tt
 {\footnotesize
-/\% Experiment initialization: \%/ \\
-ClearExp(); InitExperiment("{\tt NuFact2.exp}"); SetRunningTime(0,4.0); \\
-\\
-/\% Set reference rate vector: \%/ \\
-th12=arcsin(sqrt(0.8))/2; sdm=7e-5; th23=3.14/4; ldm=2e-3; \\
-th13=arcsin(sqrt(0.001))/2; dcp=3.14/2; \\
-\mbox{SetVacuumParameters(\{th12, \, th13, \, th23, \, dcp, \, sdm, \, ldm\});  SetRates();} \\
-\\
-/\% Find negative-sign solution: \%/ \\
-SetStartingValues(\{th12, \, th13, \, th23, \, dcp, \, sdm, \, -ldm, \, 1.0\}); \\
-SetInputErrors(\{th12*0.1, \, 10, \, 10, \, 10, \, sdm*0.1, \, ldm/3, \, 0.05\}); \\
-d = ChiAll(\{th12, \, th13, \, th23, \, dcp, \, sdm, \, ldm, \, 1.0\}); \\
-\\
-/\% Compute chi-square matrix: \%/ \\
-for (float x=-4; x<-2; x=x+2/50) \\
-\hspace*{0.5cm} for (float y=0; y<200; y=y+200/50) \{ \\
-\hspace*{1cm} theth13 = arcsin(sqrt(10$\hat{\, \, \,}$x))/2; \\
-\mbox{\hspace*{1cm} Print(\{x,y,Chi(\{d[2], theth13,  d[4],  y, d[6], d[7], d[8]\}) \}) \};}
-}
-}
+  /* Set starting vales to suspected position at opposite sign of ldm */ \\
+  \mbox{glbDefineParams(starting\_values,theta12,theta13,theta23,deltacp,sdm,-ldm);} \\
+  \\
+  /* Set input errors for external input, where some information on ldm \\
+   \hspace*{0.5cm} is imposed in order to avoid falling into the right-sign solution */ \\
+  glbDefineParams(input\_errors,theta12*0.1,10,10,10,sdm*0.1,ldm/3); \\ 
+  glbSetDensityParams(input\_errors,0.05,GLB\_ALL); \\
+  \\
+  glbSetStartingValues(starting\_values); \\
+  glbSetInputErrors(input\_errors); \\
+  \\
+  /* Localize degenerate solution by minimzation over all parameters */ \\
+  double CL=glbChiAll(starting\_values,deg\_pos,GLB\_ALL); \\
+   \\
+  \mbox{/* Now: CL is the chi2 of the deg.~solution and deg\_pos the position */} 
+}}
 \end{quote}
 
-The resulting matrix can then be plotted as a contour plot in addition to the original solution (2 d.o.f., gray contours):
+Using {\tt ent\_pos} to obtain a section of the degeneracy in the
+$\stheta$-$\deltacp$-plane (\cf, {\tt example3.c}), one can plot it as a contour plot in addition to the original solution (2 d.o.f., gray curves):
 \begin{center}
 \colorbox{white}{\includegraphics[width=7.5cm]{correntex}}
 \end{center}
@@ -515,27 +530,45 @@ Finally, note that any degenerate solution below the confidence level threshold 
 \label{ex:corrproj}
 \index{Bar charts}
 \index{Systematics on/off}
-
-Here it is shown how one can successively include systematics, correlations,
-and degeneracies at the example of the $\stheta$ sensitivity limit.
+Here it is demonstrated how one can successively include systematics, correlations, and degeneracies at the example of the $\stheta$-sensitivity limit.
 An important part of this example is how two switch the systematics off,
 \ie, how to obtain the sensitivity limit from statistics only. Since
-this example is very advanced, we only show the respective part of the code:
+this example is very advanced, we only show the respective function of the code:
 \begin{quote}
 {\tt 
-Here comes the code excerpt.
+/* Calculate chi2 with statistics only */ \\
+double CalcNoSystematics(double theldm,double thex) \\
+\{ \\
+\hspace*{0.5cm} /* Switch systematics off for all exps and all rules */ \\
+\hspace*{0.5cm} glbSwitchSystematics(GLB\_ALL,GLB\_ALL,GLB\_OFF); \\
+\\
+\hspace*{0.5cm} /* Calculate Chi2-list as if systematics were on */ \\
+\hspace*{0.5cm} double res=CalcSystematics(theldm,thex); \\
+\\
+\hspace*{0.5cm} /* Switch systematics on for all exps and all rules */ \\
+\hspace*{0.5cm} glbSwitchSystematics(GLB\_ALL,GLB\_ALL,GLB\_ON); \\
+\\
+\hspace*{0.5cm} return res; \\
+\} \\
 }
 \end{quote}
-The complete code can be found as ``example4.c'' with the software.
 
-The returned lists of data then represent $\Delta \chi^2$ 
+\vspace*{-0.5cm}
+
+The complete code can be found as {\tt example4.c} with the software,
+which consists of many of the applications from the earlier examples.
+In addition, it uses a little trick: It avoids falling into the wrong
+ solution with {\tt glbChiTheta}
+by using the fit value of $\deltacp$ from the step before as prediction
+of the position of the current calculation.
+
+The returned lists of data from thie example represent $\chi^2$ 
 as function of the fit value of $\stheta$. The intersections of these
-curves with the line $\Delta \chi^2 = 9$ give the $\stheta$ sensitivity
-limits, where we do not include the $\mathrm{sgn}(\ldm)$- and $(\deltacp,\theta_{13})$-degeneracies in the sensitivity limit with
-correlations only (green bar):
+curves with the line $\chi^2 = 9$ give the $\stheta$ sensitivity
+limits at the $3 \sigma$ confidence level, where we do not include the
+ $\mathrm{sgn}(\ldm)$- and $(\deltacp,\theta_{13})$-degeneracies in the sensitivity limit with correlations only (green bar):
 \begin{center}
-\colorbox{white}{\includegraphics[width=7cm]{barsex}}
-
+\colorbox{white}{\includegraphics[width=6.5cm]{barsex}}
 \end{center}
 }
 

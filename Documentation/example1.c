@@ -1,5 +1,27 @@
-/* Example: Correlation between s22th13 and deltacp
- * Copyright 2004 GLoBES collaboration
+/* GLoBES -- General LOng Baseline Experiment Simulator
+ * (C) 2002 - 2004,  The GLoBES Team
+ *
+ * GLoBES is mainly intended for academic purposes. Proper
+ * credit must be given if you use GLoBES or parts of it. Please
+ * read the section 'Credit' in the README file.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+ 
+ /* 
+ * Example: Correlation between s22th13 and deltacp
  * Compile with ``make example1''
  */ 
 
@@ -17,10 +39,10 @@ char MYFILE[]="test1.dat";
 int main(int argc, char *argv[])
 { 
   /* Initialize libglobes */
-  GLBInit(argv[0]); 
+  glbInit(argv[0]); 
 
   /* Initialize experiment NuFact.glb */
-  GLBInitExperiment("NuFact.glb",&ExpList[0],&numofexps); 
+  glbInitExperiment("NuFact.glb",&glb_experiment_list[0],&glb_num_of_exps); 
  
   /* Intitialize output */
   InitOutput(MYFILE,"Format: Log(10,s22th13)   deltacp   chi^2 \n"); 
@@ -34,17 +56,15 @@ int main(int argc, char *argv[])
   double ldm = 2e-3;
   
 	/* Initialize parameter vector(s) */
-  glb_params true_values = alloc_params();
-  glb_params test_values = alloc_params();
+  glb_params true_values = glbAllocParams();
+  glb_params test_values = glbAllocParams();
 
-  true_values = 
-    GLBDefineParams(true_values,theta12,theta13,theta23,deltacp,sdm,ldm);
-  test_values =  
-    GLBDefineParams(test_values,theta12,theta13,theta23,deltacp,sdm,ldm);  
+  glbDefineParams(true_values,theta12,theta13,theta23,deltacp,sdm,ldm);
+  glbDefineParams(test_values,theta12,theta13,theta23,deltacp,sdm,ldm);  
 
   /* The simulated data are computed */
-  GLBSetOscillationParameters(true_values);
-  MSetRates();
+  glbSetOscillationParameters(true_values);
+  glbSetRates();
 
   /* Iteration over all values to be computed */
   double thetheta13,x,y,res;    
@@ -52,19 +72,19 @@ int main(int argc, char *argv[])
   for(x=-4.0;x<-2.0+0.01;x=x+2.0/50)
   for(y=0.0;y<200.0+0.01;y=y+200.0/50)
   {
-      /* Set vector of test=fit values */
+      /* Set vector of test values */
       thetheta13=asin(sqrt(pow(10,x)))/2;
-      test_values=set_osc_params(test_values,thetheta13,1);
-      test_values=set_osc_params(test_values,y*M_PI/180.0,3);
+      glbSetOscParams(test_values,thetheta13,1);
+      glbSetOscParams(test_values,y*M_PI/180.0,3);
   
       /* Compute Chi^2 for all loaded experiments and all rules */
-      res=GLBChiSys(test_values,GLB_ALL,GLB_ALL);
+      res=glbChiSys(test_values,GLB_ALL,GLB_ALL);
       AddToOutput(x,y,res);
   }
    
   /* Destroy parameter vector(s) */
-  free_params(true_values);
-  free_params(test_values); 
+  glbFreeParams(true_values);
+  glbFreeParams(test_values); 
   
   exit(0);
 }

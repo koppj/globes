@@ -1,5 +1,27 @@
-/* Example: Finding the sgn(dm31^2)-degeneracy
- * Copyright 2004 GLoBES collaboration
+/* GLoBES -- General LOng Baseline Experiment Simulator
+ * (C) 2002 - 2004,  The GLoBES Team
+ *
+ * GLoBES is mainly intended for academic purposes. Proper
+ * credit must be given if you use GLoBES or parts of it. Please
+ * read the section 'Credit' in the README file.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+ 
+ /* 
+ * Example: Find the sgn(dm31^2)-degeneracy and compute shape with glbChiSys
  * Compile with ``make example3''
  */ 
 
@@ -17,10 +39,10 @@ char MYFILE[]="test3.dat";
 int main(int argc, char *argv[])
 { 
   /* Initialize libglobes */
-  GLBInit(argv[0]); 
+  glbInit(argv[0]); 
 
   /* Initialize experiment NuFact.glb */
-  GLBInitExperiment("NuFact.glb",&ExpList[0],&numofexps); 
+  glbInitExperiment("NuFact.glb",&glb_experiment_list[0],&glb_num_of_exps); 
 
   /* Intitialize output */
   InitOutput(MYFILE,"Format: Log(10,s22th13)   deltacp   chi^2 \n"); 
@@ -34,34 +56,26 @@ int main(int argc, char *argv[])
   double ldm = 2e-3;
   
 	/* Initialize parameter vector(s) */
-  glb_params true_values = alloc_params();
-  glb_params starting_values = alloc_params();
-  glb_params input_errors = alloc_params();
-  glb_params deg_pos = alloc_params();
+  glb_params true_values = glbAllocParams();
+  glb_params starting_values = glbAllocParams();
+  glb_params input_errors = glbAllocParams();
+  glb_params deg_pos = glbAllocParams();
 
   /* The simulated data are computed */
-  true_values = 
-    GLBDefineParams(true_values,theta12,theta13,theta23,deltacp,sdm,ldm);
-  GLBSetOscillationParameters(true_values);
-  MSetRates();
+  glbDefineParams(true_values,theta12,theta13,theta23,deltacp,sdm,ldm);
+  glbSetOscillationParameters(true_values);
+  glbSetRates();
 
   /* Find sgn-degeneracy */  
-  starting_values=
-    GLBDefineParams(starting_values,theta12,theta13,theta23,deltacp,sdm,-ldm);  
-  input_errors =  
-    GLBDefineParams(input_errors,theta12*0.1,10,10,10,sdm*0.1,ldm/3);  
-  input_errors = set_density_params(input_errors,0.05,GLB_ALL);
-  GLBSetStartingValues(starting_values);
-  GLBSetInputErrors(input_errors);
-  /* BUGFIX: later the following will be replaced by 
-    double CL=GLBChiALL(starting_values,deg_pos,GLB_ALL); */ 
-  int i,projection[GLB_OSCP+32]; 
-  for(i=0;i<GLB_OSCP+numofexps;i++) projection[i]=GLB_FREE;
-  SelectProjection(&projection[0]);        
-  double CL=GLBChiNP(starting_values,deg_pos,GLB_ALL);
+  glbDefineParams(starting_values,theta12,theta13,theta23,deltacp,sdm,-ldm);  
+  glbDefineParams(input_errors,theta12*0.1,10,10,10,sdm*0.1,ldm/3);  
+  glbSetDensityParams(input_errors,0.05,GLB_ALL);
+  glbSetStartingValues(starting_values);
+  glbSetInputErrors(input_errors);
+  double CL=glbChiAll(starting_values,deg_pos,GLB_ALL);
    
   printf("Position of degeneracy: s22th13=%g, deltacp=%g; Confidence level: %g \n",
-    get_osc_params(deg_pos,1),get_osc_params(deg_pos,3),CL);
+    glbGetOscParams(deg_pos,1),glbGetOscParams(deg_pos,3),CL);
   
   /* If degeneracy at low enough confidence level: compute section */
   if(CL<9.0)
@@ -70,22 +84,23 @@ int main(int argc, char *argv[])
     for(x=-4.0;x<-2.0+0.01;x=x+2.0/50)
     for(y=0.0;y<200.0+0.01;y=y+200.0/50)
     {
-        /* Set vector of test=fit values */
+        /* Set vector of test values */
         thetheta13=asin(sqrt(pow(10,x)))/2;
-        deg_pos=set_osc_params(deg_pos,thetheta13,1);
-        deg_pos=set_osc_params(deg_pos,y*M_PI/180.0,3);
+        glbSetOscParams(deg_pos,thetheta13,1);
+        glbSetOscParams(deg_pos,y*M_PI/180.0,3);
     
         /* Compute Chi^2 for all loaded experiments and all rules */
-        res=GLBChiSys(deg_pos,GLB_ALL,GLB_ALL);
+        res=glbChiSys(deg_pos,GLB_ALL,GLB_ALL);
+
         AddToOutput(x,y,res);
     }
   }
    
   /* Destroy parameter vector(s) */
-  free_params(true_values);
-  free_params(starting_values); 
-  free_params(input_errors); 
-  free_params(deg_pos); 
+  glbFreeParams(true_values);
+  glbFreeParams(starting_values); 
+  glbFreeParams(input_errors); 
+  glbFreeParams(deg_pos); 
   
   exit(0);
 }
