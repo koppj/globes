@@ -276,7 +276,7 @@ int glbNameToValue(int exp, const char* context, const char *name);
 const char *glbValueToName(int exp,const char* context, int value);
 
 /* Trying to get a tree-like linkage */
-void glbInit(char *name);
+/* void glbInit(char *name); */
 
 /* General Module support */
 int glbProbeModule(const char *module_name, int verbosity);
@@ -285,9 +285,11 @@ int glbCloseModule(glb_dlhandle stale);
 void *glbSymModule(glb_dlhandle module,const char *symbol_name);
 
 /* Adding user defined priors */
+#ifndef SWIG
 int glbRegisterPriorFunction(double (*prior)(const glb_params),
 			     int (*starting)(const glb_params),
 			     int (*error)(const glb_params));
+#endif /* SWIG */
 int glbUsePrior(glb_dlhandle module);
 
 

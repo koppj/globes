@@ -29,6 +29,13 @@ exec_prefix=@exec_prefix@
 includedir=@includedir@
 libdir=@libdir@
 pkglibdir=@libdir@/globes
+perl_ext=@really_build_perl@
+
+extension_list=""
+
+if test $perl_ext = "yes"; then
+extension_list="$extension_list perl"
+fi
 
 # FIXME
 # The usual way to access the depencies of libglobes seems to have
@@ -42,7 +49,9 @@ usage()
 Usage: globes-config [OPTION]
 
 Known values for OPTION are:
-
+ 
+  --extensions          show which language extensions for globes 
+                        have been installed
   --prefix		show GLoBES installation prefix 
   --libs		print library linking information
   --ltlibs              print linking information for use with libtool
@@ -76,6 +85,21 @@ while test $# -gt 0; do
 
     --prefix)
 	echo $prefix
+	;;
+
+    --extensions=*)
+	case "$optarg" in
+	perl)
+	    echo "$pkglibdir/perl"
+	    ;;
+	  
+  	*)
+	    echo "There is no language extension for $optarg"
+	    ;;
+	esac
+	;;
+    --extensions)
+	echo "$extension_list"
 	;;
 
     --version)

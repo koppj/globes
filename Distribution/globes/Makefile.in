@@ -14,6 +14,10 @@
 
 @SET_MAKE@
 
+
+
+SOURCES = $(globes_perl_la_SOURCES)
+
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
 VPATH = @srcdir@
@@ -35,26 +39,55 @@ NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
 host_triplet = @host@
+@PERL_TRUE@am__append_1 = && cd $(DESTDIR)$(perlexecdir) &&\
+@PERL_TRUE@ $(LN_S) -f globes_perl$(shrext_cmds) globes$(shrext_cmds) &&\
+@PERL_TRUE@cd -
+
+@PERL_TRUE@am__append_2 = && cd $(DESTDIR)$(perlexecdir) &&\
+@PERL_TRUE@	rm -f globes$(shrext_cmds) && cd -
+
 subdir = globes
 DIST_COMMON = $(pkginclude_HEADERS) $(srcdir)/Makefile.am \
-	$(srcdir)/Makefile.in
+	$(srcdir)/Makefile.in $(srcdir)/example.pl.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
+am__aclocal_m4_deps = $(top_srcdir)/m4/lapack.m4 \
+	$(top_srcdir)/m4/rpm.m4 $(top_srcdir)/m4/swig.m4 \
+	$(top_srcdir)/m4/swig_perl.m4 $(top_srcdir)/acinclude.m4 \
 	$(top_srcdir)/configure.in
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/config.h
-CONFIG_CLEAN_FILES =
-SOURCES =
-DIST_SOURCES =
+CONFIG_CLEAN_FILES = example.pl
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
     $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
     *) f=$$p;; \
   esac;
 am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
-am__installdirs = "$(DESTDIR)$(pkgincludedir)"
+am__installdirs = "$(DESTDIR)$(perlexecdir)" \
+	"$(DESTDIR)$(perlexecdir)" "$(DESTDIR)$(pkgincludedir)"
+perlexecLTLIBRARIES_INSTALL = $(INSTALL)
+LTLIBRARIES = $(perlexec_LTLIBRARIES)
+am__globes_perl_la_SOURCES_DIST = globes_perl.c
+@PERL_TRUE@am_globes_perl_la_OBJECTS = globes_perl_la-globes_perl.lo
+globes_perl_la_OBJECTS = $(am_globes_perl_la_OBJECTS)
+@PERL_TRUE@am_globes_perl_la_rpath = -rpath $(perlexecdir)
+DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
+depcomp = $(SHELL) $(top_srcdir)/depcomp
+am__depfiles_maybe = depfiles
+COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
+	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+LTCOMPILE = $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) \
+	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
+	$(AM_CFLAGS) $(CFLAGS)
+CCLD = $(CC)
+LINK = $(LIBTOOL) --mode=link --tag=CC $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(AM_LDFLAGS) $(LDFLAGS) -o $@
+SOURCES = $(globes_perl_la_SOURCES)
+DIST_SOURCES = $(am__globes_perl_la_SOURCES_DIST)
+perlexecDATA_INSTALL = $(INSTALL_DATA)
+DATA = $(perlexec_DATA)
 pkgincludeHEADERS_INSTALL = $(INSTALL_HEADER)
 HEADERS = $(pkginclude_HEADERS)
 ETAGS = etags
@@ -136,6 +169,8 @@ PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
+PERL_FALSE = @PERL_FALSE@
+PERL_TRUE = @PERL_TRUE@
 RANLIB = @RANLIB@
 RPM_ARCHS = @RPM_ARCHS@
 RPM_ARGS = @RPM_ARGS@
@@ -154,6 +189,8 @@ RPM_VERSION = @RPM_VERSION@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
+SWIG = @SWIG@
+SWIG_LIB = @SWIG_LIB@
 VERSION = @VERSION@
 WANT_LAPACK_FALSE = @WANT_LAPACK_FALSE@
 WANT_LAPACK_TRUE = @WANT_LAPACK_TRUE@
@@ -200,16 +237,39 @@ localstatedir = @localstatedir@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
 oldincludedir = @oldincludedir@
+perl = @perl@
+perl_cflags = @perl_cflags@
+perl_includes = @perl_includes@
+perl_installdir = @perl_installdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
+really_build_perl = @really_build_perl@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
+shrext_cmds = @shrext_cmds@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 pkginclude_HEADERS = globes.h glb-modules.h
-all: all-am
+insthook = : $(am__append_1)
+uninsthook = : $(am__append_2)
+
+# building a perl module with swig's help
+perlexecdir = $(pkglibdir)/perl
+EXTRA_DIST = globes.i globes.pm
+BUILT_SOURCES = globes_perl.c
+@PERL_TRUE@perlexec_DATA = globes.pm
+@PERL_TRUE@perlexec_LTLIBRARIES = globes_perl.la
+@PERL_TRUE@globes_perl_la_SOURCES = globes_perl.c
+@PERL_TRUE@globes_perl_la_LIBADD = $(top_builddir)/modules/libglobes.la
+@PERL_TRUE@globes_perl_la_LDFLAGS = -avoid-version -module
+@PERL_TRUE@INCLUDES = -I$(perl_includes)
+@PERL_TRUE@globes_perl_la_DEPENDENCIES = globes.pm
+@PERL_TRUE@globes_perl_la_CFLAGS = $(perl_cflags)
+all: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) all-am
 
 .SUFFIXES:
+.SUFFIXES: .c .lo .o .obj
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -239,6 +299,73 @@ $(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
+example.pl: $(top_builddir)/config.status $(srcdir)/example.pl.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
+install-perlexecLTLIBRARIES: $(perlexec_LTLIBRARIES)
+	@$(NORMAL_INSTALL)
+	test -z "$(perlexecdir)" || $(mkdir_p) "$(DESTDIR)$(perlexecdir)"
+	@list='$(perlexec_LTLIBRARIES)'; for p in $$list; do \
+	  if test -f $$p; then \
+	    f=$(am__strip_dir) \
+	    echo " $(LIBTOOL) --mode=install $(perlexecLTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) '$$p' '$(DESTDIR)$(perlexecdir)/$$f'"; \
+	    $(LIBTOOL) --mode=install $(perlexecLTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) "$$p" "$(DESTDIR)$(perlexecdir)/$$f"; \
+	  else :; fi; \
+	done
+
+uninstall-perlexecLTLIBRARIES:
+	@$(NORMAL_UNINSTALL)
+	@set -x; list='$(perlexec_LTLIBRARIES)'; for p in $$list; do \
+	  p=$(am__strip_dir) \
+	  echo " $(LIBTOOL) --mode=uninstall rm -f '$(DESTDIR)$(perlexecdir)/$$p'"; \
+	  $(LIBTOOL) --mode=uninstall rm -f "$(DESTDIR)$(perlexecdir)/$$p"; \
+	done
+
+clean-perlexecLTLIBRARIES:
+	-test -z "$(perlexec_LTLIBRARIES)" || rm -f $(perlexec_LTLIBRARIES)
+	@list='$(perlexec_LTLIBRARIES)'; for p in $$list; do \
+	  dir="`echo $$p | sed -e 's|/[^/]*$$||'`"; \
+	  test "$$dir" != "$$p" || dir=.; \
+	  echo "rm -f \"$${dir}/so_locations\""; \
+	  rm -f "$${dir}/so_locations"; \
+	done
+globes_perl.la: $(globes_perl_la_OBJECTS) $(globes_perl_la_DEPENDENCIES) 
+	$(LINK) $(am_globes_perl_la_rpath) $(globes_perl_la_LDFLAGS) $(globes_perl_la_OBJECTS) $(globes_perl_la_LIBADD) $(LIBS)
+
+mostlyclean-compile:
+	-rm -f *.$(OBJEXT)
+
+distclean-compile:
+	-rm -f *.tab.c
+
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/globes_perl_la-globes_perl.Plo@am__quote@
+
+.c.o:
+@am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/$*.Tpo" "$(DEPDIR)/$*.Po"; else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(COMPILE) -c $<
+
+.c.obj:
+@am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ `$(CYGPATH_W) '$<'`; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/$*.Tpo" "$(DEPDIR)/$*.Po"; else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(COMPILE) -c `$(CYGPATH_W) '$<'`
+
+.c.lo:
+@am__fastdepCC_TRUE@	if $(LTCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/$*.Tpo" "$(DEPDIR)/$*.Plo"; else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
+
+globes_perl_la-globes_perl.lo: globes_perl.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(globes_perl_la_CFLAGS) $(CFLAGS) -MT globes_perl_la-globes_perl.lo -MD -MP -MF "$(DEPDIR)/globes_perl_la-globes_perl.Tpo" -c -o globes_perl_la-globes_perl.lo `test -f 'globes_perl.c' || echo '$(srcdir)/'`globes_perl.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/globes_perl_la-globes_perl.Tpo" "$(DEPDIR)/globes_perl_la-globes_perl.Plo"; else rm -f "$(DEPDIR)/globes_perl_la-globes_perl.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='globes_perl.c' object='globes_perl_la-globes_perl.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(globes_perl_la_CFLAGS) $(CFLAGS) -c -o globes_perl_la-globes_perl.lo `test -f 'globes_perl.c' || echo '$(srcdir)/'`globes_perl.c
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -249,6 +376,23 @@ clean-libtool:
 distclean-libtool:
 	-rm -f libtool
 uninstall-info-am:
+install-perlexecDATA: $(perlexec_DATA)
+	@$(NORMAL_INSTALL)
+	test -z "$(perlexecdir)" || $(mkdir_p) "$(DESTDIR)$(perlexecdir)"
+	@list='$(perlexec_DATA)'; for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  f=$(am__strip_dir) \
+	  echo " $(perlexecDATA_INSTALL) '$$d$$p' '$(DESTDIR)$(perlexecdir)/$$f'"; \
+	  $(perlexecDATA_INSTALL) "$$d$$p" "$(DESTDIR)$(perlexecdir)/$$f"; \
+	done
+
+uninstall-perlexecDATA:
+	@$(NORMAL_UNINSTALL)
+	@list='$(perlexec_DATA)'; for p in $$list; do \
+	  f=$(am__strip_dir) \
+	  echo " rm -f '$(DESTDIR)$(perlexecdir)/$$f'"; \
+	  rm -f "$(DESTDIR)$(perlexecdir)/$$f"; \
+	done
 install-pkgincludeHEADERS: $(pkginclude_HEADERS)
 	@$(NORMAL_INSTALL)
 	test -z "$(pkgincludedir)" || $(mkdir_p) "$(DESTDIR)$(pkgincludedir)"
@@ -343,13 +487,15 @@ distdir: $(DISTFILES)
 	  fi; \
 	done
 check-am: all-am
-check: check-am
-all-am: Makefile $(HEADERS)
+check: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) check-am
+all-am: Makefile $(LTLIBRARIES) $(DATA) $(HEADERS)
 installdirs:
-	for dir in "$(DESTDIR)$(pkgincludedir)"; do \
+	for dir in "$(DESTDIR)$(perlexecdir)" "$(DESTDIR)$(perlexecdir)" "$(DESTDIR)$(pkgincludedir)"; do \
 	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
 	done
-install: install-am
+install: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) install-am
 install-exec: install-exec-am
 install-data: install-data-am
 uninstall: uninstall-am
@@ -373,14 +519,17 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
+	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
 clean: clean-am
 
-clean-am: clean-generic clean-libtool mostlyclean-am
+clean-am: clean-generic clean-libtool clean-perlexecLTLIBRARIES \
+	mostlyclean-am
 
 distclean: distclean-am
+	-rm -rf ./$(DEPDIR)
 	-rm -f Makefile
-distclean-am: clean-am distclean-generic distclean-libtool \
-	distclean-tags
+distclean-am: clean-am distclean-compile distclean-generic \
+	distclean-libtool distclean-tags
 
 dvi: dvi-am
 
@@ -394,7 +543,9 @@ info-am:
 
 install-data-am: install-pkgincludeHEADERS
 
-install-exec-am:
+install-exec-am: install-perlexecDATA install-perlexecLTLIBRARIES
+	@$(NORMAL_INSTALL)
+	$(MAKE) $(AM_MAKEFLAGS) install-exec-hook
 
 install-info: install-info-am
 
@@ -403,12 +554,14 @@ install-man:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
+	-rm -rf ./$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
 mostlyclean: mostlyclean-am
 
-mostlyclean-am: mostlyclean-generic mostlyclean-libtool
+mostlyclean-am: mostlyclean-compile mostlyclean-generic \
+	mostlyclean-libtool
 
 pdf: pdf-am
 
@@ -418,20 +571,37 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-info-am uninstall-pkgincludeHEADERS
+uninstall-am: uninstall-info-am uninstall-perlexecDATA \
+	uninstall-perlexecLTLIBRARIES uninstall-pkgincludeHEADERS
+	@$(NORMAL_INSTALL)
+	$(MAKE) $(AM_MAKEFLAGS) uninstall-hook
 
 .PHONY: CTAGS GTAGS all all-am check check-am clean clean-generic \
-	clean-libtool ctags distclean distclean-generic \
-	distclean-libtool distclean-tags distdir dvi dvi-am html \
-	html-am info info-am install install-am install-data \
-	install-data-am install-exec install-exec-am install-info \
-	install-info-am install-man install-pkgincludeHEADERS \
-	install-strip installcheck installcheck-am installdirs \
-	maintainer-clean maintainer-clean-generic mostlyclean \
+	clean-libtool clean-perlexecLTLIBRARIES ctags distclean \
+	distclean-compile distclean-generic distclean-libtool \
+	distclean-tags distdir dvi dvi-am html html-am info info-am \
+	install install-am install-data install-data-am install-exec \
+	install-exec-am install-exec-hook install-info install-info-am \
+	install-man install-perlexecDATA install-perlexecLTLIBRARIES \
+	install-pkgincludeHEADERS install-strip installcheck \
+	installcheck-am installdirs maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-compile \
 	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	tags uninstall uninstall-am uninstall-info-am \
+	tags uninstall uninstall-am uninstall-hook uninstall-info-am \
+	uninstall-perlexecDATA uninstall-perlexecLTLIBRARIES \
 	uninstall-pkgincludeHEADERS
 
+
+globes_perl.c: globes.pm            
+
+globes.pm: globes.i globes.h	
+	$(SWIG) -perl5 $(SWIG_ARGS) -o globes_perl.c globes.i
+
+install-exec-hook:
+	$(insthook)
+
+uninstall-hook:
+	$(uninsthook)
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

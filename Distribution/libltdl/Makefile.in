@@ -43,7 +43,9 @@ DIST_COMMON = README $(am__include_HEADERS_DIST) \
 	$(am__noinst_HEADERS_DIST) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in COPYING.LIB
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
+am__aclocal_m4_deps = $(top_srcdir)/m4/lapack.m4 \
+	$(top_srcdir)/m4/rpm.m4 $(top_srcdir)/m4/swig.m4 \
+	$(top_srcdir)/m4/swig_perl.m4 $(top_srcdir)/acinclude.m4 \
 	$(top_srcdir)/configure.in
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
@@ -164,6 +166,8 @@ PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
+PERL_FALSE = @PERL_FALSE@
+PERL_TRUE = @PERL_TRUE@
 RANLIB = @RANLIB@
 RPM_ARCHS = @RPM_ARCHS@
 RPM_ARGS = @RPM_ARGS@
@@ -182,6 +186,8 @@ RPM_VERSION = @RPM_VERSION@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
+SWIG = @SWIG@
+SWIG_LIB = @SWIG_LIB@
 VERSION = @VERSION@
 WANT_LAPACK_FALSE = @WANT_LAPACK_FALSE@
 WANT_LAPACK_TRUE = @WANT_LAPACK_TRUE@
@@ -228,10 +234,16 @@ localstatedir = @localstatedir@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
 oldincludedir = @oldincludedir@
+perl = @perl@
+perl_cflags = @perl_cflags@
+perl_includes = @perl_includes@
+perl_installdir = @perl_installdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
+really_build_perl = @really_build_perl@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
+shrext_cmds = @shrext_cmds@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 INCLUDES = -I$(top_builddir)

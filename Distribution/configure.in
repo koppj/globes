@@ -29,7 +29,7 @@ dnl middle digit: increment when features have been introduced/removed
 dnl first digit: major improvements/rewrites
 dnl In contrast to the result of autoupdate I had to swap the
 dnl the AC_INIT and AC_CONFIG_SRCDIR
-AC_INIT([globes],[2.1.0])
+AC_INIT([GLoBES],[2.2.0],[<globes@ph.tum.de>],[globes])
 AC_CONFIG_SRCDIR([source/glb_wrapper.c])
 
 dnl Tellin autoconf we are going to use automake
@@ -102,6 +102,7 @@ AC_PROG_LN_S
 AC_PROG_YACC
 AC_PROG_LEX
 
+
 dnl Checks wether libtool exists on this machine
 dnl in the user path (needed for globes-module to work properly)
 AC_CHECK_PROG([HAVE_LIBTOOL],[libtool],yes,no)
@@ -129,6 +130,8 @@ AC_LIBTOOL_DLOPEN
 AC_LIBTOOL_WIN32_DLL
 dnl Configure libtool
 AC_PROG_LIBTOOL
+
+
 dnl Configure libltdl
 dnl AC_CONFIG_SUBDIRS(libltdl)
 AC_C_INLINE
@@ -139,6 +142,9 @@ dnl Substitute LTDLINCL and LIBLTDL in the Makefiles
 AC_SUBST(LTDLINCL)
 AC_SUBST(LIBLTDL)
 
+dnl we need libtool first
+AC_PROG_SWIG
+AC_SWIG_PERL
 
 dnl Checks for libraries.
 AC_CHECK_LIB(m,main,[],AC_MSG_ERROR([libm not found]))
@@ -170,13 +176,17 @@ dnl   dnl Enable or disable the rpm making rules in Makefile.am
 AM_CONDITIONAL(MAKE_RPMS, test x$make_rpms = xtrue)
 AC_CONFIG_FILES(globes.spec)
 
+
+
 AC_CONFIG_FILES([Makefile libf2c/Makefile lapack/Makefile\
- globes/Makefile source/Makefile\
+ globes/Makefile globes/example.pl source/Makefile\
  examples/Makefile\
  data/Makefile modules/MakefileExample modules/Makefile globes-config.src\
  globes-module.src libltdl/Makefile])
 
 AC_OUTPUT
+dnl getting the permissions right
+chmod u+x globes/example.pl
 
 dnl pretty printing
 stars=""
