@@ -2,23 +2,228 @@
 % PART II: Experiment definition module
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\part{The Experiment Definition Module (\EDM )}
+\part{The Abstract Experiment Definition Language -- AEDL}
 
-\chapter{Basics: Source, Oscillation, Detection}
+\chapter{General Concept}
 
-Here comes how a experiment is defined (what is a channel, a rule, how are 
-they treated, ...). Splitting in source, oscillation, and detector, etc.
+The aim of AEDL is to describe a large variety of complex experiments
+by a limited number of parameters and to allow a representation of
+very different setups within one data structure, thus enabling a
+universal rate and $\chi^2$ computation. Usually in dealing with
+experiment simulations a new piece of code is written and compiled
+for each different experiments. In many cases even changes of some
+parameter like the number of bins requires the recompilation of
+large portions of the source code. This technique may however soon
+reach its limits in cases where the simulated experiments are rather complex
+and/or more than one kind of experiment is going to examined. Furthermore
+is is very difficult to assure the correctness of the results obtained
+in this way since every time a new piece of code is added to handle a new
+experiment new errors will be introduced.
 
-\chapter{Getting started: Editing existing experiments}
+Thus a general and flexible experiment description language is needed. 
+A neutrino experiment can be split into three parts: source, oscillation
+and detection. The sources within \GLOBES\ are assumed to be stationary
+point sources and each experiment has only one source. Specifically this
+does not allow to study cases where the time dependence of the neutrino flux
+is of physical significance like \eg\ in supernov\ae. It however is possible
+to study beams which have a bunch structure, since the time dependence of the
+neutrino source is physically only in as far important as it is used to
+suppress backgrounds. Also geometrical effects of a source distribution like
+\eg\ in the Sun can not described in this way. For this kind of sources
+the oscillation part of an 
+experiment is simply
+given by the baseline and the matter density profile. 
 
-Here comes how to load and modify existing experiments;
-also: how does the main screen work and the most important functions at 
-exampled
 
-\chapter{Features of the \EDM }
+While
+it is comparatively simple to define a general neutrino source 
+and the oscillation physics, the general properties of a detector are more
+complicated. The basic assumption in building an abstract detector description
+is \emph{linearity}, \ie\ two neutrino events do not interfere with each other.
+Furthermore it is assumed that all information on the oscillation physics 
+is given by the \emph{reconstructed} flavour and energy of a 
+neutrino event. The term ``reconstructed'' implies that there is not a single
+well defined value for each event and variable but a distribution of possible
+values. This illustrated in figure~\ref{fig:distro} for the energy variable.
+The same is of course possible with the flavour variable. In that case however
+only discrete values are possible.
+%
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=0.6\textwidth]{mapping}
+\end{center}
+\caption{\label{fig:distro} A detector maps the true values into
+a distribution of reconstructed values of a parameter. Here the energy is 
+shown.}
+\end{figure}
+% 
+
+This picture also can be formulated in a more mathematical language. Let $x$
+be the true variable and $x'$ the reconstructed variable then $f(x)$ is the
+distribution of true values and $p(x')$ is the distribution of reconstructed
+values. Then the detector function  $D(x,x')$ which describes 
+the mapping performed by the detector is defined by
+\begin{eqnarray}
+\label{eq:mapping}
+p(x')&=&\int dx\, f(x)\cdot D(x,x')\,.
+\end{eqnarray}
+Obviously equation~\ref{eq:mapping} can only describe the detector correctly
+when the condition of linearity is fulfilled. Within this model a detector
+is completely specified by a set of $D(E,E')$ for the energy variable $E$
+and a set $D(F,F')$ for the flavour variable $F$, where usually $D(E,E')$ also
+depends on the true flavour $F$ as well as $D(F,F')$ depends on the true energy
+$E$. Those sets of mapping functions usually will be obtained by a 
+full detector simulation and can be obtained by using as input 
+distribution $f(x)$ a delta distribution $\delta(x-x_0)$.
+
+In order to allow a systematic experiment definition including various
+sources of systematical errors we use several layers. The first layer is
+the so called ``channel'', it is the link between the oscillation physics
+and the detector. A channel specifies how a certain neutrino type in the 
+source is mapped into a reconstructed neutrino type, \eg\ a muon neutrino
+oscillates into an electron neutrino and subsequently interacts via
+quasi-elastic charged current scattering. The measured energy and direction of
+the electron in the detector finally allow to reconstruct the neutrino energy.
+The channels are the building blocks for so called ``rules'' which
+contain information like the efficiencies and systematical errors. An example
+could look like this: the efficiency for quasi-elastics electron neutrino
+events is $0.4$. There is a fraction of $0.01$ of all neutral current events
+which are mis-identified as quasi-elastic electron neutrino events. 
+The neutral current fraction is only known within $10\%$ and there is
+an energy scale uncertainty of $100\,\mathrm{MeV}$. Thus a rule connects the
+event rates to the calculation of a $\chi^2$ which properly includes 
+systematical errors. This $\chi^2$ is then the starting point for the
+oscillation physics analysis.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Getting started}
+
+As a first example we discuss how to define a neutrino factory experiment using
+AEDL. The first line of every experiment definition file is
+\begin{quote}
+{\tt !\%GLoBES}
+\end{quote}
+
+We tell \GLOBES\ that we want to use the built-in neutrino factory
+flux, by setting the beam type variable to $1$. The target mass 
+is $50\,\mathrm{kt}$ and a total of $ 4.264\cdot10^{21}$
+muons is stored. The data is divided into 20 energy bins ranging from
+$4\,\mathrm{GeV}$ to $50\,\mathrm{GeV}$. 
+\begin{quote}
+{\tt /* beam */}\\
+{\tt \$beam\_type = 1}\\
+{\tt \$target\_mass = 50}\\
+{\tt \$stored\_muons = 4.264e+21}\\
+{\tt \$numofbins = 20}\\
+{\tt \$emin = 4.0}\\
+{\tt \$emax = 50.0}
+\end{quote}
+
+Next a file has to be specified which contains the cross section we want to 
+use.
+\begin{quote}
+{\tt /* cross section */}\\
+{\tt cross(\#CC)<}\\
+{\tt \hspace*{3ex}@cross\_file = XCC.dat}\\
+{\tt >}
+\end{quote}
+The command {\tt cross} tells the parser that a cross section environment
+begins and has the name {\tt \#CC}. These names are used to refer later on
+to this specific environment and each name begins with a leading {\tt \#}.
+Whenever we need to specify a cross section from here on we can use {\tt \#CC}
+to refer to the cross section as given in the file {\tt XCC.dat}.
 
 
-\chapter{General concept}
+Of course also the baseline and matter profile have to be specified, which
+ looks like this
+\begin{quote}
+{\tt /* baseline */}\\
+{\tt \$baseline = 3000.0}\\
+{\tt \$densitytab = \{3.5\}}\\
+{\tt \$lengthtab = \{3000.0\}}\\
+{\tt \$density\_error = 0.05}
+\end{quote}
+The curly brackets used for the definition of {\tt \$densitytab} and
+{\tt \$lengthtab} delimit as simple list of numbers -- here the lists
+have length $1$. {\tt \$density\_error} is the relative $1\,\sigma$ uncertainty
+on the density.
+
+The energy resolution function can easily be specified with
+\begin{quote}
+{\tt /* energy resolution */}\\
+{\tt energy(\#MINOS)<}\\
+{\tt \hspace*{3ex}@algorithm = 1}\\
+{\tt \hspace*{3ex}@bins = 20}\\
+{\tt \hspace*{3ex}@emin = 4.0}\\
+{\tt \hspace*{3ex}@emax = 50.0}\\
+{\tt \hspace*{3ex}@energy\_resolution = \{0.15,0.0,0.0\}}\\
+{\tt >}
+\end{quote}
+The {\tt energy} command opens the corresponding energy environment and
+the energy resolution function defined here is refered to by the name 
+{\tt \#MINOS}. Out of several possibilities it employs algorithm $1$,
+the simplest and fastest one. The actual energy resolution is specified
+by the energy resolution variable which is a list of three elements. Each 
+element is one parameter of a general resolution function as defined in 
+equation ~\ref{eq:sigma_e}.
+
+Now we define the one appearance and the corresponding disappearance 
+channel of a neutrino factory: 
+$\nu_e\rightarrow\nu_\mu$  and $\bar\nu_\mu\rightarrow\bar\nu_\mu$ 
+($\mu^+$ stored).
+\begin{quote}
+{\tt /* channels */}\\
+{\tt channel(\#appearance)<}\\
+{\tt \hspace*{3ex}@channel = +: +: electron: muon: \#CC: \#MINOS}\\
+{\tt >}\\
+{\tt channel(\#disappearance)<}\\
+{\tt \hspace*{3ex}@channel = +: -: muon: muon: \#CC: \#MINOS}\\
+{\tt >}
+\end{quote}
+The first $\pm$ selects the polarity, \ie\ wether $\mu^+$ or $\mu^-$ are 
+stored. The second $\pm$ determines whether neutrinos or anti-neutrinos are
+taken from the flux table. The third position defines the initial flavour
+and the forth position the final flavour, followed by the name of the cross
+section and energy resolution function.
+
+The last step is to assemble the channels into a rule.
+\begin{quote}
+{\tt /* rules */}\\
+{\tt rule(\#rule1)<}\\
+{\tt \hspace*{3ex}@signal = 0.45 @ \#appearance}\\
+{\tt \hspace*{3ex}@signalerror = 0.001 : 0.0001}\\
+{\tt \hspace*{3ex}@background = 1.0e-05 @ \#disappearance}\\
+{\tt \hspace*{3ex}@backgroundcenter = 1 : 0.0}\\
+{\tt \hspace*{3ex}@backgrounderror = 0.05 : 0.0001}\\
+{\tt \hspace*{3ex}@errordim = 0}\\
+{\tt \hspace*{3ex}@energy\_window = 4.0 : 50.0}\\
+{\tt >}
+\end{quote}
+The signal variable says that the signal in our experiment is the 
+channel named {\tt \#appearance} with an constant efficiency of $0.45$.
+The signal error variable has two components: the first one is the
+normalization error of the signal, here it is $0.1\%$. The second component
+signifies the energy calibration error of the signal, whose definition 
+can be found in section~\ref{sec:energy}. The background variable
+specifies the composition of the beam background and this case is
+given by the channel named {\tt \#disappearance}, \ie\ this are
+the muons whose charge has been mis-identified. They enter the calculation
+with an efficiency of $1\cdot 10^{-5}$. The background center variable allows
+to rescale the total background contribution which is especially useful if
+there are many background components. 
+The background error variable is defined in the same way as the signal error
+variable, \ie\ we have a $5\%$ background uncertainty.
+The error dimension variable selects how
+the systematical errors are treated according to table~\ref{tab:error_dim}. 
+
+
+The above defined experiment represents a first version of a neutrino factory
+experiment. It still lacks the correct energy dependence of the efficiencies
+and of course the channels and rules for the operation with $\mu^-$ stored
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Features of the  AEDL}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Source properties}
 \label{sec:source}
@@ -56,8 +261,8 @@ range of values given in the file $0.0$ is returned. The units used for the
 fluxes are not specified and right now each flux has its own fudge factor
 which is hard encoded in the file {\tt nufact.c}. The problem is that
 in computing the normalization one has to know things like number of target
-particles per unit mass asf. which is not always straitforward. Thus a fudge
-factor will be usefule in any case. Right now however this is not the only 
+particles per unit mass asf. which is not always straightforward. Thus a fudge
+factor will be useful in any case. Right now however this is not the only 
 fudge factor since for some experiments the definition of their target mass
 involves another fudge factor. 
 
@@ -298,7 +503,7 @@ s_i(a,b):=s_i(a)+b\cdot s_i\, E_i/(E_\mathrm{max}-E_\mathrm{min})
 \end{equation}
 and it is refered to as tilt since it describes a linear distortion, a tilt
 of the event rate spectrum. The second option is closer to an actual energy
-calibration error, which basicaly amounts to replacing the reconstructed 
+calibration error, which basically amounts to replacing the reconstructed 
 energy $E'$ by $(1+b)\cdot E'$ and we use following approximation
 \begin{eqnarray}
 s_i(b)&=& (1+b)\cdot(s_{k+1}-s_k)\cdot\delta+s_i\,,\\
@@ -309,7 +514,7 @@ Special care is required at the boundaries when $k<1$ or $k+1>N_\mathrm{bins}$,
 since there $s_k$ or $s_{k+1}$ may not have been calculated. One possibility
 to deal with those cases is to assume that for those values of $k$ $s_k$ is
 zero. This is the default. In cases where $s$ at the boundary is however still
-sizeable this may lead to untolerable errors and subsequently to a wrong
+sizeable this may lead to intolerable errors and subsequently to a wrong
 estimate of the impact of a calibration error. Therefore in those cases it
 is advisable to truncate the analysis range by a few bins at the boundary
 and therefore ensure in this way that only those $s_i$ are used whose index
@@ -451,7 +656,7 @@ the problem and then the various algorithms and possibilities which
 
 
 Before going into the details we define that the range from $E_\mathrm{min}$
-to $E_\mathrm{max}$ is diveded in a certain number of bins $N_\mathrm{bins}$.
+to $E_\mathrm{max}$ is divided in a certain number of bins $N_\mathrm{bins}$.
 These bins form a partition, which not necessarily is equidistant. The 
 partition is any case completely defined by specifying $E_\mathrm{min}$
 and $E_\mathrm{max}$ and the size of each bin  $\Delta E_i$. It is also
@@ -611,7 +816,7 @@ that the area under the bin kernel $K_i^c$ has reached a specific
 value close to one,
 the so called confidence level $c$ (new name would be better). $1-c$ is a 
 small number and specifies the fraction of  events in bin which lie outside
-the summation range, usually $1-c=10^{-3}$ is sufficient. Furthemore the
+the summation range, usually $1-c=10^{-3}$ is sufficient. Furthermore the
 value of the bin kernel at the lower and upper boundary should
 be the same
 \begin{eqnarray}
@@ -625,17 +830,17 @@ by its value.
 
 Since the $a_i$'s and $b_i$'s are not known in advance it could be possible
 that $a_0$ and/or $b_{N_\mathrm{bins}}$ lie outside the computational domain,
-\eg\ no cross section or flux is defined at those energies. To remidy this 
+\eg\ no cross section or flux is defined at those energies. To remedy this 
 problem the computational domain can be specified. No calculation in \GLOBES\
 will leave this domain. 
 
-In order to ensure that fast oscillating probablities do not lead to aliasing
+In order to ensure that fast oscillating probabilities do not lead to aliasing
 it is desirable to impose a low-pass filter already during the calculation
-of the probablities itself. This is possible and implemented has a highly
+of the probabilities itself. This is possible and implemented has a highly
 experimental feature called ``filter''\index{Filter}. 
 The calculation of oscillation
 probabilities basically is a computation of phase differences. Restricting
-the maximum admissable size of those phase difference effectively filters
+the maximum admissible size of those phase difference effectively filters
 the high frequency component of the oscillation probability. This idea is
 implemented according to
 \begin{eqnarray}
@@ -658,10 +863,10 @@ e^{-\frac{(E-\tilde E)^2}{2\sigma^2_e}}\,.
 The equivalence of equation~\ref{eq:filter_a} and equation~\ref{eq:filter_b}
 is not obvious and connected to the properties of $P_{\alpha\beta}$, 
 see~\cite{Kiers:1996zj,Giunti:2003ax}. This feature works \emph{only} 
-for vacuum and constant denisties and controled
+for vacuum and constant densities and controlled
 by the filer state variable and $\sigma_f^0$ is set by the filter value 
 variable. Assuming that $P_{\alpha\beta}$ still is the source for the highest
-frequencies one can splitt the energy resolution function $\sigma(E)^c$ in
+frequencies one can split the energy resolution function $\sigma(E)^c$ in
 two parts by
 \begin{equation}
 \sigma_c^2(E)=\underbrace{\sigma_c^2(E)-\sigma_c^2(E_\mathrm{min})}_
@@ -673,13 +878,13 @@ smearing data and $\sigma_e$ is used to determine $\sigma_f^0$.
 Finally the user has the possibility to directly specify the smearing data.
 The format requires to provide $k_l^i$ and $k_u^i$ for each bin, the number of
 bins, the number of sampling points, the lower and upper limit of the sampling
-range. Furthemore the numbers $K_i(E_j)^c$ have to provide for all values
+range. Furthermore the numbers $K_i(E_j)^c$ have to provide for all values
 in between $k_l^i$ and $k_u^i$. The convolution is then performed according to
 equation~\ref{eq:algo_one}.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{User-defined systematics}
+\label{sec:ud_error_dim}.
 
-\chapter{Creating new experiments}
-
-Most advanced step: How to create a new experiment from scratch .
 
 %%% Local Variables: 
 %%% mode: latex
