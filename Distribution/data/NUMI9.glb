@@ -1,4 +1,24 @@
 %!GLoBES
+/* Copyright 2004 The GLoBES Team
+ *
+ * If you modify this file you have to rename it.
+ *
+ * If you are using this file for producing a scientific publication
+ * or a talk please cite the following references and check the supporting
+ * files for a similar comment.
+ *
+ #* @Article{Huber:2002rs,
+ #*     author    = "Huber, Patrick and Lindner, M. and Winter, W.",
+ #*     title     = "Synergies between the first-generation JHF-SK and NuMI
+ #*                  superbeam experiments",
+ #*     journal   = "Nucl. Phys.",
+ #*     volume    = "B654",
+ #*     year      = "2003",
+ #*     pages     = "3-29",
+ #*     eprint    = "hep-ph/0211300",
+ #*     SLACcitation  = "%%CITATION = HEP-PH 0211300;%%"
+ #* }
+ */
 
 $version="1.8.1"
 
