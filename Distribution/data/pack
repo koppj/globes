@@ -1,0 +1,80 @@
+#! /bin/sh
+# This script packs the correct files into the tar.gz archives available
+# on the GLoBES webpages and copies them to their destination
+# 2004 Patrick Huber
+
+echo "This script packs the files into the according archives"
+echo "*******************************************************"
+echo "BEWARE: It also copies all the files in the archives as"
+echo "well as the archives to the downloads area in the Web"
+echo "directory. Run this script only if you want to publish" 
+echo "your changes!"
+echo "*******************************************************"
+echo
+echo "Do you want to publish, yes/no?"
+read doyou
+
+if test $doyou = yes; then
+
+echo
+echo "okay, as you wish ..."
+echo "packing & copying files to the web area..."
+echo 
+
+cd $PWD 
+
+name="ICARUS"
+members="XCC_CNGS.dat XCC.dat XNC.dat CNGS_Spectra.dat ICARUS.glb"
+tar -czvf ${name}.tar.gz ${members}
+cp -p ${members} ../../Web/pages/download/glb/
+cp -p ${name}.tar.gz ../../Web/pages/download/glb/
+
+name="MINOS"
+members="XCC.dat XNC.dat MINOS_Spectra.dat MINOS.glb"
+tar -czvf ${name}.tar.gz ${members}
+cp -p ${members} ../../Web/pages/download/glb/
+cp -p ${name}.tar.gz ../../Web/pages/download/glb/
+
+name="NoVA"
+members="NUMI12.glb NUMI12anti.glb NUMI12comb.glb NUMI12minus.dat\
+ NUMI12plus.dat NUMI9.glb NUMI9anti.glb NUMI9comb.glb NUMI9minus.dat\
+ NUMI9plus.dat XCC.dat XNC.dat"
+tar -czvf ${name}.tar.gz ${members}
+cp -p ${members} ../../Web/pages/download/glb/
+cp -p ${name}.tar.gz ../../Web/pages/download/glb/
+
+name="NuFact"
+members="XCC.dat XNC.dat NuFact1.glb NuFact2.glb"
+tar -czvf ${name}.tar.gz ${members}
+cp -p ${members} ../../Web/pages/download/glb/
+cp -p ${name}.tar.gz ../../Web/pages/download/glb/
+
+name="OPERA"
+members="XCC_CNGS.dat XCC.dat XNC.dat CNGS_Spectra.dat OPERA.glb"
+tar -czvf ${name}.tar.gz ${members}
+cp -p ${members} ../../Web/pages/download/glb/
+cp -p ${name}.tar.gz ../../Web/pages/download/glb/
+
+name="Reactor"
+members="Reactor.dat Reactor1.glb Reactor2.glb XCCreactor.dat"
+tar -czvf ${name}.tar.gz ${members}
+cp -p ${members} ../../Web/pages/download/glb/
+cp -p ${name}.tar.gz ../../Web/pages/download/glb/
+
+name="T2K"
+members="JHFHKAll.glb JHFSKantinew.glb JHFSKcomb.glb JHFSKnew.glb \
+JHFminus.dat JHFplus.dat XCC.dat XQE.dat XNC.dat"
+tar -czvf ${name}.tar.gz ${members}
+cp -p ${members} ../../Web/pages/download/glb/
+cp -p ${name}.tar.gz ../../Web/pages/download/glb/
+
+echo "...done!"
+echo "********************************************************"
+echo "Don't forget to commit your changes in the Web directory"
+echo "********************************************************"
+exit
+
+else
+echo "doing nothing ..."
+exit
+fi
