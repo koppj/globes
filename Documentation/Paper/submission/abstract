@@ -1,0 +1,21 @@
+Simulation of long-baseline neutrino oscillation
+experiments with GLoBES
+
+We present the GLoBES (``General Long Baseline Experiment Simulator'')
+software package, which allows the simulation of long-baseline and reactor
+neutrino oscillation experiments. One part of the software is the
+abstract experiment definition language to define experiments with
+beam and full detector descriptions as accurate as possible. Many 
+systematics options are provided, such as normalization and energy
+calibration errors, or the choice between spectral or total rate 
+information. For the 
+definition of experiments, a new transparent building block concept is 
+introduced. In addition, an additional program provides the possibility 
+to develop and test new experiment definitions quickly.
+Another part of GLoBES is the user's interface, which provides 
+probability, rate, and $\Delta \chi^2$ information for a given experiment 
+or any combination of up to 32 experiments in C. Especially, the
+$\Delta \chi^2$ functions allow a simulation with statistics only,
+systematics, correlations, and degeneracies. In particular, GLoBES
+can handle the full multi-parameter correlation among the oscillation
+parameters, external input, and matter density uncertainties. 
