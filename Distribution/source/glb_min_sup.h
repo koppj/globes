@@ -20,25 +20,13 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#ifndef GLB_MIN_SUP
+#define GLB_MIN_SUP 1
 
+void glb_minimizer_error(char error_text[]);
+double *glb_alloc_vec(int nl,int nh);
+double **glb_alloc_mat(int nrl,int nrh, int ncl,int nch);
+void glb_free_vec(double *v,int nl,int nh);
+void glb_free_mat(double **m,int nrl,int nrh,int ncl,int nch);
 
-double *vector();
-double **matrix();
-double **convert_matrix();
-double *dvector();
-double **dmatrix();
-int *ivector();
-int **imatrix();
-double **submatrix();
-void free_vector();
-void free_dvector();
-void free_ivector();
-void free_matrix();
-void free_dmatrix();
-void free_imatrix();
-void free_submatrix();
-void free_convert_matrix();
-void nrerror();
-void powell2(double p[], double **xi, int n,double ftol,int *iter,double *fret,double (*func)());
-void powell(double p[], double **xi, int n,double ftol,int *iter,double *fret,double (*func)());
-
+#endif /* GLB_MIN_SUP */
