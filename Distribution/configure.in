@@ -53,24 +53,42 @@ AC_DEFINE_UNQUOTED(GLB_LIBVERSION,"$GLBLIBVERSION")
 dnl This part serves to convert Makefile.in in examples to a
 dnl Makefile which works automagically 
 
+dnl list of standard targets (the space before the closing quotes is important)
+allowed="/usr /usr/local "
+
+dnl assume there is a prefix which is not in `allowed'
+GLBLDR="${prefix}/lib"
+GLBLDF="${GLBLDR}/libglobes.so -Wl,--rpath -Wl,${GLBLDR} ${GLBLDR}/globes/libglb.so -Wl,--rpath -Wl,${GLBLDR}/globes"
+GLBMLDF="${GLBLDR}/globes/libglb.so -Wl,--rpath -Wl,${GLBLDR}/globes"
+GLBINC="-I${prefix}/include/"
+standard="no"
+
+dnl no prefix given
 if test $prefix = NONE; then
- GLBLDF="-lglobes -lglb"
- GLBMLDF="-lglb"
-else
- GLBLDR="${prefix}/lib"
- GLBLDF="${GLBLDR}/libglobes.so -Wl,--rpath -Wl,${GLBLDR} ${GLBLDR}/globes/libglb.so -Wl,--rpath -Wl,${GLBLDR}/globes"
- GLBMLDF="${GLBLDR}/globes/libglb.so -Wl,--rpath -Wl,${GLBLDR}/globes"
- GLBINC="-I${prefix}/include/"
+  GLBLDF="-lglobes -lglb"
+  GLBMLDF="-lglb"
+  GLBINC=""
+  standard="yes"	
 fi
 
+dnl prefix is one of the standard targets where only root can install to
+for allow in ´echo $allowed´
+ do
+	if test $prefix = $allow; then
+  		GLBLDF="-lglobes -lglb"
+ 		GLBMLDF="-lglb"
+ 		GLBINC=""
+ 		standard="yes"	
+	fi
+ done
+
+dnl Output our knowledge to the Makefiles
 AC_SUBST(GLBMLDF)
 AC_SUBST(GLBLDF)
 AC_SUBST(GLBINC)
 
-
 dnl Keeping track of modules which should be preloaded
 dnl if necessary
-
 GLBMODULES="glb_prior_module.la"
 AC_SUBST(GLBMODULES)
 
@@ -88,8 +106,6 @@ dnl Checks wether libtool exists on this machine
 dnl in the user path (needed for globes-module to work properly)
 AC_CHECK_PROG([HAVE_LIBTOOL],[libtool],yes,no)
 
-
-
 dnl Trying to get support for libtdl
 dnl the following lines are taken from the libtool manual
 dnl Enable building of the convenience library
@@ -105,19 +121,15 @@ AC_PROG_LIBTOOL
 dnl Configure libltdl
 AC_CONFIG_SUBDIRS(libltdl)
 
-
-
-
 dnl Checks for libraries.
 AC_CHECK_LIB(m,main,[],AC_MSG_ERROR([libm not found]))
 AC_CHECK_LIB(gslcblas,main,[],AC_MSG_ERROR([libgslcblas not found]))
 AC_CHECK_LIB(gsl,main,[],AC_MSG_ERROR([libgsl not found]))
 
+dnl same for SUSE
 AC_CHECK_SUSE_f2c
 AC_CHECK_SUSE_blas
 AC_CHECK_SUSE_lapack
-
-
 
 dnl Checks for header files.
 AC_HEADER_STDC
@@ -130,7 +142,6 @@ dnl Checks for library functions.
 AC_CHECK_FUNCS(strdup)
 
 
-
 dnl Experimental rpm-builing support
 dnl For my rpm.m4 macros
 RPM_RELEASE=0
@@ -140,6 +151,12 @@ AM_RPM_INIT
 dnl   dnl Enable or disable the rpm making rules in Makefile.am
 AM_CONDITIONAL(MAKE_RPMS, test x$make_rpms = xtrue)
 AC_CONFIG_FILES(globes.spec)
+
+AC_CONFIG_FILES([Makefile globes/Makefile source/Makefile examples/Makefile\
+ data/Makefile modules/MakefileExample modules/Makefile globes-config.src\
+ globes-module.src])
+
+AC_OUTPUT
 
 dnl pretty printing
 stars=""
@@ -154,7 +171,7 @@ done
 
 
 dnl Remind the user of things he might need ;-)
-if test $prefix = NONE; then
+if test $standard = "yes" ; then
  echo "********************************************"
  echo "*          After 'make install':           *"
  echo "* Do not forget to run 'ldconfig' as root! *"
@@ -165,8 +182,3 @@ else
  echo "* Do not forget to add ${prefix}/bin to your path! *"
  echo "***********************${stars}********************"
 fi
-
-AC_CONFIG_FILES([Makefile globes/Makefile source/Makefile examples/Makefile\
- data/Makefile modules/MakefileExample modules/Makefile globes-config.src\
- globes-module.src])
-AC_OUTPUT

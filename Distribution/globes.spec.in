@@ -3,7 +3,7 @@ Summary: General Long Baseline Experiment Simulator (GLoBES)
 
 %define version @VERSION@
 %define pkgname @PACKAGE@
-%define prefix /usr
+%define prefix /usr/local
 
 %define lt_release @LT_RELEASE@
 %define lt_version @LT_CURRENT@.@LT_REVISION@.@LT_AGE@

@@ -1987,16 +1987,30 @@ _ACEOF
 
 
 
+allowed="/usr /usr/local "
+
+GLBLDR="${prefix}/lib"
+GLBLDF="${GLBLDR}/libglobes.so -Wl,--rpath -Wl,${GLBLDR} ${GLBLDR}/globes/libglb.so -Wl,--rpath -Wl,${GLBLDR}/globes"
+GLBMLDF="${GLBLDR}/globes/libglb.so -Wl,--rpath -Wl,${GLBLDR}/globes"
+GLBINC="-I${prefix}/include/"
+standard="no"
+
 if test $prefix = NONE; then
- GLBLDF="-lglobes -lglb"
- GLBMLDF="-lglb"
-else
- GLBLDR="${prefix}/lib"
- GLBLDF="${GLBLDR}/libglobes.so -Wl,--rpath -Wl,${GLBLDR} ${GLBLDR}/globes/libglb.so -Wl,--rpath -Wl,${GLBLDR}/globes"
- GLBMLDF="${GLBLDR}/globes/libglb.so -Wl,--rpath -Wl,${GLBLDR}/globes"
- GLBINC="-I${prefix}/include/"
+  GLBLDF="-lglobes -lglb"
+  GLBMLDF="-lglb"
+  GLBINC=""
+  standard="yes"
 fi
 
+for allow in ´echo $allowed´
+ do
+	if test $prefix = $allow; then
+  		GLBLDF="-lglobes -lglb"
+ 		GLBMLDF="-lglb"
+ 		GLBINC=""
+ 		standard="yes"
+	fi
+ done
 
 
 
@@ -4913,7 +4927,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 4916 "configure"' > conftest.$ac_ext
+  echo '#line 4930 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -5787,7 +5801,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:5790:" \
+echo "$as_me:5804:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -6837,11 +6851,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:6840: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:6854: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:6844: \$? = $ac_status" >&5
+   echo "$as_me:6858: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -7080,11 +7094,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:7083: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:7097: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:7087: \$? = $ac_status" >&5
+   echo "$as_me:7101: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -7140,11 +7154,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:7143: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:7157: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:7147: \$? = $ac_status" >&5
+   echo "$as_me:7161: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -9325,7 +9339,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 9328 "configure"
+#line 9342 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -9423,7 +9437,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 9426 "configure"
+#line 9440 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11612,11 +11626,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:11615: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:11629: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:11619: \$? = $ac_status" >&5
+   echo "$as_me:11633: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -11672,11 +11686,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:11675: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:11689: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:11679: \$? = $ac_status" >&5
+   echo "$as_me:11693: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -13033,7 +13047,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 13036 "configure"
+#line 13050 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -13131,7 +13145,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 13134 "configure"
+#line 13148 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -13968,11 +13982,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13971: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13985: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:13975: \$? = $ac_status" >&5
+   echo "$as_me:13989: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -14028,11 +14042,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14031: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14045: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:14035: \$? = $ac_status" >&5
+   echo "$as_me:14049: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -16063,11 +16077,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:16066: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:16080: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:16070: \$? = $ac_status" >&5
+   echo "$as_me:16084: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -16306,11 +16320,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:16309: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:16323: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:16313: \$? = $ac_status" >&5
+   echo "$as_me:16327: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -16366,11 +16380,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:16369: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:16383: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:16373: \$? = $ac_status" >&5
+   echo "$as_me:16387: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -18551,7 +18565,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 18554 "configure"
+#line 18568 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -18649,7 +18663,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 18652 "configure"
+#line 18666 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -20768,7 +20782,6 @@ done
 
 
 
-
 RPM_RELEASE=0
 
 
@@ -20960,30 +20973,10 @@ fi
           ac_config_files="$ac_config_files globes.spec"
 
 
-stars=""
-emtpy=""
-while [  ${#stars} != ${#prefix} ]
-do
-	stars="${stars}*"
-	empty="${empty} "
-done
 
-
-
-
-if test $prefix = NONE; then
- echo "********************************************"
- echo "*          After 'make install':           *"
- echo "* Do not forget to run 'ldconfig' as root! *"
- echo "********************************************"
-else
- echo "***********************${stars}********************"
- echo "*              After 'make install':   ${empty}   *"
- echo "* Do not forget to add ${prefix}/bin to your path! *"
- echo "***********************${stars}********************"
-fi
 
                                                                                           ac_config_files="$ac_config_files Makefile globes/Makefile source/Makefile examples/Makefile data/Makefile modules/MakefileExample modules/Makefile globes-config.src globes-module.src"
+
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -22419,3 +22412,26 @@ echo "$as_me: error: $ac_sub_configure failed for $ac_dir" >&2;}
   done
 fi
 
+
+stars=""
+emtpy=""
+while [  ${#stars} != ${#prefix} ]
+do
+	stars="${stars}*"
+	empty="${empty} "
+done
+
+
+
+
+if test $standard = "yes" ; then
+ echo "********************************************"
+ echo "*          After 'make install':           *"
+ echo "* Do not forget to run 'ldconfig' as root! *"
+ echo "********************************************"
+else
+ echo "***********************${stars}********************"
+ echo "*              After 'make install':   ${empty}   *"
+ echo "* Do not forget to add ${prefix}/bin to your path! *"
+ echo "***********************${stars}********************"
+fi
