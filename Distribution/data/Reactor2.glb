@@ -12,7 +12,7 @@ flux(#Reactor)<
 
 $target_mass = 	        0.2
 
-$numofbins = 		62
+$bins = 		62
 
 $emin = 	        0.0018
 $emax = 	        0.008
@@ -28,7 +28,6 @@ $lengthtab = 		{1.7}
 
 $filter_state = 0 
 $filter_value = 1000000 
-$errorfunction = 0 
 
 /*       Energy Resolution       */
 
