@@ -34,7 +34,7 @@ to study beams with bunch structure, since the time dependence of the
 neutrino source is physically only important to suppress backgrounds. 
 \end{itemize}
 
-The description of the neutrino oscillation physics is, at least numerically, relatively simple. We use the {\em evolution operator method} to compute the neutrino oscillation probabilities and divide the matter density profile into layers with constant matter densities. For each of these layers, the Hamiltonian in matter is diagonalized in order to propagate the neutrino transition amplitudes. Finally, the transition probability is obtained by the absolute square of the total neutrino transition amplitudes. Depending on the precision of the studied experiment, this approach turns out to be precise enough in Earth matter even for a small number matter density steps. Since we allow an uncertainty of the matter density profile, it is, in fact, in most cases sufficient to consider only one density step with the average matter density together with a matter density uncertainty~\cite{Ohlsson:2003ip}. Note that this approach may not be applicable to quickly varying extraterrestrial matter density profiles.
+The description of the neutrino oscillation physics is, at least numerically, relatively simple. We use the {\em evolution operator method} to compute the neutrino oscillation probabilities and divide the matter density profile into layers with constant matter densities. For each of these layers, the Hamiltonian in matter is diagonalized in order to propagate the neutrino transition amplitudes. Finally, the transition probability is obtained by the absolute square of the total neutrino transition amplitudes. Depending on the precision of the studied experiment, this approach turns out to be precise enough in Earth matter even if only a small number matter density steps is used. Since we allow an uncertainty of the matter density profile, it is, in fact, in most cases sufficient to consider only one density step with the average matter density together with a matter density uncertainty~\cite{Ohlsson:2003ip}. Note that this approach may not be applicable to quickly varying extraterrestrial matter density profiles.
 
 While it is comparatively simple to define a general neutrino source 
 and to compute the oscillation physics, the general properties of a detector simulation are much more complicated. The basic assumption in building an abstract detector description is \emph{linearity}, \ie , that two neutrino events do not interfere with each other. Furthermore it is assumed that all information on the oscillation physics 
@@ -59,7 +59,7 @@ p(x')&=&\int dx\, f(x)\cdot D(x,x')\,.
 Obviously \equ{mapping} only describes the detector properly
 if the linearity condition is fulfilled. Within this model, a detector
 is completely specified by a set of $D(E,E')$ for the energy variable $E$,
-and a set $D(F,F')$ for the flavor variable $F$. In general, $D(E,E')$ also depends on the true flavor $F$, as well as $D(F,F')$ depends on the true energy $E$. These sets of mapping functions usually are obtained from a 
+and a set $D(F,F')$ for the flavor variable $F$. In general, $D(E,E',F)$ also depends on the incident neutrino flavor $F$, as well as $D(F,F',E)$ depends on the incident neutrino energy $E$. These sets of mapping functions usually are obtained from a 
 full detector simulation and can be obtained by using as input 
 distribution $f(x)$ a delta distribution $\delta(x-x_0)$.
 
@@ -95,7 +95,7 @@ the secondary electron in the detector then allows to reconstruct the neutrino e
 The channels are the building blocks for the so-called ``rules''.
 \index{norm}{Rule} In general, a rule consists of one or more ``signal'' and ``background'' oscillation channels, which are normalized with efficiencies
 (\cf, \figu{rule}). The event numbers from these channels are added {\em before} the $\Delta \chi^2$-value is calculated.\footnote{Note that
-in this manual, we $\chi^2$ and $\Delta \chi^2$ are equal, since
+in this manual, the $\chi^2$ and $\Delta \chi^2$ are equal, since
 for simulated data $\Delta \chi^2 = 0$ at the best-fit point. Thus, we
 are using $\chi^2$ and $\Delta \chi^2$ as equal quantities.} In addition, each rule implements an {\em independent} systematics, such as signal and background normalization errors. Eventually, each rule gives a $\Delta \chi^2$-value, and the total $\Delta \chi^2$ of one experiment is obtained by adding the $\Delta \chi^2$'s of all rules (\cf, \figu{experiment}). 
  An example for a rule could look like this: We want to detect electron
@@ -120,7 +120,8 @@ Of course, an abstract experiment definition language can not simulate all possi
 
 \section{A simple example for AEDL}
 
-Experiments are in \GLOBES\ defined by the Abstract Experiment Definition Language (AEDL). The experiment definition is written into a text file using the AEDL syntax. Currently, a number of pre-defined experiment definition files are provided with \GLOBES , which have to be modified manually in order to define new experiments. An IDE (Integrated Developement Environment) for AEDL files is currently in preparation. The application software then uses this text file to initialize the experiment, where other secondary files might read for source fluxes, cross sections \etc . In this section, we show the definition of a very simple neutrino factory in AEDL, where we do not go into details. In the next chapter, we will discuss each of the individual steps in detail.
+Experiments are in \GLOBES\ defined by the Abstract Experiment Definition Language (AEDL). The experiment definition is written into a text file using the AEDL syntax. Currently, a number of pre-defined experiment definition files are provided with \GLOBES , which have to be modified manually in order to define new experiments. An IDE (Integrated Developement Environment) for AEDL files may follow in one of the next
+versions. The application software then uses this text file to initialize the experiment, where other secondary files might read for source fluxes, cross sections \etc . In this section, we show the definition of a very simple neutrino factory in AEDL, where we do not go into details. In the next chapter, we will discuss each of the individual steps in detail.
 
 The first line of every experiment definition file has to be
 \begin{quote}
@@ -165,17 +166,17 @@ The command {\tt cross} tells the parser that a cross section environment
 begins. It has the name {\tt \#CC}, which can later be used to refer 
 to this specific environment, and thus to the file {\tt XCC.dat}. Note that each name begins with a leading {\tt \#}.
 %
-Of course, the baseline and matter profile have to be specified, too:
+Of course, the baseline and matter profile have to be specified, too, where
+we use an arbitrary matter density profile here:
 \begin{quote}
 {\tt /* baseline */}\\
-{\tt \$baseline = 3000.0}\\
+{\tt \$profiletype = 3}\\
 {\tt \$densitytab = \{3.5\}}\\
 {\tt \$lengthtab = \{3000.0\}}\\
-{\tt \$density\_error = 0.05}
 \end{quote}
 The curly brackets used for the definition of {\tt \$densitytab} and
 {\tt \$lengthtab} refer to a list of numbers. Here, the lists contain only
-one element, because we only use one density layer: We initialize a baseline length of $3000 \, \mathrm{km}$ with a constant matter density of $3.5 \, \mathrm{g/cm^3}$ and a matter density uncertainty of $5\%$ ($1 \sigma$ relative error). Note that the elements in {\tt \$lengthtab} have to add up to the baseline length. 
+one element, because we only use one density layer: We initialize a baseline length of $3000 \, \mathrm{km}$ with a constant matter density of $3.5 \, \mathrm{g/cm^3}$. 
 %
 As another ingredient, we have to define the energy resolution function:
 \begin{quote}
@@ -204,7 +205,8 @@ $\nu_e\rightarrow\nu_\mu$  and $\bar\nu_\mu\rightarrow\bar\nu_\mu$
 {\tt \tb @channel = \#mu\_plus: -: muon: muon: \#CC: \#MINOS}\\
 {\tt >}
 \end{quote}
-The first element is the name of the flux, which we have already defined above as defined above. The second element $\pm$ determines whether 
+The first element is the name of the flux, which we have defined above. 
+The second element ``$\pm$'' determines whether 
 neutrinos or anti-neutrinos are taken from the flux table (two different polarities allowed). The third position defines the initial flavor,
 and the forth position the final flavor, followed by the name of the cross
 section and energy resolution function as defined before.
@@ -252,8 +254,8 @@ Comments can be used such as in C:
 \end{quote}
 There are pre-defined variables which all start with {\tt \$}. Their range
 is also checked. For example,  {\tt 
-\$bins} can be only between $0$ and $500$~\footnote{The upper limit is 
-there only for safety reasons, the memory is allocated dynamically.}. If one uses a {\tt float} quantity where  an {\tt int} is expected, the {\tt float} will be converted to an {\tt int} in the same way as in C.  For example, we have scalar variables
+\$bins} can be only between $0$ and $500$.\footnote{The upper limit is 
+only there for safety reasons, the memory is allocated dynamically.} If one uses a {\tt float} quantity where  an {\tt int} is expected, the {\tt float} will be converted to an {\tt int} in the same way as in C.  For example, we have scalar variables
 \begin{quote}
 {\tt
 \$bins = 10\\
@@ -310,8 +312,7 @@ If you want to have several experiments in one file, separate the different
 \begin{quote}
 {\tt    \#NEXT\#}
 \end{quote}
-This command resets the counters for channels, rules and energy resolution
-functions. All variables have their scope limited 
+This command resets the counters for channels, rules, fluxes, and energy resolution environments. All variables have their scope limited 
 by either {\tt \%!GLoBES, \#NEXT\#} or {\tt EOF}.  This allows 
 a consistent treatment of various experiments in one file.
 
@@ -329,8 +330,8 @@ With this include mechanism, one can use constructions such as
         include   "JHFHK.gls"
 }
 \end{quote}
-in order to initialize a combined analysis of the experiments defined in the files {\tt NuFact.gls} and {\tt JHFHK.gls}. As one sees from the example above
-file names are always quoted in \AEDL.\index{norm}{File names}
+in order to initialize a combined analysis of the experiments defined in the files {\tt NuFact.gls} and {\tt JHFHK.gls}. Note that one has 
+to use quotation marks for filenames in \AEDL.\index{norm}{File names}
 Even if one uses the
 automatic variable {\tt \#CC} in both experiments, 
 but the cross section data are different (for example, because of different target nuclei), the correct 
@@ -344,12 +345,12 @@ Furthermore, one can define constants such as
 Pi = 3.141
 }
 \end{quote}
-These constants can not only be defined within one \AEDL\ file but also
+These constants can not only be defined within one \AEDL\ file, but also
 by the calling C program, which allows to use a simple but powerful variable
 substitution mechanism as described in~\Sec~\ref{sec:aedlparams}.
 \index{norm}{External \AEDL\ parameters}
 
-Alos some simple algebraic manipulations are possible, such as
+In addition, some simple algebraic manipulations are possible, such as
 \begin{quote}
 {\tt
 Pi+1\\
@@ -508,8 +509,8 @@ kilometers.
 \hline
 {\tt \$profiletype} & Additional variables & Description \\ 
 \hline
-$1$ & - & Average density (constant) \\
-$2$ & {\tt \$densitysteps} & PREM profile with given number of equidistant steps \\
+$1$ & {\tt \$baseline} & Average density (constant) \\
+$2$ & {\tt \$baseline}, {\tt \$densitysteps} & PREM profile with given number of equidistant steps \\
 $3$ & {\tt \$lengthtab},  {\tt \$densitytab} & Arbitrary profile (table of layer thicknesses, table of densities) \\
 \hline
 \end{tabular}
@@ -541,17 +542,17 @@ manually with a list of thicknesses and densities of the matter density layers. 
 \begin{quote}
 {\tt \$profiletype=3 } \\
 {\tt \$densitytab=\{2.8, 3.5\}}\\
-{\tt \$lengthtab=\{1000.0, 2000.0\}}\\
+{\tt \$lengthtab=\{1000.0, 2000.0\}}
 \end{quote}
-It is important that both lists habe the same length and that the  thicknesses given in  {\tt \$lengthtab} add up to the value of
-{\tt \$baseline}. In addition, matter densities are always given in $g/cm^3$.
+It is important that both lists habe the same length and that the  thicknesses given in  {\tt \$lengthtab} add up to the length of
+the baseline, which does not have to be explicitely specified anymore. In addition, matter densities are always given in $g/cm^3$.
 %
 This approach can also be used for a constant matter density profile with
 a specific matter density:
 \begin{quote}
 {\tt \$profiletype=3 } \\
 {\tt \$densitytab=\{3.5\}}\\
-{\tt \$lengthtab=\{3000.0\}}\\
+{\tt \$lengthtab=\{3000.0\}}
 \end{quote}
 The possible options for matter density profiles are summarized in \Tab~\ref{tab:profiletypes}.
 
@@ -700,7 +701,7 @@ Thus, a simple definition of a channel\index{aedl}{{\tt channel}} is
 \tb @channel = \#flux : $+$: muon: muon: \#cross: \#energy\\
 >}
 \end{quote}
-
+%
 \index{norm}{Oscillation!switching off}
 It is also possible to define a channel as no-oscillation by using the
 prefix {\tt NOSC\_}\index{aedl}{{\tt channel}!{\tt NOSC\_}} 
@@ -711,21 +712,18 @@ the final flavour, like this
 \tb @channel = \#flux : $+$: NOSC\_muon: muon: \#cross: \#energy\\
 >}
 \end{quote}
-
- In that case
-all diagonal probabilities $P_{\alpha\alpha}$ are unity and all off-diagonal
-probablities  $P_{\alpha\beta}$ are zero. This is \eg\ especially useful for
-neutral current events since they do not depend on any oscillation 
-parameters\footnote{at least in the absence of sterile neutrinos}. The channels
-marked as {\tt NOSC\_} are only computed by a call to \GLB{SetRates}
-and not recomputed in the subsequent fit (which calls \GLB{SetNewRates}).
+%
+In this case all diagonal probabilities $P_{\alpha\alpha}$ are unity, and all off-diagonal probablities  $P_{\alpha\beta}$ are zero. This is,
+for instance, useful for
+neutral current events, since these do not depend on any oscillation 
+parameters\footnote{At least in the absence of sterile neutrinos}. The channels
+marked as {\tt NOSC\_} are already computed by \GLB{SetRates}
+and do not have to be recomputed in the subsequent fit (which calls the undocumented function \GLB{SetNewRates}).
 Therefore this feature can be used to speed up the rate 
 computation considerably, especially in cases where a large set
 of channels exist which are only used for the computation of backgrounds.
 Usually it is an excellent approximation to treat backgrounds as if they
-would not be affected by oscillations.
-
-
+were not affected by oscillations.
 
 Note that the energy environment will be described in the next section. 
 In addition, one can define pre- and post-smearing effects together
@@ -745,7 +743,8 @@ proper algorithm depends on the experiment and the frequencies of the
  involved neutrino oscillations.
 
 In this section, we first discuss the principles of the energy smearing, where it is assumed that the reader is familiar with \Sec~\ref{sec:channel}. Then we introduce an automatic energy smearing algorithm, which is fairly simple to understand and applicable to most beam-based experiments. 
-In most cases, the reader may want to continue to the next section after reading these two subsections. In the third subsection, we describe a more elaborate (and slower) smearing algorithm, which can be used together with rather fast neutrino oscillations compared to the bin size, such as for reactor experiments. Eventually, we show how one can use a manual smearing matrix instead of using one of the implemented algorithms.
+In most cases, the reader may want to continue to the next section after reading these two subsections. In the third subsection, we describe a more elaborate (and slower) smearing algorithm, which can be used together with rather fast neutrino oscillations compared to the bin size, such as for
+(solar) reactor experiments to avoid aliasing effects. Eventually, we show how one can use a manual smearing matrix instead of using one of the implemented algorithms.
 
 \subsection{Introduction and principles}
 
@@ -803,7 +802,7 @@ the general evaluation algorithm. As it is illustrated in \figu{energies},
 \item[Sampling point level]
  This level is used internally to evaluate the integrand in \eq~(\ref{eq:simple_int}) at all sampling points. The energy scale is the actual incident neutrino energy $E$. Note that the sampling range should exceed the energy bin range by about the energy resolution error, since the corresponding sampling points have to be evaluated by the algorithm. 
 However, this exceeding is only
-necessary to avoid aliasing effects, if the integrand in \eq~(\ref{eq:simple_int}) is large at the limits of the sampling range.
+necessary to avoid aliasing effects if the integrand in \eq~(\ref{eq:simple_int}) is large at the limits of the sampling range.
 For a manual definition of the sampling points (depends on algorithm), use
 \index{aedl}{sampling points@{\tt \$sampling\_points}}
 \index{aedl}{sampling min@{\tt \$sampling\_min}}
@@ -947,10 +946,6 @@ simultaneously. One assumption is that all involved factors are piece-wise
 constant, \ie, they hardly change within each bin. This 
 assumption seems to be very restrictive. Note, however, if one analyzes simulated data (which are simulated with the same algorithm), the errors
 will cancel between the simulated and fitted data. 
-%
-Furthermore, we will demonstrate in the next subsection that the assumption
-is rather good. ??? COMES THERE ???
-%
 This algorithm is the fastest which \GLOBES\ offers, and is selected by
 %
 \index{aedl}{{\tt energy}!type@{\tt "@type}}
@@ -960,11 +955,8 @@ This algorithm is the fastest which \GLOBES\ offers, and is selected by
 \end{quote}
 within the {\tt \#energy} environment.
 The computation of the bin kernel $K_i^c$ is performed
-by \GLOBES. Thus, it requires  the number of bins
- $N_\mathrm{bins}$
-and the minimum $E_\mathrm{min}$ and maximum energy $E_\mathrm{max}$
-for equidistant bins.
- 
+by \GLOBES. Thus, it requires that the number of bins
+{\tt \$bins} and the minimum energy {\tt \$emin} and maximum energy {\tt \$emax} for equidistant bins are given.
 %
 \index{norm}{Energy!resolution}
 \index{norm}{Energy!resolution function}
@@ -1025,13 +1017,12 @@ algorithm is, for example,
 \subsection{Low-pass filter}
 
 In order to ensure that fast oscillating probabilities do not lead to 
-aliasing\index{norm}{Aliasing}
-it is desirable to impose a low-pass filter already during the calculation
-of the probabilities itself. This is possible and implemented has a highly
+aliasing,\index{norm}{Aliasing}
+it is possible to impose a low-pass filter already during the calculation
+of the probabilities itself. This filter is implemented has a highly
 experimental feature called ``filter''\index{norm}{Filter}. 
 The calculation of oscillation
-probabilities basically is a computation of phase differences. Restricting
-the maximum admissible size of those phase difference effectively filters
+probabilities is, in principle, a computation of phase differences. Restricting the maximum admissible size of those phase differences effectively filters
 the high frequency component of the oscillation probability. This idea is
 implemented according to
 \begin{eqnarray}
@@ -1044,19 +1035,18 @@ e^{ -\Phi_{ij}^2/\sigma_f(E)^2 }\,,
 where $\Phi_{ij}:=\Delta m_{ij}^2 L/2E$ is the usual phase difference and
 the last term is a Gau\ss ian filter with width $\sigma_f(E)$. Choosing
 $\sigma_f(E):=\sigma_f^0 \cdot E$ ensures that this filter behaves 
-approximately like an energy resolution function with constant width 
+approximately such as an energy resolution function with constant width 
 $\sigma_e=\sqrt{2}/\sigma_f^0$, \ie\
 \begin{equation}
 \label{eq:filter_b}
 \int d\tilde E\quad P(\tilde E) \frac{1}{\sigma_e\,\sqrt{2\pi}}\,
 e^{-\frac{(E-\tilde E)^2}{2\sigma^2_e}}\,.
 \end{equation}
-The equivalence of equation~\ref{eq:filter_a} and equation~\ref{eq:filter_b}
-is not obvious and connected to the properties of $P_{\alpha\beta}$, 
-see~\cite{Kiers:1996zj,Giunti:2003ax}. This feature works \emph{only} 
+The relationship between \eqs~\ref{eq:filter_a} and~\ref{eq:filter_b}
+is not obvious and connected to the properties of $P_{\alpha\beta}$: 
+see \Refs~\cite{Kiers:1996zj,Giunti:2003ax}. This feature works \emph{only} 
 for vacuum and constant densities and is controlled
-by the filer state variable and $\sigma_e$ is set by the filter value 
-variable:
+by the filer state variable. In addition, $\sigma_e$ is set by the filter value variable:
 \index{aedl}{filter state@{\tt \$filter\_state}}
 \index{aedl}{filter value@{\tt \$filter\_value}}
 \begin{quote}
@@ -1072,11 +1062,11 @@ with more than one layer is used.
 \index{aedl}{{\tt energy}!type@{\tt  "@type}}
 With a type 1 ({\tt @type = 1}) energy resolution 
 function, $\sigma_e$ adds on to the energy resolution function 
-of the detector $\sigma_c(E)$ like
+of the detector $\sigma_c(E)$ such as
 \begin{equation}
 \sigma_{\mathrm{eff}}(E)^2\simeq \sigma_e^2 + \sigma_c(E)^2\,.
 \end{equation} 
-Sometimes this behaviour is undesirable and therefore one can try to 
+Sometimes this behavior is unwanted, and therefore one can try to 
 'subtract' the filtering from the energy resolution function by splitting 
 the energy resolution function $\sigma(E)_{\mathrm{eff}}$ in
 two parts by
@@ -1086,11 +1076,11 @@ two parts by
 \end{equation}
 where the truncated energy resolution function $\tilde\sigma_c(E)$ 
 is used instead of $\sigma_c(E)$ in computing the
-smearing data. Thus one obtains that
+smearing data. Thus one obtains as effective energy resolution
 \begin{equation}
 \sigma_{\mathrm{eff}}(E)^2\simeq \sigma_c(E)^2\,.
 \end{equation} 
-This scheme is enabled by choosing as type for the energy resolution
+This scheme is used by choosing as type for the energy resolution
 \begin{quote}
 {\tt
 @type = 2
@@ -1159,8 +1149,8 @@ background events are composed out of the channels, and the second part
 specifies which systematical errors are considered, as well as their values.
 %
 For a rule, the splitting
-in signal and background is useful for simplicity and the treatment of systematics, as we will se later. Each rule will lead to a $\chi^2$-value,
-which means that all $\chi^2$'s of the different rules will be added
+in signal and background is useful for the treatment of systematics, as we will se later. Each rule will lead to a $\Delta \chi^2$-value,
+which means that all $\Delta \chi^2$'s of the different rules will be added
 for the whole experiment. Within each rule, the event rates are added, and
 the systematics is considered to be independent of the other rules.
 Thus, it is convenient to combine the above defined channels for different
@@ -1240,7 +1230,7 @@ the experiments considered here, $N$ is typically $20$ and $k\sim 4$,
 which means that the pull method is numerically much faster. Moreover,
  it is more flexible and  allows the inclusion of systematical errors 
 also for a  Poissonian $\chi^2$-function.
-In~\cite{Fogli:2002pt}, it has been demonstrated that the pull method 
+In \Ref~\cite{Fogli:2002pt}, it has been demonstrated that the pull method 
 and the covariance based approach are equivalent for a Gau\ss ian and 
 linear model. In general,
 there is a separate $(\chi^2_\mathrm{pull})^r$ for each rule $r$, 
@@ -1425,13 +1415,13 @@ Eventually, a rule looks like
 \end{quote}
 \index{aedl}{{\tt rule}|)}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Versioning of \AEDL\ files}
+\section{Version control in \AEDL\ files}
 \label{sec:aedl_versioning}
 \index{norm}{Version control}
 
-In order to provide a handle on problems which may arise due to different
-versions of \GLOBES\ and \AEDL\ files, it is possible to stamp each 
-\AEDL\ file with the corresponding version number of the \GLOBES\ package with
+In order to avoid problems which come from different
+versions of \GLOBES\ and \AEDL\ files, it is possible to use in each 
+\AEDL\ file a version number. For example, it may correspond to the  minimum version number of the \GLOBES\ package with which it works. Set the
 {\tt \$version}\index{aedl}{version@{\tt \$version}} by
 \begin{quote}
 {\tt \$version="1.8.1"}
@@ -1442,40 +1432,35 @@ This information can be accessed by the versioning functions as described in~\Se
 \chapter{Testing \& debugging of \AEDL\ files}
 \label{chap:exp_def}
 
-\AEDL\ is a powerful language to describe a vast variety 
+\AEDL\ is a powerful language to describe a variety 
 of different experiments.
-This chapter demonstrates how to test whether a given \AEDL\ file describes
-a given experiment. To this end the \GLOBES\ package also features a program
-called {\tt globes}\index{norm}{globes@{\tt globes}}, which can be seen either as a 
-crude \AEDL\ debugger 
-or a simple command line oriented tool to convert the rather 
-abstract \AEDL\ experiment description into more accessible event rates.
+This chapter demonstrates how to test an \AEDL\ file in order to check
+if they really describes given experiment. 
+For this application, the \GLOBES\ package contains the program
+{\tt globes}\index{norm}{globes@{\tt globes}}. It can either be 
+regarded as an \AEDL\ debugger, or as a simple command-line oriented tool to convert the rather  abstract \AEDL\ experiment description into more accessible event rates.
 
-\section{Basic usage of {\tt globes}}
+\section{Basic usage of the {\tt globes} binary}
 \label{sec:globes_basics}
 
-The {\tt globes}\index{norm}{globes@{\tt globes}} binary is installed along 
-with the library \index{norm}{libglobes@{\tt libglobes}}, but
+The {\tt globes}\index{norm}{globes@{\tt globes}} binary is installed 
+together with the library \index{norm}{libglobes@{\tt libglobes}}, but
 into the directory {\tt \$prefix/bin/}. In order to use the {\tt globes} 
-utility this directory\footnote{This is automatically the case, when
-no options have been given to {\tt configure}, and {\tt make install} was 
-executed with root-privilege, \ie\ a standard installation was done.} has to 
-be in the path of the shell used to invoke it.
+utility, this directory has to be in the path of the shell used to call the program.\footnote{This is automatically done if
+no options are given to {\tt configure}, and {\tt make install} was 
+executed with root-privilege, \ie, a standard installation was done.}
 
-First {\tt globes} parses the {\tt .glb}-file which was given as argument,
-prints any warnings and errors which occured during parsing. Then it
-uses the experiment description in the file to compute the event rates
-at a certain point in parameters space. And finally it displays the result
-with a varying degree of detail dependent on the options used to invoke
-{\tt globes}. The option parsing follows the GNU standards and thus there
-is a {\tt \verb+--+help} option which displays all other options 
-along with a short description.
+As an argument, {\tt globes} takes a {\tt .glb}-file. While parsing it,
+it prints any warnings and errors which have occured during reading the file. Then it uses the experiment description in the file to compute the event rates at a certain point in parameter space. Finally, it displays the result based on the options used to call {\tt globes}. 
+The options of {\tt globes} follow the GNU standard. Thus, there
+is a {\tt \verb+--+help} option to display all other options 
+together with short descriptions.
 
 \index{norm}{globes@{\tt globes}!oscillation parameters}
-Calling {\tt globes} without any options and with a {\tt .glb}-file as argument produces an event summary at rule level, taking into account 
-the full description in the file, \ie\ all efficiencies, backgrounds and resolution effects. Thus, these are the event rates which are actually 
-used to compute the $\chi^2$. By default the oscillation parameters used to
-calculate the transition probability are
+Calling {\tt globes} without any options and with a {\tt .glb}-file as argument produces an event summary at rule level. In this case,  
+the full experiment description in the file is taken into account, \ie, all efficiencies, backgrounds, and energy resolution effects. 
+Thus, the returned event rates are the ones which will be actually 
+used to compute the $\chi^2$ later. By default, the oscillation parameters used to calculate the transition probability are
 \begin{eqnarray}
 \label{eq:globes_params}
 \sin^22\theta_{12}=0.8&\quad&\Delta m^2_{21}=7\cdot10^{-5}
@@ -1485,8 +1470,8 @@ calculate the transition probability are
 \delta=0&\quad&\sin^22\theta_{13}=0.1\,.\
 \end{eqnarray}
 Of course, it is possible to change these default values either by using the
-option {\tt -p} on a call by call basis or by setting the environment variable
-{\tt GLB\_CENTRAL\_VALUES}
+option {\tt -p} on a call by call basis, or by setting the environment variable
+{\tt GLB\_CENTRAL\_VALUES}:
 %
 \index{norm}{GLB CENTRAL VALUES@{\tt GLB\_CENTRAL\_VALUES}} 
 \index{norm}{Environment variables!GLB CENTRAL VALUES@{\tt GLB\_CENTRAL\_VALUES}}
@@ -1494,113 +1479,98 @@ option {\tt -p} on a call by call basis or by setting the environment variable
 \begin{quote}
 {\tt
 globes -p'0.55,0,0.785,0,0.0008,0.0025'\\
-globes \verb+--+parameters='0.55,0,0.785,0,0.0008,0.0025'\\
+globes \verb+--+parameters='0.55,0,0.785,0,0.0008,0.0025'
 }
 \end{quote}
-or by defining within the shell session or in the shell profile:
+For example, {\tt GLB\_CENTRAL\_VALUES} can be defined
+within the shell session or in the shell profile:
 \begin{quote}
 {\tt
 export GLB\_CENTRAL\_VALUES='0.55,0,0.785,0,0.0008,0.0025'
 }
 \end{quote}
-Furthermore it is possible to switch off oscillations altogether with t
-he {\tt -N} option
-and to switch them on again with {\tt -O} (the default). The effect of {\tt -N}
-is the same than to prefix all channels with {\tt NOSC\_}.
-
-
+Furthermore it is possible to switch off oscillations with the {\tt -N} option and to switch them on again with {\tt -O} (the default). The effect of {\tt -N} is the same as to use {\tt NOSC\_} in all oscillation channels.
+Thi feature is useful if one wants to normalize an expriment flux if
+the number of un-oscillated events is given.
 
 \index{norm}{globes@{\tt globes}!warnings}
 \index{norm}{globes@{\tt globes}!errors}
 \index{norm}{globes@{\tt globes}!verbosity}
 The \AEDL\ parser and interpreter has basically three levels of messages to
-th user: warnings, errors and fatal errors. Fatal errors always are reported
-and the program exits with status '1'. Usually only errors and no warnings
-are reported. The verbosity level can be chosen by the {\tt -v} option, where
-{\tt -v1} is default, \ie\ only errors and fatal errors are reported. {-v0}
-corresponds to reporting fatal errors only, whereas {\tt -v2} will
-print in addition to fatal errors and errors also warnings. It is recommended
-to test any new {\tt .glb}-file with {\tt -v2} to see the warnings at least 
-once and to decide whether there is a problem and in case fix it. With {\tt -v3}
-all files read by {\tt globes} are displayed together with their path and
-with  {\tt -v4} all files which have been attempted to be read are shown.
+the user: Warnings, errors and fatal errors. 
+Fatal errors are always reported and lead to a 
+program exit with status '1'. Usually only errors and no warnings
+are reported. The verbosity level can be chosen by the {\tt -v} option, where {\tt -v1} is default, \ie, only errors and fatal errors are reported. The level {-v0} corresponds to reporting fatal errors only, and {\tt -v2} will print warnings in addition to fatal errors. It is recommended
+to test any new {\tt .glb}-file with {\tt -v2} to check the warnings at least once, and to decide whether there is a problem to be fixed. With {\tt -v3} all files read by {\tt globes} are displayed together with their path, and with  {\tt -v4} all files which have been attempted to be read are shown.
 These two setting are useful to clarify path resolution issues and shadowing
 of file names.
-
-
-
 
 \section{Testing \AEDL\ files}
 \label{sec:globes_test}
 
-In the process of defining a new experiment the default output of {\tt globes}
-at rule level is the final step but in order to arrive there it is often
-necessary to view the intermediate steps in the event rate calculation. The 
-{\tt globes} utility offers many possibilities to do so based on the 
-rate access functions as described in \Sec~\ref{sec:event_rates}.
+In the process of defining a new experiment, the default output of {\tt globes} at rule level is the final step. However, in order to arrive 
+at this level it is often necessary to review the intermediate steps in the event rate calculation. The {\tt globes} utility offers many possibilities to do this based on the rate access functions as described in \Sec~\ref{sec:event_rates}.
 
 \index{norm}{globes@{\tt globes}!total rates}
 \index{norm}{globes@{\tt globes}!spectral rates}
-By default {\tt globes} returns total rates corresponding to the 
-{\tt -t} option, this can be changed to
+By default, {\tt globes} returns total rates corresponding to the 
+{\tt -t} option. This can be changed to
 to a full spectrum by using {\tt -s}. The spectral rates are shown in a
 table where the first columns always gives the central energy of the
 corresponding bin.
 
-If there are more than one experiment in a file, \ie\ at least one 
-{\tt \#NEXT\#}
-command, then only the event rates for one experiment are shown.  This
-one experiment can be choose with the {\tt -e} option which takes 
-as mandatory argument the number of the experiment (starting with zero), 
-where {\tt -e0} is the default.
+If there is more than one experiment in a file, \ie, there is at least one 
+{\tt \#NEXT\#} command, only the event rates for one experiment will be shown.  This experiment can be chosen with the {\tt -e} option, which takes 
+as a mandatory argument the number of the experiment (starting with zero).
+The default is {\tt -e0}.
 
 \subsection*{Channel level}
 \index{norm}{globes@{\tt globes}!channel rates}
 
-As a first step one often wants to check whether each channel produces the 
-desired output. Channel rates are returned when the {\tt -c} option is used.
+As a first step, one may want to check if each channel produces the 
+anticipated output. Channel rates are returned if the {\tt -c} option 
+is used.
 This option takes as an optional argument the channel number 
-(starting at zero), if no argument is given all channels are displayed.
-By default the sum of the event rates in each channel is shown. Where each 
+(starting at zero). If no argument is given all channels are displayed.
+By default, the sum of the event rates in each channel is shown. Each 
 column has as first line the same channel name as in the file. 
 
-It is also possible to take out one detector effect after the other. First
-one can switch off the post-smearing efficiencies ({\tt -f}) and the 
+It is also possible to switch off one detector effect after the other. 
+First, one can switch off the post-smearing efficiencies ({\tt -f}) and the 
 post-smearing backgrounds ({\tt -g}). Next, one can switch off the 
 energy resolution function with ({\tt -b}) and view the rates before
-smearing. In case the {\tt -s} options is also used, the number of
-lines in the output now is given by the setting of {\tt \$sampling\_points}.
+smearing. If the {\tt -s} option is also used, the number of
+lines in the output will be given by {\tt \$sampling\_points}.
 Another effect of the {\tt -b} option is that the post-smearing efficiencies
-and backgrounds are no longer taken into account. Therefore the {\tt -g} 
+and backgrounds are no longer taken into account. Therefore, the {\tt -g} 
 and {\tt -f} options now apply to the \emph{pre}-smearing efficiencies 
-and the \emph{pre}-smearing backgrounds. Thus 
+and the \emph{pre}-smearing backgrounds. Thus, 
 \begin{quote}
 {\tt
 globes -c -b -g -f FILE
 }
 \end{quote}
 produces the raw event rate corresponding to the convolution of flux, 
-probability and cross section, neglecting all detector effects.
+probability, and cross section, which is neglecting all detector effects.
 
 \subsection*{Rule level}
 \index{norm}{globes@{\tt globes}!rule rates}
 
-The logical step after channels is to check the rule rates. Rule rates 
-are returned with {\tt -r}.
+The next logical step after checking the channel rates is to investigate
+ the rule rates. The rule rates are returned with the option {\tt -r}.
 This option takes as an optional argument the rule number 
-(starting at zero), if no argument is given all rules are displayed.
-By default the sum of the event rates in each rule is shown, as well
-as for each part of the rule. Where each 
+(starting at zero). If no argument is given, all rules will be displayed.
+By default, the sum of the event rates in each rule is shown, as well
+as for each component within the rule. Each 
 rule is preceeded by a line with the same rule name as in the file. 
 
-It is also possible for rules to take out one detector effect after 
-the other, however with the limitation that rules make only sense
+It is also possible for rules to switch off one detector effect after 
+the other -- with the limitation that rules only make sense
 after the energy resolution function has been applied to each channel.
-Therefore it is \emph{not} possible to use {\tt -b} together with {\tt -r} or
-to switch off any pre-smearing efficiencies or backgrounds. 
+Therefore, it is \emph{not} possible to use {\tt -b} together with {\tt -r}, or to switch off any pre-smearing efficiencies or backgrounds. 
 One can, however, switch off the post-smearing efficiencies ({\tt -f}) 
 and the post-smearing backgrounds ({\tt -g}) for each channel. Since
-the definition of a rule also contains so called coefficients it is
+the definition of a rule also contains so-called ``coefficients'', it is
 possible to switch them off with {\tt -i}. This options also deactivates
 any setting of {\tt @backgroundcenter}. 
 
@@ -1608,20 +1578,20 @@ any setting of {\tt @backgroundcenter}.
 \subsection*{Output}
 \index{norm}{globes@{\tt globes}!output}
 
-The default output stream is {\tt stdout}. The output can be redirected to 
-a file using the {\tt -o} option which takes as mandatory argument 
+The default output stream is {\tt stdout}. The output can be re-directed to 
+a file using the {\tt -o} option, which takes as mandatory argument 
 the file name. The default output format aims at maximal readability for
-a human eye, in many cases however, the output of {\tt globes} is intended
-for processing by other programs. There is a bunch of features which 
-should facilitate this. Usually one would like to omit the channel and rule 
+a human eye. In many cases however, the output of {\tt globes} is produced
+as input for other programs. There are some features to adjust the
+output format. Usually one would like to omit the channel and rule 
 names by using simple printing {\tt -S} instead of pretty printing {\tt -P}.
 
 There are special options for certain special formats: {\tt -m} produces
 Mathematica\footnote{Mathematica is a trademark of Wolfram Inc.} list
-output, which can be directly visualized using {\tt MultipleListPlot}.
-The option {\tt -u} uses the same principal formatting than {\tt -m} does, but
-it allows to specify the left, middle and right delimiters in constructing
-the list, \eg\
+output, which can be directly visualized by {\tt MultipleListPlot}.
+The option {\tt -u} uses the same principal formatting as {\tt -m}, but
+it allows to specify the left, middle, and right delimiters in constructing
+the list, such as
 \begin{quote}
 left\\
 left 1 middle 2 middle 3 right\\
@@ -1630,41 +1600,38 @@ left\\
 left 1 middle 2 middle 3 right\\
 right\\
 \end{quote}
-is, with left = '\{', middle = ',' and right = '\}',
+This is, with left = '\{', middle = ',' and right = '\}',
 equivalent to the list $\{\{1,2,3\},\{1,2,3\}\}$. 
 The delimiters can be set by {\tt -L}, {\tt -M} and {\tt -R} as in the 
-following example
+following example:
 \begin{quote}
 {\tt
 globes -Su -R\$'\verb+\n+' \verb+--+Middle=" " -L" " ...
 }
 \end{quote}
-where {\tt \$'\verb+\n+'} is the escape sequence in the shell for ANSI C
-like characters like linefeed '\verb+\n+'. The above example
-produces a a two columns style file like this
+Here {\tt \$'\verb+\n+'} is the escape sequence in the shell for ANSI C-like characters, such as linefeed '\verb+\n+'. The above example
+produces a a two column file such as
 \begin{quote}
 1.0 0.12\\
 1.2 0.14\\
 1.3 0.18\\
 ...
 \end{quote}
-where the first columns is the central energy of the bin and
-the second columns gives the event rate. The output is a concatenation
-of many such two columns tables, each rule part or channel has its
-own table. Thus one can, by using
+where the first columns is the central energy of the bin, and
+the second columns gives the event rate. Usually, the output is a concatenation of many such two columns tables, where 
+each rule part or channel part has its own table. Thus one can, by using
 {\tt -u} and user-defined delimiters, construct many different  
 output formats.
 
-\subsection*{\AEDL\ variable substitution}
+\subsection*{\AEDL\ external variable substitution}
 \index{norm}{globes@{\tt globes}!variable substitution}
 
-Some {\tt .glb}-files use \AEDL\ variable substitution in order to allow
-special purpose studies like of baseline dependence. If no special care is
-taken, any \AEDL\ variable which is not defined within a given {\tt .glb}-file
-is interpreted by the parser as zero. Thus it would be impossible to properly
-parse with {\tt globes} any files which contain such undefined variables. 
-Hence, there is the possibility to define \AEDL\ variables by using the define
-option {\tt -D}. A call like this
+Some {\tt .glb}-files use external \AEDL\ variables in order to allow
+special purpose studies (such as the energy resolution-dependence). If 
+the external variables are not explicitely specified, they are
+interpreted by the parser as zeros. Thus, it is impossible to properly
+parse any files with {\tt globes} which contain such undefined variables. 
+Hence, there is the possibility to define \AEDL\ variables by using the define option {\tt -D}. A call such as 
 \begin{quote}
 {\tt
 globes -DBASELINE=3000 ...

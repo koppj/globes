@@ -205,10 +205,10 @@ Institut f{\"u}r Theoretische Physik, T30d \\
 \GLOBES\ 1.X \\
 General Long Baseline Experiment Simulator \\ }
 \vspace*{0.5cm}
-{\large \bf User's and reference manual }
+{\large \bf User's and experiment definition manual }
 
-\vspace*{1.5cm}
-{\large \bf !!!DRAFT IN PROGRESS!!! }
+%\vspace*{1.5cm}
+%{\large \bf !!!DRAFT IN PROGRESS!!! }
 \end{center}
 
 \vspace{1cm}
@@ -264,7 +264,8 @@ Version from \today
 \chapter*{What is \GLOBES ?}
 
 \GLOBES\ (``General Long Baseline Experiment Simulator'') is a flexible
-software package to simulate neutrino long baseline experiments. On the
+software package to simulate neutrino oscillation 
+long baseline experiments. On the
 one hand, it contains a comprehensive abstract experiment definition
 language, which allows to describe most classes of long baseline experiments
 at an abstract level. On the other hand, it provides a C-library to 
@@ -330,12 +331,12 @@ of several modules.
 \end{figure}
 %
 \AEDL (``Abstract Experiment Definition Language'') is a language
-to define experiments in form of normal text files. One or more of 
+to define experiments in form of ordinary text files. One or more of 
 the resulting \AEDL\ files can then be processed together with supporting 
 flux or cross section files by the user interface. The user interface
 is a C-library, which loads one or more \AEDL\ file(s)
 containing the experiment definition(s). The user interface is linked 
-against the application software, which calls the user interface functions
+against the application software, and provides the user interface functions
 for the intended experiment simulation. 
 
 The application 
@@ -346,7 +347,7 @@ high-precision instruments, very much on the oscillation parameters.
 In general, it is quite simple to simulate superbeams and reactor
 experiments. However, because of the more complicated topology, the
 simulation of neutrino factories is much more difficult. In order
-to demonstrate some of these difficulties, we show in this manual only
+to demonstrate some of these difficulties, we present in this manual only
 examples with neutrino factories. These examples can be found in
 \Part~\ref{part:1} within the boxed pages. As complete files, they
 are also available in the \GLOBES\ software package.
@@ -380,7 +381,7 @@ short \GLOBES\ tour is given in \Chapt~\ref{chapter:tour} in order to
 have an overview over \GLOBES . 
 After that, the user
 interface is successively introduced from very basic to more sophisticated
-function. Eventually, it is demonstrated how one can change many
+functions. Eventually, it is demonstrated how one can change many
 experiment parameters at running time (such as baseline or target mass), and how one can obtain low-level
 information. We recommend that everybody interested in \GLOBES\ should
 become familiar at least with the concepts in \Chapt~\ref{chapter:tour}
@@ -395,7 +396,8 @@ want to modify or create \AEDL\ files. A useful tool in this context
 is the software program ``globes'', which returns event rates and other
 information for individual \AEDL\ files without further programming. 
 For example, flux normalizations can with this tool be easily adjusted 
-to reproduce the event rates of a specific experiment.
+to reproduce the event rates of a specific experiment. It is described
+in the last chapter of \Part~\ref{part:2}.
 
 %Finally, \Part~\ref{part:3} of this manual serves as reference manual,
 %and the appendix contains further supplementary information.

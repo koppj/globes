@@ -43,8 +43,7 @@ Needs \GLB{SetProjection} before! \\[0.2cm]
 \end{center}
 \caption{\label{tab:stdfunctions} \index{norm}{Standard functions (table)} The \GLOBES\ standard function to obtain a $\chi^2$-value with systematics only or systematics and correlations. The parameters {\tt rule} and {\tt exp}
 can either be \GLBC{GLB\_ALL} for all initialized experiment or the
-experiment number ($0$ to \GLB{\_num\_of\_exps}-1) for a specific experiment. The format of \GLB{\_params} is discussed in detail in \Chapt~\ref{chapt:gettingstarted}. Note that all functions but {\tt ChiSys}
-  are using minimizers which have to be initialized with \GLB{SetInputErrors} and \GLB{SetStartingValues} first.}
+experiment number ($0$ to \GLB{\_num\_of\_exps}-1) for a specific experiment. The format of \GLB{\_params} is discussed in detail in \Chapt~\ref{chapt:gettingstarted}. Note that all functions but {\tt glbChiSys} are using minimizers which have to be initialized with \GLB{SetInputErrors} and \GLB{SetStartingValues} first.}
 \end{table}
 
 \vspace*{0.5cm}
@@ -344,7 +343,7 @@ The sum of the two chi2s is 3.18801, whereas the total chi2 is 3.90835!
 }
 Now find the $\mathrm{sgn}(\ldm)$-degeneracies for both individual
 experiments and test if they are still there in the combination of the
-experiments. Note that a minimum at a negative value of $\theta_{13}$ is unphysical. However, if there can be no degeneracy found at a positive value, there is probably none at a low confidence level.  
+experiments.
 \gq{
  glbDefineParams(input\_errors,theta12*0.1,theta13,theta23, \\
  \hspace*{0.5cm} deltacp,sdm*0.1,ldm/3); \\
@@ -547,7 +546,7 @@ argument from the command line as the program name (such as in example on page~\
 \index{norm}{Experiment!number of}
 In principle, the \GLOBES\ user interface can currently handle up to 32 of different long-baseline experiments simultaneously, where the number
 of existing experiment definition files can, of course, be unlimited. This means that their $\Delta \chi^2$-values are added {\em after} the minimization over the systematics parameters, and {\em before} any minimization over the oscillation parameters. Note that each experiment
-assumes a specific matter density profile for all of its rules, which means
+assumes a specific matter density profile, which means
 that it makes sense to simulate different operation modes within one
 experiment definition, and physically different baselines in different
 definitions. For details of the rate computation and
@@ -687,7 +686,8 @@ returns the fiducial detector mass of experiment number {\tt exp}.
 Thus, these functions also demonstrate how to use the assigned experiment number and others. These numbers run from $0$ to the number of experiments-1, fluxes-1, \etc, where the individual elements are numbered in the order of their appearance. 
  Note that the source power and running time are quantities defined
 together with the neutrino flux, whereas the target mass scales the whole
-experiment.
+experiment. Thus, if one has, for instance, a neutrino and an antineutrino
+running mode, one can scale them independently.
 
 \section{Handling oscillation parameter vectors}
 \index{norm}{Oscillation!parameter vectors}
@@ -789,7 +789,8 @@ $0$ to $5$, where the parameters in \GLOBES\ always have the order $\theta_{12}$
 Alternatively to the number, the constants \GLBC{GLB\_THETA\_12}, \GLBC{GLB\_THETA\_13}, \GLBC{GLB\_THETA\_23}, \GLBC{GLB\_DELTA\_CP}, 
 \GLBC{GLB\_DM\_SOL}, or \GLBC{GLB\_DM\_ATM} can be used.
 
-Similarly, the density parameters or iterations can be accessed:
+Similarly, the density parameters or number of iterations 
+(returned by the minimizers) can be accessed:
 \begin{function}
 \GLBNS{SetDensityParams}
 {\tt glb\_params glbSetDensityParams(glb\_params in, double dens, int which)} sets the density parameter {\tt which} in the structure {\tt in}
@@ -897,18 +898,11 @@ used \GLOBES\ version, $1$ if it is older, and $-1$ if it is newer.
 Note that the library and \GLOBES\ versions are not the same. 
 \end{function}
 \begin{function}
-\GLBNS{TestLibraryVersion}
-{\tt int glbTestLibraryVersion(const char *version)} returns $0$ if
-the {\tt version} string of the format ``X.Y.Z'' is exactly the
-used \GLOBES\ version, $1$ if it is older, and $-1$ if it is newer.
-Note that the library and \GLOBES\ versions are not the same. 
-\end{function}
-\begin{function}
 \GLBNS{VersionOfExperiment} 
 {\tt const char* glbVersionOfExperiment(int experiment)} returns
 the version string of the experiment number {\tt experiment}.
-The version string points to the experiment structure, which means
-that it cannot be altered and does not have to be destroyed by the
+The version string is allocated within the experiment structure, which means
+that it cannot be altered and must not be destroyed by the
 user.
 \end{function}
 
@@ -1022,9 +1016,10 @@ to include the full $n$-parameter correlation in the high-dimensional parameter 
 \section{Introduction}
 
 \index{norm}{Projection of manifold}
-In principle, the precision of an individual parameter measurement including correlations in the $\chi^2$-approach can be obtained as the projection of the $n$-dimensional fit manifold onto the respective axis. Similarly, one can project the fit manifold onto a plane, such as the $\stheta$-$\deltacp$-plane, if one wants to explicitely show the allowed
+In principle, the precision of an individual parameter measurement including correlations in the $\chi^2$-approach can be obtained as the projection of the $n$-dimensional fit manifold onto the respective axis. Similarly, one can project the fit manifold onto a plane, such as the $\stheta$-$\deltacp$-plane, if one wants to show the allowed
 region in this plane with all the other parameter correlations included. 
-In practice, this projection is very difficult: a grid-based method would need $(N_{\mathrm{grid}})^n$ function calls of {\tt glbChiSys} to calculate the precision including the full $n$-parameter correlation, where $N_{\mathrm{grid}}$ is the number of points in each direction of the lattice. For example, taking only $N_{\mathrm{grid}}=20$ and $n=7$ (six oscillation parameters and matter density) would mean more than one billion function calls of {\tt glbChiSys}. One can easily image that this is too much for any sophisticated application.
+In practice, this projection is very difficult: a grid-based method would need $(N_{\mathrm{grid}})^n$ function calls of {\tt glbChiSys} to calculate the precision including the full $n$-parameter correlation, where $N_{\mathrm{grid}}$ is the number of points in each direction of the lattice. For example, taking only $N_{\mathrm{grid}}=20$ and $n=7$ (six oscillation parameters and matter density) would mean more than one billion function calls of {\tt glbChiSys}. One can easily imagine that these
+would be too many for any reasonable application.
 
 \index{norm}{Minimizer}
 The solution to this problem is using a local $n$-dimensional (local) minimizer for the projection instead of a grid-based method, where we will
@@ -1083,7 +1078,7 @@ oscillation parameters. In other cases, minor modifications of the starting valu
 For example, for the investigation of the
 opposite-sign solution, one can use the prior to constrain $\ldm$
 in order to force the minimizer not to  fall into the (unwanted) best-fit solution. In this case, the starting value of $\ldm$ would be set to $\rho^0_{\ldm} = - \ldm$, and a $\sigma_{\ldm}$ of the order of $\ldm$ would be imposed. For the algorithm, it would then be rather difficult 
-to converge into the unwanted best-fit solution. However, note that one should in this case check that the actually determined value for $\ldm$ after minimization is close enough to the guessed values $-\ldm$ in order to avoid significant artifical contributions of the priors to the 
+to converge into the unwanted best-fit solution. However, note that one should in this case check that the actually determined value for $\ldm$ after minimization is close enough to the guessed value $-\ldm$ in order to avoid significant artifical contributions of the priors to the 
 final $\chi^2$.
 
 \index{norm}{Input errors} \index{norm}{Starting values}
@@ -1183,7 +1178,7 @@ This example demonstrates how to project the fit manifold onto the $\stheta$-axi
   glbSetStartingValues(true\_values);\\
   glbSetInputErrors(input\_errors);\\
 \\
-  /* Define two-parameter projection: Only deltacp is free! */ \\
+  /* Define my own two-parameter projection for glbChiNP: Only deltacp is free! */ \\
   glbDefineProjection(th13\_projection,GLB\_FIXED,GLB\_FIXED,GLB\_FIXED,GLB\_FREE,GLB\_FIXED,GLB\_FIXED); \\
   glbSetProjection(th13\_projection); \\ 
 \\
@@ -1269,14 +1264,14 @@ and \GLB{SetInputErrors} have to be used at least once. In addition, note that t
 equal to the sum of the individual $\chi^2$-values anymore. This has two reasons: First, the topology of the fit manifold is altered by the addition of $\chi^2$-values of different experiments. Thus, after the minimization, the position of the minimum can be different to the ones of the individual experiments. Second, the priors for the external knowledge on the parameters are only added once -- independent of the number of experiments.
 
 \index{norm}{Matter density scaling factor}
-The the output of the minimizer in {\tt out} carries as many matter density scaling factors as there are experiments. Either
+The output of the minimizer in {\tt out} carries as many matter density scaling factors as there are experiments. Either
 one (for the simulation of one experiment) or all (for the simulation of
 all experiments) are different from $1.0$ if matter density uncertainties
-are present, since each experiment may face other matter density conditions. The minimizer for individual experiments ``know'' which
+are present, since each experiment may face other matter density conditions. The minimizers of individual experiments ``know'' which
 experiment they are currently treating, which means that only the returned
 matter density scaling factor of the appropriate experiment is modified.
 For example, calculating {\tt glbChiTheta} for the last experiment
-number, the last density values will be modified.
+number, the last density value will be modified.
 This approach turns out to be extremely useful together with the
 simulation of more than one experiment. One can, for instance, locate the
 degeneracies of all individual experiments. In order to test if
@@ -1410,7 +1405,7 @@ is compared with the result including the full multi-parameter correlation.
 \index{norm}{Degenerate solutions}
 \index{norm}{Degeneracies $\chi^2$}
 
-In the last chapter, we introduced the projection of any set of $k$ parameter onto any $n-k$ dimensional hyperplane, which was done by the minimization over the $k$ free fit parameters. Similarly, one can minimize over {\em all} $n$ parameters to find the local minimum close to any starting point. This approach is very useful for the exact numerical location of a degeneracy if its approximate position is known. For the determination of the approximate position, one can use analytical approaches or an educated guess. 
+In the last chapter, we introduced the projection of any set of $k$ parameters onto any $n-k$ dimensional hyperplane, which was performed by the minimization over the $k$ free fit parameters. Similarly, one can minimize over {\em all} $n$ parameters to find the local minimum close to any starting point. This approach is very useful for the exact numerical location of a degeneracy if its approximate position is known. For the determination of the approximate position, one can use analytical approaches or an educated guess. 
 Though the usage of the all-parameter minimizers is quite simple, one should keep in mind that they are local minimizers. Therefore, one may need a very sophisticated application software to find all degenerate solutions.
 
 \example{Finding the $\mathrm{sgn}(\ldm)$-degeneracy}{
@@ -1419,7 +1414,7 @@ Though the usage of the all-parameter minimizers is quite simple, one should kee
 
 In many cases, one can find the exact position of the $\mathrm{sgn}(\ldm)$-degeneracy with \GLB{ChiAll}, where one starts 
 the local minimizer at the suspected position 
-and let it converge into the minimum.  The following code excerpt  corresponds to finding the degenerate solution for the example on
+and let it run into the minimum.  The following code excerpt  corresponds to finding the degenerate solution for the example on
   page~\pageref{ex:corrth13dcp}, and it is from {\tt example3.c}: 
 \begin{quote}
 {\tt
@@ -1465,7 +1460,8 @@ used to judge whether the located degeneracy appears at the chosen
 confidence level.
 
 The example on page~\pageref{ex:sgndeg} illustrates how to locate the $\mathrm{sgn}(\ldm)$-degeneracy and show the corresponding degenerate solution in the $\stheta$-$\deltacp$-plane together with the original solution.
-In this case, the position of the degeneracy can be easily guessed to be at the best-fit parameter values but the $\ldm$ inverted. The minimizer then runs off the plane of the best-fit parameters into the local minimum. It is very important to take into account the position of the degeneracy off this plane, since the actual $\chi^2$ in the minimum is certainly lower than on the plane of the best-fit parameter values. Thus, the degeneracy may not even appear at the chosen confidence level on the plane, but it does appear at the true minimum. The two sections\footnote{The discussed figure on page~\pageref{ex:sgndeg} is produced by  {\tt glbChiSys} and thus only represents a section through the fit manifold. For the projection including correlations, one may rather want to use {\tt glbChiThetaDelta}.} through the fit manifold shown in the figure on page~\pageref{ex:sgndeg} therefore do not appear at the same oscillation parameter values (except from the ones shown in the figure). 
+In this case, the position of the degeneracy can be easily guessed to be at the best-fit parameter values but the inverted $\ldm$. The minimizer then runs off the plane of these parameters into the local minimum. It is very important to take into account the position of the degeneracy off this plane, since the actual $\chi^2$ in the minimum is probably lower than on the plane of the best-fit parameter values. Thus, the degeneracy may not even appear at the chosen confidence level on the plane, but it does appear at the true minimum. The two sections through the fit manifold shown in the figure on page~\pageref{ex:sgndeg} therefore do not appear at the same oscillation parameter values (except from the ones shown in the 
+figure).\footnote{The discussed figure on page~\pageref{ex:sgndeg} is produced by  {\tt glbChiSys} and thus only represents a section through the fit manifold. For the projection including correlations, one may rather want to use {\tt glbChiThetaDelta}.} 
 
 \index{norm}{Advanced tricks}
 For the more advanced reader, a number of tricks can be useful for the numerical localization of degenerate solutions:
@@ -1482,8 +1478,8 @@ be immediately seen from the output vector). The input error
 for $\ldm$ gives the algorithm a ``bias'' against the original solution.
 However, note that the input error must not be too small in order
 to avoid a significant contribution of the prior to the final $\chi^2$.
-Alternatively, one could run {\tt glbChiAll} again with the located minimum
-as {\tt in} vector and $\ldm$ kept free.
+Alternatively, one could once again run {\tt glbChiAll} with the located 
+minimum as {\tt in} vector, and $\ldm$ kept free.
 \item[Finding degeneracies with multiple experiments.] For multiple experiments, it turns out to be useful to locate the degeneracies for individual experiments first. Then, all of the found degeneracies below the threshold can be tested for the combination of all experiments.
 \end{description}
 Finally, note that any degenerate solution below the confidence level threshold which can not be located makes the result appear better than it actually is. Thus, one should be careful with the determination of the degenerate solutions in order to find all of them.
@@ -1509,13 +1505,13 @@ In addition, the oscillation probabilities in matter can be obtained
 with:
 \begin{function}
 \GLBNS{ProfileProbability}
-{\tt double glbProfileProbability(int l, int m, int panti,double E)}
- returns the neutrino oscillation probability $\nu_l \rightarrow \nu_m$ for the energy {\tt E} in matter. The parameter
+{\tt double glbProfileProbability(int exp, int l, int m, int panti,double E)} returns the neutrino oscillation probability $\nu_l \rightarrow \nu_m$ for the energy {\tt E} in matter, where the matter density profile
+is the one of experiment {\tt exp}. The parameter
 {\tt panti} is $+1$ for neutrinos and $-1$ for antineutrinos.
 The matter density profile including baseline is the one from the last
 evaluated experiment. 
 \end{function}
-THIS FUNCTION MAY OBTAIN AN EXPERIMENT INDEX (WW).
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Event rates}
 \index{norm}{Event rates}
@@ -1648,7 +1644,7 @@ the pre- ({\tt smearing} is \GLBC{GLB\_PRE}) or post- ({\tt smearing} is \GLBC{G
 or efficiencies ({\tt bgeff} is \GLBC{GLB\_EFF}). 
 The return value is $-1$ if unsuccessful.
 \end{function}
-Since \GLOBES\ reserved the memory for the lists returned in these
+Since \GLOBES\ reserves the memory for the lists returned in these
 functions, which it allocates on an internal stack, one has to reset
 the stack at the end of the rates access with
 \begin{function}
@@ -1804,8 +1800,16 @@ number of {\tt layers} steps for the baseline {\tt baseline}. The list of length
 {\tt glbAverageDensityProfile(double baseline, double **lengths, 
 double **densities)} creates a average matter density profile from the PREM/Stacey profile with one step for the baseline {\tt baseline}. The list of lengths {\tt lengths} and the list of densities {\tt densities} are returned.
 \end{function}
+The average matter density $\bar{\rho}(L)$ for a matter density profile $\rho(x)$ along the baseline $L$ baseline is defined as
+\be
+\bar{\rho}(L) = \frac{1}{L} \int\limits_{0}^L \rho(x) dx = 
+\frac{1}{L} \int\limits_{0}^L \tilde{\rho}\left(d(x) \right) dx \, , 
+\ee
+where $\tilde{\rho}(d)$ is the PREM matter density as function of the
+distance $d$ to the Earth's core, and $d(x)=\sqrt{x^2+R^2-2 x R \cos \theta }$ is the purely geometrical relationship between $d$ and $x$ with the
+Earth radius $R$ and the nadir angle $\cos \theta = L/(2 R)$.
 \begin{function}
-\GLBNS{StaceyProfile}
+\GLBNS{GetProfileDataInExperiment}
 {\tt int glbGetProfileDataInExperiment(int exp,size\_t *layers, double** lengths, double** densities)} returns the matter density profile 
 currently used for experiment {\tt exp}. The number of layers {\tt layers}, the list of lengths {\tt lengths}, and the list of densities {\tt densities} are returned.
 \end{function}
@@ -2049,12 +2053,12 @@ the \AEDL\ manual.
 In particular, there are a number of functions:
 \begin{function}
 \GLBNS{SetFilterState}
-{\tt int glbSetFilterState(int on\_off)} sets the filter state to
-on (\GLBC{GLB\_ON}) or off (\GLBC{GLB\_OFF}).
+{\tt int glbSetFilterState(int on\_off)} sets the currently
+used filter state to on (\GLBC{GLB\_ON}) or off (\GLBC{GLB\_OFF}).
 \end{function}
 \begin{function}
 \GLBNS{GetFilterState}
-{\tt int glbGetFilterState()} returns the filter state.
+{\tt int glbGetFilterState()} returns the currently used filter state.
 \end{function}
 \begin{function}
 \GLBNS{SetFilterStateInExperiment}
@@ -2067,12 +2071,12 @@ on (\GLBC{GLB\_ON}) or off (\GLBC{GLB\_OFF}).
 Analogously, the filter value can be accessed:
 \begin{function}
 \GLBNS{SetFilter}
-{\tt int glbSetFilter(double filter)} sets the filter to the
+{\tt int glbSetFilter(double filter)} sets the currently used filter to the
 value {\tt filter}.
 \end{function}
 \begin{function}
 \GLBNS{GetFilter}
-{\tt double glbGetFilter()} returns the filter value.
+{\tt double glbGetFilter()} returns the currently used filter value.
 \end{function}
 \begin{function}
 \GLBNS{SetFilterInExperiment}
