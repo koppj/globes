@@ -86,7 +86,7 @@ oscillation physics analysis. Note again that
 
 Of course, an abstract experiment definition language can not simulate all possible types of experiments. As we have seen, there are several assumptions for source and detector. However, it turns out that \GLOBES\ can be applied to a large number of experiment types, such as conventional beams, superbeams, neutrino factories, $\beta$-Beams, and reactor experiments.
 
-\section{A simple example for the AEDL}
+\section{A simple example for AEDL}
 
 Experiments are in \GLOBES\ defined by the Abstract Experiment Definition Language (AEDL). The experiment definition is written into a text file using the AEDL syntax. Currently, a number of pre-defined experiment definition files are provided with \GLOBES , which have to be modified manually in order to define new experiments. An IDE (Integrated Developement Environment) for AEDL files is currently in preparation. The application software then uses this text file to initialize the experiment, where other secondary files might read for source fluxes, cross sections \etc . In this section, we show the definition of a very simple neutrino factory in AEDL, where we do not go into details. In the next chapter, we will discuss each of the individual steps in detail.
 
@@ -618,9 +618,10 @@ Eventually, we can write down the number of events per bin $i$ \index{Bin} and c
 \begin{equation}
 \label{eq:channel}
 n_i^c=\int_{E_i-\Delta E_i/2}^{E_i+\Delta E_i/2} dE' \quad
-\frac{dn_{\beta}^{\text{IT}}}{dE'} (E').
+\frac{dn_{\beta}^{\text{IT}}}{dE'} (E') \,
 \end{equation}
-This means that one has to solve this integral
+where $\Delta E_i$ is the bin size of the $i$th energy bin.
+This means that one has to solve the integral
 \begin{eqnarray}
 \label{eq:events_bin}
 n_i^c=N/L^2\,\int_{E_i-\Delta E_i/2}^{E_i+\Delta E_i/2} dE' 
@@ -646,21 +647,60 @@ Thus, a simple definition of a channel is
 Note that the energy environment will be described in the next section. 
 
 
-% WW: HIER WEITER
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Energy resolution function}
 \label{sec:energy}
 
-The definition of the energy resolution function is rather sophisticated in 
-\GLOBES . In particular, since this aspect is rather time-critical, several
-algorithms are implemented. The choice of the proper algorithm depends on the
-experiment and the frequencies of the involved neutrino oscillations.
+The definition and implementation of the energy resolution function is 
+rather sophisticated in \GLOBES . In particular, since this aspect is 
+ time-critical, several algorithms are implemented. The choice of the 
+proper algorithm depends on the experiment and the frequencies of the
+ involved neutrino oscillations.
 
 In this section, we first discuss the principles of the energy smearing, where it is assumed that the reader is familiar with \Sec~\ref{sec:channel}. Then we introduce an automatic energy smearing algorithm, which is fairly simple to understand and applicable to most beam-based experiments. 
 In most cases, the reader may want to continue to the next section after reading these two subsections. In the third subsection, we describe a more elaborate (and slower) smearing algorithm, which can be used together with rather fast neutrino oscillations compared to the bin size, such as for reactor experiments. Eventually, we show how one can use a manual smearing matrix instead of using one of the implemented algorithms.
 
 \subsection{Introduction and principles}
+
+The energy resolution function $R^c(E,E')$ has been already introduced in 
+\Sec~\ref{sec:channel}, where a definition
+has been given in \eq~(\ref{eq:e_res}). Instead of using
+ \eq~(\ref{eq:e_res}) directly, we apply a slightly different
+definition of the post-smearing efficiencies $\epsilon(E')$. 
+In general, $\epsilon(E')$ has to be
+determined by means of a Monte Carlo simulation of the experiment. 
+This usually involves a binning of the simulated events in the 
+reconstructed energy $E'$. Therefore, one simplify \eq~(\ref{eq:events_bin}) by
+\begin{equation}
+\label{eq:post_smearing}
+\int_{E_i-\Delta E_i/2}^{E_i+\Delta E_i/2} dE' \, R^c(E,E') \, \epsilon^c(E') = \hat\epsilon_i^c \cdot \int_{E_i-\Delta E_i/2}^{E_i+\Delta E_i/2} dE' 
+\quad R^c(E,E')\,.
+\end{equation}
+Here the  $\hat\epsilon_i^c$ are the 
+``post-smearing'' efficiencies, which will be set within the corresponding {\tt channel} environment (see below).
+From \eq~(\ref{eq:events_bin}) it is obvious that the integration with respect to the reconstructed energy $E'$ can be
+performed independently of the oscillation parameters. We define
+the ``bin kernel'' $K_i^c$ for the $i$th bin as
+\begin{equation}
+\label{eq:kernel}
+K_i^c(E) \equiv \int_{E_i-\Delta E_i/2}^{E_i+\Delta E_i/2} dE' 
+\quad R^c(E,E')\,.
+\end{equation}
+With this definition, \eq~(\ref{eq:events_bin}) can be re-written as
+\begin{equation}
+\label{eq:simple_int}
+n_i^c=N/L^2 \int\limits_0^\infty dE\quad  \underbrace{\Phi^c(E)\,
+P^c(E)\,
+\sigma^c(E)\,
+K_i^c(E)\,}_{f(E)}. 
+\end{equation}
+
+There is no principle reason why one should not evaluate this integral directly by the usual numerical methods. However, it turns out that this 
+is very slow in many cases. Therefore, we will introduce two different approximation schemes for different applications in the next two subsections.
+In either case, the integrand in \eq~(\ref{eq:simple_int}) has to be evaluated at fixed ``sampling points''. These sampling points can be 
+either defined by the user, or be computed by
+\GLOBES . The choice between these options also depends on 
+the algorithm which is used for the calculation, as it is explained in the following subsections. 
 
 \begin{figure}[t!]
 \begin{center}
@@ -669,27 +709,28 @@ In most cases, the reader may want to continue to the next section after reading
 \caption{\label{fig:energies} The different evaluation levels for the energy smearing in \GLOBES .}
 \end{figure}
 
-DESCRIBE PICTURE!
+Before we come to the calculation algorithms, it is useful to understand
+the general evaluation algorithm. As it is illustrated in \figu{energies}, 
+\GLOBES\ uses several levels with respect to the energy ranges:
+\begin{description}
+\item[Sampling point level]
+ This level is used internally to evaluate the integrand in \eq~(\ref{eq:simple_int}) at all sampling points. The energy scale is the actual incident neutrino energy $E$. Note that the sampling range should exceed the energy bin range by about the energy resolution error, since these sampling points need to be evaluated by the algorithm. However, this is only
+necessary to avoid aliasing effects if the integrand in \eq~(\ref{eq:simple_int}) is large at the limits of the sampling range.
+For a manual definition of the sampling points (depends on algorithm), use
+\begin{quote}
+{\tt
+\$sampling\_points = 20\\
+\$sampling\_min =          4.0\\
+\$sampling\_max =         50.0
+}
+\end{quote}
+for equidistant sampling points. Arbitrary sampling points can be specified analogously to the bins (see below).
+\item[Bin level] This level is determined by the experiment. Note than energy
+bin sizes much smaller than the energy resolution will not improve the results. The energy bin range and the number of energy bins do always have to be specified. For the case of large values of the integrand in \eq~(\ref{eq:simple_int}) at the energy range limits, it is recommended to exceed the analysis energy window by about the energy calibration error in order to avoid aliasing effects.
 
-The origin and meaning of the energy resolution function 
-$R^c(E,E')$ was already discussed in 
-section~\ref{sec:channel} and  a mathematical definition
-was given in equation~\ref{eq:e_res}. Here we deal with
-how to tell \GLOBES\ which energy resolution function it should
-use. This also naturally involves the issue how the actual convolution
-of the differential event rate spectrum with $R_\beta^{\text{IT}}(E,E')$
-is performed. First we will discuss the mathematical structure of
-the problem and then the various algorithms and possibilities which
-\GLOBES\ offers are introduced. 
-
-
-Before going into the details we define that the range from $E_\mathrm{min}$
-to $E_\mathrm{max}$ is divided in a certain number of bins $N_\mathrm{bins}$.
-These bins form a partition, which not necessarily is equidistant. The 
-partition is any case completely defined by specifying $E_\mathrm{min}$
-and $E_\mathrm{max}$ and the size of each bin  $\Delta E_i$. It is also
-straightforward to compute the midpoint of each bin $E_i$. This information
-has to be provided by the user. Equidistant bins are obtained by
+In order to define a range between $E_\mathrm{min}$
+and $E_\mathrm{max}$ divided by a certain number of equidistant bins,
+use
 \begin{quote}
 {\tt
 \$emin = 4.0\\
@@ -697,8 +738,8 @@ has to be provided by the user. Equidistant bins are obtained by
 \$bins = 20
 }
 \end{quote}
-Another possibility is to specify arbitrary bin sizes and to leave out
-the number of bins itself, by
+For arbitrary bins, use $E_\mathrm{min}$
+and $E_\mathrm{max}$ and the size of each bin  $\Delta E_i$:
 \begin{quote}
 {\tt
 \$emin = 4.0\\
@@ -706,73 +747,22 @@ the number of bins itself, by
 \$binsize = \{  15.0 , 5.0 , 20.0, 6.0 \} 
 }
 \end{quote}
- 
+The number of bins will be automatically computed by \GLOBES . Note that the
+bin sizes have to add up to the energy range {\tt \$emax}-{\tt \$emin}.
+%
+It is also
+straightforward to compute the midpoint of each bin $E_i$. This information
+has to be provided by the user ???? HOW ????. 
+\item[Analysis level]
+On the analysis level, an energy window can be defined within each rule. For
+details, see next chapter.
+\end{description}
+In general, the energy smearing happens between the sampling point and bin levels, which means that the energy smearing matrix will have {\tt \$sampling\_points} columns and {\tt \$bins} rows. 
 
-Instead of using directly equation~\ref{eq:e_res} we will use a different
-definition concerning $\epsilon(E')$. In general  $\epsilon(E')$ has to be
-determined by means of a Monte Carlo simulation of the experiment. This
-usually involves anyhow a binning of the simulated events in the reconstructed
-energy $E'$, therefore one more easily can obtain  $\hat\epsilon_i$ defined
-by
-\begin{equation}
-\label{eq:post_smearing}
-\hat\epsilon_i \cdot \int_{E_i-\Delta E_i/2}^{E_i+\Delta E_i/2} dE' 
-\quad R^c(E,E')\,.
-\end{equation}
-These  $\hat\epsilon_i$ are refered to as so called 
-``post-smearing'' efficiencies and set within the corresponding {\tt channel}
-environment.
-The integration with respect to the reconstructed energy $E'$ can be
-performed independently of the oscillation parameters and we define
-the bin kernel for the $i$th bin $K_i^c$
-\begin{equation}
-\label{eq:kernel}
-K_i^c(E):=\int_{E_i-\Delta E_i/2}^{E_i+\Delta E_i/2} dE' 
-\quad R^c(E,E')\,.
-\end{equation}
-With this definition equation~\ref{eq:events_bin} can be rewritten as
-\begin{equation}
-\label{eq:simple_int}
-n_i^c=N/L^2 \int dE\quad  \underbrace{\Phi^c(E)\,
-P^c(E)\,
-\sigma^c(E)\,
-K_i^c(E)\,}_{f(E)}. 
-\end{equation}
-
-There is no basic reason why one could not evaluate this integral directly
-by the usual numerical methods. However it turns out that this may be rather
-slow, therefore we introduce two different approximation schemes which have
-a varying degree of accuracy and speed. In any case each scheme to evaluate this
-integral involves a the evaluation of the integrand at fixed sampling points.
-These sampling points can be either defined by the user or be computed by
-\GLOBES, the choice between these possibilities also depends on the algorithm
-which is used for the actual calculation, as explained in the following.
-If the user chooses to set the sampling points the procedure is analogous
-to the one setting the bins. For equidistant sampling points use
-\begin{quote}
-{\tt
-\$simbins = 20\\
-\$simtresh =          4.0\\
-\$simbeam =         50.0
-}
-\end{quote}
-The advantage in setting the sampling points in this way is that in case many
-different energy resolution functions are used the user has the control
-how the different sampling requirements are fulfilled. In case a user-defined
-smear matrix is used this data is mandatory.
-
-All energy resolution function are defined within an {\tt energy} environment
-and can be refered to by {\tt \#name}.
-\begin{quote}
-  {\tt energy(\#name)<\\
-\tb $\ldots$\\
->}
-\end{quote}
-
-ADJUST TO SECTION AND REPLACE:
-
-In combination with the channels, is is possible to define energy 
-dependent efficiencies and (non-beam) backgrounds. Efficiencies are multiplicative factors, whereas backgrounds are added to the event rates. These components can be introduced before or after the convolution in \eq~(\ref{eq:e_res}) is done. If they are introduced before, we call them
+As illustrated in the figure, an interesting feature in combination with the
+channels are pre- and post-smearing effects. Pre-smearing effects are taken into account on the sampling point level, and post-smearing effects on the bin level. Examples for these effects are energy 
+dependent efficiencies and (non-beam) backgrounds. Efficiencies are multiplicative factors, whereas backgrounds are added to the event rates. These components can be introduced before or after the convolution in \eq~(\ref{eq:post_smearing}) is done. If they are introduced before, 
+we call them
 {\tt @pre\_smearing\_efficiencies} or {\tt @pre\_smearing\_background}. 
 If they are introduced after, we call them {\tt @post\_smearing\_efficiencies} or {\tt @post\_smearing\_background}.
 Note that pre-smearing components are always afunction of the incident neutrino energy $E$. Thus, there have to be as  many elements as there are sampling points (see \Sec~\ref{sec:energy}). In same cases, the number of sampling points is determined automatically by \GLOBES , and the number of elements in the  pre-smearing vectors has to be adjusted in the second run.
@@ -787,6 +777,16 @@ and their default value is $1$, whereas backgrounds are additive and their defau
 >}
 \end{quote}
 This experiment uses $10$ sampling points and $5$ bins.
+
+In the following subsections we will define the energy resolution function.
+All energy resolution functions are defined within an {\tt energy} environment and can be refered to by {\tt \#name}.
+\begin{quote}
+  {\tt energy(\#name)<\\
+\tb $\ldots$\\
+>}
+\end{quote}
+
+%% WW: CONTINUE HERE
 
 \subsection{Bin based automatic energy smearing}
 
