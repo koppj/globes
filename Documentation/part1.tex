@@ -598,6 +598,7 @@ Cross sections/E & $\sigma_{\mathrm{CC}}/E$ & $10^{-38} \, \mathrm{cm^2}/\mathrm
 \end{table}
 
 \section{Units in \GLOBES\ and the integrated luminosity}
+\label{sec:luminosity}
 
 While interacting with the user interface of \GLOBES , parameters are transferred to and from the \GLOBES\ library. In \GLOBES , one set of units 
 for each type of quantity is used in order to avoid confusion about the definition of individual parameters. \tabl{units} summarizes the units of the most important quantities. In principle, the event rates are
@@ -1467,10 +1468,13 @@ THIS FUNCTION MAY OBTAIN AN EXPERIMENT INDEX (WW).
 \section{Event rates}
 \index{Event rates}
 One can also return event rates in \GLOBES , but this feature
-requires some knowledge about the experiment definition. \GLOBES\
-currently supports rule-based and channel-based event rate functions,
-where the information is in most cases written into a file.
-The rule-based functions are:
+requires some knowledge about the experiment definition. 
+In fact, many of these functions are very advanced, which means
+that the reader who wants to use them should be familiar with
+\Secs~\ref{sec:channel} and~\Sec~\ref{sec:rules} of the \AEDL\ manual.
+
+\GLOBES\ currently supports rule-based and channel-based event rate functions, where the information is in written into a file
+or returned in a list. The rule-based functions are:
 \begin{function}
 \GLBNS{glbShowRuleRates}
 {\tt int glbShowRuleRates(FILE* stream, int exp, int rule, int pos,
@@ -1492,19 +1496,57 @@ The return value
 is $0$ if successful, and $-1$ if unsuccessful.
 \end{function}
 \begin{function}
-\GLBNS{glbShowTotalRuleRates}
-{\tt double glbShowTotalRuleRates(int exp, int rule, int pos,
+\GLBNS{glbTotalRuleRate}
+{\tt double glbTotalRuleRate(int exp, int rule, int pos,
 int effi, int bgi, int coeffi, int signal)} returns the total rates with
 the same parameters as {\tt glbShowRuleRates}.
 \end{function}
-(THIS SYNTAX NEEDS TO BE CHECKED, BECAUSE FUNCTION IS NOT YET IMPLEMENTED - WW)
-
-The function {\tt glbShowTotalRuleRates} is especially useful if
+The function {\tt glbTotalRuleRate} is especially useful if
 one wants to draw bi-rate graphs with total event rates, or look
 for the $(\deltacp,\theta_{13})$-degeneracy by the intersection of 
 neutrino and antineutrino constant event rate curves.
+%
+In order to obtain information on the structure of the rules, 
+a number of additional functions are provided:
+\begin{function}
+\GLBNS{glbGetNumberOfRules}
+{\tt int glbGetNumberOfRules(int exp)} returns the number of
+rules in experiment {\tt exp}.
+\end{function}
+\begin{function}
+\GLBNS{glbGetLengthOfRule}
+{\tt int glbGetLengthOfRule(int exp, int rule, int signal)} returns
+the length of rule {\tt rule} in experiment {\tt exp}. The parameter
+{\tt signal} can be either \GLB{GLB\_SIG} for the number of signal
+components or \GLB{GLB\_BG} for the number of background components.
+\end{function}
+\begin{function}
+\GLBNS{glbGetNormalizationInRule}
+{\tt double glbGetNormalizationInRule(int exp, int rule, int signal)}
+returns the normalization (normalization or background center)
+in rule {\tt rule} of the experiment {\tt exp}.
+The parameter {\tt signal} refers to signal (\GLB{GLB\_SIG}) or background
+(\GLB{GLB\_BG}).
+\end{function}
+\begin{function}
+\GLBNS{glbGetChannelInRule}
+{\tt int glbGetChannelInRule(int exp, int rule, int pos, int signal)}
+returns the channel number in rule {\tt rule} at the position {\tt pos}
+of the experiment {\tt exp}.
+The parameter {\tt signal} refers to signal (\GLB{GLB\_SIG}) or background
+(\GLB{GLB\_BG}).
+\end{function}
+\begin{function}
+\GLBNS{glbGetCoefficientInRule}
+{\tt double glbGetCoefficientInRule(int exp, int rule, int pos, int signal)}
+returns the coefficient of the component {\tt pos} in rule {\tt rule} 
+of the experiment {\tt exp}.
+The parameter {\tt signal} refers to signal (\GLB{GLB\_SIG}) or background
+(\GLB{GLB\_BG}).
+\end{function}
 
-In addition, \GLOBES\ has a channel-based rate function:
+
+In addition, \GLOBES\ has channel-based rate functions:
 \begin{function}
 \GLBNS{glbShowChannelRates}
 {\tt int glbShowChannelRates(FILE *stream,
@@ -1525,6 +1567,58 @@ account if the rates are returned before the energy smearing.
 The return value
 is $0$ if successful, and $-1$ if unsuccessful.
 \end{function}
+\begin{function}
+\GLBNS{glbGetChannelRates}
+{\tt int glbGetChannelRates(double** data,
+size\_t* length, int exp, int channel, int smearing)}
+writes the binned raw channel rates to the list {\tt data}
+and the length of this list to {\tt length}. 
+A specific experiment {\tt exp} and a 
+specific channel {\tt channel} have to be chosen.
+The function may return
+the rates before ({\tt smearing} is \GLB{GLB\_PRE}) or after ({\tt smearing} is \GLB{GLB\_POST})
+the energy smearing, where no user-defined data
+(pre-/post-smearing efficiencies or backgrounds) are taken into account.
+The return value is $-1$ if unsuccessful.
+\end{function}
+\begin{function}
+\GLBNS{glbGetUserData}
+{\tt int glbGetUserData(double** data,
+size\_t* length, int exp, int channel, int smearing, int bgeff)}
+writes the binned user-defined backgrounds or efficiencies 
+to the list {\tt data} and the length of this list to {\tt length}. 
+A specific experiment {\tt exp} and a 
+specific channel {\tt channel} have to be chosen.
+The function may return
+the pre- ({\tt smearing} is \GLB{GLB\_PRE}) or post- ({\tt smearing} is \GLB{GLB\_POST}) smearing backgrounds ({\tt bgeff} is \GLB{GLB\_BG}) 
+or efficiencies ({\tt bgeff} is \GLB{GLB\_EFF}). 
+The return value is $-1$ if unsuccessful.
+\end{function}
+Since \GLOBES\ reserved the memory for the lists returned in these
+functions, which it allocates on an internal stack, one has to reset
+the stack at the end of the rates access with
+\begin{function}
+\GLBNS{glbResetRateStack}
+{\tt void glbResetRateStack()} resets the rate stack used for the
+lists returned from {\tt glbGetChannelRates} or {\tt glbGetUserData}.
+\end{function}
+A code excerpt to show the channel rates may look like this:
+\begin{quote}
+{\tt
+ double* rates; \\
+  size\_t length; \\
+  glbGetChannelRates(\&rates,\&length,0,0,GLB\_PRE); \\
+  int i; \\
+  for(i=0;i<length;i++) printf("\%g $\backslash$n",rates[i]); \\
+  glbResetRateStack(); \\
+}
+\end{quote}
+Finally, one can find the number of channels of an experiment:
+\begin{function}
+\GLBNS{glbGetNumberOfChannels}
+{\tt int glbGetNumberOfChannels(int exp)} returns the number of 
+channels of experiment {\tt exp}.
+\end{function}
 
 \section{Fluxes and cross sections}
 \index{Flux} \index{Cross section}
@@ -1544,19 +1638,164 @@ and polarity {\tt anti} ($+1$: neutrinos, $-1$: antineutinos) at the energy {\tt
 
 \begin{function}
 \GLBNS{glbXSection}
-{\tt double glbXSection(int ident, double E, int l, int anti)} returns
-the cross section of cross section number {\tt ident} for the flavor $\nu_l$ 
-and polarity {\tt anti} ($+1$: neutrinos, $-1$: antineutinos) at the energy {\tt E}.
+{\tt double glbXSection(int exp, 
+int ident, double E, int l, int anti)} returns
+the cross section of experiment {\tt exp}, 
+cross section number {\tt ident} for the flavor $\nu_l$ and polarity {\tt anti} ($+1$: neutrinos, $-1$: antineutinos) at the energy {\tt E}.
 \end{function}
 Note that all flux or flavor numbers run from $0$ to $N-1$ in these functions.
-
-(THIS FUNCTION MAY GET AN EXPERIMENT INDEX IF NOT THROUGH-COUNTED IN AEDL!)
 
 \chapter{Changing experiment parameters at running time}
 \label{chapt:running}
 
+Many of the parameters in experiment definitions can be changed
+at running time. For example, we have introduced in 
+\Sec~\ref{sec:luminosity} possibilities to change the integrated
+luminosity, which consists of source power, running time, and target mass.
+In this chapter, we discuss more sophisticated
+experiment changes. However, since \GLOBES\ computes a lot of
+information only once when an experiment is loaded, many
+parameters can not be changed at running time. For example,
+the energy resolution function or the number of bins are used
+to compute the smearing matrix already at the initialization
+of the experiment, which saves a lot of computation
+time for most applications. In \Sec~\ref{sec:aedlparams}, we 
+introduce a mechanism how one can even change these \AEDL\ parameters
+during running time.
+
+\section{Baseline and matter density profile}
+
+In order to change the baseline of an experiment, it is important
+to keep in mind that each experiment has a profile type defined
+in the \AEDL\ file (average density, PREM profile with a given
+number of steps, or arbitrary profile). One can check the currently
+used profile type with
+\begin{function}
+\GLBNS{glbGetProfileType}
+{\tt int glbGetProfileType(int exp)} returns the matter density profile
+type of experiment {\tt exp}.
+\end{function}
+For each profile type, one can easily change the baseline with {\tt glbSetBaselineInExperiment},
+where the average density or the PREM profile are re-computed, or the
+steps in the arbitrary profile are re-scaled. Of course, though this
+function is sufficient in most cases, it does often not make sense
+for arbitrary matter density profiles.
+\begin{function}
+\GLBNS{glbSetBaselineInExperiment}
+{\tt int glbSetBaselineInExperiment(int exp, double baseline)}
+sets the baseline length in experimente {\tt exp} to {\tt baseline}.
+The function returns $-1$ if it was not successful.
+\end{function}
+Note that {\tt glbSetBaselineInExperiment} does not change the
+profile type in the experiment. The counterpart of this function is:
+\begin{function}
+\GLBNS{glbGetBaselineInExperiment} 
+{\tt double glbGetBaselineInExperiment(int exp)} returns the
+baseline length currently used for experiment {\tt exp}.
+\end{function}
+One can not change the profile type of an experiment manually
+during running time. However, one can change the matter density
+profile, where the profile type is automatically changed to three
+(arbitrary matter density profile). In addition, a number of functions 
+are provided to compute possible matter density profiles (average density,
+PREM profile). In general, a matter density profile in \GLOBES\ with
+$N$ layers is represented by a list of lengths 
+\begin{equation}
+\mathrm{Lengths} = (x_1,x_2, \hdots, x_N) 
+\end{equation}
+and a list of densities
+\begin{equation}
+\mathrm{Densities} = (\rho_1,\rho_2, \hdots, \rho_N), 
+\end{equation}
+where the baseline is given by
+\begin{equation}
+L = \sum\limits_{i=1}^N x_i.
+\end{equation}
+In C, lists are represented as pointers to the first element:
+\begin{quote}
+{\tt  
+  double* lengths; \\
+  double* densities;
+}
+\end{quote}
+Many of the \GLOBES\ baseline functions take and return
+such lists as parameters, and are therefore more sophisticated
+to handle. In general, any function
+{\em returning} lists reserves the memory space for them.
+It is then up to the user to return the allocated memory!
+In addition, they normally return the length of the lists $N$
+in form of a pointer, where the corresponding memory space 
+has to be provided by the user (normally, it is enough to declare
+a variable of the type {\tt size\_t} corrsponding to positive
+integer numbers).
+The following functions return matter density profiles:
+\begin{function}
+\GLBNS{glbLoadProfileData}
+{\tt int glbLoadProfileData(const char* filename, size\_t *layers, double **lengths, double **densities)} loads a density file from the file
+{\tt filename}. It returns the number of layers {\tt layers}, the
+list of lengths {\tt lengths}, and the list of densities {\tt densities}.
+\end{function}
+The file should contain in each line a length and density for one layer,
+which are separated by an empty space.
+\begin{function}
+\GLBNS{glbStaceyProfile}
+{\tt int glbStaceyProfile(double baseline, size\_t layers, double **lengths, double **densities)} creates a PREM/Stacey matter density profile with a
+number of {\tt layers} steps for the baseline {\tt baseline}. The list of lengths {\tt lengths} and the list of densities {\tt densities} are returned.
+\end{function}
+\begin{function}
+\GLBNS{glbAverageDensityProfile}
+{\tt glbAverageDensityProfile(double baseline, double **lengths, 
+double **densities)} creates a average matter density profile from the PREM/Stacey profile with one step for the baseline {\tt baseline}. The list of lengths {\tt lengths} and the list of densities {\tt densities} are returned.
+\end{function}
+\begin{function}
+\GLBNS{glbStaceyProfile}
+{\tt int glbGetProfileDataInExperiment(int exp,size\_t *layers, double** lengths, double** densities)} returns the matter density profile 
+currently used for experiment {\tt exp}. The number of layers {\tt layers}, the list of lengths {\tt lengths}, and the list of densities {\tt densities} are returned.
+\end{function}
+All these functions return $-1$ if they were not successful.
+
+The counterpart of these functions to assign a specific matter density
+profile to an experiment is
+\begin{function}
+\GLBNS{glbSetProfileDataInExperiment}
+{\tt int glbSetProfileDataInExperiment(int exp, size\_t layers,const double* lengths, const double* densities)} sets the matter density of experiment
+{\tt exp} to an arbitrary profile with {\tt layers} steps. The density
+layers are specified by the lists {\tt lengths} and {\tt densities}.
+The function returns $-1$ if it was not successful.
+\end{function}
+Note that this function requires that the memory space for the lists
+be reserved already.
+
+Finally, let us take a look at two examples. This example changes
+the baseline length to $7\,500 \, \mathrm{km}$, where the average 
+matter density is manually computed:
+\begin{quote}
+{\tt  
+  double* lengths; \\
+  double* densities; \\
+  glbAverageDensityProfile(7500,\&lengths,\&densities); \\
+  glbSetProfileDataInExperiment(0,1,lengths,densities); \\
+  free(lengths); \\
+  free(densities); \\
+}
+\end{quote}
+In the second example, we change the baseline to a PREM profile with
+$100$ matter density steps and print them:
+\begin{quote}
+{\tt
+  double* lengths; \\
+  double* densities; \\
+  glbStaceyProfile(7500,100,\&lengths,\&densities); \\
+  int i; \\
+  for(i=0;i<100;i++) printf("\%g \%g $\backslash$n",lengths[i],densities[i]); \\
+  glbSetProfileDataInExperiment(0,100,lengths,densities); \\
+  free(lengths);\\
+  free(densities);\\
+}
+\end{quote}
+
 \example{The impact of systematics, correlations, and degeneracies}{
-\label{ex:corrproj}
+\label{ex:barcharts}
 \index{Bar charts}
 \index{Systematics on/off}
 Here it is demonstrated how one can successively include systematics, correlations, and degeneracies at the example of the $\stheta$-sensitivity limit.
@@ -1601,6 +1840,82 @@ limits at the $3 \sigma$ confidence level, where we do not include the
 \end{center}
 }
 
+\section{Systematics}
+
+Changing the systematics at running time can be useful to investigate
+the impact factors affecting the measurement.
+In \GLOBES , the sytematics is defined rule-based, \ie, each rule
+has its own systematics. In addition, \AEDL\ requires that it has to be
+defined in each rule what ``Systematics on'' and ``Systematics off'' means.
+Therefore, it is usually very simple to switch the systematics on and off:
+\begin{function}
+\GLBNS{glbSwitchSystematics}
+{\tt int glbSwitchSystematics(int exp, int rule, int on\_off)}
+switches the systematics in experiment {\tt exp} and rule {\tt rule}
+on ({\tt on\_off} is \GLB{GLB\_ON}) or off ({\tt on\_off} is \GLB{GLB\_OFF}). For the experiment or
+rule index, one can also use \GLB{GLB\_ALL}. 
+\end{function}
+In the example on page~\pageref{ex:barcharts}, the application of
+{\tt glbSwitchSystematics} is demonstrated to show the impact of
+systematics, correlations, and degeneracies.
+
+The error dimension (for the definition, see \Sec~\ref{sec:rules}) can also be accessed directly with 
+\begin{function}
+\GLBNS{glbSetErrorDim}
+{\tt int glbSetErrorDim(int exp, int rule, int on\_off, int value)}
+sets the error dimension for systematics on ({\tt on\_off} is \GLB{GLB\_ON}) or off ({\tt on\_off} is \GLB{GLB\_OFF}) of experiment {\tt exp} and rule {\tt rule} to the value {\tt value}. The function returns
+$-1$ if not successful.
+\end{function}
+\begin{function}
+\GLBNS{glbGetErrorDim}
+{\tt int glbGetErrorDim(int exp, int rule, int on\_off)}
+returns the error dimension for systematics on ({\tt on\_off} is \GLB{GLB\_ON}) or off ({\tt on\_off} is \GLB{GLB\_OFF}) of experiment {\tt exp} and rule {\tt rule}.
+\end{function}
+
+Except from the general treatment of systematics, one can read out
+and write the signal and background errors, as well as the background
+centers. For the definitions of these quantities, see \Sec~\ref{sec:rules}.
+\begin{function}
+\GLBNS{glbSetSignalErrors}
+{\tt int glbSetSignalErrors(int exp, int rule, double norm, double tilt)}
+sets the signal errors of experiment {\tt exp} and rule {\tt rule}
+to {\tt norm} (normalization error) and {\tt tilt} (tilt/calibration error).
+\end{function}
+\begin{function}
+\GLBNS{glbGetSignalErrors}
+{\tt int glbGetSignalErrors(int exp, int rule, double* norm, double* tilt)}
+writes the signal errors of experiment {\tt exp} and rule {\tt rule}
+to {\tt norm} (normalization error) and {\tt tilt} (tilt/calibration error).
+\end{function}
+\begin{function}
+\GLBNS{glbSetBGErrors}
+{\tt int glbSetBGErrors(int exp, int rule, double norm, double tilt)}
+sets the background errors of experiment {\tt exp} and rule {\tt rule}
+to {\tt norm} (normalization error) and {\tt tilt} (tilt/calibration error).
+\end{function}
+\begin{function}
+\GLBNS{glbGetBGErrors}
+{\tt int glbGetBGErrors(int exp, int rule, double* norm, double* tilt)}
+writes the background errors of experiment {\tt exp} and rule {\tt rule}
+to {\tt norm} (normalization error) and {\tt tilt} (tilt/calibration error).
+\end{function}
+\begin{function}
+\GLBNS{glbSetBGCenters}
+{\tt int glbSetBGCenters(int exp, int rule, double norm, double tilt)}
+sets the background centers of experiment {\tt exp} and rule {\tt rule}
+to {\tt norm} (normalization center) and {\tt tilt} (tilt/calibrationcenter).
+\end{function}
+\begin{function}
+\GLBNS{glbGetBGCenters}
+{\tt int glbGetBGCenters(int exp, int rule, double* norm, double* tilt)}
+writes the background centers of experiment {\tt exp} and rule {\tt rule}
+to {\tt norm} (normalization center) and {\tt tilt} (tilt/calibration center).
+\end{function}
+As usual, all these functions return $-1$ if they were not successful.
+
+\section{External parameters in \AEDL\ files}
+\label{sec:aedlparams}
+
 \bi
 \item
  Baseline, Target mass, Source power, running time
@@ -1611,3 +1926,7 @@ limits at the $3 \sigma$ confidence level, where we do not include the
 \item
  Threshold function, efficiencies etc.
 \ei
+
+\section{Algorithm parameters: Filter functions}
+
+Here come the filter functions
