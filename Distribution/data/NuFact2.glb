@@ -53,9 +53,8 @@ $sampling_max =         50
 
 /* 	 Baseline 	 */
 
-$profiletype = 3
-$densitytab = 		{3.5}
-$lengthtab = 		{3000}
+$profiletype = 1
+$baseline = 		3000
 
 /* 	 Technical information 	 */
 
@@ -73,7 +72,7 @@ cross(#CC)<
 
 cross(#NC)<
 	@cross_file = "XNC.dat"
-	
+
 >
 
 
@@ -88,19 +87,19 @@ channel(#nu_mu_appearance)<
 
 channel(#nu_mu_bar_appearance)<
 	@channel = 	#one:	-:	e:	m:	#CC:    #sm0
-	@post_smearing_efficiencies={0.071875, 0.215625, 0.359375, 0.503125, 
+	@post_smearing_efficiencies={0.071875, 0.215625, 0.359375, 0.503125,
 	0.646875, 0.790625, 0.934375, 1, 1,1,1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
 >
 
 channel(#nu_mu_bar_disappearance)<
 	@channel = 	#two:	-:	m:	m:	#CC:    #sm0
-	@post_smearing_efficiencies={0.071875, 0.215625, 0.359375, 0.503125, 
+	@post_smearing_efficiencies={0.071875, 0.215625, 0.359375, 0.503125,
 	0.646875, 0.790625, 0.934375, 1, 1,1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
 >
 
 channel(#nu_mu_disappearance)<
 	@channel = 	#one:	+:	m:	m:	#CC:    #sm0
-	@post_smearing_efficiencies={0.071875, 0.215625, 0.359375, 0.503125, 
+	@post_smearing_efficiencies={0.071875, 0.215625, 0.359375, 0.503125,
 	0.646875, 0.790625, 0.934375, 1, 1,1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
 >
 
@@ -112,7 +111,34 @@ channel(#nu_bar_NC_bckg)<
 	@channel = 	#two:	-:	NOSC_m:	NOSC_m:	#NC:    #sm0
 >
 
-/* 	 Rules 		 */
+/* 	 Rules  CHANGED ORDER BECAUSE OF DEGFINDER! */
+
+rule(#Nu_Mu_Appearance)<
+	@signal =	      0.45@#nu_mu_appearance
+	@signalerror =	     0.001  :	    0.0001
+
+	@background =	     5e-06@#nu_bar_NC_bckg : 5e-06@#nu_mu_bar_disappearance
+	@backgrounderror = 	     0.2  :	    0.0001
+	@backgroundcenter = 	         1  :	         0
+
+	@errordim_sys_on = 	0
+	@errordim_sys_off = 	2
+	@energy_window = 	         4  :	        50
+>
+
+rule(#Nu_Mu_Bar_Appearance)<
+	@signal =	      0.35@#nu_mu_bar_appearance
+	@signalerror =	     0.001  :	    0.0001
+
+	@background =	     5e-06@#nu_NC_bckg : 5e-06@#nu_mu_disappearance
+	@backgrounderror = 	     0.2  :	    0.0001
+	@backgroundcenter = 	         1  :	         0
+
+	@errordim_sys_on = 	0
+	@errordim_sys_off = 	2
+	@energy_window = 	         4  :	        50
+>
+
 rule(#Nu_Mu_Disappearance)<
 	@signal =	      0.45@#nu_mu_disappearance
 	@signalerror =	     0.001  :	    0.0001
@@ -140,31 +166,7 @@ rule(#Nu_Mu_Bar_Disappearance)<
 	@energy_window = 	         4  :	        50
 >
 
-rule(#Nu_Mu_Bar_Appearance)<
-	@signal =	      0.35@#nu_mu_bar_appearance
-	@signalerror =	     0.001  :	    0.0001
 
-	@background =	     5e-06@#nu_NC_bckg : 5e-06@#nu_mu_disappearance
-	@backgrounderror = 	     0.001  :	    0.0001
-	@backgroundcenter = 	         1  :	         0
-
-	@errordim_sys_on = 	0
-	@errordim_sys_off = 	2
-	@energy_window = 	         4  :	        50
->
-
-rule(#Nu_Mu_Appearance)<
-	@signal =	      0.45@#nu_mu_appearance
-	@signalerror =	     0.001  :	    0.0001
-
-	@background =	     5e-06@#nu_bar_NC_bckg : 5e-06@#nu_mu_bar_disappearance
-	@backgrounderror = 	     0.001  :	    0.0001
-	@backgroundcenter = 	         1  :	         0
-
-	@errordim_sys_on = 	0
-	@errordim_sys_off = 	2
-	@energy_window = 	         4  :	        50
->
 
 
 /* 	 Energy resolution   */		 
