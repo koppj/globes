@@ -1,5 +1,5 @@
 /* GLoBES -- General LOng Baseline Experiment Simulator
- * (C) 2002 - 2004,  The GLoBES Team
+ * (C) 2002 - 2005,  The GLoBES Team
  *
  * GLoBES is mainly intended for academic purposes. Proper
  * credit must be given if you use GLoBES or parts of it. Please
@@ -27,6 +27,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <complex>
+#include <globes/globes.h>  // Added because access to GLB_OSCP needed (WW)
 
 
 
@@ -82,6 +83,8 @@ static double mq[3];
 // vacuum parameters
 static double t12,t23,t13,d1;
 
+// non-standard parameters:
+static double nsparams[GLB_OSCP-6+1];
 
 
 // Matter density in g/cm^3
@@ -930,5 +933,24 @@ extern "C" void glb_set_psteps(int p)
 }
 
 
+extern "C" void glb_set_c_ns_params(double ns[])
+{
+  int i;
+  if(GLB_OSCP>6)
+    for(i=0;i<GLB_OSCP-6;i++)
+      nsparams[i]=ns[i];
+}
 
-
+extern "C" double* glb_get_ns_params()
+{
+  double* erg;
+  int i;
+  if(GLB_OSCP>6)
+    {
+      erg=(double*) glb_malloc((GLB_OSCP-6)*sizeof(double));
+      for(i=0;i<GLB_OSCP-6;i++)
+	erg[i]=nsparams[i];
+      return erg;
+    }
+  else return NULL;
+}

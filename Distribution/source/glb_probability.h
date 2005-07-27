@@ -56,4 +56,8 @@ void glb_set_filter(double x);
 double glb_get_filter();
 
 
+void glb_set_c_ns_params(double ns[]);
+double* glb_get_ns_params();
+
+
 #endif /* GLS_OSZPROB_H */

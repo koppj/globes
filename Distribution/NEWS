@@ -318,3 +318,6 @@ documented!
 	problems. But Perl support anyway is optional.
 
 	BUGS #5-#9 are fixed.
+
+	Merged Walter's code with support for more than 6 oscillation
+	parameters.

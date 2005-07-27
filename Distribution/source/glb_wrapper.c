@@ -45,11 +45,10 @@
 
 #include "glb_wrapper.h"
 
-/* The global global variables */
+/* The global variables */
 int glb_num_of_exps;
 glb_exp glb_experiment_list[32];
 int glb_rule_number;
-
 
 
 #define obstack_chunk_alloc glb_malloc
@@ -165,7 +164,7 @@ double glbGetDensityParams(const glb_params in, int which)
   return out;
 }
 
-glb_params glbSetOscParams(glb_params in, 
+glb_params glbSetOscParams(glb_params in,
 				 double osc, int which)
 {
 
@@ -491,10 +490,16 @@ int
 glbSetOscillationParameters(const glb_params in)
 {
   int i;
+  double nsp[GLB_OSCP-6+1];
   if(in==NULL) return -1;
   glb_set_c_vacuum_parameters(glbGetOscParams(in,0),glbGetOscParams(in,1)
 		       ,glbGetOscParams(in,2),glbGetOscParams(in,3));
   glb_set_c_squared_masses(0,glbGetOscParams(in,4),glbGetOscParams(in,5));
+  if(GLB_OSCP>6)
+  {
+	for(i=0;i<GLB_OSCP-6;i++) nsp[i]=glbGetOscParams(in,6+i);
+	glb_set_c_ns_params(nsp);
+  }
   for(i=0;i<glb_num_of_exps;i++) glb_set_profile_scaling(glbGetDensityParams(in,i),i);
   return 0;
 
@@ -504,12 +509,18 @@ int
 glbSetStartingValues(const glb_params in)
 {
   int i,s=0;
+  double nsp[GLB_OSCP-6+1];
   if(in==NULL) return -1;
-  
+
   glb_set_solar_starting_values(glbGetOscParams(in,0));
   glb_set_starting_values(glbGetOscParams(in,1),glbGetOscParams(in,2),
 		    glbGetOscParams(in,3),glbGetOscParams(in,4),
 		    glbGetOscParams(in,5),0);
+  if(GLB_OSCP>6)
+  {
+	for(i=0;i<GLB_OSCP-6;i++) nsp[i]=glbGetOscParams(in,6+i);
+	glb_set_ns_starting_values(nsp);
+  }
 
   for(i=0;i<glb_num_of_exps;i++) 
     glbSetDensityStartingValue(glbGetDensityParams(in,i),i);
@@ -522,12 +533,18 @@ int
 glbSetInputErrors(const glb_params in)
 {
   int i,s=0;
+  double nsp[GLB_OSCP-6+1];
   if(in==NULL) return -1;
-  
+
   glb_set_solar_input_errors(glbGetOscParams(in,0));
   glb_set_input_errors(glbGetOscParams(in,1),glbGetOscParams(in,2),
 		    glbGetOscParams(in,3),glbGetOscParams(in,4),
 		    glbGetOscParams(in,5),0);
+  if(GLB_OSCP>6)
+  {
+	for(i=0;i<GLB_OSCP-6;i++) nsp[i]=glbGetOscParams(in,6+i);
+	glb_set_ns_input_errors(nsp);
+  }
 
   /* FIXME - the density glb_error.has the same size than the
    * density_center, if the user does not use glbSetDensityParams.
@@ -553,8 +570,13 @@ glbGetOscillationParameters(glb_params in)
   t=glb_get_squared_masses();
   for(i=0;i<2;i++) glbSetOscParams(in,t[i],i+4);
   glb_free(t);
+  if(GLB_OSCP>6)
+  {  
+	  t=glb_get_ns_params();
+      for(i=0;i<GLB_OSCP-6;i++) glbSetOscParams(in,t[i],i+6);
+      glb_free(t);
+  }
   return 0;
-
 }
 
 
@@ -1360,7 +1382,7 @@ void
 glb_init(char *name)
 {
   int i;
-
+  
   atexit(final_clean);
   glb_prog_name_init(name);
   glb_setup_path();
@@ -2192,3 +2214,4 @@ int glbGetNumberOfFluxes(int exp)
   return s;
 
 }
+
