@@ -29,7 +29,7 @@ dnl middle digit: increment when features have been introduced/removed
 dnl first digit: major improvements/rewrites
 dnl In contrast to the result of autoupdate I had to swap the
 dnl the AC_INIT and AC_CONFIG_SRCDIR
-AC_INIT([GLoBES],[2.3.6],[globes@ph.tum.de],[globes])
+AC_INIT([GLoBES],[2.3.7],[globes@ph.tum.de],[globes])
 AC_CONFIG_SRCDIR([source/glb_wrapper.c])
 
 dnl Tellin autoconf we are going to use automake
@@ -131,13 +131,13 @@ AC_SUBST(GLBMODULES)
 dnl Checks for programs.
 AC_PROG_AWK
 AC_PROG_CC
+gl_EARLY
 AC_PROG_CXX
 AC_PROG_CPP
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_YACC
 AC_PROG_LEX
-
 
 dnl Checks wether libtool exists on this machine
 dnl in the user path (needed for globes-module to work properly)
@@ -169,6 +169,13 @@ dnl Configure libtool
 AC_PROG_LIBTOOL
 
 
+
+dnl gnulib support
+dnl FIXME: for some reason this macro has to be called before any
+dnl of the AC_CHECK_LIB stuff below
+gl_INIT
+
+
 dnl Configure libltdl
 dnl AC_CONFIG_SUBDIRS(libltdl)
 AC_C_INLINE
@@ -186,10 +193,11 @@ AC_SWIG_PERL
 dnl Checks for libraries.
 AC_CHECK_LIB(m,main,[],AC_MSG_ERROR([libm not found]))
 
-#AM_PATH_GSL
-
-AC_CHECK_LIB(gslcblas,main,[],AC_MSG_ERROR([libgslcblas not found]))
-AC_CHECK_LIB(gsl,main,[],AC_MSG_ERROR([libgsl not found]))
+dnl check for GSL
+AM_PATH_GSL
+LIBS="$GSL_LIBS $LIBS"
+GSLINC="$GSL_CFLAGS"
+AC_SUBST(GSLINC)
 
 dnl Checking wether f2c is there (or something similar, like g2c)
 AC_LIBF2C_CONVENIENCE
@@ -219,7 +227,7 @@ AC_CONFIG_FILES(globes.spec)
 
 
 
-AC_CONFIG_FILES([Makefile libf2c/Makefile lapack/Makefile\
+AC_CONFIG_FILES([Makefile lib/Makefile libf2c/Makefile lapack/Makefile\
  globes/Makefile globes/example.pl source/Makefile\
  examples/Makefile\
  data/Makefile modules/MakefileExample modules/Makefile globes-config.src\

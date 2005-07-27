@@ -42,9 +42,19 @@ subdir = source
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in glb_lexer.c \
 	glb_parser.c glb_parser.h
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/m4/lapack.m4 \
-	$(top_srcdir)/m4/rpm.m4 $(top_srcdir)/m4/swig.m4 \
-	$(top_srcdir)/m4/swig_perl.m4 $(top_srcdir)/acinclude.m4 \
+am__aclocal_m4_deps = $(top_srcdir)/m4/alloca.m4 \
+	$(top_srcdir)/m4/argp.m4 $(top_srcdir)/m4/exitfail.m4 \
+	$(top_srcdir)/m4/extensions.m4 $(top_srcdir)/m4/getopt.m4 \
+	$(top_srcdir)/m4/gnulib.m4 $(top_srcdir)/m4/inttypes_h.m4 \
+	$(top_srcdir)/m4/lapack.m4 $(top_srcdir)/m4/mempcpy.m4 \
+	$(top_srcdir)/m4/obstack.m4 $(top_srcdir)/m4/onceonly_2_57.m4 \
+	$(top_srcdir)/m4/restrict.m4 $(top_srcdir)/m4/rpm.m4 \
+	$(top_srcdir)/m4/stdint_h.m4 $(top_srcdir)/m4/strcase.m4 \
+	$(top_srcdir)/m4/strchrnul.m4 $(top_srcdir)/m4/strndup.m4 \
+	$(top_srcdir)/m4/strnlen.m4 $(top_srcdir)/m4/swig.m4 \
+	$(top_srcdir)/m4/swig_perl.m4 $(top_srcdir)/m4/sysexits.m4 \
+	$(top_srcdir)/m4/uintmax_t.m4 $(top_srcdir)/m4/ulonglong.m4 \
+	$(top_srcdir)/m4/unlocked-io.m4 $(top_srcdir)/acinclude.m4 \
 	$(top_srcdir)/configure.in
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
@@ -101,6 +111,8 @@ ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
+ALLOCA = @ALLOCA@
+ALLOCA_H = @ALLOCA_H@
 AMDEP_FALSE = @AMDEP_FALSE@
 AMDEP_TRUE = @AMDEP_TRUE@
 AMTAR = @AMTAR@
@@ -136,12 +148,17 @@ F2CCONVENIENCE = @F2CCONVENIENCE@
 F2CINC = @F2CINC@
 F77 = @F77@
 FFLAGS = @FFLAGS@
+GETOPT_H = @GETOPT_H@
 GLBINC = @GLBINC@
 GLBLDF = @GLBLDF@
 GLBLIBVERSION = @GLBLIBVERSION@
 GLBMLDF = @GLBMLDF@
 GLBMODULEPATH = @GLBMODULEPATH@
 GLBMODULES = @GLBMODULES@
+GSLINC = @GSLINC@
+GSL_CFLAGS = @GSL_CFLAGS@
+GSL_CONFIG = @GSL_CONFIG@
+GSL_LIBS = @GSL_LIBS@
 HAVE_LIBTOOL = @HAVE_LIBTOOL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_LTDL_FALSE = @INSTALL_LTDL_FALSE@
@@ -171,6 +188,8 @@ MAINTAINER_MODE_TRUE = @MAINTAINER_MODE_TRUE@
 MAKEINFO = @MAKEINFO@
 MAKE_RPMS_FALSE = @MAKE_RPMS_FALSE@
 MAKE_RPMS_TRUE = @MAKE_RPMS_TRUE@
+NO_ARGP_FALSE = @NO_ARGP_FALSE@
+NO_ARGP_TRUE = @NO_ARGP_TRUE@
 OBJDUMP = @OBJDUMP@
 OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
@@ -202,6 +221,7 @@ SHELL = @SHELL@
 STRIP = @STRIP@
 SWIG = @SWIG@
 SWIG_LIB = @SWIG_LIB@
+SYSEXITS_H = @SYSEXITS_H@
 VERSION = @VERSION@
 WANT_LAPACK_FALSE = @WANT_LAPACK_FALSE@
 WANT_LAPACK_TRUE = @WANT_LAPACK_TRUE@
@@ -260,7 +280,7 @@ sharedstatedir = @sharedstatedir@
 shrext_cmds = @shrext_cmds@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
-INCLUDES = -I$(top_srcdir)
+INCLUDES = -I$(top_srcdir) -I$(top_srcdir)/lib $(F2CINC) $(GSLINC)
 AM_YFLAGS = -d 
 lib_LTLIBRARIES = libglb.la
 libglb_la_SOURCES = glb_minimize.c glb_error.c glb_path.c glb_multiex.c\
@@ -273,9 +293,9 @@ glb_rate_engine.h glb_types.h glb_parser.h glb_min_sup.h  glb_version.h \
 glb_lexer.h glb_fluxes.h glb_parser_type.h glb_wrapper.h glb_modules.h\
 glb_profile.h
 
-libglb_la_LDFLAGS = @F2CCONVENIENCE@  @BLCONVENIENCE@ @LIBS@ \
--version-info @GLBLIBVERSION@ @LIBLTDL@
-
+libglb_la_LDFLAGS = @F2CCONVENIENCE@ @BLCONVENIENCE@ @LIBS@ \
+	-version-info @GLBLIBVERSION@ @LIBLTDL@ \
+	$(top_builddir)/lib/libgnu.la
 libglb_la_CPPFLAGS = -DGLB_MODULE_DIR=\"$(pkglibdir)\"
 libglb_la_DEPENDENCIES = @BLCONVENIENCE@
 all: all-am

@@ -1,4 +1,4 @@
-INCLUDES = -I$(top_srcdir)
+INCLUDES = -I$(top_srcdir) -I$(top_srcdir)/lib $(F2CINC) $(GSLINC)
 pkglib_LTLIBRARIES = glb_prior_module.la
 glb_prior_module_la_SOURCES = glb_prior_module.c
 glb_prior_module_la_LDFLAGS =  $(top_builddir)/source/libglb.la\
@@ -20,7 +20,7 @@ bin_PROGRAMS = globes
 globes_SOURCES =  globes.c 
 globes_LDADD = libglobes.la @LIBS@  @LIBLTDL@ -lstdc++ -dlopen @GLBMODULES@
 globes_DEPENDENCIES = libglobes.la
-
+globes_LDADD += $(top_builddir)/lib/libgnu.la
 
 noinst_PROGRAMS = module-example
 module_example_SOURCES = module-example.c

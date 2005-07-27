@@ -1,8 +1,8 @@
 ACLOCAL_AMFLAGS = -I m4
 
-DIST_SUBDIRS = lapack source data libltdl modules globes libf2c
-SUBDIRS = libf2c lapack libltdl source data modules globes 
-INCLUDES = $(LTDLINCL) $(F2CINC)
+DIST_SUBDIRS = lib lapack source data libltdl modules globes libf2c
+SUBDIRS = lib libf2c lapack libltdl source data modules globes 
+INCLUDES = $(LTDLINCL) $(F2CINC) $(GSLINC)
 
 EXTRA_DIST = examples/Makefile.in examples/example1.c\
   examples/example3.c examples/myio.c\

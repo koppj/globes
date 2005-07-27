@@ -1,0 +1,131 @@
+\documentclass{article}
+\usepackage{verbatim}
+\newcommand{\glb}{{\sf GLoBES}}
+\begin{document}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Purpose}
+This document describes how to install \glb\ in an adverse
+environment, ie. as user without root privileges. This 
+situation may either arise if one just wants to quickly 
+evaluate wether \glb\ is suitable for a certain task or
+when the system administration proves to be un-cooperrative.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Prerequisites}
+
+The dependencies of \glb\ have been reduced as far as 
+possible and the only remaining hard prerequisite is the
+GNU Scientific library, which itself is useful for many
+projects and thus should be installed at any rate. However,
+there are occasions where even this minimal requirement 
+cannot be met. The simplest solution in these cases is, to
+download the tar-ball from {\tt www.gnu.org/software/gsl/}
+to unpack it, to change into the GSL directory and to run
+\begin{quote}
+\begin{verbatim}
+./configure --prefix=path_to_gsl --disable-shared
+make
+make install
+\end{verbatim}
+\end{quote}
+where \verb^path_to_gsl^ points to a location where the user
+has write permission.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Building \& Installing \glb}
+
+Once GSL is made available the next step is to download
+the \glb\ tar-ball, unpack it and to change into the \glb\
+directory. There the following commands have to be executed
+\begin{quote}
+\begin{verbatim}
+./configure --prefix=path_to_globes --with-gsl-prefix=path_to_gsl
+make
+make install
+\end{verbatim}
+\end{quote}
+Now you can change into the \verb^examples^ subdirectory
+and build the first example with
+\begin{quote}
+\begin{verbatim}
+make
+\end{verbatim}
+\end{quote}
+typing
+\begin{quote}
+\begin{verbatim}
+./example-tour
+\end{verbatim}
+\end{quote}
+shoud produce something like
+\begin{quote}
+{\small
+\begin{verbatim}
+Oscillation probabilities in vacuum: 1->1: 0.999955 1->2: 2.59018e-05 1->3: 1.92391e-05
+Oscillation probabilities in matter: 1->1: 0.999965 1->2: 2.01594e-05 1->3: 1.49783e-05
+...
+\end{verbatim}
+}
+\end{quote}
+in which case you have succeded to install \glb.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Using {\tt libglobes}}
+
+The \verb^examples^ subdirectory does not only contain example C-code, but also a \verb^Makefile^ which can be used as a basis for building own projects. You just have to replace the
+source and object files by the ones you are going to use. Moreover there is a script
+called \verb^globes-config^ installed which can be used to find the necessary linker
+flags by
+\begin{quote}
+\begin{verbatim}
+globes-config --libs
+\end{verbatim}
+\end{quote}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Building static binaries}
+
+Especially for CPU intensive task having the possibility to use many CPUs is desirable. This is much easier if one can buil static binaries, i.e. binaries which can be compiled on
+one machine providing a reasonable build environment and at
+the same can be run on another machine 
+(or many other machines). Again the \verb^Makefile^ in the
+\verb^examples^ subdirectory contains the necessary information. Change into \verb^examples^ and type
+\begin{quote}
+\begin{verbatim}
+make example-static
+\end{verbatim}
+\end{quote}
+The resulting binary \verb^example-static^ should run on most Linuxes and the corresponding parts of the \verb^Makefile^ should be easily adaptible to your problem. Note, that this approach uses \verb^libtool^ to do the linking. If \verb^libtool^ should not be available on your system, one can use the
+\verb^libtool^ script in the \glb\ build directory as replacement. Just make sure it is in the path of the invocation of
+\verb^make^.
+
+All these options rely on \verb^libtool^ and a working gcc installation. It seems that \verb^gcc 3.x^
+is broken in subtle way which makes it necessary to add a symbolic link in the gcc library
+directory. The diagnostic for this requirement is that building static programs fails with
+the error message \verb^cannot find -lgcc_s^. In those cases, find \verb^libgcc.a^ and add a symbolic 
+link in the same directory where you found it (this requires probably root privileges)
+\begin{quote}
+\begin{verbatim}
+ln -s libgcc.a libgcc_s.a
+\end{verbatim}
+\end{quote}
+
+If you can not write to this directory just use the following work around. Add the same link  as above to 
+the directory where you installed \verb^globes^ into
+\begin{quote}
+\begin{verbatim}
+cd prefix/lib       
+ln -s path_to_libgcc.a/libgcc.a libgcc_s.a
+\end{verbatim}
+\end{quote}
+and then change back into the \verb^examples^ directory and type
+ \begin{quote}
+\begin{verbatim}
+make LDFLAGS=-Lprefix/lib example-static
+\end{verbatim}
+\end{quote}
+and you are done.
+
+ 
+\end{document}

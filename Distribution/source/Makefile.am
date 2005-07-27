@@ -1,4 +1,5 @@
-INCLUDES = -I$(top_srcdir)
+INCLUDES = -I$(top_srcdir) -I$(top_srcdir)/lib $(F2CINC) $(GSLINC)
+
 
 AM_YFLAGS =  -d 
 
@@ -18,3 +19,4 @@ libglb_la_LDFLAGS = @F2CCONVENIENCE@  @BLCONVENIENCE@ @LIBS@ \
 -version-info @GLBLIBVERSION@ @LIBLTDL@
 libglb_la_CPPFLAGS = -DGLB_MODULE_DIR=\"$(pkglibdir)\"
 libglb_la_DEPENDENCIES = @BLCONVENIENCE@
+libglb_la_LDFLAGS += $(top_builddir)/lib/libgnu.la

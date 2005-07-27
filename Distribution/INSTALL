@@ -13,7 +13,8 @@ Besides the usual things like a working libc you need to have
 
 The library `libglobes' should in principle compile with any ANSI C/C++ 
 compiler but the `globes' binary uses the `argp' facility of `glibc' to 
-parse its command line options.
+parse its command line options. However, on platforms where `argp' is lacking
+GLoBES has replacement code, thus it should also work there.
 
 All those libraries are also available as rpm's from the various
 distributors of GNU/Linux, see their web sites for downloads. Chances are 
@@ -147,26 +148,42 @@ at some time!
 Building and Using static versions of GLoBES
 ============================================
 
-   Due to the fact the GLoBES relies on dynamically loadable modules for
-some of its core functionality, it requires some extra attention to build
-and use static versions of the library.
+In certain circumstances it may be useful to use a static version of libglobes
+or any of the binaries, e.g. when running on a cluster.
 
    The `configure' script accepts the option `--disable-shared', in which
-case only static objects are built. The binaries which come along with GLoBES
-are statically linked and all subleties concerning module support are taken
-care of, thanks to the lt_preload-mechanism provided by libtool. In case your
-system does not support shared libraries the `configure' script recognizes 
-this. If you give no options to `configure', both shared and static versions
-are built and will be installed. All binaries, however, will use dynamic 
-linking.
+case only static objects are built, i.e. only a static version of libglobes. 
+In case your system does not support shared libraries the `configure' script 
+recognizes this. If you give no options to `configure', both shared and static 
+versions are built and will be installed. All binaries, however, will use dynamic 
+linking. If you want to build static binaries, use LDFLAGS='-all-static' for building
+them.
 
    Sometimes it is convenient, eg. for debugging purposes, to have a statically
-linked version of a program using GLoBES. To get this working together with
-loadable module support it is necessary to have libtool installed on your 
-system. Thus it is possible also for your programs to use the 
-lt_preload-mechanism. For details, please, see the manual of GLoBES.
-For general information on lt_preload and related issues the documenation
-of libtool and the Autobook may prove usefool.
+linked version of a program using GLoBES, which is easiest achieved by just linking
+with `libglobes.a'. If you need a completely statically linked version, please, have
+a look at the Makefile in the `examples' directory.
+	make example-static
+produces a statically linked program that should in principle run on most Linuxes.
+It should be straightforward to adapt this example to your needs.
+
+All these options rely on `libtool' and a working gcc installation. It seems that gcc 3.x
+is broken in subtle way which makes it necessary to add a symbolic link in the gcc library
+directory. The diagnostic for this requirement is that building static programs fails with
+the error message `cannot find -lgcc_s'. In those cases, find `libgcc.a' and add a symbolic 
+link in the same directory where you found it (this requires probably root privileges)
+	ln -s libgcc.a libgcc_s.a
+
+If you can not write to this directory just use the following work around. Add the same link  
+as above to the directory where you installed GLoBES into
+	cd prefix/lib       
+	ln -s path_to_libgcc.a/libgcc.a libgcc_s.a
+and then change back into the 'examples' directory and type
+	make LDFLAGS=-Lprefix/lib example-static
+and you are done.
+
+If you don't have libtool on your system either, then you just can use the libtool script in
+the GLoBES tar-ball instead. Make sure it is in a place where it is found by 'make'.
 
 LAPACK & BLAS requirements
 ==========================
@@ -187,6 +204,46 @@ GLoBES detects the presence of either of the two takes care of this problem.
 If none of the two is present, a convience library is used. If
 for some reason `libf2c' is installed on the system and one still wishes
 to use the convience version use `--enable-libf2c-convenience'.
+
+GSL requirements
+================
+
+Sometimes the GNU scientific library is not available or is installed in a non-standard
+location. This situation can arise in an installation without root privileges. In this 
+case one can specify '--with-gsl-prefix=path_to_gsl' as option to the `configure' script.
+If one wants to use a shared version of `libgsl' then one has to make sure that the
+linker find the library at run-time. This can be achieved by setting the environment variable
+LD_LIBRARY_PATH correctly, i.e. (in bash) 
+	export LD_LIBRARY_PATH='path_to_gsl'
+You also can use a static version of GSL by either building GLoBES with LDFLAG='-all-static'
+or by configuring GSL with '--disable-shared'. In both cases no further actions like setting
+any environment variables is necessary.
+
+Distributions
+=============
+
+Fedora Core 3
+-------------
+
+FC3 is shipped with a non working version of LAPACK. Thus to
+make GLoBES work on FC3, configure GLoBES with '--enable-lapack-convenience', which
+replaces the defunct LAPACK with GLoBES' own version thereof. You can diagnose a 
+non-working LAPACK by compiling one of the examples in the `examples' directory and 
+trying to run it. It will hang forever in the function `glbSetRates()'. 
+
+RedHat (all versions)
+---------------------
+
+The standard rpm-based installation of GSL does not provide any header files for GSL, 
+which are however needed to compile GLoBES. You have to install an additional rpm-package
+called 'gsl-devel'. Altnernatively you can install GSL from a tar-ball and use the 
+`--with-gsl-prefix' option to the configure script of GLoBES.
+
+Platforms
+=========
+
+GLoBES should build and install on 64bit Linux systems.
+GLoBES should work on Mac OS.
 
 Compilers and Options
 =====================

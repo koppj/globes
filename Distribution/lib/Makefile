@@ -49,8 +49,8 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-build_triplet = i686-suse-linux
-host_triplet = i686-suse-linux
+build_triplet = i686-pc-linux-gnu
+host_triplet = i686-pc-linux-gnu
 # Build own argp if there is none
 #am__append_1 = argp.h argp-ba.c argp-eexst.c \
 #           argp-fmtstream.c argp-fmtstream.h argp-fs-xinl.c argp-help.c \
@@ -67,12 +67,14 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/alloca.m4 \
 	$(top_srcdir)/m4/gnulib.m4 $(top_srcdir)/m4/inttypes_h.m4 \
 	$(top_srcdir)/m4/lapack.m4 $(top_srcdir)/m4/mempcpy.m4 \
 	$(top_srcdir)/m4/obstack.m4 $(top_srcdir)/m4/onceonly_2_57.m4 \
-	$(top_srcdir)/m4/restrict.m4 $(top_srcdir)/m4/stdint_h.m4 \
-	$(top_srcdir)/m4/strcase.m4 $(top_srcdir)/m4/strchrnul.m4 \
-	$(top_srcdir)/m4/strndup.m4 $(top_srcdir)/m4/strnlen.m4 \
-	$(top_srcdir)/m4/sysexits.m4 $(top_srcdir)/m4/uintmax_t.m4 \
-	$(top_srcdir)/m4/ulonglong.m4 $(top_srcdir)/m4/unlocked-io.m4 \
-	$(top_srcdir)/acinclude.m4 $(top_srcdir)/configure.in
+	$(top_srcdir)/m4/restrict.m4 $(top_srcdir)/m4/rpm.m4 \
+	$(top_srcdir)/m4/stdint_h.m4 $(top_srcdir)/m4/strcase.m4 \
+	$(top_srcdir)/m4/strchrnul.m4 $(top_srcdir)/m4/strndup.m4 \
+	$(top_srcdir)/m4/strnlen.m4 $(top_srcdir)/m4/swig.m4 \
+	$(top_srcdir)/m4/swig_perl.m4 $(top_srcdir)/m4/sysexits.m4 \
+	$(top_srcdir)/m4/uintmax_t.m4 $(top_srcdir)/m4/ulonglong.m4 \
+	$(top_srcdir)/m4/unlocked-io.m4 $(top_srcdir)/acinclude.m4 \
+	$(top_srcdir)/configure.in
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
@@ -107,22 +109,24 @@ DIST_SOURCES = $(am__libgnu_la_SOURCES_DIST)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
-ACLOCAL = ${SHELL} /home/phuber/Desktop/globes-patches/missing --run aclocal-1.9
+ACLOCAL = ${SHELL} /home/phuber/Desktop/GLOBES/Distribution/missing --run aclocal-1.9
 ALLOCA = 
 ALLOCA_H = alloca.h
 AMDEP_FALSE = #
 AMDEP_TRUE = 
-AMTAR = ${SHELL} /home/phuber/Desktop/globes-patches/missing --run tar
+AMTAR = ${SHELL} /home/phuber/Desktop/GLOBES/Distribution/missing --run tar
 AR = ar
 AS = as
-AUTOCONF = ${SHELL} /home/phuber/Desktop/globes-patches/missing --run autoconf
-AUTOHEADER = ${SHELL} /home/phuber/Desktop/globes-patches/missing --run autoheader
-AUTOMAKE = ${SHELL} /home/phuber/Desktop/globes-patches/missing --run automake-1.9
+AUTOCONF = ${SHELL} /home/phuber/Desktop/GLOBES/Distribution/missing --run autoconf
+AUTOHEADER = ${SHELL} /home/phuber/Desktop/GLOBES/Distribution/missing --run autoheader
+AUTOMAKE = ${SHELL} /home/phuber/Desktop/GLOBES/Distribution/missing --run automake-1.9
 AWK = gawk
 BLCONVENIENCE = 
 CC = gcc
 CCDEPMODE = depmode=gcc3
 CFLAGS = -g -O2
+CONVENIENCE_LTDL_FALSE = #
+CONVENIENCE_LTDL_TRUE = 
 CPP = gcc -E
 CPPFLAGS = 
 CXX = g++
@@ -145,14 +149,19 @@ F77 = g77
 FFLAGS = -g -O2
 GETOPT_H = 
 GLBINC = 
-GLBLDF = -lglobes
-GLBLIBVERSION = 4:3:2
+GLBLDF = -lglobes -lglb
+GLBLIBVERSION = 5:4:2
+GLBMLDF = -lglb
+GLBMODULEPATH = NONE/lib/globes
+GLBMODULES = glb_prior_module.la
 GSLINC = -I/usr/include
 GSL_CFLAGS = -I/usr/include
 GSL_CONFIG = /usr/bin/gsl-config
 GSL_LIBS = -L/usr/lib -lgsl -lgslcblas -lm
 HAVE_LIBTOOL = yes
 INSTALL_DATA = ${INSTALL} -m 644
+INSTALL_LTDL_FALSE = 
+INSTALL_LTDL_TRUE = #
 INSTALL_PROGRAM = ${INSTALL}
 INSTALL_SCRIPT = ${INSTALL}
 INSTALL_STRIP_PROGRAM = ${SHELL} $(install_sh) -c -s
@@ -160,17 +169,24 @@ LDFLAGS =
 LEX = flex
 LEXLIB = -lfl
 LEX_OUTPUT_ROOT = lex.yy
+LIBADD_DL = -ldl
+LIBLTDL = ${top_builddir}/libltdl/libltdlc.la
 LIBOBJS =  getopt$U.o getopt1$U.o
 LIBS = -llapack -lblas -lf2c -L/usr/lib -lgsl -lgslcblas -lm -lm 
 LIBTOOL = $(SHELL) $(top_builddir)/libtool
+LIBTOOL_DEPS = ./ltmain.sh
 LN_S = ln -s
+LTDLINCL = -I${top_srcdir}/libltdl
 LTGLBINC = 
-LTGLBLDF = -lglobes
+LTGLBLDF = -lglobes -lglb
+LTGLBMLDF = -lglb
 LTLIBOBJS =  getopt$U.lo getopt1$U.lo
 MAINT = #
 MAINTAINER_MODE_FALSE = 
 MAINTAINER_MODE_TRUE = #
-MAKEINFO = ${SHELL} /home/phuber/Desktop/globes-patches/missing --run makeinfo
+MAKEINFO = ${SHELL} /home/phuber/Desktop/GLOBES/Distribution/missing --run makeinfo
+MAKE_RPMS_FALSE = 
+MAKE_RPMS_TRUE = #
 NO_ARGP_FALSE = 
 NO_ARGP_TRUE = #
 OBJDUMP = objdump
@@ -178,16 +194,34 @@ OBJEXT = o
 PACKAGE = globes
 PACKAGE_BUGREPORT = globes@ph.tum.de
 PACKAGE_NAME = GLoBES
-PACKAGE_STRING = GLoBES 2.0.12
+PACKAGE_STRING = GLoBES 2.3.7
 PACKAGE_TARNAME = globes
-PACKAGE_VERSION = 2.0.12
+PACKAGE_VERSION = 2.3.7
 PATH_SEPARATOR = :
+PERL_FALSE = #
+PERL_TRUE = 
 RANLIB = ranlib
+RPM_ARCHS = i686
+RPM_ARGS = 
+RPM_BUILD_DIR = 
+RPM_CLEAN_NAMES = 
+RPM_CONFIGURE_ARGS =  --enable-ltdl-convenience
+RPM_DIR = 
+RPM_PROG = 
+RPM_RELEASE = 0
+RPM_SOURCE_DIR = 
+RPM_SRC_DIR = 
+RPM_SRPM_NAME = 
+RPM_TARBALL = 
+RPM_TARGET = 
+RPM_VERSION = 
 SET_MAKE = 
 SHELL = /bin/sh
 STRIP = strip
+SWIG = /usr/bin/swig
+SWIG_LIB = 
 SYSEXITS_H = sysexits.h
-VERSION = 2.0.12
+VERSION = 2.3.7
 WANT_LAPACK_FALSE = 
 WANT_LAPACK_TRUE = #
 WANT_LIBF2C_FALSE = 
@@ -212,31 +246,37 @@ am__quote =
 am__tar = ${AMTAR} chof - "$$tardir"
 am__untar = ${AMTAR} xf -
 bindir = ${exec_prefix}/bin
-build = i686-suse-linux
+build = i686-pc-linux-gnu
 build_alias = 
 build_cpu = i686
-build_os = linux
-build_vendor = suse
+build_os = linux-gnu
+build_vendor = pc
 datadir = ${prefix}/share
 exec_prefix = ${prefix}
-host = i686-suse-linux
+host = i686-pc-linux-gnu
 host_alias = 
 host_cpu = i686
-host_os = linux
-host_vendor = suse
+host_os = linux-gnu
+host_vendor = pc
 includedir = ${prefix}/include
 infodir = ${prefix}/info
-install_sh = /home/phuber/Desktop/globes-patches/install-sh
+install_sh = /home/phuber/Desktop/GLOBES/Distribution/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localstatedir = ${prefix}/var
 mandir = ${prefix}/man
 mkdir_p = mkdir -p --
 oldincludedir = /usr/include
+perl = /usr/bin/perl
+perl_cflags = -D_REENTRANT -D_GNU_SOURCE -DTHREADS_HAVE_PIDS -fno-strict-aliasing -pipe -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64
+perl_includes = /usr/lib/perl5/5.8.5/i586-linux-thread-multi/CORE
+perl_installdir = 
 prefix = /usr/local
 program_transform_name = s,x,x,
+really_build_perl = yes
 sbindir = ${exec_prefix}/sbin
 sharedstatedir = ${prefix}/com
+shrext_cmds = .so
 sysconfdir = ${prefix}/etc
 target_alias = 
 AUTOMAKE_OPTIONS = 1.8 gnits

@@ -67,12 +67,14 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/alloca.m4 \
 	$(top_srcdir)/m4/gnulib.m4 $(top_srcdir)/m4/inttypes_h.m4 \
 	$(top_srcdir)/m4/lapack.m4 $(top_srcdir)/m4/mempcpy.m4 \
 	$(top_srcdir)/m4/obstack.m4 $(top_srcdir)/m4/onceonly_2_57.m4 \
-	$(top_srcdir)/m4/restrict.m4 $(top_srcdir)/m4/stdint_h.m4 \
-	$(top_srcdir)/m4/strcase.m4 $(top_srcdir)/m4/strchrnul.m4 \
-	$(top_srcdir)/m4/strndup.m4 $(top_srcdir)/m4/strnlen.m4 \
-	$(top_srcdir)/m4/sysexits.m4 $(top_srcdir)/m4/uintmax_t.m4 \
-	$(top_srcdir)/m4/ulonglong.m4 $(top_srcdir)/m4/unlocked-io.m4 \
-	$(top_srcdir)/acinclude.m4 $(top_srcdir)/configure.in
+	$(top_srcdir)/m4/restrict.m4 $(top_srcdir)/m4/rpm.m4 \
+	$(top_srcdir)/m4/stdint_h.m4 $(top_srcdir)/m4/strcase.m4 \
+	$(top_srcdir)/m4/strchrnul.m4 $(top_srcdir)/m4/strndup.m4 \
+	$(top_srcdir)/m4/strnlen.m4 $(top_srcdir)/m4/swig.m4 \
+	$(top_srcdir)/m4/swig_perl.m4 $(top_srcdir)/m4/sysexits.m4 \
+	$(top_srcdir)/m4/uintmax_t.m4 $(top_srcdir)/m4/ulonglong.m4 \
+	$(top_srcdir)/m4/unlocked-io.m4 $(top_srcdir)/acinclude.m4 \
+	$(top_srcdir)/configure.in
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
@@ -123,6 +125,8 @@ BLCONVENIENCE = @BLCONVENIENCE@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
+CONVENIENCE_LTDL_FALSE = @CONVENIENCE_LTDL_FALSE@
+CONVENIENCE_LTDL_TRUE = @CONVENIENCE_LTDL_TRUE@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
 CXX = @CXX@
@@ -147,12 +151,17 @@ GETOPT_H = @GETOPT_H@
 GLBINC = @GLBINC@
 GLBLDF = @GLBLDF@
 GLBLIBVERSION = @GLBLIBVERSION@
+GLBMLDF = @GLBMLDF@
+GLBMODULEPATH = @GLBMODULEPATH@
+GLBMODULES = @GLBMODULES@
 GSLINC = @GSLINC@
 GSL_CFLAGS = @GSL_CFLAGS@
 GSL_CONFIG = @GSL_CONFIG@
 GSL_LIBS = @GSL_LIBS@
 HAVE_LIBTOOL = @HAVE_LIBTOOL@
 INSTALL_DATA = @INSTALL_DATA@
+INSTALL_LTDL_FALSE = @INSTALL_LTDL_FALSE@
+INSTALL_LTDL_TRUE = @INSTALL_LTDL_TRUE@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
@@ -160,17 +169,24 @@ LDFLAGS = @LDFLAGS@
 LEX = @LEX@
 LEXLIB = @LEXLIB@
 LEX_OUTPUT_ROOT = @LEX_OUTPUT_ROOT@
+LIBADD_DL = @LIBADD_DL@
+LIBLTDL = @LIBLTDL@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
+LIBTOOL_DEPS = @LIBTOOL_DEPS@
 LN_S = @LN_S@
+LTDLINCL = @LTDLINCL@
 LTGLBINC = @LTGLBINC@
 LTGLBLDF = @LTGLBLDF@
+LTGLBMLDF = @LTGLBMLDF@
 LTLIBOBJS = @LTLIBOBJS@
 MAINT = @MAINT@
 MAINTAINER_MODE_FALSE = @MAINTAINER_MODE_FALSE@
 MAINTAINER_MODE_TRUE = @MAINTAINER_MODE_TRUE@
 MAKEINFO = @MAKEINFO@
+MAKE_RPMS_FALSE = @MAKE_RPMS_FALSE@
+MAKE_RPMS_TRUE = @MAKE_RPMS_TRUE@
 NO_ARGP_FALSE = @NO_ARGP_FALSE@
 NO_ARGP_TRUE = @NO_ARGP_TRUE@
 OBJDUMP = @OBJDUMP@
@@ -182,10 +198,28 @@ PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
+PERL_FALSE = @PERL_FALSE@
+PERL_TRUE = @PERL_TRUE@
 RANLIB = @RANLIB@
+RPM_ARCHS = @RPM_ARCHS@
+RPM_ARGS = @RPM_ARGS@
+RPM_BUILD_DIR = @RPM_BUILD_DIR@
+RPM_CLEAN_NAMES = @RPM_CLEAN_NAMES@
+RPM_CONFIGURE_ARGS = @RPM_CONFIGURE_ARGS@
+RPM_DIR = @RPM_DIR@
+RPM_PROG = @RPM_PROG@
+RPM_RELEASE = @RPM_RELEASE@
+RPM_SOURCE_DIR = @RPM_SOURCE_DIR@
+RPM_SRC_DIR = @RPM_SRC_DIR@
+RPM_SRPM_NAME = @RPM_SRPM_NAME@
+RPM_TARBALL = @RPM_TARBALL@
+RPM_TARGET = @RPM_TARGET@
+RPM_VERSION = @RPM_VERSION@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
+SWIG = @SWIG@
+SWIG_LIB = @SWIG_LIB@
 SYSEXITS_H = @SYSEXITS_H@
 VERSION = @VERSION@
 WANT_LAPACK_FALSE = @WANT_LAPACK_FALSE@
@@ -233,10 +267,16 @@ localstatedir = @localstatedir@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
 oldincludedir = @oldincludedir@
+perl = @perl@
+perl_cflags = @perl_cflags@
+perl_includes = @perl_includes@
+perl_installdir = @perl_installdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
+really_build_perl = @really_build_perl@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
+shrext_cmds = @shrext_cmds@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 AUTOMAKE_OPTIONS = 1.8 gnits
