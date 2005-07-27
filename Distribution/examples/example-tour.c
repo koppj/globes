@@ -29,15 +29,21 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
-//#include <ltdl.h>
+
+#ifdef GLB_STATIC
+#include   <ltdl.h>
+#endif /* GLB_STATIC */
 
 #include <globes/globes.h>   /* GLoBES library */
 
 
 int main(int argc, char *argv[])
 {
- 
-  //LTDL_SET_PRELOADED_SYMBOLS();
+
+#ifdef GLB_STATIC
+  LTDL_SET_PRELOADED_SYMBOLS();
+#endif /* GLB_STATIC */
+  
   /* char* MYFILE=""; */ 
   char* MYFILE="gl-tour.dat"; /* if empty, write to screen */
   FILE* stream;

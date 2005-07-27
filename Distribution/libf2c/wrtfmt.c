@@ -2,6 +2,11 @@
 #include "fio.h"
 #include "fmt.h"
 
+#if HAVE_CONFIG_H
+#  include <config.h>
+#endif
+
+
 extern icilist *f__svic;
 extern char *f__icptr;
 

@@ -165,3 +165,85 @@ documented!
 	refined (typemaps etc.). Moved the contents of acinclude.m4 to some
 	files in a new subdirectory `m4'. Perl rules and rpm rules work
 	now silently together.
+
+******** Version 2.2.1
+
+10/11/04 Fixed a problem with the convenience libf2c. Added the inclusion
+	of config.h to wsfe.c and wrtfmt.c. Fixed the includes (f2c.h) for
+	the lapack stuff. The problem is, there might be a working libf2c/
+	libg2c but no f2c.h (RedHat!). Or the there is no libf2c at all and
+	thus no header. Furthemore some typos had to be fixed in the 
+	Makefile.am's. Fixed a problem in the support for libg2c, in lapack.m4
+	there was a misplaced bracket in AC_CHECK_G2C. 
+
+******** Version 2.2.2
+
+25/11/04 ******************** WARNING ********************************
+	works only with configure --prefix=something
+	************************************************************** 
+
+	Added an example which shows how to build a all-static version of an 
+	application using GLoBES. This is actually a bit trickier than one 
+	would usually expect due to the use of *dynamically* loadable modules. 
+	However, libtool and libltdl provide a way out by the use of the so 
+	called `lt_preload' mechanism. It is absolutely necessary to specify
+	the modules which will be needed by the application at link time. 
+	Unfortunately, due to a silliness of libltdl, it is also necessary that
+	the corresponding `*.la' file(s) can be found during execution. They
+	will be looked for at the place where the module itself was found 
+	during linking *and* in the local directory. Thus usually you will want
+	to copy the `*.la' file(s) into the same directory where your 
+	application's binary lives (NB the `*.la' are tiny). 
+	 The actual example is to be found in the `examples' subdirectory of
+	the tar-ball. It is built by issuing `make example-static' (after
+	you have installed this version of GLoBES). Then you should be able
+	to copy the resulting binary `example-static' together with 
+	`glb_prior_module-la' (to be found in ${prefix}/lib/globes) to any
+	computer and execute it there (there are exceptions, it will not work
+	on a non-unix system :-)
+	 If you want to use the Makefile for your own purposes, make sure to
+	add the following line  for each module your additionaly using
+	
+		LTDLOPEN += -dlopen path_to_my_module/my_module.la
+
+	Also have a look at `example-tour.c'. It now contains two blocks of 
+	code, which will be conditionally compiled for all-static applications.
+	This one at the beginning (outside main)
+
+		#ifdef GLB_STATIC
+		#include   <ltdl.h>
+		#endif /* GLB_STATIC */
+
+	and this one inside at the beginning of main
+
+		#ifdef GLB_STATIC
+  			LTDL_SET_PRELOADED_SYMBOLS();
+		#endif /* GLB_STATIC */
+
+	This you will also need in your own applications. The conditional
+	compilation makes it possible to have the same source no matter wether		
+	your going to use an all-static version.
+	
+
+	************************************************************
+	* FIXME -- examples do not work with normal root-install   *
+	************************************************************
+
+07/03/05 Version 2.3.2
+	Fixed a silly bug in glb_multiex.c in the setup of the smearing matrices. It was looped over the number
+	of rules instead of the number of smearing matrices.
+
+08/03/05 Version 2.3.3
+	Fixed the bug in the parser, concerning '$binsize'. Fixed a bug in glb_set_up_smear_data (glb_smear.c),
+	which made it ignore user defined binsizes. 
+
+21/03/05 Version 2.3.4
+	Fixed a sign error in the beta beam fluxes.
+
+19/04/05 libglb now is installed into $(prefix)/lib instead of $(prefix)/lib/globes. The built-in 
+	oscillation parameter now are the same as in the documentation, dm21 was 10 times larger. 
+
+03/06/05 Version 2.3.5
+	Fixed a bug in glb_lexer.l The consequence of this bug was that the include feature in AEDL did not
+	work for files which where not parsed by the first invocation of glbInitExperiment. The reason was that
+	include_stack_ptr was not properly reset at EOF. This fixes BUG#8.

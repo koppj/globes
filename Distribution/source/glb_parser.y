@@ -120,16 +120,25 @@
     {"$sampling_points" ,COUNTER,0,500,&buff.simbins,NULL,"global"}, 
     {"$sampling_min" ,DOUBLE,0,GMAX,&buff.simtresh,NULL,"global"},
     {"$sampling_max" ,DOUBLE,0,GMAX,&buff.simbeam,NULL,"global"},
-    
+    /* FIXME -- this was not properly recognized due to the fact the first match is performed
+     * by matching only the letters up to the length of the word ins this list, ie.
+     * if 'bins' is before 'binsize' in this list, 'binsize' will be matched as
+     * 'bins'
+     */
+    {"$binsize",DOUBLE_LIST,0,GMAX,&buff.binsize,
+     &buff.numofbins,"global"},  
+   
     {"$bins",COUNTER,0,500,&buff.numofbins,NULL,"global"},
     {"$emin",DOUBLE,0,GMAX,&buff.emin,NULL,"global"}, 
     {"$emax",DOUBLE,0,GMAX,&buff.emax,NULL,"global"},
 
     {"$baseline",DOUBLE,0,2*GLB_EARTH_RADIUS,&buff.baseline,NULL,"global"},
     {"$profiletype",INT,1,3,&buff.density_profile_type,NULL,"global"},
-    {"$binsize",DOUBLE_LIST,0,GMAX,&buff.binsize,&buff.numofbins,"global"}, 
+ 
     {"$sampling_stepsize",DOUBLE_LIST,0,GMAX,&buff.simbinsize,
      &buff.simbins,"global"}, 
+
+ 
 
    
   
@@ -170,7 +179,7 @@
    {"@channel",INT_LIST_INDEXED,-1,1,&buff.listofchannels[0],
     &buff.numofchannels,"channel"},
    {"energy",UNTYPE,-1,1,NULL,&buff.num_of_sm,"global"},
-   {"@energy",ENERGY_MATRIX,-1,1,&buff.smear[0],&loc_count,"energy"},
+   {"@energy",ENERGY_MATRIX,-1,GMAX,&buff.smear[0],&loc_count,"energy"},
 
    {"@signalerror",DOUBLE_INDEXED_PAIR
     ,0,100,&buff.signalruleerror[0],&loc_count,"rule"},
@@ -196,13 +205,15 @@
    {"flux",UNTYPE,0,20,NULL,&buff.num_of_fluxes,"global"},
    {"@flux_file",CHAR,0,20,&flt.file_name,NULL,"flux"},
 
-    {"@builtin",INT,1,2,&flt.builtin,NULL,"flux"},
+    {"@builtin",INT,1,4,&flt.builtin,NULL,"flux"},
     {"@time",DOUBLE,0,GMAX,&flt.time,NULL,"flux"},
     {"@power",DOUBLE,0,GMAX,&flt.target_power,NULL,"flux"},
     {"@stored_muons",DOUBLE,0,GMAX,&flt.stored_muons,NULL,"flux"},
     {"@parent_energy",DOUBLE,0,GMAX,&flt.parent_energy,NULL,"flux"},
     {"@norm",DOUBLE,0,GMAX,&flt.norm,NULL,"flux"},
-    
+    {"@gamma",DOUBLE,0,GMAX,&flt.gamma,NULL,"flux"},
+    {"@end_point",DOUBLE,0,GMAX,&flt.end_point,NULL,"flux"},
+    {"@stored_ions",DOUBLE,0,GMAX,&flt.stored_muons,NULL,"flux"},
  
 
    {"@type" ,INT,1,2,&ibf.type,&loc_count,"energy"},
@@ -960,7 +971,7 @@ group: GID '(' NAME ')'
 }
   GRPOPEN ingroup  GRPCLOSE { 
    
-grp_end($1);}
+grp_end(context);}
 | GID '(' RDF ')' GRPOPEN ingroup  GRPCLOSE {
   yyerror("Redefinition of an automatic variable");YYERROR;}  
 ;
@@ -1013,7 +1024,8 @@ channel: CHANNEL '=' name RULESEP pm RULESEP FLAVOR RULESEP FLAVOR RULESEP
 }
 ;
 
-name: NAME {$$=$1}
+/* FIXME, maybe we had a bug here */
+name: NAME {$$=$1;}
 |NDEF {yyerror("Unknown name");YYERROR;}
 ;
  
@@ -1494,7 +1506,7 @@ int glbInitExperiment(char *inf,glb_exp *in, int *counter)
   char tct[11];
   struct glb_experiment **ins;
   ins=(struct glb_experiment **) in;
-  //yydebug=1;
+  // yydebug=1;
   context=(char *) strdup("global");
   glb_smear_reset(&ibf);
   glb_option_type_reset(&opt);
@@ -1516,6 +1528,7 @@ int glbInitExperiment(char *inf,glb_exp *in, int *counter)
   glb_fclose(yyin);
   glb_free(context);
   glb_free(glb_file_id);
+  
   if(k!=0) return -2;
   
   k=0;

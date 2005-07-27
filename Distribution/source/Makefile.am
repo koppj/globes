@@ -2,7 +2,7 @@ INCLUDES = -I$(top_srcdir)
 
 AM_YFLAGS =  -d 
 
-pkglib_LTLIBRARIES = libglb.la
+lib_LTLIBRARIES = libglb.la
 libglb_la_SOURCES =  glb_minimize.c glb_error.c glb_path.c glb_multiex.c\
  glb_version.c \
 glb_rate_engine.c  \

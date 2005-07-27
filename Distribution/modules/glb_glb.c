@@ -29,12 +29,10 @@ void glbInit(char *name)
 {
   glb_dlhandle prior;
 
-  fprintf(stderr,"\n************************************\n");
-  fprintf(stderr,"* This is Super Init               *\n");
-  fprintf(stderr,"************************************\n\n");
+  
   glb_init(name);
   /* Loading and registeriing the prior module */
-  glbProbeModule("glb_prior_module",3);
+  glbProbeModule("glb_prior_module",0);
   
   prior=glbOpenModule("glb_prior_module");
   if(prior==NULL) glb_fatal("Could not load glb_prior_module");

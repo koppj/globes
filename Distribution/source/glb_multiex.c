@@ -113,6 +113,8 @@ glb_flux *glb_flux_alloc()
   temp->stored_muons=-1;
   temp->parent_energy=-1;
   temp->norm=-1;
+  temp->gamma=-1;
+  temp->end_point=-1;
   temp->flux_storage=NULL;
   return temp;
 }
@@ -126,6 +128,8 @@ glb_flux *glb_flux_reset(glb_flux *temp)
   temp->target_power=-1;
   temp->stored_muons=-1;
   temp->parent_energy=-1;
+  temp->gamma=-1;
+  temp->end_point=-1;
   temp->norm=-1; 
   /* FIXME serious memory leak */
   glb_free_flux_storage(temp->flux_storage);
@@ -152,9 +156,17 @@ int glb_default_flux(glb_flux *in)
   if(in->target_power==-1) in->target_power=1;
   if(in->stored_muons==-1) in->stored_muons=1;
   if(in->norm==-1) in->norm=1;  
-  if(in->builtin!=0)
+  /* nufact needs parent=muon energy */
+  if(in->builtin==1||in->builtin==2)
     {
       if(in->parent_energy==-1) {glb_error("No parent energy defined!");s=1;}
+    }
+  /* beta beam need gamma and end point */
+  if(in->builtin==3||in->builtin==4)
+    {
+      if(in->gamma==-1) {glb_error("No gamma factor defined!");s=1;}
+      if(in->end_point==-1) {glb_error("No beta end point defined!");s=1;}
+      
     }
   if(in->builtin==0)
     {
@@ -696,7 +708,7 @@ int glbDefaultExp(glb_exp ins)
 	  in->smear_data[i]->numofbins=in->numofbins;
 	  in->smear_data[i]->e_min=in->emin;
 	  in->smear_data[i]->e_max=in->emax;
-
+	
 
 	  if(glb_default_smear(in->smear_data[i],in)==1) def=-1;  
 
@@ -1068,11 +1080,7 @@ void glbSetExperiment(glb_exp in)
 				(double) s->bgterror[1][i]);
       glb_set_errordim(s->errordim[i],i);  
       
-      glb_calc_smearing[i]=s->smear[i]; 
-       
-      //changed on 14 Feb 03
-      glb_calc_uprange[i]=s->uprange[i];
-      glb_calc_lowrange[i]=s->lowrange[i];
+     
       // this is preliminary (0 should be replaced by i)
       glb_calc_simbins=s->simbins;
       glb_calc_simtresh=s->simtresh;
@@ -1083,6 +1091,17 @@ void glbSetExperiment(glb_exp in)
 				 s->energy_window[i][1]);
      
     }
+
+  for(i=0;i<s->num_of_sm;i++)
+    {
+      glb_calc_smearing[i]=s->smear[i];   
+      glb_calc_uprange[i]=s->uprange[i];
+      glb_calc_lowrange[i]=s->lowrange[i];
+    }
+
+
+
+
   glb_switch_filter(s->filter_state);
   glb_set_filter(s->filter_value);
 

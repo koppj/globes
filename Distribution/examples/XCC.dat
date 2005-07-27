@@ -1,3 +1,34 @@
+# Copyright 2004 The GLoBES Team
+#
+# If you modify this file you have to rename it.
+#
+# If you are using this file for producing a scientific publication
+# or a talk please cite the following references.
+#
+#* %The cross sections in this file are, at low energies, taken from
+#* @Article{Messier:1999kj,
+#*     author    = "Messier, Mark D.",
+#*     title     = "Evidence for neutrino mass from observations of atmospheric
+#*                  neutrinos with Super-Kamiokande",
+#*     note     = "UMI-99-23965"
+#* }
+#* %and have been kindly provided as machine readable file by the author.
+#
+#* %The high energy part is taken from the following reference and
+#* %additionaly we have performed a matching to the low energy part.
+#* @Article{Paschos:2001np,
+#*     author    = "Paschos, E. A. and Yu, J. Y.",
+#*     title     = "Neutrino interactions in oscillation experiments",
+#*     journal   = "Phys. Rev.",
+#*     volume    = "D65",
+#*     year      = "2002",
+#*     pages     = "033002",
+#*     eprint    = "hep-ph/0107261",
+#*     SLACcitation  = "%%CITATION = HEP-PH 0107261;%%"
+#* }
+#* %Again, they have been kindly provided as machine readable file by the 
+#* %authors.
+#
 -1.      0.004345797812448415   0.004345797812448415   0.                        0.00245324991670044     0.00245324991670044     0.
 -0.996   0.005544740675581973   0.005544740675581973   0.                        0.0035778830026447672   0.0035778830026447672   0.
 -0.992   0.006754777220438072   0.006754777220438072   0.                        0.004712922190409074    0.004712922190409074    0.

@@ -64,3 +64,41 @@ Date: 16.08.04
 	index range in one of the for loops is `n_s_free+n_fixed' whereas
 	the correct value is `n_s_free+n_s_fixed'. 
 -------------------------------------------------------------------------------
+
+BUG#6 Error in the glb-files for JHF/T2K
+
+From: Mark Rolinec
+Date: 20.02.04
+
+        The energy resolution is taken to be 0.085*E instead of 0.085 MeV. This
+        affects only results with very high statistics in the appearance channel
+,
+        ie. all experiments using HyperK. The effect is at the level of a few
+        percent for the largest allowed values of theta13 and much smaller
+        everywhere else.
+
+-------------------------------------------------------------------------------
+
+BUG#7 Variable bin sizes do not work
+
+From: Mark Rolinec & Patrick Huber
+Date: 07.03.05
+
+	Parsing a glb-file using '$binsize' produces an 'Unknown identifier' error.
+	In the process of resolving this issue, it was discovered that variable 
+	bin sizes will not work when using user defined smear matrices. There are
+	basically two problems: the parser and the way the smearing is set up
+	internally.
+
+-------------------------------------------------------------------------------
+
+BUG#8 Include works only for the first call of glbInitExperiment
+
+From: Patrick Huber
+Date: 30.04.05
+
+	The include feature of AEDL only works in a file which is parsed by the first
+	invocation of glbInitExperiment. 
+
+
+-------------------------------------------------------------------------------

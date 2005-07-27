@@ -36,33 +36,47 @@
 #
 # For using static libraries, see the README file.
 
-CFLAGS = -g -O4 
+GCFLAGS = -g -O4 
 LDFLAGS = @GLBLDF@ -lstdc++
 INCFLAGS = @GLBINC@
+LTLDFLAGS = @LTGLBLDF@ -lstdc++ -all-static
+LTDLOPEN= -dlopen @GLBMODULEPATH@/@GLBMODULES@
+LTDEF= -DGLB_STATIC
 
-BIN = example-tour example1 example2 example3 example4
-OBJ = example-tour.o example1.o example2.o example3.o example4.o myio.o
+BIN = example-tour example1 example2 example3 example4 example-static
+OBJ = example-tour.o example1.o example2.o example3.o example4.o myio.o\
+example-static.o
+
+
 
 example-tour: example-tour.o
-	gcc $(CFLAGS) example-tour.o -o example-tour $(LDFLAGS) $(INCFLAGS)
+	gcc $(CFLAGS) $(GCFLAGS) example-tour.o -o example-tour $(LDFLAGS) $(INCFLAGS)
+
+example-static: example-static.o
+	libtool --mode=link g++ $(CFLAGS) example-static.o -o example-static\
+$(LTLDFLAGS) $(INCFLAGS) $(LTDLOPEN)
 
 example1: example1.o myio.o
-	gcc $(CFLAGS) example1.o myio.o -o example1 $(LDFLAGS) $(INCFLAGS)
+	gcc $(CFLAGS) $(GCFLAGS) example1.o myio.o -o example1 $(LDFLAGS) $(INCFLAGS)
 
 example2: example2.o myio.o
-	gcc $(CFLAGS) example2.o myio.o -o example2 $(LDFLAGS) $(INCFLAGS)
+	gcc $(CFLAGS) $(GCFLAGS) example2.o myio.o -o example2 $(LDFLAGS) $(INCFLAGS)
 
 example3: example3.o myio.o
-	gcc $(CFLAGS) example3.o myio.o -o example3 $(LDFLAGS) $(INCFLAGS)
+	gcc $(CFLAGS) $(GCFLAGS) example3.o myio.o -o example3 $(LDFLAGS) $(INCFLAGS)
 
 example4: example4.o myio.o
-	gcc $(CFLAGS) example4.o myio.o -o example4 $(LDFLAGS) $(INCFLAGS)
+	gcc $(CFLAGS) $(GCFLAGS) example4.o myio.o -o example4 $(LDFLAGS) $(INCFLAGS)
+
+example-static.o: example-tour.c
+	g++ $(CFLAGS) $(GCFLAGS) $(LTDEF) -c example-tour.c -o\
+ example-static.o $(INCFLAGS)
 
 # g++ is necessary because the syntax in the examples does not strictly
 # follow ANSI C for pedagogical reasons
 
 %.o : %.c
-	g++ $(CFLAGS) -c $< $(INCFLAGS)
+	g++ $(CFLAGS) $(GCFLAGS) -c $< $(INCFLAGS)
 .PHONY: clean
 clean:
 	rm $(BIN) $(OBJ)

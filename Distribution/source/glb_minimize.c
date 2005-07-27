@@ -206,7 +206,8 @@ static void init_mat(double **m, int dim)
 	{
 	  if (i==j)
 	    {
-	      m[i][j]=1.0;
+	     
+	      m[i][j]=0.1;
 	    }
 	  else
 	    {
@@ -1132,6 +1133,7 @@ static double glbChi1P(const glb_params in,
   int i,*b;
   int swit[37]; 
   int buff[37];
+  /*FIXME this should read buff= , that is the origin for the bug Campagne found */
   b=CheckProjection();
   for(i=0;i<6+glb_num_of_exps;i++) buff[i]=b[i];
   for(i=0;i<6+glb_num_of_exps;i++) swit[i]=GLB_FREE;

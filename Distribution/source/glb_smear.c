@@ -67,8 +67,7 @@ void glb_init_bin_data(glb_smear *in);
  *
  *
  * The following call sequence is our safety net:
- *   glb_smear *s;  
- *   s=glb_smear_alloc();
+ *   glb_smear *s;  *   s=glb_smear_alloc();
  *    user input (via parser)
  *   glb_default_smear(s);
  *   SetupSmearMatixX(s);
@@ -279,12 +278,13 @@ int glb_default_smear(glb_smear *in,const struct glb_experiment *head)
     }
    if(in->binsize==NULL&&s==0&&head->binsize!=NULL)
     {
-      /* In this case we assume that the bins are equidistant */
       in->binsize=(double *) glb_malloc(sizeof(double)*in->numofbins);
       for(i=0;i<in->numofbins;i++) in->binsize[i]=head->binsize[i];
     }
-
-  if(s==0) glb_init_bin_data(in);
+ 
+   if(s==0) {
+     glb_init_bin_data(in);
+   }
 
 
   /* simbincenter etc. will be intialized by InitSmearMatrix */
@@ -354,9 +354,7 @@ void glb_init_sim_bin_data(glb_smear *in)
     {
       med += in->simbinsize[i];
       in->simbincenter[i]=med-in->simbinsize[i]*0.5;
-    }
-  
-  
+    } 
 }
 
 double glb_lower_bin_boundary(int bin, const glb_smear *data)
@@ -500,20 +498,23 @@ static void SetupSmearMatrixA(glb_smear *test,const struct glb_experiment *head)
     }
 
 
- 
+
+
   if(test->simbinsize==NULL&&head->simbinsize!=NULL)
     {
       /* In this case we assume that the bins are equidistant */
       test->simbinsize=(double *) glb_malloc(sizeof(double)*test->simbins);
       for(i=0;i<test->simbins;i++) test->simbinsize[i]=head->simbinsize[i];
     }
-  
+
+
   if(test->simbinsize==NULL)
     {
       test->simbinsize=(double *) glb_malloc(sizeof(double)*test->simbins);
       med=(test->e_sim_max-test->e_sim_min)/test->simbins;
       for(i=0;i<test->simbins;i++) test->simbinsize[i]=med;
     }
+  
  
   glb_init_sim_bin_data(test);
   return;
@@ -530,11 +531,17 @@ void glb_set_up_smear_data(glb_smear *test,const struct glb_experiment *head)
 
   if(test->numofbins==-1) test->numofbins=head->numofbins;
      
-  if(test->binsize==NULL)
+  if(test->binsize==NULL&&head->binsize==NULL)
     {
       test->binsize=(double *) glb_malloc(sizeof(double)*test->numofbins);
       med=(test->e_max-test->e_min)/test->numofbins;
       for(i=0;i<test->numofbins;i++) test->binsize[i]=med;
+    }
+
+  if(test->binsize==NULL&&head->binsize!=NULL)
+    {
+      test->binsize=(double *) glb_malloc(sizeof(double)*test->numofbins);
+      for(i=0;i<test->numofbins;i++) test->binsize[i]=head->binsize[i];
     }
  
   glb_init_bin_data(test);
@@ -565,11 +572,17 @@ void glb_set_up_smear_data(glb_smear *test,const struct glb_experiment *head)
 	test->simbins=head->simbins;
     }
 
-  if(test->simbinsize==NULL)
+  if(test->simbinsize==NULL&&head->simbinsize==NULL)
     {
       test->simbinsize=(double *) glb_malloc(sizeof(double)*test->simbins);
       med=(test->e_sim_max-test->e_sim_min)/test->simbins;
       for(i=0;i<test->simbins;i++) test->simbinsize[i]=med;
+    }
+
+  if(test->simbinsize==NULL&&head->simbinsize!=NULL)
+    {
+      test->simbinsize=(double *) glb_malloc(sizeof(double)*test->simbins);
+      for(i=0;i<test->simbins;i++) test->simbinsize[i]=head->simbinsize[i];
     }
  
   glb_init_sim_bin_data(test);
@@ -735,7 +748,7 @@ void glb_compute_smearing_matrix(double ***matrix,
 			  int **low, int **up, glb_smear *in
 			   , const struct glb_experiment *head)
 {
-
+ 
   if(in->type==GLB_TYPE_A) {*matrix=SmearMatrixA(in,low,up,head);return;}
   if(in->type==GLB_TYPE_C) {*matrix=SmearMatrixC(in,low,up,head);return;}
   glb_fatal("Smear type out of range");

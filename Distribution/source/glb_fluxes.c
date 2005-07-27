@@ -43,7 +43,8 @@
 
 #define PI 3.1415
 #define NORM 6.02204*1E-12 //10^-38/u (atomic mass unit)
- 
+#define GLB_ELECTRON_MASS 0.511E-3 
+
 static double mmu = 0.1056;           // muon mass in GeV
 static double beam_pol = 0;           // beam polaristaion
 static double beam_en = 20;           // beam energy in GeV
@@ -180,9 +181,18 @@ static double fastflux_e(double en, double baseline)
 }
 //here ends the NuFact part
 
-static double nufact_flux(double en, double baseline, int polarity, int l, int anti)
+
+/* This type used for all builtin fluxes
+ * The need to take the energy, the polarity (ie. neutrinos/anti-neutrinos
+ * and they have to take the flavour argument. The need to return at least
+ * zero for any valid input. 
+ */
+typedef double (*flux_calc)(glb_flux *data, double en, int polarity, int l, int anti);
+
+static double nufact_flux(glb_flux *data, double en, int polarity, int l, int anti)
 {
   double ergebnis;
+  double baseline=1.0;
   ergebnis=0.0;
   if (l==1 && anti == 1 && polarity == 1)
     {
@@ -206,13 +216,45 @@ static double nufact_flux(double en, double baseline, int polarity, int l, int a
 }
 
 
+static double bb_spectrum(double gamma, double end_point, double enu)
+{
+  double part;
+  double result,root;
+  part=enu/(2*gamma*(end_point+GLB_ELECTRON_MASS));
+  if(part>=1) return 0.0;
+  /*  sign is now correct */
+  root=(1-part)*(1-part) - (GLB_ELECTRON_MASS/(end_point+GLB_ELECTRON_MASS))
+    *(GLB_ELECTRON_MASS/(end_point+GLB_ELECTRON_MASS));
+  if(root<=0) return 0.0;
+  result=enu*enu/gamma*(1-part)*sqrt(root);
+  return result;
+}
 
-static void nufact_flux_setup(glb_flux *data, int id,int pl)
+static double bb_flux(glb_flux *data, double en, int polarity, int l, int anti)
+{
+  double ergebnis;
+  ergebnis=0.0;
+  if (l==1 && anti == 1 && polarity == 1)
+    {
+      ergebnis=bb_spectrum(data->gamma,data->end_point,en);
+    }
+  if (l==1 && anti == -1 && polarity == -1)
+    {
+      ergebnis=bb_spectrum(data->gamma,data->end_point,en);
+    }
+
+
+  return ergebnis;
+}
+
+static void builtin_flux_setup(glb_flux *data, flux_calc flx, int id,int pl)
 {
   /* the id argument is unused */
-  double smb,pb,de;
+  double smb,pb,de,emax;
   int i;
-  de=data->parent_energy/501.0;
+  
+  if(data->builtin==1||data->builtin==2) de=data->parent_energy/501.0;
+  if(data->builtin==3||data->builtin==4) de=2 * data->gamma * (data->end_point + GLB_ELECTRON_MASS)/501.0;
   smb=stored_muons;
   pb=power;
   stored_muons=data->stored_muons;
@@ -222,12 +264,12 @@ static void nufact_flux_setup(glb_flux *data, int id,int pl)
   for(i=0;i<501;i++)
     {
       data->flux_storage[i][0]=i*de;
-      data->flux_storage[i][1]=nufact_flux(i*de,1.0,pl,1,+1); 
-      data->flux_storage[i][2]=nufact_flux(i*de,1.0,pl,2,+1); 
-      data->flux_storage[i][3]=nufact_flux(i*de,1.0,pl,3,+1); 
-      data->flux_storage[i][4]=nufact_flux(i*de,1.0,pl,1,-1); 
-      data->flux_storage[i][5]=nufact_flux(i*de,1.0,pl,2,-1); 
-      data->flux_storage[i][6]=nufact_flux(i*de,1.0,pl,3,-1); 
+      data->flux_storage[i][1]=flx(data,i*de,pl,1,+1); 
+      data->flux_storage[i][2]=flx(data,i*de,pl,2,+1); 
+      data->flux_storage[i][3]=flx(data,i*de,pl,3,+1); 
+      data->flux_storage[i][4]=flx(data,i*de,pl,1,-1); 
+      data->flux_storage[i][5]=flx(data,i*de,pl,2,-1); 
+      data->flux_storage[i][6]=flx(data,i*de,pl,3,-1); 
     }
   power=pb;
   stored_muons=smb;
@@ -235,8 +277,13 @@ static void nufact_flux_setup(glb_flux *data, int id,int pl)
 
 void glb_init_fluxtables(glb_flux *data,int pos)
 {
-  if(data->builtin==1) nufact_flux_setup(data,pos,+1);
-  if(data->builtin==2) nufact_flux_setup(data,pos,-1);
+  
+  if(data->builtin==1) builtin_flux_setup(data,&nufact_flux,pos,+1);
+  if(data->builtin==2) builtin_flux_setup(data,&nufact_flux,pos,-1);
+
+  if(data->builtin==3) builtin_flux_setup(data,&bb_flux,pos,+1);
+  if(data->builtin==4) builtin_flux_setup(data,&bb_flux,pos,-1);
+
   if(data->builtin==0) glb_flux_loader(data,pos,+1);
   
 }
@@ -255,11 +302,9 @@ static double norm2(int type)
       break;
     case 2: erg=NORM*100; //NuFact
       break;   
-    case 3: erg=NORM*295*295*9.92033*1E6;//NUMI Beam (9@712) 
+    case 3: erg=NORM*100;//NUMI Beam (9@712) 
       break;
-    case 4: erg=NORM*295*295*9.92033*1E6; //NUMI Beam (9@712) 
-      break;
-    case 5: erg=NORM*295*295*9.92033*1E6; //NUMI Beam (12@712) 
+    case 4: erg=NORM*100; //NUMI Beam (9@712) 
       break;
     default: erg=NORM*295*295*9.92033*1E6;
       break;

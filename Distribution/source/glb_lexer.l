@@ -67,7 +67,7 @@ static int cond_buf_str;
 static char *fnbuf,*fnbuf2;
 static size_t len,i;
 
-
+void glb_lexer_cleanup();
 
 
 %}
@@ -116,7 +116,6 @@ fprintf( stderr, "FATAL: Includes nested too deeply\n" );
 exit( 1 );
 }
 
-
 if(include_stack_ptr==0) 
 {
 file_name_buf[include_stack_ptr]=glb_file_id;
@@ -146,7 +145,6 @@ file_name_buf[include_stack_ptr]=(char*) strdup(fnbuf2);
 glb_file_id=file_name_buf[include_stack_ptr];
 line_buf[include_stack_ptr]=glb_line_num;
 glb_line_num=0;
-
 glb_free(fnbuf);
 glb_free(fnbuf2);
 
@@ -163,6 +161,8 @@ BEGIN(cond_buf_i);
 {
 glb_copy_buff();
 glbReset();
+/* This lines fixes a tricky bug in the parser */
+include_stack_ptr=0;
 yyterminate();
 }
 else

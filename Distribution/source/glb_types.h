@@ -49,6 +49,8 @@ typedef struct {
   double stored_muons;
   double target_power;
   double norm;
+  double gamma;
+  double end_point;
   double** flux_storage;
 } glb_flux;
 

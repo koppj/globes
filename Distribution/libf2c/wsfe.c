@@ -2,6 +2,11 @@
 #include "f2c.h"
 #include "fio.h"
 #include "fmt.h"
+
+#if HAVE_CONFIG_H
+#  include <config.h>
+#endif
+
 extern int f__hiwater;
 
 #ifdef KR_headers

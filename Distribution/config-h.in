@@ -82,6 +82,9 @@
 /* Define to 1 if you have the `f2c' library (-lf2c). */
 #undef HAVE_LIBF2C
 
+/* Define to 1 if you have the `g2c' library (-lg2c). */
+#undef HAVE_LIBG2C
+
 /* Define to 1 if you have the `gsl' library (-lgsl). */
 #undef HAVE_LIBGSL
 

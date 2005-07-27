@@ -1353,9 +1353,7 @@ void
 glb_init(char *name)
 {
   int i;
-  fprintf(stderr,"\n************************************\n");
-  fprintf(stderr,"* This is a beta version of GLoBES *\n");
-  fprintf(stderr,"************************************\n\n");
+
   atexit(final_clean);
   glb_prog_name_init(name);
   glb_setup_path();

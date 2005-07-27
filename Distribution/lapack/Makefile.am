@@ -1,5 +1,6 @@
 
 if WANT_LAPACK
+INCLUDES = $(F2CINC)
 noinst_LTLIBRARIES = libglblapack.la
 libglblapack_la_SOURCES = dcabs1.c  dzasum.c  zaxpy.c   zgeev.c   zlacgv.c\
   zlarf.c   zlassq.c  ztrsv.c lsame.c\
@@ -10,4 +11,5 @@ dlapy2.c  ilaenv.c  zdscal.c  zgemv.c   zlahrd.c  zlarfx.c  ztrevc.c\
 dlapy3.c  izamax.c  zgebak.c  zgerc.c   zlange.c  zlascl.c  ztrmm.c\
 dscal.c   xerbla.c  zgebal.c  zhseqr.c  zlanhs.c  zlaset.c  ztrmv.c
 libglblapack_la_LDFLAGS = @LIBS@ -static
+libglblapack_la_CFLAGS = -ffloat-store
 endif
