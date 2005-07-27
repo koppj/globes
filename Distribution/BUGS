@@ -92,7 +92,18 @@ Date: 07.03.05
 
 -------------------------------------------------------------------------------
 
-BUG#8 Include works only for the first call of glbInitExperiment
+BUG#8 Error in the glb-files for neutrino factories
+
+Form: Mark Rolinec
+Date: 09/03/2005
+
+        Efficiencies for neutrino and anti-neutrino interchanged. Background
+        definition unclear. This is not expected to change any physics results
+        noticeably.
+
+-------------------------------------------------------------------------------
+
+BUG#9 Include works only for the first call of glbInitExperiment
 
 From: Patrick Huber
 Date: 30.04.05

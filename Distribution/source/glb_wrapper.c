@@ -45,6 +45,13 @@
 
 #include "glb_wrapper.h"
 
+/* The global global variables */
+int glb_num_of_exps;
+glb_exp glb_experiment_list[32];
+int glb_rule_number;
+
+
+
 #define obstack_chunk_alloc glb_malloc
 #define obstack_chunk_free glb_free
 

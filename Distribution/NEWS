@@ -244,6 +244,77 @@ documented!
 	oscillation parameter now are the same as in the documentation, dm21 was 10 times larger. 
 
 03/06/05 Version 2.3.5
-	Fixed a bug in glb_lexer.l The consequence of this bug was that the include feature in AEDL did not
-	work for files which where not parsed by the first invocation of glbInitExperiment. The reason was that
-	include_stack_ptr was not properly reset at EOF. This fixes BUG#8.
+	Fixed a bug in glb_lexer.l The consequence of this bug was
+	that the include feature in AEDL did not work for files which
+	where not parsed by the first invocation of
+	glbInitExperiment. The reason was that include_stack_ptr was
+	not properly reset at EOF. This fixes BUG#9.
+
+******** Version 2.3.7
+
+27/07/05 At this point we're merging most of the features which were
+	new in 2.0.11 back into the main development branch. What
+	follows is a verbatim copy of the NEWS file of 2.0.11:
+	
+	<-BEGIN-QUOTE->
+
+        This version is the attempt to solve various installation
+        problems and to increase the portability of globes.
+
+        Serious problems have been encountered on various versions of
+        the RedHat/Fedora distribution. Most of those issues can be
+        avoided by using the now embedded libraries needed for the
+        interface to LAPACK. libf2c, BLAS and LAPACK are embedded and
+        can be used in a convenience mode, i.e. they are no longer
+        required to be installed on a system in order to compile
+        GLoBES. If they are installed, the installed versions will be
+        used otherwise the embedded versions are used. One can
+        specifiy the options `--enable-lapack-convenience' and/or
+        `--enable-libf2c-convenience' to configure in order to
+        avoid using any installed versions. This is useful when
+        compiling things for a target installation which is lacking
+        those or where those libraries do not work (e.g. Fedora Core
+        3). Moreover libg2c is now also accepted by configure.
+
+        We now also have a 'globes-config' script which takes a few
+        options and allows to extract e.g the linker flags.
+
+        The test for GSL is now performed with AM_GSL_PATH which
+        allows the user to (optionally) specifiy the path to
+        libgsl. This is especially useful if o ne tries to install
+        globes in presence of a uncooperative sysadmin.
+
+	<-SNIP->	
+
+	Fixed the include files for GSL, thus using
+	'--with-gsl-prefix' now should work seemlessly. Removed the
+	'-static' flag from the linker o ptions for lapack and
+	libf2c. This may slow down compilation but ensures a prop er
+        build on some 64bit platforms. GLoBES should now also build
+        and work on 64bit platforms. There were basically three
+        problems: old version of autotools, the length of integers as
+        used by libf2c and C and some problem with a relocation,
+        which seems to happen on platforms supporting both 32 and
+        64bit applications.
+
+	<-END-QUOTE->	
+
+	Also from the NEWS file of 2.0.11
+
+	<-BEGIN-QUOTE->	
+
+	Added libgnu support to have fallbacks for argp and obstacks,
+	since they seem not to work properly on Mac OS. argp.m4
+	changed such that argp is only taken from gnulib when absent
+        on the system.
+
+	<-END-QUOTE->
+	
+	I tried to solve the problem with multiple definitions (they
+	were the main cause for GLoBES not building on Mac). There I
+	run into a new problem with SWIG. Somehow SWIG needs to have
+	glb_exp glb_experiment_list to be specifically defined, which
+	really looks strange to me. I hope I didn't create any bigger
+	problems. But Perl support anyway is optional.
+
+	BUGS #5-#9 are fixed.

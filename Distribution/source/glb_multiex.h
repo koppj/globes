@@ -28,8 +28,8 @@
 
 #include "glb_types.h"
 
-struct glb_systematic sys_list[32];
-struct glb_systematic sys_calc[32];
+extern struct glb_systematic sys_list[32];
+extern struct glb_systematic sys_calc[32];
 
 
 void glb_set_profile_scaling(double scale,int i);

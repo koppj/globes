@@ -65,6 +65,8 @@
 #include "glb_error.h"
 #include "glb_wrapper.h"
 
+/* global variabels */
+int glb_single_experiment_number=0;
 
 
 /* Warning-- fiddling around with these in general may

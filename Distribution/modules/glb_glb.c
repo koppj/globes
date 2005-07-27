@@ -25,6 +25,11 @@
 #include "source/glb_wrapper.h"
 #include "source/glb_error.h"
 
+char **glb_path_vector;
+size_t glb_path_vector_length;
+
+
+
 void glbInit(char *name)
 {
   glb_dlhandle prior;
@@ -38,3 +43,4 @@ void glbInit(char *name)
   if(prior==NULL) glb_fatal("Could not load glb_prior_module");
   glbUsePrior(prior); 
 }
+

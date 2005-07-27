@@ -27,10 +27,10 @@
 #define GLB_LEXER_H 1
 
 int yylex (void); 
-int glb_line_num;
+extern int glb_line_num;
 int yywarn (const char *s);
-FILE* yyin;
-char *glb_file_id;
+extern FILE* yyin;
+extern char *glb_file_id;
 void glb_lexer_cleanup();
 
 #endif /* GLB_LEXER_H */

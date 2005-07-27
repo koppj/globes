@@ -24,6 +24,6 @@
 #ifndef GLB_VERSION_H
 #define GLB_VERSION_H 1
 
- const char *glb_release_version;
+extern const char *glb_release_version;
 
 #endif /* GLB_VERSION_H */ 

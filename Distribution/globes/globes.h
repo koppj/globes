@@ -76,13 +76,21 @@ typedef struct glb_params_type  *glb_params;
 
 typedef struct glb_experiment *glb_exp;
 
-char **glb_path_vector;
-size_t glb_path_vector_length;
+extern char **glb_path_vector;
+extern size_t glb_path_vector_length;
 
-int glb_num_of_exps;
-int glb_single_experiment_number;
+extern int glb_num_of_exps;
+extern int glb_single_experiment_number;
+#ifdef SWIG
+/* I really have no clue why I have to 
+ * declare this one to SWIG and the other global 
+ * variables not
+ */
 glb_exp glb_experiment_list[32];
-int glb_rule_number;
+#else
+extern glb_exp glb_experiment_list[32];
+#endif
+extern int glb_rule_number;
 
 BEGIN_C_DECLS
 

@@ -50,8 +50,8 @@ int glb_set_starting_values(double a,double b, double c,double d,
 		      double e, double f);
 
 
-int (*glb_user_defined_starting_values)(const glb_params);
-int (*glb_user_defined_input_errors)(const glb_params);
+extern int (*glb_user_defined_starting_values)(const glb_params);
+extern int (*glb_user_defined_input_errors)(const glb_params);
 
 double* glb_return_input_errors();
 double* glb_return_input_values();
@@ -60,14 +60,14 @@ double* glb_return_input_values();
 
 // various projections with th12 fixed for a single experiment
 // as determined by glb_single_experiment_number
-int glb_single_experiment_number;
+extern int glb_single_experiment_number;
 
 /* This will be part of the interface to arbitrary chi^2 functions and
  * minimizers. This is right now only needed by user_chi.c.
  */
 
-double *glb_sys_errors;
-double *glb_sys_centers;
+extern double *glb_sys_errors;
+extern double *glb_sys_centers;
 
 struct glb_systematic glb_init_systematic(double (*chi_func)(),int dimension,
 			    double *sp, double *errors, double (*evalf)(),

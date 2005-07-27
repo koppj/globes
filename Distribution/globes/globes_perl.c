@@ -276,7 +276,7 @@ SWIG_UnpackData(char *c, void *ptr, int sz) {
  * perl5.swg
  *
  * Perl5 runtime library
- * $Header: /home/lin/globes/cvs-noaccess/Projects/GLOBES/Distribution/globes/globes_perl.c,v 1.2 2005/07/27 16:52:45 globes Exp $
+ * $Header: /home/lin/globes/cvs-noaccess/Projects/GLOBES/Distribution/globes/globes_perl.c,v 1.3 2005/07/27 19:49:05 globes Exp $
  * ----------------------------------------------------------------------------- */
 
 #define SWIGPERL
@@ -797,6 +797,11 @@ SWIGEXPORT(void) SWIG_init (pTHXo_ CV* cv);
 SWIGEXPORT(void) SWIG_init (CV *cv, CPerlObj *);
 #endif
 
+extern char **glb_path_vector;
+extern size_t glb_path_vector_length;
+extern int glb_num_of_exps;
+extern int glb_single_experiment_number;
+extern int glb_rule_number;
 
 #include "globes.h"
   int PInit(char *file)

@@ -161,7 +161,7 @@ BEGIN(cond_buf_i);
 {
 glb_copy_buff();
 glbReset();
-/* This lines fixes a tricky bug in the parser */
+/* BUGFIX #9 -- This lines fixes a tricky bug in the parser */
 include_stack_ptr=0;
 yyterminate();
 }

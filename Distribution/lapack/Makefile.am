@@ -10,6 +10,6 @@ dlamch.c  ieeeck.c  zdotu.c   zgemm.c   zlahqr.c  zlarft.c  zswap.c   zungqr.c\
 dlapy2.c  ilaenv.c  zdscal.c  zgemv.c   zlahrd.c  zlarfx.c  ztrevc.c\
 dlapy3.c  izamax.c  zgebak.c  zgerc.c   zlange.c  zlascl.c  ztrmm.c\
 dscal.c   xerbla.c  zgebal.c  zhseqr.c  zlanhs.c  zlaset.c  ztrmv.c
-libglblapack_la_LDFLAGS = @LIBS@ -static
+libglblapack_la_LDFLAGS = @LIBS@
 libglblapack_la_CFLAGS = -ffloat-store
 endif

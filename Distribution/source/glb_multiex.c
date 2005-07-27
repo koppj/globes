@@ -46,6 +46,10 @@
 
 #define PI 3.1415
 
+/* global variables */
+struct glb_systematic sys_list[32];
+struct glb_systematic sys_calc[32];
+
 
 static struct glb_experiment MInitMemory0(struct glb_experiment in);
 

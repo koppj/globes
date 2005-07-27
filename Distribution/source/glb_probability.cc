@@ -48,11 +48,15 @@ static double filter=1E9;
 static int filter_state=0;
 
 
-// interface to zgeev_ of netlib 
-extern "C" void zgeev_(char* jobvl, char* jobvr, int* n,
- complex<FLOAT>* a, int* lda, complex<FLOAT>* w,
- complex<FLOAT>* vl, int* ldvl, complex<FLOAT>* vr, int* ldvr,
- complex<FLOAT>* work, int* lwork, FLOAT* rwork, int* info); 
+/* interface to zgeev_ of netlib 
+ * using long instead of int ensures that globes works an a 64bit
+ * platform with a 64bit LAPACK, since long is 32bit on a 32bit
+ * machine and 64 bit on 64 bit machine
+ */
+extern "C" void zgeev_(char* jobvl, char* jobvr, long* n,
+ complex<FLOAT>* a, long* lda, complex<FLOAT>* w,
+ complex<FLOAT>* vl, long* ldvl, complex<FLOAT>* vr, long* ldvr,
+ complex<FLOAT>* work, long* lwork, FLOAT* rwork, long* info);
 
 
 
@@ -97,18 +101,18 @@ static double solar_mixing;
 
 static char jobvl='N';
 static char jobvr='V';
-static int n=3;
+static long n=3;
 static complex<FLOAT> a[3][3];
 static complex<FLOAT> w[3];
 static complex<FLOAT> vl[3][3];
 static complex<FLOAT> vr[3][3];
 static complex<FLOAT> work[LWORK];
 static FLOAT rwork[6];
-static int lda=3;
-static int ldvl=3;
-static int ldvr=3;
-static int lwork=LWORK;
-static int info;
+static long lda=3;
+static long ldvl=3;
+static long ldvr=3;
+static long lwork=LWORK;
+static long info;
 
 // Matter profile storage
 static double* length=NULL;    // Pointer on array of length values of the matter profile

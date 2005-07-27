@@ -28,23 +28,23 @@
 
 #include "glb_types.h"
 
-int glb_num_of_rules;
-double glb_glb_sig_norm_error[32];
-double glb_sig_tilt_error[32];
-double glb_bg_norm_error[32];
-double glb_bg_tilt_error[32];
-double glb_bg_norm_center[32];
-double glb_bg_tilt_center[32];
+extern int glb_num_of_rules;
+extern double glb_glb_sig_norm_error[32];
+extern double glb_sig_tilt_error[32];
+extern double glb_bg_norm_error[32];
+extern double glb_bg_tilt_error[32];
+extern double glb_bg_norm_center[32];
+extern double glb_bg_tilt_center[32];
 
-double glb_tre_null_center[32];
-double glb_tre_tilt_center[32];
-double glb_tre_null_error[32];
-double glb_tre_tilt_error[32];
+extern double glb_tre_null_center[32];
+extern double glb_tre_tilt_center[32];
+extern double glb_tre_null_error[32];
+extern double glb_tre_tilt_error[32];
 
-int glb_calc_simbins;
-double glb_calc_simtresh;
-double glb_calc_simbeam;
-double glb_calc_energy_window[32][2];
+extern int glb_calc_simbins;
+extern double glb_calc_simtresh;
+extern double glb_calc_simbeam;
+extern double glb_calc_energy_window[32][2];
 
 
 void glb_set_baseline(double l);
@@ -118,37 +118,37 @@ double glb_window_function(double low,double up,int bin);
 double glb_chi_sys_w_bg_calib(double x[5]);
 void glb_shift_energy_scale(double g,double* ratesin, double* ratesout);
 
-double* glb_chirate;
-double** glb_calc_smearing[32];
-int* glb_calc_uprange[32];
-int* glb_calc_lowrange[32];
-double* glb_calc_signal_rates[32];
-double* glb_calc_bg_rates[32]; 
-double* glb_calc_rates_0[32];
-double* glb_calc_rates_1[32];
-double* glb_calc_rates_1T[32];
-double* glb_calc_rates_1BG[32];
-double* glb_calc_rates_1BGT[32];
-double* glb_calc_energy_tab;
-double* glb_calc_ratevec[32];
-double* glb_calc_glb_calc_ratevec_bg[32];
+extern double* glb_chirate;
+extern double** glb_calc_smearing[32];
+extern int* glb_calc_uprange[32];
+extern int* glb_calc_lowrange[32];
+extern double* glb_calc_signal_rates[32];
+extern double* glb_calc_bg_rates[32]; 
+extern double* glb_calc_rates_0[32];
+extern double* glb_calc_rates_1[32];
+extern double* glb_calc_rates_1T[32];
+extern double* glb_calc_rates_1BG[32];
+extern double* glb_calc_rates_1BGT[32];
+extern double* glb_calc_energy_tab;
+extern double* glb_calc_ratevec[32];
+extern double* glb_calc_glb_calc_ratevec_bg[32];
 
-glb_smear *glb_calc_smear_data[32];
+extern glb_smear *glb_calc_smear_data[32];
 
-glb_flux *glb_calc_fluxes[32];
-glb_xsec *glb_calc_xsecs[32];
+extern glb_flux *glb_calc_fluxes[32];
+extern glb_xsec *glb_calc_xsecs[32];
 
-double *glb_calc_buffer;
-double *glb_calc_chrb[32];
-double *glb_calc_chra[32];
+extern double *glb_calc_buffer;
+extern double *glb_calc_chrb[32];
+extern double *glb_calc_chra[32];
 
-double *glb_calc_user_pre_sm_channel[32];
-double *glb_calc_user_post_sm_channel[32];
-double *glb_calc_user_pre_sm_background[32];
-double *glb_calc_user_post_sm_background[32];
+extern double *glb_calc_user_pre_sm_channel[32];
+extern double *glb_calc_user_post_sm_channel[32];
+extern double *glb_calc_user_pre_sm_background[32];
+extern double *glb_calc_user_post_sm_background[32];
 
-double* glb_calc_efficiencies[32];
-double* glb_calc_const_background[32];
+extern double* glb_calc_efficiencies[32];
+extern double* glb_calc_const_background[32];
 
 
 #endif /* GLB_CALC_H */
