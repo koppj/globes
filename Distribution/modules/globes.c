@@ -46,7 +46,7 @@
 #endif /* TEST */
 
 const char *argp_program_version =
-"globes "VERSION"\n(C) 2002 - 2004 The GLoBES Team\n"
+"globes "VERSION"\n(C) 2002 - 2005 The GLoBES Team\n"
 "This is free software see the source for copying conditions. There is NO\n"
 "warranty; not even for MERCHANTABILITY or"
 " FITNESS FOR A PARTICULAR PURPOSE.";

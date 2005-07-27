@@ -1,10 +1,14 @@
 The GLoBES Team (currently active authors):
 
-Patrick Huber <phuber@ph.tum.de>
+Patrick Huber <phuber@physics.wisc.edu>
 	most of the C programs
+Joachim Kopp <joachim.kopp@ph.tum.de>
+	C programing
 Manfred Lindner <mlindner@ph.tum.de>
 	web page & testing
-Walter Winter <wwinter@ph.tum.de>
+Mark Rolinec <mark.rolinec@ph.tum.de>
+	glb-files & graphics
+Walter Winter <wwinter@ias.edu>
 	documentation & examples
 
 Former contributors:
