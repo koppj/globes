@@ -35,9 +35,14 @@
 # replaced by the respective library, such as libglobes.so.0.0.1
 
 
+libdir = @libdir@
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+
+
 CFLAGS = -g -O4 
 local_LDFLAGS = @GLBLDF@ -lstdc++
-local_LTLDFLAGS = @LTGLBLDF@ -lstdc++
+local_LTLDFLAGS = $(libdir)/libglobes.la $(libdir)/libglb.la -lstdc++
 INCFLAGS = @GLBINC@
 
 

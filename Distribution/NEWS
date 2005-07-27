@@ -321,3 +321,6 @@ documented!
 
 	Merged Walter's code with support for more than 6 oscillation
 	parameters.
+
+	Fixed a little problem in the examples Makefile, should now 
+	work for all types of installation (prefix vs no prefix)

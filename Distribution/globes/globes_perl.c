@@ -276,7 +276,7 @@ SWIG_UnpackData(char *c, void *ptr, int sz) {
  * perl5.swg
  *
  * Perl5 runtime library
- * $Header: /home/lin/globes/cvs-noaccess/Projects/GLOBES/Distribution/globes/globes_perl.c,v 1.4 2005/07/27 20:54:17 globes Exp $
+ * $Header: /home/lin/globes/cvs-noaccess/Projects/GLOBES/Distribution/globes/globes_perl.c,v 1.5 2005/07/27 22:49:24 globes Exp $
  * ----------------------------------------------------------------------------- */
 
 #define SWIGPERL

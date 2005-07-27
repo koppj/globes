@@ -38,6 +38,11 @@
 
 #include <globes/globes.h>
 
+/* global variables */
+char **glb_path_vector;
+size_t glb_path_vector_length;
+
+
 /* This function is taken from the GNU C library reference manual */
 static char *my_getcwd ()
 {

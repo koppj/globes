@@ -325,7 +325,7 @@ target_alias = @target_alias@
 @WANT_LAPACK_TRUE@dlapy3.c  izamax.c  zgebak.c  zgerc.c   zlange.c  zlascl.c  ztrmm.c\
 @WANT_LAPACK_TRUE@dscal.c   xerbla.c  zgebal.c  zhseqr.c  zlanhs.c  zlaset.c  ztrmv.c
 
-@WANT_LAPACK_TRUE@libglblapack_la_LDFLAGS = @LIBS@ -static
+@WANT_LAPACK_TRUE@libglblapack_la_LDFLAGS = @LIBS@
 @WANT_LAPACK_TRUE@libglblapack_la_CFLAGS = -ffloat-store
 all: all-am
 

@@ -94,10 +94,12 @@ LTGLBMLDF="${GLBLDR}libglb.la -Wl,--rpath -Wl,${GLBLDR}"
 LTGLBINC="-I${prefix}/include/"
 standard="no"
 
+
+
 dnl trying to support all static linking via libtool and dlopen
 dnl no prefix given
 if test $prefix = NONE; then
-  LTGLBLDF="-lglobes -lglb"
+  LTGLBLDF="$(libdir)/libglobes.la $(libdir)/libglb.la"
   LTGLBMLDF="-lglb"
   LTGLBINC=""
   standard="yes"	
@@ -233,6 +235,8 @@ AC_CONFIG_FILES([Makefile lib/Makefile libf2c/Makefile lapack/Makefile\
  data/Makefile modules/MakefileExample modules/Makefile globes-config.src\
  globes-module.src libltdl/Makefile])
 
+	
+
 AC_OUTPUT
 dnl getting the permissions right
 chmod u+x globes/example.pl
@@ -258,3 +262,4 @@ else
  echo "* Do not forget to add ${prefix}/bin to your path! *"
  echo "***********************${stars}********************"
 fi
+
