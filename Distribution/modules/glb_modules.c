@@ -25,11 +25,12 @@
 #include <string.h>
 #include <unistd.h>
 #include <globes/globes.h>
-#include <globes/glb-modules.h>
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
+
+
 
 #include "source/glb_path.h"
 #include "source/glb_error.h"
@@ -39,6 +40,8 @@
 
 
 #ifndef GLB_WO_MODULES
+
+#include <globes/glb-modules.h>
 
 
 /* Init function to be called by glbInit */

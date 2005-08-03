@@ -59,6 +59,8 @@ Known values for OPTION are:
   --module-libs         print linking information for modules
   --ltlibs              print linking information for use with libtool
   --dlpreopen           list of modules, which should be dlpreopened
+  --include             print information, where to find the globes 
+                        header files
   --cflags		print pre-processor and compiler flags
   --help		display this help and exit
   --version		output version information

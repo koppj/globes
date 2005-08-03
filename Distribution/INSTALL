@@ -242,8 +242,18 @@ called 'gsl-devel'. Altnernatively you can install GSL from a tar-ball and use t
 Platforms
 =========
 
-GLoBES should build and install on 64bit Linux systems.
+GLoBES builds and installs on 64bit Linux systems.
 GLoBES should work on Mac OS.
+
+Windows
+-------
+
+Currently GLoBES is only able to work under Cygwin www.cygwin.com.
+Inside Cygwin GLoBES needs to be built with these commands:
+	configure --disable-modules --disable-perl --enable-libf2c-convenience
+	make LDFLAGS='-no-undefined'
+
+
 
 Compilers and Options
 =====================

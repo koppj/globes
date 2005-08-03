@@ -467,7 +467,7 @@ ac_includes_default="\
 
 gl_func_list=
 gl_header_list=
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT GLBLIBVERSION GLB_WO_MODULES_TRUE GLB_WO_MODULES_FALSE GLBMODULES CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE CPP EGREP CXX CXXFLAGS ac_ct_CXX CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE LN_S YACC LEX LEXLIB LEX_OUTPUT_ROOT HAVE_LIBTOOL build build_cpu build_vendor build_os host host_cpu host_vendor host_os ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB DLLTOOL ac_ct_DLLTOOL AS ac_ct_AS OBJDUMP ac_ct_OBJDUMP CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL ALLOCA ALLOCA_H NO_ARGP_TRUE NO_ARGP_FALSE LIBOBJS GETOPT_H SYSEXITS_H INSTALL_LTDL_TRUE INSTALL_LTDL_FALSE CONVENIENCE_LTDL_TRUE CONVENIENCE_LTDL_FALSE LIBADD_DL LIBTOOL_DEPS LTDLINCL LIBLTDL SWIG SWIG_LIB perl perl_installdir perl_includes perl_cflags PERL_TRUE PERL_FALSE shrext_cmds really_build_perl GSL_CONFIG GSL_CFLAGS GSL_LIBS GSLINC WANT_LIBF2C_TRUE WANT_LIBF2C_FALSE F2CCONVENIENCE F2CINC WANT_LAPACK_TRUE WANT_LAPACK_FALSE BLCONVENIENCE RPM_RELEASE RPM_ARCHS RPM_PROG RPM_CLEAN_NAMES RPM_SRC_DIR RPM_SRPM_NAME RPM_SOURCE_DIR RPM_BUILD_DIR RPM_DIR RPM_TARGET RPM_ARGS RPM_TARBALL RPM_VERSION RPM_CONFIGURE_ARGS MAKE_RPMS_TRUE MAKE_RPMS_FALSE LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT GLBLIBVERSION GLB_WO_MODULES_TRUE GLB_WO_MODULES_FALSE GLBMODULES CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE CPP EGREP CXX CXXFLAGS ac_ct_CXX CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE LN_S YACC LEX LEXLIB LEX_OUTPUT_ROOT HAVE_LIBTOOL build build_cpu build_vendor build_os host host_cpu host_vendor host_os ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB DLLTOOL ac_ct_DLLTOOL AS ac_ct_AS OBJDUMP ac_ct_OBJDUMP CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL ALLOCA ALLOCA_H LIBOBJS GETOPT_H NO_ARGP_TRUE NO_ARGP_FALSE SYSEXITS_H INSTALL_LTDL_TRUE INSTALL_LTDL_FALSE CONVENIENCE_LTDL_TRUE CONVENIENCE_LTDL_FALSE LIBADD_DL LIBTOOL_DEPS LTDLINCL LIBLTDL SWIG SWIG_LIB perl perl_installdir perl_includes perl_cflags PERL_TRUE PERL_FALSE shrext_cmds really_build_perl GSL_CONFIG GSL_CFLAGS GSL_LIBS GSLINC WANT_LIBF2C_TRUE WANT_LIBF2C_FALSE F2CCONVENIENCE F2CINC WANT_LAPACK_TRUE WANT_LAPACK_FALSE BLCONVENIENCE RPM_RELEASE RPM_ARCHS RPM_PROG RPM_CLEAN_NAMES RPM_SRC_DIR RPM_SRPM_NAME RPM_SOURCE_DIR RPM_BUILD_DIR RPM_DIR RPM_TARGET RPM_ARGS RPM_TARBALL RPM_VERSION RPM_CONFIGURE_ARGS MAKE_RPMS_TRUE MAKE_RPMS_FALSE LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -22575,7 +22575,8 @@ fi
 
 
 
-          echo "$as_me:$LINENO: checking for argp_parse" >&5
+
+  echo "$as_me:$LINENO: checking for argp_parse" >&5
 echo $ECHO_N "checking for argp_parse... $ECHO_C" >&6
 if test "${ac_cv_func_argp_parse+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
@@ -22673,6 +22674,151 @@ fi
 
 
   if test $ac_cv_func_argp_works = no; then
+        echo "$as_me:$LINENO: checking for _getopt_long_only_r" >&5
+echo $ECHO_N "checking for _getopt_long_only_r... $ECHO_C" >&6
+if test "${ac_cv_func__getopt_long_only_r+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+/* Define _getopt_long_only_r to an innocuous variant, in case <limits.h> declares _getopt_long_only_r.
+   For example, HP-UX 11i <limits.h> declares gettimeofday.  */
+#define _getopt_long_only_r innocuous__getopt_long_only_r
+
+/* System header to define __stub macros and hopefully few prototypes,
+    which can conflict with char _getopt_long_only_r (); below.
+    Prefer <limits.h> to <assert.h> if __STDC__ is defined, since
+    <limits.h> exists even on freestanding compilers.  */
+
+#ifdef __STDC__
+# include <limits.h>
+#else
+# include <assert.h>
+#endif
+
+#undef _getopt_long_only_r
+
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char _getopt_long_only_r ();
+/* The GNU C library defines this for functions which it implements
+    to always fail with ENOSYS.  Some functions are actually named
+    something starting with __ and the normal name is an alias.  */
+#if defined (__stub__getopt_long_only_r) || defined (__stub____getopt_long_only_r)
+choke me
+#else
+char (*f) () = _getopt_long_only_r;
+#endif
+#ifdef __cplusplus
+}
+#endif
+
+int
+main ()
+{
+return f != _getopt_long_only_r;
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_func__getopt_long_only_r=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ac_cv_func__getopt_long_only_r=no
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+fi
+echo "$as_me:$LINENO: result: $ac_cv_func__getopt_long_only_r" >&5
+echo "${ECHO_T}$ac_cv_func__getopt_long_only_r" >&6
+if test $ac_cv_func__getopt_long_only_r = yes; then
+  :
+else
+
+  GETOPT_H=getopt.h
+  case $LIBOBJS in
+    "getopt.$ac_objext"   | \
+  *" getopt.$ac_objext"   | \
+    "getopt.$ac_objext "* | \
+  *" getopt.$ac_objext "* ) ;;
+  *) LIBOBJS="$LIBOBJS getopt.$ac_objext" ;;
+esac
+
+  case $LIBOBJS in
+    "getopt1.$ac_objext"   | \
+  *" getopt1.$ac_objext"   | \
+    "getopt1.$ac_objext "* | \
+  *" getopt1.$ac_objext "* ) ;;
+  *) LIBOBJS="$LIBOBJS getopt1.$ac_objext" ;;
+esac
+
+
+cat >>confdefs.h <<\_ACEOF
+#define optarg rpl_optarg
+_ACEOF
+
+
+cat >>confdefs.h <<\_ACEOF
+#define optind rpl_optind
+_ACEOF
+
+
+cat >>confdefs.h <<\_ACEOF
+#define optopt rpl_optopt
+_ACEOF
+
+
+cat >>confdefs.h <<\_ACEOF
+#define getopt rpl_getopt
+_ACEOF
+
+
+cat >>confdefs.h <<\_ACEOF
+#define getopt_long rpl_getopt_long
+_ACEOF
+
+
+cat >>confdefs.h <<\_ACEOF
+#define getopt_long_only rpl_getopt_long_only
+_ACEOF
+
+
+
+fi
+
     echo "No argp -- using replacement out of gnulib"
   fi
 
@@ -25460,7 +25606,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 25463 "configure"
+#line 25609 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -30339,10 +30485,10 @@ s,@ac_ct_F77@,$ac_ct_F77,;t t
 s,@LIBTOOL@,$LIBTOOL,;t t
 s,@ALLOCA@,$ALLOCA,;t t
 s,@ALLOCA_H@,$ALLOCA_H,;t t
-s,@NO_ARGP_TRUE@,$NO_ARGP_TRUE,;t t
-s,@NO_ARGP_FALSE@,$NO_ARGP_FALSE,;t t
 s,@LIBOBJS@,$LIBOBJS,;t t
 s,@GETOPT_H@,$GETOPT_H,;t t
+s,@NO_ARGP_TRUE@,$NO_ARGP_TRUE,;t t
+s,@NO_ARGP_FALSE@,$NO_ARGP_FALSE,;t t
 s,@SYSEXITS_H@,$SYSEXITS_H,;t t
 s,@INSTALL_LTDL_TRUE@,$INSTALL_LTDL_TRUE,;t t
 s,@INSTALL_LTDL_FALSE@,$INSTALL_LTDL_FALSE,;t t

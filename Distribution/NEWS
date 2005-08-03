@@ -352,3 +352,9 @@ documented!
 
 03/08/05 PH -- Fixed BUG#13. Now we use realloc, which makes the glbCopyXXX
 	functions pretty featureful and  should fix the memory leak.
+
+	Finally, GLoBES seems to build and run seemlessly under Cygwin/Windows.
+	However, without support for modules.
+
+	In glb_modules.c glb-modules.h is only included if GLB_WO_MODULES is not 
+	defined, thus avoiding a warning about the redefinition of GLB_MOD_NSP. 
