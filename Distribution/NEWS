@@ -325,6 +325,24 @@ documented!
 	Fixed a little problem in the examples Makefile, should now 
 	work for all types of installation (prefix vs no prefix)
 
+
+01/08/05 Version 2.3.8
+	Moved the module support functions (glb_modules.c) into
+	globes/ and thus into libglobes. Makes linking
+	easier. 'configure' now accepts '--disable-modules' in order
+	to turn off module support. This feature may be useful on a
+	variety of platforms. The glb_prior_module in that case is
+	just linked like an ordinary object file. The mechanism I use
+	for this should be extendable to having more than one module
+	(even of the same time) permanently linked. In future any code
+	using modules has to be conditionally compiled, such that is
+	only compiled if GLB_WO_MODULES is *not* defined.
+
+	Corrected a mistake in the Makefile in examples. The static
+	linkage case was wrong, why it worked in the first place I
+	don't know but the error made it break with above changes. Now
+	it works porperly.
+
 29/07/05 JK
         Added several functions for user-defined chi^2 calculations
         (in file user_chi.c)
@@ -332,3 +350,4 @@ documented!
         Added global variable glb_current_exp that remembers the index
         of the currently processed experiment. This is necessary
         for user-defined chi^2.  
+

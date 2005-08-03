@@ -394,7 +394,7 @@ int main(int argc, char *argv[])
   double osc[]={0.553574,0.160875,M_PI/4,0.0,0.00007,0.003};
   
   /* This serves to make globes working, even with --disable-shared */
-  LTDL_SET_PRELOADED_SYMBOLS(); 
+  //  LTDL_SET_PRELOADED_SYMBOLS(); 
 
   arguments.args[0]="-";
   arguments.channel=GLB_ALL;

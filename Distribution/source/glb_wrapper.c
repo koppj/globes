@@ -41,7 +41,7 @@
 #include "glb_lexer.h"
 #include "glb_parser_addons.h"
 #include "glb_path.h"
-#include "glb_modules.h"
+
 
 #include "glb_wrapper.h"
 
@@ -49,6 +49,7 @@
 int glb_num_of_exps;
 glb_exp glb_experiment_list[32];
 int glb_rule_number;
+
 
 
 #define obstack_chunk_alloc glb_malloc
@@ -228,8 +229,9 @@ glbCopyParams(const glb_params source, glb_params dest)
   out->iterations=in->iterations;
   (out->osc)->length=(in->osc)->length;
   (out->density)->length=(in->density)->length;
+  
   if((in->osc)->length>0)
-    (out->osc)->osc_params=glb_malloc((in->osc)->length * sizeof(double));
+        (out->osc)->osc_params=glb_malloc((in->osc)->length * sizeof(double));
   else
     return NULL;
 
@@ -238,7 +240,7 @@ glbCopyParams(const glb_params source, glb_params dest)
       glb_malloc((in->density)->length * sizeof(double));
   else
     return NULL;
-
+  
   for(i=0;i<(in->osc)->length;i++) 
     (out->osc)->osc_params[i]=(in->osc)->osc_params[i];
 
@@ -1355,11 +1357,9 @@ void
   return glb_channel_print_function;
 }
 
-static void 
-final_clean()
+void glb_clean_up()
 {
   int i;
-  glb_close_module_support();
  for(i=0;i<32;i++) glbFreeExp(glb_experiment_list[i]);
  glb_clean_parser();
  glb_lexer_cleanup();
@@ -1383,11 +1383,10 @@ glb_init(char *name)
 {
   int i;
   
-  atexit(final_clean);
+ 
   glb_prog_name_init(name);
   glb_setup_path();
-  glb_init_module_support();
-  glb_setup_module_search_path();
+ 
   for(i=0;i<32;i++) glb_experiment_list[i]=glbAllocExp();
   glb_num_of_exps=0;
   glb_rule_number=0;

@@ -38,41 +38,50 @@
 libdir = @libdir@
 prefix = @prefix@
 exec_prefix = @exec_prefix@
+globesconf= $(exec_prefix)/bin/globes-config
 
+local_CFLAGS = -g -O4
 
-CFLAGS = -g -O4 
-local_LDFLAGS = @GLBLDF@ -lstdc++
-local_LTLDFLAGS = $(libdir)/libglobes.la $(libdir)/libglb.la -lstdc++
-INCFLAGS = @GLBINC@
+INCFLAGS:=$(shell $(globesconf) --include)
+local_LDFLAGS:=$(shell $(globesconf) --libs)
+preopen_modules:=$(shell $(globesconf) --dlpreopen)
+local_LTLDFLAGS:=$(shell $(globesconf) --ltlibs)
+ifdef preopen_modules
+predefs = -DGLB_STATIC
+endif
+
 
 
 BIN = example-tour example-static example1 example2 example3 example4
-OBJ = example-tour.o example1.o example2.o example3.o example4.o myio.o
+OBJ = example-tour.o example-tour-s.o example1.o example2.o example3.o example4.o myio.o
 
 example-tour: example-tour.o
-	gcc $(CFLAGS) example-tour.o -o example-tour $(LDFLAGS) $(local_LDFLAGS) $(INCFLAGS)
+	gcc example-tour.o -o example-tour $(LDFLAGS) $(local_LDFLAGS)
 
-example-static: example-tour.o
-	../libtool --mode=link gcc example-tour.o -o example-static -all-static $(LDFLAGS)\
- $(local_LTLDFLAGS) $(INCFLAGS) 
+example-tour-s.o: example-tour.c
+	gcc -c $(predefs) $(CFLAGS) $(local_CFLAGS) example-tour.c -o example-tour-s.o $(INCFLAGS)
+
+example-static: example-tour-s.o
+	../libtool --mode=link gcc example-tour-s.o -o example-static -all-static $(LDFLAGS)\
+ $(local_LTLDFLAGS) $(preopen_modules)    
 
 example1: example1.o myio.o
-	gcc $(CFLAGS) example1.o myio.o -o example1  $(LDFLAGS) $(local_LDFLAGS) $(INCFLAGS)
+	gcc example1.o myio.o -o example1  $(LDFLAGS) $(local_LDFLAGS)
 
 example2: example2.o myio.o
-	gcc $(CFLAGS) example2.o myio.o -o example2  $(LDFLAGS) $(local_LDFLAGS) $(INCFLAGS)
+	gcc  example2.o myio.o -o example2  $(LDFLAGS) $(local_LDFLAGS)
 
 example3: example3.o myio.o
-	gcc $(CFLAGS) example3.o myio.o -o example3  $(LDFLAGS) $(local_LDFLAGS) $(INCFLAGS)
+	gcc example3.o myio.o -o example3  $(LDFLAGS) $(local_LDFLAGS)
 
 example4: example4.o myio.o
-	gcc $(CFLAGS) example4.o myio.o -o example4  $(LDFLAGS) $(local_LDFLAGS) $(INCFLAGS)
+	gcc example4.o myio.o -o example4  $(LDFLAGS) $(local_LDFLAGS)
 
 # g++ is necessary because the syntax in the examples does not strictly
 # follow ANSI C for pedagogical reasons
 
 %.o : %.c
-	g++ $(CFLAGS) -c $< $(INCFLAGS)
+	g++ $(CFLAGS) $(local_CFLAGS) -c $< $(INCFLAGS)
 .PHONY: clean
 clean:
 	rm -f $(BIN) $(OBJ)

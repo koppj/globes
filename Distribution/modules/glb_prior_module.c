@@ -64,12 +64,27 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <globes/globes.h>
+
+
+#ifndef GLB_WO_MODULES
+
+#endif /* !GLB_WO_MODULES */
 
 /* The module header has to be inlcuded after GLB_MODULE_NAME and
  * GLB_XXX_MODULE have been defined.
  */
 #include <globes/glb-modules.h> /* Module header */ 
+
+
+
+int glb_module_id = GLB_PRIOR_MODULE_ID;
+
 
 
 /* File-scope static variables to store starting values and input errors */
@@ -89,6 +104,8 @@ int glb_module_init()
   er=glbAllocParams(); 
   glbGetStartingValues(sv);
   glbGetInputErrors(er);
+
+
   return 0;
 }
 
@@ -126,10 +143,9 @@ double glb_module_prior(const glb_params in)
   glb_projection pro;
   pro=glbAllocProjection();
   glbGetProjection(pro);
-
   for(i=0;i<GLB_OSCP;i++)
-    {
-      if(glbGetProjectionFlag(pro,i)==GLB_FREE) res += 
+    {   
+    if(glbGetProjectionFlag(pro,i)==GLB_FREE) res += 
 						sprior(glbGetOscParams(in,i),
 						       glbGetOscParams(sv,i),
 						       glbGetOscParams(er,i)
@@ -138,6 +154,7 @@ double glb_module_prior(const glb_params in)
   
   for(i=0;i<glb_num_of_exps;i++)
     {
+      
       if(glbGetDensityProjectionFlag(pro,i)==GLB_FREE) 
 	res += 
 	  sprior(glbGetDensityParams(in,i),
@@ -147,6 +164,7 @@ double glb_module_prior(const glb_params in)
     }
 
   glbFreeProjection(pro);
+ 
   return res;
 }
 

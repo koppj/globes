@@ -16,7 +16,10 @@ AC_DEFUN([gl_ARGP],
     [#include <errno.h>])
   AC_CHECK_FUNCS_ONCE([flockfile funlockfile])
   AC_CHECK_HEADERS_ONCE([features.h linewrap.h])
-  AC_CHECK_FUNC(_getopt_long_only_r, :, [gl_GETOPT_SUBSTITUTE])
+  dnl I removed the test for _getopt_long_r since it fails on my GNU systems
+  dnl and getopt replacements are built which then clash with
+  dnl with the ones in glibc
+  dnl AC_CHECK_FUNC(_getopt_long_only_r, :, [gl_GETOPT_SUBSTITUTE])
   AC_CHECK_FUNC(argp_parse,[ac_cv_func_argp_works=yes],
 	[ac_cv_func_argp_works=no])
  

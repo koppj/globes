@@ -20,45 +20,14 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
+#ifndef GLB_MODULES_H
+#define GLB_MODULES_H 1
 
-#include <stdio.h>
 #include <globes/globes.h>
-#include "source/glb_wrapper.h"
-#include "source/glb_error.h"
-#include "glb_modules.h"
+
+void glb_init_module_support();
+void glb_close_module_support();
+int glb_setup_module_search_path();
 
 
-/* Moved from glb_wrapper.c, in order to have the module support stuff
- * only used in this file.
- */ 
-static void final_clean() 
-{
-   glb_close_module_support(); 
-   glb_clean_up(); 
-   return; 
-}
-
-void glbInit(char *name)
-{
-  glb_dlhandle prior;
-
-  atexit(final_clean);
-  glb_init(name);
-
-  /* Make sure that all code which loads modules at start up goes in
-   * between the ifndef - endif pair below
-   */
-  glb_init_module_support();
-  glb_setup_module_search_path();
-#ifndef GLB_WO_MODULES
-  /* Loading and registeriing the prior module */
-  glbProbeModule("glb_prior_module",0);  
-  prior=glbOpenModule("glb_prior_module");
-  if(prior==NULL) glb_fatal("Could not load glb_prior_module");
-#endif /* !GLB_WO_MODULES */  
-  glbUsePrior(prior); 
-}
-
+#endif /* GLB_MODULES_H */

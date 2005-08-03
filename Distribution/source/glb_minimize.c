@@ -785,9 +785,9 @@ static double sglb_prior(double x, double center, double sigma)
 }  
 
 // the pointer to the userdefined prior function
-static double (*glb_user_defined_prior)(const glb_params);
-int (*glb_user_defined_starting_values)(const glb_params);
-int (*glb_user_defined_input_errors)(const glb_params);
+ double (*glb_user_defined_prior)(const glb_params);
+ int (*glb_user_defined_starting_values)(const glb_params);
+ int (*glb_user_defined_input_errors)(const glb_params);
 
 static int my_default_sv(const glb_params in)
 {

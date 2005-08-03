@@ -78,8 +78,7 @@ am_libglb_la_OBJECTS = libglb_la-glb_minimize.lo \
 	libglb_la-glb_min_sup.lo libglb_la-glb_fluxes.lo \
 	libglb_la-glb_smear.lo libglb_la-glb_lexer.lo \
 	libglb_la-glb_probability.lo libglb_la-glb_profile.lo \
-	libglb_la-user_chi.lo libglb_la-glb_wrapper.lo \
-	libglb_la-glb_modules.lo
+	libglb_la-user_chi.lo libglb_la-glb_wrapper.lo
 libglb_la_OBJECTS = $(am_libglb_la_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -149,12 +148,10 @@ F2CINC = @F2CINC@
 F77 = @F77@
 FFLAGS = @FFLAGS@
 GETOPT_H = @GETOPT_H@
-GLBINC = @GLBINC@
-GLBLDF = @GLBLDF@
 GLBLIBVERSION = @GLBLIBVERSION@
-GLBMLDF = @GLBMLDF@
-GLBMODULEPATH = @GLBMODULEPATH@
 GLBMODULES = @GLBMODULES@
+GLB_WO_MODULES_FALSE = @GLB_WO_MODULES_FALSE@
+GLB_WO_MODULES_TRUE = @GLB_WO_MODULES_TRUE@
 GSLINC = @GSLINC@
 GSL_CFLAGS = @GSL_CFLAGS@
 GSL_CONFIG = @GSL_CONFIG@
@@ -178,9 +175,6 @@ LIBTOOL = @LIBTOOL@
 LIBTOOL_DEPS = @LIBTOOL_DEPS@
 LN_S = @LN_S@
 LTDLINCL = @LTDLINCL@
-LTGLBINC = @LTGLBINC@
-LTGLBLDF = @LTGLBLDF@
-LTGLBMLDF = @LTGLBMLDF@
 LTLIBOBJS = @LTLIBOBJS@
 MAINT = @MAINT@
 MAINTAINER_MODE_FALSE = @MAINTAINER_MODE_FALSE@
@@ -287,10 +281,10 @@ libglb_la_SOURCES = glb_minimize.c glb_error.c glb_path.c glb_multiex.c\
  glb_version.c \
 glb_rate_engine.c  \
   glb_parser.y  glb_min_sup.c glb_fluxes.c glb_smear.c glb_lexer.l glb_probability.cc glb_profile.c\
-  user_chi.c glb_wrapper.c glb_modules.c\
+  user_chi.c glb_wrapper.c\
 glb_minimize.h  glb_error.h glb_path.h glb_parser_addons.h glb_multiex.h glb_probability.h glb_smear.h \
 glb_rate_engine.h glb_types.h glb_parser.h glb_min_sup.h  glb_version.h \
-glb_lexer.h glb_fluxes.h glb_parser_type.h glb_wrapper.h glb_modules.h\
+glb_lexer.h glb_fluxes.h glb_parser_type.h glb_wrapper.h\
 glb_profile.h
 
 libglb_la_LDFLAGS = @F2CCONVENIENCE@ @BLCONVENIENCE@ @LIBS@ \
@@ -377,7 +371,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libglb_la-glb_lexer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libglb_la-glb_min_sup.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libglb_la-glb_minimize.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libglb_la-glb_modules.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libglb_la-glb_multiex.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libglb_la-glb_parser.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libglb_la-glb_path.Plo@am__quote@
@@ -507,13 +500,6 @@ libglb_la-glb_wrapper.lo: glb_wrapper.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='glb_wrapper.c' object='libglb_la-glb_wrapper.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libglb_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libglb_la-glb_wrapper.lo `test -f 'glb_wrapper.c' || echo '$(srcdir)/'`glb_wrapper.c
-
-libglb_la-glb_modules.lo: glb_modules.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libglb_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libglb_la-glb_modules.lo -MD -MP -MF "$(DEPDIR)/libglb_la-glb_modules.Tpo" -c -o libglb_la-glb_modules.lo `test -f 'glb_modules.c' || echo '$(srcdir)/'`glb_modules.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libglb_la-glb_modules.Tpo" "$(DEPDIR)/libglb_la-glb_modules.Plo"; else rm -f "$(DEPDIR)/libglb_la-glb_modules.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='glb_modules.c' object='libglb_la-glb_modules.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libglb_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libglb_la-glb_modules.lo `test -f 'glb_modules.c' || echo '$(srcdir)/'`glb_modules.c
 
 .cc.o:
 @am__fastdepCXX_TRUE@	if $(CXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \

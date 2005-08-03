@@ -1,5 +1,5 @@
 /* GLoBES -- General LOng Baseline Experiment Simulator
- * (C) 2002 - 2004,  The GLoBES Team
+ * (C) 2002 - 2005,  The GLoBES Team
  *
  * GLoBES is mainly intended for academic purposes. Proper
  * credit must be given if you use GLoBES or parts of it. Please
@@ -30,9 +30,18 @@
 #ifndef USE_NO_LIBTOOL
 #define GLB_CONCAT3x(a,b,c) a ## _ ## b ## _ ## c
 #define GLB_CONCAT3(a,b,c) GLB_CONCAT3x(a,b,c)
-#define GLB_MOD_NSP(x) GLB_CONCAT3(GLB_MODULE_NAME,LTX,x)
+#ifdef     GLB_WO_MODULES
+#define       GLB_MOD_NSP(x) GLB_CONCAT3(GLB_MODULE_NAME,WOM,x)
+#else
+#define       GLB_MOD_NSP(x) GLB_CONCAT3(GLB_MODULE_NAME,LTX,x)
+#endif
+#else
+
+#ifdef GLB_WO_MODULES
+#define  GLB_MOD_NSP(x) GLB_CONCAT3(GLB_MODULE_NAME,WOM,x)
 #else
 #define GLB_MOD_NSP(x) x
+#endif
 #endif
 
 #ifdef GLB_PRIOR_MODULE
@@ -43,7 +52,7 @@
 #define    glb_module_prior GLB_MOD_NSP(glb_module_prior)
 #define    glb_module_starting_values GLB_MOD_NSP(glb_module_starting_values)
 #define    glb_module_input_errors GLB_MOD_NSP(glb_module_input_errors)
-int glb_module_id = GLB_PRIOR_MODULE_ID;
+extern int glb_module_id; 
 #endif /* GLB_PRIOR_MODULE */
 
 #define GLB_MODULE_NOT_FOUND -2

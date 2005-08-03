@@ -39,7 +39,12 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
+@GLB_WO_MODULES_TRUE@am__append_1 = glb_prior_module.c
+@GLB_WO_MODULES_FALSE@am__append_2 = -dlopen @GLBMODULES@
+@GLB_WO_MODULES_TRUE@libglobes_la_DEPENDENCIES =  \
+@GLB_WO_MODULES_TRUE@	$(top_builddir)/source/libglb.la
 bin_PROGRAMS = globes$(EXEEXT)
+@GLB_WO_MODULES_FALSE@am__append_3 = -dlopen @GLBMODULES@
 noinst_PROGRAMS = module-example$(EXEEXT)
 subdir = modules
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
@@ -76,14 +81,23 @@ libLTLIBRARIES_INSTALL = $(INSTALL)
 pkglibLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES) $(pkglib_LTLIBRARIES)
 glb_prior_module_la_LIBADD =
-am_glb_prior_module_la_OBJECTS = glb_prior_module.lo
+am__glb_prior_module_la_SOURCES_DIST = glb_prior_module.c
+@GLB_WO_MODULES_FALSE@am_glb_prior_module_la_OBJECTS =  \
+@GLB_WO_MODULES_FALSE@	glb_prior_module.lo
 glb_prior_module_la_OBJECTS = $(am_glb_prior_module_la_OBJECTS)
-am_libglobes_la_OBJECTS = libglobes_la-glb_glb.lo
+@GLB_WO_MODULES_FALSE@am_glb_prior_module_la_rpath = -rpath \
+@GLB_WO_MODULES_FALSE@	$(pkglibdir)
+am__libglobes_la_SOURCES_DIST = glb_glb.c glb_modules.c glb_modules.h \
+	glb_prior_module.h glb_prior_module.c
+@GLB_WO_MODULES_TRUE@am__objects_1 = libglobes_la-glb_prior_module.lo
+am_libglobes_la_OBJECTS = libglobes_la-glb_glb.lo \
+	libglobes_la-glb_modules.lo $(am__objects_1)
 libglobes_la_OBJECTS = $(am_libglobes_la_OBJECTS)
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS) $(noinst_PROGRAMS)
 am_globes_OBJECTS = globes.$(OBJEXT)
 globes_OBJECTS = $(am_globes_OBJECTS)
+am__DEPENDENCIES_1 =
 am_module_example_OBJECTS = module-example.$(OBJEXT)
 module_example_OBJECTS = $(am_module_example_OBJECTS)
 module_example_DEPENDENCIES = libglobes.la
@@ -100,8 +114,9 @@ LINK = $(LIBTOOL) --mode=link --tag=CC $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(glb_prior_module_la_SOURCES) $(libglobes_la_SOURCES) \
 	$(globes_SOURCES) $(module_example_SOURCES)
-DIST_SOURCES = $(glb_prior_module_la_SOURCES) $(libglobes_la_SOURCES) \
-	$(globes_SOURCES) $(module_example_SOURCES)
+DIST_SOURCES = $(am__glb_prior_module_la_SOURCES_DIST) \
+	$(am__libglobes_la_SOURCES_DIST) $(globes_SOURCES) \
+	$(module_example_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -144,12 +159,10 @@ F2CINC = @F2CINC@
 F77 = @F77@
 FFLAGS = @FFLAGS@
 GETOPT_H = @GETOPT_H@
-GLBINC = @GLBINC@
-GLBLDF = @GLBLDF@
 GLBLIBVERSION = @GLBLIBVERSION@
-GLBMLDF = @GLBMLDF@
-GLBMODULEPATH = @GLBMODULEPATH@
 GLBMODULES = @GLBMODULES@
+GLB_WO_MODULES_FALSE = @GLB_WO_MODULES_FALSE@
+GLB_WO_MODULES_TRUE = @GLB_WO_MODULES_TRUE@
 GSLINC = @GSLINC@
 GSL_CFLAGS = @GSL_CFLAGS@
 GSL_CONFIG = @GSL_CONFIG@
@@ -173,9 +186,6 @@ LIBTOOL = @LIBTOOL@
 LIBTOOL_DEPS = @LIBTOOL_DEPS@
 LN_S = @LN_S@
 LTDLINCL = @LTDLINCL@
-LTGLBINC = @LTGLBINC@
-LTGLBLDF = @LTGLBLDF@
-LTGLBMLDF = @LTGLBMLDF@
 LTLIBOBJS = @LTLIBOBJS@
 MAINT = @MAINT@
 MAINTAINER_MODE_FALSE = @MAINTAINER_MODE_FALSE@
@@ -276,24 +286,23 @@ shrext_cmds = @shrext_cmds@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 INCLUDES = -I$(top_srcdir) -I$(top_srcdir)/lib $(F2CINC) $(GSLINC)
-pkglib_LTLIBRARIES = glb_prior_module.la
-glb_prior_module_la_SOURCES = glb_prior_module.c
-glb_prior_module_la_LDFLAGS = $(top_builddir)/source/libglb.la\
- @LIBS@ -module -avoid-version -no-undefined
+@GLB_WO_MODULES_FALSE@pkglib_LTLIBRARIES = glb_prior_module.la
+@GLB_WO_MODULES_FALSE@glb_prior_module_la_SOURCES = glb_prior_module.c
+@GLB_WO_MODULES_FALSE@glb_prior_module_la_LDFLAGS = $(top_builddir)/source/libglb.la\
+@GLB_WO_MODULES_FALSE@ @LIBS@ -module -avoid-version -no-undefined
 
 lib_LTLIBRARIES = libglobes.la
 # Here we try to get a tree like linking scheme including modules
-libglobes_la_SOURCES = glb_glb.c
+libglobes_la_SOURCES = glb_glb.c glb_modules.c glb_modules.h \
+	glb_prior_module.h $(am__append_1)
 libglobes_la_LIBADD = $(top_builddir)/source/libglb.la
-libglobes_la_LDFLAGS = @LIBS@ \
--version-info @GLBLIBVERSION@\
- @LIBLTDL@ -dlopen @GLBMODULES@
-
+libglobes_la_LDFLAGS = @LIBS@ -version-info @GLBLIBVERSION@ @LIBLTDL@ \
+	$(am__append_2)
 libglobes_la_CPPFLAGS = -DGLB_MODULE_DIR=\"$(pkglibdir)\"
-libglobes_la_DEPENDENCIES = glb_prior_module.la
+@GLB_WO_MODULES_FALSE@libglobes_la_DEPENDENCIES = glb_prior_module.la
 globes_SOURCES = globes.c 
-globes_LDADD = libglobes.la @LIBS@ @LIBLTDL@ -lstdc++ -dlopen \
-	@GLBMODULES@ $(top_builddir)/lib/libgnu.la
+globes_LDADD = libglobes.la @LIBS@ @LIBLTDL@ -lstdc++ $(am__append_3) \
+	$(top_builddir)/lib/libgnu.la
 globes_DEPENDENCIES = libglobes.la
 module_example_SOURCES = module-example.c
 module_example_LDADD = libglobes.la @LIBS@ @LIBLTDL@ -lstdc++
@@ -387,7 +396,7 @@ clean-pkglibLTLIBRARIES:
 	  rm -f "$${dir}/so_locations"; \
 	done
 glb_prior_module.la: $(glb_prior_module_la_OBJECTS) $(glb_prior_module_la_DEPENDENCIES) 
-	$(LINK) -rpath $(pkglibdir) $(glb_prior_module_la_LDFLAGS) $(glb_prior_module_la_OBJECTS) $(glb_prior_module_la_LIBADD) $(LIBS)
+	$(LINK) $(am_glb_prior_module_la_rpath) $(glb_prior_module_la_LDFLAGS) $(glb_prior_module_la_OBJECTS) $(glb_prior_module_la_LIBADD) $(LIBS)
 libglobes.la: $(libglobes_la_OBJECTS) $(libglobes_la_DEPENDENCIES) 
 	$(LINK) -rpath $(libdir) $(libglobes_la_LDFLAGS) $(libglobes_la_OBJECTS) $(libglobes_la_LIBADD) $(LIBS)
 install-binPROGRAMS: $(bin_PROGRAMS)
@@ -441,6 +450,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/glb_prior_module.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/globes.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libglobes_la-glb_glb.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libglobes_la-glb_modules.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libglobes_la-glb_prior_module.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/module-example.Po@am__quote@
 
 .c.o:
@@ -470,6 +481,20 @@ libglobes_la-glb_glb.lo: glb_glb.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='glb_glb.c' object='libglobes_la-glb_glb.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libglobes_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libglobes_la-glb_glb.lo `test -f 'glb_glb.c' || echo '$(srcdir)/'`glb_glb.c
+
+libglobes_la-glb_modules.lo: glb_modules.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libglobes_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libglobes_la-glb_modules.lo -MD -MP -MF "$(DEPDIR)/libglobes_la-glb_modules.Tpo" -c -o libglobes_la-glb_modules.lo `test -f 'glb_modules.c' || echo '$(srcdir)/'`glb_modules.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libglobes_la-glb_modules.Tpo" "$(DEPDIR)/libglobes_la-glb_modules.Plo"; else rm -f "$(DEPDIR)/libglobes_la-glb_modules.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='glb_modules.c' object='libglobes_la-glb_modules.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libglobes_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libglobes_la-glb_modules.lo `test -f 'glb_modules.c' || echo '$(srcdir)/'`glb_modules.c
+
+libglobes_la-glb_prior_module.lo: glb_prior_module.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libglobes_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libglobes_la-glb_prior_module.lo -MD -MP -MF "$(DEPDIR)/libglobes_la-glb_prior_module.Tpo" -c -o libglobes_la-glb_prior_module.lo `test -f 'glb_prior_module.c' || echo '$(srcdir)/'`glb_prior_module.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libglobes_la-glb_prior_module.Tpo" "$(DEPDIR)/libglobes_la-glb_prior_module.Plo"; else rm -f "$(DEPDIR)/libglobes_la-glb_prior_module.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='glb_prior_module.c' object='libglobes_la-glb_prior_module.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libglobes_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libglobes_la-glb_prior_module.lo `test -f 'glb_prior_module.c' || echo '$(srcdir)/'`glb_prior_module.c
 
 mostlyclean-libtool:
 	-rm -f *.lo

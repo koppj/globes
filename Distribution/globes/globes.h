@@ -78,8 +78,8 @@ typedef struct glb_experiment *glb_exp;
 
 extern char **glb_path_vector;
 extern size_t glb_path_vector_length;
-
 extern int glb_num_of_exps;
+
 extern int glb_single_experiment_number;
 #ifdef SWIG
 /* I really have no clue why I have to 

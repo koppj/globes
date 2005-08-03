@@ -38,7 +38,7 @@ build_triplet = @build@
 host_triplet = @host@
 DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/config-h.in \
-	$(srcdir)/globes-config.src.in $(srcdir)/globes-module.src.in \
+	$(srcdir)/globes-config.in $(srcdir)/globes-module.in \
 	$(srcdir)/globes.spec.in $(top_srcdir)/configure \
 	$(top_srcdir)/examples/Makefile.in AUTHORS COPYING ChangeLog \
 	INSTALL NEWS TODO compile config.guess config.sub depcomp \
@@ -65,11 +65,11 @@ am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno configure.status.lineno
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = config.h
-CONFIG_CLEAN_FILES = globes.spec examples/Makefile globes-config.src \
-	globes-module.src
+CONFIG_CLEAN_FILES = globes.spec examples/Makefile globes-config \
+	globes-module
 am__installdirs = "$(DESTDIR)$(bindir)"
 nodist_binSCRIPT_INSTALL = $(INSTALL_SCRIPT)
-SCRIPTS = $(nodist_bin_SCRIPTS) $(noinst_SCRIPTS)
+SCRIPTS = $(nodist_bin_SCRIPTS)
 SOURCES =
 DIST_SOURCES =
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
@@ -130,12 +130,10 @@ F2CINC = @F2CINC@
 F77 = @F77@
 FFLAGS = @FFLAGS@
 GETOPT_H = @GETOPT_H@
-GLBINC = @GLBINC@
-GLBLDF = @GLBLDF@
 GLBLIBVERSION = @GLBLIBVERSION@
-GLBMLDF = @GLBMLDF@
-GLBMODULEPATH = @GLBMODULEPATH@
 GLBMODULES = @GLBMODULES@
+GLB_WO_MODULES_FALSE = @GLB_WO_MODULES_FALSE@
+GLB_WO_MODULES_TRUE = @GLB_WO_MODULES_TRUE@
 GSLINC = @GSLINC@
 GSL_CFLAGS = @GSL_CFLAGS@
 GSL_CONFIG = @GSL_CONFIG@
@@ -159,9 +157,6 @@ LIBTOOL = @LIBTOOL@
 LIBTOOL_DEPS = @LIBTOOL_DEPS@
 LN_S = @LN_S@
 LTDLINCL = @LTDLINCL@
-LTGLBINC = @LTGLBINC@
-LTGLBLDF = @LTGLBLDF@
-LTGLBMLDF = @LTGLBMLDF@
 LTLIBOBJS = @LTLIBOBJS@
 MAINT = @MAINT@
 MAINTAINER_MODE_FALSE = @MAINTAINER_MODE_FALSE@
@@ -269,10 +264,9 @@ EXTRA_DIST = examples/Makefile.in examples/example1.c\
   examples/example3.c examples/myio.c\
 examples/example-tour.c  examples/example2.c  examples/example4.c\
 examples/myio.h examples/XCC.dat examples/NuFact.glb\
-BUGS globes-script lapack/Notice libf2c/Notice
+BUGS lapack/Notice libf2c/Notice
 
 nodist_bin_SCRIPTS = globes-config globes-module
-noinst_SCRIPTS = globes-script
 CLEANFILES = globes-module globes-config
 AM_YFLAGS = -d 
 all: config.h
@@ -333,9 +327,9 @@ globes.spec: $(top_builddir)/config.status $(srcdir)/globes.spec.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 examples/Makefile: $(top_builddir)/config.status $(top_srcdir)/examples/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
-globes-config.src: $(top_builddir)/config.status $(srcdir)/globes-config.src.in
+globes-config: $(top_builddir)/config.status $(srcdir)/globes-config.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
-globes-module.src: $(top_builddir)/config.status $(srcdir)/globes-module.src.in
+globes-module: $(top_builddir)/config.status $(srcdir)/globes-module.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 install-nodist_binSCRIPTS: $(nodist_bin_SCRIPTS)
 	@$(NORMAL_INSTALL)
@@ -731,12 +725,6 @@ uninstall-info: uninstall-info-recursive
 	uninstall uninstall-am uninstall-info-am \
 	uninstall-nodist_binSCRIPTS
 
-
-globes-config: globes-config.src
-	$(top_srcdir)/globes-script globes-config.src globes-config
-
-globes-module: globes-module.src
-	$(top_srcdir)/globes-script globes-module.src globes-module 
 
 @MAKE_RPMS_TRUE@rpm: $(DISTFILES) 
 @MAKE_RPMS_TRUE@	${MAKE} dist

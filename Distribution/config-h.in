@@ -11,6 +11,9 @@
 /* The version of libglb in libtool format c:r:a */
 #undef GLB_LIBVERSION
 
+/* adsa */
+#undef GLB_WO_MODULES
+
 /* Define to 1 if you have `alloca' after including <alloca.h>, a header that
    may be supplied by this distribution. */
 #undef HAVE_ALLOCA

@@ -29,7 +29,7 @@ dnl middle digit: increment when features have been introduced/removed
 dnl first digit: major improvements/rewrites
 dnl In contrast to the result of autoupdate I had to swap the
 dnl the AC_INIT and AC_CONFIG_SRCDIR
-AC_INIT([GLoBES],[2.3.7],[globes@ph.tum.de],[globes])
+AC_INIT([GLoBES],[2.3.8],[globes@ph.tum.de],[globes])
 AC_CONFIG_SRCDIR([source/glb_wrapper.c])
 
 dnl Tellin autoconf we are going to use automake
@@ -44,91 +44,57 @@ dnl code changed: c:r+1:a
 dnl API changed: c+1:0:a
 dnl -> API extended: c:0:a+1
 dnl -> API shrunken: c:0:0
-GLBLIBVERSION="5:4:2"
+GLBLIBVERSION="5:5:2"
 
 dnl From here no editing !
 AC_SUBST(GLBLIBVERSION)
 AC_DEFINE_UNQUOTED(GLB_LIBVERSION,"$GLBLIBVERSION",[The version of libglb in libtool format c:r:a])
+
+dnl Optional module support
+AC_ARG_ENABLE(modules,[--enable-modules   Module support],[
+if test $enableval = "yes"; then 
+glb_modules="yes"
+fi
+if test $enableval = "no"; then
+glb_modules="no"
+fi
+],
+[glb_modules="yes"])
+
+AM_CONDITIONAL(GLB_WO_MODULES,test x$glb_modules = xno)
+if test $glb_modules = "no"; then 		 
+GLBMODULES=""
+AC_DEFINE([GLB_WO_MODULES],[],[adsa])
+else
+GLBMODULES="glb_prior_module.la"
+fi
+AC_SUBST(GLBMODULES)
 
 dnl This part serves to convert Makefile.in in examples to a
 dnl Makefile which works automagically 
 
 dnl list of standard targets (the space before the closing quotes is important)
 allowed="/usr /usr/local "
-
 dnl assume there is a prefix which is not in `allowed'
-GLBLDR="${prefix}/lib"
-GLBLDF="${GLBLDR}/libglobes.so -Wl,--rpath -Wl,${GLBLDR} ${GLBLDR}/libglb.so -Wl,--rpath -Wl,${GLBLDR}"
-GLBMLDF="${GLBLDR}/globes/libglb.so -Wl,--rpath -Wl,${GLBLDR}"
-GLBINC="-I${prefix}/include/"
 standard="no"
-
 dnl no prefix given
 if test $prefix = NONE; then
-  GLBLDF="-lglobes -lglb"
-  GLBMLDF="-lglb"
-  GLBINC=""
   standard="yes"	
 fi
-
 dnl prefix is one of the standard targets where only root can install to
 for allow in ´echo $allowed´
  do
 	if test $prefix = $allow; then
-  		GLBLDF="-lglobes -lglb"
- 		GLBMLDF="-lglb"
- 		GLBINC=""
  		standard="yes"	
 	fi
  done
-
 dnl Output our knowledge to the Makefiles
-AC_SUBST(GLBMLDF)
-AC_SUBST(GLBLDF)
-AC_SUBST(GLBINC)
-
-dnl assume there is a prefix which is not in `allowed'
-LTGLBLDR="${prefix}/lib"
-LTGLBLDF="${GLBLDR}/libglobes.la -Wl,--rpath -Wl,${GLBLDR} ${GLBLDR}/libglb.la -Wl,--rpath -Wl,${GLBLDR}"
-LTGLBMLDF="${GLBLDR}libglb.la -Wl,--rpath -Wl,${GLBLDR}"
-LTGLBINC="-I${prefix}/include/"
-standard="no"
 
 
 
-dnl trying to support all static linking via libtool and dlopen
-dnl no prefix given
-if test $prefix = NONE; then
-  LTGLBLDF="$(libdir)/libglobes.la $(libdir)/libglb.la"
-  LTGLBMLDF="-lglb"
-  LTGLBINC=""
-  standard="yes"	
-fi
-
-dnl prefix is one of the standard targets where only root can install to
-for allow in ´echo $allowed´
- do
-	if test $prefix = $allow; then
-  		LTGLBLDF="-lglobes -lglb"
- 		LTGLBMLDF="-lglb"
- 		LTGLBINC=""
- 		standard="yes"	
-	fi
- done
-
-dnl Output our knowledge to the Makefiles
-AC_SUBST(LTGLBMLDF)
-AC_SUBST(LTGLBLDF)
-AC_SUBST(LTGLBINC)
 
 
-dnl FIXME -dlopen will not accept a list (I bet)
-dnl Keeping track of modules which should be preloaded
-dnl if necessary
-GLBMODULEPATH="${GLBLDR}/globes"
-AC_SUBST(GLBMODULEPATH)
-GLBMODULES="glb_prior_module.la"
-AC_SUBST(GLBMODULES)
+
 
 dnl Checks for programs.
 AC_PROG_AWK
@@ -232,8 +198,8 @@ AC_CONFIG_FILES(globes.spec)
 AC_CONFIG_FILES([Makefile lib/Makefile libf2c/Makefile lapack/Makefile\
  globes/Makefile globes/example.pl source/Makefile\
  examples/Makefile\
- data/Makefile modules/MakefileExample modules/Makefile globes-config.src\
- globes-module.src libltdl/Makefile])
+ data/Makefile modules/MakefileExample modules/Makefile globes-config\
+ globes-module libltdl/Makefile])
 
 	
 
