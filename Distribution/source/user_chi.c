@@ -19,12 +19,158 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
+#include <globes/globes.h>
+#include "glb_multiex.h"
+#include "glb_rate_engine.h"
+#include "glb_minimize.h"
 
 
-/* This file contains highly experimental features, and is therefore
- * not documented. You are on your own when you are going to use this.
- */
+// ----------------------------------------------------------------------------
+void glbSetUserChi(int exp, int rule, double (*chi_func)(double x[]), int dim,
+                   double params[], double errors[], char *info)
+// ----------------------------------------------------------------------------
+// Assign a user-defined chi^2 function to an experiment.
+// Parameters:
+//  exp:      Number of experiment for which the chi^2 function is intended
+//  rule:     Number of rule for which the chi^2 function is intended
+//  chi_func: A pointer to the actual function
+//  dim:      Dimension of parameter space expected by this function
+//  params:   Initial values for the parameters
+//  errors:   Errors of the parameters
+//  info:     An optional string describing the chi^2 function
+// ----------------------------------------------------------------------------
+{
+  int i,j;
+  
+  if (exp == GLB_ALL)
+  {
+    for (i=0; i < glb_num_of_exps; i++)
+      if (rule == GLB_ALL)
+      {
+        for (j=0; j < glbGetNumberOfRules(i); j++)
+          glb_experiment_list[i]->sys[j] =
+               glb_init_systematic(chi_func, dim, params, errors, &glb_evaluate_chi, info);
+      }
+      else
+        glb_experiment_list[i]->sys[rule] =
+             glb_init_systematic(chi_func, dim, params, errors, &glb_evaluate_chi, info);
+  }
+  else
+  {
+    if (rule == GLB_ALL)
+    {
+      for (j=0; j < glbGetNumberOfRules(exp); j++)
+        glb_experiment_list[exp]->sys[j] =
+             glb_init_systematic(chi_func, dim, params, errors, &glb_evaluate_chi, info);
+    }
+    else
+      glb_experiment_list[exp]->sys[rule] =
+           glb_init_systematic(chi_func, dim, params, errors, &glb_evaluate_chi, info);
+  }
+}
 
+
+// ----------------------------------------------------------------------------
+int glbGetCurrentExp()
+// ----------------------------------------------------------------------------
+// Returns the number of the experiment that is currently being processed.
+// User-defined chi^2 function will need this information.
+// ----------------------------------------------------------------------------
+{
+  return glb_current_exp;
+}
+
+// ----------------------------------------------------------------------------
+int glbGetCurrentRule()
+// ----------------------------------------------------------------------------
+// Returns the number of the rule that is currently being processed.
+// User-defined chi^2 function will need this information.
+// ----------------------------------------------------------------------------
+{
+  return glb_rule_number;
+}
+
+// ----------------------------------------------------------------------------
+double glbGetSignalBin(int exp, int rule, int bin)
+// ----------------------------------------------------------------------------
+// Returns the signal rate for the given experiment, rule and bin
+// ----------------------------------------------------------------------------
+{
+  return glb_experiment_list[exp]->rates1T[rule][bin] *
+            glb_window_function(glb_experiment_list[exp]->energy_window[glb_rule_number][0],
+                                glb_experiment_list[exp]->energy_window[glb_rule_number][1],bin);
+}
+
+// ----------------------------------------------------------------------------
+double glbGetBackgroundBin(int exp, int rule, int bin)
+// ----------------------------------------------------------------------------
+// Returns the background rate for the given experiment, rule and bin
+// ----------------------------------------------------------------------------
+{
+  return glb_experiment_list[exp]->rates1BGT[rule][bin] *
+            glb_window_function(glb_experiment_list[exp]->energy_window[glb_rule_number][0],
+                                glb_experiment_list[exp]->energy_window[glb_rule_number][1],bin);
+}
+  
+// ----------------------------------------------------------------------------
+double glbGetChannelBin(int exp, int channel, int bin)
+// ----------------------------------------------------------------------------
+// Returns the signal rate for the given experiment, channel and bin
+// ----------------------------------------------------------------------------
+{
+  return glb_experiment_list[exp]->chra[channel][bin] *
+            glb_window_function(glb_experiment_list[exp]->energy_window[glb_rule_number][0],
+                                glb_experiment_list[exp]->energy_window[glb_rule_number][1],bin);
+}
+
+// ----------------------------------------------------------------------------
+double glbGetMeasuredBin(int exp, int rule, int bin)
+// ----------------------------------------------------------------------------
+// Returns the measured event rate for the given experiment, rule and bin
+// ----------------------------------------------------------------------------
+{
+  return glb_experiment_list[exp]->rates0[rule][bin];
+}
+
+// ----------------------------------------------------------------------------
+int glbShiftSignalEnergyScale(int exp, int rule, double amount)
+// ----------------------------------------------------------------------------
+// Applies an energy calibration error of magnitude amount to the signal event
+// rates of the given experiment and rule
+// The algorithm is the same as in the internal function glb_shift_energy_scale
+// ----------------------------------------------------------------------------
+{
+  double tmp_rates[glb_experiment_list[exp]->numofbins];
+  int i;
+
+  glb_shift_energy_scale(amount, glb_experiment_list[exp]->SignalRates[rule], tmp_rates);
+  memcpy(glb_experiment_list[exp]->rates1T[rule], tmp_rates,
+         glb_experiment_list[exp]->numofbins * sizeof(tmp_rates[0]));
+  return 0;
+}
+
+// ----------------------------------------------------------------------------
+int glbShiftBackgroundEnergyScale(int exp, int rule, double amount)
+// ----------------------------------------------------------------------------
+// Applies an energy calibration error of magnitude amount to the background
+// event rates of the given experiment and rule
+// The algorithm is the same as in the internal function glb_shift_energy_scale
+// ----------------------------------------------------------------------------
+{
+  double tmp_rates[glb_experiment_list[exp]->numofbins];
+  int i;
+
+  glb_shift_energy_scale(amount, glb_experiment_list[exp]->BackgroundRates[rule], tmp_rates);
+  memcpy(glb_experiment_list[exp]->rates1BGT[rule], tmp_rates,
+         glb_experiment_list[exp]->numofbins * sizeof(tmp_rates[0]));
+  return 0;
+}
+
+
+// The following part of this file contains highly experimental functions for
+// handling user-defined systematics which are not documented.
+// If you want to implement your own systematics, user the routines above and
+// follow their documentation
 #ifdef GLB_EXPERIMENTAL
 
 #include <stdio.h>

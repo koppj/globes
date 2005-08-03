@@ -200,13 +200,14 @@ glb_dlhandle glbOpenModule(const char *module_name)
     fprintf(stderr,"\tlt_dlopen reports following error %s\n",error);
     return NULL;
   }
- init=lt_dlsym(module, "glb_module_init");
+  init=lt_dlsym(module, "glb_module_init");
+// init=lt_dlsym(module, "glb_prior_module_LTX_glb_module_init");
  if(init==NULL) {
    glb_error("Deficient module");
    fprintf(stderr,"\tmodule %s has no working glb_module_init!\n",module_name);
    return NULL;
  }
-
+ 
  init();
 
  return (glb_dlhandle) module;

@@ -25,7 +25,7 @@
 #ifndef GLS_GLOBES_H
 #define GLS_GLOBES_H 1
 
-
+#include <stdio.h>
 
 #ifdef __cplusplus
 #  define BEGIN_C_DECLS extern "C" {
@@ -166,6 +166,15 @@ double glbChiDm(const glb_params in, glb_params out, int exp);
 double glbChiThetaDelta(const glb_params in, glb_params out, int exp);
 double glbChiAll(const glb_params in, glb_params out, int exp);
 
+/* Functions for user-defined chi^2 calculations */
+
+void glbSetUserChi(int exp, int rule, double (*chi_func)(double x[]), int dim,
+                   double params[], double errors[], char *info);
+int glbGetCurrentExp();
+int glbGetCurrentRule();
+int glbShiftSignalEnergyScale(int exp, int rule, double amount);
+int glbShiftBackgroundEnergyScale(int exp, int rule, double amount);
+
 /* Interface to the projected chi^2 functions */
 
 int glbSetProjection(const glb_projection in);
@@ -222,6 +231,7 @@ void glbResetRateStack();
 int glbGetNumberOfChannels(int exp);
 int glbGetChannelRates(double **data, size_t *length, 
 		       int exp, int channel,int smearing);
+double glbGetChannelBin(int exp, int channel, int bin);
 int glbGetUserData(double **data, size_t *length, 
 		   int exp, int channel,int smearing, int bgeff);
 
@@ -241,6 +251,9 @@ int glbShowChannelRates(FILE *stream,
 void *glbSetChannelPrintFunction(void *fp);
 void glbSetPrintDelimiters(const char *left,const char *middle,
 			   const char *right);
+double glbGetSignalBin(int exp, int rule, int bin);
+double glbGetBackgroundBin(int exp, int rule, int bin);
+double glbGetMeasuredBin(int exp, int rule, int bin);
 
 
 /* Matter profile access */

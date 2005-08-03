@@ -50,6 +50,8 @@
 struct glb_systematic sys_list[32];
 struct glb_systematic sys_calc[32];
 
+int glb_current_exp = -1;  // Indicates which experiment is currently
+                           // being processed by the rate engine
 
 static struct glb_experiment MInitMemory0(struct glb_experiment in);
 
@@ -1114,7 +1116,13 @@ void glbSetExperiment(glb_exp in)
   MMovePointers(s);
   
   glb_rule_number=0;
-
+  glb_current_exp = -1;              // Find experiment number
+  for (i=0; i < glb_num_of_exps; i++)
+    if (glb_experiment_list[i] == s)
+    {
+      glb_current_exp = i;
+      break;
+    }
 
   return;
 }
