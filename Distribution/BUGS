@@ -30,7 +30,7 @@ BUG#3 glbCopyProjection is leaking memory
 From: Patrick Huber
 Date: 04.08.04
 	
-	see BUG#3
+	see BUG#2
 -------------------------------------------------------------------------------
 
 BUG#4 User-defined smearing matrices do not work
@@ -138,4 +138,13 @@ BUG#12 The default parameters in 'globes' are different from the ones
 
 From: Christine Lewis
 Date: 15.07.05
+-------------------------------------------------------------------------------	 
+
+BUG#13 glbCopyParams and glbCopyProjection are leaking memory
+
+From: Patrick Huber
+Date: 01.08.05
+
+	The problem is the same as in the description of BUG#2 and #3,
+	but the fix, wasn't one.
 -------------------------------------------------------------------------------	 

@@ -325,8 +325,15 @@ documented!
 	Fixed a little problem in the examples Makefile, should now 
 	work for all types of installation (prefix vs no prefix)
 
+29/07/05 JK
+        Added several functions for user-defined chi^2 calculations
+        (in file user_chi.c)
 
-01/08/05 Version 2.3.8
+        Added global variable glb_current_exp that remembers the index
+        of the currently processed experiment. This is necessary
+        for user-defined chi^2.  
+
+01/08/05 Version 2.3.8 -- PH
 	Moved the module support functions (glb_modules.c) into
 	globes/ and thus into libglobes. Makes linking
 	easier. 'configure' now accepts '--disable-modules' in order
@@ -343,11 +350,5 @@ documented!
 	don't know but the error made it break with above changes. Now
 	it works porperly.
 
-29/07/05 JK
-        Added several functions for user-defined chi^2 calculations
-        (in file user_chi.c)
-
-        Added global variable glb_current_exp that remembers the index
-        of the currently processed experiment. This is necessary
-        for user-defined chi^2.  
-
+03/08/05 PH -- Fixed BUG#13. Now we use realloc, which makes the glbCopyXXX
+	functions pretty featureful and  should fix the memory leak.

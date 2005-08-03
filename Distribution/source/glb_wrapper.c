@@ -227,24 +227,31 @@ glbCopyParams(const glb_params source, glb_params dest)
   if(out==NULL||in==NULL) return NULL;
   if(out==in) return (glb_params) out;
   out->iterations=in->iterations;
-  (out->osc)->length=(in->osc)->length;
-  (out->density)->length=(in->density)->length;
   
-  if((in->osc)->length>0)
-        (out->osc)->osc_params=glb_malloc((in->osc)->length * sizeof(double));
-  else
-    return NULL;
+  /* BUG #13 -- The use of realloc should solve a memory leak and makes this
+     function pretty featureful, since it supports copying parameters
+     even if the number of parameters and/or experiments has changed.
+  */
 
-  if((in->density)->length>0)
-    (out->density)->density_params=
-      glb_malloc((in->density)->length * sizeof(double));
-  else
-    return NULL;
+  if((in->osc)->length>0&&
+     (in->osc)->length!=(out->osc)->length)
+    {
+      (out->osc)->osc_params=glb_realloc((out->osc)->osc_params,(in->osc)->length * sizeof(double));
+      (out->osc)->length=(in->osc)->length;
+    }
+
+  if((in->density)->length>0&&
+     (in->density)->length!=(out->density)->length)
+    {
+      (out->density)->density_params=
+	glb_realloc((out->density)->density_params,(in->density)->length * sizeof(double));
+      (out->density)->length=(in->density)->length;
+    }
   
-  for(i=0;i<(in->osc)->length;i++) 
+  for(i=0;i<(out->osc)->length;i++) 
     (out->osc)->osc_params[i]=(in->osc)->osc_params[i];
 
-  for(i=0;i<(in->density)->length;i++) 
+  for(i=0;i<(out->density)->length;i++) 
     (out->density)->density_params[i]=(in->density)->density_params[i];
 
   return (glb_params) out;
@@ -430,18 +437,26 @@ glbCopyProjection(const glb_projection source, glb_projection dest)
 
   if(out==NULL||in==NULL) return NULL;
   if(out==in) return (glb_projection) out;
-  (out->osc)->length=(in->osc)->length;
-  (out->density)->length=(in->density)->length;
-  if((in->osc)->length>0)
-    (out->osc)->osc_params=glb_malloc((in->osc)->length * sizeof(int));
-  else
-    return NULL;
 
-  if((in->density)->length>0)
-    (out->density)->density_params=
-      glb_malloc((in->density)->length * sizeof(int));
-  else
-    return NULL;
+  /* BUG #13 -- The use of realloc should solve a memory leak and makes this
+     function pretty featureful, since it supports copying parameters
+     even if the number of parameters and/or experiments has changed.
+  */
+
+  if((in->osc)->length>0&&
+     (in->osc)->length!=(out->osc)->length)
+    {
+      (out->osc)->osc_params=glb_realloc((out->osc)->osc_params,(in->osc)->length * sizeof(int));
+      (out->osc)->length=(in->osc)->length;
+    }
+
+  if((in->density)->length>0&&
+     (in->density)->length!=(out->density)->length)
+    {
+      (out->density)->density_params=
+	glb_realloc((out->density)->density_params,(in->density)->length * sizeof(int));
+      (out->density)->length=(in->density)->length;
+    }
 
   for(i=0;i<(in->osc)->length;i++) 
     (out->osc)->osc_params[i]=(in->osc)->osc_params[i];
