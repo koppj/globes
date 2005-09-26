@@ -1,0 +1,31 @@
+
+
+%%%%%%%%%%%%%% COLOR STUFF %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Color to underly headlines, text and footer
+% \definecolor{headcolor}{rgb}{0.0, 0.05, 1.0} % used in foilhead
+% \definecolor{headcolor}{rgb}{0.15, 0.5, 1.0} % used in foilhead
+\definecolor{headcolor}{rgb}{0.30, 0.65, 1.0} % used in foilhead
+\definecolor{footcolor}{rgb}{0.2, 0.8, 1.0} % used in page footer
+\definecolor{Cboxcolor}{rgb}{1.0, 0.6, 0.6} % used in colored box
+\definecolor{Tschwarz}{rgb}{0, 0, 0 }       % from here colors for text
+\definecolor{Trot}{rgb}{1.0, 0.0, 0.0}      
+\definecolor{Tgruen}{rgb}{0.0, 1.0, 0.0}
+% \definecolor{Tblau}{rgb}{0.1, 0.1, 1.0}
+\definecolor{Tblau}{rgb}{0.1, 0.3, 1.0}
+\definecolor{Tgelb}{rgb}{1.0, 0.9, 0.0}
+\newrgbcolor{Cboxrot}{1.0 0.6 0.6}
+
+\newcommand{\headbox}[1]{\fcolorbox{black}{headcolor}{#1}}
+\newcommand{\footbox}[1]{\fbox{#1}}
+\newcommand{\Cbox}[1]{\colorbox{Cboxcolor}{#1}}
+\newcommand{\ROT}[1]{\textcolor{Trot}{#1}}
+\newcommand{\GRUEN}[1]{\textcolor{Tgruen}{#1}}
+\newcommand{\BLAU}[1]{\textcolor{Tblau}{#1}}
+\newcommand{\GELB}[1]{\textcolor{Tgelb}{#1}}
+
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% End: 
