@@ -251,9 +251,9 @@ int glbShowChannelRates(FILE *stream,
 void *glbSetChannelPrintFunction(void *fp);
 void glbSetPrintDelimiters(const char *left,const char *middle,
 			   const char *right);
-double glbGetSignalBin(int exp, int rule, int bin);
-double glbGetBackgroundBin(int exp, int rule, int bin);
-double glbGetMeasuredBin(int exp, int rule, int bin);
+double glbGetSignalBinInRule(int exp, int rule, int bin);
+double glbGetBackgroundBinInRule(int exp, int rule, int bin);
+double glbGetObservedBinInRule(int exp, int rule, int bin);
 
 
 /* Matter profile access */

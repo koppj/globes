@@ -1428,9 +1428,13 @@ the complete error dimension definition could look like
 \tb @errordim\_sys\_on = 0
 }
 \end{quote}
-It is foreseen to add the possiblity to extend the set 
-of error dimensions or the set of possible systematical errors in one
-of the next versions of \GLOBES.
+If none of the built-in algorithms listed in \Tab~\ref{tab:error_dim} is
+suitable for a certain setup, the user can override them by setting
+{\tt @errordim\_sys\_on} to 20 and using the \GLB{SetUserChi}
+function to specify a specialized function for the calculation
+of $\chi^2$. This function will then be called by the \GLOBES\ minimizers.
+For details, see \Sec~\ref{sec:userchi}.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{center}
 \begin{table}[t!]
@@ -1444,8 +1448,9 @@ Error dimension&$a$&$b$&$c$&$d$&Tilt/Calibration&Remarks\\
 2&-&-&-&-&-&No systematics\\
 4&+&+&+&+&T&Total rates\\
 7& $\infty$ &-& $\infty$ &-&-&Spectrum only\\
-8&-&-&-&-&-&Total rates, No systematics\\
+8&-&-&-&-&-&Total rates, no systematics\\
 9&+&+&+&+&C&Systematics with calibration\\
+20&?&?&?&?&?&User-defined systematics\\
 \hline
 \end{tabular}
 \caption[Table of error dimensions]{\label{tab:error_dim}

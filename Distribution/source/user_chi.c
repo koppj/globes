@@ -91,7 +91,7 @@ int glbGetCurrentRule()
 }
 
 // ----------------------------------------------------------------------------
-double glbGetSignalBin(int exp, int rule, int bin)
+double glbGetSignalBinInRule(int exp, int rule, int bin)
 // ----------------------------------------------------------------------------
 // Returns the signal rate for the given experiment, rule and bin
 // ----------------------------------------------------------------------------
@@ -102,7 +102,7 @@ double glbGetSignalBin(int exp, int rule, int bin)
 }
 
 // ----------------------------------------------------------------------------
-double glbGetBackgroundBin(int exp, int rule, int bin)
+double glbGetBackgroundBinInRule(int exp, int rule, int bin)
 // ----------------------------------------------------------------------------
 // Returns the background rate for the given experiment, rule and bin
 // ----------------------------------------------------------------------------
@@ -124,7 +124,7 @@ double glbGetChannelBin(int exp, int channel, int bin)
 }
 
 // ----------------------------------------------------------------------------
-double glbGetMeasuredBin(int exp, int rule, int bin)
+double glbGetObservedBinInRule(int exp, int rule, int bin)
 // ----------------------------------------------------------------------------
 // Returns the measured event rate for the given experiment, rule and bin
 // ----------------------------------------------------------------------------

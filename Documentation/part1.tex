@@ -1007,6 +1007,9 @@ factors is initially set to $1.0$. Therefore, for the calculation of
 $\chi^2$ with systematics only, we do not have to care about the
 matter density scaling factors.
 
+\section{Built-in systematics}
+\index{norm}{Systematics!builtin functions}
+
 \example{Correlation between $\stheta$ and $\deltacp$}{
 \label{ex:corrth13dcp}
 \index{norm}{Correlation!two-parameter}
@@ -1048,7 +1051,7 @@ The resulting data can then be plotted as a contour plot (2 d.o.f.):
 }
 
 Keeping all oscillation parameters and matter density scaling factors fixed,
- one can use the following functions to obtain the total $\chi^2$ of all 
+ one can use the following builtin functions to obtain the total $\chi^2$ of all 
  specified oscillation channels including systematics:
 \begin{function} 
 \GLBNS{ChiSys}
@@ -1085,6 +1088,165 @@ This minimization is done independently for all auxiliary parameters of the rule
 The systematics minimization of an experiment can be easily switched on and off with \GLB{SwitchSystematics}, \ie, one can also compute the $\chi^2$ with statistics only. In addition, several options for 
 systematics are available, such as only using total event rates without
 spectral information. For details, we refer to \Chapt~\ref{chapt:running}.
+
+
+\section{User-defined systematics calculation}
+\index{norm}{Systematics!user-defined}
+\label{sec:userchi}
+
+For some experimental setups the built-in systematics functions are not sufficient
+because they cannot handle systematical errors that are correlated between different
+parts of a multi-detector or multi-source setup. Therefore \GLOBES\ allows the user
+to override the default $\chi^2$ calculation. The reader who wants to use this
+feature should be familiar with \Sec~\ref{sec:channel} and~\Sec~\ref{sec:rules}
+of the \AEDL\ manual.
+
+To specify a user-defined $\chi^2$ algorithm, the following function can be used:
+\begin{function}
+\GLBNS{SetUserChi}
+{\tt void glbSetUserChi(int exp,int rule,double (*chi\_func)(double x[]),int dim,%
+double centers[],double errors[],char *info)} tells \GLOBES\ to use {\tt chi\_func}
+to calculate $\chi^2$ for experiment {\tt exp} and rule {\tt rule} (these parameters
+can take the value \GLBC{GLB\_ALL} to specify all experiments or all rules). {\tt dim} is
+the number of variables parametrizing the systematical errors, while {\tt centers[]}
+and {\tt errors[]} give their central values and standard deviations, respectively.
+When \GLOBES\ calls {\tt chi\_func}, the parameter array {\tt x[]} will contain
+the values of the systematics parameters for which $\chi^2$ should be calculated.
+Deviating from the standard conventions, the entries of {\tt x[]} will start at
+index 1.
+\end{function}
+
+In addition to calling {\tt glbSetUserChi}, {\tt @errordim\_sys\_on} has to be set
+to 20 in the \AEDL\ file (see~\Sec~\ref{sec:rules}).
+
+Note that {\tt chi\_func} will be called many times by the \GLOBES\ minimizers.
+Therefore the function should be as efficient as possible. The function
+will need low-level access to internal \GLOBES\ data. Therefore the following
+routines are provided:
+\begin{function}
+\GLBNS{GetCurrentExp}
+{\tt int glbGetCurrentExp()} gives the number of the experiment for which
+{\tt chi\_func} has been called.
+\end{function}
+\begin{function}
+\GLBNS{GetCurrentRule}
+{\tt int glbGetCurrentRule()} gives the number of the rule in the current experiment
+for which {\tt chi\_func} has been called.
+\end{function}
+\begin{function}
+\GLBNS{GetObservedBinInRule}
+{\tt double glbGetObservedBinInRule(int exp,int rule,int bin)} returns the number of
+signal events for experiment {\tt exp}, rule {\tt rule} and bin {\tt bin}, as calculated
+in the preceding call to {\tt glbSetRates}.
+\end{function}
+\begin{function}
+\GLBNS{GetSignalBinInRule}
+{\tt double glbGetSignalBinInRule(int exp,int rule,int bin)} returns the number of
+signal events for experiment {\tt exp}, rule {\tt rule} and bin {\tt bin}, calculated
+for the oscillation parameter values that are currently being tested.
+\end{function}
+\begin{function}
+\GLBNS{GetBackgroundBinInRule}
+{\tt double glbGetBackgroundBinInRule(int exp,int rule,int bin)} returns the number of
+background events for experiment {\tt exp}, rule {\tt rule} and bin {\tt bin}, calculated
+for the oscillation parameter values that are currently being tested.
+\end{function}
+\begin{function}
+\GLBNS{GetChannelBin}
+{\tt double glbGetChannelBin(int exp,int channel,int bin)} returns the number of
+signal events for experiment {\tt exp}, channel {\tt channel} and bin {\tt bin}, calculated
+for the oscillation parameter values that are currently being tested.
+\end{function}
+\begin{function}
+\GLBNS{ShiftSignalEnergyScale}
+{\tt int glbShiftSignalEnergyScale(int exp,int rule,double amount)} applies an energy
+calibration error of magnitude {\tt amount} to the signal event rates in experiment
+{\tt exp} and rule {\tt rule}. Subsequent calls to {\tt glbGetSignalBinInRule} will
+return the modified event rates. For details on energy calibration errors, see
+\Sec~\ref{sec:rules}.
+\end{function}
+\begin{function}
+\GLBNS{ShiftBackgroundEnergyScale}
+{\tt int glbShiftBackgroundEnergyScale(int exp,int rule,double amount)} applies an energy
+calibration error of magnitude {\tt amount} to the background event rates in experiment
+{\tt exp} and rule {\tt rule}. Subsequent calls to {\tt glbGetBackgroundBinInRule} will
+return the modified event rates. For details on energy calibration errors, see
+\Sec~\ref{sec:rules}.
+\end{function}
+
+Typical applications for user-defined systematics are reactor neutrino experiments,
+where systematics play a crucial role. For a setup with near and far detectors,
+the formula for $\chi^2$ is
+\begin{align}
+  \chi^2 =& \sum_{i=1}^{\textrm{\# of bins}} \sum_{d = N,F}2
+     \left( O_{d,i} - (1 + a_R + a_d) T_{d,i} +
+       (1 + a_R + a_d) T_{d,i} \log \frac{(1 + a_R + a_d) T_{d,i}}{O_{d,i}}  \right) \nonumber\\
+         & \ \ + \frac{a_R^2}{\sigma_R^2} + \frac{a_N^2}{\sigma_N^2} + \frac{a_F^2}{\sigma_F^2}
+\label{equ:chi2reactor}
+\end{align}
+where $O_{N,i}$ and $O_{F,i}$ are the event rates for the $i$-th bin in the near and
+far detector, calculated for the assumed ``true'' values of the oscillation parameters.
+$T_{d,i}$ are the event rates for the parameter values that are currently being tested.
+$a_R$, $a_N$ and $a_F$ parametrize the small uncertainties in the reactor flux and the fiducial
+mass of the two detectors. In this example their central values are assumed to be zero,
+while their standard deviations are $\sigma_R$, $\sigma_N$ and $\sigma_F$.
+
+The first line of \equ{chi2reactor} is the standard $\chi^2$ expression for
+the Poisson distribution, while the terms in the second line are penalties
+for deviations of the systematics parameters from their central values.
+
+
+\example{Systematics for a reactor setup with near and far detector}{
+The following code fragment calculates $\chi^2$ for a reactor setup with
+a far detector (experiment 0) and a near detector (experiment 1),
+including six different systematical errors: the flux normalization
+of the reactor ({\tt x[1]}), the fiducial mass uncertainties of the far
+({\tt x[2]}) and near ({\tt x[3]}) detector, the normalization of the
+background ({\tt x[4]}) and energy calibration errors for the far
+({\tt x[5]}) and near ({\tt x[6]}) detectors. We assume that the central
+values and errors of these parameters are stored in the global arrays
+{\tt sys\_centers} and {\tt sys\_errors}. The calculation follows
+\equ{chi2reactor}.
+
+\begin{quote}{\tt \footnotesize
+  double chi2nearfar(double *x)                                                 \\
+  \{                                                                            \\
+\hspace*{0.5 cm}      double chi2 = 0;                                          \\
+\hspace*{0.5 cm}      double chirate, measured\_rate;                           \\
+\hspace*{0.5 cm}                                                                \\
+\hspace*{0.5 cm}      glbShiftSignalEnergyScale(0, 0, x[5]);   /* Apply E calib. error */ \\
+\hspace*{0.5 cm}      glbShiftSignalEnergyScale(1, 0, x[6]);                    \\
+\hspace*{0.5 cm}      glbShiftBackgroundEnergyScale(0, 0, x[5]);                \\
+\hspace*{0.5 cm}      glbShiftBackgroundEnergyScale(1, 0, x[6]);                \\
+\hspace*{0.5 cm}      for (int i=0; i < NBINS; i++) \{                          \\
+\hspace*{1.0 cm}        /* Statistical part of chi\textasciicircum2 for far detector */ \\
+\hspace*{1.0 cm}        chirate = (x[1]+x[2]) * glbGetSignalBinInRule(0,0,i) +  \\
+\hspace*{2.0 cm}                        (x[4]+x[3]) * glbGetBackgroundBinInRule(0,0,i);\\
+\hspace*{1.0 cm}        measured\_rate = glbGetObservedBinInRule(0,0,i);        \\
+\hspace*{1.0 cm}        chi2 += 2 * (measured\_rate - chirate);                 \\
+\hspace*{1.0 cm}        if (measured\_rate > 0  \&\&  chirate > 0)              \\
+\hspace*{1.5 cm}          chi2 += 2 * chirate * log(chirate / measured\_rate);  \\
+\hspace*{1.0 cm}                                                                \\
+\hspace*{1.0 cm}        /* Statistical part of chi\textasciicircum2 for near detector */ \\
+\hspace*{1.0 cm}        chirate = (x[1]+x[3]) * glbGetSignalBinInRule(1,0,i) +  \\
+\hspace*{2.0 cm}                        (x[4]+x[3]) * glbGetBackgroundBinInRule(1,0,i);\\
+\hspace*{1.0 cm}        measured\_rate = glbGetObservedBinInRule(1,0,i);        \\
+\hspace*{1.0 cm}        chi2 += 2 * (measured\_rate - chirate);                 \\
+\hspace*{1.0 cm}        if (measured\_rate > 0  \&\&  chirate > 0)              \\
+\hspace*{1.5 cm}          chi2 += 2 * chirate * log(chirate / measured\_rate);  \\
+\hspace*{0.5 cm}      \}                                                        \\
+\hspace*{0.5 cm}                                                                \\
+\hspace*{0.5 cm}      for (int j=0; j < 6; j++)  /* Penalties */                \\
+\hspace*{1.0 cm}        chi2 += square((x[j+1] - sys\_centers[j]) / sys\_errors[j]);\\
+\hspace*{0.5 cm}                                                                \\
+\hspace*{0.5 cm}      /* The function is called for each exp ->
+                                       Assign chi\textasciicircum2/2 to each */ \\
+\hspace*{0.5 cm}      return chi2 / 2;                                          \\
+  \}                                                                            
+}
+\end{quote}
+}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter[Calculating $\chi^2$-projections: how one can include correlations]{Calculating $\boldsymbol{\chi^2}$-projections: how one can include correlations}
