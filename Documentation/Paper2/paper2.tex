@@ -1,0 +1,371 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\NeedsTeXFormat{LaTeX2e}
+\documentclass[12pt,a4paper]{article}
+
+%-- used packages ------------------------------------------------------
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{epsfig}
+\usepackage{graphicx}
+\usepackage{cite}
+%\usepackage{mcite}
+%-- page parameters -------------------------------------------------
+
+\jot = 1.5ex
+\parskip 5pt plus 1pt
+\parindent 0pt
+\evensidemargin -0.1in   \oddsidemargin  -0.1in
+\textwidth  6.45in       \textheight 9.1in
+\topmargin -1.0cm        \headsep    1.0cm
+
+%-- command (re)definitions -----------------------------------------
+
+
+\newcommand{\capdef}{}
+%\newcommand{\mycaption}[2][\capdef]{\renewcommand{\capdef}{#2}%
+%       \caption[#1]{{\itshape #2}}}
+\newcommand{\mycaption}[2][\capdef]{\renewcommand{\capdef}{#2}%
+       \caption[#1]{{\footnotesize #2}}}
+\makeatletter
+\renewcommand{\fnum@table}{\textbf{\tablename~\thetable}}
+\renewcommand{\fnum@figure}{\textbf{\figurename~\thefigure}}
+\makeatother
+\def\ltap{\ \raisebox{-.4ex}{\rlap{$\sim$}} \raisebox{.4ex}{$<$}\ }
+\def\gtap{\ \raisebox{-.4ex}{\rlap{$\sim$}} \raisebox{.4ex}{$>$}\ }
+
+\newcounter{myenumi}
+\newcommand{\myitem}{\refstepcounter{myenumi}\item}
+\renewcommand{\themyenumi}{\roman{myenumi}}
+\newenvironment{mylist}{%
+        \setcounter{myenumi}{0}
+        \begin{list}{\textit{\themyenumi)}}{%
+        \setlength{\topsep}{0.2\baselineskip}%
+        \setlength{\partopsep}{-\topsep}%
+        \setlength{\itemsep}{\topsep}%
+        \setlength{\parsep}{0\baselineskip}%
+        \setlength{\leftmargin}{0em}%
+        \setlength{\listparindent}{\parindent}%
+        \setlength{\itemindent}{2.5em}%
+        \setlength{\labelwidth}{1.5em}%
+        \setlength{\labelsep}{0.75em}}}%
+{\end{list}}
+
+\newlength{\myem}
+\settowidth{\myem}{m}
+\newcommand{\sep}[1]{#1}
+\newcounter{mysubequation}[equation]
+\renewcommand{\themysubequation}{\alph{mysubequation}}
+\newcommand{\mytag}{\stepcounter{mysubequation}%
+\tag{\theequation\protect\sep{\themysubequation}}}
+\newcommand{\globallabel}[1]{\refstepcounter{equation}\label{#1}}
+
+\makeatletter
+\renewcommand{\section}{\@startsection{section}{1}{0em}{-\baselineskip}%
+{\baselineskip}{\normalfont\large\bfseries}}
+\renewcommand{\subsection}%
+{\@startsection{subsection}{2}{0em}{-0.7\baselineskip}%
+{0.7\baselineskip}{\normalfont\bfseries}}
+\makeatother
+
+\newcommand{\ie}{{\it i.e.}}
+\newcommand{\Ie}{{\it I.e.}}
+\newcommand{\eg}{{\it e.g.}}
+\newcommand{\Eg}{{\it E.g.}}
+\newcommand{\cf}{{\it cf.}}
+\newcommand{\etc}{{\it etc.}}
+\newcommand{\eq}{Eq.}
+\newcommand{\eqs}{Eqs.}
+\newcommand{\Def}{Definition}
+\newcommand{\fig}{Fig.}
+\newcommand{\Fig}{Fig.}
+\newcommand{\figs}{Figs.}
+\newcommand{\Figs}{Figs.}
+\newcommand{\Ref}{Ref.}
+\newcommand{\Refs}{Refs.}
+\newcommand{\Sec}{Sec.}
+\newcommand{\Secs}{Secs.}
+\newcommand{\Chapt}{Chapter}
+\newcommand{\Chapts}{Chapters}
+\newcommand{\Part}{Part}
+\newcommand{\App}{Appendix}
+\newcommand{\Apps}{Appendices}
+\newcommand{\Tab}{Table}
+\newcommand{\Tabs}{Tables}
+
+\newcommand{\bi}{\begin{itemize}}
+\newcommand{\ei}{\end{itemize}}
+\newcommand{\ra}{$\rightarrow$}
+\newcommand{\be}{\begin{equation}}
+\newcommand{\ee}{\end{equation}}
+\newcommand{\bea}{\begin{eqnarray}}
+\newcommand{\eea}{\end{eqnarray}}
+\newcommand{\nn}{\nonumber}
+\newcommand{\ldm}{\Delta m_{31}^2}
+\newcommand{\sdm}{\Delta m_{21}^2}
+\newcommand{\deltacp}{\delta_{\mathrm{CP}}}
+\newcommand{\stheta}{\sin^2 2 \theta_{13}}
+
+\newcommand{\MINOS}{{\sf MINOS}}
+\newcommand{\ICARUS}{{\sf ICARUS}}
+\newcommand{\OPERA}{{\sf OPERA}}
+\newcommand{\JHFSK}{{\sf JHF-SK}}
+\newcommand{\NUMI }{{\sf NuMI}}
+\newcommand{\ReactorI}{{\sf Reactor-I}}
+\newcommand{\ReactorII}{{\sf Reactor-II}}
+\newcommand{\JHFHK}{{\sf JHF-HK}}
+\newcommand{\NuFactI}{{\sf NuFact-I}}
+\newcommand{\NuFactII}{{\sf NuFact-II}}
+
+\newcommand{\GLOBES}{{\sf GLoBES}}
+\newcommand{\AEDL}{{\sf AEDL}}
+\newcommand{\EDM}{{\sf EDM}}
+
+\newcommand{\equ}[1]{\eq~(\ref{equ:#1})}
+\newcommand{\figu}[1]{\fig~\ref{fig:#1}}
+\newcommand{\tabl}[1]{\Tab~\ref{tab:#1}}
+\newcommand{\tb}{\hspace*{3ex}}
+
+\begin{document}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%                     Title-page                              %%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{titlepage}
+
+% the footnote symbols are only redefined for the title page !
+\renewcommand{\thefootnote}{\alph{footnote}}
+
+\vspace*{-3.cm}
+\begin{flushright}
+TUM-HEP-YYY/0X\\
+%hep-ph/
+\end{flushright}
+
+\vspace*{0.5cm}
+
+\renewcommand{\thefootnote}{\fnsymbol{footnote}}
+\setcounter{footnote}{-1}
+
+{\begin{center}
+{\Large\bf New features in the simulation of long baseline experiments with GLoBES 3.0 (working title)}
+\end{center}}
+{\begin{center}
+{\large\bf (General Long Baseline Experiment Simulator)}
+\end{center}}
+\renewcommand{\thefootnote}{\alph{footnote}}
+
+\vspace*{.8cm}
+%\vspace*{.3cm}
+{\begin{center} {\large{\sc
+                P.~Huber\footnotemark[1],~
+                J.~Kopp\footnotemark[2],~
+                M.~Lindner\footnotemark[2],~
+                M.~Rolinec\footnotemark[2],~
+                W.~Winter\footnotemark[3]
+                }}
+
+\footnote{All correspondence should be addressed to {\tt globes@ph.tum.de}}
+
+\end{center}}
+\vspace*{0cm}
+{\it
+\begin{center}
+
+\footnotemark[1]%${}^,$\footnotemark[2]%
+       Department of Physics, University of Wisconsin, \\
+       1150 University Avenue, Madison, WI 53706, USA
+
+\vspace*{1mm}
+
+\footnotemark[2]%
+       Physik--Department, Technische Universit\"at M\"unchen, \\
+       James--Franck--Strasse, 85748 Garching, Germany
+
+\vspace*{1mm}
+
+\footnotemark[3]%
+       School of Natural Sciences, Institute for Advanced Study, \\
+       Einstein Drive, Princeton, NJ 08540, USA
+
+\end{center}}
+
+\vspace*{1cm}
+
+
+\begin{abstract}
+Here comes the abstract.
+\end{abstract}
+
+
+\vspace*{.5cm}
+
+
+\end{titlepage}
+
+\newpage
+
+\renewcommand{\thefootnote}{\arabic{footnote}}
+\setcounter{footnote}{0}
+
+\section{Introduction}
+
+\nocite{Huber:2004ka}
+
+\section{User-defined priors and systematics}
+
+\bi
+ \item
+  User-defined priors
+ \item
+  User-defined systematics
+\ei
+
+\section{Simulation of non-standard physics with GLoBES}
+
+HOWTO
+
+\section{Simulation of new experiment features}
+
+\bi
+\item 
+ Built-in $\beta$-beam fluxes
+\item
+ New AEDL features
+\item
+ New AEDL files in standard GLoBES delivery + changes to existing ones
+\ei
+
+\section{New platform and interpreter support}
+
+\bi
+\item
+ PERL?
+\item 
+ Windows?
+\item
+ Better RedHat support
+\item
+ Changes in installation scheme
+\ei
+
+\section{New ways to improve performance}
+
+\bi
+\item 
+ GLoBES on clusters, Condor; parallized code; static links
+\item 
+ 64 bit support
+\item 
+ New minimization algorithm!?
+\ei
+
+\section{Summary and conclusions}
+
+\begin{appendix}
+\section{To do list for new feature release (early spring?); internal}
+
+\subsection*{Programming [PH+JK?]}
+
+\bi
+\item
+ Implement user-defined priors+ systematics (done?)
+\item
+ Clean up linking scheme: No dynamic linking of modules (physical module
+ support) anymore; support static binaries, support Condor etc.;
+ problem with append mode (files) [PH]
+\item
+ New algoriihm for minimzer [JK]? In this context: Is there any
+ efficient algorithm for more than six parameters?
+\item
+ Can globes-command (!) take more than six parameters if GLB\_OSCP $>$ 6?
+ Adjust, if necessary.
+\item
+ Implement Walter's or any modified bugfix for glb\_min\_sup.c
+ (we had some negative feedback about that, and for more than
+ six parameters ITMAX is far away from being sufficient)
+\ei
+
+\subsection*{Testing [MR+All?]}
+
+\bi
+\item
+ Does release-version support Condor and more than six parameters?
+\item 
+ Do beta-beam fluxes etc. work?
+\item
+ Do examples produce same results as before?
+\item
+ Are AEDL files consistent?
+\ei
+
+\subsection*{Documentation [WW with some help?]}
+
+\bi
+\item
+ Document all new features and make examples; 
+ especially user-defined priors+systematics, Non-standard-Support
+\item
+ New examples files for new examples in manual
+\item
+ Describe what papers have to be cited
+\ei
+
+\subsection*{Paper [WW/ML?]}
+
+\bi
+ \item
+  Write new release paper (this draft)
+\ei
+
+\subsection*{AEDL files [MR?]}
+
+\bi
+\item
+ Provide new AEDL files for some/any finished (=published) projects!?
+ \bi
+  \item
+   $\beta$-Beams
+  \item
+   New NuFact (from scoping study); our new NuFact; silver channels?
+  \item
+   Double Chooz
+  \item
+   NOvA, BNL beam?
+ \ei
+\item
+ Cleaned up old AEDL files (e.g., 2.5\% background error NuFact etc.);
+ document what changes
+\item
+ New AEDL file forum on webpage
+\item
+ Clear description in each AEDL file which papers have to be cited
+\ei
+
+\subsection*{Website [ML/JK?]}
+
+\bi
+ \item
+  New layout with new release
+ \item
+  New FAQ section (e.g., about normalization in AEDL fluxes)
+ \item
+  New AEDL file forum
+ \item
+  Figure forum, at least from current projects (download)
+\ei
+
+\end{appendix}
+
+\subsection*{Acknowledgments}
+
+We would like to thank ... 
+
+WW would like to
+acknowledge support from the W.~M.~Keck Foundation and NSF grant PHY-0503584.
+
+\bibliographystyle{apsrev}
+\bibliography{references}
+
+\end{document}
+
