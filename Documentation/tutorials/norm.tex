@@ -1,0 +1,299 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\NeedsTeXFormat{LaTeX2e}
+\documentclass[12pt]{article}
+
+%-- used packages ------------------------------------------------------
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{epsfig}
+\usepackage{graphicx}
+\usepackage{cite}
+%\usepackage{mcite}
+%-- page parameters -------------------------------------------------
+
+\jot = 1.5ex
+\parskip 5pt plus 1pt
+\parindent 0pt
+\evensidemargin -0.1in   \oddsidemargin  -0.1in
+\textwidth  6.45in       \textheight 9.1in
+\topmargin -1.0cm        \headsep    1.0cm
+
+%-- command (re)definitions -----------------------------------------
+
+
+\newcommand{\capdef}{}
+%\newcommand{\mycaption}[2][\capdef]{\renewcommand{\capdef}{#2}%
+%       \caption[#1]{{\itshape #2}}}
+\newcommand{\mycaption}[2][\capdef]{\renewcommand{\capdef}{#2}%
+       \caption[#1]{{\footnotesize #2}}}
+\makeatletter
+\renewcommand{\fnum@table}{\textbf{\tablename~\thetable}}
+\renewcommand{\fnum@figure}{\textbf{\figurename~\thefigure}}
+\makeatother
+\def\ltap{\ \raisebox{-.4ex}{\rlap{$\sim$}} \raisebox{.4ex}{$<$}\ }
+\def\gtap{\ \raisebox{-.4ex}{\rlap{$\sim$}} \raisebox{.4ex}{$>$}\ }
+
+\newcounter{myenumi}
+\newcommand{\myitem}{\refstepcounter{myenumi}\item}
+\renewcommand{\themyenumi}{\roman{myenumi}}
+\newenvironment{mylist}{%
+        \setcounter{myenumi}{0}
+        \begin{list}{\textit{\themyenumi)}}{%
+        \setlength{\topsep}{0.2\baselineskip}%
+        \setlength{\partopsep}{-\topsep}%
+        \setlength{\itemsep}{\topsep}%
+        \setlength{\parsep}{0\baselineskip}%
+        \setlength{\leftmargin}{0em}%
+        \setlength{\listparindent}{\parindent}%
+        \setlength{\itemindent}{2.5em}%
+        \setlength{\labelwidth}{1.5em}%
+        \setlength{\labelsep}{0.75em}}}%
+{\end{list}}
+
+\newlength{\myem}
+\settowidth{\myem}{m}
+\newcommand{\sep}[1]{#1}
+\newcounter{mysubequation}[equation]
+\renewcommand{\themysubequation}{\alph{mysubequation}}
+\newcommand{\mytag}{\stepcounter{mysubequation}%
+\tag{\theequation\protect\sep{\themysubequation}}}
+\newcommand{\globallabel}[1]{\refstepcounter{equation}\label{#1}}
+
+\makeatletter
+\renewcommand{\section}{\@startsection{section}{1}{0em}{-\baselineskip}%
+{\baselineskip}{\normalfont\large\bfseries}}
+\renewcommand{\subsection}%
+{\@startsection{subsection}{2}{0em}{-0.7\baselineskip}%
+{0.7\baselineskip}{\normalfont\bfseries}}
+\makeatother
+
+\newcommand{\ie}{{\it i.e.}}
+\newcommand{\Ie}{{\it I.e.}}
+\newcommand{\eg}{{\it e.g.}}
+\newcommand{\Eg}{{\it E.g.}}
+\newcommand{\cf}{{\it cf.}}
+\newcommand{\etc}{{\it etc.}}
+\newcommand{\eq}{Eq.}
+\newcommand{\eqs}{Eqs.}
+\newcommand{\Def}{Definition}
+\newcommand{\fig}{Fig.}
+\newcommand{\Fig}{Fig.}
+\newcommand{\figs}{Figs.}
+\newcommand{\Figs}{Figs.}
+\newcommand{\Ref}{Ref.}
+\newcommand{\Refs}{Refs.}
+\newcommand{\Sec}{Sec.}
+\newcommand{\Secs}{Secs.}
+\newcommand{\Chapt}{Chapter}
+\newcommand{\Chapts}{Chapters}
+\newcommand{\Part}{Part}
+\newcommand{\App}{Appendix}
+\newcommand{\Apps}{Appendices}
+\newcommand{\Tab}{Table}
+\newcommand{\Tabs}{Tables}
+
+\newcommand{\bi}{\begin{itemize}}
+\newcommand{\ei}{\end{itemize}}
+\newcommand{\ra}{$\rightarrow$}
+\newcommand{\be}{\begin{equation}}
+\newcommand{\ee}{\end{equation}}
+\newcommand{\bea}{\begin{eqnarray}}
+\newcommand{\eea}{\end{eqnarray}}
+\newcommand{\nn}{\nonumber}
+\newcommand{\ldm}{\Delta m_{31}^2}
+\newcommand{\sdm}{\Delta m_{21}^2}
+\newcommand{\deltacp}{\delta_{\mathrm{CP}}}
+\newcommand{\stheta}{\sin^2 2 \theta_{13}}
+
+\newcommand{\MINOS}{{\sf MINOS}}
+\newcommand{\ICARUS}{{\sf ICARUS}}
+\newcommand{\OPERA}{{\sf OPERA}}
+\newcommand{\JHFSK}{{\sf JHF-SK}}
+\newcommand{\NUMI }{{\sf NuMI}}
+\newcommand{\ReactorI}{{\sf Reactor-I}}
+\newcommand{\ReactorII}{{\sf Reactor-II}}
+\newcommand{\JHFHK}{{\sf JHF-HK}}
+\newcommand{\NuFactI}{{\sf NuFact-I}}
+\newcommand{\NuFactII}{{\sf NuFact-II}}
+
+\newcommand{\GLOBES}{{\sf GLoBES}}
+\newcommand{\AEDL}{{\sf AEDL}}
+\newcommand{\EDM}{{\sf EDM}}
+
+\newcommand{\equ}[1]{\eq~(\ref{equ:#1})}
+\newcommand{\figu}[1]{\fig~\ref{fig:#1}}
+\newcommand{\tabl}[1]{\Tab~\ref{tab:#1}}
+\newcommand{\tb}{\hspace*{3ex}}
+
+\begin{document}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%                     Title-page                              %%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\begin{titlepage}
+
+% the footnote symbols are only redefined for the title page !
+\renewcommand{\thefootnote}{\alph{footnote}}
+
+\vspace*{-3.cm}
+\begin{flushright}
+\today
+%TUM-HEP-553/04\\
+%hep-ph/
+\end{flushright}
+
+\vspace*{0.5cm}
+
+\renewcommand{\thefootnote}{\fnsymbol{footnote}}
+\setcounter{footnote}{-1}
+
+{\begin{center}
+{\Large\bf Units for flux files in GLoBES}
+\end{center}}
+\renewcommand{\thefootnote}{\alph{footnote}}
+
+\vspace*{.8cm}
+%\vspace*{.3cm}
+{\begin{center} {\large{\sc
+                P.~Huber\footnote[1]{\makebox[1.cm]{Email:}
+                phuber@physics.wisc.edu}
+             %   M.~Lindner\footnote[2]{\makebox[1.cm]{Email:}
+             %   lindner@ph.tum.de},~and~
+             %   W.~Winter\footnote[3]{\makebox[1.cm]{Email:}
+             %   wwinter@ph.tum.de}
+                }}
+\end{center}}
+\vspace*{0cm}
+{\it
+\begin{center}
+
+\footnotemark[1]${}^,$% 
+      Department of Physics, University of Wisconsin,\\ 
+ 1150 University
+      Avenue, Madison ,WI 53706, USA
+
+\end{center}}
+
+\vspace*{1cm}
+
+
+\begin{abstract}
+A common issue with \GLOBES\ is confusion about the proper units for
+the input flux files for use in \AEDL\ experiment descriptions. 
+\end{abstract}
+
+
+\vspace*{.5cm}
+
+
+%\end{titlepage}
+
+\renewcommand{\thefootnote}{\arabic{footnote}}
+\setcounter{footnote}{0}
+
+\section{Problem}
+
+One problem for the design of \AEDL\ was initially that meaningful
+units for flux data strongly depend on the given type of experiment,
+but also on relatively arbitrary decisions. For accelerator beams
+based on $\pi$-decay one frequently defines the beam luminosity in
+{\it protons on target (pot)} since this number has a one-to-one
+correspondence with the number of neutrinos produced. Another sensible
+unit could be {\it megawatt on target (MW)}, again this number is directly
+correlated with the number of neutrinos and moreover there is a unique
+relation to {\it pot} for a given accelerator. Of course,
+what matters is the integrated luminosity. Thus in some  cases the
+neutrino flux is given per $10^7\,\mathrm{s}$. However,
+most experiments will run for several years, hence also this number
+has to enter somewhere. For neutrino factories the proper number is
+useful muon decays per unit time and for reactor experiments it is
+the thermal power of the reactor {\it asf}. This shows that there is
+not much of a  point to declare one unit for the input fluxes.
+
+\section{Solution}
+
+In understanding how one still can figure out what the correct units
+are for each case, it is a good starting point to look at what
+\GLOBES\ does with the input files. The cross section in the file is given as
+differential cross section divided by energy $x=\sigma/E$, and the flux file
+gives $f$. The differential number of events per GeV $n$ as computed in
+\GLOBES\ without oscillation and efficiencies is given by
+\begin{eqnarray}
+n &=& 5.20034\times x\times E\times f\times\\
+&&\mathtt{@norm}\times\mathtt{@power}\times\mathtt{@stored\_muons}\times\mathtt{@time}\times\mathtt{\$target\_mass}\times(\mathtt{\$baseline})^{-2}\nonumber
+\end{eqnarray}
+ Beware: $5.2\ldots$ is a undocumented fudge factor!
+
+It is the sole responsibility of the author of the \AEDL\ file and its
+supporting files, to ensure that the result makes actually sense. In
+principle it is possible to divide {\tt @time}  by
+{\it eg} $\pi$ and fix that by redefining the flux file by multiplying
+it with $\pi$. Things like that happen and have happened, and worse,
+many of them are not properly commented.
+ 
+\section{Writing \AEDL\ files}
+
+The task is to choose the value of  {\tt @norm} such that all the
+variables in the \AEDL\ file have the proper units {\it eg} {\tt
+  @time} has proper unit years.
+ 
+
+\GLOBES\ assume that the cross
+section $x$ is given in $10^{-38}\,\mathrm{cm}^2$, that all fluxes are
+given at a distance of $1\,\mathrm{km}$ and the proper accounting for
+the number of target nuclei $\tau$ (or protons or whatever applies to the
+given cross section) per unit target mass $m_u$ (which usually is {\it
+  kt}), is dealt with in the
+definition of the flux inside \AEDL.  Assuming that in the flux file
+the data is given as number of neutrinos per unit area $A$ and
+energy bin of width $\Delta E$ at a distance $L$ from the source, one
+obtains
+
+\begin{eqnarray}
+(\mathtt{@norm})^{-1}=5.20034\left(\frac{\Delta E}{\mathrm{GeV}}\right)\left(\frac{A}{\mathrm{cm}^2}\right)\left(\frac{\mathrm{km}}{L}\right)^2\left(\frac{\tau}{m_u}\right)\times10^{-38}\times\left(\frac{\mathcal{L}}{\mathcal{L}_u}\right)
+\end{eqnarray}
+where the $\mathcal{L}$ absorbs all factors in the flux file related to
+the integrated luminosity and $\mathcal{L_u}$ is the unit chosen for
+it.  The concept of integrated luminosity is
+nicely described in the \GLOBES\ manual:
+
+\begin{quote}
+ In \GLOBES , the total number of events is in general proportional to the product of
+\begin{equation}
+\mathrm{Fid.~detector~mass}\,\left[\mathrm{kt/t}\right]\times 
+\mathrm{Running~time} \,\left[\mathrm{yr}\right]\times\left\{ \begin{array}{c}
+\mathrm{Source~power}\,\left[\mathrm{MW/GW}\right]\\
+\mathrm{Useful~muon~decays}\,\left[\mathrm{yr}^{-1}\right]
+\end{array}\right.\,.
+\end{equation}
+Thus, the source power corresponds to either the amount of energy produced per time frame in the target (such as for nuclear reactors or sources based on pion decay), or the useful muon decays per time frame (neutrino factories). In addition, the definition of the source power makes only sense together with the flux normalization, the running time, and fiducial detector mass in order to define the total integrated luminosity. Therefore, one can, in principle, use arbitrary units for these components as long as their product gives the wanted neutrino flux. However, it is
+recommended to use normalizations such that the source power units are $\mathrm{MW}$ for a proton-based beam, and $\mathrm{GW}_\mathrm{thermal}$ for a reactor experiment. Correspondingly, the detector mass units should be kilotons for a proton-based beam, and tons for a reactor experiment. In any case it is a good
+idea to document the choices made by the user by corresponding comments
+in \AEDL.
+\end{quote}
+
+A little example may illustrate this:
+The flux is given for $10^{21}\, \mathrm{pot}\,\mathrm{y}^{-1}$ of
+$10\,\mathrm{GeV}$ protons, thus a good choice for the units $\mathcal{L}_u$
+is $\mathrm{MW}\,\mathrm{y}^{-1}$, which means that
+$\mathcal{L}/\mathcal{L}_u$ is given by (assuming a $10^7\,\mathrm{s}$
+year)
+\begin{equation}
+\frac{\mathcal{L}}{\mathcal{L}_u}=\frac{10\,\mathrm{GeV}\,10^{21}\,\mathrm{pot}\,\mathrm{y}}{10^7\,\mathrm{s}}\times(\mathrm{MW}\,\mathrm{y}^{-1})^{-1}=0.160218\ldots
+\end{equation}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                     Introduction                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+\end{document}
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% End: 
