@@ -2494,6 +2494,142 @@ value {\tt filter}.
 \end{function}
 The return value of all {\tt Set-} functions is $-1$ if they were not successful.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Simulating non-standard physics}
+\label{chapt:nsphysics}
+\index{norm}{Non-standard physics}
+
+In this chapter, we discuss how to simulate non-standard physics with \GLOBES , \ie, physics
+beyond three-flavor neutrino oscillations. For the first time, this feature was used in \Ref~\cite{Blennow:2005yk},
+and it has become a standard feature of \GLOBES\ starting from version 3.0 (CHECK). Since the 
+computation of oscilltion probabilities, and therefore the flavor transition probabilities, is the core basic
+element of \GLOBES , the introduction of non-standard physics requires that one produce a new version branch
+of the software, \ie, the software has to be re-compiled after the modification of the probability engine.
+Below, we will demonstrate how and where to do the necessary mofifications, and how to simulate non-standard
+physics in the application software using the ``new'' \GLOBES .
+
+\section{Modification of \GLOBES }
+
+In order to modify \GLOBES , first install a current version of GLOBES (version larger than X.X.X CHECK) as
+a new branch, \ie, in a new directory, and rename the directory \GLOBES\ expanded into. 
+Using multiple versions of \GLOBES , it is, in general, advisable
+to specify the installation directory of all used versions manually (see ``Installation without
+root privilege'' in {\tt INSTALL} file). For instance, if the current ``standard'' version of \GLOBES\ is
+installed in {\tt GLOBES/Versions}, you may use {\tt GLOBES/NSVersion} for the non-standard version
+specified in {\tt configure}. Do not forget to rename the directory \GLOBES\ tar-ball expanded into: For instance,
+change the name from {\tt globes-3.0.0} to {\tt globes-3.0.0nsi}. 
+Then you can modify the source code in the sub-directories of {\tt globes-3.0.0nsi}, such as {\tt globes-3.0.0nsi/source}.
+In particular, we will be interested in modifying {\tt glb\_probability.cc}, which contains the
+Hamiltonian in the routine {\tt ComputeMixingMatrix}.
+%
+In general, the steps to introduce non-standard physics as follows:
+\begin{enumerate}
+\item
+ Change the number of oscillation parameters in {\tt GLB\_OSCP} from six (standard) to the
+ new number $6+N$, where $N$ is the number of non-standard parameters. 
+ This change has to be done in the header file {\tt globes.h} in the sub-directory {\tt globes}
+ where the tar-ball was extracted into,  {\em as well as} in the {\tt include/globes} sub-directory
+ where the non-standard version was installed into (such as {\tt GLOBES/NSVersion/include/globes}).
+\item 
+ Modify {\tt glb\_probability.cc} to include the non-standard effects. The parameters
+ can be accessed by {\tt nsparams[0]}, {\tt nsparams[1]}, ..., {\tt nsparams[N-1]}.
+\item
+ Re-compile the software using \\
+ {\tt make} \\
+ {\tt make install}
+\end{enumerate}
+Now your version of \GLOBES\ uses $6+N$ transition parameters, the six standard oscillation parameters,
+and $N$ additional ones. 
+
+\section{Using a non-standard version of \GLOBES }
+
+Using more than six transition parameters in \GLOBES , you will have to maintain the additional parameters. 
+For example, there are no standard routines in \GLOBES\ which define projections including more than six parameters, 
+which means that you should only use {\tt glbChiNP} further on. In addition, you can still use {\tt glbDefineParams}, but this 
+will only access the six standard parameters. You will need to set the additional ones manually using {\tt glbSetOscParams}. 
+Do not forget to maintain your non-standard parameters, since any negligence will be punished by un-predicted behavior!
+
+In order to use the non-standard parameters, \GLOBES\ creates any set of oscillation parameters (type {\tt glb\_params})
+with the additional parameters. To access the non-standard parameters, you can use the following functions as usual:
+\begin{itemize}
+\item
+{\tt glbSetOscParams}
+\item
+{\tt glbGetOscParams}
+\item
+{\tt glbSetProjectionFlag}
+\item
+{\tt glbGetProjectionFlag}
+\end{itemize}
+In all these cases, the last parameter {\tt which} can now run from $0$ to {\tt GLB\_OSCP}$-1$. For instance,
+\begin{quote}
+{\tt
+ glbDefineParams(true\_values,0.55,0.15,0.78,0.0,0.000082,0.0022); \\
+ glbSetOscParams(true\_values,0.0,6);
+}
+\end{quote}
+sets all of the oscillation parameters if {\tt GLB\_OSCP}=7. In addition, the function {\tt glbCopyParams}
+can be used to copy all parameters inluding the non-standard ones. For projections,
+do not use any of the {\tt glbChi...} functions anymore except from {\tt glbChiNP} in order to have a
+predictive behavior of the extra dimenstions. Similar to the oscillation parameters, you can define
+the marginalization over the extra parameter(s) by {\tt glbSetProjectionFlag}. You can find a simple
+example using non-standard physics on page~\pageref{ex:nsphysics}.
+
+\example{Non-standard process on Hamiltonian level}{
+\label{ex:nsphysics}
+\index{norm}{Hamiltonian}
+Let us discuss an example of a very simple Hamiltonian-level non-standard flavor-changing effect which 
+couples $\nu_\mu$ to $\nu_\tau$ in flavor base. This effect can be parameterized
+relative to the standard matter effect acting on $\nu_e$ by an additional
+parameter, which we adopt as our 7th oscillation parameter. In order
+to incorporate this effect, we change a few lines in the function {\tt ComputeMixingMatrix}
+in {\tt glb\_probability.cc}:
+\begin{quote}
+{\tt {\footnotesize
+double msw = 0.1*1.5*anti\_neutrinos*(10E-4)*neutrino\_energy*0.5*matter\_density; \\
+md[0][0] += msw; \\
+md[1][2] += msw*nsparams[0]; md[2][1] += msw*nsparams[0];
+}}
+\end{quote}
+Here we have assume a real contribution which has to be added in a Hermitian way (the Hamiltonian
+has to be Hermitian), where the first line is the standard matter effect acting on $\nu_e$ only 
+($2 \sqrt{2} G_F n_e E$ expressed in our units). 
+
+In the application software, we can now use this additional parameter. Let us assume that we
+want to compute the projection onto the $\stheta$-axis when we do not know the size of the  non-standard
+effect, \ie, we keep it completely free but assume it to be zero as null hypothesis:
+\begin{quote}
+{\tt {\footnotesize
+ \#define MY\_FV 6 \\
+ ... \\
+ glbDefineParams(true\_values,theta12,theta13,theta23,deltacp,sdm,ldm); \\
+ glbSetOscParams(true\_values,0.0,MY\_FV); \\
+ glbDefineParams(input\_errors,0.1*theta12,0,0,0,0.1*sdm,0); \\
+ glbSetOscParams(input\_errors,0,MY\_FV);  \\
+ glbSetDensityParams(input\_errors,0.05,GLB\_ALL); \\
+ glbSetOscillationParameters(); glbSetRates(); \\
+ glbSetStartingValues(true\_values);glbSetInputErrors(input\_errors); \\
+ \\
+ glbDefineProjection(my\_proj,GLB\_FREE,GLB\_FIXED,GLB\_FREE,\\
+  \hspace*{2cm} GLB\_FREE,GLB\_FREE,GLB\_FREE); \\
+ glbSetProjectionFlag(my\_proj,GLB\_FREE,MY\_FV); \\
+ glbSetDensityProjectionFlag(my\_proj,GLB\_FREE,GLB\_ALL); \\
+ glbSetProjection(my\_proj);
+ \\
+ glbCopyParams(true\_values,fit\_values); \\
+ glbSetOscParams(fit\_values,0.1,GLB\_THETA\_13); \\
+ res=glbChiNP(fit\_values,minimum,GLB\_ALL); 
+}}
+\end{quote}
+This code fragment illustrates the implementation of a {\tt glbChiTheta} function
+including the non-standard effect, which is being marginalized over.
+Alternatively, one could define a {\tt glbChiTheta} fixing the non-standard
+parameter, or include external constrainys to limit its size. Therefore, 
+there is no ``standard'' treatment of new physics effects incorporated
+in \GLOBES .
+}
+
+
 %%% Local Variables: 
 %%% mode: latex
 %%% TeX-master: Manual.tex
