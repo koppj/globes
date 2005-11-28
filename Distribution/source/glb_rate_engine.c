@@ -706,6 +706,10 @@ void glb_shift_energy_scale(double g,double* ratesin, double* ratesout)
 	{
 	  ratesout[i]=0.0;
 	}
+      else if (k==bins-1)   // This prevents reading beyond array boundaries below - JK
+        {
+          ratesout[i]=(1+g)*((0-ratesin[k])*(ki-k)+ratesin[k]);
+        }
       else
 	{
 	  ratesout[i]=(1+g)*((ratesin[k+1]-ratesin[k])*(ki-k)+ratesin[k]);

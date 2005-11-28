@@ -363,3 +363,4 @@ documented!
         Renamed some of the functions in user_chi.c with more unambiguous
         names
 
+26/11/05 JK -- Fixed problem in glb_shift_energy_scale (read beyond array boundaries)
