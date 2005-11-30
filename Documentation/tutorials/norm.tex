@@ -240,7 +240,8 @@ variables in the \AEDL\ file have the proper units {\it eg} {\tt
 section $x$ is given in $10^{-38}\,\mathrm{cm}^2$, that all fluxes are
 given at a distance of $1\,\mathrm{km}$ and the proper accounting for
 the number of target nuclei $\tau$ (or protons or whatever applies to the
-given cross section) per unit target mass $m_u$ (which usually is {\it
+given cross section\footnote{The cross section which come with
+  \GLOBES\ always are per nucleon.}) per unit target mass $m_u$ (which usually is {\it
   kt}), is dealt with in the
 definition of the flux inside \AEDL.  Assuming that in the flux file
 the data is given as number of neutrinos per unit area $A$ and
@@ -248,7 +249,9 @@ energy bin of width $\Delta E$ at a distance $L$ from the source, one
 obtains
 
 \begin{eqnarray}
-(\mathtt{@norm})^{-1}=5.20034\left(\frac{\Delta E}{\mathrm{GeV}}\right)\left(\frac{A}{\mathrm{cm}^2}\right)\left(\frac{\mathrm{km}}{L}\right)^2\left(\frac{\tau}{m_u}\right)\times10^{-38}\times\left(\frac{\mathcal{L}}{\mathcal{L}_u}\right)
+\mathtt{@norm}=\frac{1}{5.20034}\left(\frac{\mathrm{GeV}}{\Delta
+      E}\right)
+\left(\frac{\mathrm{cm}^2}{A}\right)\left(\frac{L}{\mathrm{km}}\right)^2\left(\frac{\tau}{m_u}\right)\times10^{-38}\times\left(\frac{\mathcal{L}_u}{\mathcal{L}}\right)
 \end{eqnarray}
 where the $\mathcal{L}$ absorbs all factors in the flux file related to
 the integrated luminosity and $\mathcal{L}_u$ is the unit chosen for
