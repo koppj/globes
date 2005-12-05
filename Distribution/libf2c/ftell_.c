@@ -1,46 +1,35 @@
+#include "config.h"
 #include "f2c.h"
 #include "fio.h"
 
- static FILE *
-#ifdef KR_headers
-unit_chk(Unit, who) integer Unit; char *who;
-#else
-unit_chk(integer Unit, char *who)
-#endif
+static FILE *
+unit_chk (integer Unit, char *who)
 {
-	if (Unit >= MXUNIT || Unit < 0)
-		f__fatal(101, who);
-	return f__units[Unit].ufd;
-	}
+  if (Unit >= MXUNIT || Unit < 0)
+    f__fatal (101, who);
+  return f__units[Unit].ufd;
+}
 
- integer
-#ifdef KR_headers
-ftell_(Unit) integer *Unit;
-#else
-ftell_(integer *Unit)
-#endif
+integer
+G77_ftell_0 (integer * Unit)
 {
-	FILE *f;
-	return (f = unit_chk(*Unit, "ftell")) ? ftell(f) : -1L;
-	}
+  FILE *f;
+  return (f = unit_chk (*Unit, "ftell")) ? (integer) FTELL (f) : -1L;
+}
 
- int
-#ifdef KR_headers
-fseek_(Unit, offset, whence) integer *Unit, *offset, *whence;
-#else
-fseek_(integer *Unit, integer *offset, integer *whence)
-#endif
+integer
+G77_fseek_0 (integer * Unit, integer * offset, integer * xwhence)
 {
-	FILE *f;
-	int w = (int)*whence;
+  FILE *f;
+  int w = (int) *xwhence;
 #ifdef SEEK_SET
-	static int wohin[3] = { SEEK_SET, SEEK_CUR, SEEK_END };
+  static int wohin[3] = { SEEK_SET, SEEK_CUR, SEEK_END };
 #endif
-	if (w < 0 || w > 2)
-		w = 0;
+  if (w < 0 || w > 2)
+    w = 0;
 #ifdef SEEK_SET
-	w = wohin[w];
+  w = wohin[w];
 #endif
-	return	!(f = unit_chk(*Unit, "fseek"))
-		|| fseek(f, *offset, w) ? 1 : 0;
-	}
+  return !(f = unit_chk (*Unit, "fseek"))
+    || FSEEK (f, (off_t) * offset, w) ? 1 : 0;
+}

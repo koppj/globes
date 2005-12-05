@@ -323,6 +323,10 @@ void glbFreeProjection(glb_projection stale)
 {
   glb_free_osc_proj_type(((glb_projection_type *) stale)->osc);
   glb_free_density_proj_type(((glb_projection_type *) stale)->density);
+  /* BUG #14 -- This line solves a serious leak in connection with the
+   * prior-module.
+   */
+  glb_free(stale);
   stale = NULL;
 }
 

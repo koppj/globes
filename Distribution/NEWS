@@ -359,8 +359,30 @@ documented!
 	In glb_modules.c glb-modules.h is only included if GLB_WO_MODULES is not 
 	defined, thus avoiding a warning about the redefinition of GLB_MOD_NSP. 
 
+
+04/10/05
+******** Version 2.3.9
+	PH -- trying to produce a version which easily (!) can work
+	with condor and on FC.
+
+	Fixed a problem in libf2c/main.c, main was multiply defined. I
+	just made the code which creates this problem conditional. If
+	it turn out you need it define GLB_ORIG_F2C.
+
+	Changed examples/Makefile.in, uses now g++ for linking the
+	static example instead of gcc.
+
+05/10/05 PH -- added an explicit check for the gsl headers.
+
+	Changed the ordering of the libs in globes-config --libs, to match
+	what actually is needed.
+
+10/10/05 PH -- replaced the I/O related stuff in libf2c by a more recent 
+	version from gcc 3.4 in order to fix BUG#15
+
 17/10/05 JK
         Renamed some of the functions in user_chi.c with more unambiguous
         names
 
 26/11/05 JK -- Fixed problem in glb_shift_energy_scale (read beyond array boundaries)
+

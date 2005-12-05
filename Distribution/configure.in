@@ -29,7 +29,7 @@ dnl middle digit: increment when features have been introduced/removed
 dnl first digit: major improvements/rewrites
 dnl In contrast to the result of autoupdate I had to swap the
 dnl the AC_INIT and AC_CONFIG_SRCDIR
-AC_INIT([GLoBES],[2.3.8],[globes@ph.tum.de],[globes])
+AC_INIT([GLoBES],[2.3.10],[globes@ph.tum.de],[globes])
 AC_CONFIG_SRCDIR([source/glb_wrapper.c])
 
 dnl Tellin autoconf we are going to use automake
@@ -44,7 +44,7 @@ dnl code changed: c:r+1:a
 dnl API changed: c+1:0:a
 dnl -> API extended: c:0:a+1
 dnl -> API shrunken: c:0:0
-GLBLIBVERSION="5:5:2"
+GLBLIBVERSION="5:6:2"
 
 dnl From here no editing !
 AC_SUBST(GLBLIBVERSION)
@@ -70,8 +70,8 @@ GLBMODULES="glb_prior_module.la"
 fi
 AC_SUBST(GLBMODULES)
 
-dnl This part serves to convert Makefile.in in examples to a
-dnl Makefile which works automagically 
+dnl This part serves to convert Makefile.in in examples to a 
+dnl Makefile which works automagically
 
 dnl list of standard targets (the space before the closing quotes is important)
 allowed="/usr /usr/local "
@@ -167,6 +167,14 @@ LIBS="$GSL_LIBS $LIBS"
 GSLINC="$GSL_CFLAGS"
 AC_SUBST(GSLINC)
 
+dnl check for the headers of GSL (RedHat!)
+TMPCFLAGS=$CFLAGS
+TMPCPPFLAGS=$CPPFLAGS
+CFLAGS="$GSL_CFLAGS $CFLAGS"
+CPPFLAGS="$GSL_CFLAGS $CPPFLAGS"
+AC_CHECK_HEADERS([gsl/gsl_math.h gsl/gsl_sf_erf.h gsl/gsl_errno.h],[],[AC_MSG_WARN([GSL headers are missing])],[])
+CFLAGS=$TMPCFLAGS
+CPPFLAGS=$TMPCPPFLAGS
 dnl Checking wether f2c is there (or something similar, like g2c)
 AC_LIBF2C_CONVENIENCE
 
@@ -182,7 +190,7 @@ AC_C_CONST
 AC_TYPE_SIZE_T
 
 dnl Checks for library functions.
-AC_CHECK_FUNCS(strdup)
+AC_CHECK_FUNCS([strdup mkstemp tempnam])
 
 dnl Experimental rpm-builing support
 RPM_RELEASE=0

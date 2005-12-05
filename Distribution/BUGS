@@ -148,3 +148,24 @@ Date: 01.08.05
 	The problem is the same as in the description of BUG#2 and #3,
 	but the fix, wasn't one.
 -------------------------------------------------------------------------------	 
+
+BUG#14 glbFreeProjection does not completely clean the memory
+       allocated by glbAllocProjection
+
+From: Patrick Huber
+Date: 04.08.05
+
+	The space allocated for the projection type structure itself
+	was not freed. Which in combination with glb_prior_module.c
+	yields a leak rate of 1MB/h.
+-------------------------------------------------------------------------------
+
+BUG#15 fopen does not work with 'r+' mode
+
+From: Walter Winter
+Date: 09.10.05
+
+	If globes is built with '--enable-libf2c-convenience', fopen
+	seezes to work properly for unkown reasons. It looks like the
+	file stream is lost.
+

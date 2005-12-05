@@ -165,6 +165,15 @@
 /* Define to 1 if you have the `getopt_long_only' function. */
 #undef HAVE_GETOPT_LONG_ONLY
 
+/* Define to 1 if you have the <gsl/gsl_errno.h> header file. */
+#undef HAVE_GSL_GSL_ERRNO_H
+
+/* Define to 1 if you have the <gsl/gsl_math.h> header file. */
+#undef HAVE_GSL_GSL_MATH_H
+
+/* Define to 1 if you have the <gsl/gsl_sf_erf.h> header file. */
+#undef HAVE_GSL_GSL_SF_ERF_H
+
 /* Define to 1 if you have the `index' function. */
 #undef HAVE_INDEX
 
@@ -213,6 +222,9 @@
 
 /* Define to 1 if you have the `mempcpy' function. */
 #undef HAVE_MEMPCPY
+
+/* Define to 1 if you have the `mkstemp' function. */
+#undef HAVE_MKSTEMP
 
 /* Define to 1 if you have the <ndir.h> header file, and it defines `DIR'. */
 #undef HAVE_NDIR_H
@@ -300,6 +312,9 @@
 
 /* Define to 1 if you have the <sys/types.h> header file. */
 #undef HAVE_SYS_TYPES_H
+
+/* Define to 1 if you have the `tempnam' function. */
+#undef HAVE_TEMPNAM
 
 /* Define if you have the 'uintmax_t' type in <stdint.h> or <inttypes.h>. */
 #undef HAVE_UINTMAX_T

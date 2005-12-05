@@ -94,6 +94,11 @@ char **xargv;
 	}
 #endif
 
+/* Changed on 04/10/05, in order to fix a problem with multiple
+   definition of main.
+*/
+#ifdef GLB_ORIG_F2C
+
 #ifdef KR_headers
 main(argc, argv) int argc; char **argv;
 #else
@@ -133,3 +138,5 @@ exit(0);	/* exit(0) rather than return(0) to bypass Cray bug */
 return 0;	/* For compilers that complain of missing return values; */
 		/* others will complain that this is unreachable code. */
 }
+
+#endif /* GLB_ORIG_F2C */
