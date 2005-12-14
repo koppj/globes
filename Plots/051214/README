@@ -1,0 +1,84 @@
+The plots that come with this README are copyright 
+(C) 2005 - The GLoBES Team 
+
+You have permission to use those plots, if you provide the following
+information along with the plots and make sure to cite the proper
+references as given here:
+
+The plots show the sensitivity to CP violation at 3\sigma CL
+(\Delta\chi^2=9). Sensitivity to CP violation is defined, for a given
+point in the theta13-delta plane, by being able to exclude delta=0 and
+delta=\pi at the given confidence level. All plots have been prepared
+with GLoBES [1].
+
+Degeneracies and correlations are fully taken into account. For all
+setups the appropriate disappearance channels have been included. The
+beta beam is lacking muon neutrino disappearance, but the result does
+not change if T2K disappearance information is included in the
+analysis. In all cases systematics between neutrinos, anti-neutrinos,
+appearance and disappearance is uncorrelated. For all setups with a
+water Cherenkov detector the systematics applies both to background
+and signal, uncorrelated.
+
+The neutrino factory assumes 3.1 10^20 mu^+ decays per year for 10
+years and 3.1 10^20 mu^- decays for 10 years. It has one detector with
+m=100kt at 3000km and another detector with 30kt at 7000km. The
+density errors between the two baselines are uncorrelated. The
+systematics are 0.1% on the signal and 20% on the background,
+uncorrelated. The detector threshold and the other parameters are
+taken from [2] and approximate the results of [3].
+
+The beta beam assumes 5.8 10^18 He decays per year for five years and
+2.2 10^18 Ne decays per year for five years. The detector mass is
+500kt. The detector description and the glb-file is from [5]. 
+
+The SPL setup is taken from [6], and the detector mass is 500kt.
+
+The T2HK setup is taken from [2] and closely follows the LOI [7]. The
+detector mass is 1000kt and it runs with 4MW beam power, 6 years with
+anti-neutrinos and 2 years with neutrinos. The systematic error on
+both background and signal is 5%.
+
+The oscillation parameters were [7,8]:
+dm31=0.0024 eV^2
+dm21=0.00079 eV^2
+th23=\pi/4
+th12=0.578
+
+The input errors are (at 1 sigma):
+10% on dm31
+10% on th23
+10% on th12
+ 4% on dm21
+ 5% on rho (unless otherwise stated)
+
+References
+==========
+[1] P. Huber, M. Lindner, W. Winter,
+Comput.Phys.Commun.167:195,2005, [hep-ph/0407333].
+
+[2] P. Huber, M. Lindner, W. Winter,
+Nucl.Phys.B645:3-48,2002, [hep-ph/0204352].
+
+[3]  A. Cervera, F. Dydak, J. Gomez-Cadenas,  
+Nucl.Instrum.Meth.A451:123-130, 2000.
+
+[4] M. Mezzetto,
+hep-ex/0511005.
+
+[5] J.E. Campagne,
+hep-ex/0511013.
+
+[6] Y. Itow, et al.,
+hep-ex/0106019.
+
+[7] M. Maltoni, T. Schwetz, M.A. Tortola, J.W.F. Valle,
+New J.Phys.6:122,2004, [hep-ph/0405172].
+
+[8] G.L. Fogli, E. Lisi, A. Marrone, A. Palazzo, A.M. Rotunno,
+hep-ph/0506307.
+
+===================
+In case of questions or comments write to <globes@ph.tum.de>
+
+Last modified 14/12/2005 by P. Huber
