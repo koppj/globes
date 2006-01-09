@@ -525,21 +525,17 @@ int glb_check_error_function()
   return errortype;
 }
 
-double glb_window_function(double low,double up,int bin)
+inline double glb_window_function(double low,double up,int bin)
 {
-  /* needed by user_chi.c */
-  double erg;
-  double xx;
-  xx=glb_calc_energy_tab[bin];
- 
-  erg=1.0;
-  if(xx<=low) erg=0.0;
-  if(xx>=up) erg=0.0;
-  
-  return erg;
+  double en = glb_calc_energy_tab[bin];
+
+  if (en > low && en < up)
+    return 1.0;
+  else
+    return 0.0;
 }
 
-static double errorf(double x, double y, int bin)
+inline double errorf(double x, double y, int bin)
 {
   double xx;
   double erg;
@@ -871,7 +867,7 @@ void glb_set_bg_center(int i,double norm, double tilt)
 
 
 //likelihood funktion
-static double likelihood(double ntheo, double nobs)
+inline double likelihood(double ntheo, double nobs)
 {
   if(nobs>0)
       return 2*(ntheo-nobs) + 2*nobs * log(nobs/ntheo);
@@ -890,10 +886,10 @@ static double likelihood(double ntheo, double nobs)
 
 
 
-double glb_list_likelihood(double* ratest, double* ratesm)
+inline double glb_list_likelihood(double* ratest, double* ratesm)
 {
   /* needed by user_chi.c */
-  int i;
+  register int i;
 
   double sum = 0;
   for (i=0; i< bins; i++)
@@ -901,13 +897,14 @@ double glb_list_likelihood(double* ratest, double* ratesm)
   return sum;
 }
 
-
-/* //now comes a whole bunch of functions which calculate different chi^2 for different situations */
-
-double glb_prior(double x, double center, double sigma)
+inline double glb_prior(double x, double center, double sigma)
 {
-  return (x-center)*(x-center)/sigma/sigma;
+  double tmp = (x - center)/sigma;
+  return tmp*tmp;
 }  
+
+
+/* now comes a whole bunch of functions which calculate different chi^2 for different situations */
 
 // standard chi^2
 double glb_chi_sys_w_bg(double x[5])
@@ -916,18 +913,35 @@ double glb_chi_sys_w_bg(double x[5])
   double erg;
   int i;
   
+
+  // The following code admittedly does not look very nice, but it's fast because
+  // it decouples consecutive instructions, enabling modern processor to partially
+  // parallelise them
+  for (i=0; i < bins; i++)
+    glb_chirate[i] = x[1]*glb_calc_rates_1[glb_rule_number][i];
+  for (i=0; i < bins; i++)
+    glb_chirate[i] += x[2]*glb_calc_rates_1T[glb_rule_number][i];
+  for (i=0; i < bins; i++)
+    glb_chirate[i] += x[3]*glb_calc_rates_1BG[glb_rule_number][i];
+  for (i=0; i < bins; i++)
+    glb_chirate[i] += x[4]*glb_calc_rates_1BGT[glb_rule_number][i];
+  for (i=0; i < bins; i++)
+    glb_chirate[i] *= errorf(glb_tre_null_center[glb_rule_number],
+                             glb_tre_tilt_center[glb_rule_number], i);
+  for (i=0; i < bins; i++)
+    glb_chirate[i] *= glb_window_function(glb_calc_energy_window[glb_rule_number][0],
+                                          glb_calc_energy_window[glb_rule_number][1],i);
   
   
-  for (i=0;i<bins;i++)
+/*  for (i=0;i<bins;i++)
     {
       glb_chirate[i]= 
 	(x[1]*glb_calc_rates_1[glb_rule_number][i]+
 	x[2]*glb_calc_rates_1T[glb_rule_number][i]+
 	x[3]*glb_calc_rates_1BG[glb_rule_number][i]+
 	x[4]*glb_calc_rates_1BGT[glb_rule_number][i]) * errorf(glb_tre_null_center[glb_rule_number],glb_tre_tilt_center[glb_rule_number],i)
-	*glb_window_function(glb_calc_energy_window[glb_rule_number][0],glb_calc_energy_window[glb_rule_number][1],i);
-    
-    }
+	*glb_window_function(glb_calc_energy_window[glb_rule_number][0],glb_calc_energy_window[glb_rule_number][1],i);  
+    }*/
  
   erg = glb_list_likelihood(glb_calc_rates_0[glb_rule_number],glb_chirate)+
     glb_prior(x[1],1,glb_glb_sig_norm_error[glb_rule_number])+

@@ -825,11 +825,18 @@ extern "C" void glb_probability_matrix(FLOAT prob[3][3], int panti, double pen)
 	else
 	  {
 	    // Unity matrix as starting point
-	    for (int i=0; i<3; i++)
-	      for (int j=0; i<3; i++)
-		amp[i][j] = complex<FLOAT>(0,0);
-	    for (int i=0; i<3; i++)
-	      amp[i][i]=complex<FLOAT>(1,0);
+            for (int i=0; i < 3; i++)
+            {
+              for (int j=i+1; j < 3; j++)
+                amp[i][j] = a[j][i] = complex<FLOAT>(0,0);
+              amp[i][i] = complex<FLOAT>(1,0);
+            }
+
+//	    for (int i=0; i<3; i++)
+//	      for (int j=0; i<3; i++)
+//		amp[i][j] = complex<FLOAT>(0,0);
+//	    for (int i=0; i<3; i++)
+//	      amp[i][i]=complex<FLOAT>(1,0);
 	    
 	    for (int i=0; i<psteps; i++)
 	      MultiplyAmplitudeMatrix(amp,panti,length[i],pen,density[i]);

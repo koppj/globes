@@ -386,3 +386,14 @@ documented!
 
 26/11/05 JK -- Fixed problem in glb_shift_energy_scale (read beyond array boundaries)
 
+09/01/06 JK -- Some optimizations:
+       - Declared glb_window_function, errorf, likelihood, glb_list_likelihood, glb_prior
+         as inline
+       - Optimized glb_window_function (do as few comparisons as possible)
+       - Optimized glb_chi_sys_w_bg (use several for loops)
+       - Optimized glb_prior (save intermediate result)
+
+       Bugfix in glb_probability.cc: Initialization of amplitude matrix in
+       glb_probability_matrix was wrong (but seemed to cause no problems because
+       the C++ library automatically initializes objects of class complex)
+
