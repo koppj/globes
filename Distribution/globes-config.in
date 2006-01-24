@@ -40,7 +40,9 @@ fi
 
 
 linkerflag="-Wl,--rpath -Wl,$libdir"
-newlibs="-L$libdir $linkerflag -lglb -lglobes @LEXLIB@ @LIBADD_DL@ @LIBS@" 
+#newlibs="-L$libdir $linkerflag -lglb -lglobes @LEXLIB@ @LIBADD_DL@ @LIBS@" 
+
+newlibs="-L$libdir $linkerflag -lglb -lglobes @LIBADD_DL@ @LIBS@" 
 
 lesslibs=${newlibs%"-lglobes"}
 

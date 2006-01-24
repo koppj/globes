@@ -168,4 +168,14 @@ Date: 09.10.05
 	If globes is built with '--enable-libf2c-convenience', fopen
 	seezes to work properly for unkown reasons. It looks like the
 	file stream is lost.
+-------------------------------------------------------------------------------
 
+BUG#16 does not compile with gcc 4xx
+
+From: Patrick Huber
+Date: 24.01.06
+
+	Conflicting definitions of static and extern in
+	glb_parser.y. Should have caused an error also in earlier
+	version of gcc.
+-------------------------------------------------------------------------------

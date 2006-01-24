@@ -1152,7 +1152,6 @@ outchannel: NAME {
 %%
 
 extern glb_symrec *sym_table;
-
  
 int
 yyerror (const char *s)  /* Called by yyparse on error */
@@ -1225,7 +1224,8 @@ struct glb_init_sig sig_fncts[] =
 
 /* The symbol table: a chain of `struct glb_symrec'.  */
 static glb_namerec *name_table = (glb_namerec *) NULL; 
-static glb_symrec *sym_table = (glb_symrec *) NULL;
+/* cannot use static here, since its declared earlier as extern 
+glb_symrec *sym_table = (glb_symrec *) NULL;
 static glb_symrec *pre_sym_table = (glb_symrec *) NULL;
 
 /* Put arithmetic functions in table. 

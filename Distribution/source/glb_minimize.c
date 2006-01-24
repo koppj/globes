@@ -238,7 +238,7 @@ static double chi_sys_wrap(double (*chi_func)(), int dimension, int alpha_in)
   sp[4]=glb_bg_tilt_center[alpha_in];
   sp[5]=glb_tre_null_center[alpha_in];
   sp[6]=glb_tre_tilt_center[alpha_in];
-  glb_powell(sp,mat,dimension,TOLSYS,&it,&result,chi_func);  
+  if(glb_powell(sp,mat,dimension,TOLSYS,&it,&result,chi_func)!=0) result=-result;  
   glb_free_vec(sp,1,6);
   glb_free_mat(mat,1,dimension,1,dimension);
   return result;
@@ -301,7 +301,7 @@ double glb_evaluate_chi(struct glb_systematic *in)
   glb_sys_centers=in->sp;
   glb_sys_errors=in->errors;
   //------------------------
-  glb_powell(spi,mat,in->dimension,TOLSYS,&it,&result,in->chi_func);  
+  if(glb_powell(spi,mat,in->dimension,TOLSYS,&it,&result,in->chi_func)!=0) result=-result;  
   glb_free_vec(spi,1,in->dimension);
   glb_free_mat(mat,1,in->dimension,1,in->dimension);
   return result;
@@ -1073,7 +1073,7 @@ static double internal_glbSingleChiNP(const glb_params in, glb_params out,
       okay_flag=1;
       return er1;  
     }
-  glb_powell2(sp2,mat2,dim,TOLOSC,&it,&er1,chi_NP);
+  if(glb_powell2(sp2,mat2,dim,TOLOSC,&it,&er1,chi_NP)!=0) count=-count;
   if(out!=NULL)
     {
       for(i=0;i<s_n_free;i++) 
@@ -1138,7 +1138,7 @@ static double internal_glbChiNP(const glb_params in, glb_params out)
       okay_flag=1;
       return er1;  
     }
-  glb_powell2(sp2,mat2,dim,TOLOSC,&it,&er1,MD_chi_NP);
+  if(glb_powell2(sp2,mat2,dim,TOLOSC,&it,&er1,MD_chi_NP)!=0) count=-count;
   if(out!=NULL)
     {
       for(i=0;i<n_free;i++) 

@@ -386,6 +386,17 @@ documented!
 
 26/11/05 JK -- Fixed problem in glb_shift_energy_scale (read beyond array boundaries)
 
+
+********Version 2.3.11
+
+10/12/05 PH -- Solved the "FATAL: empty" problem. The code no longer will 
+	abort when ITMAX in 'glb_min_sup.c' is exceeded. It will issue a warning
+	with glb_warning and a now meaningful error message. Warning are not
+	ouput by default but the verbosity level has to be high enough. Thus,
+	if glb_powell fails, the resuting chi^2 will be negative and if 
+	glb_powell2 fails (the usual culprit) the number of iterations, will be 
+	negative. Moreover ITMAX is now 5000.=======
+
 09/01/06 JK -- Some optimizations:
        - Declared glb_window_function, errorf, likelihood, glb_list_likelihood, glb_prior
          as inline
@@ -397,3 +408,4 @@ documented!
        glb_probability_matrix was wrong (but seemed to cause no problems because
        the C++ library automatically initializes objects of class complex)
 
+24/01/06 PH -- Fixed BUG#16

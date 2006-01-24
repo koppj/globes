@@ -31,7 +31,7 @@
 
 static void glb_minimizer_error(char error_text[])
 {
-  glb_fatal(error_text);  
+  glb_warning(error_text);  
 }
 
 double *glb_alloc_vec(int nl,int nh)
@@ -284,11 +284,11 @@ static void line_minimization(double p[],double xi[],int n,double *fret,
 
 
 
-#define ITMAX 500
+#define ITMAX 5000
 static double sqrarg;
 #define SQR(a) (sqrarg=(a),sqrarg*sqrarg)
 
-void glb_powell(double p[],double **xi,int n,
+int glb_powell(double p[],double **xi,int n,
 		double ftol,int *iter,double *fret,
 		double (*func)(double*))
 {
@@ -318,9 +318,9 @@ void glb_powell(double p[],double **xi,int n,
 			glb_free_vec(xit,1,n);
 			glb_free_vec(ptt,1,n);
 			glb_free_vec(pt,1,n);
-			return;
+			return 0;
 		}
-		if (*iter == ITMAX) glb_minimizer_error("empty");
+		if (*iter == ITMAX) {glb_minimizer_error("Minimizer could not converge!");return -1;}
 		for (j=1;j<=n;j++) {
 			ptt[j]=2.0*p[j]-pt[j];
 			xit[j]=p[j]-pt[j];
@@ -335,10 +335,11 @@ void glb_powell(double p[],double **xi,int n,
 			}
 		}
 	}
+	return 0;
 }
 
 
-void glb_powell2(double p[],double **xi,int n,double ftol,
+int glb_powell2(double p[],double **xi,int n,double ftol,
 		 int *iter,double *fret,
 		 double (*func)(double*))
 {
@@ -368,9 +369,9 @@ void glb_powell2(double p[],double **xi,int n,double ftol,
 			glb_free_vec(xit,1,n);
 			glb_free_vec(ptt,1,n);
 			glb_free_vec(pt,1,n);
-			return;
+			return 0;
 		}
-		if (*iter == ITMAX) glb_minimizer_error("empty");
+		if (*iter == ITMAX) {glb_minimizer_error("Minimizer could not converge!");return -1;}
 		for (j=1;j<=n;j++) {
 			ptt[j]=2.0*p[j]-pt[j];
 			xit[j]=p[j]-pt[j];
@@ -385,6 +386,7 @@ void glb_powell2(double p[],double **xi,int n,double ftol,
 			}
 		}
 	}
+	return 0;
 }
 
 
