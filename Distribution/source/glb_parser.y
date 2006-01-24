@@ -1224,7 +1224,7 @@ struct glb_init_sig sig_fncts[] =
 
 /* The symbol table: a chain of `struct glb_symrec'.  */
 static glb_namerec *name_table = (glb_namerec *) NULL; 
-/* cannot use static here, since its declared earlier as extern 
+/* cannot use static here, since its declared earlier as extern */
 glb_symrec *sym_table = (glb_symrec *) NULL;
 static glb_symrec *pre_sym_table = (glb_symrec *) NULL;
 

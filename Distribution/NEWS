@@ -395,7 +395,7 @@ documented!
 	ouput by default but the verbosity level has to be high enough. Thus,
 	if glb_powell fails, the resuting chi^2 will be negative and if 
 	glb_powell2 fails (the usual culprit) the number of iterations, will be 
-	negative. Moreover ITMAX is now 5000.=======
+	negative. Moreover ITMAX is now 5000.
 
 09/01/06 JK -- Some optimizations:
        - Declared glb_window_function, errorf, likelihood, glb_list_likelihood, glb_prior
