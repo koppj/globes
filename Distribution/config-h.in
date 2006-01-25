@@ -196,6 +196,9 @@
 /* Define to 1 if you have the `g2c' library (-lg2c). */
 #undef HAVE_LIBG2C
 
+/* Define to 1 if you have the `gfortran' library (-lgfortran). */
+#undef HAVE_LIBGFORTRAN
+
 /* Define to 1 if you have the `lapack' library (-llapack). */
 #undef HAVE_LIBLAPACK
 

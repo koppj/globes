@@ -409,3 +409,13 @@ documented!
        the C++ library automatically initializes objects of class complex)
 
 24/01/06 PH -- Fixed BUG#16
+
+********Version 2.3.12
+
+	PH -- while trying to solve a number of problem with the new
+	SuSE 10.0, I discovered a little flaw in
+	AM_PATH_GSL. Basically I had to add the --rpath stuff to make
+	sure GSL is found at run time even if it sits in a non-standard
+	place. Moreover 'libgfortran' should now be addded to 'LIBS'
+	in those cases where it is necessary. Tests seem to indicate
+	that globes is now SuSE 10.0 proof.
