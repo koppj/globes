@@ -419,3 +419,10 @@ documented!
 	place. Moreover 'libgfortran' should now be addded to 'LIBS'
 	in those cases where it is necessary. Tests seem to indicate
 	that globes is now SuSE 10.0 proof.
+
+07/02/06 PH -- added a new flag to 'globes' '-w', which gives list of
+	the oscillation probabilities for the central energy of each
+	bin for each channel. It is still experimental.
+
+21/02/06 PH -- added proper treatment of filtered constant density
+	probability to above feature.

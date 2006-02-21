@@ -133,6 +133,7 @@ static struct argp_option options[] ={
   {"Middle",'M',"STRING",0,"Middle delimiter used in"
    " formatting output"},
   {"user",'u',0,0,"Output formatting in user defined mode"},
+  {"wahrscheinlichkeit",'w',0,0,"probability"},
   { 0 } 
 };
 
@@ -141,7 +142,7 @@ struct arguments
 {
   char* args[1];                /* many arguments*/
   int channel,rule,experiment,user;
-  int smearing,eff,bg,spectrum,mathematica,coeff,verbosity,pretty,oscillation;
+  int smearing,eff,bg,spectrum,mathematica,coeff,verbosity,pretty,oscillation,probability;
   char *output_file;
   char* params;
   char *left,*middle,*right;
@@ -228,6 +229,9 @@ parse_opt (int key, char *arg, struct argp_state *state)
       break;
     case 'R':
       arguments->right = arg;
+      break;
+    case 'w':
+      arguments->probability = 1;
       break;
       
 
@@ -415,7 +419,7 @@ int main(int argc, char *argv[])
   arguments.right="\n";
   arguments.middle="\t";
   arguments.user=0;
-  
+  arguments.probability=0;
  
 
 
@@ -526,6 +530,7 @@ int main(int argc, char *argv[])
   fprintf(stderr,"glbValueToName ... %s\n",glbValueToName(0,"flux",0));
 #endif /* TEST */
 
+ 
   /* Chosing the right outputformat */
   print_buf= glbSetChannelPrintFunction(NULL);
   if(arguments.spectrum==0)
@@ -549,6 +554,23 @@ int main(int argc, char *argv[])
       glbSetChannelPrintFunction(glb_channel_printf_mathematica);     
     }
  
+  /* Probability-only output */
+  if(arguments.probability==1)
+    {
+
+      if(arguments.pretty==1) channel_name(stream,arguments.experiment,
+					   arguments.channel,
+					   arguments.spectrum);
+      glbShowChannelProbs(stream,arguments.experiment,arguments.channel,
+			  arguments.smearing,arguments.eff,arguments.bg);
+      
+      /* Cleaning up */
+      glbFreeParams(oscp);
+      if(stream!=stdout) fclose(stream);
+      exit(0);  
+    }
+
+
   /* Displaying the channel rates */
   if(arguments.rule==-2) 
     {

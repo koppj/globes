@@ -1102,6 +1102,88 @@ void (*glb_channel_print_function)(FILE *stream,const double *energy,
 				   double **res, size_t l, size_t c);
 
 int 
+glbShowChannelProbs(FILE *stream,
+			int exp, int channel, int smearing, int effi, int bgi)
+{
+  int i,s,cc,currentchannel[6],filter;
+  size_t k,l,m,c;
+  double *ch,*bg,*eff,*temp,**res,*energy,sum;
+  glb_smear *smt;
+  s=0;
+  sum=0.0;
+  cc=(size_t) glbGetNumberOfChannels(exp);
+  
+  filter = glbGetFilterStateInExperiment(exp);
+  if(s!=0) return -1;
+  if(channel!=GLB_ALL) smt=get_channel_smear_data(exp,channel);
+  if(channel==GLB_ALL) smt=get_channel_smear_data(exp,0);
+  s+=glbGetChannelRates(&ch,&l,exp,0,smearing); 
+  energy=(double *) obstack_alloc(&glb_rate_stack,sizeof(double)*(l+1));
+  if(smearing==GLB_PRE)
+      for(i=0;i<l;i++) energy[i]=glb_sbin_center(i,smt);
+  if(smearing==GLB_POST)
+    for(i=0;i<l;i++) energy[i]=glb_bin_center(i,smt);
+  energy[l]=-1.0;
+  if(channel!=GLB_ALL)
+    {
+      res=(double **) obstack_alloc(&glb_rate_stack,sizeof(double *)*2);
+      res[0]=(double *) obstack_alloc(&glb_rate_stack,sizeof(double)*(l+1));
+      res[1]=NULL;
+      c=1;
+ 
+      for(i=0;i<l;i++)
+	{
+	  for(m=0;m<6;m++) currentchannel[m]=((struct glb_experiment *) 
+					      glb_experiment_list[exp])->listofchannels[m][channel];
+	  if(currentchannel[2]>3||currentchannel[3]>3) res[k][i]=1.0;
+	  else
+	    if(filter==GLB_OFF) {
+	    res[0][i] = glbProfileProbability(exp,currentchannel[3],currentchannel[2],currentchannel[1],energy[i]);
+	    }
+	    else {
+	    res[0][i] = 
+	      glbFilteredConstantDensityProbability(exp,currentchannel[3],currentchannel[2],currentchannel[1],energy[i]);
+	    }
+	}
+
+   }
+  else
+    {
+      res=(double **) obstack_alloc(&glb_rate_stack,sizeof(double *)*(cc+1));
+      for(i=0;i<cc;i++) res[i]=(double *)    obstack_alloc(&glb_rate_stack,sizeof(double)*(l+1));
+      res[cc]=NULL;
+      c=cc;
+      for(k=0;k<cc;k++)
+	{
+	  for(m=0;m<6;m++) currentchannel[m]=((struct glb_experiment *) 
+					      glb_experiment_list[exp])->listofchannels[m][k];
+	  for(i=0;i<l;i++)
+	    {
+	  
+	      if(currentchannel[2]>3||currentchannel[3]>3) res[k][i]=1.0;
+	      else
+		if(filter==GLB_OFF) {
+		res[k][i] = glbProfileProbability(exp,currentchannel[3],currentchannel[2],currentchannel[1],energy[i]);
+		}
+		else {
+		  res[k][i] = 
+		    glbFilteredConstantDensityProbability(exp,currentchannel[3],currentchannel[2],currentchannel[1],energy[i]);
+		}
+	    }
+	}
+    }
+  
+ 
+
+  glb_channel_print_function(stream,energy,res,l,c);
+
+  obstack_free(&glb_rate_stack,ch);
+  return 0;
+}
+
+
+
+int 
 glbShowChannelRates(FILE *stream,
 			int exp, int channel, int smearing, int effi, int bgi)
 {
@@ -1160,6 +1242,7 @@ glbShowChannelRates(FILE *stream,
   obstack_free(&glb_rate_stack,ch);
   return 0;
 }
+
 
 
 
@@ -2215,6 +2298,19 @@ double glbProfileProbability(int exp,int initial_flavour, int final_flavour,
   glbSetExperiment(glb_experiment_list[exp]);
 
   res=glb_profile_probability(initial_flavour,final_flavour,panti,energy);
+  return res;
+}
+
+double glbFilteredConstantDensityProbability(int exp,int initial_flavour, int final_flavour,
+			    int panti, double energy)
+{
+  double res;
+  if(exp<0||exp>=glb_num_of_exps) {glb_error("Experiment index out of range");
+  return -1;}
+
+  glbSetExperiment(glb_experiment_list[exp]);
+  if(((struct glb_experiment *) glb_experiment_list[exp])->psteps != 1) {glb_error("Non-constant density profile");return -1;}
+  res=glb_filtered_const_density_probability(initial_flavour,final_flavour,panti,energy);
   return res;
 }
 

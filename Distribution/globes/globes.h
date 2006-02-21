@@ -140,8 +140,8 @@ double glbVacuumProbability(int pl, int pm, int panti,double pen,
 			    double plength);
 double glbProfileProbability(int exp,int initial_flavour, int final_flavour,
 			     int panti, double energy);
-
-
+double glbFilteredConstantDensityProbability(int exp,int initial_flavour, int final_flavour,
+					     int panti, double energy);
 /* Fluxes and X-sections */
 
 double glbXSection(int experiment, int xsec_ident,double energy,int flavour, 
@@ -247,6 +247,8 @@ int glbShowRuleRates(FILE *stream,
 		 int exp, int rule, int pos,
 		 int effi, int bgi, int coeffi, int signal);
 int glbShowChannelRates(FILE *stream,
+			int exp, int channel, int smearing, int effi, int bgi);
+int glbShowChannelProbs(FILE *stream,
 			int exp, int channel, int smearing, int effi, int bgi);
 void *glbSetChannelPrintFunction(void *fp);
 void glbSetPrintDelimiters(const char *left,const char *middle,
