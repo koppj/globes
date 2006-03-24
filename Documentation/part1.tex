@@ -1106,14 +1106,16 @@ To specify a user-defined $\chi^2$ algorithm, the following function can be used
 \GLBNS{SetUserChi}
 {\tt void glbSetUserChi(int exp,int rule,double (*chi\_func)(double x[]),int dim,%
 double centers[],double errors[],char *info)} tells \GLOBES\ to use {\tt chi\_func}
-to calculate $\chi^2$ for experiment {\tt exp} and rule {\tt rule} (these parameters
-can take the value \GLBC{GLB\_ALL} to specify all experiments or all rules). {\tt dim} is
+instead of the builtin functions to calculate $\chi^2$ for experiment {\tt exp} and
+rule {\tt rule}. These parameters can take the value \GLBC{GLB\_ALL} to specify that
+{\tt chi\_func} should be called once for each experiment or each rule. {\tt dim} is
 the number of variables parametrizing the systematical errors, while {\tt centers[]}
 and {\tt errors[]} give their central values and standard deviations, respectively.
 When \GLOBES\ calls {\tt chi\_func}, the parameter array {\tt x[]} will contain
 the values of the systematics parameters for which $\chi^2$ should be calculated.
-Deviating from the standard conventions, the entries of {\tt x[]} will start at
-index 1.
+Deviating from the standard conventions, the entries of {\tt x[]} will start at index 1
+(The indices for {\tt params} are {\tt errors} in the call to {\tt glbSetUserChi} start
+at 0 as usual).
 \end{function}
 
 In addition to calling {\tt glbSetUserChi}, {\tt @errordim\_sys\_on} has to be set
@@ -1214,6 +1216,9 @@ values and errors of these parameters are stored in the global arrays
 \hspace*{0.5 cm}      double chi2 = 0;                                          \\
 \hspace*{0.5 cm}      double chirate, measured\_rate;                           \\
 \hspace*{0.5 cm}                                                                \\
+\hspace*{0.5 cm}      /* Assign complete chi\textasciicircum2 to first experiment */ \\
+\hspace*{0.5 cm}      if (glbGetCurrentExp() != 0)  return 0;                   \\
+\hspace*{0.5 cm}                                                                \\
 \hspace*{0.5 cm}      glbShiftSignalEnergyScale(0, 0, x[5]);   /* Apply E calib. error */ \\
 \hspace*{0.5 cm}      glbShiftSignalEnergyScale(1, 0, x[6]);                    \\
 \hspace*{0.5 cm}      glbShiftBackgroundEnergyScale(0, 0, x[5]);                \\
@@ -1235,13 +1240,9 @@ values and errors of these parameters are stored in the global arrays
 \hspace*{1.0 cm}        if (measured\_rate > 0  \&\&  chirate > 0)              \\
 \hspace*{1.5 cm}          chi2 += 2 * chirate * log(chirate / measured\_rate);  \\
 \hspace*{0.5 cm}      \}                                                        \\
-\hspace*{0.5 cm}                                                                \\
 \hspace*{0.5 cm}      for (int j=0; j < 6; j++)  /* Penalties */                \\
 \hspace*{1.0 cm}        chi2 += square((x[j+1] - sys\_centers[j]) / sys\_errors[j]);\\
-\hspace*{0.5 cm}                                                                \\
-\hspace*{0.5 cm}      /* The function is called for each exp ->
-                                       Assign chi\textasciicircum2/2 to each */ \\
-\hspace*{0.5 cm}      return chi2 / 2;                                          \\
+\hspace*{0.5 cm}      return chi2;                                              \\
   \}                                                                            
 }
 \end{quote}
