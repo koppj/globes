@@ -316,6 +316,7 @@ static double chi_dispatch(int error_dim, int i)
   // finally
   double erg2=0;
   
+  glb_rule_number = i;      // Tell the systematics functions which rule we are in
   if(error_dim==0) //chi^2 with 4 sys. parameters
     {
       erg2=chi_sys_wrap(&glb_chi_sys_w_bg,4,i);
@@ -367,7 +368,7 @@ static double chi_dispatch(int error_dim, int i)
     {
       erg2=chi_sys_wrap(&glb_chi_sys_w_bgtot,4,i); 
     }
-  else if(error_dim==20) // total chi^2 with 4 syst params 
+  else if(error_dim==20) // User-defined systematics 
     {
       erg2=glb_evaluate_chi(&sys_calc[i]); 
     }
