@@ -426,3 +426,5 @@ documented!
 
 21/02/06 PH -- added proper treatment of filtered constant density
 	probability to above feature.
+
+06/07/06 JK -- fixed energy_window bug in glb_parser.y

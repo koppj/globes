@@ -611,8 +611,8 @@ static int set_pair(char *name,double value,double value2,int scalar)
 		   {
 		    
 		     dbf=(double*) token_list[i].ptr;
-		     dbf[(loc_count-1)*32+0]=(double) value;
-		     dbf[(loc_count-1)*32+1]=(double) value2;
+		     dbf[(loc_count-1)*2+0]=(double) value;
+		     dbf[(loc_count-1)*2+1]=(double) value2;
 		     return 0;
 		   }
 		 else       
@@ -1178,11 +1178,11 @@ static const char *const yytname[] =
   "CROSS", "FLUXP", "FLUXM", "GRP", "GID", "FNAME", "VERS", "SIGNAL", 
   "BG", "GRPOPEN", "GRPCLOSE", "PM", "FLAVOR", "NOGLOBES", "CHANNEL", 
   "RULESEP", "RULEMULT", "ENERGY", "NAME", "RDF", "NDEF", "','", "'='", 
-  "'>'", "'}'", "'{'", "'-'", "'+'", "'*'", "'/'", "NEG", "'^'", 
-  "'\\247'", "'\\n'", "';'", "'('", "')'", "$accept", "input", "line", 
-  "exp", "seq", "rulepart", "expseq", "group", "@1", "ingroup", "version", 
-  "cross", "flux", "channel", "name", "pm", "ene", "brule", "srule", 
-  "rule", "outrule", "@2", "outchannel", "@3", 0
+  "'>'", "'}'", "'{'", "'-'", "'+'", "'*'", "'/'", "NEG", "'^'", "'§'", 
+  "'\\n'", "';'", "'('", "')'", "$accept", "input", "line", "exp", "seq", 
+  "rulepart", "expseq", "group", "@1", "ingroup", "version", "cross", 
+  "flux", "channel", "name", "pm", "ene", "brule", "srule", "rule", 
+  "outrule", "@2", "outchannel", "@3", 0
 };
 #endif
 

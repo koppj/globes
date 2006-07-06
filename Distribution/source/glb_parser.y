@@ -519,8 +519,8 @@ static int set_pair(char *name,double value,double value2,int scalar)
 		   {
 		    
 		     dbf=(double*) token_list[i].ptr;
-		     dbf[(loc_count-1)*32+0]=(double) value;
-		     dbf[(loc_count-1)*32+1]=(double) value2;
+		     dbf[(loc_count-1)*2+0]=(double) value;
+		     dbf[(loc_count-1)*2+1]=(double) value2;
 		     return 0;
 		   }
 		 else       
