@@ -1178,11 +1178,11 @@ static const char *const yytname[] =
   "CROSS", "FLUXP", "FLUXM", "GRP", "GID", "FNAME", "VERS", "SIGNAL", 
   "BG", "GRPOPEN", "GRPCLOSE", "PM", "FLAVOR", "NOGLOBES", "CHANNEL", 
   "RULESEP", "RULEMULT", "ENERGY", "NAME", "RDF", "NDEF", "','", "'='", 
-  "'>'", "'}'", "'{'", "'-'", "'+'", "'*'", "'/'", "NEG", "'^'", "'§'", 
-  "'\\n'", "';'", "'('", "')'", "$accept", "input", "line", "exp", "seq", 
-  "rulepart", "expseq", "group", "@1", "ingroup", "version", "cross", 
-  "flux", "channel", "name", "pm", "ene", "brule", "srule", "rule", 
-  "outrule", "@2", "outchannel", "@3", 0
+  "'>'", "'}'", "'{'", "'-'", "'+'", "'*'", "'/'", "NEG", "'^'", 
+  "'\\247'", "'\\n'", "';'", "'('", "')'", "$accept", "input", "line", 
+  "exp", "seq", "rulepart", "expseq", "group", "@1", "ingroup", "version", 
+  "cross", "flux", "channel", "name", "pm", "ene", "brule", "srule", 
+  "rule", "outrule", "@2", "outchannel", "@3", 0
 };
 #endif
 

@@ -29,7 +29,7 @@ dnl middle digit: increment when features have been introduced/removed
 dnl first digit: major improvements/rewrites
 dnl In contrast to the result of autoupdate I had to swap the
 dnl the AC_INIT and AC_CONFIG_SRCDIR
-AC_INIT([GLoBES],[2.3.12],[globes@ph.tum.de],[globes])
+AC_INIT([GLoBES],[2.3.13],[globes@ph.tum.de],[globes])
 AC_CONFIG_SRCDIR([source/glb_wrapper.c])
 
 dnl Tellin autoconf we are going to use automake
@@ -82,7 +82,7 @@ if test $prefix = NONE; then
   standard="yes"	
 fi
 dnl prefix is one of the standard targets where only root can install to
-for allow in ´echo $allowed´
+for allow in echo $allowed
  do
 	if test $prefix = $allow; then
  		standard="yes"	

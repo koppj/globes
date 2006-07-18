@@ -156,9 +156,6 @@
 /* Define to 1 if you have the `funlockfile' function. */
 #undef HAVE_FUNLOCKFILE
 
-/* Define to 1 if you have the <g2c.h> header file. */
-#undef HAVE_G2C_H
-
 /* Define to 1 if you have the <getopt.h> header file. */
 #undef HAVE_GETOPT_H
 
@@ -184,23 +181,8 @@
    declares uintmax_t. */
 #undef HAVE_INTTYPES_H_WITH_UINTMAX
 
-/* Define to 1 if you have the `blas' library (-lblas). */
-#undef HAVE_LIBBLAS
-
 /* Define if you have the libdl library or equivalent. */
 #undef HAVE_LIBDL
-
-/* Define to 1 if you have the `f2c' library (-lf2c). */
-#undef HAVE_LIBF2C
-
-/* Define to 1 if you have the `g2c' library (-lg2c). */
-#undef HAVE_LIBG2C
-
-/* Define to 1 if you have the `gfortran' library (-lgfortran). */
-#undef HAVE_LIBGFORTRAN
-
-/* Define to 1 if you have the `lapack' library (-llapack). */
-#undef HAVE_LIBLAPACK
 
 /* Define to 1 if you have the `m' library (-lm). */
 #undef HAVE_LIBM
@@ -351,12 +333,6 @@
 /* Define if dlsym() requires a leading underscore in symbol names. */
 #undef NEED_USCORE
 
-/* Needed by convenience libf2c */
-#undef NON_ANSI_RW_MODES
-
-/* Needed by convenience libf2c */
-#undef NON_UNIX_STDIO
-
 /* Name of package */
 #undef PACKAGE
 
@@ -385,12 +361,6 @@
 
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
-
-/* Needed by convenience libf2c */
-#undef UIOLEN_int
-
-/* Needed by convenience libf2c */
-#undef USE_STRLEN
 
 /* Version number of package */
 #undef VERSION
