@@ -64,6 +64,10 @@ int main(int argc, char *argv[])
 
   /* The simulated data are computed */
   glbSetOscillationParameters(true_values);
+  for (int i=1; i <= 3; i++)
+    for (int j=1; j <= 3; j++)
+      printf("%d -> %d: %g\n", i, j, glbProfileProbability(0, i, j, +1, 1.0));
+  
   glbSetRates();
 
   /* Iteration over all values to be computed */
