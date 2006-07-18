@@ -167,8 +167,7 @@ int main(int argc, char *argv[])
   {
      res1=CalcNoSystematics(2.0e-3,x);
      res2=CalcNoSystematics(3.0e-3,x);
-     AddToOutput(x,1,res1);
-     AddToOutput(x,2,res2);
+     AddToOutput(x,res1,res2);
   }
   
   /* Compute 2nd edges of bars: systematics on, fit value of deltacp=0 */
@@ -177,8 +176,7 @@ int main(int argc, char *argv[])
   {
      res1=CalcSystematics(2.0e-3,x);
      res2=CalcSystematics(3.0e-3,x);
-     AddToOutput(x,1,res1);
-     AddToOutput(x,2,res2);
+     AddToOutput(x,res1,res2);
   }
  
   /* Compute 3rd edges of bars: systematics on, projection onto s22th13 axis */
@@ -189,8 +187,7 @@ int main(int argc, char *argv[])
   {
      res1=CalcProjection(2.0e-3,x,original1);
      res2=CalcProjection(3.0e-3,x,original2);
-     AddToOutput(x,1,res1);
-     AddToOutput(x,2,res2);
+     AddToOutput(x,res1,res2);
   }
 
   /* Find sgn-degeneracies */
@@ -203,8 +200,7 @@ int main(int argc, char *argv[])
   {
      res1=CalcProjection(2.0e-3,x,degeneracy1);
      res2=CalcProjection(3.0e-3,x,degeneracy2);
-     AddToOutput(x,1,res1);
-     AddToOutput(x,2,res2);
+     AddToOutput(x,res1,res2);
   }
 
   glbFreeParams(original1);

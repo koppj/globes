@@ -45,28 +45,9 @@ void InitOutput(char* filename, char* headline)
  }
 }
 
-void AddToOutput(double n1,double n2)
-{
- if(strlen(THEFILE)==0) printf("<%g> %f \n",n1,n2);
- else 
- {
-   FILE* f=fopen(THEFILE, "a");
-   if (!f)
-   {
-     printf("File cannot be opened!\n");
-     THEFILE[0]=0;
-   }
-   else
-   {
-    fprintf(f,"<%g> %f \n",n1,n2);
-    fclose(f);
-   }
- }
-}
-
 void AddToOutput(double n1,double n2,double n3)
 {
- if(strlen(THEFILE)==0) printf("<%g %g> %f \n",n1,n2,n3);
+ if(strlen(THEFILE)==0) printf("%g %g %f \n",n1,n2,n3);
  else 
  {
    FILE* f=fopen(THEFILE, "a");
@@ -77,7 +58,7 @@ void AddToOutput(double n1,double n2,double n3)
    }
    else
    {
-    fprintf(f,"<%g %g> %f \n",n1,n2,n3);
+    fprintf(f,"%g %g %f \n",n1,n2,n3);
     fclose(f);
    }
  }
