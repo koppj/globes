@@ -1,14 +1,21 @@
 ACLOCAL_AMFLAGS = -I m4
 
 DIST_SUBDIRS = lib source data libltdl modules globes
-SUBDIRS = lib libltdl source data modules globes 
+SUBDIRS = lib libltdl source data modules globes
 INCLUDES = $(LTDLINCL) $(F2CINC) $(GSLINC)
 
-EXTRA_DIST = examples/Makefile.in examples/example1.c\
-  examples/example3.c examples/myio.c\
-examples/example-tour.c  examples/example2.c  examples/example4.c\
-examples/myio.h examples/XCC.dat examples/NuFact.glb\
-BUGS
+EXTRA_DIST = examples/Makefile.in examples/example1.c	      \
+  examples/example3.c examples/myio.c examples/example-tour.c \
+  examples/example2.c examples/example4.c examples/myio.h     \
+  examples/XCC.dat examples/NuFact.glb BUGS 
+
+# that is only needed if the testsuite should go into the release
+# testsuite/01-probabilities.c             testsuite/03-chisys.glb   testsuite/06-chibars.c \
+# testsuite/01-probabilities.glb           testsuite/04-chicorr.c    testsuite/06-chibars.glb  testsuite/myio.c \
+# testsuite/02-probabilities-filtered.c    testsuite/04-chicorr.glb  testsuite/myio.h \
+# testsuite/02-probabilities-filtered.glb  testsuite/05-chideg.c     testsuite/glbdiff.pl      testsuite/README \
+# testsuite/03-chisys.c                    testsuite/05-chideg.glb   testsuite/run-tests 
+
 
 nodist_bin_SCRIPTS = globes-config globes-module
 

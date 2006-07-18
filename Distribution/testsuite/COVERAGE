@@ -1,0 +1,32 @@
+This note explains how to get 'gcov' to work for testing how much code
+is covered by particular tests. 
+
+0) Have look at the man page of gcov
+
+1) Run configure with the right flags since coverage testing doesn't
+work with shared libraries. There may be versions of gcc where it
+doesn't work either.
+	configure --disable-shared --disable-modules --disable-perl
+
+2) Make sure that no shared libraries are available in prefix/lib
+
+3) You need to set both CFLAGS and CPPFLAGS 
+	make CFLAGS="-ftest-coverage -fprofile-arcs" \
+	CPPFLAGS="-ftest-coverage -fprofile-arcs"
+
+4) 
+	make install
+
+5) edit 'run-tests' to take your newly compiled version
+
+6) run 'run-tests'
+
+7) cd into the source directory and run
+	gcov libglb_la-XXX.da
+where XXX is the name of the pertinent source file
+
+8) have a look at the outputs of 7) and XXX.c.gcov
+
+9) you can remove all the coverage test stuff by
+	reset-coverage
+in the distribution directory

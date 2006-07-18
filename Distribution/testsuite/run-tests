@@ -3,10 +3,12 @@
 # GLoBES Testsuite
 # ---------------------------------------------------------
 
+#export TESTS="03-chisys 04-chicorr 05-chideg 06-chibars"
 export TESTS="03-chisys 04-chicorr 05-chideg 06-chibars"
-#export TESTS="01-probabilities 02-probabilities-filtered 03-chisys 04-chicorr 05-chideg 06-chibars"
-export prefix1=/home/t30/lin/jkopp/software/installed/globes-cvs
-export prefix2=/home/t30/lin/jkopp/software/installed/globes-debug
+
+#TESTS="01-probabilities 02-probabilities-filtered"
+export prefix1=/home/phuber/globes-binaries/2.3.13/
+export prefix2=/usr/local/
 
 # Loop over all tests
 for THIS_TEST in $TESTS; do
