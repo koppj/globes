@@ -1,0 +1,30 @@
+----------------------------------------------------------------
+                       GLoBES Testsuite
+----------------------------------------------------------------
+
+This directory contains some very preliminary scripts that could be
+the basis for a GLoBES testsuite. The purpose is to compare the results
+of two different GLoBES versions. There are a number of test programs
+which are subsequently compiled and called by the script run-tests. After
+running each test for two different GLoBES-Versions, the results are
+compared using the script glbdiff.pl
+
+The test programs must produce output (sent to stdout) in the following
+format
+  <Some arbitrary Metadata 1> The data that is to be compared 1
+  <Some arbitrary Metadata 2> The data that is to be compared 2
+  <Some arbitrary Metadata 3> The data that is to be compared 3
+  ...
+
+If you want to add your own test program, add the corresponding information
+to Makefile.in and rerun autoconf/automake. DON'T FORGET TO MODIFY THE "BIN=..."
+and "OBJ=..." LINES APPROPRIATELY! Otherwise, the old executables will not be
+properly removed before recompilation, i.e. the tests are run twice with
+the same GLoBES version.
+
+To run the tests, specify the directories of the binaries of the two
+GLoBES versions you want to compare in run-tests. The variable TESTS
+specifies which tests are to be run.
+
+
+

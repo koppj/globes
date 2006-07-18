@@ -1,0 +1,34 @@
+#!/bin/bash
+# ---------------------------------------------------------
+# GLoBES Testsuite
+# ---------------------------------------------------------
+
+export TESTS="03-chisys 04-chicorr 05-chideg 06-chibars"
+#export TESTS="01-probabilities 02-probabilities-filtered 03-chisys 04-chicorr 05-chideg 06-chibars"
+export prefix1=/home/t30/lin/jkopp/software/installed/globes-cvs
+export prefix2=/home/t30/lin/jkopp/software/installed/globes-debug
+
+# Loop over all tests
+for THIS_TEST in $TESTS; do
+  # Generate results for GLoBES version 1
+  echo "Compiling test $THIS_TEST with GLoBES version in $prefix1 ..."
+  export prefix=$prefix1
+  make clean > /dev/null
+  make $THIS_TEST > /dev/null
+  echo "Running test $THIS_TEST"
+  ./$THIS_TEST $THIS_TEST.glb > $THIS_TEST.out.1;
+
+  # Generate results for GLoBES version 2
+  echo "Compiling test $THIS_TEST with GLoBES version in $prefix2 ..."
+  export prefix=$prefix2
+  make clean > /dev/null
+  make $THIS_TEST > /dev/null
+  echo "Running test $THIS_TEST"
+  ./$THIS_TEST $THIS_TEST.glb > $THIS_TEST.out.2;
+
+  echo "Comparing results for test $THIS_TEST ..."
+  ./glbdiff.pl $THIS_TEST.out.1 $THIS_TEST.out.2
+done;
+
+
+

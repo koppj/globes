@@ -19,10 +19,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-
-/* 
- * Example: Projection of two- and n-dimensional manifold onto stheta-axis
- * Compile with ``make example2''
+ 
+ /* 
+ * Example: Correlation between s22th13 and deltacp
+ * Compile with ``make example1''
  */ 
 
 #include <stdio.h>
@@ -34,19 +34,21 @@
 #include "myio.h"             /* my input-output routines */
 
 /* If filename given, write to file; for empty filename write to screen */
-char MYFILE[]="test2.dat";
+char MYFILE[]="";
 
 int main(int argc, char *argv[])
 { 
+  char *GLB_FILE = argv[argc-1];
+  
   /* Initialize libglobes */
   glbInit(argv[0]); 
 
   /* Initialize experiment NuFact.glb */
-  glbInitExperiment("NuFact.glb",&glb_experiment_list[0],&glb_num_of_exps); 
-
+  glbInitExperiment(GLB_FILE,&glb_experiment_list[0],&glb_num_of_exps); 
+ 
   /* Intitialize output */
-  InitOutput(MYFILE,"Format: Log(10,s22th13)   chi^2 one param   chi^2 all params \n"); 
-
+  InitOutput(MYFILE,"Format: Log(10,s22th13)   deltacp   chi^2 \n"); 
+  
   /* Define standard oscillation parameters */
   double theta12 = asin(sqrt(0.8))/2;
   double theta13 = asin(sqrt(0.001))/2;
@@ -55,11 +57,9 @@ int main(int argc, char *argv[])
   double sdm = 7e-5;
   double ldm = 2e-3;
   
-	/* Initialize parameter and projection vector(s) */
+	/* Initialize parameter vector(s) */
   glb_params true_values = glbAllocParams();
   glb_params test_values = glbAllocParams();
-  glb_params input_errors = glbAllocParams();
-  glb_projection theta13_projection = glbAllocProjection();  
 
   glbDefineParams(true_values,theta12,theta13,theta23,deltacp,sdm,ldm);
   glbDefineParams(test_values,theta12,theta13,theta23,deltacp,sdm,ldm);  
@@ -68,43 +68,25 @@ int main(int argc, char *argv[])
   glbSetOscillationParameters(true_values);
   glbSetRates();
 
-  /* Set starting values and input errors for all projections */  
-  glbDefineParams(input_errors,theta12*0.1,0,0,0,sdm*0.1,0);  
-  glbSetDensityParams(input_errors,0.05,GLB_ALL);
-  glbSetStartingValues(true_values);
-  glbSetInputErrors(input_errors);
-
-  /* Set two-parameter projection onto s22th13-axis: only deltacp free! */
-  glbDefineProjection(theta13_projection,GLB_FIXED,GLB_FIXED,GLB_FIXED,
-   GLB_FREE,GLB_FIXED,GLB_FIXED);
-  glbSetProjection(theta13_projection); 
-
   /* Iteration over all values to be computed */
-  double thetheta13,x,res1,res2;    
-  for(x=-4;x<-2.0+0.001;x=x+2.0/50)
+  double thetheta13,x,y,res;    
+    
+  for(x=-4.0;x<-2.0+0.01;x=x+2.0/50)
+  for(y=0.0;y<200.0+0.01;y=y+200.0/50)
   {
-      /* Set vector of test=fit values */
+      /* Set vector of test values */
       thetheta13=asin(sqrt(pow(10,x)))/2;
       glbSetOscParams(test_values,thetheta13,GLB_THETA_13);
-     
-      /* Guess fit value for deltacp in order to safely find minimum */
-      glbSetOscParams(test_values,200.0/2*(x+4)*M_PI/180,GLB_DELTA_CP);
- 
-      /* Compute Chi^2 for two-parameter correlation: minimize over deltacp only */
-      res1=glbChiNP(test_values,NULL,GLB_ALL);
-      
-      /* Compute Chi^2 for full correlation: minimize over all but theta13 */
-      res2=glbChiTheta(test_values,NULL,GLB_ALL);
+      glbSetOscParams(test_values,y*M_PI/180.0,GLB_DELTA_CP);
   
-      AddToOutput(x,1,res1);
-      AddToOutput(x,2,res2);
+      /* Compute Chi^2 for all loaded experiments and all rules */
+      res=glbChiSys(test_values,GLB_ALL,GLB_ALL);
+      AddToOutput(x,y,res);
   }
-  
-  /* Destroy parameter and projection vector(s) */
+   
+  /* Destroy parameter vector(s) */
   glbFreeParams(true_values);
   glbFreeParams(test_values); 
-  glbFreeParams(input_errors); 
-  glbFreeProjection(theta13_projection);
-    
+  
   exit(0);
 }

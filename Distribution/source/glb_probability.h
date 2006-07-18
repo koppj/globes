@@ -27,37 +27,33 @@
 #ifndef GLS_OSZPROB_H
 #define GLS_OSZPROB_H 1
 
+#include <gsl/gsl_complex.h>
 
-double glbVacuumProbability(int pl, int pm, int panti, double pen, double plength);
+//#define GLB_V_FACTOR        7.56e-14   // Conversion factor for matter potentials
+#define GLB_V_FACTOR        7.5e-14   // Conversion factor for matter potentials
+//#define GLB_Ne_MANTLE       0.497      // Effective electron numbers for calculation
+#define GLB_Ne_MANTLE       0.5
+#define GLB_Ne_CORE         0.468      //   of MSW potentials
+
+BEGIN_C_DECLS
+
+int glb_33_zheev(gsl_complex A[3][3], gsl_complex Q[3][3], double lambda[3]);
 double glb_profile_probability(int pl, int pm, int panti, double pen);
-void glb_probability_matrix(double prob[3][3], int panti, double pen);
-void glb_set_parameters(double dm21, double dm31, double pt12, double pt13, double pt23, double pdelta1);
-void glb_get_profile_data(double** lval, double** rval, int* n);
-double* glb_get_vacuum_parameters();
-double* glb_get_squared_masses();
-
-void glb_set_c_squared_masses(double mq1, double mq2, double mq3);
-void glb_set_c_vacuum_parameters(double pt12, double pt13, double pt23, double pdelta1);
-
- double *glb_get_density_ptr();
- double *glb_get_length_ptr();
- int glb_get_psteps();
- void glb_set_density_ptr(double *d);
- void glb_set_length_ptr(double *l);
- int glb_set_psteps(int p);
+int glb_probability_matrix(double P[3][3], int cp_sign, double E,
+    int psteps, const double *length, const double *density,
+    double filter_sigma);
+int glb_filtered_probability_matrix_cd(double E, double L, double V, double sigma, int cp_sign);
+int glb_set_oscillation_parameters(glb_params p);
+int glb_get_oscillation_parameters(glb_params p);
 
 
-double glb_filtered_vac_probability(int pl, int pm, int panti, double pen, double plength);
-double glb_filtered_const_density_probability(int pl, int pm, int panti,double pen);
+// Macros
+// ------
+#define SQR(x)      ((x)*(x))                              // x^2 
+#define SQR_ABS(x)  (SQR(GSL_REAL(x)) + SQR(GSL_IMAG(x)))  // |x|^2
 
-void glb_switch_filter(int on);
-int glb_check_filter();
-void glb_set_filter(double x);
-double glb_get_filter();
-
-
-void glb_set_c_ns_params(double ns[]);
-double* glb_get_ns_params();
-
+END_C_DECLS
 
 #endif /* GLS_OSZPROB_H */
+
+

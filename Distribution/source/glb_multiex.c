@@ -1004,14 +1004,12 @@ static struct glb_experiment MInitMemory0(struct glb_experiment in)
 static void glb_set_profile_scaling_sec(struct glb_experiment *in)
 {
   int k;
-  glb_set_length_ptr(in->lengthtab);
-  glb_set_psteps(in->psteps);
+//  glb_set_length_ptr(in->lengthtab);
+//  glb_set_psteps(in->psteps);
 
   for(k=0;k<in->psteps;k++)
-    {
-      in->densitybuffer[k]=(double) 1.0*in->densitytab[k];
-    }
-  glb_set_density_ptr(in->densitybuffer);
+    in->densitybuffer[k]=(double) 1.0*in->densitytab[k];
+//  glb_set_density_ptr(in->densitybuffer);
 
 }
 
@@ -1025,6 +1023,16 @@ void glbSetExperiment(glb_exp in)
   int i;
   struct glb_experiment *s;
   s=(struct glb_experiment *) in;
+
+  glb_rule_number=0;
+  glb_current_exp = -1;              // Find experiment number
+  for (i=0; i < glb_num_of_exps; i++)
+    if (glb_experiment_list[i] == s)
+    {
+      glb_current_exp = i;
+      break;
+    }
+
   //  set_type(s->beamtype);
   glb_set_error_function(s->errorfunction);
  
@@ -1038,8 +1046,6 @@ void glbSetExperiment(glb_exp in)
  
 
   // pointer moving for density profile
-  glb_set_psteps(s->psteps);
-  glb_set_length_ptr(s->lengthtab);
   glb_set_baseline(s->baseline);
   //density=in->densitytab;
   glb_set_profile_scaling_sec(s);
@@ -1108,22 +1114,13 @@ void glbSetExperiment(glb_exp in)
 
 
 
-  glb_switch_filter(s->filter_state);
-  glb_set_filter(s->filter_value);
+//  glb_switch_filter(s->filter_state);
+//  glb_set_filter(s->filter_value);
 
 
   
   MMovePointers(s);
   
-  glb_rule_number=0;
-  glb_current_exp = -1;              // Find experiment number
-  for (i=0; i < glb_num_of_exps; i++)
-    if (glb_experiment_list[i] == s)
-    {
-      glb_current_exp = i;
-      break;
-    }
-
   return;
 }
 
@@ -1159,15 +1156,15 @@ void glbSetNewRates()
 void glb_set_profile_scaling(double scale,int i)
 {
   int k;
-  glb_set_length_ptr(glb_experiment_list[i]->lengthtab);
+//  glb_set_length_ptr(glb_experiment_list[i]->lengthtab);
  
-  glb_set_psteps(glb_experiment_list[i]->psteps);
+//  glb_set_psteps(glb_experiment_list[i]->psteps);
   for(k=0;k<glb_experiment_list[i]->psteps;k++)
     {
       glb_experiment_list[i]->densitybuffer[k]=(double) 
 	scale*glb_experiment_list[i]->densitytab[k];
     }
-  glb_set_density_ptr(glb_experiment_list[i]->densitybuffer);
+//  glb_set_density_ptr(glb_experiment_list[i]->densitybuffer);
 
 }
 

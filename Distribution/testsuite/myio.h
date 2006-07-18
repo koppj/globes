@@ -19,66 +19,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
+ 
+/*
+ Some simple output functions for GLoBES examples
+ */
 
-#include "myio.h"
-#include <stdio.h>
-#include <string.h>
+/* Init standard output and write the string headline into it */
+/* If filename given, write to file; for empty filename write to screen */
+void InitOutput(char* filename, char* headline);
 
-static char* THEFILE;
-
-void InitOutput(char* filename, char* headline)
-{
- THEFILE=filename;
- if(strlen(THEFILE)==0) printf(headline);
- else 
- {
-   FILE* f=fopen(THEFILE, "w");
-   if (!f)
-   {
-     printf("File cannot be opened!\n");
-     THEFILE[0]=0;
-   }
-   else {
-    fprintf(f,headline);
-    fclose(f);
-   }
- }
-}
-
-void AddToOutput(double n1,double n2)
-{
- if(strlen(THEFILE)==0) printf("<%g> %f \n",n1,n2);
- else 
- {
-   FILE* f=fopen(THEFILE, "a");
-   if (!f)
-   {
-     printf("File cannot be opened!\n");
-     THEFILE[0]=0;
-   }
-   else
-   {
-    fprintf(f,"<%g> %f \n",n1,n2);
-    fclose(f);
-   }
- }
-}
-
-void AddToOutput(double n1,double n2,double n3)
-{
- if(strlen(THEFILE)==0) printf("<%g %g> %f \n",n1,n2,n3);
- else 
- {
-   FILE* f=fopen(THEFILE, "a");
-   if (!f)
-   {
-     printf("File cannot be opened!\n");
-     THEFILE[0]=0;
-   }
-   else
-   {
-    fprintf(f,"<%g %g> %f \n",n1,n2,n3);
-    fclose(f);
-   }
- }
-}
+/* Add line to standard output with three numbers */
+void AddToOutput(double n1,double n2,double n3);

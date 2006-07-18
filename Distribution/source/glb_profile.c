@@ -30,6 +30,7 @@
 
 #include "glb_types.h"
 #include "glb_error.h"
+#include "glb_multiex.h"
 #include "glb_probability.h"
 
 
@@ -222,35 +223,7 @@ int glbAverageDensityProfile(double baseline, double **length,
 
 int glbGetProfileData(size_t *layers, double** length, double** density)
 {
-  double *l,*d,*ll,*dd;
-  int i,steps;
- 
-  steps=glb_get_psteps();
-  ll=glb_get_length_ptr();
-  dd=glb_get_density_ptr();
-  if(steps>0)
-    {
-      l=(double*) glb_malloc(steps*sizeof(double));
-      d=(double*) glb_malloc(steps*sizeof(double));
-      for(i=0;i<steps;i++)
-	{
-	  d[i]=dd[i];
-	  l[i]=ll[i];
-	}
-      *density=d;
-      *length=l;
-      *layers=steps;
-      return 0;
-    }
-  else
-    {
-      glb_error("No profile data to get");
-      *length=NULL;
-      *density=NULL;
-      *layers=0;
-      return -1;
-    }
-  return 0;
+  return glbGetProfileDataInExperiment(glb_current_exp, layers, length, density);
 }
 
 

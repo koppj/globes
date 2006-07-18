@@ -188,22 +188,8 @@ the GLoBES tar-ball instead. Make sure it is in a place where it is found by 'ma
 LAPACK & BLAS requirements
 ==========================
 
-GLoBES uses one single routine out of LAPACK (www.netlib.org/lapack/) named
-`zgeev' to diagonalize the oscillation Hamiltonian in matter. Since LAPACK
-is not part of the standard installation of many distributions and we need
-only one function, GLoBES comes with a convenience version of the required
-routines, which are taken from LAPACK and BLAS (www.netlib.org/blas) and have
-been translated to C with `f2c'. In case your system has a working installation
-of BLAS/LAPACK GLoBES will use it. However, if your system is lacking BLAS/
-LAPACK the convenience version will be compiled and linked into GLoBES. If
-for some reason BLAS/LAPACK is installed on the system and one still wishes
-to use the convience version use `--enable-lapack-convenience'. Using Fortran
-code which has been translated to C with `f2c' requires a run-time library
-called `libf2c' (on some systems it is called `libg2c'). The configury of 
-GLoBES detects the presence of either of the two takes care of this problem.
-If none of the two is present, a convience library is used. If
-for some reason `libf2c' is installed on the system and one still wishes
-to use the convience version use `--enable-libf2c-convenience'.
+In contrast to former versions, GLoBES does not require LAPACK any more
+since version 2.3.13
 
 GSL requirements
 ================

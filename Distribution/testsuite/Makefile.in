@@ -1,0 +1,70 @@
+# GLoBES -- General LOng Baseline Experiment Simulator
+# (C) 2002 - 2004,  The GLoBES Team
+#
+# GLoBES is mainly intended for academic purposes. Proper
+# credit must be given if you use GLoBES or parts of it. Please
+# read the section 'Credit' in the README file.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+# The configure script should have replaced anything as required to
+# obtain a working Makefile, which may serve as a template for own
+# applications.
+#
+# This Makefile assumes dynamic libraries, installed to either
+# the default prefix /usr/local/ or to a user-defined directory 
+# called ${prefix}.
+#
+# For linking against a specific version of GLoBES, libglobes.so can be 
+# replaced by the respective library, such as libglobes.so.0.0.1
+
+
+exec_prefix = @exec_prefix@
+libdir = @libdir@
+globesconf= $(exec_prefix)/bin/globes-config
+
+local_CFLAGS = -g -O4
+
+INCFLAGS:=$(shell $(globesconf) --include)
+local_LDFLAGS:=$(shell $(globesconf) --libs)
+preopen_modules:=$(shell $(globesconf) --dlpreopen)
+local_LTLDFLAGS:=$(shell $(globesconf) --ltlibs)
+ifdef preopen_modules
+predefs = -DGLB_STATIC
+endif
+
+
+
+BIN = 01-probabilities 02-probabilities-filtered 03-chisys 04-chicorr 05-chideg 06-chibars
+OBJ = 01-probabilities.o 02-probabilities-filtered.o 03-chisys.o  04-chicorr 05-chideg 06-chibars  myio.o
+
+01-probabilities: 01-probabilities.o
+	gcc 01-probabilities.o -o 01-probabilities $(LDFLAGS) $(local_LDFLAGS)
+02-probabilities-filtered: 02-probabilities-filtered.o
+	gcc 02-probabilities-filtered.o -o 02-probabilities-filtered $(LDFLAGS) $(local_LDFLAGS)
+03-chisys: 03-chisys.o myio.o
+	gcc 03-chisys.o myio.o -o 03-chisys $(LDFLAGS) $(local_LDFLAGS)
+04-chicorr: 04-chicorr.o myio.o
+	gcc 04-chicorr.o myio.o -o 04-chicorr $(LDFLAGS) $(local_LDFLAGS)
+05-chideg: 05-chideg.o myio.o
+	gcc 05-chideg.o myio.o -o 05-chideg $(LDFLAGS) $(local_LDFLAGS)
+06-chibars: 06-chibars.o myio.o
+	gcc 06-chibars.o myio.o -o 06-chibars $(LDFLAGS) $(local_LDFLAGS)
+
+%.o : %.c
+	g++ $(CFLAGS) $(local_CFLAGS) -c $< $(INCFLAGS)
+.PHONY: clean
+clean:
+	rm -f $(BIN) $(OBJ)

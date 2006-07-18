@@ -428,3 +428,23 @@ documented!
 	probability to above feature.
 
 06/07/06 JK -- fixed energy_window bug in glb_parser.y
+
+
+********Version 2.3.13
+
+         JK -- Replaced glb_probability.cc completely:
+           - The new oscillation engine is based on an optimized algorithm for
+             the diagonalization of 3x3 matrices.
+           - There is only one function to set the oscillation parameters
+           - There is only one function to obtain oscillation probabilities
+           - These modifications required changes in glb_wrapper.c and glb_minimize.c.
+           - The functions glbSetFilter, glbGetFilter, glbSetFilterState, glbGetFilterState
+             are now deprecated
+
+         Removed all the LAPACK and libf2c stuff.
+
+         Written some test programs (new directory "testsuite"), along with some scripts
+         to automatically compile and run them, and to compare the results. See README
+         file in the tesuite folder for details.
+
+          

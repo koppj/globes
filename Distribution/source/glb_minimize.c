@@ -436,14 +436,22 @@ static double Chi(double x[])
 {
   int i;  
   double erg;
-  double nsp[GLB_OSCP-6+1];
-  glb_set_c_vacuum_parameters(x[0],x[1],x[2],x[3]);
-  glb_set_c_squared_masses(0,x[4],x[5]);
-  if(GLB_OSCP>6)
-  {
-	for(i=0;i<GLB_OSCP-6;i++) nsp[i]=x[i+6];
-	glb_set_c_ns_params(nsp);
-  }
+
+  glb_params p = glbAllocParams();
+  for (i=0; i < GLB_OSCP; i++)
+    p->osc->osc_params[i] = x[i];
+  glb_set_oscillation_parameters(p);
+  glbFreeParams(p);
+    
+//  double nsp[GLB_OSCP-6+1];
+//  glb_set_c_vacuum_parameters(x[0],x[1],x[2],x[3]);
+//  glb_set_c_squared_masses(0,x[4],x[5]);
+//  if(GLB_OSCP>6)
+//  {
+//	for(i=0;i<GLB_OSCP-6;i++) nsp[i]=x[i+6];
+//	glb_set_c_ns_params(nsp);
+//  }
+  
   for (i=0;i<glb_num_of_exps;i++)
     {
       glbSetExperiment(glb_experiment_list[i]);
@@ -468,14 +476,21 @@ static double SingleChi(double x[GLB_OSCP+1],int exp)
 {
   int i;
   double erg;
-  double nsp[GLB_OSCP-6+1];
-  glb_set_c_vacuum_parameters(x[0], x[1],x[2],x[3]);
-  glb_set_c_squared_masses(0,x[4],x[5]);
-  if(GLB_OSCP>6)
-  {
-	for(i=0;i<GLB_OSCP-6;i++) nsp[i]=x[i+6];
-	glb_set_c_ns_params(nsp);
-  }
+
+  glb_params p = glbAllocParams();
+  for (i=0; i < GLB_OSCP; i++)
+    p->osc->osc_params[i] = x[i];
+  glb_set_oscillation_parameters(p);
+  glbFreeParams(p);
+
+//  double nsp[GLB_OSCP-6+1];
+//  glb_set_c_vacuum_parameters(x[0], x[1],x[2],x[3]);
+//  glb_set_c_squared_masses(0,x[4],x[5]);
+//  if(GLB_OSCP>6)
+//  {
+//	for(i=0;i<GLB_OSCP-6;i++) nsp[i]=x[i+6];
+//	glb_set_c_ns_params(nsp);
+//  }
 
       glbSetExperiment(glb_experiment_list[exp]);
       glb_set_profile_scaling(x[GLB_OSCP],exp);
@@ -499,14 +514,21 @@ static double SingleRuleChi(double x[GLB_OSCP+1],int exp, int rule)
 {
   int i;
   double erg;
-  double nsp[GLB_OSCP-6+1];
-  glb_set_c_vacuum_parameters(x[0], x[1],x[2],x[3]);
-  glb_set_c_squared_masses(0,x[4],x[5]);
-  if(GLB_OSCP>6)
-  {
-	for(i=0;i<GLB_OSCP-6;i++) nsp[i]=x[i+6];
-	glb_set_c_ns_params(nsp);
-  }
+
+  glb_params p = glbAllocParams();
+  for (i=0; i < GLB_OSCP; i++)
+    p->osc->osc_params[i] = x[i];
+  glb_set_oscillation_parameters(p);
+  glbFreeParams(p);
+
+//  double nsp[GLB_OSCP-6+1];
+//  glb_set_c_vacuum_parameters(x[0], x[1],x[2],x[3]);
+//  glb_set_c_squared_masses(0,x[4],x[5]);
+//  if(GLB_OSCP>6)
+//  {
+//	for(i=0;i<GLB_OSCP-6;i++) nsp[i]=x[i+6];
+//	glb_set_c_ns_params(nsp);
+//  }
 
       glbSetExperiment(glb_experiment_list[exp]);
       glb_set_profile_scaling(x[GLB_OSCP],exp);
@@ -837,7 +859,7 @@ static double MD_chi_NP(double x[])
   double erg2;
   double y[GLB_OSCP+32];
   int i; 
-  double nsp[GLB_OSCP-6+1];
+//  double nsp[GLB_OSCP-6+1];
   prior_input=glbAllocParams();
   count = count +1;
   for(i=0;i<n_free;i++) y[index_tab[i]]=x[i+1];
@@ -845,14 +867,19 @@ static double MD_chi_NP(double x[])
   // change a global (i.e to this file) parameter (fix_params) at this place
   for(i=n_free;i<n_free+n_fix;i++) y[index_tab[i]]=fix_params[index_tab[i]]; 
 
-  //fprintf(stderr,"x2 %f\n",x2[1]);
-  glb_set_c_vacuum_parameters(y[0],y[1],y[2],y[3]);
-  glb_set_c_squared_masses(0,y[4],y[5]);
-  if(GLB_OSCP>6)
-  {
-	for(i=0;i<GLB_OSCP-6;i++) nsp[i]=y[i+6];
-	glb_set_c_ns_params(nsp);
-  }
+  glb_params p = glbAllocParams();
+  for (i=0; i < GLB_OSCP; i++)
+    p->osc->osc_params[i] = y[i];
+  glb_set_oscillation_parameters(p);
+  glbFreeParams(p);
+
+//  glb_set_c_vacuum_parameters(y[0],y[1],y[2],y[3]);
+//  glb_set_c_squared_masses(0,y[4],y[5]);
+//  if(GLB_OSCP>6)
+//  {
+//	for(i=0;i<GLB_OSCP-6;i++) nsp[i]=y[i+6];
+//	glb_set_c_ns_params(nsp);
+//  }
   
   for (i=0;i<glb_num_of_exps;i++)
     {
@@ -957,14 +984,19 @@ static double chi_NP(double x[])
   for(i=s_n_free;i<s_n_free+s_n_fix;i++) y[s_index_tab[i]]
 					 =s_fix_params[s_index_tab[i]];
 
-  //fprintf(stderr,"x2 %f\n",x2[1]);
-  glb_set_c_vacuum_parameters(y[0],y[1],y[2],y[3]);
-  glb_set_c_squared_masses(0,y[4],y[5]);
-  if(GLB_OSCP>6)
-  {
-	for(i=0;i<GLB_OSCP-6;i++) nsp[i]=y[i+6];
-	glb_set_c_ns_params(nsp);
-  }
+  glb_params p = glbAllocParams();
+  for (i=0; i < GLB_OSCP; i++)
+    p->osc->osc_params[i] = y[i];
+  glb_set_oscillation_parameters(p);
+  glbFreeParams(p);
+
+//  glb_set_c_vacuum_parameters(y[0],y[1],y[2],y[3]);
+//  glb_set_c_squared_masses(0,y[4],y[5]);
+//  if(GLB_OSCP>6)
+//  {
+//	for(i=0;i<GLB_OSCP-6;i++) nsp[i]=y[i+6];
+//	glb_set_c_ns_params(nsp);
+//  }
   
   glbSetExperiment(glb_experiment_list[glb_single_experiment_number]);
   glb_set_profile_scaling(y[GLB_OSCP],glb_single_experiment_number);

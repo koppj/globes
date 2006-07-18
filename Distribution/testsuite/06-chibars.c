@@ -34,10 +34,10 @@
 #include "myio.h"             /* my input-output routines */
 
 /* If filenames given, write to file; for empty filenames, write to screen */
-char MYFILE1[]="test4a.dat";
-char MYFILE2[]="test4b.dat";
-char MYFILE3[]="test4c.dat";
-char MYFILE4[]="test4d.dat";
+char MYFILE1[]="";
+char MYFILE2[]="";
+char MYFILE3[]="";
+char MYFILE4[]="";
 
 /* Global oscillation parameters */
 double theta12,theta13,theta23,deltacp,sdm,ldm;
@@ -140,11 +140,13 @@ double FindDeg(glb_params deg_pos,double theldm)
 
 int main(int argc, char *argv[])
 { 
+  char *GLB_FILE = argv[argc-1];
+
   /* Initialize libglobes */
   glbInit(argv[0]); 
 
   /* Initialize experiment NuFact.glb */
-  glbInitExperiment("NuFact.glb",&glb_experiment_list[0],&glb_num_of_exps); 
+  glbInitExperiment(GLB_FILE,&glb_experiment_list[0],&glb_num_of_exps); 
 
   /* Set standard oscillation parameters */
   theta12 = asin(sqrt(0.8))/2;
@@ -163,7 +165,7 @@ int main(int argc, char *argv[])
   
   /* Compute 1st edges of bars: systematics off, fit value of deltacp=0 */
   InitOutput(MYFILE1,"Format: Log(10,s22th13)  chi^2:ldm=2e-3  chi^2:ldm=3.0e-3 \n"); 
-  for(x=-7.0;x<-2.0+0.01;x=x+5.0/50)
+  for(x=-7.0;x<-2.0+0.01;x=x+5.0/20)
   {
      res1=CalcNoSystematics(2.0e-3,x);
      res2=CalcNoSystematics(3.0e-3,x);
@@ -173,7 +175,7 @@ int main(int argc, char *argv[])
   
   /* Compute 2nd edges of bars: systematics on, fit value of deltacp=0 */
   InitOutput(MYFILE2,"Format: Log(10,s22th13)  chi^2:ldm=2e-3  chi^2:ldm=3.0e-3 \n"); 
-  for(x=-7.0;x<-2.0+0.01;x=x+5.0/50)
+  for(x=-7.0;x<-2.0+0.01;x=x+5.0/20)
   {
      res1=CalcSystematics(2.0e-3,x);
      res2=CalcSystematics(3.0e-3,x);
@@ -185,7 +187,7 @@ int main(int argc, char *argv[])
   InitOutput(MYFILE3,"Format: Log(10,s22th13)  chi^2:ldm=2e-3  chi^2:ldm=3.0e-3 \n"); 
   glbDefineParams(original1,theta12,theta13,theta23,deltacp,sdm,2.0e-3);
   glbDefineParams(original2,theta12,theta13,theta23,deltacp,sdm,3.0e-3);
-  for(x=-7.0;x<-2.0+0.01;x=x+5.0/50)
+  for(x=-7.0;x<-2.0+0.01;x=x+5.0/20)
   {
      res1=CalcProjection(2.0e-3,x,original1);
      res2=CalcProjection(3.0e-3,x,original2);
@@ -199,7 +201,7 @@ int main(int argc, char *argv[])
  
   /* Compute 4th edges of bars: systematics on, degeneracy, projection onto s22th13 axis */
   InitOutput(MYFILE4,"Format: Log(10,s22th13)  chi^2:ldm=2e-3  chi^2:ldm=3.0e-3 \n"); 
-  for(x=-7.0;x<-2.0+0.01;x=x+5.0/30)
+  for(x=-7.0;x<-2.0+0.01;x=x+5.0/20)
   {
      res1=CalcProjection(2.0e-3,x,degeneracy1);
      res2=CalcProjection(3.0e-3,x,degeneracy2);

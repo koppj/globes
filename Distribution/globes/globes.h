@@ -36,6 +36,10 @@
 #endif /* __cplusplus */
 
 
+// Number of neutrino flavours
+#define GLB_NU_FLAVOURS             3
+
+
 #define GLB_EFF 1
 #define GLB_BG 2
 #define GLB_SIG 3
@@ -61,6 +65,13 @@
 #define GLB_OFF 0
 
 #define GLB_EARTH_RADIUS 6371.0
+
+// Unit conversion
+//#define EV_TO_KM_FACTOR  1.973e-10
+#define EV_TO_KM_FACTOR  1.9747235e-10
+#define KM_TO_EV(x)      ((x) / EV_TO_KM_FACTOR)
+#define EV_TO_KM(x)      ((x) * EV_TO_KM_FACTOR)
+
 
 /* In the application software we only need a handle for the
  * any lt_dlopen`ed module ...

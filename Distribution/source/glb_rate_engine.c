@@ -34,6 +34,7 @@
 #include "glb_types.h"
 #include "glb_smear.h"
 #include "glb_probability.h"
+#include "glb_multiex.h"
 #include "glb_fluxes.h"
 #include "glb_error.h"
 
@@ -55,8 +56,6 @@ static double years = 1;          // running time in years
 static int bins = 20;          // number of energy bins
 static double treshold = 5.0;     // treshold energy
 
-static double MartinsProbs[3][3];
-static double MartinsProbsAnti[3][3];
 static double Probs[3][3];
 static double ProbsAnti[3][3];
 double** glb_calc_smearing[32];
@@ -167,11 +166,12 @@ int glb_get_type()
 
 void glb_set_baseline(double l)
 {
+  struct glb_experiment *e = glb_experiment_list[glb_current_exp];
   double sum,*ll;
   size_t s;
   int i;
-  s=glb_get_psteps();
-  ll=glb_get_length_ptr();
+  s = e->psteps;
+  ll = e->lengthtab;
   sum=0;
   if(s<=0)
     { 
@@ -367,17 +367,17 @@ void glb_set_bg_rule(int i, int cn, int *rule, double *coeff)
 
 static void CalcAllProbs(double en, double baseline)
 {
-  int i;
-  int j;
-  glb_probability_matrix(MartinsProbs,+1,en);
-  glb_probability_matrix(MartinsProbsAnti,-1,en); 
-  for (j=0;j<3;j++) 
-    {   
-      for (i=0;i<3;i++) ProbsAnti[j][i]=(double) MartinsProbsAnti[j][i];
-      for (i=0;i<3;i++) Probs[j][i]=(double) MartinsProbs[j][i];
- 
-    } 
+  struct glb_experiment *e = glb_experiment_list[glb_current_exp];
+  int i, j;
+  int status;
   
+  if ((status=glb_probability_matrix(Probs, +1, en, e->psteps, e->lengthtab, e->densitybuffer,
+          (e->filter_state == GLB_ON) ? e->filter_value : -1.0)) != GLB_SUCCESS)
+    glb_error("Calculation of oscillation probabilities failed.");
+
+  if ((status=glb_probability_matrix(ProbsAnti, -1, en, e->psteps, e->lengthtab, e->densitybuffer,
+          (e->filter_state == GLB_ON) ? e->filter_value : -1.0)) != GLB_SUCCESS)
+    glb_error("Calculation of oscillation probabilities failed.");
 }
 
 // Sum of all NC rates
@@ -1294,9 +1294,6 @@ void glb_remove_calc_pointers()
     }
   glb_calc_buffer=NULL;
   smm=NULL;
-  glb_set_length_ptr(NULL);
-  glb_set_density_ptr(NULL);
-  glb_set_psteps(0);
   glb_chirate=NULL;
 
 }

@@ -93,8 +93,8 @@ void glb_free_density_type(glb_density_type *stale)
 
 glb_params glbAllocParams()
 {
-  glb_params_type *temp;
-  temp=(glb_params_type *) glb_malloc(sizeof(glb_params_type));
+  glb_params temp;
+  temp=(glb_params) glb_malloc(sizeof(struct glb_params_type));
   temp->osc=glb_alloc_osc_type();
   temp->density=glb_alloc_density_type();
   temp->iterations=0;
@@ -103,59 +103,49 @@ glb_params glbAllocParams()
 
 void glbFreeParams(glb_params stale)
 {
-  glb_free_osc_type(((glb_params_type *) stale)->osc);
-  glb_free_density_type(((glb_params_type *) stale)->density);
+  glb_free_osc_type(((struct glb_params_type *) stale)->osc);
+  glb_free_density_type(((struct glb_params_type *) stale)->density);
   glb_free(stale);
   stale = NULL;
 }
 
 glb_params glbSetIteration(glb_params in, int iter)
 {
-  glb_params_type *s;
-  s=(glb_params_type *) in;
-  s->iterations=iter;
-  return (glb_params) s;
+  in->iterations=iter;
+  return in;
 }
 
 int glbGetIteration(const glb_params in)
 {
-  int iter;
-  glb_params_type *s;
-  s=(glb_params_type *) in;
-  iter = s->iterations;
-  return iter;
+  return in->iterations;
 }
 
 glb_params glbSetDensityParams(glb_params in, 
 				 double dens, int which)
 {
   int i;
-  glb_params_type *s;
-  s=(glb_params_type *) in;
   if(which==GLB_ALL)
     {
-      for(i=0;i<(s->density)->length;i++) (s->density)->density_params[i]=dens;
+      for(i=0;i<(in->density)->length;i++) (in->density)->density_params[i]=dens;
     }
-  else if(0 <= which&&which < (s->density)->length )
+  else if(0 <= which&&which < (in->density)->length )
     {
-      (s->density)->density_params[which]=dens;
+      (in->density)->density_params[which]=dens;
     }
   else 
     {
       glb_error("Density list length mismatch");
       return NULL;
     }
-  return (glb_params) s;
+  return in;
 }
 
 double glbGetDensityParams(const glb_params in, int which)
 {
   double out;
-  glb_params_type *s;
-  s=(glb_params_type *) in;
-  if(0 <= which&&which < (s->density)->length )
+  if(0 <= which&&which < (in->density)->length )
     {
-      out=(s->density)->density_params[which];
+      out=(in->density)->density_params[which];
     }
   else 
     {
@@ -168,29 +158,22 @@ double glbGetDensityParams(const glb_params in, int which)
 glb_params glbSetOscParams(glb_params in,
 				 double osc, int which)
 {
-
-  glb_params_type *s;
-  s=(glb_params_type *) in;
-   if(0 <= which&&which < GLB_OSCP )
-    {
-      (s->osc)->osc_params[which]=osc;
-    }
+  if (0 <= which&&which < GLB_OSCP)
+    in->osc->osc_params[which] = osc;
   else 
-    {
-      glb_error("Oscillation list length mismatch");
-      return NULL;
-    }
-  return (glb_params) s;
+  {
+    glb_error("Oscillation list length mismatch");
+    return NULL;
+  }
+  return in;
 }
 
 double glbGetOscParams(const glb_params in, int which)
 {
   double out;
-  glb_params_type *s;
-  s=(glb_params_type *) in;
  if(0 <= which&&which < GLB_OSCP )
     {
-      out=(s->osc)->osc_params[which];
+      out=(in->osc)->osc_params[which];
     }
   else 
     {
@@ -218,58 +201,51 @@ glb_params
 glbCopyParams(const glb_params source, glb_params dest)
 {
   int i;
-  const glb_params_type *in;
-  glb_params_type *out;
-  in=(glb_params_type *) source;
-  out=(glb_params_type *) dest;
   
-  
-  if(out==NULL||in==NULL) return NULL;
-  if(out==in) return (glb_params) out;
-  out->iterations=in->iterations;
+  if(dest==NULL||source==NULL) return NULL;
+  if(source==dest) return dest;
+  dest->iterations=source->iterations;
   
   /* BUG #13 -- The use of realloc should solve a memory leak and makes this
      function pretty featureful, since it supports copying parameters
      even if the number of parameters and/or experiments has changed.
   */
 
-  if((in->osc)->length>0&&
-     (in->osc)->length!=(out->osc)->length)
+  if((source->osc)->length>0&&
+     (source->osc)->length!=(dest->osc)->length)
     {
-      (out->osc)->osc_params=glb_realloc((out->osc)->osc_params,(in->osc)->length * sizeof(double));
-      (out->osc)->length=(in->osc)->length;
+      (dest->osc)->osc_params=glb_realloc((dest->osc)->osc_params,(source->osc)->length * sizeof(double));
+      (dest->osc)->length=(source->osc)->length;
     }
 
-  if((in->density)->length>0&&
-     (in->density)->length!=(out->density)->length)
+  if((source->density)->length>0&&
+     (source->density)->length!=(dest->density)->length)
     {
-      (out->density)->density_params=
-	glb_realloc((out->density)->density_params,(in->density)->length * sizeof(double));
-      (out->density)->length=(in->density)->length;
+      (dest->density)->density_params=
+	glb_realloc((dest->density)->density_params,(source->density)->length * sizeof(double));
+      (dest->density)->length=(source->density)->length;
     }
   
-  for(i=0;i<(out->osc)->length;i++) 
-    (out->osc)->osc_params[i]=(in->osc)->osc_params[i];
+  for(i=0;i<(dest->osc)->length;i++) 
+    (dest->osc)->osc_params[i]=(source->osc)->osc_params[i];
 
-  for(i=0;i<(out->density)->length;i++) 
-    (out->density)->density_params[i]=(in->density)->density_params[i];
+  for(i=0;i<(dest->density)->length;i++) 
+    (dest->density)->density_params[i]=(source->density)->density_params[i];
 
-  return (glb_params) out;
+  return dest;
   
 }
 
 void glbPrintParams(FILE *stream, const glb_params in)
 {
   size_t k;
-  const glb_params_type *source;
-  source=(glb_params_type *) in;
-  for(k=0;k<(source->osc)->length;k++) 
-	fprintf(stream,"%g ",(source->osc)->osc_params[k]);   
+  for(k=0;k<(in->osc)->length;k++) 
+	fprintf(stream,"%g ",(in->osc)->osc_params[k]);   
   fprintf(stream,"\n");
-  for(k=0;k<(source->density)->length;k++) 
-	fprintf(stream,"%g ",(source->density)->density_params[k]);    
+  for(k=0;k<(in->density)->length;k++) 
+	fprintf(stream,"%g ",(in->density)->density_params[k]);    
   fprintf(stream,"\n");
-  fprintf(stream,"Iterations: %d\n",source->iterations);
+  fprintf(stream,"Iterations: %d\n",in->iterations);
 }
 
 /* This  is a bunch of function in order to deal with the
@@ -312,17 +288,17 @@ void glb_free_density_proj_type(glb_density_proj_type *stale)
 
 glb_projection glbAllocProjection()
 {
-  glb_projection_type *temp;
-  temp=(glb_projection_type *) glb_malloc(sizeof(glb_projection_type));
+  glb_projection temp;
+  temp=(glb_projection) glb_malloc(sizeof(struct glb_projection_type));
   temp->osc=glb_alloc_osc_proj_type();
   temp->density=glb_alloc_density_proj_type();
-  return (glb_projection) temp;
+  return temp;
 }
 
 void glbFreeProjection(glb_projection stale)
 {
-  glb_free_osc_proj_type(((glb_projection_type *) stale)->osc);
-  glb_free_density_proj_type(((glb_projection_type *) stale)->density);
+  glb_free_osc_proj_type(stale->osc);
+  glb_free_density_proj_type(stale->density);
   /* BUG #14 -- This line solves a serious leak in connection with the
    * prior-module.
    */
@@ -335,37 +311,33 @@ glb_projection glbSetDensityProjectionFlag(glb_projection in,
 				       int flag, int which)
 {
   int i;
-  glb_projection_type *s;
   if((flag!=GLB_FREE)&&(flag!=GLB_FIXED)) {
     glb_error("Projection flag must be either GLB_FREE or GLB_FIXED");
     return NULL;
   }
 
-  s=(glb_projection_type *) in;
   if(which==GLB_ALL)
     {
-      for(i=0;i<glb_num_of_exps;i++) (s->density)->density_params[i]=flag;
+      for(i=0;i<glb_num_of_exps;i++) (in->density)->density_params[i]=flag;
     }
-  else if(0 <= which&&which < (s->osc)->length )
+  else if(0 <= which&&which < (in->osc)->length )
     {
-      (s->density)->density_params[which]=flag;
+      (in->density)->density_params[which]=flag;
     }
   else 
     {
       glb_error("Density list length mismatch");
       return NULL;
     }
-  return (glb_projection) s;
+  return in;
 }
 
 int glbGetDensityProjectionFlag(const glb_projection in, int which)
 {
   int out;
-  glb_projection_type *s;
-  s=(glb_projection_type *) in;
-  if(0 <= which&&which < (s->density)->length )
+  if(0 <= which&&which < (in->density)->length )
     {
-      out=(s->density)->density_params[which];
+      out=(in->density)->density_params[which];
     }
   else 
     {
@@ -378,34 +350,29 @@ int glbGetDensityProjectionFlag(const glb_projection in, int which)
 glb_projection glbSetProjectionFlag(glb_projection in, 
 				 int flag, int which)
 {
-
-  glb_projection_type *s;
   if((flag!=GLB_FREE)&&(flag!=GLB_FIXED)) {
     glb_error("Projection flag must be either GLB_FREE or GLB_FIXED");
     return NULL;
   }
 
-  s=(glb_projection_type *) in;
    if(0 <= which&&which < GLB_OSCP )
     {
-      (s->osc)->osc_params[which]=flag;
+      (in->osc)->osc_params[which]=flag;
     }
   else 
     {
       glb_error("Oscillation list length mismatch");
       return NULL;
     }
-  return (glb_projection) s;
+  return in;
 }
 
 int glbGetProjectionFlag(const glb_projection in, int which)
 {
   int out;
-  glb_projection_type *s;
-  s=(glb_projection_type *) in;
- if(0 <= which&&which < GLB_OSCP )
+  if(0 <= which&&which < GLB_OSCP )
     {
-      out=(s->osc)->osc_params[which];
+      out=(in->osc)->osc_params[which];
     }
   else 
     {
@@ -434,68 +401,62 @@ glb_projection
 glbCopyProjection(const glb_projection source, glb_projection dest)
 {
   int i;
-  const glb_projection_type *in;
-  glb_projection_type *out;
-  in=(glb_projection_type *) source;
-  out=(glb_projection_type *) dest;
 
-  if(out==NULL||in==NULL) return NULL;
-  if(out==in) return (glb_projection) out;
+  if(dest==NULL||source==NULL) return NULL;
+  if(dest==source) return (glb_projection) dest;
 
   /* BUG #13 -- The use of realloc should solve a memory leak and makes this
      function pretty featureful, since it supports copying parameters
      even if the number of parameters and/or experiments has changed.
   */
 
-  if((in->osc)->length>0&&
-     (in->osc)->length!=(out->osc)->length)
+  if((source->osc)->length>0&&
+     (source->osc)->length!=(dest->osc)->length)
     {
-      (out->osc)->osc_params=glb_realloc((out->osc)->osc_params,(in->osc)->length * sizeof(int));
-      (out->osc)->length=(in->osc)->length;
+      (dest->osc)->osc_params=glb_realloc((dest->osc)->osc_params,(source->osc)->length * sizeof(int));
+      (dest->osc)->length=(source->osc)->length;
     }
 
-  if((in->density)->length>0&&
-     (in->density)->length!=(out->density)->length)
+  if((source->density)->length>0&&
+     (source->density)->length!=(dest->density)->length)
     {
-      (out->density)->density_params=
-	glb_realloc((out->density)->density_params,(in->density)->length * sizeof(int));
-      (out->density)->length=(in->density)->length;
+      (dest->density)->density_params=
+	glb_realloc((dest->density)->density_params,(source->density)->length * sizeof(int));
+      (dest->density)->length=(source->density)->length;
     }
 
-  for(i=0;i<(in->osc)->length;i++) 
-    (out->osc)->osc_params[i]=(in->osc)->osc_params[i];
+  for(i=0;i<(source->osc)->length;i++) 
+    (dest->osc)->osc_params[i]=(source->osc)->osc_params[i];
 
-  for(i=0;i<(in->density)->length;i++) 
-    (out->density)->density_params[i]=(in->density)->density_params[i];
+  for(i=0;i<(source->density)->length;i++) 
+    (dest->density)->density_params[i]=(source->density)->density_params[i];
 
-  return (glb_projection) out;
+  return dest;
 }
 
 
 void glbPrintProjection(FILE *stream, const glb_projection in)
 {
   size_t k;
-  const glb_projection_type *source;
-  source=(glb_projection_type *) in;
-  for(k=0;k<(source->osc)->length;k++) 
+  for(k=0;k<(in->osc)->length;k++) 
     {
-      if((source->osc)->osc_params[k]==GLB_FREE) 
+      if((in->osc)->osc_params[k]==GLB_FREE) 
 	fprintf(stream,"free  ");
-      if((source->osc)->osc_params[k]==GLB_FIXED) 
+      if((in->osc)->osc_params[k]==GLB_FIXED) 
 	fprintf(stream,"fixed ");
-      if(((source->osc)->osc_params[k]!=GLB_FIXED) &&
-	 ((source->osc)->osc_params[k]!=GLB_FREE) )
+      if(((in->osc)->osc_params[k]!=GLB_FIXED) &&
+	 ((in->osc)->osc_params[k]!=GLB_FREE) )
 	fprintf(stream,"undef ");
     }
   fprintf(stream,"\n");
-  for(k=0;k<(source->density)->length;k++) 
+  for(k=0;k<(in->density)->length;k++) 
     {
-      if((source->density)->density_params[k]==GLB_FREE) 
+      if((in->density)->density_params[k]==GLB_FREE) 
 	fprintf(stream,"free  ");
-      if((source->density)->density_params[k]==GLB_FIXED) 
+      if((in->density)->density_params[k]==GLB_FIXED) 
 	fprintf(stream,"fixed ");
-      if(((source->density)->density_params[k]!=GLB_FIXED) &&
-	 ((source->density)->density_params[k]!=GLB_FREE) )
+      if(((in->density)->density_params[k]!=GLB_FIXED) &&
+	 ((in->density)->density_params[k]!=GLB_FREE) )
 	fprintf(stream,"undef ");
     }
   fprintf(stream,"\n");
@@ -510,20 +471,12 @@ void glbPrintProjection(FILE *stream, const glb_projection in)
 int 
 glbSetOscillationParameters(const glb_params in)
 {
-  int i;
-  double nsp[GLB_OSCP-6+1];
-  if(in==NULL) return -1;
-  glb_set_c_vacuum_parameters(glbGetOscParams(in,0),glbGetOscParams(in,1)
-		       ,glbGetOscParams(in,2),glbGetOscParams(in,3));
-  glb_set_c_squared_masses(0,glbGetOscParams(in,4),glbGetOscParams(in,5));
-  if(GLB_OSCP>6)
-  {
-	for(i=0;i<GLB_OSCP-6;i++) nsp[i]=glbGetOscParams(in,6+i);
-	glb_set_c_ns_params(nsp);
-  }
-  for(i=0;i<glb_num_of_exps;i++) glb_set_profile_scaling(glbGetDensityParams(in,i),i);
-  return 0;
+  if (in == NULL)
+    return -1;
+  else
+    glb_set_oscillation_parameters(in);
 
+  return 0;
 }
 
 int
@@ -582,22 +535,7 @@ glbSetInputErrors(const glb_params in)
 int 
 glbGetOscillationParameters(glb_params in)
 {
-  int i;
-  double *t;
-  if(in==NULL) return -1;
-  t=glb_get_vacuum_parameters();
-  for(i=0;i<4;i++) glbSetOscParams(in,t[i],i);
-  glb_free(t);
-  t=glb_get_squared_masses();
-  for(i=0;i<2;i++) glbSetOscParams(in,t[i],i+4);
-  glb_free(t);
-  if(GLB_OSCP>6)
-  {  
-	  t=glb_get_ns_params();
-      for(i=0;i<GLB_OSCP-6;i++) glbSetOscParams(in,t[i],i+6);
-      glb_free(t);
-  }
-  return 0;
+  return glb_get_oscillation_parameters(in);
 }
 
 
@@ -1137,13 +1075,8 @@ glbShowChannelProbs(FILE *stream,
 					      glb_experiment_list[exp])->listofchannels[m][channel];
 	  if(currentchannel[2]>3||currentchannel[3]>3) res[k][i]=1.0;
 	  else
-	    if(filter==GLB_OFF) {
-	    res[0][i] = glbProfileProbability(exp,currentchannel[3],currentchannel[2],currentchannel[1],energy[i]);
-	    }
-	    else {
-	    res[0][i] = 
-	      glbFilteredConstantDensityProbability(exp,currentchannel[3],currentchannel[2],currentchannel[1],energy[i]);
-	    }
+	    res[0][i] = glbProfileProbability(exp,currentchannel[3],currentchannel[2],
+                                              currentchannel[1],energy[i]);
 	}
 
    }
@@ -1162,13 +1095,8 @@ glbShowChannelProbs(FILE *stream,
 	  
 	      if(currentchannel[2]>3||currentchannel[3]>3) res[k][i]=1.0;
 	      else
-		if(filter==GLB_OFF) {
-		res[k][i] = glbProfileProbability(exp,currentchannel[3],currentchannel[2],currentchannel[1],energy[i]);
-		}
-		else {
-		  res[k][i] = 
-		    glbFilteredConstantDensityProbability(exp,currentchannel[3],currentchannel[2],currentchannel[1],energy[i]);
-		}
+		res[k][i] = glbProfileProbability(exp,currentchannel[3],currentchannel[2],
+                                                  currentchannel[1],energy[i]);
 	    }
 	}
     }
@@ -2119,19 +2047,15 @@ glbGetRunningTime(int experiment, int flux_ident)
 int
 glbSetFilterState(int on_off)
 {
-  if (on_off==GLB_ON) {glb_switch_filter(GLB_ON);}
-  if (on_off==GLB_OFF) {glb_switch_filter(GLB_OFF);}
-  if((on_off!=GLB_ON)&&(on_off!=GLB_OFF)) 
-    {glb_error("On/Off was not GLB_ON/GLB_OFF");return -1;}
-  return 0;
+  glb_error("Function glbSetFilterState is deprecated.");
+  return -1.0;
 }
 
 int
 glbGetFilterState()
 {
-  int i;
-  i=glb_check_filter();
-  return i;
+  glb_error("Function glbGetFilterState is deprecated.");
+  return -1.0;
 }
 
 
@@ -2186,17 +2110,15 @@ glbGetFilterStateInExperiment(int experiment)
 int
 glbSetFilter(double filter)
 {
-  if(filter<0) {glb_error("Filter must be positive");return -1;}
-  glb_set_filter(filter);
-  return 0;
+  glb_error("Function glbSetFilter is deprecated.");
+  return GLBERR_DEPRECATED;
 }
 
 double
 glbGetFilter()
 {
-  double out;
-  out=glb_get_filter();
-  return out;
+  glb_error("Function glbGetFilter is deprecated.");
+  return GLBERR_DEPRECATED;
 }
 
 int
@@ -2286,33 +2208,100 @@ const char
 }
 
 
-/* Acces to the more complicated probabilities */
+/* Calculation of oscillation probabilities */
 
+// ----------------------------------------------------------------------------
+double glbVacuumProbability(int initial_flavour, int final_flavour,
+			    int cp_sign, double E, double L)
+// ----------------------------------------------------------------------------
+// Returns the vacuum oscillation probability for one specific oscillation
+// channel
+// ----------------------------------------------------------------------------
+// Parameters:
+//   initial_flavour/final_flavour: The desired oscillation channel
+//   cp_sign: +1 for neutrinos, -1 for antineutrinos
+//   E: Neutrino energy
+//   L: Baseline
+// ----------------------------------------------------------------------------
+{
+  const double V = 0.0;
+  double P[3][3];
+  int status;
+ 
+  if ((status=glb_probability_matrix(P, cp_sign, E, 1, &L, &V, -1.0)) != GLB_SUCCESS)
+  {
+    glb_error("Calculation of oscillation probabilities failed.");
+    return -1.0;
+  }
+  return P[initial_flavour-1][final_flavour-1];
+}
+
+
+// ----------------------------------------------------------------------------
 double glbProfileProbability(int exp,int initial_flavour, int final_flavour,
-			    int panti, double energy)
+			     int cp_sign, double E)
+// ----------------------------------------------------------------------------
+// Returns the oscillation probability in matter for one specific oscillation
+// channel
+// ----------------------------------------------------------------------------
+// Parameters:
+//   exp: Number of experiment
+//   initial_flavour/final_flavour: The desired oscillation channel
+//   cp_sign: +1 for neutrinos, -1 for antineutrinos
+//   E: Neutrino energy
+// ----------------------------------------------------------------------------
 {
-  double res;
-  if(exp<0||exp>=glb_num_of_exps) {glb_error("Experiment index out of range");
-  return -1;}
+  struct glb_experiment *e = glb_experiment_list[exp];
+  double P[3][3];
+  int status;
+  
+  if (exp < 0  ||  exp >= glb_num_of_exps)
+  {
+    glb_error("Experiment index out of range");
+    return -1.0;
+  }
 
-  glbSetExperiment(glb_experiment_list[exp]);
-
-  res=glb_profile_probability(initial_flavour,final_flavour,panti,energy);
-  return res;
+  glb_set_profile_scaling(1.0, exp);
+  if ((status=glb_probability_matrix(P, cp_sign, E, e->psteps, e->lengthtab,
+                                     e->densitybuffer, -1.0)) != GLB_SUCCESS)
+  {
+    glb_error("Calculation of oscillation probabilities failed.");
+    return -1.0;
+  }
+  
+  return P[initial_flavour-1][final_flavour-1];
 }
 
+
+// ----------------------------------------------------------------------------
 double glbFilteredConstantDensityProbability(int exp,int initial_flavour, int final_flavour,
-			    int panti, double energy)
+			    int cp_sign, double E)
+// ----------------------------------------------------------------------------
 {
-  double res;
-  if(exp<0||exp>=glb_num_of_exps) {glb_error("Experiment index out of range");
-  return -1;}
+  struct glb_experiment *e = glb_experiment_list[exp];
+  double P[3][3];
+  int status;
+  
+  if (exp < 0  ||  exp >= glb_num_of_exps)
+  {
+    glb_error("Experiment index out of range");
+    return -1.0;
+  }
 
-  glbSetExperiment(glb_experiment_list[exp]);
-  if(((struct glb_experiment *) glb_experiment_list[exp])->psteps != 1) {glb_error("Non-constant density profile");return -1;}
-  res=glb_filtered_const_density_probability(initial_flavour,final_flavour,panti,energy);
-  return res;
+  glb_set_profile_scaling(1.0, exp);
+  if ((status=glb_probability_matrix(P, cp_sign, E, e->psteps, e->lengthtab, e->densitybuffer,
+      (e->filter_state == GLB_ON) ? e->filter_value : -1.0)) != GLB_SUCCESS)
+  {
+    glb_error("Calculation of oscillation probabilities failed.");
+    return -1.0;
+  }
+  
+  return P[initial_flavour-1][final_flavour-1];
+//  glb_error("Function glbFilteredConstantDensityProbability is deprecated. "
+//            "Use glbProfileProbability instead.");
+//  return -1.0;
 }
+
 
 /* Number of fluxes in an experiment */
 

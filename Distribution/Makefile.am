@@ -1,14 +1,14 @@
 ACLOCAL_AMFLAGS = -I m4
 
-DIST_SUBDIRS = lib lapack source data libltdl modules globes libf2c
-SUBDIRS = lib libf2c lapack libltdl source data modules globes 
+DIST_SUBDIRS = lib source data libltdl modules globes
+SUBDIRS = lib libltdl source data modules globes 
 INCLUDES = $(LTDLINCL) $(F2CINC) $(GSLINC)
 
 EXTRA_DIST = examples/Makefile.in examples/example1.c\
   examples/example3.c examples/myio.c\
 examples/example-tour.c  examples/example2.c  examples/example4.c\
 examples/myio.h examples/XCC.dat examples/NuFact.glb\
-BUGS lapack/Notice libf2c/Notice
+BUGS
 
 nodist_bin_SCRIPTS = globes-config globes-module
 

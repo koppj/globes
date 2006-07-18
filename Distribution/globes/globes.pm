@@ -175,6 +175,7 @@ package globes;
 package globes;
 
 *GLS_GLOBES_H = *globesc::GLS_GLOBES_H;
+*GLB_NU_FLAVOURS = *globesc::GLB_NU_FLAVOURS;
 *GLB_EFF = *globesc::GLB_EFF;
 *GLB_BG = *globesc::GLB_BG;
 *GLB_SIG = *globesc::GLB_SIG;
@@ -199,6 +200,7 @@ package globes;
 *GLB_ON = *globesc::GLB_ON;
 *GLB_OFF = *globesc::GLB_OFF;
 *GLB_EARTH_RADIUS = *globesc::GLB_EARTH_RADIUS;
+*EV_TO_KM_FACTOR = *globesc::EV_TO_KM_FACTOR;
 *glb_path_vector = *globesc::glb_path_vector;
 *glb_path_vector_length = *globesc::glb_path_vector_length;
 *glb_num_of_exps = *globesc::glb_num_of_exps;

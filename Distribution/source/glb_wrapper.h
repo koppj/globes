@@ -39,12 +39,11 @@ typedef struct {
 } glb_density_type;
 
 
-typedef struct {
+struct glb_params_type {
   glb_osc_type *osc;
   glb_density_type *density;
   int iterations;
-} glb_params_type;
-
+};
 
 typedef struct {
   int *osc_params;
@@ -57,10 +56,10 @@ typedef struct {
 } glb_density_proj_type;
 
 
-typedef struct {
+struct glb_projection_type {
   glb_osc_proj_type *osc;
   glb_density_proj_type *density;
-} glb_projection_type;
+};
 
 
 

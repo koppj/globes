@@ -1,4 +1,4 @@
-INCLUDES = -I$(top_srcdir) -I$(top_srcdir)/lib $(F2CINC) $(GSLINC)
+INCLUDES = -I$(top_srcdir) -I$(top_srcdir)/lib $(GSLINC)
 
 
 AM_YFLAGS =  -d 
@@ -15,8 +15,7 @@ glb_lexer.h glb_fluxes.h glb_parser_type.h glb_wrapper.h\
 glb_profile.h
 
 
-libglb_la_LDFLAGS = @F2CCONVENIENCE@  @BLCONVENIENCE@ @LIBS@ \
--version-info @GLBLIBVERSION@ @LIBLTDL@
+libglb_la_LDFLAGS = @LIBS@ -version-info @GLBLIBVERSION@ @LIBLTDL@
 libglb_la_CPPFLAGS = -DGLB_MODULE_DIR=\"$(pkglibdir)\"
-libglb_la_DEPENDENCIES = @BLCONVENIENCE@
+libglb_la_DEPENDENCIES =
 libglb_la_LDFLAGS += $(top_builddir)/lib/libgnu.la

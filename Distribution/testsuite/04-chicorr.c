@@ -34,15 +34,17 @@
 #include "myio.h"             /* my input-output routines */
 
 /* If filename given, write to file; for empty filename write to screen */
-char MYFILE[]="test2.dat";
+char MYFILE[]="";
 
 int main(int argc, char *argv[])
 { 
+  char *GLB_FILE = argv[argc-1];
+
   /* Initialize libglobes */
   glbInit(argv[0]); 
 
   /* Initialize experiment NuFact.glb */
-  glbInitExperiment("NuFact.glb",&glb_experiment_list[0],&glb_num_of_exps); 
+  glbInitExperiment(GLB_FILE,&glb_experiment_list[0],&glb_num_of_exps); 
 
   /* Intitialize output */
   InitOutput(MYFILE,"Format: Log(10,s22th13)   chi^2 one param   chi^2 all params \n"); 
@@ -81,7 +83,7 @@ int main(int argc, char *argv[])
 
   /* Iteration over all values to be computed */
   double thetheta13,x,res1,res2;    
-  for(x=-4;x<-2.0+0.001;x=x+2.0/50)
+  for(x=-4;x<-2.0+0.001;x=x+2.0/20)
   {
       /* Set vector of test=fit values */
       thetheta13=asin(sqrt(pow(10,x)))/2;
@@ -91,7 +93,7 @@ int main(int argc, char *argv[])
       glbSetOscParams(test_values,200.0/2*(x+4)*M_PI/180,GLB_DELTA_CP);
  
       /* Compute Chi^2 for two-parameter correlation: minimize over deltacp only */
-      res1=glbChiNP(test_values,NULL,GLB_ALL);
+      res1=glbChiNP(test_values,NULL,0);  // Cover single-experiment code
       
       /* Compute Chi^2 for full correlation: minimize over all but theta13 */
       res2=glbChiTheta(test_values,NULL,GLB_ALL);

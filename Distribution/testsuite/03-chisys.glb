@@ -1,0 +1,147 @@
+%!GLoBES
+
+$version="1.8.1"
+
+/* 	 Beam data 	 */
+
+flux(#one)<
+@builtin = 2
+@parent_energy = 50 
+@stored_muons = 5.33e+20 
+@time = 8
+@norm = 1
+>
+
+flux(#two)<
+@builtin = 1
+@parent_energy = 50 
+@stored_muons = 5.33e+20
+@time = 8
+>
+
+
+
+$target_mass = 	        50 
+
+$bins = 		20
+$emin = 	         4
+$emax = 	        50
+
+$sampling_points = 20
+$sampling_min =          4
+$sampling_max =         50
+
+
+/* 	 Baseline 	 */
+$profiletype = 1
+$baseline = 3000
+
+
+
+
+/* 	 Technical information 	 */
+
+$filter_state = 	0
+$filter_value = 	   1000000
+
+energy(#sm0)<>
+
+
+/* 	 Cross sections 	 */
+
+cross(#CC)<
+	@cross_file = "XCC.dat"
+>
+
+/* 	 Channels 	 */
+
+channel(#ch0)<
+	@channel = 	#two:	+:	e:	m:	#CC:    #sm0
+
+	@post_smearing_efficiencies={0.071875, 0.215625, 0.359375, 0.503125,
+	0.646875, 0.790625, 0.934375, 1, 1,1, 1, 1, 1, 1,1, 1, 1, 1, 1, 1}
+>
+
+channel(#ch1)<
+	@channel = 	#one:	-:	e:	m:	#CC:    #sm0
+	@post_smearing_efficiencies={0.071875, 0.215625, 0.359375, 0.503125, 
+	0.646875, 0.790625, 0.934375, 1, 1,1,1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+>
+
+channel(#ch2)<
+	@channel = 	#two:	-:	m:	m:	#CC:    #sm0
+	@post_smearing_efficiencies={0.071875, 0.215625, 0.359375, 0.503125, 
+	0.646875, 0.790625, 0.934375, 1, 1,1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+>
+
+channel(#ch3)<
+	@channel = 	#one:	+:	m:	  m:	#CC:    #sm0
+	@post_smearing_efficiencies={0.071875, 0.215625, 0.359375, 0.503125, 
+	0.646875, 0.790625, 0.934375, 1, 1,1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+>
+
+
+/* 	 Rules 		 */
+rule(#rule0)<
+	@signal =	      0.45@#ch0
+	@signalerror =	     0.001  :	    0.0001
+
+	@background =	         1@#ch2
+	@backgrounderror = 	     2e-06  :	    0.0001
+	@backgroundcenter = 	     1e-05  :	         0
+
+	@errordim_sys_on = 	0
+	@errordim_sys_off = 2
+	@energy_window = 	         4  :	        50
+
+>
+
+rule(#rule1)<
+	@signal =	      0.35@#ch1
+	@signalerror =	     0.001  :	    0.0001
+
+	@background =	         1@#ch3
+	@backgrounderror = 	     2e-06  :	    0.0001
+	@backgroundcenter = 	     1e-05  :	         0
+
+	@errordim_sys_on = 	0
+	@errordim_sys_off = 2
+	@energy_window = 	         4  :	        50
+>
+
+rule(#rule2)<
+	@signal =	      0.45@#ch2
+	@signalerror =	     0.001  :	    0.0001
+
+	@background =	     1e-05@#ch0
+	@backgrounderror = 	     0.001  :	    0.0001
+	@backgroundcenter = 	         1  :	         0
+
+	@errordim_sys_on = 	0
+	@errordim_sys_off = 2
+	@energy_window = 	         4  :	        50
+>
+
+rule(#rule3)<
+	@signal =	      0.35@#ch3
+	@signalerror =	     0.001  :	    0.0001
+
+	@background =	     1e-05@#ch1
+	@backgrounderror = 	     0.001  :	    0.0001
+	@backgroundcenter = 	         1  :	         0
+
+	@errordim_sys_on = 	0
+	@errordim_sys_off = 2
+	@energy_window = 	         4  :	        50
+>
+
+
+/* 	 Energy resolution   */		 
+
+
+energy(#sm0)<
+	@type = 1	
+	@sigma_e = {0.15,0,0}
+>
+
+/**********************END**********************/

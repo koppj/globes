@@ -46,9 +46,7 @@ extern double glb_calc_simtresh;
 extern double glb_calc_simbeam;
 extern double glb_calc_energy_window[32][2];
 
-
 void glb_set_baseline(double l);
-double glb_check_baseline();
 void glb_set_target_mass(double mass);
 double glb_check_target_mass();
 void glb_set_years(double year);

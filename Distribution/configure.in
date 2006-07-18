@@ -176,18 +176,6 @@ AC_CHECK_HEADERS([gsl/gsl_math.h gsl/gsl_sf_erf.h gsl/gsl_errno.h],[],[AC_MSG_WA
 CFLAGS=$TMPCFLAGS
 CPPFLAGS=$TMPCPPFLAGS
 
-
-dnl this is first attempt to catch libgfortran in the new SuSE 10.0
-if test $F77 = "gfortran"; then
-AC_CHECK_LIB(gfortran,main,[],AC_MSG_WARN([libgfortran not found]))
-fi
-
-dnl Checking wether f2c is there (or something similar, like g2c)
-AC_LIBF2C_CONVENIENCE
-
-dnl Handling the BLAS/LAPACK stuff
-AC_LAPACK_CONVENIENCE
-
 dnl Checks for header files.
 AC_HEADER_STDC
 
@@ -209,9 +197,9 @@ AC_CONFIG_FILES(globes.spec)
 
 
 
-AC_CONFIG_FILES([Makefile lib/Makefile libf2c/Makefile lapack/Makefile\
+AC_CONFIG_FILES([Makefile lib/Makefile \
  globes/Makefile globes/example.pl source/Makefile\
- examples/Makefile\
+ testsuite/Makefile examples/Makefile\
  data/Makefile modules/MakefileExample modules/Makefile globes-config\
  globes-module libltdl/Makefile])
 
