@@ -14,6 +14,7 @@
 
 @SET_MAKE@
 
+
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
 VPATH = @srcdir@
@@ -68,7 +69,7 @@ mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = config.h
 CONFIG_CLEAN_FILES = globes.spec testsuite/Makefile examples/Makefile \
 	globes-config globes-module
-am__installdirs = "$(DESTDIR)$(bindir)"
+am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(m4datadir)"
 nodist_binSCRIPT_INSTALL = $(INSTALL_SCRIPT)
 SCRIPTS = $(nodist_bin_SCRIPTS)
 SOURCES =
@@ -79,6 +80,14 @@ RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	install-recursive installcheck-recursive installdirs-recursive \
 	pdf-recursive ps-recursive uninstall-info-recursive \
 	uninstall-recursive
+am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
+am__vpath_adj = case $$p in \
+    $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
+    *) f=$$p;; \
+  esac;
+am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
+m4dataDATA_INSTALL = $(INSTALL_DATA)
+DATA = $(m4data_DATA)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -257,7 +266,7 @@ INCLUDES = $(LTDLINCL) $(F2CINC) $(GSLINC)
 EXTRA_DIST = examples/Makefile.in examples/example1.c	      \
   examples/example3.c examples/myio.c examples/example-tour.c \
   examples/example2.c examples/example4.c examples/myio.h     \
-  examples/XCC.dat examples/NuFact.glb BUGS 
+  examples/XCC.dat examples/NuFact.glb BUGS globes.m4
 
 
 # that is only needed if the testsuite should go into the release
@@ -269,6 +278,8 @@ EXTRA_DIST = examples/Makefile.in examples/example1.c	      \
 nodist_bin_SCRIPTS = globes-config globes-module
 CLEANFILES = globes-module globes-config
 AM_YFLAGS = -d 
+m4datadir = $(datadir)/aclocal
+m4data_DATA = globes.m4
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
@@ -362,6 +373,23 @@ clean-libtool:
 distclean-libtool:
 	-rm -f libtool
 uninstall-info-am:
+install-m4dataDATA: $(m4data_DATA)
+	@$(NORMAL_INSTALL)
+	test -z "$(m4datadir)" || $(mkdir_p) "$(DESTDIR)$(m4datadir)"
+	@list='$(m4data_DATA)'; for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  f=$(am__strip_dir) \
+	  echo " $(m4dataDATA_INSTALL) '$$d$$p' '$(DESTDIR)$(m4datadir)/$$f'"; \
+	  $(m4dataDATA_INSTALL) "$$d$$p" "$(DESTDIR)$(m4datadir)/$$f"; \
+	done
+
+uninstall-m4dataDATA:
+	@$(NORMAL_UNINSTALL)
+	@list='$(m4data_DATA)'; for p in $$list; do \
+	  f=$(am__strip_dir) \
+	  echo " rm -f '$(DESTDIR)$(m4datadir)/$$f'"; \
+	  rm -f "$(DESTDIR)$(m4datadir)/$$f"; \
+	done
 
 # This directory's subdirectories are mostly independent; you can cd
 # into them and run `make' without going through this Makefile.
@@ -627,10 +655,10 @@ distcleancheck: distclean
 	       exit 1; } >&2
 check-am: all-am
 check: check-recursive
-all-am: Makefile $(SCRIPTS) config.h
+all-am: Makefile $(SCRIPTS) $(DATA) config.h
 installdirs: installdirs-recursive
 installdirs-am:
-	for dir in "$(DESTDIR)$(bindir)"; do \
+	for dir in "$(DESTDIR)$(bindir)" "$(DESTDIR)$(m4datadir)"; do \
 	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
 	done
 install: install-recursive
@@ -678,7 +706,7 @@ info: info-recursive
 
 info-am:
 
-install-data-am:
+install-data-am: install-m4dataDATA
 
 install-exec-am: install-nodist_binSCRIPTS
 
@@ -706,7 +734,8 @@ ps: ps-recursive
 
 ps-am:
 
-uninstall-am: uninstall-info-am uninstall-nodist_binSCRIPTS
+uninstall-am: uninstall-info-am uninstall-m4dataDATA \
+	uninstall-nodist_binSCRIPTS
 
 uninstall-info: uninstall-info-recursive
 
@@ -718,14 +747,14 @@ uninstall-info: uninstall-info-recursive
 	distclean-recursive distclean-tags distcleancheck distdir \
 	distuninstallcheck dvi dvi-am html html-am info info-am \
 	install install-am install-data install-data-am install-exec \
-	install-exec-am install-info install-info-am install-man \
-	install-nodist_binSCRIPTS install-strip installcheck \
-	installcheck-am installdirs installdirs-am maintainer-clean \
-	maintainer-clean-generic maintainer-clean-recursive \
-	mostlyclean mostlyclean-generic mostlyclean-libtool \
-	mostlyclean-recursive pdf pdf-am ps ps-am tags tags-recursive \
-	uninstall uninstall-am uninstall-info-am \
-	uninstall-nodist_binSCRIPTS
+	install-exec-am install-info install-info-am \
+	install-m4dataDATA install-man install-nodist_binSCRIPTS \
+	install-strip installcheck installcheck-am installdirs \
+	installdirs-am maintainer-clean maintainer-clean-generic \
+	maintainer-clean-recursive mostlyclean mostlyclean-generic \
+	mostlyclean-libtool mostlyclean-recursive pdf pdf-am ps ps-am \
+	tags tags-recursive uninstall uninstall-am uninstall-info-am \
+	uninstall-m4dataDATA uninstall-nodist_binSCRIPTS
 
 
 @MAKE_RPMS_TRUE@rpm: $(DISTFILES) 

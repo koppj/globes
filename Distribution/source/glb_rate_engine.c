@@ -508,11 +508,10 @@ static double Background(int cn, double en, double baseline)
 }
 
 
-static double BinEnergy(int i)
+inline static double BinEnergy(int i)
 {
-  double beam_energy = glb_get_max_energy();  
-  double deltae = (beam_energy-treshold)/bins;
-  return treshold+(0.5+i)*deltae;
+  /* This fixed a bug with energy window stuff for variable bin width */
+  return glb_bin_center(i,glb_calc_smear_data[0]);
 }
 
 void glb_set_error_function(int typ)

@@ -270,6 +270,9 @@ int glbUsePrior(glb_dlhandle module)
   int s=0;
 
   id=lt_dlsym(module,"glb_module_id"); 
+  /* FIXME -- what if the module fails to define glb_module_id? The
+     id=NULL and *id produces a SEGFAULT (if your lucky).
+  */ 
   magic=*id;
   
   /* Probing wether it is designed as prior module */

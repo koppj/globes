@@ -448,3 +448,15 @@ documented!
          file in the tesuite folder for details.
 
           
+25/07/06 PH -- added globes.m4, which is useful for those who want to
+         use globes in their own projects using autotools
+
+
+*********Version 2.3.14
+
+01/08/06 PH -- added a fix for @energy_window and variable bin
+         width. This is a pretty serious bug since it may be hard to spot.
+
+
+
+

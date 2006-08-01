@@ -578,8 +578,8 @@ static int glb_hamiltonian_cd(double E, double V, int cp_sign)
       for (int j=0; j < GLB_NU_FLAVOURS; j++)
         H[i][j] = conj(H0_template[i][j] * inv_E);   // delta_CP -> -delta_CP
   }
+ 
   H[0][0] = H[0][0] + cp_sign*V;
-
   return GLB_SUCCESS;
 }
 
