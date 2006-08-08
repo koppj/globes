@@ -242,7 +242,7 @@ int glb_33_zheev(gsl_complex A[3][3], gsl_complex Q[3][3], double lambda[3])
   double householder_sign;        // The sign in the Householder transformation
   double norm, inv_norm, norm0, norm1;
   gsl_complex v2[3], v3[3];       // Second and third eigenvector
-  double a[2];
+  double a[3];
   
   // Determine coefficients of characteristic poynomial. We write
   //       | a   d   f  |

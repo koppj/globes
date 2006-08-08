@@ -457,6 +457,7 @@ documented!
 01/08/06 PH -- added a fix for @energy_window and variable bin
          width. This is a pretty serious bug since it may be hard to spot.
 
-
+08/08/06 JK -- corrected a bug in glb_33_zheev: double a[2] --> double a[3]
+         This might have caused segfaults in some situations.
 
 
