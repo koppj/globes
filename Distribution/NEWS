@@ -461,3 +461,6 @@ documented!
          This might have caused segfaults in some situations.
 
 
+27/08/08 PH -- improved globes.m4. It now tries to link globes and
+	checks whether the version as returned by globes-config and the
+	library itself match. It now should be finished.
