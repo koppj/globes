@@ -16,21 +16,23 @@ AC_ARG_WITH(globes-prefix,[  --with-globes-prefix=PFX   Prefix where GLoBES is i
             globes_prefix="$withval", globes_prefix="")
 AC_ARG_WITH(globes-exec-prefix,[  --with-globes-exec-prefix=PFX Exec prefix where GLoBES is installed (optional)],
             globes_exec_prefix="$withval", globes_exec_prefix="")
+AC_REQUIRE([AC_HEADER_STDC])
 
-  if test "x${GLOBES_CONFIG+set}" != xset ; then
+GLOBES_PATH=$PATH  
+
      if test "x$globes_prefix" != x ; then
-         GLOBES_CONFIG="$globes_prefix/bin/globes-config"
+         GLOBES_PATH="$globes_prefix/bin"
      fi
      if test "x$globes_exec_prefix" != x ; then
-        GLOBES_CONFIG="$gsl_exec_prefix/bin/globes-config"
+        GLOBES_PATH="$gsl_exec_prefix/bin"
      fi
-  fi
+  
+  AC_PATH_PROG(GLOBES_CONFIG, [globes-config], [no], [$GLOBES_PATH])
 
-  AC_PATH_PROG(GLOBES_CONFIG, globes-config, no)
- 
   no_globes=""
-  if test "$GLOBES_CONFIG" = "no" ; then
+  if test "x$GLOBES_CONFIG" = "xno" ; then
     no_globes=yes
+	AC_MSG_ERROR([globes-config not found])
   else
 
     globes_major_version=`$GLOBES_CONFIG --version | sed -n 's/^Package //p'| \ 
@@ -117,7 +119,40 @@ fi
   AC_SUBST(GLOBES_CFLAGS)
   AC_SUBST(GLOBES_LIBS)
   AC_SUBST(GLOBESINC)
-  LIBS="$GLOBES_LIBS $LIBS"	
+  LIBS="$GLOBES_LIBS $LIBS"
+  globes_cflags="$GFLAGS"
+  # we need that to make sure globes headers are found even if globes
+  # is installed in non-standard place
+  CFLAGS="$GLOBESINC $CFLAGS"	
+  AC_LINK_IFELSE(AC_LANG_PROGRAM([[
+	#include <stdlib.h>
+	#include <stdio.h>
+	#include <globes/globes.h>
+	]],[[
+	glbInit("test");
+	]])
+  ,[],[
+  AC_MSG_ERROR([cannot link libglobes])
+  ])
+
+# now we check whether globes and globes-config really have the same version
+test_version="$globes_major_version.$globes_minor_version.$globes_micro_version"
+
+ AC_RUN_IFELSE(AC_LANG_PROGRAM([[
+	#include <stdlib.h>
+	#include <stdio.h>
+	#include <globes/globes.h>
+ ]],[[
+	glbInit("test");
+	return glbTestReleaseVersion("$test_version");
+ ]])
+ ,[],[
+ AC_MSG_ERROR([globes version returned by 'globes-config' does not
+ match version of the library])
+ ])
+
+CFLAGS="$globes_cflags"
+
 ])
 
 
