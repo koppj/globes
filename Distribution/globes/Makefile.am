@@ -18,7 +18,7 @@ if PERL
 perlexec_DATA = globes.pm
 perlexec_LTLIBRARIES = globes_perl.la
 globes_perl_la_SOURCES = globes_perl.c
-globes_perl_la_LIBADD = $(top_builddir)/modules/libglobes.la
+globes_perl_la_LIBADD = $(top_builddir)/source/libglobes.la
 globes_perl_la_LDFLAGS = -avoid-version -module
 INCLUDES= -I$(perl_includes)
 globes_perl_la_DEPENDENCIES = globes.pm

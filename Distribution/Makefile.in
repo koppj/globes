@@ -39,9 +39,8 @@ build_triplet = @build@
 host_triplet = @host@
 DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/config-h.in \
-	$(srcdir)/globes-config.in $(srcdir)/globes-module.in \
-	$(srcdir)/globes.spec.in $(top_srcdir)/configure \
-	$(top_srcdir)/examples/Makefile.in \
+	$(srcdir)/globes-config.in $(srcdir)/globes.spec.in \
+	$(top_srcdir)/configure $(top_srcdir)/examples/Makefile.in \
 	$(top_srcdir)/testsuite/Makefile.in AUTHORS COPYING ChangeLog \
 	INSTALL NEWS TODO compile config.guess config.sub depcomp \
 	install-sh ltconfig ltmain.sh missing mkinstalldirs ylwrap
@@ -68,7 +67,7 @@ am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = config.h
 CONFIG_CLEAN_FILES = globes.spec testsuite/Makefile examples/Makefile \
-	globes-config globes-module
+	globes-config
 am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(m4datadir)"
 nodist_binSCRIPT_INSTALL = $(INSTALL_SCRIPT)
 SCRIPTS = $(nodist_bin_SCRIPTS)
@@ -108,7 +107,6 @@ AMDEP_FALSE = @AMDEP_FALSE@
 AMDEP_TRUE = @AMDEP_TRUE@
 AMTAR = @AMTAR@
 AR = @AR@
-AS = @AS@
 AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
@@ -116,8 +114,6 @@ AWK = @AWK@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
-CONVENIENCE_LTDL_FALSE = @CONVENIENCE_LTDL_FALSE@
-CONVENIENCE_LTDL_TRUE = @CONVENIENCE_LTDL_TRUE@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
 CXX = @CXX@
@@ -127,7 +123,6 @@ CXXFLAGS = @CXXFLAGS@
 CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
-DLLTOOL = @DLLTOOL@
 ECHO = @ECHO@
 ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
@@ -138,17 +133,11 @@ F77 = @F77@
 FFLAGS = @FFLAGS@
 GETOPT_H = @GETOPT_H@
 GLBLIBVERSION = @GLBLIBVERSION@
-GLBMODULES = @GLBMODULES@
-GLB_WO_MODULES_FALSE = @GLB_WO_MODULES_FALSE@
-GLB_WO_MODULES_TRUE = @GLB_WO_MODULES_TRUE@
 GSLINC = @GSLINC@
 GSL_CFLAGS = @GSL_CFLAGS@
 GSL_CONFIG = @GSL_CONFIG@
 GSL_LIBS = @GSL_LIBS@
-HAVE_LIBTOOL = @HAVE_LIBTOOL@
 INSTALL_DATA = @INSTALL_DATA@
-INSTALL_LTDL_FALSE = @INSTALL_LTDL_FALSE@
-INSTALL_LTDL_TRUE = @INSTALL_LTDL_TRUE@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
@@ -156,14 +145,10 @@ LDFLAGS = @LDFLAGS@
 LEX = @LEX@
 LEXLIB = @LEXLIB@
 LEX_OUTPUT_ROOT = @LEX_OUTPUT_ROOT@
-LIBADD_DL = @LIBADD_DL@
-LIBLTDL = @LIBLTDL@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
-LIBTOOL_DEPS = @LIBTOOL_DEPS@
 LN_S = @LN_S@
-LTDLINCL = @LTDLINCL@
 LTLIBOBJS = @LTLIBOBJS@
 MAINT = @MAINT@
 MAINTAINER_MODE_FALSE = @MAINTAINER_MODE_FALSE@
@@ -173,7 +158,6 @@ MAKE_RPMS_FALSE = @MAKE_RPMS_FALSE@
 MAKE_RPMS_TRUE = @MAKE_RPMS_TRUE@
 NO_ARGP_FALSE = @NO_ARGP_FALSE@
 NO_ARGP_TRUE = @NO_ARGP_TRUE@
-OBJDUMP = @OBJDUMP@
 OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
@@ -208,12 +192,9 @@ SYSEXITS_H = @SYSEXITS_H@
 VERSION = @VERSION@
 YACC = @YACC@
 ac_ct_AR = @ac_ct_AR@
-ac_ct_AS = @ac_ct_AS@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
-ac_ct_DLLTOOL = @ac_ct_DLLTOOL@
 ac_ct_F77 = @ac_ct_F77@
-ac_ct_OBJDUMP = @ac_ct_OBJDUMP@
 ac_ct_RANLIB = @ac_ct_RANLIB@
 ac_ct_STRIP = @ac_ct_STRIP@
 am__fastdepCC_FALSE = @am__fastdepCC_FALSE@
@@ -260,9 +241,9 @@ shrext_cmds = @shrext_cmds@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 ACLOCAL_AMFLAGS = -I m4
-DIST_SUBDIRS = lib source data libltdl modules globes
-SUBDIRS = lib libltdl source data modules globes
-INCLUDES = $(LTDLINCL) $(F2CINC) $(GSLINC)
+DIST_SUBDIRS = lib source data  globes
+SUBDIRS = lib source data globes
+INCLUDES = $(F2CINC) $(GSLINC)
 EXTRA_DIST = examples/Makefile.in examples/example1.c	      \
   examples/example3.c examples/myio.c examples/example-tour.c \
   examples/example2.c examples/example4.c examples/myio.h     \
@@ -275,8 +256,8 @@ EXTRA_DIST = examples/Makefile.in examples/example1.c	      \
 # testsuite/02-probabilities-filtered.c    testsuite/04-chicorr.glb  testsuite/myio.h \
 # testsuite/02-probabilities-filtered.glb  testsuite/05-chideg.c     testsuite/glbdiff.pl      testsuite/README \
 # testsuite/03-chisys.c                    testsuite/05-chideg.glb   testsuite/run-tests 
-nodist_bin_SCRIPTS = globes-config globes-module
-CLEANFILES = globes-module globes-config
+nodist_bin_SCRIPTS = globes-config
+CLEANFILES = globes-config
 AM_YFLAGS = -d 
 m4datadir = $(datadir)/aclocal
 m4data_DATA = globes.m4
@@ -341,8 +322,6 @@ testsuite/Makefile: $(top_builddir)/config.status $(top_srcdir)/testsuite/Makefi
 examples/Makefile: $(top_builddir)/config.status $(top_srcdir)/examples/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 globes-config: $(top_builddir)/config.status $(srcdir)/globes-config.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
-globes-module: $(top_builddir)/config.status $(srcdir)/globes-module.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 install-nodist_binSCRIPTS: $(nodist_bin_SCRIPTS)
 	@$(NORMAL_INSTALL)
@@ -514,7 +493,7 @@ distclean-tags:
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkdir_p) $(distdir)/. $(distdir)/examples $(distdir)/globes $(distdir)/m4 $(distdir)/modules $(distdir)/testsuite
+	$(mkdir_p) $(distdir)/. $(distdir)/examples $(distdir)/globes $(distdir)/m4 $(distdir)/testsuite
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \

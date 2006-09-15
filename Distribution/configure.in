@@ -29,7 +29,7 @@ dnl middle digit: increment when features have been introduced/removed
 dnl first digit: major improvements/rewrites
 dnl In contrast to the result of autoupdate I had to swap the
 dnl the AC_INIT and AC_CONFIG_SRCDIR
-AC_INIT([GLoBES],[2.3.14],[globes@ph.tum.de],[globes])
+AC_INIT([GLoBES],[2.3.15],[globes@ph.tum.de],[globes])
 AC_CONFIG_SRCDIR([source/glb_wrapper.c])
 
 dnl Tellin autoconf we are going to use automake
@@ -44,31 +44,11 @@ dnl code changed: c:r+1:a
 dnl API changed: c+1:0:a
 dnl -> API extended: c:0:a+1
 dnl -> API shrunken: c:0:0
-GLBLIBVERSION="6:8:3"
+GLBLIBVERSION="7:9:0"
 
 dnl From here no editing !
 AC_SUBST(GLBLIBVERSION)
 AC_DEFINE_UNQUOTED(GLB_LIBVERSION,"$GLBLIBVERSION",[The version of libglb in libtool format c:r:a])
-
-dnl Optional module support
-AC_ARG_ENABLE(modules,[--enable-modules   Module support],[
-if test $enableval = "yes"; then 
-glb_modules="yes"
-fi
-if test $enableval = "no"; then
-glb_modules="no"
-fi
-],
-[glb_modules="yes"])
-
-AM_CONDITIONAL(GLB_WO_MODULES,test x$glb_modules = xno)
-if test $glb_modules = "no"; then 		 
-GLBMODULES=""
-AC_DEFINE([GLB_WO_MODULES],[],[adsa])
-else
-GLBMODULES="glb_prior_module.la"
-fi
-AC_SUBST(GLBMODULES)
 
 dnl This part serves to convert Makefile.in in examples to a 
 dnl Makefile which works automagically
@@ -107,32 +87,6 @@ AC_PROG_LN_S
 AC_PROG_YACC
 AC_PROG_LEX
 
-dnl Checks wether libtool exists on this machine
-dnl in the user path (needed for globes-module to work properly)
-AC_CHECK_PROG([HAVE_LIBTOOL],[libtool],yes,no)
-
-dnl Trying to get support for libtdl
-dnl the following lines are taken from the libtool manual
-dnl Enable building of the convenience library
-dnl and set LIBLTDL accordingly
-AC_LIBLTDL_CONVENIENCE(libltdl)
-
-if test -z "$enable_ltdl_install$enable_ltdl_convenience"; then
-  if test -f ${srcdir}/ltmain.sh; then
-    # if libltdl is libtoolized, it is assumed to be stand-alone and
-    # installed unless the command line overrides it (tested above)
-    enable_ltdl_install=yes
-  else
-    AC_MSG_WARN([*** The top-level configure must select either])
-    AC_MSG_WARN([*** [A""C_LIBLTDL_INSTALLABLE] or [A""C_LIBLTDL_CONVENIENCE].])
-    AC_MSG_ERROR([*** Maybe you want to --enable-ltdl-install?])
-  fi
-fi
-
-dnl Check for dlopen support
-AC_LIBTOOL_WIN32_DLL
-AC_LIBTOOL_DLOPEN
-
 dnl Configure libtool
 AC_PROG_LIBTOOL
 
@@ -142,17 +96,6 @@ dnl gnulib support
 dnl FIXME: for some reason this macro has to be called before any
 dnl of the AC_CHECK_LIB stuff below
 gl_INIT
-
-
-dnl Configure libltdl
-dnl AC_CONFIG_SUBDIRS(libltdl)
-AC_C_INLINE
-AC_LIB_LTDL([libltdl])
-dnl AC_PROG_LIBTOOL
-AC_SUBST([LIBTOOL_DEPS])
-dnl Substitute LTDLINCL and LIBLTDL in the Makefiles
-AC_SUBST(LTDLINCL)
-AC_SUBST(LIBLTDL)
 
 dnl we need libtool first
 AC_PROG_SWIG
@@ -200,8 +143,7 @@ AC_CONFIG_FILES(globes.spec)
 AC_CONFIG_FILES([Makefile lib/Makefile \
  globes/Makefile globes/example.pl source/Makefile\
  testsuite/Makefile examples/Makefile\
- data/Makefile modules/MakefileExample modules/Makefile globes-config\
- globes-module libltdl/Makefile])
+ data/Makefile  globes-config])
 
 	
 

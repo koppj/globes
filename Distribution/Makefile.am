@@ -1,8 +1,8 @@
 ACLOCAL_AMFLAGS = -I m4
 
-DIST_SUBDIRS = lib source data libltdl modules globes
-SUBDIRS = lib libltdl source data modules globes
-INCLUDES = $(LTDLINCL) $(F2CINC) $(GSLINC)
+DIST_SUBDIRS = lib source data  globes
+SUBDIRS = lib source data globes
+INCLUDES = $(F2CINC) $(GSLINC)
 
 EXTRA_DIST = examples/Makefile.in examples/example1.c	      \
   examples/example3.c examples/myio.c examples/example-tour.c \
@@ -17,9 +17,9 @@ EXTRA_DIST = examples/Makefile.in examples/example1.c	      \
 # testsuite/03-chisys.c                    testsuite/05-chideg.glb   testsuite/run-tests 
 
 
-nodist_bin_SCRIPTS = globes-config globes-module
+nodist_bin_SCRIPTS = globes-config
 
-CLEANFILES = globes-module globes-config
+CLEANFILES = globes-config
 
 AM_YFLAGS =  -d 
 

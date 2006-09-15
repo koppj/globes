@@ -230,18 +230,22 @@ documented!
 	************************************************************
 
 07/03/05 Version 2.3.2
-	Fixed a silly bug in glb_multiex.c in the setup of the smearing matrices. It was looped over the number
+	Fixed a silly bug in glb_multiex.c in the setup of the
+	smearing matrices. It was looped over the number
 	of rules instead of the number of smearing matrices.
 
 08/03/05 Version 2.3.3
-	Fixed the bug in the parser, concerning '$binsize'. Fixed a bug in glb_set_up_smear_data (glb_smear.c),
+	Fixed the bug in the parser, concerning '$binsize'. Fixed a
+	bug in glb_set_up_smear_data (glb_smear.c),
 	which made it ignore user defined binsizes. 
 
 21/03/05 Version 2.3.4
 	Fixed a sign error in the beta beam fluxes.
 
-19/04/05 libglb now is installed into $(prefix)/lib instead of $(prefix)/lib/globes. The built-in 
-	oscillation parameter now are the same as in the documentation, dm21 was 10 times larger. 
+19/04/05 libglb now is installed into $(prefix)/lib instead of
+        $(prefix)/lib/globes. The built-in
+	oscillation parameter now are the same as in the 
+	documentation, dm21 was 10 times larger. 
 
 03/06/05 Version 2.3.5
 	Fixed a bug in glb_lexer.l The consequence of this bug was
@@ -443,9 +447,10 @@ documented!
 
          Removed all the LAPACK and libf2c stuff.
 
-         Written some test programs (new directory "testsuite"), along with some scripts
-         to automatically compile and run them, and to compare the results. See README
-         file in the tesuite folder for details.
+         Written some test programs (new directory "testsuite"), along
+         with some scripts to automatically compile and run them, and
+         to compare the
+         results. See README file in the tesuite folder for details.
 
           
 25/07/06 PH -- added globes.m4, which is useful for those who want to
@@ -461,6 +466,18 @@ documented!
          This might have caused segfaults in some situations.
 
 
-27/08/08 PH -- improved globes.m4. It now tries to link globes and
+27/08/06 PH -- improved globes.m4. It now tries to link globes and
 	checks whether the version as returned by globes-config and the
 	library itself match. It now should be finished.
+
+
+*********Version 2.3.15
+
+15/09/06 PH -- removed module support. This brings a number of changes
+        and I am not sure whether all places have the necessary
+        updates. In any case, the directories 'libldtl' and 'modules'
+        are gone. The linking pattern for libglobes changed, now only
+        '-lglobes' is necessary (i.e. libglb died). Static linking is
+        greatly facilitated, in that case '-lstdc++' has to be
+        added by hand at the end of the linker command line. All other
+        changes should be self-explaining.
