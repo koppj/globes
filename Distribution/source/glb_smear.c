@@ -521,6 +521,7 @@ static void SetupSmearMatrixA(glb_smear *test,const struct glb_experiment *head)
 }
 
 
+
 void glb_set_up_smear_data(glb_smear *test,const struct glb_experiment *head)
 {
   int i;
@@ -530,7 +531,8 @@ void glb_set_up_smear_data(glb_smear *test,const struct glb_experiment *head)
   if(test->e_max==-1) test->e_max=head->emax;
 
   if(test->numofbins==-1) test->numofbins=head->numofbins;
-     
+    
+
   if(test->binsize==NULL&&head->binsize==NULL)
     {
       test->binsize=(double *) glb_malloc(sizeof(double)*test->numofbins);

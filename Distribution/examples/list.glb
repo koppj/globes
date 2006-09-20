@@ -1,0 +1,240 @@
+%!GLoBES
+/* Copyright 2004,2005,2006 The GLoBES Team
+ *
+ * If you modify this file you have to rename it.
+ *
+ * If you are using this file for producing a scientific publication
+ * or a talk please cite the following references and check the supporting
+ * files for a similar comment.
+ *
+ #* @Article{Huber:2002mx,
+ #*     author    = "Huber, Patrick and Lindner, Manfred and Winter, Walter",
+ #*     title     = "Superbeams versus neutrino factories",
+ #*     journal   = "Nucl. Phys.",
+ #*     volume    = "B645",
+ #*     year      = "2002",
+ #*     pages     = "3-48",
+ #*     eprint    = "hep-ph/0204352",
+ #*     SLACcitation  = "%%CITATION = HEP-PH 0204352;%%"
+ #* }
+ *
+ * This file is intended as example and documentation for the latest features of AEDL.
+ *
+ * Last modified 20/09/2006
+ */
+
+$version="2.3.15"
+
+/* 	 Beam data 	 */
+
+
+
+flux(#one)<
+@builtin = 2
+@parent_energy = 50
+@stored_muons = 2e+20 
+@time = 2.5
+>
+
+flux(#two)<
+@builtin = 1
+@parent_energy = 50
+@stored_muons = 2e+20
+@time = 2.5
+>
+
+
+
+$target_mass = 	        10 
+
+$bins = 		50
+$emin = 	         4
+$emax = 	        50
+
+
+
+$sampling_points = 	120
+$sampling_min =          4
+$sampling_max =         50
+
+
+/* 	 Baseline 	 */
+
+$profiletype = 3
+$densitytab = 		{3.5}
+$lengthtab = 		{3000}
+
+/* 	 Technical information 	 */
+
+$filter_state = 	0
+$filter_value = 	   1000000
+
+energy(#sm0)<>
+
+
+/* 	 Cross sections 	 */
+
+cross(#CC)<
+	@cross_file = "XCC.dat"
+	
+>
+
+cross(#NC)<
+	@cross_file = "XNC.dat"
+	
+>
+
+/* 	 Channels 	 */
+
+
+/* We now have variables for lists: they start with '!' and work like
+ * other variable as well. Morver functions are threaded over list, by
+ * applying the function to each element and returning a list. The
+ * orginal lsit is destroyed in that process. Hence, you will need to
+ * create a copy of your list if you want to use the orginal list and
+ * the one you have treated with a function. For that you use the
+ * 'copy()' function. Also, wheneever the list finally will be stored
+ * into the experiment structure, i.e. you assign it any of the named
+ * variables of AEDL you have to use 'copy()'.
+ */
+
+!effs={0.071875, 0.215625, 0.359375, 0.503125, 
+	0.646875, 0.790625, 0.934375, 1, 1,1,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+
+
+!energ={5.15,7.45,9.75,12.05,14.35,16.65,18.95,
+	21.25,23.55,25.85,28.15,30.45,32.75,
+	35.05,37.35,39.65,41.95,44.25,46.55,48.85 }
+
+/* The functions 'bincenter[]' and 'simbincenter[]' respectively return
+ * a list with $bins ($sim_points) length which contains the average
+ * energy of each bin (simbin). Can only be called once $bins, $emin,
+ * $emax have been specified (resp. $sampling_points, $sampling_min and
+ * $sampling_max).
+ */
+
+!bc=bincenter[]
+
+/* AEDL now has interpolation built-in. The syntax is
+ * !(!xvals,!yvals,interpolation_order|!points) and this returns a new
+ * list. 'interpolation_order' can be 1 for linear interpolation or 2
+ * for using cubic splines (see gsl manual). !xvals and !yvals have to
+ * have the same length and !xval must be a monotonous increasing set
+ * of values. !points will be the list of points at which you want the
+ * interpolating function to be evaluated */
+
+/* This example here, allows to define our standard threshold
+ * independtly of the number of bins used */
+
+!inter=!(!energ,!effs,1|!bc)
+
+/* For debugging purposes a simple printing facility has been added,
+ * called 'echo()' and 'echon()'. They will print any number or list
+ * either in the same line (echo) or with a linefeed at the end
+ * (echon). 'line(n)' will put n linefeeds.
+ */
+
+echo(!inter)
+
+line(1)
+
+channel(#nu_mu_appearance)<
+	@channel = #two: +: e: m: #CC: #sm0 
+
+/* This here, shows how to properly assign a list to a named
+ * variable. Using 'copy()' is importnat because otherwise the memory
+ * used by different parts of the glb_experiment structure will
+ * overlapp and things like freeing memory or memcopy will fail. 
+ */
+
+        @post_smearing_efficiencies= copy(!inter)
+>
+
+channel(#nu_mu_bar_appearance)<
+	@channel = 	#one:	-:	e:	m:	#CC:    #sm0
+	@post_smearing_efficiencies= copy(!inter)
+>
+
+channel(#nu_mu_bar_disappearance)<
+	@channel = 	#two:	-:	m:	m:	#CC:    #sm0
+	@post_smearing_efficiencies= copy(!inter)
+>	
+
+channel(#nu_mu_disappearance)<
+	@channel = 	#one:	+:	m:	m:	#CC:    #sm0
+	@post_smearing_efficiencies= copy(!inter)
+>
+
+channel(#nu_NC_bckg)<
+	@channel = 	#one:	+:	NOSC_m:	NOSC_m:	#NC:    #sm0
+>
+
+channel(#nu_bar_NC_bckg)<
+	@channel = 	#two:	-:	NOSC_m:	NOSC_m:	#NC:    #sm0
+>
+
+/* 	 Rules 		 */
+rule(#Nu_Mu_Disappearance)<
+	@signal =	      0.45@#nu_mu_disappearance
+	@signalerror =	     0.001  :	    0.0001
+
+	@background =	         1@#nu_NC_bckg
+	@backgrounderror = 	     2e-06  :	    0.0001
+	@backgroundcenter = 	     1e-05  :	         0
+
+	@errordim_sys_on = 	0
+	@errordim_sys_off = 	2
+	@energy_window = 	         4  :	        50
+
+>
+
+rule(#Nu_Mu_Bar_Disappearance)<
+	@signal =	      0.35@#nu_mu_bar_disappearance
+	@signalerror =	     0.001  :	    0.0001
+
+	@background =	         1@#nu_bar_NC_bckg
+	@backgrounderror = 	     2e-06  :	    0.0001
+	@backgroundcenter = 	     1e-05  :	         0
+
+	@errordim_sys_on = 	0
+	@errordim_sys_off = 	2
+	@energy_window = 	         4  :	        50
+>
+
+rule(#Nu_Mu_Bar_Appearance)<
+	@signal =	      0.35@#nu_mu_bar_appearance
+	@signalerror =	     0.001  :	    0.0001
+
+	@background =	     5e-06@#nu_NC_bckg : 5e-06@#nu_mu_disappearance
+	@backgrounderror = 	     0.001  :	    0.0001
+	@backgroundcenter = 	         1  :	         0
+
+	@errordim_sys_on = 	0
+	@errordim_sys_off = 	2
+	@energy_window = 	         4  :	        50
+>
+
+rule(#Nu_Mu_Appearance)<
+	@signal =	      0.45@#nu_mu_appearance
+	@signalerror =	     0.001  :	    0.0001
+
+	@background =	     5e-06@#nu_bar_NC_bckg : 5e-06@#nu_mu_bar_disappearance
+	@backgrounderror = 	     0.001  :	    0.0001
+	@backgroundcenter = 	         1  :	         0
+
+	@errordim_sys_on = 	0
+	@errordim_sys_off = 	2
+	@energy_window = 	         4  :	        50
+>
+
+
+/* 	 Energy resolution   */		 
+
+
+energy(#sm0)<
+	@type = 1	
+	@sigma_e = {0.15,0,0}
+>
+
+/**********************END**********************/

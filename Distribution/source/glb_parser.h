@@ -31,66 +31,68 @@
    enum yytokentype {
      NUM = 258,
      SFNCT = 259,
-     VAR = 260,
-     FNCT = 261,
-     IDN = 262,
-     CROSS = 263,
-     FLUXP = 264,
-     FLUXM = 265,
-     GRP = 266,
-     GID = 267,
-     FNAME = 268,
-     VERS = 269,
-     SIGNAL = 270,
-     BG = 271,
-     GRPOPEN = 272,
-     GRPCLOSE = 273,
-     PM = 274,
-     FLAVOR = 275,
-     NOGLOBES = 276,
-     CHANNEL = 277,
-     RULESEP = 278,
-     RULEMULT = 279,
-     ENERGY = 280,
-     NAME = 281,
-     RDF = 282,
-     NDEF = 283,
-     NEG = 284
+     LVAR = 260,
+     VAR = 261,
+     FNCT = 262,
+     IDN = 263,
+     CROSS = 264,
+     FLUXP = 265,
+     FLUXM = 266,
+     GRP = 267,
+     GID = 268,
+     FNAME = 269,
+     VERS = 270,
+     SIGNAL = 271,
+     BG = 272,
+     GRPOPEN = 273,
+     GRPCLOSE = 274,
+     PM = 275,
+     FLAVOR = 276,
+     NOGLOBES = 277,
+     CHANNEL = 278,
+     RULESEP = 279,
+     RULEMULT = 280,
+     ENERGY = 281,
+     NAME = 282,
+     RDF = 283,
+     NDEF = 284,
+     NEG = 285
    };
 #endif
 #define NUM 258
 #define SFNCT 259
-#define VAR 260
-#define FNCT 261
-#define IDN 262
-#define CROSS 263
-#define FLUXP 264
-#define FLUXM 265
-#define GRP 266
-#define GID 267
-#define FNAME 268
-#define VERS 269
-#define SIGNAL 270
-#define BG 271
-#define GRPOPEN 272
-#define GRPCLOSE 273
-#define PM 274
-#define FLAVOR 275
-#define NOGLOBES 276
-#define CHANNEL 277
-#define RULESEP 278
-#define RULEMULT 279
-#define ENERGY 280
-#define NAME 281
-#define RDF 282
-#define NDEF 283
-#define NEG 284
+#define LVAR 260
+#define VAR 261
+#define FNCT 262
+#define IDN 263
+#define CROSS 264
+#define FLUXP 265
+#define FLUXM 266
+#define GRP 267
+#define GID 268
+#define FNAME 269
+#define VERS 270
+#define SIGNAL 271
+#define BG 272
+#define GRPOPEN 273
+#define GRPCLOSE 274
+#define PM 275
+#define FLAVOR 276
+#define NOGLOBES 277
+#define CHANNEL 278
+#define RULESEP 279
+#define RULEMULT 280
+#define ENERGY 281
+#define NAME 282
+#define RDF 283
+#define NDEF 284
+#define NEG 285
 
 
 
 
 #if ! defined (YYSTYPE) && ! defined (YYSTYPE_IS_DECLARED)
-#line 828 "glb_parser.y"
+#line 942 "glb_parser.y"
 typedef union YYSTYPE {
   double  val;  /* For returning numbers.                   */
   double *dpt;  /* for rules */
@@ -101,10 +103,9 @@ typedef union YYSTYPE {
   char *iname;
   int in;
   glb_namerec *nameptr;
-  
 } YYSTYPE;
 /* Line 1249 of yacc.c.  */
-#line 107 "glb_parser.h"
+#line 108 "glb_parser.h"
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
 # define YYSTYPE_IS_TRIVIAL 1

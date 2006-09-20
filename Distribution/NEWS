@@ -481,3 +481,15 @@ documented!
         greatly facilitated, in that case '-lstdc++' has to be
         added by hand at the end of the linker command line. All other
         changes should be self-explaining.
+
+20/09/06 PH -- added a number of features to AEDL. They are nicely
+       demonstrated (and documented) in 'examples/list.glb'. AEDL now
+       supports variables for lists and allows to thread functions over
+       lists. This was needed in order to have a half-way decent
+       implementation for interpolating functions. This new feature is
+       really nice, and allows to define efficencies, backgrounds
+       asf. *independently* of the binning. Moreover, I added simple
+       debugging functions to AEDL which allow to print out the values
+       of variables and list. I ran 'valgrind' (found and fixed a
+       minor memory leak). The new parser is clean, no memory leaks
+       (at least with my test case).

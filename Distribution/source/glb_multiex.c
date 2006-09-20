@@ -235,6 +235,7 @@ glb_xsec *glb_xsec_reset(glb_xsec *temp)
 {
   temp->builtin=-1;
   /* FIXME memory leak */
+  glb_free(temp->file_name);
   temp->file_name=NULL;
   glb_free_xsec_storage(temp->xsec_storage);
   return temp;

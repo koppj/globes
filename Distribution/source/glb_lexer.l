@@ -80,6 +80,7 @@ RL       @signal
 DIGIT    [0-9]
 IVAL     $[a-zA-Z][a-zA-Z0-9_]*
 ID       [a-zA-Z][a-zA-Z0-9_]*
+LID      ![a-zA-Z][a-zA-Z0-9_]*
 
 %%
 
@@ -219,7 +220,7 @@ return BG;}
 
 <str>\" {BEGIN(cond_buf_str);}
 
-<str>\n {glb_fatal("Lexer error: Unterminated filename");exit(1);}
+<str>\n {glb_fatal("Lexer error: Unterminated string");exit(1);}
 
 <str>{FN} {
 yylval.name=yytext;
@@ -378,6 +379,15 @@ return NUM;
 s = glb_getsym (yytext);
 if (s == 0) 
 s = glb_putsym (yytext, VAR); 
+yylval.tptr = s; 
+return s->type; 
+}
+
+
+{LID}        {glb_symrec *s;
+s = glb_getsym (yytext);
+if (s == 0) 
+s = glb_putsym (yytext, LVAR); 
 yylval.tptr = s; 
 return s->type; 
 }

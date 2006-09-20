@@ -37,6 +37,9 @@ typedef struct glb_list {
 /* Functions type.                                   */
 typedef double (*func_t) (double);
 
+/* Functions type.                                   */
+typedef glb_List *(*lfunc_t) (void);
+
 /* Data type for links in the chain of symbols.      */
 struct glb_symrec
 {
@@ -46,7 +49,12 @@ struct glb_symrec
   {
     double var;                  /* value of a VAR   */
     func_t fnctptr;              /* value of a FNCT  */
+    /* this field is added for the case of threadable function */
+    lfunc_t lfnctptr; 
   } value;
+  glb_List *list;
+  int destroy;
+  int reverse;
   struct glb_symrec *next;    /* link field              */
 };
 

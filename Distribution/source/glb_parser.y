@@ -31,6 +31,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <globes/globes.h>
+#include <gsl/gsl_spline.h>
 #include "glb_smear.h"
 #include "glb_multiex.h"
 #include "glb_types.h"
@@ -536,6 +537,16 @@ static int set_pair(char *name,double value,double value2,int scalar)
    return 1;   
 }
 
+
+static size_t list_length (glb_List *head)
+{
+  size_t n;  
+  for (n = 0; head; ++n)
+    head = head->next;
+  return n; 
+}
+
+
 static void list_free(glb_List *stale)
 {
  glb_List *ptr;
@@ -551,8 +562,12 @@ static void list_free(glb_List *stale)
 }
 
 
+static double glb_reverse(double x)
+{
+  return x;
+}
 
-     
+
 static glb_List *list_cons (glb_List *tail, double newdata)
 {
   glb_List *res = (glb_List*) glb_malloc(sizeof(glb_List)); 
@@ -561,14 +576,57 @@ static glb_List *list_cons (glb_List *tail, double newdata)
   return res;
 }
 
+/* this functions threads a funct_t function (double f (double x))
+   over a list */
 
-static size_t list_length (glb_List *head)
+static double glb_list_copy(double x)
 {
-  size_t n;  
-  for (n = 0; head; ++n)
-    head = head->next;
-  return n; 
+  return x;
 }
+
+static glb_List *thread_list(func_t f, int reverse, int destroy ,glb_List *tail)
+{
+  glb_List *res, *head;
+  size_t n,l;
+  double nv;
+  res=NULL;
+  /* the problem is that threading reverses the list, hence we
+     re-reverse it by default, unless someone wants to reverse himself
+  */
+  if(reverse==1)
+    {
+      head=tail;  
+      for (n = 0; head; ++n)
+	{
+	  nv=f(head->entry);
+	  res=list_cons(res,nv);
+	  head = head->next;
+	}
+    }
+  else
+    {
+      double *rlist,x;
+      l=list_length(tail);
+      rlist=(double *) malloc(sizeof(double)*l);   
+      head=tail;  
+      for (n = 0; head; ++n)
+	{
+	  rlist[n]=head->entry;
+	  head = head->next;
+	}
+
+      for(n=l;n>0; n--)
+	{
+	  x=f(rlist[n-1]);
+	  res=list_cons(res,x);
+	}
+      free(rlist);
+    }
+  if(destroy==1) list_free(tail);
+  if(destroy==-1) {list_free(res);res=tail;}
+  return res;
+}
+     
 
 static void showlist(glb_List *lp)
 { 
@@ -593,6 +651,62 @@ static double list_take(glb_List *li,int k)
       erg=bf->entry;
     }
   return erg;
+}
+
+
+static glb_List *glb_interpolation(glb_List *xval,glb_List *yval,int flag,glb_List *where)
+{
+  glb_List *head,*res=NULL;
+  size_t xl,yl,rl,i;
+  double *xlist,*ylist,*rlist,x;
+  gsl_interp_type type;
+
+  if(flag==1) type=*gsl_interp_linear;
+  else if (flag==2) type=*gsl_interp_cspline;
+  else {glb_error("Invalid interpolation scheme flag");return NULL;}
+
+  xl=list_length(xval);
+  yl=list_length(yval);
+  rl=list_length(where);
+ 
+  if(yl!=xl) {glb_error("Xval and Yval in glb_interpolation are not of the same length"); return NULL;}
+
+  xlist=(double*) malloc(sizeof(double)*xl);
+  ylist=(double*) malloc(sizeof(double)*yl);  
+  rlist=(double*) malloc(sizeof(double)*rl);
+
+  gsl_interp_accel *acc = gsl_interp_accel_alloc();
+  gsl_spline *spline = gsl_spline_alloc (&type,yl);
+
+  head=xval;
+  for (i = yl-1; head; i--){
+    xlist[i]=head->entry;
+    head = head->next;
+  }
+  
+  head=yval;
+  for (i = yl-1; head; i--){
+    ylist[i]=head->entry;
+    head = head->next;
+  }
+
+  gsl_spline_init(spline,xlist,ylist,yl);
+  
+  head=where;
+  for(i=0; head; i++){
+     rlist[i]=gsl_spline_eval(spline,head->entry,acc);   
+    head=head->next;
+ }
+
+  for(i=rl;i>0;i--) res=list_cons(res,rlist[i-1]);
+ 
+  free(xlist);
+  free(ylist);
+  free(rlist);
+  gsl_spline_free(spline);
+  gsl_interp_accel_free(acc);
+
+  return res;
 }
 
 
@@ -835,12 +949,11 @@ static int set_exp_energy(char *name, glb_List **value)
   char *iname;
   int in;
   glb_namerec *nameptr;
-  
 }
 
 %token <val> NUM
 %token <nameptr> SFNCT
-%token <tptr> VAR FNCT   /* Variable and Function */
+%token <tptr> LVAR VAR FNCT   /* Variable and Function */
 %token <name> IDN CROSS FLUXP FLUXM
 %token <name> GRP GID FNAME VERS
 %token <in> SIGNAL BG GRPOPEN GRPCLOSE PM FLAVOR
@@ -858,7 +971,7 @@ static int set_exp_energy(char *name, glb_List **value)
 %type <name> flux
 %type <name> version
 
-%expect 11
+%expect 20
 %nonassoc ','
 %right '='
 %left RULESEP
@@ -907,6 +1020,7 @@ $$ = $3; }
 | IDN '=' exp RULESEP exp  { if(set_pair($1,$3,$5,0)==1) yyerror("Unknown identifier");
 $$ = $3; }
 | FNCT '(' exp ')'   { $$ = (*($1->value.fnctptr))($3); }
+
 | exp '+' exp        { $$ = $1 + $3;                    }
 | exp '-' exp        { $$ = $1 - $3;                    }
 | exp '*' exp        { $$ = $1 * $3;                    }
@@ -947,6 +1061,12 @@ seq:    exp  ','        {$$=list_cons(NULL,$1); }
 | IDN '=' seq        { if(set_exp_list($1,$3,3)==1) 
   yyerror("Unknown identifier");
  $$ = $3; }
+//| FNCT '{' exp '}'   { $$ = ($1->value.lfnctptr)($3); }
+| FNCT '(' seq ')' {$$ = thread_list($1->value.fnctptr,$1->reverse,$1->destroy,$3);}
+| FNCT '['']' {$$ = (*($1->value.lfnctptr))();}
+| LVAR                { $$ = $1->list;              }
+| LVAR '=' seq        { $$ = $3; $1->list = $3;/* printf("%s ",$1->name);showlist($3);printf("\n");*/ }
+| '!''(' seq ',' seq ',' exp  '|'seq')'          {$$=glb_interpolation($3,$5,floor($7),$9);}
 ;
 
 rulepart: exp RULEMULT exp { 
@@ -1172,11 +1292,30 @@ yywarn (const char *s)  /* Called by yyparse on warning */
 }
 
 
+
+
 struct glb_init
 {
   char *fname;
   double (*fnct)(double);
+  /* these two flags determine the behaviour under threading
+     reverse 0 leaves the list as is (i.e reverse)
+     reverse 1 reverse the list (right order)
+
+     destroy -1 leaves the list (even the memory location) unscathed
+     destroy 0  procuces a copy
+     destroy 1 destroys the input list and returns a new list
+  */
+  int reverse;
+  int destroy;
 };
+
+struct glb_init_list
+{
+  char *fname;
+  glb_List *(*fnct)(void);
+};
+
 
 struct glb_init_sig
 {
@@ -1184,22 +1323,105 @@ struct glb_init_sig
   sigfun sf;
 };
      
+static double echo(double x)
+{
+  fprintf(stdout,"%f ",x);
+  return x;
+}
 
+static double echon(double x)
+{
+  fprintf(stdout,"%f\n",x);
+  return x;
+}
+
+
+static double line(double x)
+{
+  size_t n,i;
+  n=floor(x);
+  for(i=0;i<n;i++) fprintf(stdout,"\n",x);
+  return x;
+}
 
 static struct glb_init arith_fncts[] =
   {
-    {"sin",  sin},
-    {"cos",  cos},
-    {"tan",  tan},
-    {"asin", asin},
-    {"acos", acos},
-    {"atan", atan},
-    {"log",   log},
-    {"exp",  exp},
-    {"log10", log10},
-    {"sqrt", sqrt},
-    {NULL, NULL}
+    {"sin",  sin, 0,1},
+    {"cos",  cos,0,1},
+    {"tan",  tan,0,1},
+    {"asin", asin,0,1},
+    {"acos", acos,0,1},
+    {"atan", atan,0,1},
+    {"log",   log,0,1},
+    {"exp",  exp,0,1},
+    {"log10", log10,0,1},
+    {"sqrt", sqrt,0,1},
+    {"reverse",glb_reverse,1,1},
+    {"copy",glb_list_copy,0,0},
+    {"echo",echo,0,-1},
+    {"echon",echon,0,-1},
+    {"line",line,0,-1},
+    {NULL, NULL,0,0}
      };
+
+
+//void glb_set_up_smear_data(glb_smear *test,const struct glb_experiment *head)
+static glb_List *glb_bincenter(void)
+{
+  int i;
+  glb_List *res=NULL;
+  glb_smear *test;
+  test=glb_smear_alloc();
+  
+  if(buff.numofbins<0) {glb_error("Cannot compute bincenter. Binning not set up properly."); return NULL;}
+
+  glb_set_up_smear_data(test,&buff);
+
+ 
+  for(i=0;i<test->numofbins;i++)
+    {    
+      res=list_cons(res,test->bincenter[i]);
+    }
+ 
+  glb_smear_free(test);
+ 
+  return res;
+}
+
+
+static glb_List *glb_simbincenter(void)
+{
+  int i;
+  glb_List *res=NULL;
+  glb_smear *test;
+  test=glb_smear_alloc();
+  
+  if(buff.simbins<0) {glb_error("Cannot compute simbincenter. Sim-binning not set up properly."); return NULL;}
+
+  
+  glb_set_up_smear_data(test,&buff);
+
+  for(i=0;i<test->simbins;i++)
+    {
+      
+      res=list_cons(res,test->simbincenter[i]);
+    }
+ 
+  glb_smear_free(test);
+ 
+  
+  return res;
+}
+
+
+
+
+static struct glb_init_list list_fncts[] =
+  {
+    {"bincenter",glb_bincenter},
+    {"simbincenter",glb_simbincenter},
+    {NULL, NULL}
+  };
 
 static double standard_sig(double x ,double *in)
 {
@@ -1228,6 +1450,11 @@ static glb_namerec *name_table = (glb_namerec *) NULL;
 glb_symrec *sym_table = (glb_symrec *) NULL;
 static glb_symrec *pre_sym_table = (glb_symrec *) NULL;
 
+#define BIN_LIST 1
+#define SAMPLING_LIST 2
+#define DENSITY_LIST 3
+
+
 /* Put arithmetic functions in table. 
  * And all user-defined stuff.
  */
@@ -1242,7 +1469,16 @@ init_table (void)
     {
       ptr = glb_putsym (arith_fncts[i].fname, FNCT);
       ptr->value.fnctptr = arith_fncts[i].fnct;
+      ptr->destroy=arith_fncts[i].destroy;
+      ptr->reverse=arith_fncts[i].reverse;
+ 
     }
+  for (i = 0; list_fncts[i].fname != 0; i++)
+    {
+      ptr = glb_putsym (list_fncts[i].fname, FNCT);
+      ptr->value.lfnctptr = list_fncts[i].fnct;
+    }
+
   ptr=pre_sym_table;
   /* Copying the contents of pre_sym_table to sym_table */
   for (i=0; ptr !=0; i++)
@@ -1252,7 +1488,6 @@ init_table (void)
       ptr=ptr->next;
     }
   
-
   for (i = 0; sig_fncts[i].fname != 0; i++)
     {
       sptr = glb_putname (sig_fncts[i].fname,"energy",SFNCT);
@@ -1269,6 +1504,7 @@ free_symtable()
     while(ptr != (glb_symrec *) NULL)
       {	
 	glb_free(ptr->name);
+	if(ptr->list!=NULL){ list_free(ptr->list);}
 	dummy=ptr->next;
 	glb_free(ptr);
 	ptr=dummy;  
@@ -1318,6 +1554,7 @@ glb_putsym (char *sym_name, int sym_type)
   strcpy (ptr->name,sym_name);
   ptr->type = sym_type;
   ptr->value.var = 0; /* set value to 0 even if fctn.  */
+  ptr->list= NULL;
   ptr->next = (struct glb_symrec *) sym_table;
   sym_table = ptr;
   return ptr;
@@ -1440,7 +1677,6 @@ void glbClearAEDLVariables()
 }
 
 
-
 void glb_copy_buff()
 {
   /* I am not sure how well this assigment really works */
@@ -1488,6 +1724,9 @@ void glbResetEOF()
   name_table =(glb_namerec *) NULL;
   sym_table =(glb_symrec *) NULL;
   init_table ();
+  glb_flux_reset(&flt);
+  glb_xsec_reset(&xsc);
+ 
 }
 
 void glb_clean_parser()
