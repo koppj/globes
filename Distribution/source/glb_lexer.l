@@ -407,6 +407,7 @@ return s->type;
 %%
 
 
+/* OLD CODE, DOES NOT RUN WITH NEWER FLEX VERSIONS ANYMORE [WW, JK]:
 
 void glb_lexer_cleanup() {
      if( yy_current_buffer != NULL )
@@ -414,6 +415,14 @@ void glb_lexer_cleanup() {
          yy_delete_buffer( yy_current_buffer );
          yy_current_buffer = 0;
      }
+}
+
+*/
+
+
+void glb_lexer_cleanup() {
+      if( YY_CURRENT_BUFFER != NULL )
+          yy_delete_buffer( YY_CURRENT_BUFFER );
 }
 
 

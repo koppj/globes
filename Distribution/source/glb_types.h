@@ -462,33 +462,14 @@ struct glb_experiment {
   /** Now comes a bunch of pointers which finally are vectors containing
   * the different parts of event vectors needed during computation.
   * All mallocing has to be done at intialization of a given experiment!
-  * Has length simbins 
   */
-  double* SignalRates[32];
-
-  /** Has length simbins */
-  double* BackgroundRates[32]; 
-
-  /** Has length numofbins */
-  double* rates0[32];
-
-  /** Has length numofbins */
-  double* rates1[32];
-
-  /** Has length numofbins */
-  double* rates1T[32];
-
-  /** Has length numofbins */
-  double* rates1BG[32];
-
-  /** Has length numofbins */
-  double* rates1BGT[32];
-
-  /** Has length numofbins */
-  double* ratevec[32];
-
-  /** Has length numofbins */
-  double* ratevecBG[32];
+  double* SignalRates[32];    /* "True" signal event rates for all rules */
+  double* BackgroundRates[32];/* "True" background event rates for all rules */
+  double* rates0[32];         /* "True" event rates for all rules */
+  double* rates1[32];         /* Fitted signal rates for all rules */
+  double* rates1T[32];        /* Fitted and tilted signal rates for all rules */
+  double* rates1BG[32];       /* Fitted background rates for all rules */
+  double* rates1BGT[32];      /* Fitted and tilted background rates for all rules */
 
   /** Has length numofbins */
   double* energy_tab;
@@ -507,8 +488,8 @@ struct glb_experiment {
   /* Additional work spaces */  
 
   double *buffer;
-  double *chrb[32];
-  double *chra[32];
+  double *chrb_0[32], *chrb_1[32];  /* True and fitted pre-smearing rates  */
+  double *chra_0[32], *chra_1[32];  /* True and fitted post-smearing rates */
 
 
 };

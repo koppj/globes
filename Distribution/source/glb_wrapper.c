@@ -586,6 +586,260 @@ glbClearExperimentList()
   glbResetCounters();
 }
 
+
+/* ****************************************** * 
+ * Low-level access to the event rate vectors * 
+ * ****************************************** */
+
+/* *************************************************************************
+ * Function glbGetChannelRatePtr                                           *
+ * *************************************************************************
+ * Get at pointer to the "true" event rate vector for a specific channel.  *
+ * pre_post = GLB_PRE/GLB_POST determines whether pre-smearing or post-    *
+ * smearing rates are requested.                                           *
+ * *************************************************************************/
+double *glbGetChannelRatePtr(int exp, int channel, int pre_post)
+{
+  if (exp < 0 || exp >= glb_num_of_exps)
+  {
+    glb_error("glbGetChannelRatePtr: Parameter \"exp\" is invalid");
+    return NULL;
+  }
+  if (channel < 0 || channel >= glb_experiment_list[exp]->numofchannels)
+  {
+    glb_error("glbGetChannelRatePtr: Parameter \"channel\" is invalid");
+    return NULL;
+  }
+  
+  switch (pre_post)
+  {
+    case GLB_PRE:
+      return glb_experiment_list[exp]->chrb_0[channel];
+    case GLB_POST:
+      return glb_experiment_list[exp]->chra_0[channel];
+    default:
+      glb_error("glbGetChannelRatePtr: Parameter \"pre_post\" is invalid");
+  }
+
+  return NULL;
+}
+
+
+/* *************************************************************************
+ * Function glbGetRuleRatePtr                                              *
+ * *************************************************************************
+ * Get at pointer to the "true" event rate vector for a specific rule.     *
+ * *************************************************************************/
+double *glbGetRuleRatePtr(int exp, int rule)
+{
+  if (exp < 0 || exp >= glb_num_of_exps)
+  {
+    glb_error("glbGetRuleRatePtr: Parameter \"exp\" is invalid");
+    return NULL;
+  }
+  if (rule < 0 || rule >= glb_experiment_list[exp]->numofrules)
+  {
+    glb_error("glbGetRuleRatePtr: Parameter \"rule\" is invalid");
+    return NULL;
+  }
+  
+  return glb_experiment_list[exp]->rates0[rule];
+}
+
+
+/* *************************************************************************
+ * Function glbGetSignalRatePtr                                            *
+ * *************************************************************************
+ * Get at pointer to the "true" signal event rate vector for a specific    *
+ * rule.                                                                   *
+ * *************************************************************************/
+double *glbGetSignalRatePtr(int exp, int rule)
+{
+  if (exp < 0 || exp >= glb_num_of_exps)
+  {
+    glb_error("glbGetSignalRatePtr: Parameter \"exp\" is invalid");
+    return NULL;
+  }
+  if (rule < 0 || rule >= glb_experiment_list[exp]->numofrules)
+  {
+    glb_error("glbGetSignalRatePtr: Parameter \"rule\" is invalid");
+    return NULL;
+  }
+  
+  return glb_experiment_list[exp]->SignalRates[rule];
+}
+
+
+/* *************************************************************************
+ * Function glbGetBGRatePtr                                                *
+ * *************************************************************************
+ * Get at pointer to the "true" background event rate vector for a         *
+ * specific rule.                                                          *
+ * *************************************************************************/
+double *glbGetBGRatePtr(int exp, int rule)
+{
+  if (exp < 0 || exp >= glb_num_of_exps)
+  {
+    glb_error("glbGetBGRatePtr: Parameter \"exp\" is invalid");
+    return NULL;
+  }
+  if (rule < 0 || rule >= glb_experiment_list[exp]->numofrules)
+  {
+    glb_error("glbGetBGRatePtr: Parameter \"rule\" is invalid");
+    return NULL;
+  }
+  
+  return glb_experiment_list[exp]->BackgroundRates[rule];
+}
+
+
+/* *************************************************************************
+ * Function glbGetChannelFitRatePtr                                        *
+ * *************************************************************************
+ * Get at pointer to the fitted event rate vector for a specific channel.  *
+ * pre_post = GLB_PRE/GLB_POST determines whether pre-smearing or post-    *
+ * smearing rates are requested.                                           *
+ * *************************************************************************/
+double *glbGetChannelFitRatePtr(int exp, int channel, int pre_post)
+{
+  if (exp < 0 || exp >= glb_num_of_exps)
+  {
+    glb_error("glbGetChannelFitRatePtr: Parameter \"exp\" is invalid");
+    return NULL;
+  }
+  if (channel < 0 || channel >= glb_experiment_list[exp]->numofchannels)
+  {
+    glb_error("glbGetChannelFitRatePtr: Parameter \"channel\" is invalid");
+    return NULL;
+  }
+  
+  switch (pre_post)
+  {
+    case GLB_PRE:
+      return glb_experiment_list[exp]->chrb_1[channel];
+    case GLB_POST:
+      return glb_experiment_list[exp]->chra_1[channel];
+    default:
+      glb_error("glbGetChannelFitRatePtr: Parameter \"pre_post\" is invalid");
+  }
+
+  return NULL;
+}
+
+
+/* *************************************************************************
+ * Function glbGetSignalFitRatePtr                                         *
+ * *************************************************************************
+ * Get at pointer to the fitted signal event rate vector for a specific    *
+ * rule.                                                                   *
+ * *************************************************************************/
+double *glbGetSignalFitRatePtr(int exp, int rule)
+{
+  if (exp < 0 || exp >= glb_num_of_exps)
+  {
+    glb_error("glbGetSignalFitRatePtr: Parameter \"exp\" is invalid");
+    return NULL;
+  }
+  if (rule < 0 || rule >= glb_experiment_list[exp]->numofrules)
+  {
+    glb_error("glbGetSignalFitRatePtr: Parameter \"rule\" is invalid");
+    return NULL;
+  }
+  
+  return glb_experiment_list[exp]->rates1[rule];
+}
+
+
+/* *************************************************************************
+ * Function glbGetBGFitRatePtr                                             *
+ * *************************************************************************
+ * Get at pointer to the fitted background event rate vector for a         *
+ * specific rule.                                                          *
+ * *************************************************************************/
+double *glbGetBGFitRatePtr(int exp, int rule)
+{
+  if (exp < 0 || exp >= glb_num_of_exps)
+  {
+    glb_error("glbGetBGFitRatePtr: Parameter \"exp\" is invalid");
+    return NULL;
+  }
+  if (rule < 0 || rule >= glb_experiment_list[exp]->numofrules)
+  {
+    glb_error("glbGetBGFitRatePtr: Parameter \"rule\" is invalid");
+    return NULL;
+  }
+  
+  return glb_experiment_list[exp]->rates1BG[rule];
+}
+
+
+/* *************************************************************************
+ * Function glbGetEfficiencyPtr                                            *
+ * *************************************************************************
+ * Get at pointer to the pre- or post-smearing efficiency vector, depending*
+ * on the parameter pre_post (GLB_PRE or GLB_POST)                         *
+ * *************************************************************************/
+double *glbGetEfficiencyPtr(int exp, int channel, int pre_post)
+{
+  if (exp < 0 || exp >= glb_num_of_exps)
+  {
+    glb_error("glbGetEfficiencyPtr: Parameter \"exp\" is invalid");
+    return NULL;
+  }
+  if (channel < 0 || channel >= glb_experiment_list[exp]->numofchannels)
+  {
+    glb_error("glbGetEfficiencyPtr: Parameter \"channel\" is invalid");
+    return NULL;
+  }
+  
+  switch (pre_post)
+  {
+    case GLB_PRE:
+      return glb_experiment_list[exp]->user_pre_smearing_channel[channel];
+    case GLB_POST:
+      return glb_experiment_list[exp]->user_post_smearing_channel[channel];
+    default:
+      glb_error("glbGetEfficiencyPtr: Parameter \"pre_post\" is invalid");
+  }
+
+  return NULL;
+}
+
+
+/* *************************************************************************
+ * Function glbGetBackgroundPtr                                            *
+ * *************************************************************************
+ * Get at pointer to the pre- or post-smearing background vector, depending*
+ * on the parameter pre_post (GLB_PRE or GLB_POST)                         *
+ * *************************************************************************/
+double *glbGetBackgroundPtr(int exp, int channel, int pre_post)
+{
+  if (exp < 0 || exp >= glb_num_of_exps)
+  {
+    glb_error("glbGetBackgroundPtr: Parameter \"exp\" is invalid");
+    return NULL;
+  }
+  if (channel < 0 || channel >= glb_experiment_list[exp]->numofchannels)
+  {
+    glb_error("glbGetBackgroundPtr: Parameter \"channel\" is invalid");
+    return NULL;
+  }
+  
+  switch (pre_post)
+  {
+    case GLB_PRE:
+      return glb_experiment_list[exp]->user_pre_smearing_background[channel];
+    case GLB_POST:
+      return glb_experiment_list[exp]->user_post_smearing_background[channel];
+    default:
+      glb_error("glbGetBackgroundPtr: Parameter \"pre_post\" is invalid");
+  }
+
+  return NULL;
+}
+
+
+/* Deprecated */
 int
 glbGetChannelRates(double **data, size_t *length,
 		   int exp, int channel, int smearing)
@@ -652,10 +906,10 @@ glbGetChannelRates(double **data, size_t *length,
   temp=(double *) obstack_alloc(&glb_rate_stack,(l+1) * sizeof(double));
   if(smearing==GLB_PRE)
     for(i=0;i<l;i++) 
-      temp[i]= ((struct glb_experiment *) glb_experiment_list[exp])->chrb[channel][i];
+      temp[i]= ((struct glb_experiment *) glb_experiment_list[exp])->chrb_0[channel][i];
   else
     for(i=0;i<l;i++) 
-      temp[i]= ((struct glb_experiment *) glb_experiment_list[exp])->chra[channel][i];
+      temp[i]= ((struct glb_experiment *) glb_experiment_list[exp])->chra_0[channel][i];
 
   temp[l]=-1.0;
 
@@ -836,6 +1090,22 @@ static int pos_range(int exp, int rule, int pos, int signal)
 
 
 /* Accessing channel and rule internals */
+
+int glbGetNumberOfSimBins(int exp)
+{
+  if (exp_range(exp) !=0)
+    return -1;
+  else
+    return glb_experiment_list[exp]->simbins;
+}
+
+int glbGetNumberOfBins(int exp)
+{
+  if (exp_range(exp) !=0)
+    return -1;
+  else
+    return glb_experiment_list[exp]->numofbins;
+}
 
 int glbGetNumberOfChannels(int exp)
 {
@@ -2220,15 +2490,42 @@ double glbVacuumProbability(int initial_flavour, int final_flavour,
 // Parameters:
 //   initial_flavour/final_flavour: The desired oscillation channel
 //   cp_sign: +1 for neutrinos, -1 for antineutrinos
-//   E: Neutrino energy
-//   L: Baseline
+//   E: Neutrino energy in GeV
+//   L: Baseline in km
 // ----------------------------------------------------------------------------
 {
-  const double V = 0.0;
+  const double rho = 0.0;
   double P[3][3];
   int status;
  
-  if ((status=glb_probability_matrix(P, cp_sign, E, 1, &L, &V, -1.0)) != GLB_SUCCESS)
+  if ((status=glb_probability_matrix(P, cp_sign, E, 1, &L, &rho, -1.0)) != GLB_SUCCESS)
+  {
+    glb_error("Calculation of oscillation probabilities failed.");
+    return -1.0;
+  }
+  return P[initial_flavour-1][final_flavour-1];
+}
+
+
+// ----------------------------------------------------------------------------
+double glbConstantDensityProbability(int initial_flavour, int final_flavour,
+			    int cp_sign, double E, double L, double rho)
+// ----------------------------------------------------------------------------
+// Returns the constant density oscillation probability for one specific
+// oscillation channel
+// ----------------------------------------------------------------------------
+// Parameters:
+//   initial_flavour/final_flavour: The desired oscillation channel
+//   cp_sign: +1 for neutrinos, -1 for antineutrinos
+//   E:   Neutrino energy in GeV
+//   L:   Baseline in km
+//   rho: Matter density in g/cm^3
+// ----------------------------------------------------------------------------
+{
+  double P[3][3];
+  int status;
+ 
+  if ((status=glb_probability_matrix(P, cp_sign, E, 1, &L, &rho, -1.0)) != GLB_SUCCESS)
   {
     glb_error("Calculation of oscillation probabilities failed.");
     return -1.0;
@@ -2248,7 +2545,7 @@ double glbProfileProbability(int exp,int initial_flavour, int final_flavour,
 //   exp: Number of experiment
 //   initial_flavour/final_flavour: The desired oscillation channel
 //   cp_sign: +1 for neutrinos, -1 for antineutrinos
-//   E: Neutrino energy
+//   E: Neutrino energy in GeV
 // ----------------------------------------------------------------------------
 {
   struct glb_experiment *e = glb_experiment_list[exp];
@@ -2297,9 +2594,6 @@ double glbFilteredConstantDensityProbability(int exp,int initial_flavour, int fi
   }
   
   return P[initial_flavour-1][final_flavour-1];
-//  glb_error("Function glbFilteredConstantDensityProbability is deprecated. "
-//            "Use glbProfileProbability instead.");
-//  return -1.0;
 }
 
 

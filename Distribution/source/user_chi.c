@@ -91,47 +91,51 @@ int glbGetCurrentRule()
   return glb_rule_number;
 }
 
+
+// FIXME Remove
 // ----------------------------------------------------------------------------
-double glbGetSignalBinInRule(int exp, int rule, int bin)
+//double glbGetSignalBinInRule(int exp, int rule, int bin)
 // ----------------------------------------------------------------------------
 // Returns the signal rate for the given experiment, rule and bin
 // ----------------------------------------------------------------------------
-{
-  return glb_experiment_list[exp]->rates1T[rule][bin] *
-            glb_window_function(glb_experiment_list[exp]->energy_window[glb_rule_number][0],
-                                glb_experiment_list[exp]->energy_window[glb_rule_number][1],bin);
-}
+//{
+//  return glb_experiment_list[exp]->rates1T[rule][bin] *
+//            glb_window_function(glb_experiment_list[exp]->energy_window[glb_rule_number][0],
+//                                glb_experiment_list[exp]->energy_window[glb_rule_number][1],bin);
+//}
 
 // ----------------------------------------------------------------------------
-double glbGetBackgroundBinInRule(int exp, int rule, int bin)
+//double glbGetBackgroundBinInRule(int exp, int rule, int bin)
 // ----------------------------------------------------------------------------
 // Returns the background rate for the given experiment, rule and bin
 // ----------------------------------------------------------------------------
-{
-  return glb_experiment_list[exp]->rates1BGT[rule][bin] *
-            glb_window_function(glb_experiment_list[exp]->energy_window[glb_rule_number][0],
-                                glb_experiment_list[exp]->energy_window[glb_rule_number][1],bin);
-}
-  
+//{
+//  return glb_experiment_list[exp]->rates1BGT[rule][bin] *
+//            glb_window_function(glb_experiment_list[exp]->energy_window[glb_rule_number][0],
+//                                glb_experiment_list[exp]->energy_window[glb_rule_number][1],bin);
+//}
+ 
+
 // ----------------------------------------------------------------------------
-double glbGetChannelBin(int exp, int channel, int bin)
+//double glbGetChannelBin(int exp, int channel, int bin)
 // ----------------------------------------------------------------------------
 // Returns the signal rate for the given experiment, channel and bin
 // ----------------------------------------------------------------------------
-{
-  return glb_experiment_list[exp]->chra[channel][bin] *
-            glb_window_function(glb_experiment_list[exp]->energy_window[glb_rule_number][0],
-                                glb_experiment_list[exp]->energy_window[glb_rule_number][1],bin);
-}
+//{
+//  return glb_experiment_list[exp]->chra[channel][bin] *
+//            glb_window_function(glb_experiment_list[exp]->energy_window[glb_rule_number][0],
+//                                glb_experiment_list[exp]->energy_window[glb_rule_number][1],bin);
+//}
 
 // ----------------------------------------------------------------------------
-double glbGetObservedBinInRule(int exp, int rule, int bin)
+//double glbGetObservedBinInRule(int exp, int rule, int bin)
 // ----------------------------------------------------------------------------
 // Returns the measured event rate for the given experiment, rule and bin
 // ----------------------------------------------------------------------------
-{
-  return glb_experiment_list[exp]->rates0[rule][bin];
-}
+//{
+//  return glb_experiment_list[exp]->rates0[rule][bin];
+//}
+
 
 // ----------------------------------------------------------------------------
 int glbShiftSignalEnergyScale(int exp, int rule, double amount)

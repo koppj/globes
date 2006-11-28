@@ -1219,11 +1219,11 @@ static double glbChi1P(const glb_params in,
   b=CheckProjection();
   for(i=0;i<GLB_OSCP+glb_num_of_exps;i++) buff[i]=b[i];
   for(i=0;i<GLB_OSCP+glb_num_of_exps;i++) swit[i]=GLB_FREE;
-  swit[n-1]=GLB_FIXED;
+  swit[n]=GLB_FIXED;
   SelectProjection(swit);
   if(in==NULL)
     {
-      glb_error("Failure in glbChiNP: Input pointer must be non-NULL");
+      glb_error("Failure in glbChi1P: Input pointer must be non-NULL");
       return -1;
     }
   
@@ -1233,45 +1233,56 @@ static double glbChi1P(const glb_params in,
   return res; 
 }
 
-
-double glbChiTheta(const glb_params in,glb_params out, int exp)
+/* Projection of chi^2 onto theta-12 */
+double glbChiTheta12(const glb_params in,glb_params out, int exp)
 {
   double res;
-  res=glbChi1P(in,out,exp,2);
+  res=glbChi1P(in,out,exp,GLB_THETA_12);
   return res;
 }
 
+/* Projection of chi^2 onto theta-13 */
+double glbChiTheta13(const glb_params in,glb_params out, int exp)
+{
+  double res;
+  res=glbChi1P(in,out,exp,GLB_THETA_13);
+  return res;
+}
+
+/* Projection of chi^2 onto theta-23 */
 double glbChiTheta23(const glb_params in,glb_params out, int exp)
 {
   double res;
-  res=glbChi1P(in,out,exp,3);
+  res=glbChi1P(in,out,exp,GLB_THETA_23);
   return res;
 }
 
+/* Projection of chi^2 onto delta_CP */
 double glbChiDelta(const glb_params in,glb_params out, int exp)
 {
   double res;
-  res=glbChi1P(in,out,exp,4);
+  res=glbChi1P(in,out,exp,GLB_DELTA_CP);
   return res;
 }
 
-double glbChiDms(const glb_params in,glb_params out, int exp)
+/* Projection of chi^2 onto Delta m_{21}^2 */
+double glbChiDm21(const glb_params in,glb_params out, int exp)
 {
   double res;
-  res=glbChi1P(in,out,exp,5);
+  res=glbChi1P(in,out,exp,GLB_DM_21);
   return res;
 }
 
-double glbChiDm(const glb_params in,glb_params out, int exp)
+/* Projection of chi^2 onto Delta m_{31}^2 */
+double glbChiDm31(const glb_params in,glb_params out, int exp)
 {
   double res;
-  res=glbChi1P(in,out,exp,6);
+  res=glbChi1P(in,out,exp,GLB_DM_31);
   return res;
 }
 
-/* 2-d wrapper -- only ChiThetaDelta */
-
-double glbChiThetaDelta(const glb_params in,glb_params out, int exp)
+/* 2-dim Projection of chi^2 onto the theta-13 - delta_CP plane */
+double glbChiTheta13Delta(const glb_params in,glb_params out, int exp)
 {
   double res;
   int i,*b;
@@ -1280,8 +1291,8 @@ double glbChiThetaDelta(const glb_params in,glb_params out, int exp)
   b=CheckProjection();
   for(i=0;i<GLB_OSCP+glb_num_of_exps;i++) buff[i]=b[i];
   for(i=0;i<GLB_OSCP+glb_num_of_exps;i++) swit[i]=GLB_FREE;
-  swit[1]=GLB_FIXED;
-  swit[3]=GLB_FIXED;
+  swit[GLB_THETA_13]=GLB_FIXED;
+  swit[GLB_DELTA_CP]=GLB_FIXED;
   SelectProjection(swit);
   if(in==NULL)
     {
@@ -1296,7 +1307,6 @@ double glbChiThetaDelta(const glb_params in,glb_params out, int exp)
 }
 
 /* Wrapper for ChiAll */
-
 double glbChiAll(const glb_params in,glb_params out, int exp)
 {
   double res;

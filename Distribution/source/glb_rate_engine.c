@@ -48,8 +48,6 @@
 #define FLOAT double
 
 
-
-
 static double baseline = 1000 ;   // baseline in km
 static double target_mass = 10;   // target mass in kt;
 static double years = 1;          // running time in years
@@ -69,9 +67,6 @@ static int BGrule_length[32];
 static double* BGrule_coeff[32];
  double* glb_calc_signal_rates[32];
  double* glb_calc_bg_rates[32]; 
-// speeding up the rate calculation
-static double* signal_prefactors[32];
-static double* background_prefactors[32];
 // ---------------------------------
 double* glb_calc_rates_0[32];
 double* glb_calc_rates_1[32];
@@ -86,8 +81,6 @@ double glb_bg_tilt_error[32];
 double glb_bg_norm_center[32];
 double glb_bg_tilt_center[32];
 
-double* glb_calc_ratevec[32];
-double* glb_calc_glb_calc_ratevec_bg[32];
 
 /* rate glb_calc_buffer for chi functions in order to allow
  * access to shifted rate vector
@@ -121,10 +114,12 @@ int glb_num_of_rules=1;
 double *glb_calc_buffer;
 
 /* storing the channel result before glb_calc_smearing (glb_calc_simbins) */
-double *glb_calc_chrb[32];
+double *glb_calc_chrb_0[32];
+double *glb_calc_chrb_1[32];
 
 /* storing the channel result after glb_calc_smearing (bins) */
-double *glb_calc_chra[32];
+double *glb_calc_chra_0[32];
+double *glb_calc_chra_1[32];
 
 
 //binwise glb_calc_efficiencies
@@ -459,29 +454,6 @@ double glb_calc_channel(int i, double en, double baseline)
   return ergebnis;
 }
 
-static void CalcAllChannels(int mode)
-{
-  int i,k,s;
-     
-  for (i=0; i<glb_calc_simbins; i++)
-    {
-      CalcAllProbs(glb_sbin_center(i,glb_calc_smear_data[0]),baseline);
-      for(k=0;k<num_of_ch;k++)
-	{
-	  if(!((mode!=0)&&((channel_list[k][2]>9)||(channel_list[k][3]>9))))
-	    {
-	      s=channel_list[k][5];
-	      glb_calc_chrb[k][i]=glb_calc_channel(k,glb_sbin_center(i,glb_calc_smear_data[s]),baseline)
-		* glb_calc_user_pre_sm_channel[k][i] 
-		* glb_calc_smear_data[s]->simbinsize[i]
-		+ glb_calc_user_pre_sm_background[k][i];
-	    } 
-	}	
-    }
-}
-
-
-
 
 static double Signal(int cn, double en, double baseline)
 {
@@ -570,114 +542,34 @@ inline double errorf(double x, double y, int bin)
   return erg;
 }
 
-static void SmearAllChannels(int mode);
-
-static void BinnedSignalB(int mode)
-{
-  int k,j,i;
-  CalcAllChannels(mode);
-  SmearAllChannels(mode);
-  for(i=0;i<bins;i++)
-    {
-      for(k=0;k<glb_num_of_rules;k++)
-	{
-	  glb_calc_bg_rates[k][i]=0;
-	  for (j=0;j<BGrule_length[k];j++)
-	    {
-	      glb_calc_bg_rates[k][i] += BGrule_coeff[k][j] * 
-		glb_calc_chra[BGrules[k][j]][i];
-	    }
-	  
-	  glb_calc_signal_rates[k][i]=0;
-	  for (j=0;j<rule_length[k];j++)
-	    {
-	      glb_calc_signal_rates[k][i] += rule_coeff[k][j] * 
-		glb_calc_chra[rules[k][j]][i];
-	    } 
-	}     
-    }  
-}
-
-
-//-----------------------------------------
-//-----   Smearing                 --------
-//-----------------------------------------
 
 
 
-//this does the actual folding
-
-static double* SmearRates(double* rates, int pl)
-{
-  int i;
-  int j;
-  double* rateout;
-  rateout = (double*) glb_malloc(bins*sizeof(double));
-  
-  for (i=0; i<bins; i++)
-    {
-      rateout[i]=0;
-      for (j=glb_calc_lowrange[pl][i]; j<glb_calc_uprange[pl][i]+1; j++)
-	{
-	  rateout[i] += glb_calc_smearing[pl][i][j-glb_calc_lowrange[pl][i]]* rates[j];
-	}
-      rateout[i]=rateout[i]*glb_calc_smear_data[pl]->simbinsize[i];
-    }
-  
-  for(i=0;i<bins;i++) rates[i]=rateout[i];  
-  glb_free(rateout);
-  return rates;
-}
-
-
-static void SmearAllChannels(int mode)
-{
-  int i,k,l,s;
-  
-  for(k=0;k<num_of_ch;k++)
-    {
-      if(!((mode!=0)&&((channel_list[k][2]>9)||(channel_list[k][3]>9))))
-	{
-	  s=channel_list[k][5];
-	  for(i=0;i<bins;i++)
-	    {
-	      glb_calc_chra[k][i]=0;
-	      for(l=glb_calc_lowrange[s][i]; l<glb_calc_uprange[s][i]+1; l++)
-		{
-		  glb_calc_chra[k][i] += glb_calc_smearing[s][i][l-glb_calc_lowrange[s][i]]
-		    *glb_calc_chrb[k][l];
-		}
-	      glb_calc_chra[k][i]=glb_calc_chra[k][i] * glb_calc_user_post_sm_channel[k][i]
-		+ glb_calc_user_post_sm_background[k][i];
-	    }
-	}    
-    }
-}
-
-static void SmearAllChannelsTilt(int mode)
-{
-  int i,k,l,s;
-  
-  for(k=0;k<num_of_ch;k++)
-    {
-      if(!((mode!=0)&&((channel_list[k][2]>9)||(channel_list[k][3]>9))))
-	{
-	  s=channel_list[k][5];
-	  for(i=0;i<bins;i++)
-	    {
-	      glb_calc_chra[k][i]=0;
-	      for(l=glb_calc_lowrange[s][i]; l<glb_calc_uprange[s][i]+1; l++)
-		{
-		  glb_calc_chra[k][i] += glb_calc_smearing[s][i][l-glb_calc_lowrange[s][i]]
-		    *glb_calc_chrb[k][l]
-		    *glb_sbin_center(l,glb_calc_smear_data[s]);
-		}
-	      glb_calc_chra[k][i]=glb_calc_chra[k][i] * glb_calc_user_post_sm_channel[k][i]
-		+ glb_calc_user_post_sm_background[k][i];
-	    }
-	}
-    }
-}
+// FIXME: When fixing BUG#11, this will have to be modified, rewritten, or deleted
+//static void SmearAllChannelsTilt(int mode)
+//{
+//  int i,k,l,s;
+//  
+//  for(k=0;k<num_of_ch;k++)
+//    {
+//      if(!((mode!=GLB_MODE_TRUE)&&((channel_list[k][2]>9)||(channel_list[k][3]>9))))
+//	{
+//	  s=channel_list[k][5];
+//	  for(i=0;i<bins;i++)
+//	    {
+//	      glb_calc_chra[k][i]=0;
+//	      for(l=glb_calc_lowrange[s][i]; l<glb_calc_uprange[s][i]+1; l++)
+//		{
+//		  glb_calc_chra[k][i] += glb_calc_smearing[s][i][l-glb_calc_lowrange[s][i]]
+//		    *glb_calc_chrb[k][l]
+//		    *glb_sbin_center(l,glb_calc_smear_data[s]);
+//		}
+//	      glb_calc_chra[k][i]=glb_calc_chra[k][i] * glb_calc_user_post_sm_channel[k][i]
+//		+ glb_calc_user_post_sm_background[k][i];
+//	    }
+//	}
+//    }
+//}
 
 
 void glb_shift_energy_scale(double g,double* ratesin, double* ratesout)
@@ -712,62 +604,181 @@ void glb_shift_energy_scale(double g,double* ratesin, double* ratesout)
     }
 }
 
-/* Set rate vector(s) */
 
-
+/* *************************************************************************
+ * Function glb_set_rates                                                  *
+ * *************************************************************************
+ * Calculate the "true" event rates for the current experiment.            *
+ * *************************************************************************/
 void glb_set_rates()
 {
-  int i;
-  int j;
-
+  int i, j, k, s;
+  double current_rule_rate;
  
-  BinnedSignalB(0);
-  for(i=0;i<bins;i++) glb_calc_energy_tab[i]=BinEnergy(i);
-
-  for (i=0;i<glb_num_of_rules;i++)
+  for(j=0; j < bins; j++)
+    glb_calc_energy_tab[j] = BinEnergy(j);
+  
+  /* Calculate pre-smearing rates for all channels */
+  for (j=0; j < glb_calc_simbins; j++)
+  {
+    /* Calculate probability matrix */
+    CalcAllProbs(glb_sbin_center(j, glb_calc_smear_data[0]), baseline);
+    for(i=0; i < num_of_ch; i++)
     {
-      for (j=0; j<bins;j++)
-	{
-	  glb_calc_buffer[j]=(glb_calc_signal_rates[i][j]+ (glb_calc_bg_rates[i][j])*
-		  (glb_bg_norm_center[i]));
-	   
-	}
-    
-      for(j=0;j<bins;j++) glb_calc_rates_0[i][j]=glb_calc_buffer[j] 
-			    *errorf(glb_tre_null_center[i],glb_tre_tilt_center[i],j)
-			    *glb_window_function(glb_calc_energy_window[i][0],
-					     glb_calc_energy_window[i][1],j);
+      /* Calculate rate and incorporare pre-smearing efficiencies and
+       * pre-smearing backgrounds */
+      s = channel_list[i][5];
+      glb_calc_chrb_0[i][j] = glb_calc_channel(i, glb_sbin_center(j,glb_calc_smear_data[s]),
+                                               baseline)
+              * glb_calc_user_pre_sm_channel[i][j] 
+              * glb_calc_smear_data[s]->simbinsize[j]
+              + glb_calc_user_pre_sm_background[i][j];
 
+      /* If NOSC-flag was set in glb-file, the "true" and fitted rates
+       * are identical --> store them also in glb_calc_chrb_1 */
+      if ((channel_list[i][2] > 9 || channel_list[i][3] > 9))
+        glb_calc_chrb_1[i][j] = glb_calc_chrb_0[i][j];
     }
- 
+  }
+  
+  /* Calculate post-smearing rates for all channels */
+  for(i=0; i < num_of_ch; i++)
+  {
+    s = channel_list[i][5];
+    for(j=0; j < bins; j++)
+    {
+      /* Apply smearing matrix */
+      glb_calc_chra_0[i][j] = 0;
+      for(k=glb_calc_lowrange[s][j]; k < glb_calc_uprange[s][j]+1; k++)
+      {
+        glb_calc_chra_0[i][j] += glb_calc_smearing[s][j][k-glb_calc_lowrange[s][j]]
+                                   * glb_calc_chrb_0[i][k];
+      }
 
+      /* Apply post-smearing efficiencies and post-smearing backgrounds */
+      glb_calc_chra_0[i][j] = glb_calc_chra_0[i][j] * glb_calc_user_post_sm_channel[i][j]
+                                  + glb_calc_user_post_sm_background[i][j];
+    }
+      
+    /* If NOSC-flag was set in glb-file, the "true" and fitted rates
+     * are identical --> store them also in glb_calc_chra_1 */
+    if ((channel_list[i][2] > 9 || channel_list[i][3] > 9))
+      for(j=0; j < bins; j++)
+        glb_calc_chra_1[i][j] = glb_calc_chra_0[i][j];
+  }
+
+  /* Merge channel rates into signal, background, and total rates */
+  for(i=0; i < glb_num_of_rules; i++)
+  {
+    for(j=0; j < bins; j++)
+    {
+      /* Background */
+      glb_calc_bg_rates[i][j] = 0.0;
+      for (k=0; k < BGrule_length[i]; k++)
+        glb_calc_bg_rates[i][j] += BGrule_coeff[i][k] * glb_calc_chra_0[BGrules[i][k]][j];
+         
+      /* Signal */
+      glb_calc_signal_rates[i][j] = 0.0; 
+      for (k=0; k < rule_length[i]; k++)
+        glb_calc_signal_rates[i][j] += rule_coeff[i][k] * glb_calc_chra_0[rules[i][k]][j];
+
+      /* Total */
+      current_rule_rate = glb_calc_signal_rates[i][j]
+                               + glb_calc_bg_rates[i][j]*glb_bg_norm_center[i];
+      glb_calc_rates_0[i][j] = current_rule_rate 
+              * errorf(glb_tre_null_center[i],glb_tre_tilt_center[i],j)
+              * glb_window_function(glb_calc_energy_window[i][0],
+                                    glb_calc_energy_window[i][1],j);
+    }     
+  }
 }
 
+
+/* *************************************************************************
+ * Function glb_set_new_rates                                              *
+ * *************************************************************************
+ * Calculate the fitted event rates for the current experiment.            *
+ * *************************************************************************/
 void glb_set_new_rates()
 {
-  int i;
-  int j;
- 
-  
-  
-  BinnedSignalB(1);
-  for (i=0;i<glb_num_of_rules;i++)
-    {
-      for (j=0;j<bins;j++) glb_calc_rates_1[i][j]= glb_calc_signal_rates[i][j];
+  int i, j, k, s;
 
-      for (j=0;j<bins;j++) glb_calc_rates_1BG[i][j]= glb_calc_bg_rates[i][j];
-    }
- 
-  /* FIXME add. glb_calc_buffer for tiltet rates prob. safer */
-  SmearAllChannelsTilt(1);
-  for (i=0;i<glb_num_of_rules;i++)
+  /* Calculate pre-smearing rates for all channels */
+  for (j=0; j < glb_calc_simbins; j++)
+  {
+    /* Calculate probability matrix */
+    CalcAllProbs(glb_sbin_center(j, glb_calc_smear_data[0]), baseline);
+    for(i=0; i < num_of_ch; i++)
     {
-      for (j=0;j<bins;j++) glb_calc_rates_1T[i][j]= glb_calc_signal_rates[i][j];
-      for (j=0;j<bins;j++) glb_calc_rates_1BGT[i][j]= glb_calc_bg_rates[i][j];
-      
+      /* Recalculate rates only if NOSC-flag was not set in glb-file */
+      if (channel_list[i][2] <= 9 && channel_list[i][3] <= 9)
+      {
+        s = channel_list[i][5];
+        glb_calc_chrb_1[i][j] = glb_calc_channel(i, glb_sbin_center(j,glb_calc_smear_data[s]),
+                                                 baseline)
+                * glb_calc_user_pre_sm_channel[i][j] 
+                * glb_calc_smear_data[s]->simbinsize[j]
+                + glb_calc_user_pre_sm_background[i][j];
+      }
     }
- 
+  }
+  
+  /* Calculate post-smearing rates for all channels */
+  for(i=0; i < num_of_ch; i++)
+  {
+    /* Recalculate rates only if NOSC-flag was not set in glb-file */
+    if (channel_list[i][2] <= 9 && channel_list[i][3] <= 9)
+    {
+      s = channel_list[i][5];
+      for(j=0; j < bins; j++)
+      {
+        glb_calc_chra_1[i][j] = 0.0;
+        for(k=glb_calc_lowrange[s][j]; k < glb_calc_uprange[s][j]+1; k++)
+        {
+          glb_calc_chra_1[i][j] += glb_calc_smearing[s][j][k-glb_calc_lowrange[s][j]]
+                                     * glb_calc_chrb_1[i][k];
+        }
+        glb_calc_chra_1[i][j] = glb_calc_chra_1[i][j] * glb_calc_user_post_sm_channel[i][j]
+                                    + glb_calc_user_post_sm_background[i][j];
+      }
+    }
+  }
+
+  /* Merge channel rates into signal and background rates */
+  for(i=0; i < glb_num_of_rules; i++)
+  {
+    for(j=0; j < bins; j++)
+    {
+      glb_calc_rates_1BG[i][j] = 0.0;
+      for (k=0; k < BGrule_length[i]; k++)
+        glb_calc_rates_1BG[i][j] += BGrule_coeff[i][k] * glb_calc_chra_1[BGrules[i][k]][j];
+         
+      glb_calc_rates_1[i][j] = 0.0; 
+      for (k=0; k < rule_length[i]; k++)
+        glb_calc_rates_1[i][j] += rule_coeff[i][k] * glb_calc_chra_1[rules[i][k]][j];
+    }
+  }
+   
+  
+  /* FIXME add. glb_calc_buffer for tiltet rates prob. safer */
+//  SmearAllChannelsTilt(GLB_MODE_FIT);  FIXME JK - Here is BUG#11
+//  for (i=0;i<glb_num_of_rules;i++)
+//  {
+//    for (j=0; j < bins; j++)
+//      glb_calc_rates_1T[i][j] = glb_calc_signal_rates[i][j];
+//    for (j=0; j < bins; j++)
+//      glb_calc_rates_1BGT[i][j] = glb_calc_bg_rates[i][j];
+//  }
+//  
+  for (i=0;i<glb_num_of_rules;i++)
+  {
+    for (j=0; j < bins; j++)
+      glb_calc_rates_1T[i][j] = glb_calc_rates_1[i][j];
+    for (j=0; j < bins; j++)
+      glb_calc_rates_1BGT[i][j] = glb_calc_rates_1BG[i][j];
+  }
 }
+
 
 
 /* // ---------------------------------------- */
@@ -1167,99 +1178,6 @@ double glb_chi_sys_w_bg_calib(double x[5])
   
 }
 
-// reprogrammed on 12.09.02
-//______________________________________________________
-//Acces to glb_calc_ratevectors
-//______________________________________________________
-
-static double signal_parts(int cn, int k, double en, double baseline)
-{
-  double ergebnis;  
-  ergebnis = rule_coeff[cn][k] * glb_calc_channel(rules[cn][k],en,baseline);
-  return ergebnis;
-}
-
-static double background_parts(int cn, int k, double en, double baseline)
-{
-  double ergebnis;
-  ergebnis = BGrule_coeff[cn][k] * glb_calc_channel(BGrules[cn][k],en,baseline);
-  return ergebnis;
-}
-
-static void binned_signal_parts(int rulenumber,int partnumber,double* inrates)
-{
-  int i;
-  double beam_energy = glb_get_max_energy(); 
-  int k;
- 
-  double deltae2=(beam_energy-treshold)/bins;
-  double deltae = (glb_calc_simbeam-glb_calc_simtresh)/glb_calc_simbins;
-  
-  k=rulenumber;
- 
-  for (i=0; i<glb_calc_simbins; i++)
-    {
-      CalcAllProbs(glb_calc_simtresh+(0.5+i)*deltae,baseline);
-      inrates[i]=signal_parts(k,partnumber,glb_calc_simtresh + (0.5+i)*deltae,baseline)*deltae2; 
-    }
-}
-
-static void binned_background_parts(int rulenumber,int partnumber,double* inrates)
-{
-  int i;
-  double beam_energy = glb_get_max_energy(); 
-  int k;
-  
-  double deltae2=(beam_energy-treshold)/bins;
-  double deltae = (glb_calc_simbeam-glb_calc_simtresh)/glb_calc_simbins;
-  
-  
-  k=rulenumber;
- 
-  for (i=0; i<glb_calc_simbins; i++)
-    {
-      CalcAllProbs(glb_calc_simtresh+(0.5+i)*deltae,baseline);
-      inrates[i]=background_parts(k,partnumber,glb_calc_simtresh + (0.5+i)*deltae,baseline)*deltae2*glb_bg_norm_center[k]; 
-    }
-}
-
-// bug fixed in Returnglb_calc_signal_rates and glb_calc_bg_rates on 25.01.03
-// SmearRates was called with the second argument 1, but
-// correctly its i (the rulenumber)
-
-static void Returnglb_calc_signal_rates(int rulenumber, int partnumber, double* inrates)
-{
-  int i;
-  int j;
-
-  double* out;
-  i=rulenumber;
-  out=inrates;
- 
-  binned_signal_parts(i,partnumber,out);
-  for(j=0;j<bins;j++) glb_calc_energy_tab[j]=BinEnergy(j);
-  out=SmearRates(out,i);
-  for(j=0;j<bins;j++) out[j]=out[j] * errorf(glb_tre_null_center[i],glb_tre_tilt_center[i],j)*glb_window_function(glb_calc_energy_window[i][0],glb_calc_energy_window[i][1],j);
-}
-
-static void Returnglb_calc_bg_rates(int rulenumber, int partnumber, double* inrates)
-{
-  int i;
-  int j;
-
-  double* out;
-  i=rulenumber;
-  out=inrates;
- 
-  binned_background_parts(i,partnumber,out);
-  
-  for(j=0;j<bins;j++) glb_calc_energy_tab[j]=BinEnergy(j);
-  out=SmearRates(out,i);
-  for(j=0;j<bins;j++) out[j]=out[j] * errorf(glb_tre_null_center[i],glb_tre_tilt_center[i],j)*glb_window_function(glb_calc_energy_window[i][0],glb_calc_energy_window[i][1],j);
- 
-}
-
-
 
 // function for avoiding malloc problems
 
@@ -1276,20 +1194,18 @@ void glb_remove_calc_pointers()
       BGrule_coeff[k]=NULL;
       glb_calc_signal_rates[k]=NULL;
       glb_calc_bg_rates[k]=NULL; 
-      signal_prefactors[k]=NULL;
-      background_prefactors[k]=NULL;
       glb_calc_rates_0[k]=NULL;
       glb_calc_rates_1[k]=NULL;
       glb_calc_rates_1T[k]=NULL;
       glb_calc_rates_1BG[k]=NULL;
       glb_calc_rates_1BGT[k]=NULL;
       glb_calc_energy_tab=NULL;
-      glb_calc_ratevec[k]=NULL;
-      glb_calc_glb_calc_ratevec_bg[k]=NULL;
       glb_calc_efficiencies[k]=NULL;
       glb_calc_const_background[k]=NULL;
-      glb_calc_chra[k]=NULL;
-      glb_calc_chrb[k]=NULL;
+      glb_calc_chra_0[k]=NULL;
+      glb_calc_chra_1[k]=NULL;
+      glb_calc_chrb_0[k]=NULL;
+      glb_calc_chrb_1[k]=NULL;
     }
   glb_calc_buffer=NULL;
   smm=NULL;

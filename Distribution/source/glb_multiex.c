@@ -354,8 +354,10 @@ void glbInitExp(glb_exp ins)
   for(i=0;i<32;i++) in->smear[i]=NULL;
   for(i=0;i<32;i++) in->lowrange[i]=NULL;
   for(i=0;i<32;i++) in->uprange[i]=NULL; 
- for(i=0;i<32;i++) in->chrb[i]=NULL; 
- for(i=0;i<32;i++) in->chra[i]=NULL; 
+ for(i=0;i<32;i++) in->chrb_0[i]=NULL; 
+ for(i=0;i<32;i++) in->chrb_1[i]=NULL; 
+ for(i=0;i<32;i++) in->chra_0[i]=NULL; 
+ for(i=0;i<32;i++) in->chra_1[i]=NULL; 
  in->buffer=NULL;
   in->simtresh=-1;
   in->simbeam=-1;
@@ -385,8 +387,6 @@ void glbInitExp(glb_exp ins)
       in->rates1T[i]=NULL;
       in->rates1BG[i]=NULL;
       in->rates1BGT[i]=NULL;
-      in->ratevec[i]=NULL;
-      in->ratevecBG[i]=NULL;
     }
   in->energy_tab=NULL;
   for(i=0;i<32;i++) in->no_osc_background[i]=NULL;
@@ -438,8 +438,10 @@ void glbFreeExp(glb_exp ins)
     }
   for(i=0;i<in->numofchannels;i++) 
     {
-      my_free(in->chrb[i]);
-      my_free(in->chra[i]);
+      my_free(in->chrb_0[i]);
+      my_free(in->chrb_1[i]);
+      my_free(in->chra_0[i]);
+      my_free(in->chra_1[i]);
       my_free(in->user_pre_smearing_channel[i]);
       my_free(in->user_post_smearing_channel[i]);
       my_free(in->user_pre_smearing_background[i]);
@@ -460,8 +462,6 @@ void glbFreeExp(glb_exp ins)
       my_free(in->rates1T[i]);
       my_free(in->rates1BG[i]);
       my_free(in->rates1BGT[i]);
-      my_free(in->ratevec[i]);
-      my_free(in->ratevecBG[i]);
     }
   my_free(in->energy_tab);
   my_free(in);
@@ -843,14 +843,19 @@ int glbDefaultExp(glb_exp ins)
 	 in->rates1[i]==NULL||
 	 in->rates1T[i]==NULL||
 	 in->rates1BG[i]==NULL||
-	 in->rates1BGT[i]==NULL||
-	 in->ratevec[i]==NULL||
-	 in->ratevecBG[i]==NULL){glb_error("No memory for ratevectors"
-					   " allocated!");status=-1;};
+	 in->rates1BGT[i]==NULL)
+      {
+        glb_error("No memory for ratevectors allocated!");
+        status=-1;
+      }
 
-      if(in->chrb[i]==NULL||in->chra[i]==NULL
-	 ||in->buffer==NULL){glb_error("No memory for convolution"
-					   " allocated!");status=-1;};
+      if(in->chrb_0[i]==NULL || in->chrb_1[i]==NULL ||
+         in->chra_0[i]==NULL || in->chra_1[i]==NULL ||
+	 in->buffer==NULL)
+      {
+        glb_error("No memory for convolution allocated!");
+        status=-1;
+      }
     }
   if(in->energy_tab==NULL){glb_error("energy_tab not allocated!");
   status=-1;}
@@ -923,8 +928,6 @@ static void MMovePointers(struct glb_experiment *in)
       glb_calc_rates_1T[k] = in->rates1T[k];
       glb_calc_rates_1BG[k] = in->rates1BG[k];
       glb_calc_rates_1BGT[k] = in->rates1BGT[k];
-      glb_calc_ratevec[k] = in->ratevec[k];
-      glb_calc_glb_calc_ratevec_bg[k] = in->ratevecBG[k]; 
       glb_calc_signal_rates[k] = in->SignalRates[k]; 
       glb_calc_bg_rates[k] = in->BackgroundRates[k];
       /* FIXME -- wrong number */ 
@@ -933,8 +936,10 @@ static void MMovePointers(struct glb_experiment *in)
   for(k=0;k<in->num_of_sm;k++) glb_calc_smear_data[k]=in->smear_data[k];
   for(k=0;k<in->numofchannels;k++)
     {
-      glb_calc_chrb[k]=in->chrb[k];
-      glb_calc_chra[k]=in->chra[k];
+      glb_calc_chrb_0[k] = in->chrb_0[k];
+      glb_calc_chrb_1[k] = in->chrb_1[k];
+      glb_calc_chra_0[k] = in->chra_0[k];
+      glb_calc_chra_1[k] = in->chra_1[k];
       glb_calc_user_pre_sm_channel[k]=in->user_pre_smearing_channel[k];
       glb_calc_user_post_sm_channel[k]= in->user_post_smearing_channel[k];
       glb_calc_user_pre_sm_background[k]=in->user_pre_smearing_background[k];
@@ -971,8 +976,6 @@ static struct glb_experiment MInitMemory0(struct glb_experiment in)
 	  out.rates1T[k] = (double*) glb_malloc( len*sizeof(double));
 	  out.rates1BG[k] = (double*) glb_malloc( len*sizeof(double));
 	  out.rates1BGT[k] = (double*) glb_malloc( len*sizeof(double));
-	  out.ratevec[k] = (double*) glb_malloc( len*sizeof(double));
-	  out.ratevecBG[k] = (double*) glb_malloc( len*sizeof(double));  
 	  if(out.simbins<=0) glb_error("Too few simbins defined!");
 	  else
 	    {
@@ -986,10 +989,20 @@ static struct glb_experiment MInitMemory0(struct glb_experiment in)
     }
   for(k=0;k<out.numofchannels;k++)
     {
-      if(out.simbins<=0) glb_error("Too few simbins defined!");
-      else out.chrb[k] = (double*) glb_malloc(out.simbins*sizeof(double)); 
-      if(out.numofbins<=0) glb_error("Too few bins defined!"); 
-      else out.chra[k] = (double*) glb_malloc(out.numofbins*sizeof(double));
+      if (out.simbins <= 0)
+        glb_error("Too few simbins defined!");
+      else
+      {
+        out.chrb_0[k] = (double*) glb_malloc(out.simbins*sizeof(double)); 
+        out.chrb_1[k] = (double*) glb_malloc(out.simbins*sizeof(double)); 
+      }
+      if (out.numofbins <= 0)
+        glb_error("Too few bins defined!"); 
+      else
+      {
+        out.chra_0[k] = (double*) glb_malloc(out.numofbins*sizeof(double));
+        out.chra_1[k] = (double*) glb_malloc(out.numofbins*sizeof(double));
+      }
     } 
   if(out.psteps<=0) glb_error("Too few density steps defined!");
   else if (out.densitybuffer==NULL) out.densitybuffer=(double*) 

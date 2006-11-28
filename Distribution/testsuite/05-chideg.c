@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
   double sdm = 7e-5;
   double ldm = 2e-3;
   
-	/* Initialize parameter vector(s) */
+  /* Initialize parameter vector(s) */
   glb_params true_values = glbAllocParams();
   glb_params starting_values = glbAllocParams();
   glb_params input_errors = glbAllocParams();
@@ -78,7 +78,7 @@ int main(int argc, char *argv[])
    
   printf("Position of degeneracy: s22th13=%g, deltacp=%g; Confidence level: %g \n",
     glbGetOscParams(deg_pos,GLB_THETA_13),glbGetOscParams(deg_pos,GLB_DELTA_CP),CL);
-  
+
   /* If degeneracy at low enough confidence level: compute section */
   if(CL<9.0)
   {

@@ -12,7 +12,7 @@ glb_rate_engine.c  \
 glb_minimize.h  glb_error.h glb_path.h glb_parser_addons.h glb_multiex.h glb_probability.h glb_smear.h \
 glb_rate_engine.h glb_types.h glb_parser.h glb_min_sup.h  glb_version.h \
 glb_lexer.h glb_fluxes.h glb_parser_type.h glb_wrapper.h\
-glb_profile.h  glb_glb.c  glb_prior.h glb_prior.c
+glb_profile.h  glb_glb.c  glb_prior.h glb_prior.c glb_compat.c
 
 
 libglobes_la_LDFLAGS = @LIBS@ -version-info @GLBLIBVERSION@

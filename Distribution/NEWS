@@ -493,3 +493,67 @@ documented!
        of variables and list. I ran 'valgrind' (found and fixed a
        minor memory leak). The new parser is clean, no memory leaks
        (at least with my test case).
+
+15/11/2006 WW -- fixed problem in glb_lexer.c (incompatibility with new
+       flex version)
+
+27/11/2006 JK
+       - Renamed some of the glbChiXXX functions to avoid confusion.
+         The old versions are still available as wrappers in the new file
+         glb_compat.c
+       - Renamed the constants GLB_DM_SOL -> GLB_DM_21 and
+         GLB_DM_ATM -> GLB_DM_31. Old versions are still available for
+         compatibility.
+       - Modifed constant definitions in globes.h by using enum-constructs
+       - Applied the modification from 15/11/2006 also in glb_lexer.l
+       Verification: Examples still compile, testsuite programs 03/04/05/06
+         produce no errors.
+       - Introduced function glbConstantDensityProbability
+       Verification: Checked that glbConstantDensityProbability gives the
+         same results as glbProfileProbability with the same parameters
+
+28/11/2006 JK
+       - Introduced the following functions
+           glbGetRuleRatePtr
+           glbGetSignalRatePtr
+           glbGetBGRatePtr
+           glbGetSignalFitRatePtr
+           glbGetBGFitRatePtr
+           glbGetEfficiencyPtr
+           glbGetBackgroundPtr
+       - Introduced glbGetChannelRatePtr and glbGetChannelFitRatePtr
+         This required to promote chra/chrb to new arrays chra_0/chrb_0
+         and chra_1/chrb_1 storing the true and fitted rates separately.
+         The (now deprecated) function glbGetChannelRates will
+         always return the _true_ rates (in the past, the behavior of
+         this function was somewhat undefined after calls to glbChiXXX)
+       Verification: Checked that the functions are callable and produce
+         meaningful results.
+
+       - The above modification required some code duplication in
+         the rate engine. I used this chance to rewrite parts of
+         glb_rate_engine.c: The functions BinnedSignalB, CalcAllChannels,
+         and SmearAllChannels have been REMOVED. The respective code
+         is now directly in glb_set_rates and glb_set_new_rates.
+       - The arrays SignalRates and BackgroundRates in struct glb_experiment
+         hold now the "true" signal and background rates. In the past,
+         they were only used for intermediate results.
+       - Removed the following unused arrays form the rate engine
+         (and if necessary also from struct glb_experiment):
+           ratevec
+           ratevecBG
+           signal_prefactors
+           background_prefactors
+       - Removed the following unused functions from the rate engine
+           signal_parts
+           background_parts
+           binned_signal_parts
+           binned_background_parts
+           Returnglb_calc_signal_rates
+           Returnglb_calc_bg_rates
+           SmearRates
+       Verification: tesuite programs 03/04/06 produce no errors, 05
+         yields minor deviations which originate from different
+         compiler optimizations in the last loop of glb_set_rates.
+
+

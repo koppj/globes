@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 # PERL script to results from the GLoBES testsuite
 
-$THRESHOLD = 1e-2;
+$THRESHOLD = 1e-5;
 
 if ($ARGV[0] eq "" || $ARGV[1] eq "")
 {

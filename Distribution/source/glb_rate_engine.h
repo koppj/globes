@@ -128,8 +128,6 @@ extern double* glb_calc_rates_1T[32];
 extern double* glb_calc_rates_1BG[32];
 extern double* glb_calc_rates_1BGT[32];
 extern double* glb_calc_energy_tab;
-extern double* glb_calc_ratevec[32];
-extern double* glb_calc_glb_calc_ratevec_bg[32];
 
 extern glb_smear *glb_calc_smear_data[32];
 
@@ -137,8 +135,10 @@ extern glb_flux *glb_calc_fluxes[32];
 extern glb_xsec *glb_calc_xsecs[32];
 
 extern double *glb_calc_buffer;
-extern double *glb_calc_chrb[32];
-extern double *glb_calc_chra[32];
+extern double *glb_calc_chrb_0[32];
+extern double *glb_calc_chrb_1[32];
+extern double *glb_calc_chra_0[32];
+extern double *glb_calc_chra_1[32];
 
 extern double *glb_calc_user_pre_sm_channel[32];
 extern double *glb_calc_user_post_sm_channel[32];
