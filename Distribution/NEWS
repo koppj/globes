@@ -556,4 +556,10 @@ documented!
          yields minor deviations which originate from different
          compiler optimizations in the last loop of glb_set_rates.
 
+29/11/2006 JK
+       - Made GLB_OSCP a variable and introduced hooks for glb_probability_matrix,
+         glb_set_oscillation_parameters, and glb_get_oscillation_parameters.
+       Verification: Works with the standard probability code.
+         Has still to be verified for > 6 parameters.
+
 

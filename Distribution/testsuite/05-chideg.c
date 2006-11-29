@@ -75,7 +75,7 @@ int main(int argc, char *argv[])
   glbSetStartingValues(starting_values);
   glbSetInputErrors(input_errors);
   double CL=glbChiAll(starting_values,deg_pos,GLB_ALL);
-   
+
   printf("Position of degeneracy: s22th13=%g, deltacp=%g; Confidence level: %g \n",
     glbGetOscParams(deg_pos,GLB_THETA_13),glbGetOscParams(deg_pos,GLB_DELTA_CP),CL);
 

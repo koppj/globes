@@ -453,7 +453,7 @@ int main(int argc, char *argv[])
     {
       rv=sscanf(central_values,"%lf , %lf , %lf , %lf , %lf , %lf",&osc[0],
 	     &osc[1],&osc[2],&osc[3],&osc[4],&osc[5]);
-      if(rv!=GLB_OSCP) 
+      if(rv!=glbGetNumOfOscParams()) 
 	{
 	  fprintf(stderr,"%s: FATAL: Wrong format for oscillation"
 		  " parameters from environment variable GLB_CENTRAL_VALUES\n"
@@ -468,7 +468,7 @@ int main(int argc, char *argv[])
     {
       rv=sscanf(arguments.params,"%lf , %lf , %lf , %lf , %lf , %lf",&osc[0],
 	     &osc[1],&osc[2],&osc[3],&osc[4],&osc[5]);
-      if(rv!=GLB_OSCP) 
+      if(rv!=glbGetNumOfOscParams()) 
 	{
 	  fprintf(stderr,"%s: FATAL: Wrong format for oscillation"
 		  " parameters\n ",argv[0]);

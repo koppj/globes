@@ -503,7 +503,7 @@ SWIG_UnpackDataName(const char *c, void *ptr, size_t sz, const char *name) {
  * perl5.swg
  *
  * Perl5 runtime library
- * $Header: /home/lin/globes/cvs-noaccess/Projects/GLOBES/Distribution/globes/globes_perl.c,v 1.11 2006/11/28 20:47:20 globes Exp $
+ * $Header: /home/lin/globes/cvs-noaccess/Projects/GLOBES/Distribution/globes/globes_perl.c,v 1.12 2006/11/29 12:37:10 globes Exp $
  * ----------------------------------------------------------------------------- */
 
 #define SWIGPERL
@@ -999,19 +999,21 @@ SWIG_Perl_SetModule(swig_module_info *module) {
 
 #define SWIGTYPE_p_FILE swig_types[0]
 #define SWIGTYPE_p_double swig_types[1]
-#define SWIGTYPE_p_f_a___double__double swig_types[2]
-#define SWIGTYPE_p_glb_experiment swig_types[3]
-#define SWIGTYPE_p_glb_params_type swig_types[4]
-#define SWIGTYPE_p_glb_projection_type swig_types[5]
-#define SWIGTYPE_p_int swig_types[6]
-#define SWIGTYPE_p_lt_dlhandle_struct swig_types[7]
-#define SWIGTYPE_p_p_char swig_types[8]
-#define SWIGTYPE_p_p_double swig_types[9]
-#define SWIGTYPE_p_p_glb_experiment swig_types[10]
-#define SWIGTYPE_p_size_t swig_types[11]
-#define SWIGTYPE_p_void swig_types[12]
-static swig_type_info *swig_types[14];
-static swig_module_info swig_module = {swig_types, 13, 0, 0, 0, 0};
+#define SWIGTYPE_p_f_a_3__a_3__double_int_double_int_p_q_const__double_p_q_const__double_double__int swig_types[2]
+#define SWIGTYPE_p_f_a___double__double swig_types[3]
+#define SWIGTYPE_p_f_p_struct_glb_params_type__int swig_types[4]
+#define SWIGTYPE_p_glb_experiment swig_types[5]
+#define SWIGTYPE_p_glb_params_type swig_types[6]
+#define SWIGTYPE_p_glb_projection_type swig_types[7]
+#define SWIGTYPE_p_int swig_types[8]
+#define SWIGTYPE_p_lt_dlhandle_struct swig_types[9]
+#define SWIGTYPE_p_p_char swig_types[10]
+#define SWIGTYPE_p_p_double swig_types[11]
+#define SWIGTYPE_p_p_glb_experiment swig_types[12]
+#define SWIGTYPE_p_size_t swig_types[13]
+#define SWIGTYPE_p_void swig_types[14]
+static swig_type_info *swig_types[16];
+static swig_module_info swig_module = {swig_types, 15, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -1190,6 +1192,289 @@ XS(_wrap_glbInit) {
         glbInit(arg1);
         
         
+        XSRETURN(argvi);
+        fail:
+        ;
+    }
+    croak(Nullch);
+}
+
+
+XS(_wrap_glbAllocExp) {
+    {
+        glb_exp result;
+        int argvi = 0;
+        dXSARGS;
+        
+        if ((items < 0) || (items > 0)) {
+            SWIG_croak("Usage: glbAllocExp();");
+        }
+        result = (glb_exp)glbAllocExp();
+        
+        ST(argvi) = sv_newmortal();
+        SWIG_MakePtr(ST(argvi++), (void *) result, SWIGTYPE_p_glb_experiment, 0|0);
+        XSRETURN(argvi);
+        fail:
+        ;
+    }
+    croak(Nullch);
+}
+
+
+XS(_wrap_glbClearExperimentList) {
+    {
+        int argvi = 0;
+        dXSARGS;
+        
+        if ((items < 0) || (items > 0)) {
+            SWIG_croak("Usage: glbClearExperimentList();");
+        }
+        glbClearExperimentList();
+        
+        
+        XSRETURN(argvi);
+        fail:
+        ;
+    }
+    croak(Nullch);
+}
+
+
+XS(_wrap_glbDefineAEDLVariable) {
+    {
+        char *arg1 = (char *) 0 ;
+        double arg2 ;
+        int argvi = 0;
+        dXSARGS;
+        
+        if ((items < 2) || (items > 2)) {
+            SWIG_croak("Usage: glbDefineAEDLVariable(name,value);");
+        }
+        if (!SvOK((SV*) ST(0))) arg1 = 0;
+        else arg1 = (char *) SvPV(ST(0), PL_na);
+        arg2 = (double) SvNV(ST(1));
+        
+        glbDefineAEDLVariable((char const *)arg1,arg2);
+        
+        
+        XSRETURN(argvi);
+        fail:
+        ;
+    }
+    croak(Nullch);
+}
+
+
+XS(_wrap_glbClearAEDLVariables) {
+    {
+        int argvi = 0;
+        dXSARGS;
+        
+        if ((items < 0) || (items > 0)) {
+            SWIG_croak("Usage: glbClearAEDLVariables();");
+        }
+        glbClearAEDLVariables();
+        
+        
+        XSRETURN(argvi);
+        fail:
+        ;
+    }
+    croak(Nullch);
+}
+
+
+XS(_wrap_glbInitExperiment) {
+    {
+        char *arg1 = (char *) 0 ;
+        glb_exp *arg2 = (glb_exp *) 0 ;
+        int *arg3 = (int *) 0 ;
+        int result;
+        int argvi = 0;
+        dXSARGS;
+        
+        if ((items < 3) || (items > 3)) {
+            SWIG_croak("Usage: glbInitExperiment(inf,in,counter);");
+        }
+        if (!SvOK((SV*) ST(0))) arg1 = 0;
+        else arg1 = (char *) SvPV(ST(0), PL_na);
+        {
+            if (SWIG_ConvertPtr(ST(1), (void **) &arg2, SWIGTYPE_p_p_glb_experiment,0) < 0) {
+                SWIG_croak("Type error in argument 2 of glbInitExperiment. Expected _p_p_glb_experiment");
+            }
+        }
+        {
+            if (SWIG_ConvertPtr(ST(2), (void **) &arg3, SWIGTYPE_p_int,0) < 0) {
+                SWIG_croak("Type error in argument 3 of glbInitExperiment. Expected _p_int");
+            }
+        }
+        result = (int)glbInitExperiment(arg1,arg2,arg3);
+        
+        ST(argvi) = sv_newmortal();
+        sv_setiv(ST(argvi++), (IV) result);
+        XSRETURN(argvi);
+        fail:
+        ;
+    }
+    croak(Nullch);
+}
+
+
+XS(_wrap_glbSetExperiment) {
+    {
+        glb_exp arg1 = (glb_exp) 0 ;
+        int argvi = 0;
+        dXSARGS;
+        
+        if ((items < 1) || (items > 1)) {
+            SWIG_croak("Usage: glbSetExperiment(in);");
+        }
+        {
+            if (SWIG_ConvertPtr(ST(0), (void **) &arg1, SWIGTYPE_p_glb_experiment,0) < 0) {
+                SWIG_croak("Type error in argument 1 of glbSetExperiment. Expected _p_glb_experiment");
+            }
+        }
+        glbSetExperiment(arg1);
+        
+        
+        XSRETURN(argvi);
+        fail:
+        ;
+    }
+    croak(Nullch);
+}
+
+
+XS(_wrap_glbDefaultExp) {
+    {
+        glb_exp arg1 = (glb_exp) 0 ;
+        int result;
+        int argvi = 0;
+        dXSARGS;
+        
+        if ((items < 1) || (items > 1)) {
+            SWIG_croak("Usage: glbDefaultExp(ins);");
+        }
+        {
+            if (SWIG_ConvertPtr(ST(0), (void **) &arg1, SWIGTYPE_p_glb_experiment,0) < 0) {
+                SWIG_croak("Type error in argument 1 of glbDefaultExp. Expected _p_glb_experiment");
+            }
+        }
+        result = (int)glbDefaultExp(arg1);
+        
+        ST(argvi) = sv_newmortal();
+        sv_setiv(ST(argvi++), (IV) result);
+        XSRETURN(argvi);
+        fail:
+        ;
+    }
+    croak(Nullch);
+}
+
+
+XS(_wrap_glbInitExp) {
+    {
+        glb_exp arg1 = (glb_exp) 0 ;
+        int argvi = 0;
+        dXSARGS;
+        
+        if ((items < 1) || (items > 1)) {
+            SWIG_croak("Usage: glbInitExp(ins);");
+        }
+        {
+            if (SWIG_ConvertPtr(ST(0), (void **) &arg1, SWIGTYPE_p_glb_experiment,0) < 0) {
+                SWIG_croak("Type error in argument 1 of glbInitExp. Expected _p_glb_experiment");
+            }
+        }
+        glbInitExp(arg1);
+        
+        
+        XSRETURN(argvi);
+        fail:
+        ;
+    }
+    croak(Nullch);
+}
+
+
+XS(_wrap_glbFreeExp) {
+    {
+        glb_exp arg1 = (glb_exp) 0 ;
+        int argvi = 0;
+        dXSARGS;
+        
+        if ((items < 1) || (items > 1)) {
+            SWIG_croak("Usage: glbFreeExp(ins);");
+        }
+        {
+            if (SWIG_ConvertPtr(ST(0), (void **) &arg1, SWIGTYPE_p_glb_experiment,0) < 0) {
+                SWIG_croak("Type error in argument 1 of glbFreeExp. Expected _p_glb_experiment");
+            }
+        }
+        glbFreeExp(arg1);
+        
+        
+        XSRETURN(argvi);
+        fail:
+        ;
+    }
+    croak(Nullch);
+}
+
+
+XS(_wrap_glbNameToValue) {
+    {
+        int arg1 ;
+        char *arg2 = (char *) 0 ;
+        char *arg3 = (char *) 0 ;
+        int result;
+        int argvi = 0;
+        dXSARGS;
+        
+        if ((items < 3) || (items > 3)) {
+            SWIG_croak("Usage: glbNameToValue(exp,context,name);");
+        }
+        arg1 = (int) SvIV(ST(0));
+        if (!SvOK((SV*) ST(1))) arg2 = 0;
+        else arg2 = (char *) SvPV(ST(1), PL_na);
+        if (!SvOK((SV*) ST(2))) arg3 = 0;
+        else arg3 = (char *) SvPV(ST(2), PL_na);
+        result = (int)glbNameToValue(arg1,(char const *)arg2,(char const *)arg3);
+        
+        ST(argvi) = sv_newmortal();
+        sv_setiv(ST(argvi++), (IV) result);
+        XSRETURN(argvi);
+        fail:
+        ;
+    }
+    croak(Nullch);
+}
+
+
+XS(_wrap_glbValueToName) {
+    {
+        int arg1 ;
+        char *arg2 = (char *) 0 ;
+        int arg3 ;
+        char *result;
+        int argvi = 0;
+        dXSARGS;
+        
+        if ((items < 3) || (items > 3)) {
+            SWIG_croak("Usage: glbValueToName(exp,context,value);");
+        }
+        arg1 = (int) SvIV(ST(0));
+        if (!SvOK((SV*) ST(1))) arg2 = 0;
+        else arg2 = (char *) SvPV(ST(1), PL_na);
+        arg3 = (int) SvIV(ST(2));
+        result = (char *)glbValueToName(arg1,(char const *)arg2,arg3);
+        
+        ST(argvi) = sv_newmortal();
+        if (result) {
+            sv_setpv((SV*)ST(argvi++), (char *) result);
+        } else {
+            sv_setsv((SV*)ST(argvi++), &PL_sv_undef);
+        }
         XSRETURN(argvi);
         fail:
         ;
@@ -1675,6 +1960,241 @@ XS(_wrap_glbGetOscillationParameters) {
         
         ST(argvi) = sv_newmortal();
         sv_setiv(ST(argvi++), (IV) result);
+        XSRETURN(argvi);
+        fail:
+        ;
+    }
+    croak(Nullch);
+}
+
+
+XS(_wrap_glbShowRuleRates) {
+    {
+        FILE *arg1 = (FILE *) 0 ;
+        int arg2 ;
+        int arg3 ;
+        int arg4 ;
+        int arg5 ;
+        int arg6 ;
+        int arg7 ;
+        int arg8 ;
+        int result;
+        int argvi = 0;
+        dXSARGS;
+        
+        if ((items < 8) || (items > 8)) {
+            SWIG_croak("Usage: glbShowRuleRates(stream,exp,rule,pos,effi,bgi,coeffi,signal);");
+        }
+        {
+            if (SWIG_ConvertPtr(ST(0), (void **) &arg1, SWIGTYPE_p_FILE,0) < 0) {
+                SWIG_croak("Type error in argument 1 of glbShowRuleRates. Expected _p_FILE");
+            }
+        }
+        arg2 = (int) SvIV(ST(1));
+        arg3 = (int) SvIV(ST(2));
+        arg4 = (int) SvIV(ST(3));
+        arg5 = (int) SvIV(ST(4));
+        arg6 = (int) SvIV(ST(5));
+        arg7 = (int) SvIV(ST(6));
+        arg8 = (int) SvIV(ST(7));
+        result = (int)glbShowRuleRates(arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8);
+        
+        ST(argvi) = sv_newmortal();
+        sv_setiv(ST(argvi++), (IV) result);
+        XSRETURN(argvi);
+        fail:
+        ;
+    }
+    croak(Nullch);
+}
+
+
+XS(_wrap_glbShowChannelRates) {
+    {
+        FILE *arg1 = (FILE *) 0 ;
+        int arg2 ;
+        int arg3 ;
+        int arg4 ;
+        int arg5 ;
+        int arg6 ;
+        int result;
+        int argvi = 0;
+        dXSARGS;
+        
+        if ((items < 6) || (items > 6)) {
+            SWIG_croak("Usage: glbShowChannelRates(stream,exp,channel,smearing,effi,bgi);");
+        }
+        {
+            if (SWIG_ConvertPtr(ST(0), (void **) &arg1, SWIGTYPE_p_FILE,0) < 0) {
+                SWIG_croak("Type error in argument 1 of glbShowChannelRates. Expected _p_FILE");
+            }
+        }
+        arg2 = (int) SvIV(ST(1));
+        arg3 = (int) SvIV(ST(2));
+        arg4 = (int) SvIV(ST(3));
+        arg5 = (int) SvIV(ST(4));
+        arg6 = (int) SvIV(ST(5));
+        result = (int)glbShowChannelRates(arg1,arg2,arg3,arg4,arg5,arg6);
+        
+        ST(argvi) = sv_newmortal();
+        sv_setiv(ST(argvi++), (IV) result);
+        XSRETURN(argvi);
+        fail:
+        ;
+    }
+    croak(Nullch);
+}
+
+
+XS(_wrap_glbShowChannelProbs) {
+    {
+        FILE *arg1 = (FILE *) 0 ;
+        int arg2 ;
+        int arg3 ;
+        int arg4 ;
+        int arg5 ;
+        int arg6 ;
+        int result;
+        int argvi = 0;
+        dXSARGS;
+        
+        if ((items < 6) || (items > 6)) {
+            SWIG_croak("Usage: glbShowChannelProbs(stream,exp,channel,smearing,effi,bgi);");
+        }
+        {
+            if (SWIG_ConvertPtr(ST(0), (void **) &arg1, SWIGTYPE_p_FILE,0) < 0) {
+                SWIG_croak("Type error in argument 1 of glbShowChannelProbs. Expected _p_FILE");
+            }
+        }
+        arg2 = (int) SvIV(ST(1));
+        arg3 = (int) SvIV(ST(2));
+        arg4 = (int) SvIV(ST(3));
+        arg5 = (int) SvIV(ST(4));
+        arg6 = (int) SvIV(ST(5));
+        result = (int)glbShowChannelProbs(arg1,arg2,arg3,arg4,arg5,arg6);
+        
+        ST(argvi) = sv_newmortal();
+        sv_setiv(ST(argvi++), (IV) result);
+        XSRETURN(argvi);
+        fail:
+        ;
+    }
+    croak(Nullch);
+}
+
+
+XS(_wrap_glbPrintDelimiter) {
+    {
+        FILE *arg1 = (FILE *) 0 ;
+        int arg2 ;
+        int argvi = 0;
+        dXSARGS;
+        
+        if ((items < 2) || (items > 2)) {
+            SWIG_croak("Usage: glbPrintDelimiter(stream,character);");
+        }
+        {
+            if (SWIG_ConvertPtr(ST(0), (void **) &arg1, SWIGTYPE_p_FILE,0) < 0) {
+                SWIG_croak("Type error in argument 1 of glbPrintDelimiter. Expected _p_FILE");
+            }
+        }
+        arg2 = (int) SvIV(ST(1));
+        glbPrintDelimiter(arg1,arg2);
+        
+        
+        XSRETURN(argvi);
+        fail:
+        ;
+    }
+    croak(Nullch);
+}
+
+
+XS(_wrap_glbSetChannelPrintFunction) {
+    {
+        void *arg1 = (void *) 0 ;
+        void *result;
+        int argvi = 0;
+        dXSARGS;
+        
+        if ((items < 1) || (items > 1)) {
+            SWIG_croak("Usage: glbSetChannelPrintFunction(fp);");
+        }
+        {
+            if (SWIG_ConvertPtr(ST(0), (void **) &arg1, 0,0) < 0) {
+                SWIG_croak("Type error in argument 1 of glbSetChannelPrintFunction. Expected _p_void");
+            }
+        }
+        result = (void *)glbSetChannelPrintFunction(arg1);
+        
+        ST(argvi) = sv_newmortal();
+        SWIG_MakePtr(ST(argvi++), (void *) result, SWIGTYPE_p_void, 0|0);
+        XSRETURN(argvi);
+        fail:
+        ;
+    }
+    croak(Nullch);
+}
+
+
+XS(_wrap_glbSetPrintDelimiters) {
+    {
+        char *arg1 = (char *) 0 ;
+        char *arg2 = (char *) 0 ;
+        char *arg3 = (char *) 0 ;
+        int argvi = 0;
+        dXSARGS;
+        
+        if ((items < 3) || (items > 3)) {
+            SWIG_croak("Usage: glbSetPrintDelimiters(left,middle,right);");
+        }
+        if (!SvOK((SV*) ST(0))) arg1 = 0;
+        else arg1 = (char *) SvPV(ST(0), PL_na);
+        if (!SvOK((SV*) ST(1))) arg2 = 0;
+        else arg2 = (char *) SvPV(ST(1), PL_na);
+        if (!SvOK((SV*) ST(2))) arg3 = 0;
+        else arg3 = (char *) SvPV(ST(2), PL_na);
+        glbSetPrintDelimiters((char const *)arg1,(char const *)arg2,(char const *)arg3);
+        
+        
+        XSRETURN(argvi);
+        fail:
+        ;
+    }
+    croak(Nullch);
+}
+
+
+XS(_wrap_glbSetRates) {
+    {
+        int argvi = 0;
+        dXSARGS;
+        
+        if ((items < 0) || (items > 0)) {
+            SWIG_croak("Usage: glbSetRates();");
+        }
+        glbSetRates();
+        
+        
+        XSRETURN(argvi);
+        fail:
+        ;
+    }
+    croak(Nullch);
+}
+
+
+XS(_wrap_glbSetNewRates) {
+    {
+        int argvi = 0;
+        dXSARGS;
+        
+        if ((items < 0) || (items > 0)) {
+            SWIG_croak("Usage: glbSetNewRates();");
+        }
+        glbSetNewRates();
+        
+        
         XSRETURN(argvi);
         fail:
         ;
@@ -2341,6 +2861,272 @@ XS(_wrap_glbChiAll) {
         }
         arg3 = (int) SvIV(ST(2));
         result = (double)glbChiAll(arg1,arg2,arg3);
+        
+        ST(argvi) = sv_newmortal();
+        sv_setnv(ST(argvi++), (double) result);
+        XSRETURN(argvi);
+        fail:
+        ;
+    }
+    croak(Nullch);
+}
+
+
+XS(_wrap_glbLoadProfileData) {
+    {
+        char *arg1 = (char *) 0 ;
+        size_t *arg2 = (size_t *) 0 ;
+        double **arg3 = (double **) 0 ;
+        double **arg4 = (double **) 0 ;
+        int result;
+        int argvi = 0;
+        dXSARGS;
+        
+        if ((items < 4) || (items > 4)) {
+            SWIG_croak("Usage: glbLoadProfileData(filename,layers,length,density);");
+        }
+        if (!SvOK((SV*) ST(0))) arg1 = 0;
+        else arg1 = (char *) SvPV(ST(0), PL_na);
+        {
+            if (SWIG_ConvertPtr(ST(1), (void **) &arg2, SWIGTYPE_p_size_t,0) < 0) {
+                SWIG_croak("Type error in argument 2 of glbLoadProfileData. Expected _p_size_t");
+            }
+        }
+        {
+            if (SWIG_ConvertPtr(ST(2), (void **) &arg3, SWIGTYPE_p_p_double,0) < 0) {
+                SWIG_croak("Type error in argument 3 of glbLoadProfileData. Expected _p_p_double");
+            }
+        }
+        {
+            if (SWIG_ConvertPtr(ST(3), (void **) &arg4, SWIGTYPE_p_p_double,0) < 0) {
+                SWIG_croak("Type error in argument 4 of glbLoadProfileData. Expected _p_p_double");
+            }
+        }
+        result = (int)glbLoadProfileData((char const *)arg1,arg2,arg3,arg4);
+        
+        ST(argvi) = sv_newmortal();
+        sv_setiv(ST(argvi++), (IV) result);
+        XSRETURN(argvi);
+        fail:
+        ;
+    }
+    croak(Nullch);
+}
+
+
+XS(_wrap_glbStaceyProfile) {
+    {
+        double arg1 ;
+        size_t arg2 ;
+        double **arg3 = (double **) 0 ;
+        double **arg4 = (double **) 0 ;
+        int result;
+        int argvi = 0;
+        dXSARGS;
+        
+        if ((items < 4) || (items > 4)) {
+            SWIG_croak("Usage: glbStaceyProfile(baseline,layers,length,density);");
+        }
+        arg1 = (double) SvNV(ST(0));
+        
+        arg2 = (size_t) SvUV(ST(1));
+        {
+            if (SWIG_ConvertPtr(ST(2), (void **) &arg3, SWIGTYPE_p_p_double,0) < 0) {
+                SWIG_croak("Type error in argument 3 of glbStaceyProfile. Expected _p_p_double");
+            }
+        }
+        {
+            if (SWIG_ConvertPtr(ST(3), (void **) &arg4, SWIGTYPE_p_p_double,0) < 0) {
+                SWIG_croak("Type error in argument 4 of glbStaceyProfile. Expected _p_p_double");
+            }
+        }
+        result = (int)glbStaceyProfile(arg1,arg2,arg3,arg4);
+        
+        ST(argvi) = sv_newmortal();
+        sv_setiv(ST(argvi++), (IV) result);
+        XSRETURN(argvi);
+        fail:
+        ;
+    }
+    croak(Nullch);
+}
+
+
+XS(_wrap_glbAverageDensityProfile) {
+    {
+        double arg1 ;
+        double **arg2 = (double **) 0 ;
+        double **arg3 = (double **) 0 ;
+        int result;
+        int argvi = 0;
+        dXSARGS;
+        
+        if ((items < 3) || (items > 3)) {
+            SWIG_croak("Usage: glbAverageDensityProfile(baseline,length,density);");
+        }
+        arg1 = (double) SvNV(ST(0));
+        
+        {
+            if (SWIG_ConvertPtr(ST(1), (void **) &arg2, SWIGTYPE_p_p_double,0) < 0) {
+                SWIG_croak("Type error in argument 2 of glbAverageDensityProfile. Expected _p_p_double");
+            }
+        }
+        {
+            if (SWIG_ConvertPtr(ST(2), (void **) &arg3, SWIGTYPE_p_p_double,0) < 0) {
+                SWIG_croak("Type error in argument 3 of glbAverageDensityProfile. Expected _p_p_double");
+            }
+        }
+        result = (int)glbAverageDensityProfile(arg1,arg2,arg3);
+        
+        ST(argvi) = sv_newmortal();
+        sv_setiv(ST(argvi++), (IV) result);
+        XSRETURN(argvi);
+        fail:
+        ;
+    }
+    croak(Nullch);
+}
+
+
+XS(_wrap_glbGetProfileDataInExperiment) {
+    {
+        int arg1 ;
+        size_t *arg2 = (size_t *) 0 ;
+        double **arg3 = (double **) 0 ;
+        double **arg4 = (double **) 0 ;
+        int result;
+        int argvi = 0;
+        dXSARGS;
+        
+        if ((items < 4) || (items > 4)) {
+            SWIG_croak("Usage: glbGetProfileDataInExperiment(exp,layers,length,density);");
+        }
+        arg1 = (int) SvIV(ST(0));
+        {
+            if (SWIG_ConvertPtr(ST(1), (void **) &arg2, SWIGTYPE_p_size_t,0) < 0) {
+                SWIG_croak("Type error in argument 2 of glbGetProfileDataInExperiment. Expected _p_size_t");
+            }
+        }
+        {
+            if (SWIG_ConvertPtr(ST(2), (void **) &arg3, SWIGTYPE_p_p_double,0) < 0) {
+                SWIG_croak("Type error in argument 3 of glbGetProfileDataInExperiment. Expected _p_p_double");
+            }
+        }
+        {
+            if (SWIG_ConvertPtr(ST(3), (void **) &arg4, SWIGTYPE_p_p_double,0) < 0) {
+                SWIG_croak("Type error in argument 4 of glbGetProfileDataInExperiment. Expected _p_p_double");
+            }
+        }
+        result = (int)glbGetProfileDataInExperiment(arg1,arg2,arg3,arg4);
+        
+        ST(argvi) = sv_newmortal();
+        sv_setiv(ST(argvi++), (IV) result);
+        XSRETURN(argvi);
+        fail:
+        ;
+    }
+    croak(Nullch);
+}
+
+
+XS(_wrap_glbSetProfileDataInExperiment) {
+    {
+        int arg1 ;
+        size_t arg2 ;
+        double *arg3 = (double *) 0 ;
+        double *arg4 = (double *) 0 ;
+        int result;
+        int argvi = 0;
+        dXSARGS;
+        
+        if ((items < 4) || (items > 4)) {
+            SWIG_croak("Usage: glbSetProfileDataInExperiment(exp,layers,length,density);");
+        }
+        arg1 = (int) SvIV(ST(0));
+        arg2 = (size_t) SvUV(ST(1));
+        {
+            if (SWIG_ConvertPtr(ST(2), (void **) &arg3, SWIGTYPE_p_double,0) < 0) {
+                SWIG_croak("Type error in argument 3 of glbSetProfileDataInExperiment. Expected _p_double");
+            }
+        }
+        {
+            if (SWIG_ConvertPtr(ST(3), (void **) &arg4, SWIGTYPE_p_double,0) < 0) {
+                SWIG_croak("Type error in argument 4 of glbSetProfileDataInExperiment. Expected _p_double");
+            }
+        }
+        result = (int)glbSetProfileDataInExperiment(arg1,arg2,(double const *)arg3,(double const *)arg4);
+        
+        ST(argvi) = sv_newmortal();
+        sv_setiv(ST(argvi++), (IV) result);
+        XSRETURN(argvi);
+        fail:
+        ;
+    }
+    croak(Nullch);
+}
+
+
+XS(_wrap_glbSetBaselineInExperiment) {
+    {
+        int arg1 ;
+        double arg2 ;
+        int result;
+        int argvi = 0;
+        dXSARGS;
+        
+        if ((items < 2) || (items > 2)) {
+            SWIG_croak("Usage: glbSetBaselineInExperiment(exp,baseline);");
+        }
+        arg1 = (int) SvIV(ST(0));
+        arg2 = (double) SvNV(ST(1));
+        
+        result = (int)glbSetBaselineInExperiment(arg1,arg2);
+        
+        ST(argvi) = sv_newmortal();
+        sv_setiv(ST(argvi++), (IV) result);
+        XSRETURN(argvi);
+        fail:
+        ;
+    }
+    croak(Nullch);
+}
+
+
+XS(_wrap_glbGetProfileTypeInExperiment) {
+    {
+        int arg1 ;
+        int result;
+        int argvi = 0;
+        dXSARGS;
+        
+        if ((items < 1) || (items > 1)) {
+            SWIG_croak("Usage: glbGetProfileTypeInExperiment(exp);");
+        }
+        arg1 = (int) SvIV(ST(0));
+        result = (int)glbGetProfileTypeInExperiment(arg1);
+        
+        ST(argvi) = sv_newmortal();
+        sv_setiv(ST(argvi++), (IV) result);
+        XSRETURN(argvi);
+        fail:
+        ;
+    }
+    croak(Nullch);
+}
+
+
+XS(_wrap_glbGetBaselineInExperiment) {
+    {
+        int arg1 ;
+        double result;
+        int argvi = 0;
+        dXSARGS;
+        
+        if ((items < 1) || (items > 1)) {
+            SWIG_croak("Usage: glbGetBaselineInExperiment(exp);");
+        }
+        arg1 = (int) SvIV(ST(0));
+        result = (double)glbGetBaselineInExperiment(arg1);
         
         ST(argvi) = sv_newmortal();
         sv_setnv(ST(argvi++), (double) result);
@@ -3032,6 +3818,68 @@ XS(_wrap_glbUsePrior) {
 }
 
 
+XS(_wrap_glbRegisterProbabilityEngine) {
+    {
+        int arg1 ;
+        glb_probability_matrix_function arg2 = (glb_probability_matrix_function) 0 ;
+        glb_set_oscillation_parameters_function arg3 = (glb_set_oscillation_parameters_function) 0 ;
+        glb_get_oscillation_parameters_function arg4 = (glb_get_oscillation_parameters_function) 0 ;
+        int result;
+        int argvi = 0;
+        dXSARGS;
+        
+        if ((items < 4) || (items > 4)) {
+            SWIG_croak("Usage: glbRegisterProbabilityEngine(n_parameters,prob_func,set_params_func,get_params_func);");
+        }
+        arg1 = (int) SvIV(ST(0));
+        {
+            if (SWIG_ConvertPtr(ST(1), (void **) &arg2, SWIGTYPE_p_f_a_3__a_3__double_int_double_int_p_q_const__double_p_q_const__double_double__int,0) < 0) {
+                SWIG_croak("Type error in argument 2 of glbRegisterProbabilityEngine. Expected _p_f_a_3__a_3__double_int_double_int_p_q_const__double_p_q_const__double_double__int");
+            }
+        }
+        {
+            if (SWIG_ConvertPtr(ST(2), (void **) &arg3, SWIGTYPE_p_f_p_struct_glb_params_type__int,0) < 0) {
+                SWIG_croak("Type error in argument 3 of glbRegisterProbabilityEngine. Expected _p_f_p_struct_glb_params_type__int");
+            }
+        }
+        {
+            if (SWIG_ConvertPtr(ST(3), (void **) &arg4, SWIGTYPE_p_f_p_struct_glb_params_type__int,0) < 0) {
+                SWIG_croak("Type error in argument 4 of glbRegisterProbabilityEngine. Expected _p_f_p_struct_glb_params_type__int");
+            }
+        }
+        result = (int)glbRegisterProbabilityEngine(arg1,arg2,arg3,arg4);
+        
+        ST(argvi) = sv_newmortal();
+        sv_setiv(ST(argvi++), (IV) result);
+        XSRETURN(argvi);
+        fail:
+        ;
+    }
+    croak(Nullch);
+}
+
+
+XS(_wrap_glbGetNumOfOscParams) {
+    {
+        int result;
+        int argvi = 0;
+        dXSARGS;
+        
+        if ((items < 0) || (items > 0)) {
+            SWIG_croak("Usage: glbGetNumOfOscParams();");
+        }
+        result = (int)glbGetNumOfOscParams();
+        
+        ST(argvi) = sv_newmortal();
+        sv_setiv(ST(argvi++), (IV) result);
+        XSRETURN(argvi);
+        fail:
+        ;
+    }
+    croak(Nullch);
+}
+
+
 XS(_wrap_glbTotalRuleRate) {
     {
         int arg1 ;
@@ -3433,33 +4281,6 @@ XS(_wrap_glbFilteredConstantDensityProbability) {
 }
 
 
-XS(_wrap_glbPrintDelimiter) {
-    {
-        FILE *arg1 = (FILE *) 0 ;
-        int arg2 ;
-        int argvi = 0;
-        dXSARGS;
-        
-        if ((items < 2) || (items > 2)) {
-            SWIG_croak("Usage: glbPrintDelimiter(stream,character);");
-        }
-        {
-            if (SWIG_ConvertPtr(ST(0), (void **) &arg1, SWIGTYPE_p_FILE,0) < 0) {
-                SWIG_croak("Type error in argument 1 of glbPrintDelimiter. Expected _p_FILE");
-            }
-        }
-        arg2 = (int) SvIV(ST(1));
-        glbPrintDelimiter(arg1,arg2);
-        
-        
-        XSRETURN(argvi);
-        fail:
-        ;
-    }
-    croak(Nullch);
-}
-
-
 XS(_wrap_glbSetStartingValues) {
     {
         glb_params arg1 = (glb_params) (glb_params)0 ;
@@ -3704,167 +4525,6 @@ XS(_wrap_glbShiftBackgroundEnergyScale) {
         
         ST(argvi) = sv_newmortal();
         sv_setiv(ST(argvi++), (IV) result);
-        XSRETURN(argvi);
-        fail:
-        ;
-    }
-    croak(Nullch);
-}
-
-
-XS(_wrap_glbSetExperiment) {
-    {
-        glb_exp arg1 = (glb_exp) 0 ;
-        int argvi = 0;
-        dXSARGS;
-        
-        if ((items < 1) || (items > 1)) {
-            SWIG_croak("Usage: glbSetExperiment(in);");
-        }
-        {
-            if (SWIG_ConvertPtr(ST(0), (void **) &arg1, SWIGTYPE_p_glb_experiment,0) < 0) {
-                SWIG_croak("Type error in argument 1 of glbSetExperiment. Expected _p_glb_experiment");
-            }
-        }
-        glbSetExperiment(arg1);
-        
-        
-        XSRETURN(argvi);
-        fail:
-        ;
-    }
-    croak(Nullch);
-}
-
-
-XS(_wrap_glbDefaultExp) {
-    {
-        glb_exp arg1 = (glb_exp) 0 ;
-        int result;
-        int argvi = 0;
-        dXSARGS;
-        
-        if ((items < 1) || (items > 1)) {
-            SWIG_croak("Usage: glbDefaultExp(ins);");
-        }
-        {
-            if (SWIG_ConvertPtr(ST(0), (void **) &arg1, SWIGTYPE_p_glb_experiment,0) < 0) {
-                SWIG_croak("Type error in argument 1 of glbDefaultExp. Expected _p_glb_experiment");
-            }
-        }
-        result = (int)glbDefaultExp(arg1);
-        
-        ST(argvi) = sv_newmortal();
-        sv_setiv(ST(argvi++), (IV) result);
-        XSRETURN(argvi);
-        fail:
-        ;
-    }
-    croak(Nullch);
-}
-
-
-XS(_wrap_glbInitExp) {
-    {
-        glb_exp arg1 = (glb_exp) 0 ;
-        int argvi = 0;
-        dXSARGS;
-        
-        if ((items < 1) || (items > 1)) {
-            SWIG_croak("Usage: glbInitExp(ins);");
-        }
-        {
-            if (SWIG_ConvertPtr(ST(0), (void **) &arg1, SWIGTYPE_p_glb_experiment,0) < 0) {
-                SWIG_croak("Type error in argument 1 of glbInitExp. Expected _p_glb_experiment");
-            }
-        }
-        glbInitExp(arg1);
-        
-        
-        XSRETURN(argvi);
-        fail:
-        ;
-    }
-    croak(Nullch);
-}
-
-
-XS(_wrap_glbAllocExp) {
-    {
-        glb_exp result;
-        int argvi = 0;
-        dXSARGS;
-        
-        if ((items < 0) || (items > 0)) {
-            SWIG_croak("Usage: glbAllocExp();");
-        }
-        result = (glb_exp)glbAllocExp();
-        
-        ST(argvi) = sv_newmortal();
-        SWIG_MakePtr(ST(argvi++), (void *) result, SWIGTYPE_p_glb_experiment, 0|0);
-        XSRETURN(argvi);
-        fail:
-        ;
-    }
-    croak(Nullch);
-}
-
-
-XS(_wrap_glbFreeExp) {
-    {
-        glb_exp arg1 = (glb_exp) 0 ;
-        int argvi = 0;
-        dXSARGS;
-        
-        if ((items < 1) || (items > 1)) {
-            SWIG_croak("Usage: glbFreeExp(ins);");
-        }
-        {
-            if (SWIG_ConvertPtr(ST(0), (void **) &arg1, SWIGTYPE_p_glb_experiment,0) < 0) {
-                SWIG_croak("Type error in argument 1 of glbFreeExp. Expected _p_glb_experiment");
-            }
-        }
-        glbFreeExp(arg1);
-        
-        
-        XSRETURN(argvi);
-        fail:
-        ;
-    }
-    croak(Nullch);
-}
-
-
-XS(_wrap_glbSetNewRates) {
-    {
-        int argvi = 0;
-        dXSARGS;
-        
-        if ((items < 0) || (items > 0)) {
-            SWIG_croak("Usage: glbSetNewRates();");
-        }
-        glbSetNewRates();
-        
-        
-        XSRETURN(argvi);
-        fail:
-        ;
-    }
-    croak(Nullch);
-}
-
-
-XS(_wrap_glbSetRates) {
-    {
-        int argvi = 0;
-        dXSARGS;
-        
-        if ((items < 0) || (items > 0)) {
-            SWIG_croak("Usage: glbSetRates();");
-        }
-        glbSetRates();
-        
-        
         XSRETURN(argvi);
         fail:
         ;
@@ -4160,469 +4820,6 @@ XS(_wrap_glbGetBGCenters) {
 }
 
 
-XS(_wrap_glbInitExperiment) {
-    {
-        char *arg1 = (char *) 0 ;
-        glb_exp *arg2 = (glb_exp *) 0 ;
-        int *arg3 = (int *) 0 ;
-        int result;
-        int argvi = 0;
-        dXSARGS;
-        
-        if ((items < 3) || (items > 3)) {
-            SWIG_croak("Usage: glbInitExperiment(inf,in,counter);");
-        }
-        if (!SvOK((SV*) ST(0))) arg1 = 0;
-        else arg1 = (char *) SvPV(ST(0), PL_na);
-        {
-            if (SWIG_ConvertPtr(ST(1), (void **) &arg2, SWIGTYPE_p_p_glb_experiment,0) < 0) {
-                SWIG_croak("Type error in argument 2 of glbInitExperiment. Expected _p_p_glb_experiment");
-            }
-        }
-        {
-            if (SWIG_ConvertPtr(ST(2), (void **) &arg3, SWIGTYPE_p_int,0) < 0) {
-                SWIG_croak("Type error in argument 3 of glbInitExperiment. Expected _p_int");
-            }
-        }
-        result = (int)glbInitExperiment(arg1,arg2,arg3);
-        
-        ST(argvi) = sv_newmortal();
-        sv_setiv(ST(argvi++), (IV) result);
-        XSRETURN(argvi);
-        fail:
-        ;
-    }
-    croak(Nullch);
-}
-
-
-XS(_wrap_glbClearExperimentList) {
-    {
-        int argvi = 0;
-        dXSARGS;
-        
-        if ((items < 0) || (items > 0)) {
-            SWIG_croak("Usage: glbClearExperimentList();");
-        }
-        glbClearExperimentList();
-        
-        
-        XSRETURN(argvi);
-        fail:
-        ;
-    }
-    croak(Nullch);
-}
-
-
-XS(_wrap_glbResetRateStack) {
-    {
-        int argvi = 0;
-        dXSARGS;
-        
-        if ((items < 0) || (items > 0)) {
-            SWIG_croak("Usage: glbResetRateStack();");
-        }
-        glbResetRateStack();
-        
-        
-        XSRETURN(argvi);
-        fail:
-        ;
-    }
-    croak(Nullch);
-}
-
-
-XS(_wrap_glbGetChannelRates) {
-    {
-        double **arg1 = (double **) 0 ;
-        size_t *arg2 = (size_t *) 0 ;
-        int arg3 ;
-        int arg4 ;
-        int arg5 ;
-        int result;
-        int argvi = 0;
-        dXSARGS;
-        
-        if ((items < 5) || (items > 5)) {
-            SWIG_croak("Usage: glbGetChannelRates(data,length,exp,channel,smearing);");
-        }
-        {
-            if (SWIG_ConvertPtr(ST(0), (void **) &arg1, SWIGTYPE_p_p_double,0) < 0) {
-                SWIG_croak("Type error in argument 1 of glbGetChannelRates. Expected _p_p_double");
-            }
-        }
-        {
-            if (SWIG_ConvertPtr(ST(1), (void **) &arg2, SWIGTYPE_p_size_t,0) < 0) {
-                SWIG_croak("Type error in argument 2 of glbGetChannelRates. Expected _p_size_t");
-            }
-        }
-        arg3 = (int) SvIV(ST(2));
-        arg4 = (int) SvIV(ST(3));
-        arg5 = (int) SvIV(ST(4));
-        result = (int)glbGetChannelRates(arg1,arg2,arg3,arg4,arg5);
-        
-        ST(argvi) = sv_newmortal();
-        sv_setiv(ST(argvi++), (IV) result);
-        XSRETURN(argvi);
-        fail:
-        ;
-    }
-    croak(Nullch);
-}
-
-
-XS(_wrap_glbGetUserData) {
-    {
-        double **arg1 = (double **) 0 ;
-        size_t *arg2 = (size_t *) 0 ;
-        int arg3 ;
-        int arg4 ;
-        int arg5 ;
-        int arg6 ;
-        int result;
-        int argvi = 0;
-        dXSARGS;
-        
-        if ((items < 6) || (items > 6)) {
-            SWIG_croak("Usage: glbGetUserData(data,length,exp,channel,smearing,bgeff);");
-        }
-        {
-            if (SWIG_ConvertPtr(ST(0), (void **) &arg1, SWIGTYPE_p_p_double,0) < 0) {
-                SWIG_croak("Type error in argument 1 of glbGetUserData. Expected _p_p_double");
-            }
-        }
-        {
-            if (SWIG_ConvertPtr(ST(1), (void **) &arg2, SWIGTYPE_p_size_t,0) < 0) {
-                SWIG_croak("Type error in argument 2 of glbGetUserData. Expected _p_size_t");
-            }
-        }
-        arg3 = (int) SvIV(ST(2));
-        arg4 = (int) SvIV(ST(3));
-        arg5 = (int) SvIV(ST(4));
-        arg6 = (int) SvIV(ST(5));
-        result = (int)glbGetUserData(arg1,arg2,arg3,arg4,arg5,arg6);
-        
-        ST(argvi) = sv_newmortal();
-        sv_setiv(ST(argvi++), (IV) result);
-        XSRETURN(argvi);
-        fail:
-        ;
-    }
-    croak(Nullch);
-}
-
-
-XS(_wrap_glbShowRuleRates) {
-    {
-        FILE *arg1 = (FILE *) 0 ;
-        int arg2 ;
-        int arg3 ;
-        int arg4 ;
-        int arg5 ;
-        int arg6 ;
-        int arg7 ;
-        int arg8 ;
-        int result;
-        int argvi = 0;
-        dXSARGS;
-        
-        if ((items < 8) || (items > 8)) {
-            SWIG_croak("Usage: glbShowRuleRates(stream,exp,rule,pos,effi,bgi,coeffi,signal);");
-        }
-        {
-            if (SWIG_ConvertPtr(ST(0), (void **) &arg1, SWIGTYPE_p_FILE,0) < 0) {
-                SWIG_croak("Type error in argument 1 of glbShowRuleRates. Expected _p_FILE");
-            }
-        }
-        arg2 = (int) SvIV(ST(1));
-        arg3 = (int) SvIV(ST(2));
-        arg4 = (int) SvIV(ST(3));
-        arg5 = (int) SvIV(ST(4));
-        arg6 = (int) SvIV(ST(5));
-        arg7 = (int) SvIV(ST(6));
-        arg8 = (int) SvIV(ST(7));
-        result = (int)glbShowRuleRates(arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8);
-        
-        ST(argvi) = sv_newmortal();
-        sv_setiv(ST(argvi++), (IV) result);
-        XSRETURN(argvi);
-        fail:
-        ;
-    }
-    croak(Nullch);
-}
-
-
-XS(_wrap_glbShowChannelRates) {
-    {
-        FILE *arg1 = (FILE *) 0 ;
-        int arg2 ;
-        int arg3 ;
-        int arg4 ;
-        int arg5 ;
-        int arg6 ;
-        int result;
-        int argvi = 0;
-        dXSARGS;
-        
-        if ((items < 6) || (items > 6)) {
-            SWIG_croak("Usage: glbShowChannelRates(stream,exp,channel,smearing,effi,bgi);");
-        }
-        {
-            if (SWIG_ConvertPtr(ST(0), (void **) &arg1, SWIGTYPE_p_FILE,0) < 0) {
-                SWIG_croak("Type error in argument 1 of glbShowChannelRates. Expected _p_FILE");
-            }
-        }
-        arg2 = (int) SvIV(ST(1));
-        arg3 = (int) SvIV(ST(2));
-        arg4 = (int) SvIV(ST(3));
-        arg5 = (int) SvIV(ST(4));
-        arg6 = (int) SvIV(ST(5));
-        result = (int)glbShowChannelRates(arg1,arg2,arg3,arg4,arg5,arg6);
-        
-        ST(argvi) = sv_newmortal();
-        sv_setiv(ST(argvi++), (IV) result);
-        XSRETURN(argvi);
-        fail:
-        ;
-    }
-    croak(Nullch);
-}
-
-
-XS(_wrap_glbShowChannelProbs) {
-    {
-        FILE *arg1 = (FILE *) 0 ;
-        int arg2 ;
-        int arg3 ;
-        int arg4 ;
-        int arg5 ;
-        int arg6 ;
-        int result;
-        int argvi = 0;
-        dXSARGS;
-        
-        if ((items < 6) || (items > 6)) {
-            SWIG_croak("Usage: glbShowChannelProbs(stream,exp,channel,smearing,effi,bgi);");
-        }
-        {
-            if (SWIG_ConvertPtr(ST(0), (void **) &arg1, SWIGTYPE_p_FILE,0) < 0) {
-                SWIG_croak("Type error in argument 1 of glbShowChannelProbs. Expected _p_FILE");
-            }
-        }
-        arg2 = (int) SvIV(ST(1));
-        arg3 = (int) SvIV(ST(2));
-        arg4 = (int) SvIV(ST(3));
-        arg5 = (int) SvIV(ST(4));
-        arg6 = (int) SvIV(ST(5));
-        result = (int)glbShowChannelProbs(arg1,arg2,arg3,arg4,arg5,arg6);
-        
-        ST(argvi) = sv_newmortal();
-        sv_setiv(ST(argvi++), (IV) result);
-        XSRETURN(argvi);
-        fail:
-        ;
-    }
-    croak(Nullch);
-}
-
-
-XS(_wrap_glbSetChannelPrintFunction) {
-    {
-        void *arg1 = (void *) 0 ;
-        void *result;
-        int argvi = 0;
-        dXSARGS;
-        
-        if ((items < 1) || (items > 1)) {
-            SWIG_croak("Usage: glbSetChannelPrintFunction(fp);");
-        }
-        {
-            if (SWIG_ConvertPtr(ST(0), (void **) &arg1, 0,0) < 0) {
-                SWIG_croak("Type error in argument 1 of glbSetChannelPrintFunction. Expected _p_void");
-            }
-        }
-        result = (void *)glbSetChannelPrintFunction(arg1);
-        
-        ST(argvi) = sv_newmortal();
-        SWIG_MakePtr(ST(argvi++), (void *) result, SWIGTYPE_p_void, 0|0);
-        XSRETURN(argvi);
-        fail:
-        ;
-    }
-    croak(Nullch);
-}
-
-
-XS(_wrap_glbSetPrintDelimiters) {
-    {
-        char *arg1 = (char *) 0 ;
-        char *arg2 = (char *) 0 ;
-        char *arg3 = (char *) 0 ;
-        int argvi = 0;
-        dXSARGS;
-        
-        if ((items < 3) || (items > 3)) {
-            SWIG_croak("Usage: glbSetPrintDelimiters(left,middle,right);");
-        }
-        if (!SvOK((SV*) ST(0))) arg1 = 0;
-        else arg1 = (char *) SvPV(ST(0), PL_na);
-        if (!SvOK((SV*) ST(1))) arg2 = 0;
-        else arg2 = (char *) SvPV(ST(1), PL_na);
-        if (!SvOK((SV*) ST(2))) arg3 = 0;
-        else arg3 = (char *) SvPV(ST(2), PL_na);
-        glbSetPrintDelimiters((char const *)arg1,(char const *)arg2,(char const *)arg3);
-        
-        
-        XSRETURN(argvi);
-        fail:
-        ;
-    }
-    croak(Nullch);
-}
-
-
-XS(_wrap_glbGetProfileTypeInExperiment) {
-    {
-        int arg1 ;
-        int result;
-        int argvi = 0;
-        dXSARGS;
-        
-        if ((items < 1) || (items > 1)) {
-            SWIG_croak("Usage: glbGetProfileTypeInExperiment(exp);");
-        }
-        arg1 = (int) SvIV(ST(0));
-        result = (int)glbGetProfileTypeInExperiment(arg1);
-        
-        ST(argvi) = sv_newmortal();
-        sv_setiv(ST(argvi++), (IV) result);
-        XSRETURN(argvi);
-        fail:
-        ;
-    }
-    croak(Nullch);
-}
-
-
-XS(_wrap_glbLoadProfileData) {
-    {
-        char *arg1 = (char *) 0 ;
-        size_t *arg2 = (size_t *) 0 ;
-        double **arg3 = (double **) 0 ;
-        double **arg4 = (double **) 0 ;
-        int result;
-        int argvi = 0;
-        dXSARGS;
-        
-        if ((items < 4) || (items > 4)) {
-            SWIG_croak("Usage: glbLoadProfileData(filename,layers,length,density);");
-        }
-        if (!SvOK((SV*) ST(0))) arg1 = 0;
-        else arg1 = (char *) SvPV(ST(0), PL_na);
-        {
-            if (SWIG_ConvertPtr(ST(1), (void **) &arg2, SWIGTYPE_p_size_t,0) < 0) {
-                SWIG_croak("Type error in argument 2 of glbLoadProfileData. Expected _p_size_t");
-            }
-        }
-        {
-            if (SWIG_ConvertPtr(ST(2), (void **) &arg3, SWIGTYPE_p_p_double,0) < 0) {
-                SWIG_croak("Type error in argument 3 of glbLoadProfileData. Expected _p_p_double");
-            }
-        }
-        {
-            if (SWIG_ConvertPtr(ST(3), (void **) &arg4, SWIGTYPE_p_p_double,0) < 0) {
-                SWIG_croak("Type error in argument 4 of glbLoadProfileData. Expected _p_p_double");
-            }
-        }
-        result = (int)glbLoadProfileData((char const *)arg1,arg2,arg3,arg4);
-        
-        ST(argvi) = sv_newmortal();
-        sv_setiv(ST(argvi++), (IV) result);
-        XSRETURN(argvi);
-        fail:
-        ;
-    }
-    croak(Nullch);
-}
-
-
-XS(_wrap_glbStaceyProfile) {
-    {
-        double arg1 ;
-        size_t arg2 ;
-        double **arg3 = (double **) 0 ;
-        double **arg4 = (double **) 0 ;
-        int result;
-        int argvi = 0;
-        dXSARGS;
-        
-        if ((items < 4) || (items > 4)) {
-            SWIG_croak("Usage: glbStaceyProfile(baseline,layers,length,density);");
-        }
-        arg1 = (double) SvNV(ST(0));
-        
-        arg2 = (size_t) SvUV(ST(1));
-        {
-            if (SWIG_ConvertPtr(ST(2), (void **) &arg3, SWIGTYPE_p_p_double,0) < 0) {
-                SWIG_croak("Type error in argument 3 of glbStaceyProfile. Expected _p_p_double");
-            }
-        }
-        {
-            if (SWIG_ConvertPtr(ST(3), (void **) &arg4, SWIGTYPE_p_p_double,0) < 0) {
-                SWIG_croak("Type error in argument 4 of glbStaceyProfile. Expected _p_p_double");
-            }
-        }
-        result = (int)glbStaceyProfile(arg1,arg2,arg3,arg4);
-        
-        ST(argvi) = sv_newmortal();
-        sv_setiv(ST(argvi++), (IV) result);
-        XSRETURN(argvi);
-        fail:
-        ;
-    }
-    croak(Nullch);
-}
-
-
-XS(_wrap_glbAverageDensityProfile) {
-    {
-        double arg1 ;
-        double **arg2 = (double **) 0 ;
-        double **arg3 = (double **) 0 ;
-        int result;
-        int argvi = 0;
-        dXSARGS;
-        
-        if ((items < 3) || (items > 3)) {
-            SWIG_croak("Usage: glbAverageDensityProfile(baseline,length,density);");
-        }
-        arg1 = (double) SvNV(ST(0));
-        
-        {
-            if (SWIG_ConvertPtr(ST(1), (void **) &arg2, SWIGTYPE_p_p_double,0) < 0) {
-                SWIG_croak("Type error in argument 2 of glbAverageDensityProfile. Expected _p_p_double");
-            }
-        }
-        {
-            if (SWIG_ConvertPtr(ST(2), (void **) &arg3, SWIGTYPE_p_p_double,0) < 0) {
-                SWIG_croak("Type error in argument 3 of glbAverageDensityProfile. Expected _p_p_double");
-            }
-        }
-        result = (int)glbAverageDensityProfile(arg1,arg2,arg3);
-        
-        ST(argvi) = sv_newmortal();
-        sv_setiv(ST(argvi++), (IV) result);
-        XSRETURN(argvi);
-        fail:
-        ;
-    }
-    croak(Nullch);
-}
-
-
 XS(_wrap_glbGetProfileData) {
     {
         size_t *arg1 = (size_t *) 0 ;
@@ -4654,283 +4851,6 @@ XS(_wrap_glbGetProfileData) {
         
         ST(argvi) = sv_newmortal();
         sv_setiv(ST(argvi++), (IV) result);
-        XSRETURN(argvi);
-        fail:
-        ;
-    }
-    croak(Nullch);
-}
-
-
-XS(_wrap_glbGetProfileDataInExperiment) {
-    {
-        int arg1 ;
-        size_t *arg2 = (size_t *) 0 ;
-        double **arg3 = (double **) 0 ;
-        double **arg4 = (double **) 0 ;
-        int result;
-        int argvi = 0;
-        dXSARGS;
-        
-        if ((items < 4) || (items > 4)) {
-            SWIG_croak("Usage: glbGetProfileDataInExperiment(exp,layers,length,density);");
-        }
-        arg1 = (int) SvIV(ST(0));
-        {
-            if (SWIG_ConvertPtr(ST(1), (void **) &arg2, SWIGTYPE_p_size_t,0) < 0) {
-                SWIG_croak("Type error in argument 2 of glbGetProfileDataInExperiment. Expected _p_size_t");
-            }
-        }
-        {
-            if (SWIG_ConvertPtr(ST(2), (void **) &arg3, SWIGTYPE_p_p_double,0) < 0) {
-                SWIG_croak("Type error in argument 3 of glbGetProfileDataInExperiment. Expected _p_p_double");
-            }
-        }
-        {
-            if (SWIG_ConvertPtr(ST(3), (void **) &arg4, SWIGTYPE_p_p_double,0) < 0) {
-                SWIG_croak("Type error in argument 4 of glbGetProfileDataInExperiment. Expected _p_p_double");
-            }
-        }
-        result = (int)glbGetProfileDataInExperiment(arg1,arg2,arg3,arg4);
-        
-        ST(argvi) = sv_newmortal();
-        sv_setiv(ST(argvi++), (IV) result);
-        XSRETURN(argvi);
-        fail:
-        ;
-    }
-    croak(Nullch);
-}
-
-
-XS(_wrap_glbSetProfileDataInExperiment) {
-    {
-        int arg1 ;
-        size_t arg2 ;
-        double *arg3 = (double *) 0 ;
-        double *arg4 = (double *) 0 ;
-        int result;
-        int argvi = 0;
-        dXSARGS;
-        
-        if ((items < 4) || (items > 4)) {
-            SWIG_croak("Usage: glbSetProfileDataInExperiment(exp,layers,length,density);");
-        }
-        arg1 = (int) SvIV(ST(0));
-        arg2 = (size_t) SvUV(ST(1));
-        {
-            if (SWIG_ConvertPtr(ST(2), (void **) &arg3, SWIGTYPE_p_double,0) < 0) {
-                SWIG_croak("Type error in argument 3 of glbSetProfileDataInExperiment. Expected _p_double");
-            }
-        }
-        {
-            if (SWIG_ConvertPtr(ST(3), (void **) &arg4, SWIGTYPE_p_double,0) < 0) {
-                SWIG_croak("Type error in argument 4 of glbSetProfileDataInExperiment. Expected _p_double");
-            }
-        }
-        result = (int)glbSetProfileDataInExperiment(arg1,arg2,(double const *)arg3,(double const *)arg4);
-        
-        ST(argvi) = sv_newmortal();
-        sv_setiv(ST(argvi++), (IV) result);
-        XSRETURN(argvi);
-        fail:
-        ;
-    }
-    croak(Nullch);
-}
-
-
-XS(_wrap_glbSetBaselineInExperiment) {
-    {
-        int arg1 ;
-        double arg2 ;
-        int result;
-        int argvi = 0;
-        dXSARGS;
-        
-        if ((items < 2) || (items > 2)) {
-            SWIG_croak("Usage: glbSetBaselineInExperiment(exp,baseline);");
-        }
-        arg1 = (int) SvIV(ST(0));
-        arg2 = (double) SvNV(ST(1));
-        
-        result = (int)glbSetBaselineInExperiment(arg1,arg2);
-        
-        ST(argvi) = sv_newmortal();
-        sv_setiv(ST(argvi++), (IV) result);
-        XSRETURN(argvi);
-        fail:
-        ;
-    }
-    croak(Nullch);
-}
-
-
-XS(_wrap_glbGetBaselineInExperiment) {
-    {
-        int arg1 ;
-        double result;
-        int argvi = 0;
-        dXSARGS;
-        
-        if ((items < 1) || (items > 1)) {
-            SWIG_croak("Usage: glbGetBaselineInExperiment(exp);");
-        }
-        arg1 = (int) SvIV(ST(0));
-        result = (double)glbGetBaselineInExperiment(arg1);
-        
-        ST(argvi) = sv_newmortal();
-        sv_setnv(ST(argvi++), (double) result);
-        XSRETURN(argvi);
-        fail:
-        ;
-    }
-    croak(Nullch);
-}
-
-
-XS(_wrap_glbDefineAEDLVariable) {
-    {
-        char *arg1 = (char *) 0 ;
-        double arg2 ;
-        int argvi = 0;
-        dXSARGS;
-        
-        if ((items < 2) || (items > 2)) {
-            SWIG_croak("Usage: glbDefineAEDLVariable(name,value);");
-        }
-        if (!SvOK((SV*) ST(0))) arg1 = 0;
-        else arg1 = (char *) SvPV(ST(0), PL_na);
-        arg2 = (double) SvNV(ST(1));
-        
-        glbDefineAEDLVariable((char const *)arg1,arg2);
-        
-        
-        XSRETURN(argvi);
-        fail:
-        ;
-    }
-    croak(Nullch);
-}
-
-
-XS(_wrap_glbClearAEDLVariables) {
-    {
-        int argvi = 0;
-        dXSARGS;
-        
-        if ((items < 0) || (items > 0)) {
-            SWIG_croak("Usage: glbClearAEDLVariables();");
-        }
-        glbClearAEDLVariables();
-        
-        
-        XSRETURN(argvi);
-        fail:
-        ;
-    }
-    croak(Nullch);
-}
-
-
-XS(_wrap_glbSetFilter) {
-    {
-        double arg1 ;
-        int result;
-        int argvi = 0;
-        dXSARGS;
-        
-        if ((items < 1) || (items > 1)) {
-            SWIG_croak("Usage: glbSetFilter(filter);");
-        }
-        arg1 = (double) SvNV(ST(0));
-        
-        result = (int)glbSetFilter(arg1);
-        
-        ST(argvi) = sv_newmortal();
-        sv_setiv(ST(argvi++), (IV) result);
-        XSRETURN(argvi);
-        fail:
-        ;
-    }
-    croak(Nullch);
-}
-
-
-XS(_wrap_glbGetFilter) {
-    {
-        double result;
-        int argvi = 0;
-        dXSARGS;
-        
-        if ((items < 0) || (items > 0)) {
-            SWIG_croak("Usage: glbGetFilter();");
-        }
-        result = (double)glbGetFilter();
-        
-        ST(argvi) = sv_newmortal();
-        sv_setnv(ST(argvi++), (double) result);
-        XSRETURN(argvi);
-        fail:
-        ;
-    }
-    croak(Nullch);
-}
-
-
-XS(_wrap_glbNameToValue) {
-    {
-        int arg1 ;
-        char *arg2 = (char *) 0 ;
-        char *arg3 = (char *) 0 ;
-        int result;
-        int argvi = 0;
-        dXSARGS;
-        
-        if ((items < 3) || (items > 3)) {
-            SWIG_croak("Usage: glbNameToValue(exp,context,name);");
-        }
-        arg1 = (int) SvIV(ST(0));
-        if (!SvOK((SV*) ST(1))) arg2 = 0;
-        else arg2 = (char *) SvPV(ST(1), PL_na);
-        if (!SvOK((SV*) ST(2))) arg3 = 0;
-        else arg3 = (char *) SvPV(ST(2), PL_na);
-        result = (int)glbNameToValue(arg1,(char const *)arg2,(char const *)arg3);
-        
-        ST(argvi) = sv_newmortal();
-        sv_setiv(ST(argvi++), (IV) result);
-        XSRETURN(argvi);
-        fail:
-        ;
-    }
-    croak(Nullch);
-}
-
-
-XS(_wrap_glbValueToName) {
-    {
-        int arg1 ;
-        char *arg2 = (char *) 0 ;
-        int arg3 ;
-        char *result;
-        int argvi = 0;
-        dXSARGS;
-        
-        if ((items < 3) || (items > 3)) {
-            SWIG_croak("Usage: glbValueToName(exp,context,value);");
-        }
-        arg1 = (int) SvIV(ST(0));
-        if (!SvOK((SV*) ST(1))) arg2 = 0;
-        else arg2 = (char *) SvPV(ST(1), PL_na);
-        arg3 = (int) SvIV(ST(2));
-        result = (char *)glbValueToName(arg1,(char const *)arg2,arg3);
-        
-        ST(argvi) = sv_newmortal();
-        if (result) {
-            sv_setpv((SV*)ST(argvi++), (char *) result);
-        } else {
-            sv_setsv((SV*)ST(argvi++), &PL_sv_undef);
-        }
         XSRETURN(argvi);
         fail:
         ;
@@ -5079,6 +4999,194 @@ XS(_wrap_glbChiThetaDelta) {
 }
 
 
+XS(_wrap_glbGetUserData) {
+    {
+        double **arg1 = (double **) 0 ;
+        size_t *arg2 = (size_t *) 0 ;
+        int arg3 ;
+        int arg4 ;
+        int arg5 ;
+        int arg6 ;
+        int result;
+        int argvi = 0;
+        dXSARGS;
+        
+        if ((items < 6) || (items > 6)) {
+            SWIG_croak("Usage: glbGetUserData(data,length,exp,channel,smearing,bgeff);");
+        }
+        {
+            if (SWIG_ConvertPtr(ST(0), (void **) &arg1, SWIGTYPE_p_p_double,0) < 0) {
+                SWIG_croak("Type error in argument 1 of glbGetUserData. Expected _p_p_double");
+            }
+        }
+        {
+            if (SWIG_ConvertPtr(ST(1), (void **) &arg2, SWIGTYPE_p_size_t,0) < 0) {
+                SWIG_croak("Type error in argument 2 of glbGetUserData. Expected _p_size_t");
+            }
+        }
+        arg3 = (int) SvIV(ST(2));
+        arg4 = (int) SvIV(ST(3));
+        arg5 = (int) SvIV(ST(4));
+        arg6 = (int) SvIV(ST(5));
+        result = (int)glbGetUserData(arg1,arg2,arg3,arg4,arg5,arg6);
+        
+        ST(argvi) = sv_newmortal();
+        sv_setiv(ST(argvi++), (IV) result);
+        XSRETURN(argvi);
+        fail:
+        ;
+    }
+    croak(Nullch);
+}
+
+
+XS(_wrap_glbGetChannelRates) {
+    {
+        double **arg1 = (double **) 0 ;
+        size_t *arg2 = (size_t *) 0 ;
+        int arg3 ;
+        int arg4 ;
+        int arg5 ;
+        int result;
+        int argvi = 0;
+        dXSARGS;
+        
+        if ((items < 5) || (items > 5)) {
+            SWIG_croak("Usage: glbGetChannelRates(data,length,exp,channel,smearing);");
+        }
+        {
+            if (SWIG_ConvertPtr(ST(0), (void **) &arg1, SWIGTYPE_p_p_double,0) < 0) {
+                SWIG_croak("Type error in argument 1 of glbGetChannelRates. Expected _p_p_double");
+            }
+        }
+        {
+            if (SWIG_ConvertPtr(ST(1), (void **) &arg2, SWIGTYPE_p_size_t,0) < 0) {
+                SWIG_croak("Type error in argument 2 of glbGetChannelRates. Expected _p_size_t");
+            }
+        }
+        arg3 = (int) SvIV(ST(2));
+        arg4 = (int) SvIV(ST(3));
+        arg5 = (int) SvIV(ST(4));
+        result = (int)glbGetChannelRates(arg1,arg2,arg3,arg4,arg5);
+        
+        ST(argvi) = sv_newmortal();
+        sv_setiv(ST(argvi++), (IV) result);
+        XSRETURN(argvi);
+        fail:
+        ;
+    }
+    croak(Nullch);
+}
+
+
+XS(_wrap_glbResetRateStack) {
+    {
+        int argvi = 0;
+        dXSARGS;
+        
+        if ((items < 0) || (items > 0)) {
+            SWIG_croak("Usage: glbResetRateStack();");
+        }
+        glbResetRateStack();
+        
+        
+        XSRETURN(argvi);
+        fail:
+        ;
+    }
+    croak(Nullch);
+}
+
+
+XS(_wrap_glbSetFilterState) {
+    {
+        int arg1 ;
+        int result;
+        int argvi = 0;
+        dXSARGS;
+        
+        if ((items < 1) || (items > 1)) {
+            SWIG_croak("Usage: glbSetFilterState(on_off);");
+        }
+        arg1 = (int) SvIV(ST(0));
+        result = (int)glbSetFilterState(arg1);
+        
+        ST(argvi) = sv_newmortal();
+        sv_setiv(ST(argvi++), (IV) result);
+        XSRETURN(argvi);
+        fail:
+        ;
+    }
+    croak(Nullch);
+}
+
+
+XS(_wrap_glbGetFilterState) {
+    {
+        int result;
+        int argvi = 0;
+        dXSARGS;
+        
+        if ((items < 0) || (items > 0)) {
+            SWIG_croak("Usage: glbGetFilterState();");
+        }
+        result = (int)glbGetFilterState();
+        
+        ST(argvi) = sv_newmortal();
+        sv_setiv(ST(argvi++), (IV) result);
+        XSRETURN(argvi);
+        fail:
+        ;
+    }
+    croak(Nullch);
+}
+
+
+XS(_wrap_glbSetFilter) {
+    {
+        double arg1 ;
+        int result;
+        int argvi = 0;
+        dXSARGS;
+        
+        if ((items < 1) || (items > 1)) {
+            SWIG_croak("Usage: glbSetFilter(filter);");
+        }
+        arg1 = (double) SvNV(ST(0));
+        
+        result = (int)glbSetFilter(arg1);
+        
+        ST(argvi) = sv_newmortal();
+        sv_setiv(ST(argvi++), (IV) result);
+        XSRETURN(argvi);
+        fail:
+        ;
+    }
+    croak(Nullch);
+}
+
+
+XS(_wrap_glbGetFilter) {
+    {
+        double result;
+        int argvi = 0;
+        dXSARGS;
+        
+        if ((items < 0) || (items > 0)) {
+            SWIG_croak("Usage: glbGetFilter();");
+        }
+        result = (double)glbGetFilter();
+        
+        ST(argvi) = sv_newmortal();
+        sv_setnv(ST(argvi++), (double) result);
+        XSRETURN(argvi);
+        fail:
+        ;
+    }
+    croak(Nullch);
+}
+
+
 XS(_wrap_PInit) {
     {
         char *arg1 = (char *) 0 ;
@@ -5108,7 +5216,9 @@ XS(_wrap_PInit) {
 
 static swig_type_info _swigt__p_FILE = {"_p_FILE", "FILE *", 0, 0, 0};
 static swig_type_info _swigt__p_double = {"_p_double", "double *", 0, 0, 0};
+static swig_type_info _swigt__p_f_a_3__a_3__double_int_double_int_p_q_const__double_p_q_const__double_double__int = {"_p_f_a_3__a_3__double_int_double_int_p_q_const__double_p_q_const__double_double__int", "int (*)(double [3][3],int,double,int,double const *,double const *,double)|glb_probability_matrix_function", 0, 0, 0};
 static swig_type_info _swigt__p_f_a___double__double = {"_p_f_a___double__double", "double (*)(double [])", 0, 0, 0};
+static swig_type_info _swigt__p_f_p_struct_glb_params_type__int = {"_p_f_p_struct_glb_params_type__int", "int (*)(struct glb_params_type *)|glb_get_oscillation_parameters_function", 0, 0, 0};
 static swig_type_info _swigt__p_glb_experiment = {"_p_glb_experiment", "struct glb_experiment *|glb_exp", 0, 0, 0};
 static swig_type_info _swigt__p_glb_params_type = {"_p_glb_params_type", "struct glb_params_type *|glb_params", 0, 0, 0};
 static swig_type_info _swigt__p_glb_projection_type = {"_p_glb_projection_type", "struct glb_projection_type *|glb_projection", 0, 0, 0};
@@ -5123,7 +5233,9 @@ static swig_type_info _swigt__p_void = {"_p_void", "void *", 0, 0, 0};
 static swig_type_info *swig_type_initial[] = {
   &_swigt__p_FILE,
   &_swigt__p_double,
+  &_swigt__p_f_a_3__a_3__double_int_double_int_p_q_const__double_p_q_const__double_double__int,
   &_swigt__p_f_a___double__double,
+  &_swigt__p_f_p_struct_glb_params_type__int,
   &_swigt__p_glb_experiment,
   &_swigt__p_glb_params_type,
   &_swigt__p_glb_projection_type,
@@ -5138,7 +5250,9 @@ static swig_type_info *swig_type_initial[] = {
 
 static swig_cast_info _swigc__p_FILE[] = {  {&_swigt__p_FILE, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_double[] = {  {&_swigt__p_double, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_f_a_3__a_3__double_int_double_int_p_q_const__double_p_q_const__double_double__int[] = {  {&_swigt__p_f_a_3__a_3__double_int_double_int_p_q_const__double_p_q_const__double_double__int, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_f_a___double__double[] = {  {&_swigt__p_f_a___double__double, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_f_p_struct_glb_params_type__int[] = {  {&_swigt__p_f_p_struct_glb_params_type__int, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_glb_experiment[] = {  {&_swigt__p_glb_experiment, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_glb_params_type[] = {  {&_swigt__p_glb_params_type, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_glb_projection_type[] = {  {&_swigt__p_glb_projection_type, 0, 0, 0},{0, 0, 0, 0}};
@@ -5153,7 +5267,9 @@ static swig_cast_info _swigc__p_void[] = {  {&_swigt__p_void, 0, 0, 0},{0, 0, 0,
 static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_FILE,
   _swigc__p_double,
+  _swigc__p_f_a_3__a_3__double_int_double_int_p_q_const__double_p_q_const__double_double__int,
   _swigc__p_f_a___double__double,
+  _swigc__p_f_p_struct_glb_params_type__int,
   _swigc__p_glb_experiment,
   _swigc__p_glb_params_type,
   _swigc__p_glb_projection_type,
@@ -5172,7 +5288,6 @@ static swig_cast_info *swig_cast_initial[] = {
 static swig_constant_info swig_constants[] = {
 { SWIG_INT,     (char *) SWIG_prefix "__GLOBES_H", (long) 1, 0, 0, 0},
 { SWIG_INT,     (char *) SWIG_prefix "GLB_NU_FLAVOURS", (long) 3, 0, 0, 0},
-{ SWIG_INT,     (char *) SWIG_prefix "GLB_OSCP", (long) 6, 0, 0, 0},
 { SWIG_INT,     (char *) SWIG_prefix "GLB_THETA_12", (long) GLB_THETA_12, 0, 0, 0},
 { SWIG_INT,     (char *) SWIG_prefix "GLB_THETA_13", (long) GLB_THETA_13, 0, 0, 0},
 { SWIG_INT,     (char *) SWIG_prefix "GLB_THETA_23", (long) GLB_THETA_23, 0, 0, 0},
@@ -5213,6 +5328,17 @@ static swig_variable_info swig_variables[] = {
 };
 static swig_command_info swig_commands[] = {
 {"globesc::glbInit", _wrap_glbInit},
+{"globesc::glbAllocExp", _wrap_glbAllocExp},
+{"globesc::glbClearExperimentList", _wrap_glbClearExperimentList},
+{"globesc::glbDefineAEDLVariable", _wrap_glbDefineAEDLVariable},
+{"globesc::glbClearAEDLVariables", _wrap_glbClearAEDLVariables},
+{"globesc::glbInitExperiment", _wrap_glbInitExperiment},
+{"globesc::glbSetExperiment", _wrap_glbSetExperiment},
+{"globesc::glbDefaultExp", _wrap_glbDefaultExp},
+{"globesc::glbInitExp", _wrap_glbInitExp},
+{"globesc::glbFreeExp", _wrap_glbFreeExp},
+{"globesc::glbNameToValue", _wrap_glbNameToValue},
+{"globesc::glbValueToName", _wrap_glbValueToName},
 {"globesc::glbTestReleaseVersion", _wrap_glbTestReleaseVersion},
 {"globesc::glbTestLibraryVersion", _wrap_glbTestLibraryVersion},
 {"globesc::glbVersionOfExperiment", _wrap_glbVersionOfExperiment},
@@ -5230,6 +5356,14 @@ static swig_command_info swig_commands[] = {
 {"globesc::glbPrintParams", _wrap_glbPrintParams},
 {"globesc::glbSetOscillationParameters", _wrap_glbSetOscillationParameters},
 {"globesc::glbGetOscillationParameters", _wrap_glbGetOscillationParameters},
+{"globesc::glbShowRuleRates", _wrap_glbShowRuleRates},
+{"globesc::glbShowChannelRates", _wrap_glbShowChannelRates},
+{"globesc::glbShowChannelProbs", _wrap_glbShowChannelProbs},
+{"globesc::glbPrintDelimiter", _wrap_glbPrintDelimiter},
+{"globesc::glbSetChannelPrintFunction", _wrap_glbSetChannelPrintFunction},
+{"globesc::glbSetPrintDelimiters", _wrap_glbSetPrintDelimiters},
+{"globesc::glbSetRates", _wrap_glbSetRates},
+{"globesc::glbSetNewRates", _wrap_glbSetNewRates},
 {"globesc::glbAllocProjection", _wrap_glbAllocProjection},
 {"globesc::glbFreeProjection", _wrap_glbFreeProjection},
 {"globesc::glbDefineProjection", _wrap_glbDefineProjection},
@@ -5251,6 +5385,14 @@ static swig_command_info swig_commands[] = {
 {"globesc::glbChiTheta13Delta", _wrap_glbChiTheta13Delta},
 {"globesc::glbChiNP", _wrap_glbChiNP},
 {"globesc::glbChiAll", _wrap_glbChiAll},
+{"globesc::glbLoadProfileData", _wrap_glbLoadProfileData},
+{"globesc::glbStaceyProfile", _wrap_glbStaceyProfile},
+{"globesc::glbAverageDensityProfile", _wrap_glbAverageDensityProfile},
+{"globesc::glbGetProfileDataInExperiment", _wrap_glbGetProfileDataInExperiment},
+{"globesc::glbSetProfileDataInExperiment", _wrap_glbSetProfileDataInExperiment},
+{"globesc::glbSetBaselineInExperiment", _wrap_glbSetBaselineInExperiment},
+{"globesc::glbGetProfileTypeInExperiment", _wrap_glbGetProfileTypeInExperiment},
+{"globesc::glbGetBaselineInExperiment", _wrap_glbGetBaselineInExperiment},
 {"globesc::glbSetTargetMass", _wrap_glbSetTargetMass},
 {"globesc::glbSetSourcePower", _wrap_glbSetSourcePower},
 {"globesc::glbSetRunningTime", _wrap_glbSetRunningTime},
@@ -5277,6 +5419,8 @@ static swig_command_info swig_commands[] = {
 {"globesc::glbCloseModule", _wrap_glbCloseModule},
 {"globesc::glbSymModule", _wrap_glbSymModule},
 {"globesc::glbUsePrior", _wrap_glbUsePrior},
+{"globesc::glbRegisterProbabilityEngine", _wrap_glbRegisterProbabilityEngine},
+{"globesc::glbGetNumOfOscParams", _wrap_glbGetNumOfOscParams},
 {"globesc::glbTotalRuleRate", _wrap_glbTotalRuleRate},
 {"globesc::glbGetChannelRatePtr", _wrap_glbGetChannelRatePtr},
 {"globesc::glbGetRuleRatePtr", _wrap_glbGetRuleRatePtr},
@@ -5291,7 +5435,6 @@ static swig_command_info swig_commands[] = {
 {"globesc::glbConstantDensityProbability", _wrap_glbConstantDensityProbability},
 {"globesc::glbProfileProbability", _wrap_glbProfileProbability},
 {"globesc::glbFilteredConstantDensityProbability", _wrap_glbFilteredConstantDensityProbability},
-{"globesc::glbPrintDelimiter", _wrap_glbPrintDelimiter},
 {"globesc::glbSetStartingValues", _wrap_glbSetStartingValues},
 {"globesc::glbSetInputErrors", _wrap_glbSetInputErrors},
 {"globesc::glbGetStartingValues", _wrap_glbGetStartingValues},
@@ -5301,13 +5444,6 @@ static swig_command_info swig_commands[] = {
 {"globesc::glbGetCurrentRule", _wrap_glbGetCurrentRule},
 {"globesc::glbShiftSignalEnergyScale", _wrap_glbShiftSignalEnergyScale},
 {"globesc::glbShiftBackgroundEnergyScale", _wrap_glbShiftBackgroundEnergyScale},
-{"globesc::glbSetExperiment", _wrap_glbSetExperiment},
-{"globesc::glbDefaultExp", _wrap_glbDefaultExp},
-{"globesc::glbInitExp", _wrap_glbInitExp},
-{"globesc::glbAllocExp", _wrap_glbAllocExp},
-{"globesc::glbFreeExp", _wrap_glbFreeExp},
-{"globesc::glbSetNewRates", _wrap_glbSetNewRates},
-{"globesc::glbSetRates", _wrap_glbSetRates},
 {"globesc::glbSetErrorDim", _wrap_glbSetErrorDim},
 {"globesc::glbGetErrorDim", _wrap_glbGetErrorDim},
 {"globesc::glbSwitchSystematics", _wrap_glbSwitchSystematics},
@@ -5317,35 +5453,18 @@ static swig_command_info swig_commands[] = {
 {"globesc::glbGetBGErrors", _wrap_glbGetBGErrors},
 {"globesc::glbSetBGCenters", _wrap_glbSetBGCenters},
 {"globesc::glbGetBGCenters", _wrap_glbGetBGCenters},
-{"globesc::glbInitExperiment", _wrap_glbInitExperiment},
-{"globesc::glbClearExperimentList", _wrap_glbClearExperimentList},
-{"globesc::glbResetRateStack", _wrap_glbResetRateStack},
-{"globesc::glbGetChannelRates", _wrap_glbGetChannelRates},
-{"globesc::glbGetUserData", _wrap_glbGetUserData},
-{"globesc::glbShowRuleRates", _wrap_glbShowRuleRates},
-{"globesc::glbShowChannelRates", _wrap_glbShowChannelRates},
-{"globesc::glbShowChannelProbs", _wrap_glbShowChannelProbs},
-{"globesc::glbSetChannelPrintFunction", _wrap_glbSetChannelPrintFunction},
-{"globesc::glbSetPrintDelimiters", _wrap_glbSetPrintDelimiters},
-{"globesc::glbGetProfileTypeInExperiment", _wrap_glbGetProfileTypeInExperiment},
-{"globesc::glbLoadProfileData", _wrap_glbLoadProfileData},
-{"globesc::glbStaceyProfile", _wrap_glbStaceyProfile},
-{"globesc::glbAverageDensityProfile", _wrap_glbAverageDensityProfile},
 {"globesc::glbGetProfileData", _wrap_glbGetProfileData},
-{"globesc::glbGetProfileDataInExperiment", _wrap_glbGetProfileDataInExperiment},
-{"globesc::glbSetProfileDataInExperiment", _wrap_glbSetProfileDataInExperiment},
-{"globesc::glbSetBaselineInExperiment", _wrap_glbSetBaselineInExperiment},
-{"globesc::glbGetBaselineInExperiment", _wrap_glbGetBaselineInExperiment},
-{"globesc::glbDefineAEDLVariable", _wrap_glbDefineAEDLVariable},
-{"globesc::glbClearAEDLVariables", _wrap_glbClearAEDLVariables},
-{"globesc::glbSetFilter", _wrap_glbSetFilter},
-{"globesc::glbGetFilter", _wrap_glbGetFilter},
-{"globesc::glbNameToValue", _wrap_glbNameToValue},
-{"globesc::glbValueToName", _wrap_glbValueToName},
 {"globesc::glbChiTheta", _wrap_glbChiTheta},
 {"globesc::glbChiDms", _wrap_glbChiDms},
 {"globesc::glbChiDm", _wrap_glbChiDm},
 {"globesc::glbChiThetaDelta", _wrap_glbChiThetaDelta},
+{"globesc::glbGetUserData", _wrap_glbGetUserData},
+{"globesc::glbGetChannelRates", _wrap_glbGetChannelRates},
+{"globesc::glbResetRateStack", _wrap_glbResetRateStack},
+{"globesc::glbSetFilterState", _wrap_glbSetFilterState},
+{"globesc::glbGetFilterState", _wrap_glbGetFilterState},
+{"globesc::glbSetFilter", _wrap_glbSetFilter},
+{"globesc::glbGetFilter", _wrap_glbGetFilter},
 {"globesc::PInit", _wrap_PInit},
 {0,0}
 };

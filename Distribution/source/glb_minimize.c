@@ -105,12 +105,37 @@ static jmp_buf env;
 //--------------------------------------------------------
 
 
-static double inp_errs[GLB_OSCP+1];
-static double start[GLB_OSCP+1];
+static double *inp_errs = NULL;
+static double *start = NULL;
+//static double inp_errs[GLB_OSCP+1];
+//static double start[GLB_OSCP+1];
 static int count=0;
 static int errordim[32];
 //int glb_single_experiment_number=0;
 static double sysglb_calc_buffer[6];
+
+//This serves for ChiNP
+static double *fix_params = NULL;
+static int *para_tab = NULL;
+static int *index_tab = NULL;
+//static double fix_params[GLB_OSCP+32];
+//static int para_tab[GLB_OSCP+32];
+//static int index_tab[GLB_OSCP+32];
+static int n_free;
+static int n_fix;
+
+//This serves for SingleChiNP
+static double *s_fix_params = NULL;
+static int *s_para_tab = NULL;
+static int *s_index_tab = NULL;
+//static double s_fix_params[GLB_OSCP+1];
+//static int s_para_tab[GLB_OSCP+1];
+//static int s_index_tab[GLB_OSCP+1];
+static int s_n_free;
+static int s_n_fix;
+
+//-----------------------
+
 
 //-------------------------------------------------------------
 //------------------    MLAbort handling     ------------------
@@ -186,6 +211,48 @@ static double* read_glb_calc_buffer()
 {
   return &sysglb_calc_buffer[0];
 }
+
+
+
+//--------------------------------------------------------------------------
+//-------------------- Initialization of arrays ----------------------------
+//--------------------------------------------------------------------------
+int glb_init_minimizer()
+{
+  glb_free_minimizer();
+  
+  /* General data structures */
+  inp_errs = (double *) glb_malloc((glbGetNumOfOscParams()+1) * sizeof(inp_errs[0]));
+  start = (double *) glb_malloc((glbGetNumOfOscParams()+1) * sizeof(start[0]));
+  
+  /* Data structures for internal_glbChiNP */
+  fix_params = (double *) glb_malloc((glbGetNumOfOscParams()+32) * sizeof(fix_params[0]));
+  para_tab = (int *) glb_malloc((glbGetNumOfOscParams()+32) * sizeof(para_tab[0]));
+  index_tab = (int *) glb_malloc((glbGetNumOfOscParams()+32) * sizeof(index_tab[0]));
+
+  /* Data structures for internal_glbSingleChiNP */
+  s_fix_params = (double *) glb_malloc((glbGetNumOfOscParams()+1) * sizeof(s_fix_params[0]));
+  s_para_tab = (int *) glb_malloc((glbGetNumOfOscParams()+1) * sizeof(s_para_tab[0]));
+  s_index_tab = (int *) glb_malloc((glbGetNumOfOscParams()+1) * sizeof(s_index_tab[0]));
+
+  return 0;
+}
+
+
+int glb_free_minimizer()
+{
+  if (inp_errs != NULL)     { glb_free(inp_errs);     inp_errs = NULL;     }
+  if (start != NULL)        { glb_free(start);        start = NULL;        }
+  if (fix_params != NULL)   { glb_free(fix_params);   fix_params = NULL;   }
+  if (para_tab != NULL)     { glb_free(para_tab);     para_tab = NULL;     }
+  if (index_tab != NULL)    { glb_free(index_tab);    index_tab = NULL;    }
+  if (s_fix_params != NULL) { glb_free(s_fix_params); s_fix_params = NULL; }
+  if (s_para_tab != NULL)   { glb_free(s_para_tab);   s_para_tab = NULL;   }
+  if (s_index_tab != NULL)  { glb_free(s_index_tab);  s_index_tab = NULL;  }
+
+  return 0;
+}
+
 
 //--------------------------------------------------------------------------
 //--------------------------------------------------------------------------
@@ -438,24 +505,24 @@ static double Chi(double x[])
   double erg;
 
   glb_params p = glbAllocParams();
-  for (i=0; i < GLB_OSCP; i++)
+  for (i=0; i < glbGetNumOfOscParams(); i++)
     p->osc->osc_params[i] = x[i];
-  glb_set_oscillation_parameters(p);
+  glb_hook_set_oscillation_parameters(p);
   glbFreeParams(p);
     
-//  double nsp[GLB_OSCP-6+1];
+//  double nsp[glbGetNumOfOscParams()-6+1];
 //  glb_set_c_vacuum_parameters(x[0],x[1],x[2],x[3]);
 //  glb_set_c_squared_masses(0,x[4],x[5]);
-//  if(GLB_OSCP>6)
+//  if(glbGetNumOfOscParams()>6)
 //  {
-//	for(i=0;i<GLB_OSCP-6;i++) nsp[i]=x[i+6];
+//	for(i=0;i<glbGetNumOfOscParams()-6;i++) nsp[i]=x[i+6];
 //	glb_set_c_ns_params(nsp);
 //  }
   
   for (i=0;i<glb_num_of_exps;i++)
     {
       glbSetExperiment(glb_experiment_list[i]);
-      glb_set_profile_scaling(x[GLB_OSCP+i],i);
+      glb_set_profile_scaling(x[glbGetNumOfOscParams()+i],i);
       glb_set_new_rates();
     }
   if (setjmp(env)==1)
@@ -472,28 +539,28 @@ static double Chi(double x[])
 
 // chi^2 with systematics for each Experiment
 
-static double SingleChi(double x[GLB_OSCP+1],int exp)
+static double SingleChi(double x[glbGetNumOfOscParams()+1],int exp)
 {
   int i;
   double erg;
 
   glb_params p = glbAllocParams();
-  for (i=0; i < GLB_OSCP; i++)
+  for (i=0; i < glbGetNumOfOscParams(); i++)
     p->osc->osc_params[i] = x[i];
-  glb_set_oscillation_parameters(p);
+  glb_hook_set_oscillation_parameters(p);
   glbFreeParams(p);
 
-//  double nsp[GLB_OSCP-6+1];
+//  double nsp[glbGetNumOfOscParams()-6+1];
 //  glb_set_c_vacuum_parameters(x[0], x[1],x[2],x[3]);
 //  glb_set_c_squared_masses(0,x[4],x[5]);
-//  if(GLB_OSCP>6)
+//  if(glbGetNumOfOscParams()>6)
 //  {
-//	for(i=0;i<GLB_OSCP-6;i++) nsp[i]=x[i+6];
+//	for(i=0;i<glbGetNumOfOscParams()-6;i++) nsp[i]=x[i+6];
 //	glb_set_c_ns_params(nsp);
 //  }
 
       glbSetExperiment(glb_experiment_list[exp]);
-      glb_set_profile_scaling(x[GLB_OSCP],exp);
+      glb_set_profile_scaling(x[glbGetNumOfOscParams()],exp);
       glb_set_new_rates();
      
 
@@ -510,28 +577,28 @@ static double SingleChi(double x[GLB_OSCP+1],int exp)
 
 // chi^2 with systematics for each Experiment
 
-static double SingleRuleChi(double x[GLB_OSCP+1],int exp, int rule)
+static double SingleRuleChi(double x[glbGetNumOfOscParams()+1],int exp, int rule)
 {
   int i;
   double erg;
 
   glb_params p = glbAllocParams();
-  for (i=0; i < GLB_OSCP; i++)
+  for (i=0; i < glbGetNumOfOscParams(); i++)
     p->osc->osc_params[i] = x[i];
-  glb_set_oscillation_parameters(p);
+  glb_hook_set_oscillation_parameters(p);
   glbFreeParams(p);
 
-//  double nsp[GLB_OSCP-6+1];
+//  double nsp[glbGetNumOfOscParams()-6+1];
 //  glb_set_c_vacuum_parameters(x[0], x[1],x[2],x[3]);
 //  glb_set_c_squared_masses(0,x[4],x[5]);
-//  if(GLB_OSCP>6)
+//  if(glbGetNumOfOscParams()>6)
 //  {
-//	for(i=0;i<GLB_OSCP-6;i++) nsp[i]=x[i+6];
+//	for(i=0;i<glbGetNumOfOscParams()-6;i++) nsp[i]=x[i+6];
 //	glb_set_c_ns_params(nsp);
 //  }
 
       glbSetExperiment(glb_experiment_list[exp]);
-      glb_set_profile_scaling(x[GLB_OSCP],exp);
+      glb_set_profile_scaling(x[glbGetNumOfOscParams()],exp);
       glb_set_new_rates();
      
 
@@ -545,20 +612,20 @@ static double SingleRuleChi(double x[GLB_OSCP+1],int exp, int rule)
 double glbChiSys(const glb_params in,int experiment, int rule)
 {
   int i;
-  double res,x[32+GLB_OSCP];
+  double res,x[32+glbGetNumOfOscParams()];
 
   if(in==NULL)
     {
       glb_error("Failure in glbChiSys: Input pointer must be non-NULL");
       return -1;
     }
-  for(i=0;i<GLB_OSCP;i++) x[i]=glbGetOscParams(in,i);
+  for(i=0;i<glbGetNumOfOscParams();i++) x[i]=glbGetOscParams(in,i);
   if(experiment==GLB_ALL)
     {
       if(rule==GLB_ALL)
 	{
 	  for(i=0;i<glb_num_of_exps;i++) 
-	    x[i+GLB_OSCP]=glbGetDensityParams(in,i);
+	    x[i+glbGetNumOfOscParams()]=glbGetDensityParams(in,i);
 	  res=Chi(x);
 	}
       else
@@ -568,7 +635,7 @@ double glbChiSys(const glb_params in,int experiment, int rule)
 	     {   
 	       if(rule < glb_experiment_list[i]->numofrules)
 		 {
-		   x[GLB_OSCP]=glbGetDensityParams(in,i);
+		   x[glbGetNumOfOscParams()]=glbGetDensityParams(in,i);
 		   res+=SingleRuleChi(x,i,rule);
 		 }
 	       else
@@ -584,7 +651,7 @@ double glbChiSys(const glb_params in,int experiment, int rule)
 		    "glb_num_of_exps");
 	  return -1;
 	}
-      x[GLB_OSCP]=glbGetDensityParams(in,experiment);
+      x[glbGetNumOfOscParams()]=glbGetDensityParams(in,experiment);
       if(rule==GLB_ALL) res=SingleChi(x,experiment);
 	else
 	  {
@@ -637,8 +704,8 @@ int glb_set_starting_values(double a, double b, double c, double d, double e, do
 int glb_set_ns_input_errors(double v[])
 { 
   int i;
-  if(GLB_OSCP>6)
-	for(i=6;i<GLB_OSCP;i++)
+  if(glbGetNumOfOscParams()>6)
+	for(i=6;i<glbGetNumOfOscParams();i++)
 		inp_errs[i]=v[i-6];
   return 0;
 }
@@ -646,8 +713,8 @@ int glb_set_ns_input_errors(double v[])
 int glb_set_ns_starting_values(double v[])
 { 
   int i;
-  if(GLB_OSCP>6)
-	for(i=6;i<GLB_OSCP;i++)
+  if(glbGetNumOfOscParams()>6)
+	for(i=6;i<glbGetNumOfOscParams();i++)
 		start[i]=v[i-6];
   return 0;
 }
@@ -680,10 +747,10 @@ double* glb_return_input_errors()
 {
   double* out;
   int i;
-  i=GLB_OSCP+glb_num_of_exps;
+  i=glbGetNumOfOscParams()+glb_num_of_exps;
   out=(double*) glb_malloc(i*sizeof(double));
-  for(i=0;i<GLB_OSCP;i++) out[i]=inp_errs[i];
-  for(i=0;i<glb_num_of_exps;i++) out[i+GLB_OSCP]=glb_experiment_list[i]->density_error;
+  for(i=0;i<glbGetNumOfOscParams();i++) out[i]=inp_errs[i];
+  for(i=0;i<glb_num_of_exps;i++) out[i+glbGetNumOfOscParams()]=glb_experiment_list[i]->density_error;
   return out;
 }
 
@@ -691,10 +758,10 @@ double* glb_return_input_values()
 {
   double* out;
   int i;
-  i=GLB_OSCP+glb_num_of_exps;
+  i=glbGetNumOfOscParams()+glb_num_of_exps;
   out=(double*) glb_malloc(i*sizeof(double));
-  for(i=0;i<GLB_OSCP;i++) out[i]=start[i];
-  for(i=0;i<glb_num_of_exps;i++) out[i+GLB_OSCP]=glb_experiment_list[i]->density_center;
+  for(i=0;i<glbGetNumOfOscParams();i++) out[i]=start[i];
+  for(i=0;i<glb_num_of_exps;i++) out[i+glbGetNumOfOscParams()]=glb_experiment_list[i]->density_center;
   return out;
 }
   
@@ -741,14 +808,6 @@ static void ReturnShiftedRates(int rulenumber, int exp, double* inrates)
 //----------------------- 23.01.2004 -------------------------------
 //------------------------------------------------------------------
 
-//This serves for ChiNP
-
-static double fix_params[GLB_OSCP+32];
-static int para_tab[GLB_OSCP+32];
-static int index_tab[GLB_OSCP+32];
-static int n_free;
-static int n_fix;
-
 //-----------------------
 
 
@@ -756,15 +815,15 @@ static void SelectProjection(int *vec)
 {
   int i,c,c1,c2;
 
-  for(i=0;i<GLB_OSCP+glb_num_of_exps;i++) para_tab[i]=vec[i];
+  for(i=0;i<glbGetNumOfOscParams()+glb_num_of_exps;i++) para_tab[i]=vec[i];
   c=0;
   c1=0;
   c2=0;
-  for(i=0;i<GLB_OSCP+glb_num_of_exps;i++)
+  for(i=0;i<glbGetNumOfOscParams()+glb_num_of_exps;i++)
     {
       if(para_tab[i]==1) c++;
     }
-  for(i=0;i<GLB_OSCP+glb_num_of_exps;i++)
+  for(i=0;i<glbGetNumOfOscParams()+glb_num_of_exps;i++)
     {
       if(para_tab[i]==1) 
 	{
@@ -857,9 +916,9 @@ static double MD_chi_NP(double x[])
 {
   glb_params prior_input;
   double erg2;
-  double y[GLB_OSCP+32];
+  double y[glbGetNumOfOscParams()+32];
   int i; 
-//  double nsp[GLB_OSCP-6+1];
+//  double nsp[glbGetNumOfOscParams()-6+1];
   prior_input=glbAllocParams();
   count = count +1;
   for(i=0;i<n_free;i++) y[index_tab[i]]=x[i+1];
@@ -868,32 +927,32 @@ static double MD_chi_NP(double x[])
   for(i=n_free;i<n_free+n_fix;i++) y[index_tab[i]]=fix_params[index_tab[i]]; 
 
   glb_params p = glbAllocParams();
-  for (i=0; i < GLB_OSCP; i++)
+  for (i=0; i < glbGetNumOfOscParams(); i++)
     p->osc->osc_params[i] = y[i];
-  glb_set_oscillation_parameters(p);
+  glb_hook_set_oscillation_parameters(p);
   glbFreeParams(p);
 
 //  glb_set_c_vacuum_parameters(y[0],y[1],y[2],y[3]);
 //  glb_set_c_squared_masses(0,y[4],y[5]);
-//  if(GLB_OSCP>6)
+//  if(glbGetNumOfOscParams()>6)
 //  {
-//	for(i=0;i<GLB_OSCP-6;i++) nsp[i]=y[i+6];
+//	for(i=0;i<glbGetNumOfOscParams()-6;i++) nsp[i]=y[i+6];
 //	glb_set_c_ns_params(nsp);
 //  }
   
   for (i=0;i<glb_num_of_exps;i++)
     {
       glbSetExperiment(glb_experiment_list[i]);
-      glb_set_profile_scaling(y[GLB_OSCP+i],i);
+      glb_set_profile_scaling(y[glbGetNumOfOscParams()+i],i);
       glb_set_new_rates();
     }
   
   erg2=ChiS();
   // adding  the user defined prior
   // shoufling the parameter vector y into an glb_params structure
-  for (i=0;i<GLB_OSCP;i++) glbSetOscParams(prior_input,y[i],i);
+  for (i=0;i<glbGetNumOfOscParams();i++) glbSetOscParams(prior_input,y[i],i);
   for (i=0;i<glb_num_of_exps;i++) glbSetDensityParams(prior_input,
-						      y[i+GLB_OSCP],i);
+						      y[i+glbGetNumOfOscParams()],i);
   glbSetIteration(prior_input,count);
   
   erg2 = erg2 + glb_user_defined_prior(prior_input); 
@@ -901,7 +960,7 @@ static double MD_chi_NP(double x[])
   // adding the glb_priors
   /*for(i=0;i<n_free;i++)
     {
-      if(index_tab[i]<GLB_OSCP)
+      if(index_tab[i]<glbGetNumOfOscParams())
 	{
 	  erg2+=sglb_prior(y[index_tab[i]],
 		      start[index_tab[i]],inp_errs[index_tab[i]]);  
@@ -910,8 +969,8 @@ static double MD_chi_NP(double x[])
       else
 	{
 	  erg2+=sglb_prior(y[index_tab[i]],
-	  	     (glb_experiment_list[index_tab[i]-GLB_OSCP])->density_center,
-	       (glb_experiment_list[index_tab[i]-GLB_OSCP])->density_error);
+	  	     (glb_experiment_list[index_tab[i]-glbGetNumOfOscParams()])->density_center,
+	       (glb_experiment_list[index_tab[i]-glbGetNumOfOscParams()])->density_error);
 	}
 	}
   */
@@ -921,31 +980,21 @@ static double MD_chi_NP(double x[])
  
 
 // single-experiment functions ChiXXXSection
-//This serves for ChiNP
-
-static double s_fix_params[GLB_OSCP+1];
-static int s_para_tab[GLB_OSCP+1];
-static int s_index_tab[GLB_OSCP+1];
-static int s_n_free;
-static int s_n_fix;
-
-//-----------------------
-
 
 static void single_SelectProjection(int set)
 {
   int i,c,c1,c2;
 
-  for(i=0;i<GLB_OSCP;i++) s_para_tab[i]=para_tab[i];
-  s_para_tab[GLB_OSCP]=para_tab[GLB_OSCP+set];
+  for(i=0;i<glbGetNumOfOscParams();i++) s_para_tab[i]=para_tab[i];
+  s_para_tab[glbGetNumOfOscParams()]=para_tab[glbGetNumOfOscParams()+set];
   c=0;
   c1=0;
   c2=0;
-  for(i=0;i<GLB_OSCP+1;i++)
+  for(i=0;i<glbGetNumOfOscParams()+1;i++)
     {
       if(s_para_tab[i]==1) c++;
     }
-  for(i=0;i<GLB_OSCP+1;i++)
+  for(i=0;i<glbGetNumOfOscParams()+1;i++)
     {
       if(s_para_tab[i]==1) 
 	{
@@ -973,8 +1022,8 @@ static double chi_NP(double x[])
 {
   glb_params prior_input;
   double erg2;
-  double nsp[GLB_OSCP-6+1];
-  double y[GLB_OSCP+1];
+  double nsp[glbGetNumOfOscParams()-6+1];
+  double y[glbGetNumOfOscParams()+1];
   int i;
   prior_input=glbAllocParams();
   count = count +1;
@@ -985,21 +1034,21 @@ static double chi_NP(double x[])
 					 =s_fix_params[s_index_tab[i]];
 
   glb_params p = glbAllocParams();
-  for (i=0; i < GLB_OSCP; i++)
+  for (i=0; i < glbGetNumOfOscParams(); i++)
     p->osc->osc_params[i] = y[i];
-  glb_set_oscillation_parameters(p);
+  glb_hook_set_oscillation_parameters(p);
   glbFreeParams(p);
 
 //  glb_set_c_vacuum_parameters(y[0],y[1],y[2],y[3]);
 //  glb_set_c_squared_masses(0,y[4],y[5]);
-//  if(GLB_OSCP>6)
+//  if(glbGetNumOfOscParams()>6)
 //  {
-//	for(i=0;i<GLB_OSCP-6;i++) nsp[i]=y[i+6];
+//	for(i=0;i<glbGetNumOfOscParams()-6;i++) nsp[i]=y[i+6];
 //	glb_set_c_ns_params(nsp);
 //  }
   
   glbSetExperiment(glb_experiment_list[glb_single_experiment_number]);
-  glb_set_profile_scaling(y[GLB_OSCP],glb_single_experiment_number);
+  glb_set_profile_scaling(y[glbGetNumOfOscParams()],glb_single_experiment_number);
   glb_set_new_rates();
     
   
@@ -1007,8 +1056,8 @@ static double chi_NP(double x[])
   
   // adding  the user defined prior
   // shoufling the parameter vector y into an glb_params structure
-  for (i=0;i<GLB_OSCP;i++) glbSetOscParams(prior_input,y[i],i);
-  glbSetDensityParams(prior_input,y[GLB_OSCP],glb_single_experiment_number);
+  for (i=0;i<glbGetNumOfOscParams();i++) glbSetOscParams(prior_input,y[i],i);
+  glbSetDensityParams(prior_input,y[glbGetNumOfOscParams()],glb_single_experiment_number);
   glbSetIteration(prior_input,count);
 
   erg2 = erg2 + glb_user_defined_prior(prior_input); 
@@ -1018,7 +1067,7 @@ static double chi_NP(double x[])
   /*
    for(i=0;i<s_n_free;i++)
     {
-      if(s_index_tab[i]<GLB_OSCP)
+      if(s_index_tab[i]<glbGetNumOfOscParams())
 	{
 	  erg2+=sglb_prior(y[s_index_tab[i]],
 		      start[s_index_tab[i]],inp_errs[s_index_tab[i]]);  
@@ -1026,7 +1075,7 @@ static double chi_NP(double x[])
 	}
       else
 	{
-	  erg2+=sglb_prior(y[GLB_OSCP],
+	  erg2+=sglb_prior(y[glbGetNumOfOscParams()],
 	  	     (glb_experiment_list[glb_single_experiment_number])->density_center,
 	       (glb_experiment_list[glb_single_experiment_number])->density_error);
 	}
@@ -1052,7 +1101,7 @@ static double internal_glbSingleChiNP(const glb_params in, glb_params out,
   double er1;
   glb_projection fbuf,fnew; 
 
-  double x[32+GLB_OSCP];
+  double x[32+glbGetNumOfOscParams()];
   int it;
   int i;
   int dim;
@@ -1096,10 +1145,10 @@ static double internal_glbSingleChiNP(const glb_params in, glb_params out,
       }
   }
   
-  for(i=0;i<GLB_OSCP;i++) x[i]=glbGetOscParams(in,i);
-  x[GLB_OSCP]=glbGetDensityParams(in,exp);
+  for(i=0;i<glbGetNumOfOscParams();i++) x[i]=glbGetOscParams(in,i);
+  x[glbGetNumOfOscParams()]=glbGetDensityParams(in,exp);
 
-  for(i=0;i<GLB_OSCP+1;i++) s_fix_params[i]=x[i];
+  for(i=0;i<glbGetNumOfOscParams()+1;i++) s_fix_params[i]=x[i];
   for(i=0;i<s_n_free;i++) sp2[i+1]=x[s_index_tab[i]];
   if (setjmp(env)==1) 
     {
@@ -1111,7 +1160,7 @@ static double internal_glbSingleChiNP(const glb_params in, glb_params out,
     {
       for(i=0;i<s_n_free;i++) 
 	{
-	  if(s_index_tab[i]<GLB_OSCP)
+	  if(s_index_tab[i]<glbGetNumOfOscParams())
 	    glbSetOscParams(out,sp2[i+1],s_index_tab[i]);
 	  else
 	    glbSetDensityParams(out,sp2[i+1],exp);
@@ -1136,7 +1185,7 @@ static double internal_glbChiNP(const glb_params in, glb_params out)
   double er1;
  
 
-  double x[32+GLB_OSCP];
+  double x[32+glbGetNumOfOscParams()];
   int it;
   int i;
   int dim;
@@ -1161,10 +1210,10 @@ static double internal_glbChiNP(const glb_params in, glb_params out)
       }
   }
   
-  for(i=0;i<GLB_OSCP;i++) x[i]=glbGetOscParams(in,i);
-  for(i=0;i<glb_num_of_exps;i++) x[i+GLB_OSCP]=glbGetDensityParams(in,i);
+  for(i=0;i<glbGetNumOfOscParams();i++) x[i]=glbGetOscParams(in,i);
+  for(i=0;i<glb_num_of_exps;i++) x[i+glbGetNumOfOscParams()]=glbGetDensityParams(in,i);
 
-  for(i=0;i<GLB_OSCP+glb_num_of_exps;i++) fix_params[i]=x[i];
+  for(i=0;i<glbGetNumOfOscParams()+glb_num_of_exps;i++) fix_params[i]=x[i];
   for(i=0;i<n_free;i++) sp2[i+1]=x[index_tab[i]];
   if (setjmp(env)==1) 
     {
@@ -1176,10 +1225,10 @@ static double internal_glbChiNP(const glb_params in, glb_params out)
     {
       for(i=0;i<n_free;i++) 
 	{
-	  if(index_tab[i]<GLB_OSCP)
+	  if(index_tab[i]<glbGetNumOfOscParams())
 	    glbSetOscParams(out,sp2[i+1],index_tab[i]);
 	  else
-	    glbSetDensityParams(out,sp2[i+1],index_tab[i]-GLB_OSCP);
+	    glbSetDensityParams(out,sp2[i+1],index_tab[i]-glbGetNumOfOscParams());
 	}
       out=glbSetIteration(out,count);
     }
@@ -1214,11 +1263,11 @@ static double glbChi1P(const glb_params in,
 {
   double res;
   int i,*b;
-  int swit[32+GLB_OSCP]; 
-  int buff[32+GLB_OSCP];
+  int swit[32+glbGetNumOfOscParams()]; 
+  int buff[32+glbGetNumOfOscParams()];
   b=CheckProjection();
-  for(i=0;i<GLB_OSCP+glb_num_of_exps;i++) buff[i]=b[i];
-  for(i=0;i<GLB_OSCP+glb_num_of_exps;i++) swit[i]=GLB_FREE;
+  for(i=0;i<glbGetNumOfOscParams()+glb_num_of_exps;i++) buff[i]=b[i];
+  for(i=0;i<glbGetNumOfOscParams()+glb_num_of_exps;i++) swit[i]=GLB_FREE;
   swit[n]=GLB_FIXED;
   SelectProjection(swit);
   if(in==NULL)
@@ -1286,11 +1335,11 @@ double glbChiTheta13Delta(const glb_params in,glb_params out, int exp)
 {
   double res;
   int i,*b;
-  int swit[32+GLB_OSCP]; 
-  int buff[32+GLB_OSCP];
+  int swit[32+glbGetNumOfOscParams()]; 
+  int buff[32+glbGetNumOfOscParams()];
   b=CheckProjection();
-  for(i=0;i<GLB_OSCP+glb_num_of_exps;i++) buff[i]=b[i];
-  for(i=0;i<GLB_OSCP+glb_num_of_exps;i++) swit[i]=GLB_FREE;
+  for(i=0;i<glbGetNumOfOscParams()+glb_num_of_exps;i++) buff[i]=b[i];
+  for(i=0;i<glbGetNumOfOscParams()+glb_num_of_exps;i++) swit[i]=GLB_FREE;
   swit[GLB_THETA_13]=GLB_FIXED;
   swit[GLB_DELTA_CP]=GLB_FIXED;
   SelectProjection(swit);
@@ -1311,11 +1360,11 @@ double glbChiAll(const glb_params in,glb_params out, int exp)
 {
   double res;
   int i,*b;
-  int swit[32+GLB_OSCP]; 
-  int buff[32+GLB_OSCP];
+  int swit[32+glbGetNumOfOscParams()]; 
+  int buff[32+glbGetNumOfOscParams()];
   b=CheckProjection();
-  for(i=0;i<GLB_OSCP+glb_num_of_exps;i++) buff[i]=b[i];
-  for(i=0;i<GLB_OSCP+glb_num_of_exps;i++) swit[i]=GLB_FREE;
+  for(i=0;i<glbGetNumOfOscParams()+glb_num_of_exps;i++) buff[i]=b[i];
+  for(i=0;i<glbGetNumOfOscParams()+glb_num_of_exps;i++) swit[i]=GLB_FREE;
   SelectProjection(swit);
   if(in==NULL)
     {
@@ -1339,10 +1388,10 @@ glbSetProjection(const glb_projection in)
   int i;
   int *buf;
   if(in==NULL) return -1;
-  buf=glb_malloc(sizeof(int)*(GLB_OSCP+glb_num_of_exps));
+  buf=glb_malloc(sizeof(int)*(glbGetNumOfOscParams()+glb_num_of_exps));
 
-  for(i=0;i<GLB_OSCP;i++) buf[i]=glbGetProjectionFlag(in,i);
-  for(i=0;i<glb_num_of_exps;i++) buf[i+GLB_OSCP]=
+  for(i=0;i<glbGetNumOfOscParams();i++) buf[i]=glbGetProjectionFlag(in,i);
+  for(i=0;i<glb_num_of_exps;i++) buf[i+glbGetNumOfOscParams()]=
 				   glbGetDensityProjectionFlag(in,i);
   SelectProjection(buf);
   glb_free(buf);
@@ -1355,9 +1404,9 @@ glbGetProjection(glb_projection in)
 {
   int i;
   if(in==NULL) return -1;
-  for(i=0;i<GLB_OSCP;i++) in=glbSetProjectionFlag(in,para_tab[i],i);
+  for(i=0;i<glbGetNumOfOscParams();i++) in=glbSetProjectionFlag(in,para_tab[i],i);
   for(i=0;i<glb_num_of_exps;i++) 
-    in=glbSetDensityProjectionFlag(in,para_tab[i+GLB_OSCP],i);
+    in=glbSetDensityProjectionFlag(in,para_tab[i+glbGetNumOfOscParams()],i);
   return 0;
 }
 

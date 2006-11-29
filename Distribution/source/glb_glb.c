@@ -29,6 +29,7 @@
 #include "source/glb_wrapper.h"
 #include "source/glb_error.h"
 #include "glb_prior.h"
+#include "glb_probability.h"
 
 
 /* Moved from glb_wrapper.c, in order to have the module support stuff
@@ -49,6 +50,12 @@ void glbInit(char *name)
   glb_init(name);
 
   glb_builtin_prior_init();
+
+  /* Setup default probability engine */
+  glbRegisterProbabilityEngine(-1, NULL, NULL, NULL);
+  glbRegisterProbabilityEngine(6, &glb_probability_matrix,
+                                  &glb_set_oscillation_parameters,
+                                  &glb_get_oscillation_parameters);
 
   /*setup default priors */  
   glbRegisterPriorFunction( glb_builtin_prior_prior,

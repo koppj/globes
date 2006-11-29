@@ -63,8 +63,8 @@ glb_osc_type *glb_alloc_osc_type()
 {
   glb_osc_type *temp;
   temp=(glb_osc_type *) glb_malloc(sizeof(glb_osc_type));
-  temp->osc_params=(double *) glb_malloc(sizeof(double) *  GLB_OSCP); 
-  temp->length = (size_t) GLB_OSCP;
+  temp->osc_params=(double *) glb_malloc(sizeof(double) *  glbGetNumOfOscParams()); 
+  temp->length = (size_t) glbGetNumOfOscParams();
   return temp;
 }
 
@@ -158,7 +158,7 @@ double glbGetDensityParams(const glb_params in, int which)
 glb_params glbSetOscParams(glb_params in,
 				 double osc, int which)
 {
-  if (0 <= which&&which < GLB_OSCP)
+  if (0 <= which&&which < glbGetNumOfOscParams())
     in->osc->osc_params[which] = osc;
   else 
   {
@@ -171,7 +171,7 @@ glb_params glbSetOscParams(glb_params in,
 double glbGetOscParams(const glb_params in, int which)
 {
   double out;
- if(0 <= which&&which < GLB_OSCP )
+ if(0 <= which&&which < glbGetNumOfOscParams() )
     {
       out=(in->osc)->osc_params[which];
     }
@@ -257,9 +257,9 @@ glb_osc_proj_type *glb_alloc_osc_proj_type()
   int i;
   glb_osc_proj_type *temp;
   temp=(glb_osc_proj_type *) glb_malloc(sizeof(glb_osc_proj_type));
-  temp->osc_params=(int *) glb_malloc(sizeof(int) *  GLB_OSCP); 
-  temp->length = (size_t) GLB_OSCP;
-  for(i=0;i<GLB_OSCP;i++) temp->osc_params[i]=GLB_FREE;
+  temp->osc_params=(int *) glb_malloc(sizeof(int) *  glbGetNumOfOscParams()); 
+  temp->length = (size_t) glbGetNumOfOscParams();
+  for(i=0;i<glbGetNumOfOscParams();i++) temp->osc_params[i]=GLB_FREE;
   return temp;
 }
 
@@ -355,7 +355,7 @@ glb_projection glbSetProjectionFlag(glb_projection in,
     return NULL;
   }
 
-   if(0 <= which&&which < GLB_OSCP )
+   if(0 <= which&&which < glbGetNumOfOscParams() )
     {
       (in->osc)->osc_params[which]=flag;
     }
@@ -370,7 +370,7 @@ glb_projection glbSetProjectionFlag(glb_projection in,
 int glbGetProjectionFlag(const glb_projection in, int which)
 {
   int out;
-  if(0 <= which&&which < GLB_OSCP )
+  if(0 <= which&&which < glbGetNumOfOscParams() )
     {
       out=(in->osc)->osc_params[which];
     }
@@ -474,7 +474,7 @@ glbSetOscillationParameters(const glb_params in)
   if (in == NULL)
     return -1;
   else
-    glb_set_oscillation_parameters(in);
+    glb_hook_set_oscillation_parameters(in);
 
   return 0;
 }
@@ -483,16 +483,16 @@ int
 glbSetStartingValues(const glb_params in)
 {
   int i,s=0;
-  double nsp[GLB_OSCP-6+1];
+  double nsp[glbGetNumOfOscParams()-6+1];
   if(in==NULL) return -1;
 
   glb_set_solar_starting_values(glbGetOscParams(in,0));
   glb_set_starting_values(glbGetOscParams(in,1),glbGetOscParams(in,2),
 		    glbGetOscParams(in,3),glbGetOscParams(in,4),
 		    glbGetOscParams(in,5),0);
-  if(GLB_OSCP>6)
+  if(glbGetNumOfOscParams()>6)
   {
-	for(i=0;i<GLB_OSCP-6;i++) nsp[i]=glbGetOscParams(in,6+i);
+	for(i=0;i<glbGetNumOfOscParams()-6;i++) nsp[i]=glbGetOscParams(in,6+i);
 	glb_set_ns_starting_values(nsp);
   }
 
@@ -507,16 +507,16 @@ int
 glbSetInputErrors(const glb_params in)
 {
   int i,s=0;
-  double nsp[GLB_OSCP-6+1];
+  double nsp[glbGetNumOfOscParams()-6+1];
   if(in==NULL) return -1;
 
   glb_set_solar_input_errors(glbGetOscParams(in,0));
   glb_set_input_errors(glbGetOscParams(in,1),glbGetOscParams(in,2),
 		    glbGetOscParams(in,3),glbGetOscParams(in,4),
 		    glbGetOscParams(in,5),0);
-  if(GLB_OSCP>6)
+  if(glbGetNumOfOscParams()>6)
   {
-	for(i=0;i<GLB_OSCP-6;i++) nsp[i]=glbGetOscParams(in,6+i);
+	for(i=0;i<glbGetNumOfOscParams()-6;i++) nsp[i]=glbGetOscParams(in,6+i);
 	glb_set_ns_input_errors(nsp);
   }
 
@@ -535,7 +535,7 @@ glbSetInputErrors(const glb_params in)
 int 
 glbGetOscillationParameters(glb_params in)
 {
-  return glb_get_oscillation_parameters(in);
+  return glb_hook_get_oscillation_parameters(in);
 }
 
 
@@ -546,8 +546,8 @@ glbGetStartingValues(glb_params in)
   double *t;
   if(in==NULL) return -1;
   t=glb_return_input_values();
-  for(i=0;i<GLB_OSCP;i++) glbSetOscParams(in,t[i],i);
-  for(i=0;i<glb_num_of_exps;i++) glbSetDensityParams(in,t[i+GLB_OSCP],i);
+  for(i=0;i<glbGetNumOfOscParams();i++) glbSetOscParams(in,t[i],i);
+  for(i=0;i<glb_num_of_exps;i++) glbSetDensityParams(in,t[i+glbGetNumOfOscParams()],i);
   glb_free(t);
   return 0;
 
@@ -560,8 +560,8 @@ glbGetInputErrors(glb_params in)
   double *t;
   if(in==NULL) return -1;
   t=glb_return_input_errors();
-  for(i=0;i<GLB_OSCP;i++) glbSetOscParams(in,t[i],i);
-  for(i=0;i<glb_num_of_exps;i++) glbSetDensityParams(in,t[i+GLB_OSCP],i);
+  for(i=0;i<glbGetNumOfOscParams();i++) glbSetOscParams(in,t[i],i);
+  for(i=0;i<glb_num_of_exps;i++) glbSetDensityParams(in,t[i+glbGetNumOfOscParams()],i);
   glb_free(t);
   return 0;
 
@@ -587,17 +587,17 @@ glbClearExperimentList()
 }
 
 
-/* ****************************************** * 
+/********************************************** 
  * Low-level access to the event rate vectors * 
- * ****************************************** */
+ **********************************************/
 
-/* *************************************************************************
+/***************************************************************************
  * Function glbGetChannelRatePtr                                           *
- * *************************************************************************
+ ***************************************************************************
  * Get at pointer to the "true" event rate vector for a specific channel.  *
  * pre_post = GLB_PRE/GLB_POST determines whether pre-smearing or post-    *
  * smearing rates are requested.                                           *
- * *************************************************************************/
+ ***************************************************************************/
 double *glbGetChannelRatePtr(int exp, int channel, int pre_post)
 {
   if (exp < 0 || exp >= glb_num_of_exps)
@@ -625,11 +625,11 @@ double *glbGetChannelRatePtr(int exp, int channel, int pre_post)
 }
 
 
-/* *************************************************************************
+/***************************************************************************
  * Function glbGetRuleRatePtr                                              *
- * *************************************************************************
+ ***************************************************************************
  * Get at pointer to the "true" event rate vector for a specific rule.     *
- * *************************************************************************/
+ ***************************************************************************/
 double *glbGetRuleRatePtr(int exp, int rule)
 {
   if (exp < 0 || exp >= glb_num_of_exps)
@@ -647,12 +647,12 @@ double *glbGetRuleRatePtr(int exp, int rule)
 }
 
 
-/* *************************************************************************
+/***************************************************************************
  * Function glbGetSignalRatePtr                                            *
- * *************************************************************************
+ ***************************************************************************
  * Get at pointer to the "true" signal event rate vector for a specific    *
  * rule.                                                                   *
- * *************************************************************************/
+ ***************************************************************************/
 double *glbGetSignalRatePtr(int exp, int rule)
 {
   if (exp < 0 || exp >= glb_num_of_exps)
@@ -670,12 +670,12 @@ double *glbGetSignalRatePtr(int exp, int rule)
 }
 
 
-/* *************************************************************************
+/***************************************************************************
  * Function glbGetBGRatePtr                                                *
- * *************************************************************************
+ ***************************************************************************
  * Get at pointer to the "true" background event rate vector for a         *
  * specific rule.                                                          *
- * *************************************************************************/
+ ***************************************************************************/
 double *glbGetBGRatePtr(int exp, int rule)
 {
   if (exp < 0 || exp >= glb_num_of_exps)
@@ -693,13 +693,13 @@ double *glbGetBGRatePtr(int exp, int rule)
 }
 
 
-/* *************************************************************************
+/***************************************************************************
  * Function glbGetChannelFitRatePtr                                        *
- * *************************************************************************
+ ***************************************************************************
  * Get at pointer to the fitted event rate vector for a specific channel.  *
  * pre_post = GLB_PRE/GLB_POST determines whether pre-smearing or post-    *
  * smearing rates are requested.                                           *
- * *************************************************************************/
+ ***************************************************************************/
 double *glbGetChannelFitRatePtr(int exp, int channel, int pre_post)
 {
   if (exp < 0 || exp >= glb_num_of_exps)
@@ -727,12 +727,12 @@ double *glbGetChannelFitRatePtr(int exp, int channel, int pre_post)
 }
 
 
-/* *************************************************************************
+/***************************************************************************
  * Function glbGetSignalFitRatePtr                                         *
- * *************************************************************************
+ ***************************************************************************
  * Get at pointer to the fitted signal event rate vector for a specific    *
  * rule.                                                                   *
- * *************************************************************************/
+ ***************************************************************************/
 double *glbGetSignalFitRatePtr(int exp, int rule)
 {
   if (exp < 0 || exp >= glb_num_of_exps)
@@ -750,12 +750,12 @@ double *glbGetSignalFitRatePtr(int exp, int rule)
 }
 
 
-/* *************************************************************************
+/***************************************************************************
  * Function glbGetBGFitRatePtr                                             *
- * *************************************************************************
+ ***************************************************************************
  * Get at pointer to the fitted background event rate vector for a         *
  * specific rule.                                                          *
- * *************************************************************************/
+ ***************************************************************************/
 double *glbGetBGFitRatePtr(int exp, int rule)
 {
   if (exp < 0 || exp >= glb_num_of_exps)
@@ -773,12 +773,12 @@ double *glbGetBGFitRatePtr(int exp, int rule)
 }
 
 
-/* *************************************************************************
+/***************************************************************************
  * Function glbGetEfficiencyPtr                                            *
- * *************************************************************************
+ ***************************************************************************
  * Get at pointer to the pre- or post-smearing efficiency vector, depending*
  * on the parameter pre_post (GLB_PRE or GLB_POST)                         *
- * *************************************************************************/
+ ***************************************************************************/
 double *glbGetEfficiencyPtr(int exp, int channel, int pre_post)
 {
   if (exp < 0 || exp >= glb_num_of_exps)
@@ -806,12 +806,12 @@ double *glbGetEfficiencyPtr(int exp, int channel, int pre_post)
 }
 
 
-/* *************************************************************************
+/***************************************************************************
  * Function glbGetBackgroundPtr                                            *
- * *************************************************************************
+ ***************************************************************************
  * Get at pointer to the pre- or post-smearing background vector, depending*
  * on the parameter pre_post (GLB_PRE or GLB_POST)                         *
- * *************************************************************************/
+ ***************************************************************************/
 double *glbGetBackgroundPtr(int exp, int channel, int pre_post)
 {
   if (exp < 0 || exp >= glb_num_of_exps)
@@ -2478,27 +2478,30 @@ const char
 }
 
 
-/* Calculation of oscillation probabilities */
+/*********************************************
+ * Calculation of oscillation probabilities  *
+ *********************************************/
 
-// ----------------------------------------------------------------------------
+/***************************************************************************
+ * Function glbVacuumProbability                                           *
+ ***************************************************************************
+ * Returns the vacuum oscillation probability for one specific oscillation *
+ * channel                                                                 *
+ ***************************************************************************
+ * Parameters:                                                             *
+ *   initial_flavour/final_flavour: The desired oscillation channel        *
+ *   cp_sign: +1 for neutrinos, -1 for antineutrinos                       *
+ *   E: Neutrino energy in GeV                                             *
+ *   L: Baseline in km                                                     *
+ ***************************************************************************/
 double glbVacuumProbability(int initial_flavour, int final_flavour,
 			    int cp_sign, double E, double L)
-// ----------------------------------------------------------------------------
-// Returns the vacuum oscillation probability for one specific oscillation
-// channel
-// ----------------------------------------------------------------------------
-// Parameters:
-//   initial_flavour/final_flavour: The desired oscillation channel
-//   cp_sign: +1 for neutrinos, -1 for antineutrinos
-//   E: Neutrino energy in GeV
-//   L: Baseline in km
-// ----------------------------------------------------------------------------
 {
   const double rho = 0.0;
   double P[3][3];
   int status;
  
-  if ((status=glb_probability_matrix(P, cp_sign, E, 1, &L, &rho, -1.0)) != GLB_SUCCESS)
+  if ((status=glb_hook_probability_matrix(P, cp_sign, E, 1, &L, &rho, -1.0)) != GLB_SUCCESS)
   {
     glb_error("Calculation of oscillation probabilities failed.");
     return -1.0;
@@ -2507,25 +2510,26 @@ double glbVacuumProbability(int initial_flavour, int final_flavour,
 }
 
 
-// ----------------------------------------------------------------------------
+/***************************************************************************
+ * Function glbConstantDensityProbability                                  *
+ ***************************************************************************
+ * Returns the constant density oscillation probability for one specific   *
+ * oscillation channel                                                     *
+ ***************************************************************************
+ * Parameters:                                                             *
+ *   initial_flavour/final_flavour: The desired oscillation channel        *
+ *   cp_sign: +1 for neutrinos, -1 for antineutrinos                       *
+ *   E: Neutrino energy in GeV                                             *
+ *   L: Baseline in km                                                     *
+ *   rho: Matter density in g/cm^3                                         *
+ ***************************************************************************/
 double glbConstantDensityProbability(int initial_flavour, int final_flavour,
 			    int cp_sign, double E, double L, double rho)
-// ----------------------------------------------------------------------------
-// Returns the constant density oscillation probability for one specific
-// oscillation channel
-// ----------------------------------------------------------------------------
-// Parameters:
-//   initial_flavour/final_flavour: The desired oscillation channel
-//   cp_sign: +1 for neutrinos, -1 for antineutrinos
-//   E:   Neutrino energy in GeV
-//   L:   Baseline in km
-//   rho: Matter density in g/cm^3
-// ----------------------------------------------------------------------------
 {
   double P[3][3];
   int status;
  
-  if ((status=glb_probability_matrix(P, cp_sign, E, 1, &L, &rho, -1.0)) != GLB_SUCCESS)
+  if ((status=glb_hook_probability_matrix(P, cp_sign, E, 1, &L, &rho, -1.0)) != GLB_SUCCESS)
   {
     glb_error("Calculation of oscillation probabilities failed.");
     return -1.0;
@@ -2534,19 +2538,22 @@ double glbConstantDensityProbability(int initial_flavour, int final_flavour,
 }
 
 
-// ----------------------------------------------------------------------------
+/***************************************************************************
+ * Function glbProfileProbability                                          *
+ ***************************************************************************
+ * Returns the oscillation probability in matter for a specific channel    *
+ * in a specific experiment. All information about the matter profile is   *
+ * taken from the respective glb_experiment structure, but a possible      *
+ * specification of the filter feature in the experiment is neglected      *
+ ***************************************************************************
+ * Parameters:                                                             *
+ *   exp: Number of experiment                                             *
+ *   initial_flavour/final_flavour: The desired oscillation channel        *
+ *   cp_sign: +1 for neutrinos, -1 for antineutrinos                       *
+ *   E: Neutrino energy in GeV                                             *
+ ***************************************************************************/
 double glbProfileProbability(int exp,int initial_flavour, int final_flavour,
 			     int cp_sign, double E)
-// ----------------------------------------------------------------------------
-// Returns the oscillation probability in matter for one specific oscillation
-// channel
-// ----------------------------------------------------------------------------
-// Parameters:
-//   exp: Number of experiment
-//   initial_flavour/final_flavour: The desired oscillation channel
-//   cp_sign: +1 for neutrinos, -1 for antineutrinos
-//   E: Neutrino energy in GeV
-// ----------------------------------------------------------------------------
 {
   struct glb_experiment *e = glb_experiment_list[exp];
   double P[3][3];
@@ -2559,7 +2566,7 @@ double glbProfileProbability(int exp,int initial_flavour, int final_flavour,
   }
 
   glb_set_profile_scaling(1.0, exp);
-  if ((status=glb_probability_matrix(P, cp_sign, E, e->psteps, e->lengthtab,
+  if ((status=glb_hook_probability_matrix(P, cp_sign, E, e->psteps, e->lengthtab,
                                      e->densitybuffer, -1.0)) != GLB_SUCCESS)
   {
     glb_error("Calculation of oscillation probabilities failed.");
@@ -2570,10 +2577,24 @@ double glbProfileProbability(int exp,int initial_flavour, int final_flavour,
 }
 
 
-// ----------------------------------------------------------------------------
+/***************************************************************************
+ * Function glbFilteredConstantDensityProbability                          *
+ ***************************************************************************
+ * Returns the oscillation probability in matter for a specific channel    *
+ * in a specific experiment. All information about the matter profile      *
+ * _and_ about the filter feature is taken from the respective             *
+ * glb_experiment structure.                                               *
+ * Therefore, if no filter is specified in the experiment, this function   *
+ * is identical to glbProfileProbability.                                  *
+ ***************************************************************************
+ * Parameters:                                                             *
+ *   exp: Number of experiment                                             *
+ *   initial_flavour/final_flavour: The desired oscillation channel        *
+ *   cp_sign: +1 for neutrinos, -1 for antineutrinos                       *
+ *   E: Neutrino energy in GeV                                             *
+ ***************************************************************************/
 double glbFilteredConstantDensityProbability(int exp,int initial_flavour, int final_flavour,
 			    int cp_sign, double E)
-// ----------------------------------------------------------------------------
 {
   struct glb_experiment *e = glb_experiment_list[exp];
   double P[3][3];
@@ -2586,7 +2607,7 @@ double glbFilteredConstantDensityProbability(int exp,int initial_flavour, int fi
   }
 
   glb_set_profile_scaling(1.0, exp);
-  if ((status=glb_probability_matrix(P, cp_sign, E, e->psteps, e->lengthtab, e->densitybuffer,
+  if ((status=glb_hook_probability_matrix(P, cp_sign, E, e->psteps, e->lengthtab, e->densitybuffer,
       (e->filter_state == GLB_ON) ? e->filter_value : -1.0)) != GLB_SUCCESS)
   {
     glb_error("Calculation of oscillation probabilities failed.");

@@ -34,6 +34,7 @@
 #include <gsl/gsl_blas.h>
 #include <globes/globes.h>
 #include "glb_wrapper.h"
+#include "glb_minimize.h"
 #include "glb_probability.h"
 using namespace std;
 
@@ -204,7 +205,14 @@ static glbNuOscWorkspace w;
 static double th12, th13, th23; // Mixing angles
 static double delta;            // Dirac CP phase
 static double mq[3];            // Squared masses
-static double nsparams[GLB_OSCP-6+1];  // Non-standard parameters
+
+// Interface for non-standard implementations of the probability engine
+BEGIN_C_DECLS
+  int glb_oscp;
+  glb_probability_matrix_function glb_hook_probability_matrix;
+  glb_set_oscillation_parameters_function glb_hook_set_oscillation_parameters;
+  glb_get_oscillation_parameters_function glb_hook_get_oscillation_parameters;
+END_C_DECLS
 
 
 
@@ -838,6 +846,54 @@ extern "C" int glb_probability_matrix(double P[3][3], int cp_sign, double E,
 }
 
 
+// ----------------------------------------------------------------------------
+extern "C" int glbRegisterProbabilityEngine(int n_parameters,
+                    glb_probability_matrix_function prob_func,
+                    glb_set_oscillation_parameters_function set_params_func,
+                    glb_get_oscillation_parameters_function get_params_func)
+// ----------------------------------------------------------------------------
+// Replaces the functions glb_probability_matrix, glb_set_oscillation_parameters,
+// and glb_get_oscillation_parameters by user-defined functions. Furthermore,
+// the value of glb_oscp is modified.
+// ----------------------------------------------------------------------------
+// Parameters:
+//   n_parameters:    New number of oscillation parameters
+//   prob_func:       The replacement for glb_probability_matrix
+//   set_params_func: The replacement for glb_set_oscillation_parameters
+//   get_params_func: The replacement for glb_get_oscillation_parameters
+// If n_parameters is <= 0, glb_oscp will be set to the default value of 6.
+// If any of the pointer-valued arguments is NULL, the respective hook
+// will be reset to its default value.
+// ----------------------------------------------------------------------------
+{
+  if (n_parameters <= 0)
+    glb_oscp = 6;
+  else
+    glb_oscp = n_parameters;
+  
+  if (prob_func != NULL)
+    glb_hook_probability_matrix = prob_func;
+  else
+    glb_hook_probability_matrix = &glb_probability_matrix;
+
+  if (set_params_func != NULL)
+    glb_hook_set_oscillation_parameters = set_params_func;
+  else
+    glb_hook_set_oscillation_parameters = &glb_set_oscillation_parameters;
+  
+  if (get_params_func != NULL)
+    glb_hook_get_oscillation_parameters = get_params_func;
+  else
+    glb_hook_get_oscillation_parameters = &glb_get_oscillation_parameters;
+
+  /* Reallocate arrays for minimizer */
+  glb_init_minimizer();
+}
 
 
-
+// ----------------------------------------------------------------------------
+extern "C" int glbGetNumOfOscParams()
+// ----------------------------------------------------------------------------
+{
+  return glb_oscp;
+}

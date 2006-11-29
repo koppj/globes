@@ -28,10 +28,12 @@
 #define GLB_MMINIMIZE_H 1
 
 
+BEGIN_C_DECLS
+int glb_init_minimizer();
+int glb_free_minimizer();
 
 void glb_set_errordim(int typ,int rule);
 int glb_check_errordim(int rule);
-
 
 
 
@@ -73,5 +75,7 @@ struct glb_systematic glb_init_systematic(double (*chi_func)(),int dimension,
 			    double *sp, double *errors, double (*evalf)(),
 			    char info[]);
 double glb_evaluate_chi(struct glb_systematic *in);
+
+END_C_DECLS
 
 #endif /*  GLB_MMINIMIZE_H */

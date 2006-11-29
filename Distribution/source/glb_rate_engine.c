@@ -366,11 +366,11 @@ static void CalcAllProbs(double en, double baseline)
   int i, j;
   int status;
   
-  if ((status=glb_probability_matrix(Probs, +1, en, e->psteps, e->lengthtab, e->densitybuffer,
+  if ((status=glb_hook_probability_matrix(Probs, +1, en, e->psteps, e->lengthtab, e->densitybuffer,
           (e->filter_state == GLB_ON) ? e->filter_value : -1.0)) != GLB_SUCCESS)
     glb_error("Calculation of oscillation probabilities failed.");
 
-  if ((status=glb_probability_matrix(ProbsAnti, -1, en, e->psteps, e->lengthtab, e->densitybuffer,
+  if ((status=glb_hook_probability_matrix(ProbsAnti, -1, en, e->psteps, e->lengthtab, e->densitybuffer,
           (e->filter_state == GLB_ON) ? e->filter_value : -1.0)) != GLB_SUCCESS)
     glb_error("Calculation of oscillation probabilities failed.");
 }
@@ -1179,8 +1179,52 @@ double glb_chi_sys_w_bg_calib(double x[5])
 }
 
 
-// function for avoiding malloc problems
+/***************************************************************************
+ * Here are reimplementations of the above chi^2 functions, conforming to  *
+ * the user-defined systematics interface                                  *
+ ***************************************************************************/
 
+/***************************************************************************
+ * Function glb_chi_sys_w_bg                                               *
+ ***************************************************************************
+ * Standard chi^2 including backgrounds and spectral information           *
+ ***************************************************************************/
+/*double glb_chi_sys_w_bg(int exp, int rule, double *x, int n_params)
+{
+  double *true_rates       = glbGetRuleRatePtr(exp, rule);
+  double *signal_fit_rates = glbGetSignalFitRates(exp, rule);
+  double *bg_fit_rates     = glbGetBGFitRates(exp, rule);
+  double fit_rate, true_rate;
+  double chi2 = 0.0;
+  int i;
+
+  for (i=0; i < glbGetNumOfBins(exp); i++)
+  {
+    fit_rate = x[0]*signal_fit_rates[i] + x[1]*signal_fit_rates[i] // FIXME TILT
+                + x[2]*bg_fit_rates[i] + x[3]*bg_fit_rates[i] // FIXME TILT
+    fit_rate *= errorf(glb_tre_null_center[glb_rule_number],
+                       glb_tre_tilt_center[glb_rule_number], i);  //FIXME
+    fit_rate *= glb_window_function(glb_calc_energy_window[rule][0],
+                                    glb_calc_energy_window[rule][1]);  // FIXME
+    
+    chi2 += 2 * (true_rates[i] - fit_rate);
+    if (true_rates[i] > 0  &&  fit_rate > 0)
+      chi2 += 2 * fit_rate * log(fit_rate / true_rates[i]);
+  }
+
+  for (i=0; i < n_params; i++)
+    chi2 += // FIXME
+      glb_prior(x[0],1,glb_glb_sig_norm_error[glb_rule_number])+
+      glb_prior(x[1],0,glb_sig_tilt_error[glb_rule_number])+
+      glb_prior(x[2],glb_bg_norm_center[glb_rule_number],glb_bg_norm_error[glb_rule_number])+
+      glb_prior(x[3],glb_bg_tilt_center[glb_rule_number],glb_bg_tilt_error[glb_rule_number]);
+  
+  return chi2;
+}*/
+
+
+
+// function for avoiding malloc problems
 void glb_remove_calc_pointers()
 {
   int k;

@@ -91,7 +91,7 @@ double glb_builtin_prior_prior(const glb_params in)
   glb_projection pro;
   pro=glbAllocProjection();
   glbGetProjection(pro);
-  for(i=0;i<GLB_OSCP;i++)
+  for(i=0;i<glbGetNumOfOscParams();i++)
     {   
     if(glbGetProjectionFlag(pro,i)==GLB_FREE) res += 
 						sprior(glbGetOscParams(in,i),
