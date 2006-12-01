@@ -90,7 +90,7 @@ rule(#rule0)<
 	@backgrounderror = 	     2e-06  :	    0.0001
 	@backgroundcenter = 	     1e-05  :	         0
 
-	@errordim_sys_on = 	0
+	@errordim_sys_on = 	9
 	@errordim_sys_off = 2
 	@energy_window = 	         4  :	        50
 

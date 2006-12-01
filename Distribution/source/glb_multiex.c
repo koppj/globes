@@ -47,9 +47,6 @@
 #define PI 3.1415
 
 /* global variables */
-struct glb_systematic sys_list[32];
-struct glb_systematic sys_calc[32];
-
 int glb_current_exp = -1;  // Indicates which experiment is currently
                            // being processed by the rate engine
 
@@ -281,28 +278,6 @@ glb_xsec  *cpy_glb_xsec(glb_xsec *dest, const glb_xsec *src)
 }
 
 
-//this structure contains all information needed for implementing
-//the systematics for each rule and experiment. Should be roughly
-//equivalent to a class in C++
-
-/* this function definition clashes nearyl with 
- * struct systematic glb_init_systematic
- * in Mminimize.c
- */
-
-
-static void init_struct_systematic(struct glb_systematic *in)
-{
-  in->chi_func=NULL; 
-  in->dimension=-1;
-  in->sp=NULL; 
-  in->errors=NULL; 
-  in->evalf=NULL; 
-  in->info=NULL;
-};
-
-
-
 void glbInitExp(glb_exp ins)
 {
   int i;
@@ -320,9 +295,11 @@ void glbInitExp(glb_exp ins)
 
   in->binsize=NULL;
   in->simbinsize=NULL;
-  for(i=0;i<32;i++) in->errordim[i]=-1;
-  for(i=0;i<32;i++) in->errordim_sys_off[i]=-1;
-  for(i=0;i<32;i++) in->errordim_sys_on[i]=-1;
+  for(i=0;i<32;i++) in->sys_on[i]=NULL;
+  for(i=0;i<32;i++) in->sys_off[i]=NULL;
+  for(i=0;i<32;i++) in->sys_on_strings[i]=NULL;
+  for(i=0;i<32;i++) in->sys_off_strings[i]=NULL;
+  for(i=0;i<32;i++) in->sys_on_off[i]=GLB_ON;
   in->errorfunction=-1;
   in->baseline=-1;
   in->emin=-1;
@@ -377,7 +354,6 @@ void glbInitExp(glb_exp ins)
   for(i=0;i<32;i++) in->user_post_smearing_background[i]=NULL;
   for(i=0;i<32;i++) in->energy_window[i][0]=-1;
   for(i=0;i<32;i++) in->energy_window[i][1]=-1;
-  in->chirate=NULL;
   for(i=0;i<32;i++)
     {
       in->SignalRates[i]=NULL;
@@ -390,9 +366,6 @@ void glbInitExp(glb_exp ins)
     }
   in->energy_tab=NULL;
   for(i=0;i<32;i++) in->no_osc_background[i]=NULL;
-  for(i=0;i<32;i++) init_struct_systematic(&(in->sys[i])); 
-  
-
 }
 
 
@@ -451,7 +424,6 @@ void glbFreeExp(glb_exp ins)
   my_free(in->lengthtab);
   my_free(in->densitytab);
   my_free(in->densitybuffer);
-  my_free(in->chirate);
   
   for(i=0;i<in->numofrules;i++)
     {
@@ -614,27 +586,22 @@ int glbDefaultExp(glb_exp ins)
 	    }
 	}
     }
- 
-  for(i=0;i<in->numofrules;i++) 
-    {
-      
 
+  for (i=0; i < in->numofrules; i++)
+  {
+    // FIXME Shall we be so strict here, or should we use some default?
+    // (was default formerly)
+    if (in->sys_on_strings[i] == NULL)
+      { glb_error("No chi^2 function specified."); status=-1; }
+    else if (glbSetChiFunctionInExperiment(in, i, GLB_ON, in->sys_on_strings[i]) != 0)
+      { glb_error("Unknown chi^2 function specified."); status=-1; }
+    
+    if (in->sys_off_strings[i] == NULL)
+      { glb_error("No chi^2 function specified."); status=-1; }
+    else if (glbSetChiFunctionInExperiment(in, i, GLB_OFF, in->sys_off_strings[i]) != 0)
+      { glb_error("Unknown chi^2 function specified."); status=-1; }
+  }
 
-      if(in->errordim_sys_off[i]==-1){
-	in->errordim_sys_off[i]=2;
-	// This is a safe setting, i.e. no systematics are
-	// considered
-	def=-1;}
-
-      if(in->errordim_sys_on[i]==-1){
-	in->errordim_sys_on[i]=2;
-	// This is a safe setting, i.e. no systematics are
-	// considered
-	def=-1;}
-
-      in->errordim[i]=in->errordim_sys_on[i];
-     
-    }
   if(in->errorfunction==-1){in->errorfunction=0;def=-1;}
   if(in->baseline==-1){glb_error("No baseline specified!");status=-1;}
   if(in->emin==-1){glb_error("No emin specified!");status=-1;}
@@ -833,8 +800,6 @@ int glbDefaultExp(glb_exp ins)
       if(in->energy_window[i][0]==-1){in->energy_window[i][0]=in->emin;def=-1;}
       if(in->energy_window[i][1]==-1){in->energy_window[i][1]=in->emax;def=-1;}
     }
-  if(in->chirate==NULL){glb_error("chirate not allocated!");
-  status=-1;}
   for(i=0;i<in->numofrules;i++)
     {
       if(in->SignalRates[i]==NULL||
@@ -888,30 +853,6 @@ static void glbSetNumberOfExperiments(int in)
 }
 
 
-char* glbSetSys(int select, int rule, int experiment)
-{
-  glb_experiment_list[experiment]->sys[rule]=sys_list[select];
-  return sys_list[select].info;
-}
-
-void glbSetSysErrors(double *val, int rule, int experiment)
-{
-  int i;
-  for(i=0;i<(glb_experiment_list[experiment]->sys[rule]).dimension;i++)
-    {
-      (glb_experiment_list[experiment]->sys[rule]).errors[i]=val[i];
-    }
-}
-
-void glbSetSysCenter(double *val, int rule, int experiment)
-{
-  int i;
-  for(i=0;i<(glb_experiment_list[experiment]->sys[rule]).dimension;i++)
-    {
-      (glb_experiment_list[experiment]->sys[rule]).sp[i]=val[i];
-    }
-}
-
 // this function moves the pointers to the ratevectors to the correct address
 // allocated with MInitFile().
 // this is crucial for multiple experiment support
@@ -931,7 +872,6 @@ static void MMovePointers(struct glb_experiment *in)
       glb_calc_signal_rates[k] = in->SignalRates[k]; 
       glb_calc_bg_rates[k] = in->BackgroundRates[k];
       /* FIXME -- wrong number */ 
-      sys_calc[k]=in->sys[k];    
     } 
   for(k=0;k<in->num_of_sm;k++) glb_calc_smear_data[k]=in->smear_data[k];
   for(k=0;k<in->numofchannels;k++)
@@ -948,7 +888,6 @@ static void MMovePointers(struct glb_experiment *in)
   
   for(k=0;k<in->num_of_fluxes;k++) glb_calc_fluxes[k]=in->fluxes[k];
   for(k=0;k<in->num_of_xsecs;k++) glb_calc_xsecs[k]=in->xsecs[k];
-  glb_chirate = in->chirate;
   glb_calc_energy_tab = in->energy_tab;
   glb_calc_buffer=in->buffer;
   return;
@@ -985,7 +924,6 @@ static struct glb_experiment MInitMemory0(struct glb_experiment in)
 	}
       out.buffer=(double*) glb_malloc(l2*sizeof(double));
       out.energy_tab= (double*) glb_malloc(len*sizeof(double)); 
-      out.chirate=(double*) glb_malloc(len*sizeof(double));
     }
   for(k=0;k<out.numofchannels;k++)
     {
@@ -1104,8 +1042,6 @@ void glbSetExperiment(glb_exp in)
 				(double) s->bgtcenter[1][i]);
       glb_calc_set_tresh_errors(i,(double) s->bgterror[0][i],
 				(double) s->bgterror[1][i]);
-      glb_set_errordim(s->errordim[i],i);  
-      
      
       // this is preliminary (0 should be replaced by i)
       glb_calc_simbins=s->simbins;

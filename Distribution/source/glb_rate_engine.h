@@ -76,7 +76,7 @@ void glb_set_new_rates();
 void glb_set_signal_errors(int i,double norm, double tilt);
 void glb_set_bg_errors(int i,double norm, double tilt);
 void glb_set_bg_center(int i,double norm, double tilt);
-double glb_chi_sys_w_bg(double x[5]);
+double glb_chi_sys_w_bg(int exp, int rule, double *params, int n_params);
 
 
 
@@ -95,26 +95,25 @@ int glb_calc_check_num_of_rules();
 double* glb_calc_check_signal_errors(int i);
 double* glb_calc_check_bg_errors(int i);
 double* glb_calc_check_bg_center(int i);
-double glb_chi_sys_w_bgtot(double x[5]);
+double glb_chi_sys_w_bgtot(int exp, int rule, double *params, int n_params);
 void glb_calc_set_tresh_center(int i, double a, double b);
 void glb_calc_set_tresh_errors(int i, double a, double b);
 void glb_calc_check_tresh_center(int i,double *in);
 void glb_calc_check_tresh_errors(int i,double *in);
-double glb_chi_sys_w_bg2(double x[7]);
+double glb_chi_sys_w_bg2(int exp, int rule, double *params, int n_params);
 
 void glb_set_error_function(int typ);
 int glb_check_error_function();
 
 void glb_remove_calc_pointers();
-double glb_chi_sys_w_bgtot2(double x[5]);
-double glb_chi_split(double x[6]);
-double glb_chi_spec(double x[2]);
+double glb_chi_sys_w_bgtot2(int exp, int rule, double *params, int n_params);
+double glb_chi_split(int exp, int rule, double *params, int n_params);
+double glb_chi_spec(int exp, int rule, double *params, int n_params);
 
 void glb_calc_set_energy_window(int i, double a, double b);
 void check_glb_calc_energy_window(int i,double *in);
 double glb_window_function(double low,double up,int bin);
-double glb_chi_sys_w_bg_calib(double x[5]);
-void glb_shift_energy_scale(double g,double* ratesin, double* ratesout);
+double glb_chi_sys_w_bg_calib(int exp, int rule, double *params, int n_params);
 
 extern double* glb_chirate;
 extern double** glb_calc_smearing[32];

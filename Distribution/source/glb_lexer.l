@@ -214,6 +214,16 @@ yylval.name=yytext;
 
 return BG;}
 
+<rule>@sys_on_function   {
+yylval.name=yytext;
+return SYS_ON_FUNCTION;
+}
+
+<rule>@sys_off_function   {
+yylval.name=yytext;
+return SYS_OFF_FUNCTION;
+}
+
 
 
 \" {cond_buf_str=YY_START;BEGIN(str);}

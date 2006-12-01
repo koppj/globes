@@ -76,6 +76,8 @@
   static glb_option_type opt;
   static glb_flux flt;
   static glb_xsec xsc;
+  static int errordim_sys_on;    /* Temporary storage for the old numerical errordims */
+  static int errordim_sys_off;
   static char *context;
 
 
@@ -138,10 +140,6 @@
  
     {"$sampling_stepsize",DOUBLE_LIST,0,GMAX,&buff.simbinsize,
      &buff.simbins,"global"}, 
-
- 
-
-   
   
    {"$densitytab",DOUBLE_LIST,0,GMAX,&buff.densitytab,&buff.psteps,"global"},
    {"$lengthtab",DOUBLE_LIST,0,2*GLB_EARTH_RADIUS,
@@ -171,11 +169,12 @@
     {"@post_smearing_background",DOUBLE_LIST_INDEXED,0,GMAX,
      &buff.user_post_smearing_background[0],&loc_count,"channel"},
     
-   
-   {"@errordim_sys_on",INT_INDEXED,0,20
-    ,&buff.errordim_sys_on[0],&loc_count,"rule"},
-    {"@errordim_sys_off",INT_INDEXED,0,20
-    ,&buff.errordim_sys_off[0],&loc_count,"rule"},
+ 
+   {"@errordim_sys_on",INT,0,20,&errordim_sys_on,NULL,"rule"},
+   {"@errordim_sys_off",INT,0,20,&errordim_sys_off,NULL,"rule"},
+   {"@sys_on_function",CHAR,0,20,&buff.sys_on_strings[0],&loc_count,"rule"},
+   {"@sys_off_function",CHAR,0,20,&buff.sys_off_strings[0],&loc_count,"rule"},
+
    {"channel",UNTYPE,-1,1,NULL,&buff.numofchannels,"global"},
    {"@channel",INT_LIST_INDEXED,-1,1,&buff.listofchannels[0],
     &buff.numofchannels,"channel"},
@@ -232,7 +231,8 @@
 
  
 static void grp_end(char* name)
-   {    
+   {
+     char tmp_errordim[2];    
      
      if(strncmp(name,"energy",6)==0 )
        {
@@ -267,7 +267,7 @@ static void grp_end(char* name)
 	   }
        }  
 
-     if(strncmp(name,"cross",4)==0 )
+     if(strncmp(name,"cross",5)==0 )
        {
 	 if(buff.num_of_xsecs > 0)   
 	   {
@@ -278,6 +278,33 @@ static void grp_end(char* name)
 	     glb_xsec_reset(&xsc);
 	   }
        }  
+
+     /* Parse old (numerical) errordims */
+     if(strncmp(name,"rule",4)==0 )
+       {
+         if (buff.sys_on_strings[buff.numofrules-1] == NULL)
+         {
+           if (errordim_sys_on >=0  &&  errordim_sys_on <= 99)
+           {
+             sprintf(tmp_errordim, "%d", errordim_sys_on);
+             buff.sys_on_strings[buff.numofrules-1] = strdup(tmp_errordim);
+//             glbSetChiFunctionInExperiment(&buff, buff.numofrules-1, GLB_ON,
+//                                           buff.sys_on_strings[buff.numofrules-1]);
+           }
+         }
+
+         if (buff.sys_off_strings[buff.numofrules-1] == NULL)
+         {
+           if (errordim_sys_off >=0  &&  errordim_sys_off <= 99)
+           {
+             sprintf(tmp_errordim, "%d", errordim_sys_off);
+             buff.sys_off_strings[buff.numofrules-1] = strdup(tmp_errordim);
+//             glbSetChiFunctionInExperiment(&buff, buff.numofrules-1, GLB_OFF,
+//                                           buff.sys_off_strings[buff.numofrules-1]);
+           }
+         }
+       } 
+
 
      glb_free(context);
      context = (char *) strdup("global");
@@ -955,6 +982,7 @@ static int set_exp_energy(char *name, glb_List **value)
 %token <nameptr> SFNCT
 %token <tptr> LVAR VAR FNCT   /* Variable and Function */
 %token <name> IDN CROSS FLUXP FLUXM
+%token <name> SYS_ON_FUNCTION SYS_OFF_FUNCTION
 %token <name> GRP GID FNAME VERS
 %token <in> SIGNAL BG GRPOPEN GRPCLOSE PM FLAVOR
 %token <in> NOGLOBES CHANNEL
@@ -1108,6 +1136,7 @@ ingroup: /* empty */
 version: VERS '=' FNAME {
   buff.version=strdup($3);
 }
+;
 
 cross: CROSS '=' FNAME {
   //load_cross($3,loc_count-1);
@@ -1121,6 +1150,16 @@ flux: FLUXP '=' FNAME {
   flt.file_name=strdup($3);
   //if(set_exp($1,$3,0)==1) yyerror("Unknown identifier");
   $$=$3;
+}
+;
+
+rule: SYS_ON_FUNCTION '=' FNAME {
+  buff.sys_on_strings[buff.numofrules-1] = strdup($3);
+}
+;
+
+rule: SYS_OFF_FUNCTION '=' FNAME {
+  buff.sys_off_strings[buff.numofrules-1] = strdup($3);
 }
 ;
 
@@ -1138,9 +1177,6 @@ channel: CHANNEL '=' name RULESEP pm RULESEP FLAVOR RULESEP FLAVOR RULESEP
 
 
   set_channel_data(x,loc_count);
-
-
-
 }
 ;
 

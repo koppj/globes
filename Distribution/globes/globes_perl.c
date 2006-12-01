@@ -503,7 +503,7 @@ SWIG_UnpackDataName(const char *c, void *ptr, size_t sz, const char *name) {
  * perl5.swg
  *
  * Perl5 runtime library
- * $Header: /home/lin/globes/cvs-noaccess/Projects/GLOBES/Distribution/globes/globes_perl.c,v 1.12 2006/11/29 12:37:10 globes Exp $
+ * $Header: /home/lin/globes/cvs-noaccess/Projects/GLOBES/Distribution/globes/globes_perl.c,v 1.13 2006/12/01 14:17:07 globes Exp $
  * ----------------------------------------------------------------------------- */
 
 #define SWIGPERL
@@ -1000,7 +1000,7 @@ SWIG_Perl_SetModule(swig_module_info *module) {
 #define SWIGTYPE_p_FILE swig_types[0]
 #define SWIGTYPE_p_double swig_types[1]
 #define SWIGTYPE_p_f_a_3__a_3__double_int_double_int_p_q_const__double_p_q_const__double_double__int swig_types[2]
-#define SWIGTYPE_p_f_a___double__double swig_types[3]
+#define SWIGTYPE_p_f_int_int_p_double_int__double swig_types[3]
 #define SWIGTYPE_p_f_p_struct_glb_params_type__int swig_types[4]
 #define SWIGTYPE_p_glb_experiment swig_types[5]
 #define SWIGTYPE_p_glb_params_type swig_types[6]
@@ -3684,6 +3684,104 @@ XS(_wrap_glbXSection) {
 }
 
 
+XS(_wrap_glbDefineChiFunction) {
+    {
+        glb_chi_function arg1 = (glb_chi_function) 0 ;
+        int arg2 ;
+        char *arg3 = (char *) 0 ;
+        int result;
+        int argvi = 0;
+        dXSARGS;
+        
+        if ((items < 3) || (items > 3)) {
+            SWIG_croak("Usage: glbDefineChiFunction(chi_func,dim,name);");
+        }
+        {
+            if (SWIG_ConvertPtr(ST(0), (void **) &arg1, SWIGTYPE_p_f_int_int_p_double_int__double,0) < 0) {
+                SWIG_croak("Type error in argument 1 of glbDefineChiFunction. Expected _p_f_int_int_p_double_int__double");
+            }
+        }
+        arg2 = (int) SvIV(ST(1));
+        if (!SvOK((SV*) ST(2))) arg3 = 0;
+        else arg3 = (char *) SvPV(ST(2), PL_na);
+        result = (int)glbDefineChiFunction(arg1,arg2,(char const *)arg3);
+        
+        ST(argvi) = sv_newmortal();
+        sv_setiv(ST(argvi++), (IV) result);
+        XSRETURN(argvi);
+        fail:
+        ;
+    }
+    croak(Nullch);
+}
+
+
+XS(_wrap_glbSetChiFunction) {
+    {
+        int arg1 ;
+        int arg2 ;
+        int arg3 ;
+        char *arg4 = (char *) 0 ;
+        int result;
+        int argvi = 0;
+        dXSARGS;
+        
+        if ((items < 4) || (items > 4)) {
+            SWIG_croak("Usage: glbSetChiFunction(exp,rule,on_off,sys_id);");
+        }
+        arg1 = (int) SvIV(ST(0));
+        arg2 = (int) SvIV(ST(1));
+        arg3 = (int) SvIV(ST(2));
+        if (!SvOK((SV*) ST(3))) arg4 = 0;
+        else arg4 = (char *) SvPV(ST(3), PL_na);
+        result = (int)glbSetChiFunction(arg1,arg2,arg3,(char const *)arg4);
+        
+        ST(argvi) = sv_newmortal();
+        sv_setiv(ST(argvi++), (IV) result);
+        XSRETURN(argvi);
+        fail:
+        ;
+    }
+    croak(Nullch);
+}
+
+
+XS(_wrap_glbShiftEnergyScale) {
+    {
+        double arg1 ;
+        double *arg2 = (double *) 0 ;
+        double *arg3 = (double *) 0 ;
+        int arg4 ;
+        int argvi = 0;
+        dXSARGS;
+        
+        if ((items < 4) || (items > 4)) {
+            SWIG_croak("Usage: glbShiftEnergyScale(g,rates_in,rates_out,n_bins);");
+        }
+        arg1 = (double) SvNV(ST(0));
+        
+        {
+            if (SWIG_ConvertPtr(ST(1), (void **) &arg2, SWIGTYPE_p_double,0) < 0) {
+                SWIG_croak("Type error in argument 2 of glbShiftEnergyScale. Expected _p_double");
+            }
+        }
+        {
+            if (SWIG_ConvertPtr(ST(2), (void **) &arg3, SWIGTYPE_p_double,0) < 0) {
+                SWIG_croak("Type error in argument 3 of glbShiftEnergyScale. Expected _p_double");
+            }
+        }
+        arg4 = (int) SvIV(ST(3));
+        glbShiftEnergyScale(arg1,arg2,arg3,arg4);
+        
+        
+        XSRETURN(argvi);
+        fail:
+        ;
+    }
+    croak(Nullch);
+}
+
+
 XS(_wrap_glbProbeModule) {
     {
         char *arg1 = (char *) 0 ;
@@ -4393,7 +4491,7 @@ XS(_wrap_glbSetUserChi) {
     {
         int arg1 ;
         int arg2 ;
-        double (*arg3)(double []) = (double (*)(double [])) 0 ;
+        glb_chi_function arg3 = (glb_chi_function) 0 ;
         int arg4 ;
         double *arg5 ;
         double *arg6 ;
@@ -4407,8 +4505,8 @@ XS(_wrap_glbSetUserChi) {
         arg1 = (int) SvIV(ST(0));
         arg2 = (int) SvIV(ST(1));
         {
-            if (SWIG_ConvertPtr(ST(2), (void **) &arg3, SWIGTYPE_p_f_a___double__double,0) < 0) {
-                SWIG_croak("Type error in argument 3 of glbSetUserChi. Expected _p_f_a___double__double");
+            if (SWIG_ConvertPtr(ST(2), (void **) &arg3, SWIGTYPE_p_f_int_int_p_double_int__double,0) < 0) {
+                SWIG_croak("Type error in argument 3 of glbSetUserChi. Expected _p_f_int_int_p_double_int__double");
             }
         }
         arg4 = (int) SvIV(ST(3));
@@ -4466,62 +4564,6 @@ XS(_wrap_glbGetCurrentRule) {
             SWIG_croak("Usage: glbGetCurrentRule();");
         }
         result = (int)glbGetCurrentRule();
-        
-        ST(argvi) = sv_newmortal();
-        sv_setiv(ST(argvi++), (IV) result);
-        XSRETURN(argvi);
-        fail:
-        ;
-    }
-    croak(Nullch);
-}
-
-
-XS(_wrap_glbShiftSignalEnergyScale) {
-    {
-        int arg1 ;
-        int arg2 ;
-        double arg3 ;
-        int result;
-        int argvi = 0;
-        dXSARGS;
-        
-        if ((items < 3) || (items > 3)) {
-            SWIG_croak("Usage: glbShiftSignalEnergyScale(exp,rule,amount);");
-        }
-        arg1 = (int) SvIV(ST(0));
-        arg2 = (int) SvIV(ST(1));
-        arg3 = (double) SvNV(ST(2));
-        
-        result = (int)glbShiftSignalEnergyScale(arg1,arg2,arg3);
-        
-        ST(argvi) = sv_newmortal();
-        sv_setiv(ST(argvi++), (IV) result);
-        XSRETURN(argvi);
-        fail:
-        ;
-    }
-    croak(Nullch);
-}
-
-
-XS(_wrap_glbShiftBackgroundEnergyScale) {
-    {
-        int arg1 ;
-        int arg2 ;
-        double arg3 ;
-        int result;
-        int argvi = 0;
-        dXSARGS;
-        
-        if ((items < 3) || (items > 3)) {
-            SWIG_croak("Usage: glbShiftBackgroundEnergyScale(exp,rule,amount);");
-        }
-        arg1 = (int) SvIV(ST(0));
-        arg2 = (int) SvIV(ST(1));
-        arg3 = (double) SvNV(ST(2));
-        
-        result = (int)glbShiftBackgroundEnergyScale(arg1,arg2,arg3);
         
         ST(argvi) = sv_newmortal();
         sv_setiv(ST(argvi++), (IV) result);
@@ -5217,7 +5259,7 @@ XS(_wrap_PInit) {
 static swig_type_info _swigt__p_FILE = {"_p_FILE", "FILE *", 0, 0, 0};
 static swig_type_info _swigt__p_double = {"_p_double", "double *", 0, 0, 0};
 static swig_type_info _swigt__p_f_a_3__a_3__double_int_double_int_p_q_const__double_p_q_const__double_double__int = {"_p_f_a_3__a_3__double_int_double_int_p_q_const__double_p_q_const__double_double__int", "int (*)(double [3][3],int,double,int,double const *,double const *,double)|glb_probability_matrix_function", 0, 0, 0};
-static swig_type_info _swigt__p_f_a___double__double = {"_p_f_a___double__double", "double (*)(double [])", 0, 0, 0};
+static swig_type_info _swigt__p_f_int_int_p_double_int__double = {"_p_f_int_int_p_double_int__double", "double (*)(int,int,double *,int)|glb_chi_function", 0, 0, 0};
 static swig_type_info _swigt__p_f_p_struct_glb_params_type__int = {"_p_f_p_struct_glb_params_type__int", "int (*)(struct glb_params_type *)|glb_get_oscillation_parameters_function", 0, 0, 0};
 static swig_type_info _swigt__p_glb_experiment = {"_p_glb_experiment", "struct glb_experiment *|glb_exp", 0, 0, 0};
 static swig_type_info _swigt__p_glb_params_type = {"_p_glb_params_type", "struct glb_params_type *|glb_params", 0, 0, 0};
@@ -5234,7 +5276,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_FILE,
   &_swigt__p_double,
   &_swigt__p_f_a_3__a_3__double_int_double_int_p_q_const__double_p_q_const__double_double__int,
-  &_swigt__p_f_a___double__double,
+  &_swigt__p_f_int_int_p_double_int__double,
   &_swigt__p_f_p_struct_glb_params_type__int,
   &_swigt__p_glb_experiment,
   &_swigt__p_glb_params_type,
@@ -5251,7 +5293,7 @@ static swig_type_info *swig_type_initial[] = {
 static swig_cast_info _swigc__p_FILE[] = {  {&_swigt__p_FILE, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_double[] = {  {&_swigt__p_double, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_f_a_3__a_3__double_int_double_int_p_q_const__double_p_q_const__double_double__int[] = {  {&_swigt__p_f_a_3__a_3__double_int_double_int_p_q_const__double_p_q_const__double_double__int, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_f_a___double__double[] = {  {&_swigt__p_f_a___double__double, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_f_int_int_p_double_int__double[] = {  {&_swigt__p_f_int_int_p_double_int__double, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_f_p_struct_glb_params_type__int[] = {  {&_swigt__p_f_p_struct_glb_params_type__int, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_glb_experiment[] = {  {&_swigt__p_glb_experiment, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_glb_params_type[] = {  {&_swigt__p_glb_params_type, 0, 0, 0},{0, 0, 0, 0}};
@@ -5268,7 +5310,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_FILE,
   _swigc__p_double,
   _swigc__p_f_a_3__a_3__double_int_double_int_p_q_const__double_p_q_const__double_double__int,
-  _swigc__p_f_a___double__double,
+  _swigc__p_f_int_int_p_double_int__double,
   _swigc__p_f_p_struct_glb_params_type__int,
   _swigc__p_glb_experiment,
   _swigc__p_glb_params_type,
@@ -5414,6 +5456,9 @@ static swig_command_info swig_commands[] = {
 {"globesc::glbGetNumberOfFluxes", _wrap_glbGetNumberOfFluxes},
 {"globesc::glbFlux", _wrap_glbFlux},
 {"globesc::glbXSection", _wrap_glbXSection},
+{"globesc::glbDefineChiFunction", _wrap_glbDefineChiFunction},
+{"globesc::glbSetChiFunction", _wrap_glbSetChiFunction},
+{"globesc::glbShiftEnergyScale", _wrap_glbShiftEnergyScale},
 {"globesc::glbProbeModule", _wrap_glbProbeModule},
 {"globesc::glbOpenModule", _wrap_glbOpenModule},
 {"globesc::glbCloseModule", _wrap_glbCloseModule},
@@ -5442,8 +5487,6 @@ static swig_command_info swig_commands[] = {
 {"globesc::glbSetUserChi", _wrap_glbSetUserChi},
 {"globesc::glbGetCurrentExp", _wrap_glbGetCurrentExp},
 {"globesc::glbGetCurrentRule", _wrap_glbGetCurrentRule},
-{"globesc::glbShiftSignalEnergyScale", _wrap_glbShiftSignalEnergyScale},
-{"globesc::glbShiftBackgroundEnergyScale", _wrap_glbShiftBackgroundEnergyScale},
 {"globesc::glbSetErrorDim", _wrap_glbSetErrorDim},
 {"globesc::glbGetErrorDim", _wrap_glbGetErrorDim},
 {"globesc::glbSwitchSystematics", _wrap_glbSwitchSystematics},

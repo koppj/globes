@@ -19,37 +19,15 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-
-
-
-
-#ifndef GLB_MULTIEX_H
-#define GLB_MULTIEX_H 1
+#ifndef GLB_SYS_H
+#define GLB_SYS_H 1
 
 #include "glb_types.h"
 
-extern int glb_current_exp;
+extern glb_systematic *glb_sys_list;
 
-void glb_set_profile_scaling(double scale,int i);
-
-glb_flux *glb_flux_alloc();
-void glb_flux_free(glb_flux *stale);
-int glb_default_flux(glb_flux *in);
-glb_flux  *cpy_glb_flux(glb_flux *dest, const glb_flux *src);
-
-glb_flux *glb_flux_reset(glb_flux *temp);
-double** glb_alloc_flux_storage(size_t lines);
-void glb_free_flux_storage(double **stale);
-
-glb_xsec *glb_xsec_alloc();
-void glb_xsec_free(glb_xsec *stale);
-int glb_default_xsec(glb_xsec *in);
-glb_xsec  *cpy_glb_xsec(glb_xsec *dest, const glb_xsec *src);
-
-glb_xsec *glb_xsec_reset(glb_xsec *temp);
-double** glb_alloc_xsec_storage(size_t lines);
-void glb_free_xsec_storage(double **stale);
+int glbSetChiFunctionInExperiment(struct glb_experiment *exp, int rule, int on_off,
+                                  const char * sys_id);
 
 
-
-#endif /* GLB_MULTIEX_H */
+#endif /* GLB_SYS_H */

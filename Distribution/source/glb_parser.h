@@ -1,7 +1,7 @@
-/* A Bison parser, made by GNU Bison 1.875.  */
+/* A Bison parser, made by GNU Bison 2.1.  */
 
 /* Skeleton parser for Yacc-like parsing with Bison,
-   Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002 Free Software Foundation, Inc.
+   Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,8 +15,8 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place - Suite 330,
-   Boston, MA 02111-1307, USA.  */
+   Foundation, Inc., 51 Franklin Street, Fifth Floor,
+   Boston, MA 02110-1301, USA.  */
 
 /* As a special exception, when this file is copied by Bison into a
    Bison output file, you may use that output file without restriction.
@@ -38,27 +38,30 @@
      CROSS = 264,
      FLUXP = 265,
      FLUXM = 266,
-     GRP = 267,
-     GID = 268,
-     FNAME = 269,
-     VERS = 270,
-     SIGNAL = 271,
-     BG = 272,
-     GRPOPEN = 273,
-     GRPCLOSE = 274,
-     PM = 275,
-     FLAVOR = 276,
-     NOGLOBES = 277,
-     CHANNEL = 278,
-     RULESEP = 279,
-     RULEMULT = 280,
-     ENERGY = 281,
-     NAME = 282,
-     RDF = 283,
-     NDEF = 284,
-     NEG = 285
+     SYS_ON_FUNCTION = 267,
+     SYS_OFF_FUNCTION = 268,
+     GRP = 269,
+     GID = 270,
+     FNAME = 271,
+     VERS = 272,
+     SIGNAL = 273,
+     BG = 274,
+     GRPOPEN = 275,
+     GRPCLOSE = 276,
+     PM = 277,
+     FLAVOR = 278,
+     NOGLOBES = 279,
+     CHANNEL = 280,
+     RULESEP = 281,
+     RULEMULT = 282,
+     ENERGY = 283,
+     NAME = 284,
+     RDF = 285,
+     NDEF = 286,
+     NEG = 287
    };
 #endif
+/* Tokens.  */
 #define NUM 258
 #define SFNCT 259
 #define LVAR 260
@@ -68,31 +71,33 @@
 #define CROSS 264
 #define FLUXP 265
 #define FLUXM 266
-#define GRP 267
-#define GID 268
-#define FNAME 269
-#define VERS 270
-#define SIGNAL 271
-#define BG 272
-#define GRPOPEN 273
-#define GRPCLOSE 274
-#define PM 275
-#define FLAVOR 276
-#define NOGLOBES 277
-#define CHANNEL 278
-#define RULESEP 279
-#define RULEMULT 280
-#define ENERGY 281
-#define NAME 282
-#define RDF 283
-#define NDEF 284
-#define NEG 285
+#define SYS_ON_FUNCTION 267
+#define SYS_OFF_FUNCTION 268
+#define GRP 269
+#define GID 270
+#define FNAME 271
+#define VERS 272
+#define SIGNAL 273
+#define BG 274
+#define GRPOPEN 275
+#define GRPCLOSE 276
+#define PM 277
+#define FLAVOR 278
+#define NOGLOBES 279
+#define CHANNEL 280
+#define RULESEP 281
+#define RULEMULT 282
+#define ENERGY 283
+#define NAME 284
+#define RDF 285
+#define NDEF 286
+#define NEG 287
 
 
 
 
 #if ! defined (YYSTYPE) && ! defined (YYSTYPE_IS_DECLARED)
-#line 942 "glb_parser.y"
+#line 969 "glb_parser.y"
 typedef union YYSTYPE {
   double  val;  /* For returning numbers.                   */
   double *dpt;  /* for rules */
@@ -104,8 +109,8 @@ typedef union YYSTYPE {
   int in;
   glb_namerec *nameptr;
 } YYSTYPE;
-/* Line 1249 of yacc.c.  */
-#line 108 "glb_parser.h"
+/* Line 1447 of yacc.c.  */
+#line 114 "glb_parser.h"
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
 # define YYSTYPE_IS_TRIVIAL 1

@@ -562,4 +562,22 @@ documented!
        Verification: Works with the standard probability code.
          Has still to be verified for > 6 parameters.
 
+       - Modified definition of user-defined chi^2 functions. (exp, rule,
+           and n_params are parameters now)
+       - Work on chi^2/systematics stuff
+       Verification: only minimal deviations in testsuite 03/04/05/06,
+         which are due to varying compiler optimizations
 
+01/12/2006 JK
+       - First part of new systematics implemented:
+           * New AEDL directives sys_on_function/sys_off_function
+           * New functions glbDefineChiFunction/glbSetChiFunction
+           * Converted the (documented) old chi functions
+       - Removed the obsolete internal parts of the old systematics treatment
+       - Removed the now unused array chirate in glb_experiment
+       Verification: Testsuite
+
+
+
+
+           

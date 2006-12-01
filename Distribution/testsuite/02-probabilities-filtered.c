@@ -34,14 +34,14 @@ using namespace std;
 int main(int argc, char *argv[])
 { 
   // "True" oscillation parameter ranges
-  const double p_ranges[GLB_OSCP][3] = { 
+  const double p_ranges[6][3] = { 
     { 20.0 * M_PI/180.0, 45.0 * M_PI/180.0,  8.0 * M_PI/180.0 },              // theta-12
     { 0.0,               10.0 * M_PI/180.0,  2.5 * M_PI/180.0 },              // theta-13
     { 30.0 * M_PI/180.0, 60.0 * M_PI/180.0, 10.0 * M_PI/180.0 },              // theta-23
     { 0.0,             2*M_PI,               M_PI/4.0         },              // delta_CP
     { 6e-5,              9e-5,               1.0e-5           },              // dm21
     { 1e-3,              4e-3,               1.0e-3           } };            // dm31
-  double params[GLB_OSCP];
+  double params[6];
   long nLine = 0;
   char *GLB_FILE = argv[argc-1];
 
@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
   delete[] lengths;
   delete[] densities;
   
-  for (int j=0; j < GLB_OSCP; j++)
+  for (int j=0; j < glbGetNumOfOscParams(); j++)
     params[j] = p_ranges[j][0];
   
   int k;
@@ -78,7 +78,7 @@ int main(int argc, char *argv[])
           for (int ff=1; ff <= 3; ff++)
           {
             cout << "<" << ++nLine <<": E=" << E << ", CP=" << cp_sign << ", Osc.params = {";
-            for (int k=0; k < GLB_OSCP; k++)
+            for (int k=0; k < glbGetNumOfOscParams(); k++)
               cout << params[k] << ", ";
             cout << "\b\b}, Channel " << fi << " -> " << ff << ">  ";
             probs[fi-1][ff-1] = glbFilteredConstantDensityProbability(0, fi, ff, cp_sign, E);
@@ -100,7 +100,7 @@ int main(int argc, char *argv[])
     }
     
     // Increment parameter values
-    for (k=GLB_OSCP-1; k >= 0; k--)
+    for (k=glbGetNumOfOscParams()-1; k >= 0; k--)
       if ((params[k] += p_ranges[k][2]) <= p_ranges[k][1])
         break;
       else

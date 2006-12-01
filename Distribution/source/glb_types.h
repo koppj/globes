@@ -25,6 +25,7 @@
 #ifndef GLB_TYPES_H
 #define GLB_TYPES_H 1
 
+#include "globes/globes.h"
 
 /* This is a close relative of glb_namerec, which is needed in order
  * to facilitate the cooperation between AEDL and C.
@@ -123,15 +124,14 @@ typedef struct {
 } glb_smear;
 
 
-struct glb_systematic
+/* Data structure containing information about systematics functions */
+typedef struct glb_systematic
 {
-  double (*chi_func)();
-  int dimension;
-  double *sp; 
-  double *errors;
-  double (*evalf)();
-  char *info;
-};
+  glb_chi_function chi_func;   /* Pointer to the chi^2 function         */
+  int dim;                     /* Number of systematics parameters      */
+  char *name;                  /* Unique name of this chi^2 routine     */
+  struct glb_systematic *next; /* Pointer to next entry in glb_sys_list */
+} glb_systematic;
 
 
 
@@ -151,12 +151,9 @@ struct glb_systematic
 struct glb_experiment {
 
   /* Version string */
-
   char *version;
 
-
   /* This contains the parsing meta-information like names of rules etc. */
-
   glb_naming *names;
   
   /** The beam spectrum is loaded with glb_flux_loader(file_name, flux_ident)
@@ -172,26 +169,9 @@ struct glb_experiment {
 
  
   /* This is the binsize array. */
-  
   double *binsize;
 
   double *simbinsize; 
-
-  /** errordim describes how the systematical errors are handled and
-  * also how the low level chi^2 function is computed (at event rate level).
-  * right now it ranges from 0 to 9. errordim can be defined for each
-  * rule independently, that´s why it is a vector. In any case this
-  * flag is probably going to change! The default right now is 0.
-  */
-  int errordim[32];
-  
-  /** Two more values for storing the errordims. One for the value which 
-   * corresponds to 'systematics on' and the other to 'systematics off'.
-   * A function called glbSwitchSystematics will copy either value to
-   * errordim, which then is used by glbSetExperiment.
-   */
-  int errordim_sys_on[32];
-  int errordim_sys_off[32];
 
   /** errorfunction is a rather strange construct and probably will become
   * obsolete. The default is 1.
@@ -222,7 +202,6 @@ struct glb_experiment {
   * It is larger than zero.
   */
   int numofbins;
-
 
 
   /** Target mass in units of kt (=1000 tons). It is positive.
@@ -313,7 +292,6 @@ struct glb_experiment {
   int num_of_sm;
 
   /** Meta information for computing the smear matrix for each rule */
-  
   glb_smear *smear_data[32];
 
   /** Thus holds the pointer to the place where the energy resolution
@@ -446,52 +424,47 @@ struct glb_experiment {
   */
   double* user_post_smearing_background[32];
 
-
- 
-
-  /** Energy range for each rule in which the events are used to compute
-  * the chi^2. Lower limit and upper limit.
-  */
-  double energy_window[32][2];
-
-  /** One more buffer of length numofbins. Needed to access shifted
-  * rate vector.
-  */
-  double* chirate;
-
-  /** Now comes a bunch of pointers which finally are vectors containing
-  * the different parts of event vectors needed during computation.
-  * All mallocing has to be done at intialization of a given experiment!
-  */
-  double* SignalRates[32];    /* "True" signal event rates for all rules */
-  double* BackgroundRates[32];/* "True" background event rates for all rules */
-  double* rates0[32];         /* "True" event rates for all rules */
-  double* rates1[32];         /* Fitted signal rates for all rules */
-  double* rates1T[32];        /* Fitted and tilted signal rates for all rules */
-  double* rates1BG[32];       /* Fitted background rates for all rules */
-  double* rates1BGT[32];      /* Fitted and tilted background rates for all rules */
-
-  /** Has length numofbins */
-  double* energy_tab;
-
   /** New.
   * Store pre-computed background. Has length numofbins. 
   * Determined internally.
   */
   double* no_osc_background[32];
 
-  /** New.
-   * All crucial for the chi^2 interface
-   */
-  struct glb_systematic sys[32]; 
+  /** Energy range for each rule in which the events are used to compute
+  * the chi^2. Lower limit and upper limit.
+  */
+  double energy_window[32][2];
 
+  /** Has length numofbins */
+  double* energy_tab;
+
+
+  /** Now comes a bunch of pointers which finally are vectors containing
+  * the different parts of event vectors needed during computation.
+  * All mallocing has to be done at intialization of a given experiment!
+  */
+  double *chrb_0[32], *chrb_1[32]; /* True and fitted pre-smearing rates by channel   */
+  double *chra_0[32], *chra_1[32]; /* True and fitted post-smearing rates  by channel */
+  double* SignalRates[32];    /* "True" signal event rates for all rules */
+  double* BackgroundRates[32];/* "True" background event rates for all rules */
+  double* rates0[32];         /* "True" event rates for all rules */
+  double* rates1[32];         /* Fitted signal rates for all rules */
+  double* rates1T[32];        /* Fitted and tilted signal rates for all rules *///FIXME remove
+  double* rates1BG[32];       /* Fitted background rates for all rules */
+  double* rates1BGT[32];      /* Fitted and tilted background rates for all rules *///FIXME remove
+
+  int sys_on_off[32];         /* Systematics switch (GLB_ON/GLB_OFF)     */
+  glb_systematic *sys_on[32]; /* The chi^2 functions of the rules        */
+  glb_systematic *sys_off[32]; 
+  char *sys_on_strings[32];   /* The errordim strings from the AEDL file */
+  char *sys_off_strings[32];
+
+//  double *sys_errors[32];     /* Systematical errors */
+//  double *sys_startvals[32];  /* Starting values for systematics minimization */
+
+  
   /* Additional work spaces */  
-
   double *buffer;
-  double *chrb_0[32], *chrb_1[32];  /* True and fitted pre-smearing rates  */
-  double *chra_0[32], *chra_1[32];  /* True and fitted post-smearing rates */
-
-
 };
 
 #endif /* GLB_TYPES_H 1 */

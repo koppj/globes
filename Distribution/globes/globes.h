@@ -260,9 +260,8 @@ double glbXSection(int experiment, int xsec_ident,double energy,int flavour,
 
 
 /* User-defined Systematics */
-//void glbDefineChiFunction(glb_chi_function chi_func, int dim, char *info);           // JK - new
-//int glbSetChiFunction(int experiment, int rule, int on_off, const char *sys_id); 
-       // JK - new, replaces glbSetErrorDim
+int glbDefineChiFunction(glb_chi_function chi_func, int dim, const char *name);
+int glbSetChiFunction(int exp, int rule, int on_off, const char *sys_id); 
 //int glbSwitchSystematics(int experiment, int rule, int on_off);
 //int glbSetSignalErrors(int experiment, int rule, double norm, double tilt);
 //int glbSetSignalCenters(int experiment, int rule, double norm, double tilt);         // JK - new
@@ -287,7 +286,7 @@ double glbXSection(int experiment, int xsec_ident,double energy,int flavour,
 //int glbGetSysCentersList(int experiment, int rule, double *sys_list);                // JK - new
 //int glbGetSysStartingValuesList(int experiment, int rule, double *sys_list);         // JK - new
 
-//void glbShiftEnergyScale(double *rates, int n_bins, double amount);  // JK - new
+void glbShiftEnergyScale(double g, double *rates_in, double *rates_out, int n_bins);
 
 
 /* Modules and user-defined priors */
@@ -355,12 +354,10 @@ int glbGetInputErrors(glb_params in);
 
 /* Functions for user-defined chi^2 calculations */
 
-void glbSetUserChi(int exp, int rule, double (*chi_func)(double x[]), int dim,
+void glbSetUserChi(int exp, int rule, glb_chi_function chi_func, int dim,
                    double params[], double errors[], char *info);
 int glbGetCurrentExp();
 int glbGetCurrentRule();
-int glbShiftSignalEnergyScale(int exp, int rule, double amount);
-int glbShiftBackgroundEnergyScale(int exp, int rule, double amount);
 
 
 

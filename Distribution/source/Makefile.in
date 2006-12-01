@@ -78,7 +78,7 @@ am_libglobes_la_OBJECTS = libglobes_la-glb_minimize.lo \
 	libglobes_la-glb_min_sup.lo libglobes_la-glb_fluxes.lo \
 	libglobes_la-glb_smear.lo libglobes_la-glb_lexer.lo \
 	libglobes_la-glb_probability.lo libglobes_la-glb_profile.lo \
-	libglobes_la-user_chi.lo libglobes_la-glb_wrapper.lo \
+	libglobes_la-glb_sys.lo libglobes_la-glb_wrapper.lo \
 	libglobes_la-glb_glb.lo libglobes_la-glb_prior.lo \
 	libglobes_la-glb_compat.lo
 libglobes_la_OBJECTS = $(am_libglobes_la_OBJECTS)
@@ -259,15 +259,13 @@ target_alias = @target_alias@
 INCLUDES = -I$(top_srcdir) -I$(top_srcdir)/lib $(GSLINC)
 AM_YFLAGS = -d 
 lib_LTLIBRARIES = libglobes.la
-libglobes_la_SOURCES = glb_minimize.c glb_error.c glb_path.c glb_multiex.c\
- glb_version.c \
-glb_rate_engine.c  \
-  glb_parser.y  glb_min_sup.c glb_fluxes.c glb_smear.c glb_lexer.l glb_probability.cc glb_profile.c\
-  user_chi.c glb_wrapper.c\
-glb_minimize.h  glb_error.h glb_path.h glb_parser_addons.h glb_multiex.h glb_probability.h glb_smear.h \
-glb_rate_engine.h glb_types.h glb_parser.h glb_min_sup.h  glb_version.h \
-glb_lexer.h glb_fluxes.h glb_parser_type.h glb_wrapper.h\
-glb_profile.h  glb_glb.c  glb_prior.h glb_prior.c glb_compat.c
+libglobes_la_SOURCES = glb_minimize.c glb_error.c glb_path.c glb_multiex.c \
+ glb_version.c glb_rate_engine.c  glb_parser.y glb_min_sup.c glb_fluxes.c \
+ glb_smear.c glb_lexer.l glb_probability.cc glb_profile.c glb_sys.c glb_wrapper.c \
+ glb_minimize.h glb_error.h glb_path.h glb_parser_addons.h glb_multiex.h \
+ glb_probability.h glb_smear.h glb_rate_engine.h glb_types.h glb_parser.h \
+ glb_min_sup.h  glb_version.h glb_lexer.h glb_fluxes.h glb_parser_type.h \
+ glb_wrapper.h glb_profile.h glb_sys.h glb_glb.c  glb_prior.h glb_prior.c glb_compat.c
 
 libglobes_la_LDFLAGS = @LIBS@ -version-info @GLBLIBVERSION@ \
 	$(top_builddir)/lib/libgnu.la
@@ -396,9 +394,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libglobes_la-glb_profile.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libglobes_la-glb_rate_engine.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libglobes_la-glb_smear.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libglobes_la-glb_sys.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libglobes_la-glb_version.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libglobes_la-glb_wrapper.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libglobes_la-user_chi.Plo@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
@@ -505,12 +503,12 @@ libglobes_la-glb_profile.lo: glb_profile.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libglobes_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libglobes_la-glb_profile.lo `test -f 'glb_profile.c' || echo '$(srcdir)/'`glb_profile.c
 
-libglobes_la-user_chi.lo: user_chi.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libglobes_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libglobes_la-user_chi.lo -MD -MP -MF "$(DEPDIR)/libglobes_la-user_chi.Tpo" -c -o libglobes_la-user_chi.lo `test -f 'user_chi.c' || echo '$(srcdir)/'`user_chi.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libglobes_la-user_chi.Tpo" "$(DEPDIR)/libglobes_la-user_chi.Plo"; else rm -f "$(DEPDIR)/libglobes_la-user_chi.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='user_chi.c' object='libglobes_la-user_chi.lo' libtool=yes @AMDEPBACKSLASH@
+libglobes_la-glb_sys.lo: glb_sys.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libglobes_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libglobes_la-glb_sys.lo -MD -MP -MF "$(DEPDIR)/libglobes_la-glb_sys.Tpo" -c -o libglobes_la-glb_sys.lo `test -f 'glb_sys.c' || echo '$(srcdir)/'`glb_sys.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libglobes_la-glb_sys.Tpo" "$(DEPDIR)/libglobes_la-glb_sys.Plo"; else rm -f "$(DEPDIR)/libglobes_la-glb_sys.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='glb_sys.c' object='libglobes_la-glb_sys.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libglobes_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libglobes_la-user_chi.lo `test -f 'user_chi.c' || echo '$(srcdir)/'`user_chi.c
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libglobes_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libglobes_la-glb_sys.lo `test -f 'glb_sys.c' || echo '$(srcdir)/'`glb_sys.c
 
 libglobes_la-glb_wrapper.lo: glb_wrapper.c
 @am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libglobes_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libglobes_la-glb_wrapper.lo -MD -MP -MF "$(DEPDIR)/libglobes_la-glb_wrapper.Tpo" -c -o libglobes_la-glb_wrapper.lo `test -f 'glb_wrapper.c' || echo '$(srcdir)/'`glb_wrapper.c; \

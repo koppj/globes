@@ -110,17 +110,12 @@ static double *start = NULL;
 //static double inp_errs[GLB_OSCP+1];
 //static double start[GLB_OSCP+1];
 static int count=0;
-static int errordim[32];
 //int glb_single_experiment_number=0;
-static double sysglb_calc_buffer[6];
 
 //This serves for ChiNP
 static double *fix_params = NULL;
 static int *para_tab = NULL;
 static int *index_tab = NULL;
-//static double fix_params[GLB_OSCP+32];
-//static int para_tab[GLB_OSCP+32];
-//static int index_tab[GLB_OSCP+32];
 static int n_free;
 static int n_fix;
 
@@ -128,9 +123,6 @@ static int n_fix;
 static double *s_fix_params = NULL;
 static int *s_para_tab = NULL;
 static int *s_index_tab = NULL;
-//static double s_fix_params[GLB_OSCP+1];
-//static int s_para_tab[GLB_OSCP+1];
-//static int s_index_tab[GLB_OSCP+1];
 static int s_n_free;
 static int s_n_fix;
 
@@ -191,34 +183,13 @@ static void  ml_abort_check(int flag)
 #endif
 
 
-// functions for returning the bfp of systematic parameters
-
-static void to_glb_calc_buffer(double sys[],int len)
-{
-  int i;
-  for (i=0;i<len;i++) sysglb_calc_buffer[i]=sys[i+1];
-  return;
-}
-
-static void clear_glb_calc_buffer()
-{
-  int i;
-  for (i=0;i<6;i++) sysglb_calc_buffer[i]=0.0;
-  return;
-}
-
-static double* read_glb_calc_buffer()
-{
-  return &sysglb_calc_buffer[0];
-}
-
-
-
 //--------------------------------------------------------------------------
 //-------------------- Initialization of arrays ----------------------------
 //--------------------------------------------------------------------------
 int glb_init_minimizer()
 {
+  int i;
+  
   glb_free_minimizer();
   
   /* General data structures */
@@ -235,7 +206,11 @@ int glb_init_minimizer()
   s_para_tab = (int *) glb_malloc((glbGetNumOfOscParams()+1) * sizeof(s_para_tab[0]));
   s_index_tab = (int *) glb_malloc((glbGetNumOfOscParams()+1) * sizeof(s_index_tab[0]));
 
-  return 0;
+  /* Select default projection */
+  for (i=0; i < glbGetNumOfOscParams()+32; i++)
+    para_tab[i] = GLB_FREE;
+  for (i=0; i < glbGetNumOfOscParams()+1; i++)
+    s_para_tab[i] = GLB_FREE;
 }
 
 
@@ -261,11 +236,22 @@ int glb_free_minimizer()
 //--------------------------------------------------------------------------
 
 
+/* Callback function for the systematics minimizer;        */
+/* Calls the actual (possibly user-defined) chi^2 function */
+/* with the appropriate parameters                         */
+// JK - FIXME - This should be solved more elegantly
+static glb_chi_function glb_current_chi_function;
+static int glb_current_n_sys;
+double glb_chi_callback(double *params)
+{
+  return glb_current_chi_function(glb_current_exp, glb_rule_number,
+                                  &(params[1]), glb_current_n_sys);
+}
+
+
 // this an init function -
 // setting up the input matrix for minimization
 // ie. the set of starting directions
-
-
 static void init_mat(double **m, int dim)
 {
   int i;
@@ -286,44 +272,6 @@ static void init_mat(double **m, int dim)
     }
 }
 
-//This is a wraper for accessing the minimizer
-
-static double chi_sys_wrap(double (*chi_func)(), int dimension, int alpha_in)
-{
-  double **mat; // contains the direction set
-  double *sp; // stores the coordinates of the minimum
-  double result=0; // stores the minimum value
-  int it=0; // counts the number of iterations
-  mat=glb_alloc_mat(1,dimension,1,dimension);
-  sp=glb_alloc_vec(1,6); // that is the maximal length
-  glb_rule_number=alpha_in;
-  init_mat(mat,dimension);
-
-  sp[1]=1;
-  sp[2]=0;
-  sp[3]=glb_bg_norm_center[alpha_in];
-  sp[4]=glb_bg_tilt_center[alpha_in];
-  sp[5]=glb_tre_null_center[alpha_in];
-  sp[6]=glb_tre_tilt_center[alpha_in];
-  if(glb_powell(sp,mat,dimension,TOLSYS,&it,&result,chi_func)!=0) result=-result;  
-  glb_free_vec(sp,1,6);
-  glb_free_mat(mat,1,dimension,1,dimension);
-  return result;
-}
-//Chi^2 where the systematics are integrated out
-
-void glb_set_errordim(int typ, int rule)
-{
-  errordim[rule]=typ;
-}
-
-int glb_check_errordim(int rule)
-{
-  return errordim[rule];
-}
-
-
-
 // probably will be replaced by a more object oriented approach
 
 // those two are needed in order to write unique
@@ -331,151 +279,132 @@ int glb_check_errordim(int rule)
 double *glb_sys_errors;
 double *glb_sys_centers;
 
-struct glb_systematic glb_init_systematic(double (*chi_func)(),int dimension,
-			    double *sp, double *errors, double (*evalf)(),
-			    char info[])
-{
-  struct glb_systematic out;
-  double *si,*se;
-  int i;
-  si=(double *) glb_malloc(sizeof(double)*dimension);
-  se=(double *) glb_malloc(sizeof(double)*dimension);
-  for(i=0;i<dimension;i++) si[i]=sp[i];
-  for(i=0;i<dimension;i++) se[i]=errors[i];
-  out.chi_func=chi_func;
-  out.dimension=dimension;
-  out.sp=si;
-  out.errors=se;
-  out.evalf=evalf;
-  out.info=info;
-  return out;
-}
-
-
-
-double glb_evaluate_chi(struct glb_systematic *in)
-{
-  int i;
-  double **mat; // contains the direction set
-  double *spi; // stores the coordinates of the minimum
-  double result=0; // stores the minimum value
-  int it=0; // counts the number of iterations
-  mat=glb_alloc_mat(1,in->dimension,1,in->dimension);
-  spi=glb_alloc_vec(1,in->dimension); // that is the maximal length
-  init_mat(mat,in->dimension);
-  for(i=1;i<in->dimension+1;i++) spi[i]=in->sp[i-1];
-  // this part of the unified interface to this quantities
-  glb_sys_centers=in->sp;
-  glb_sys_errors=in->errors;
-  //------------------------
-  if(glb_powell(spi,mat,in->dimension,TOLSYS,&it,&result,in->chi_func)!=0) result=-result;  
-  glb_free_vec(spi,1,in->dimension);
-  glb_free_mat(mat,1,in->dimension,1,in->dimension);
-  return result;
-}
-
-// This is the central switch board for choosing the
-// chi^2 function and  systematics treatment according
-// to each value of errordim
-
-static double chi_dispatch(int error_dim, int i)
-{     
-  // finally
-  double erg2=0;
-  
-  glb_rule_number = i;      // Tell the systematics functions which rule we are in
-  if(error_dim==0) //chi^2 with 4 sys. parameters
-    {
-      erg2=chi_sys_wrap(&glb_chi_sys_w_bg,4,i);
-      
-    }
-  else if(error_dim==1) //chi^2 with 6 sys. parameters
-    {
-      erg2=chi_sys_wrap(&glb_chi_sys_w_bg2,6,i); 
-    }
-  else if(error_dim==2) // chi^2 without sys. parameters
-    {
-      erg2=chi_sys_wrap(&glb_chi_sys_w_bg,0,i); 
-      // it seems that the minimizer correctly interprest zero dimensions
-      // as the function value at the starting point  
-    }
-  else if(error_dim==3) // very special for JHF-HK
-    {
-      if(i<4) erg2=chi_sys_wrap(&glb_chi_sys_w_bg,4,i); 
-      else erg2=chi_sys_wrap(&glb_chi_sys_w_bgtot,4,i); 
-    }
-  else if(error_dim==4) // total chi^2 with 4 sys parameters
-    {
-      erg2=chi_sys_wrap(&glb_chi_sys_w_bgtot2,4,i); 
-    }
-  else if(error_dim==5) // obsolete
-    {
-      fprintf(stderr,"Warning: obsolete errordim\n");
-      erg2=0;
-    }
-  else if(error_dim==6) // obsolete
-    {
-      fprintf(stderr,"Warning: obsolete errordim\n");
-      erg2=0;
-    }
-  else if(error_dim==7) // free normalization, i.e. spectrum only
-    {
-      erg2=chi_sys_wrap(&glb_chi_spec,1,i); 
-    }
-  else if(error_dim==8) //total chi^2 w/o systematics
-    {
-      erg2=chi_sys_wrap(&glb_chi_sys_w_bgtot2,0,i); 
-    }
-  else if(error_dim==9) // chi^2 with 4 syst params and 
-    // true energy calibration
-    {
-      erg2=chi_sys_wrap(&glb_chi_sys_w_bg_calib,4,i); 
-    }
-  else if(error_dim==10) // total chi^2 with 4 syst params 
-    {
-      erg2=chi_sys_wrap(&glb_chi_sys_w_bgtot,4,i); 
-    }
-  else if(error_dim==20) // User-defined systematics 
-    {
-      erg2=glb_evaluate_chi(&sys_calc[i]); 
-    }
-  else if(error_dim==21) // total chi^2 with 4 syst params 
-    {
-      erg2=sys_calc[i].evalf(&sys_calc[i]); 
-    }
-  else
-    {
-      erg2=0;
-    }
-return erg2;
-}
-
-static double ChiS0(int typ[])
-{
-  double erg2;
-  int i,rul;
- 
-  ml_abort_check(GLB_MATHLINK);    /* RELICT??? WW */
- 
-  erg2=0;
-  for (i=0;i<glb_num_of_rules;i++) 
-    {
-      erg2+=chi_dispatch(typ[i],i);
-    }
-  
-  glb_rule_number=0;
-  return erg2;
-}
+//FIXME Remove
+//static double chi_dispatch(int error_dim, int i)
+//{     
+//  // finally
+//  double erg2=0;
+//  
+//  glb_rule_number = i;      // Tell the systematics functions which rule we are in
+//  if(error_dim==0) //chi^2 with 4 sys. parameters
+//    {
+//      erg2=chi_sys_wrap(&glb_chi_sys_w_bg,4,i);
+//      
+//    }
+//  else if(error_dim==1) //chi^2 with 6 sys. parameters
+//    {
+//      erg2=chi_sys_wrap(&glb_chi_sys_w_bg2,6,i); 
+//    }
+//  else if(error_dim==2) // chi^2 without sys. parameters
+//    {
+//      erg2=chi_sys_wrap(&glb_chi_sys_w_bg,0,i); 
+//      // it seems that the minimizer correctly interprest zero dimensions
+//      // as the function value at the starting point  
+//    }
+//  else if(error_dim==3) // very special for JHF-HK
+//    {
+//      if(i<4) erg2=chi_sys_wrap(&glb_chi_sys_w_bg,4,i); 
+//      else erg2=chi_sys_wrap(&glb_chi_sys_w_bgtot,4,i); 
+//    }
+//  else if(error_dim==4) // total chi^2 with 4 sys parameters
+//    {
+//      erg2=chi_sys_wrap(&glb_chi_sys_w_bgtot2,4,i); 
+//    }
+//  else if(error_dim==5) // obsolete
+//    {
+//      fprintf(stderr,"Warning: obsolete errordim\n");
+//      erg2=0;
+//    }
+//  else if(error_dim==6) // obsolete
+//    {
+//      fprintf(stderr,"Warning: obsolete errordim\n");
+//      erg2=0;
+//    }
+//  else if(error_dim==7) // free normalization, i.e. spectrum only
+//    {
+//      erg2=chi_sys_wrap(&glb_chi_spec,1,i); 
+//    }
+//  else if(error_dim==8) //total chi^2 w/o systematics
+//    {
+//      erg2=chi_sys_wrap(&glb_chi_sys_w_bgtot2,0,i); 
+//    }
+//  else if(error_dim==9) // chi^2 with 4 syst params and 
+//    // true energy calibration
+//    {
+//      erg2=chi_sys_wrap(&glb_chi_sys_w_bg_calib,4,i); 
+//    }
+//  else if(error_dim==10) // total chi^2 with 4 syst params 
+//    {
+//      erg2=chi_sys_wrap(&glb_chi_sys_w_bgtot,4,i); 
+//    }
+//  else if(error_dim==20) // User-defined systematics 
+//    {
+//      erg2=glb_evaluate_chi(&sys_calc[i]); 
+//    }
+//  else if(error_dim==21) // total chi^2 with 4 syst params 
+//    {
+//      erg2=sys_calc[i].evalf(&sys_calc[i]); 
+//    }
+//  else
+//    {
+//      erg2=0;
+//    }
+//return erg2;
+//}
 
 // this is the same as ChiSO()  but it allows access to a single rule !
 
-static double ChiS0_Rule(int typ[],int rule)
+static double ChiS0_Rule(int rule)
 {
-  double erg2;
-  clear_glb_calc_buffer();
-  erg2=chi_dispatch(typ[rule],rule);
-  glb_rule_number=0;
-  return erg2;
+  double **mat; // contains the direction set
+  double *sp;   // stores the coordinates of the minimum
+  double res;   // stores the minimum value
+  int it=0;     // counts the number of iterations
+  glb_systematic *sys;
+  struct glb_experiment *exp = glb_experiment_list[glb_current_exp];
+  int i;
+ 
+  res = 0.0;
+  glb_rule_number = rule;
+  if (exp->sys_on_off[rule] == GLB_ON)
+    sys = exp->sys_on[rule];
+  else
+    sys = exp->sys_off[rule];
+    
+  mat  = glb_alloc_mat(1, sys->dim, 1, sys->dim);
+  sp   = glb_alloc_vec(1, 6); // that is the maximal length //FIXME
+  init_mat(mat, sys->dim);
+  sp[1] = 1;
+  sp[2] = 0;
+  sp[3] = glb_bg_norm_center[rule];
+  sp[4] = glb_bg_tilt_center[rule];
+  sp[5] = glb_tre_null_center[rule];
+  sp[6] = glb_tre_tilt_center[rule];
+  glb_current_chi_function = sys->chi_func;
+  glb_current_n_sys        = sys->dim;
+  if (glb_powell(sp, mat, sys->dim, TOLSYS, &it, &res, &glb_chi_callback) != 0)
+  {
+    glb_warning("Systematics minimization failed.");
+    return -res;
+  }
+  glb_free_vec(sp, 1, 6);
+  glb_free_mat(mat, 1, sys->dim, 1, sys->dim);
+
+  glb_rule_number = 0;
+  return res;
+}
+
+static double ChiS0()
+{
+  int i;
+  double res = 0.0;
+  
+//  ml_abort_check(GLB_MATHLINK);    /* RELICT??? WW */
+
+  for (i=0; i < glb_num_of_rules; i++) 
+    res += ChiS0_Rule(i);
+
+  return res;
 }
 
 //---------------------------------------------------------------
@@ -492,7 +421,7 @@ static double ChiS()
   for (i=0;i<glb_num_of_exps;i++)
     {
       glbSetExperiment(glb_experiment_list[i]);
-      erg += ChiS0(glb_experiment_list[i]->errordim);
+      erg += ChiS0();
     }
   return erg;
 }
@@ -510,6 +439,7 @@ static double Chi(double x[])
   glb_hook_set_oscillation_parameters(p);
   glbFreeParams(p);
     
+//FIXME Remove
 //  double nsp[glbGetNumOfOscParams()-6+1];
 //  glb_set_c_vacuum_parameters(x[0],x[1],x[2],x[3]);
 //  glb_set_c_squared_masses(0,x[4],x[5]);
@@ -550,6 +480,7 @@ static double SingleChi(double x[glbGetNumOfOscParams()+1],int exp)
   glb_hook_set_oscillation_parameters(p);
   glbFreeParams(p);
 
+//FIXME remove
 //  double nsp[glbGetNumOfOscParams()-6+1];
 //  glb_set_c_vacuum_parameters(x[0], x[1],x[2],x[3]);
 //  glb_set_c_squared_masses(0,x[4],x[5]);
@@ -571,7 +502,7 @@ static double SingleChi(double x[glbGetNumOfOscParams()+1],int exp)
       okay_flag=1;
       return erg;  
     }
-  erg=ChiS0(errordim);
+  erg=ChiS0();
   return erg;
 }
 
@@ -588,6 +519,7 @@ static double SingleRuleChi(double x[glbGetNumOfOscParams()+1],int exp, int rule
   glb_hook_set_oscillation_parameters(p);
   glbFreeParams(p);
 
+// FIXME Remove
 //  double nsp[glbGetNumOfOscParams()-6+1];
 //  glb_set_c_vacuum_parameters(x[0], x[1],x[2],x[3]);
 //  glb_set_c_squared_masses(0,x[4],x[5]);
@@ -603,7 +535,7 @@ static double SingleRuleChi(double x[glbGetNumOfOscParams()+1],int exp, int rule
      
 
   glbSetExperiment(glb_experiment_list[exp]);
-  erg=ChiS0_Rule(errordim,rule);
+  erg=ChiS0_Rule(rule);
   return erg;
 }
 
@@ -768,7 +700,7 @@ double* glb_return_input_values()
  
 
 //--------------------------------------------------------------
-//--------- Setting the glb_priors for th12 ------------------------
+//--------- Setting the glb_priors for th12 --------------------
 //--------------------------------------------------------------
 
 int glb_set_solar_input_errors(double a)
@@ -785,31 +717,10 @@ int glb_set_solar_starting_values(double a)
 
 
 
-//----------------------------------------------------------------
-//----------- shifted rate access --------------------------------
-//----------------------------------------------------------------
-
-static void ReturnShiftedRates(int rulenumber, int exp, double* inrates)
-{
-  int i;
-  int bins;
-  glbSetExperiment(glb_experiment_list[exp]);
-  //glb_set_new_rates();
-  //glbSetExperiment(&glb_experiment_list[exp]);
-  //ChiS0_Rule(errordim,rulenumber);
-  bins=rulenumber;
-  bins=glb_get_number_of_bins();
-  for(i=0;i<bins;i++) inrates[i]=glb_chirate[i];
-
-}
-
 //------------------------------------------------------------------
 //---- Chi^2 with arbitrary number of free parameters --------------
 //----------------------- 23.01.2004 -------------------------------
 //------------------------------------------------------------------
-
-//-----------------------
-
 
 static void SelectProjection(int *vec)
 {
@@ -855,7 +766,6 @@ static int CheckFree()
 
 static int* CheckProjection()
 {
-  
   return &para_tab[0];
 }
 
@@ -932,6 +842,7 @@ static double MD_chi_NP(double x[])
   glb_hook_set_oscillation_parameters(p);
   glbFreeParams(p);
 
+// FIXME Remove
 //  glb_set_c_vacuum_parameters(y[0],y[1],y[2],y[3]);
 //  glb_set_c_squared_masses(0,y[4],y[5]);
 //  if(glbGetNumOfOscParams()>6)
@@ -957,6 +868,7 @@ static double MD_chi_NP(double x[])
   
   erg2 = erg2 + glb_user_defined_prior(prior_input); 
 
+  // FIXME Remove
   // adding the glb_priors
   /*for(i=0;i<n_free;i++)
     {
@@ -1039,6 +951,7 @@ static double chi_NP(double x[])
   glb_hook_set_oscillation_parameters(p);
   glbFreeParams(p);
 
+// FIXME Remove
 //  glb_set_c_vacuum_parameters(y[0],y[1],y[2],y[3]);
 //  glb_set_c_squared_masses(0,y[4],y[5]);
 //  if(glbGetNumOfOscParams()>6)
@@ -1052,7 +965,7 @@ static double chi_NP(double x[])
   glb_set_new_rates();
     
   
-  erg2=ChiS0(errordim);
+  erg2=ChiS0();
   
   // adding  the user defined prior
   // shoufling the parameter vector y into an glb_params structure
@@ -1062,7 +975,7 @@ static double chi_NP(double x[])
 
   erg2 = erg2 + glb_user_defined_prior(prior_input); 
 
-  
+  //FIXME Remove  
   // adding the glb_priors
   /*
    for(i=0;i<s_n_free;i++)

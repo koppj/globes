@@ -1712,23 +1712,17 @@ glb_switch_systematics(int experiment, int rule, int on_off)
 
   in=(struct glb_experiment *) glb_experiment_list[experiment];
   if(rule==GLB_ALL)
-    {
-      for(i=0;i<in->numofrules;i++) {
-	if(on_off==GLB_ON) in->errordim[i]=in->errordim_sys_on[i];
-	if(on_off==GLB_OFF) in->errordim[i]=in->errordim_sys_off[i];
-      }
-    }
+  {
+    for(i=0;i<in->numofrules;i++)
+      in->sys_on_off[i] = on_off;
+  }
   else if((rule >= 0)&&(rule < in->numofrules ))
-    {
-      i=rule;
-      if(on_off==GLB_ON) in->errordim[i]=in->errordim_sys_on[i];
-      if(on_off==GLB_OFF) in->errordim[i]=in->errordim_sys_off[i];
-    }
+    in->sys_on_off[rule] = on_off;
   else 
-    {
-      glb_error("Invalid value for rule number");
-      return -1;
-    }
+  {
+    glb_error("Invalid value for rule number");
+    return -1;
+  }
   return 0;
 }
 
@@ -1753,85 +1747,86 @@ glbSwitchSystematics(int experiment, int rule, int on_off)
   return s;
 }
 
-static int
-glb_set_systematics(int experiment, int rule, int on_off, int value)
-{
-  int i;
-  struct glb_experiment *in;
-  if((on_off!=GLB_ON)&&(on_off!=GLB_OFF)) {
-    glb_error("Invalid value for on_off");
-    return -1;
-  }
-
-  in=(struct glb_experiment *) glb_experiment_list[experiment];
-  if(rule==GLB_ALL)
-    {
-      for(i=0;i<in->numofrules;i++) {
-	if(on_off==GLB_ON) in->errordim_sys_on[i]=value;
-	if(on_off==GLB_OFF) in->errordim_sys_off[i]=value;
-      }
-    }
-  else if((rule >= 0)&&(rule < in->numofrules ))
-    {
-      i=rule;
-      if(on_off==GLB_ON) in->errordim_sys_on[i]=value;
-      if(on_off==GLB_OFF) in->errordim_sys_off[i]=value;
-    }
-  else 
-    {
-      glb_error("Invalid value for rule number");
-      return -1;
-    }
-  return 0;
-}
-
-
-int 
-glbSetErrorDim(int experiment, int rule, int on_off, int value)
-{
-  int i,s=0;
-  if(experiment==GLB_ALL)
-    {
-      for(i=0;i<glb_num_of_exps;i++) 
-	s+=glb_set_systematics(i, rule, on_off, value);
-    }
-  else if((experiment >= 0)&&(experiment < glb_num_of_exps))
-    {
-	s+=glb_set_systematics(experiment, rule, on_off,value);
-    }
-  else 
-    {
-      glb_error("Invalid value for experiment number");
-      return -1;
-    }
-  return s;
-}
-
-int 
-glbGetErrorDim(int experiment, int rule, int on_off)
-{
-  int s=0;
-  struct glb_experiment *in;
-  if((on_off!=GLB_ON)&&(on_off!=GLB_OFF)) {
-    glb_error("Invalid value for on_off");
-    return -1;
-  }
-  if((experiment >= 0)&&(experiment < glb_num_of_exps))
-    {
-      in=(struct glb_experiment *) glb_experiment_list[experiment];
-      if((rule >= 0)&&(rule < in->numofrules )) 
-	{
-	  if(on_off==GLB_ON) s=in->errordim_sys_on[rule];
-	  if(on_off==GLB_OFF) s=in->errordim_sys_off[rule];
-	}
-    }
-  else 
-    {
-      glb_error("Invalid value for experiment number");
-      return -1;
-    }
-  return s;
-}
+// FIXME Rewrite for new systematics
+//static int
+//glb_set_systematics(int experiment, int rule, int on_off, int value)
+//{
+//  int i;
+//  struct glb_experiment *in;
+//  if((on_off!=GLB_ON)&&(on_off!=GLB_OFF)) {
+//    glb_error("Invalid value for on_off");
+//    return -1;
+//  }
+//
+//  in=(struct glb_experiment *) glb_experiment_list[experiment];
+//  if(rule==GLB_ALL)
+//    {
+//      for(i=0;i<in->numofrules;i++) {
+//	if(on_off==GLB_ON) in->errordim_sys_on[i]=value;
+//	if(on_off==GLB_OFF) in->errordim_sys_off[i]=value;
+//      }
+//    }
+//  else if((rule >= 0)&&(rule < in->numofrules ))
+//    {
+//      i=rule;
+//      if(on_off==GLB_ON) in->errordim_sys_on[i]=value;
+//      if(on_off==GLB_OFF) in->errordim_sys_off[i]=value;
+//    }
+//  else 
+//    {
+//      glb_error("Invalid value for rule number");
+//      return -1;
+//    }
+//  return 0;
+//}
+//
+//
+//int 
+//glbSetErrorDim(int experiment, int rule, int on_off, int value)
+//{
+//  int i,s=0;
+//  if(experiment==GLB_ALL)
+//    {
+//      for(i=0;i<glb_num_of_exps;i++) 
+//	s+=glb_set_systematics(i, rule, on_off, value);
+//    }
+//  else if((experiment >= 0)&&(experiment < glb_num_of_exps))
+//    {
+//	s+=glb_set_systematics(experiment, rule, on_off,value);
+//    }
+//  else 
+//    {
+//      glb_error("Invalid value for experiment number");
+//      return -1;
+//    }
+//  return s;
+//}
+//
+//int 
+//glbGetErrorDim(int experiment, int rule, int on_off)
+//{
+//  int s=0;
+//  struct glb_experiment *in;
+//  if((on_off!=GLB_ON)&&(on_off!=GLB_OFF)) {
+//    glb_error("Invalid value for on_off");
+//    return -1;
+//  }
+//  if((experiment >= 0)&&(experiment < glb_num_of_exps))
+//    {
+//      in=(struct glb_experiment *) glb_experiment_list[experiment];
+//      if((rule >= 0)&&(rule < in->numofrules )) 
+//	{
+//	  if(on_off==GLB_ON) s=in->errordim_sys_on[rule];
+//	  if(on_off==GLB_OFF) s=in->errordim_sys_off[rule];
+//	}
+//    }
+//  else 
+//    {
+//      glb_error("Invalid value for experiment number");
+//      return -1;
+//    }
+//  return s;
+//}
 
 
 /* Here comes a bunch of set/get functions.
