@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
   double sdm = 7e-5;
   double ldm = 2e-3;
   
-	/* Initialize parameter vector(s) */
+  /* Initialize parameter vector(s) */
   glb_params true_values = glbAllocParams();
   glb_params test_values = glbAllocParams();
 
@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
 
   /* Iteration over all values to be computed */
   double thetheta13,x,y,res;    
-    
+
   for(x=-4.0;x<-2.0+0.01;x=x+2.0/50)
   for(y=0.0;y<200.0+0.01;y=y+200.0/50)
   {

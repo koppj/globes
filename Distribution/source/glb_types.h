@@ -173,11 +173,6 @@ struct glb_experiment {
 
   double *simbinsize; 
 
-  /** errorfunction is a rather strange construct and probably will become
-  * obsolete. The default is 1.
-  */
-  int errorfunction;
-
   /** set the way a profile is computed or the baseline is changed */
   int density_profile_type;
 
@@ -247,11 +242,6 @@ struct glb_experiment {
   */
   int* rulechannellist[32];
 
-  /** Contains the 1 sigma errors on normalization and energy calibration
-  * of the signal for each rule. It is zero or positive. Default is zero.
-  */
-  double signalruleerror[2][32];
-
   /** Tells for each rule how many channels are added to form the background.
   * Ranges from 1 to 32.
   */
@@ -268,25 +258,6 @@ struct glb_experiment {
   * malloc!
   */
   int* bgrulechannellist[32];
-
-  /** Relative weight of the background, divided into to parts.
-  * bgcenter[0] is usually 1 and bgcenter[1] is usually 0 (default).
-  */
-  double bgcenter[2][32];
-
-  /** Contains the 1 sigma errors on normalization and energy calibration
-  * of the signal for each rule. It is zero or positive. Default is zero.
-  */
-  double bgerror[2][32];
-
-  /** Parmeters necessary if errorfunction is not default, i.e. not 1.
-   */
-  double bgtcenter[2][32];
-
-  /** Contains the 1 sigma errors on bgtcenter
-  * It is zero or positive. Default is zero.
-  */
-  double bgterror[2][32];
 
   /** Number of smearing data types stored */
   int num_of_sm;
@@ -433,7 +404,8 @@ struct glb_experiment {
   /** Energy range for each rule in which the events are used to compute
   * the chi^2. Lower limit and upper limit.
   */
-  double energy_window[32][2];
+  double energy_window[32][2];    /* Energy range */
+  int energy_window_bins[32][2];  /* Bin range    */
 
   /** Has length numofbins */
   double* energy_tab;
@@ -453,18 +425,25 @@ struct glb_experiment {
   double* rates1BG[32];       /* Fitted background rates for all rules */
   double* rates1BGT[32];      /* Fitted and tilted background rates for all rules *///FIXME remove
 
+  /** Systematics functions and on/off states */
   int sys_on_off[32];         /* Systematics switch (GLB_ON/GLB_OFF)     */
   glb_systematic *sys_on[32]; /* The chi^2 functions of the rules        */
   glb_systematic *sys_off[32]; 
   char *sys_on_strings[32];   /* The errordim strings from the AEDL file */
   char *sys_off_strings[32];
 
-//  double *sys_errors[32];     /* Systematical errors */
-//  double *sys_startvals[32];  /* Starting values for systematics minimization */
+  /** Systematical error and starting values (GLoBES 3.0 scheme) */
+  double *sys_on_errors[32];     /* Systematical errors */
+  double *sys_on_startvals[32];  /* Starting values for systematics minimization */
+  double *sys_off_errors[32];    /* Systematical errors */
+  double *sys_off_startvals[32]; /* Starting values for systematics minimization */
 
-  
-  /* Additional work spaces */  
-  double *buffer;
+  /** Systematical error and starting values (GLoBES 2.0.11 scheme) */
+  double signal_errors[2][32];   /* Signal norm/energy errors for old chi^2 functions */
+  double signal_startvals[2][32];/* Signal starting values for old chi^2 functions */
+  double bg_errors[2][32];       /* Background norm/energy errors for old chi^2 functions */
+  double bg_startvals[2][32];    /* BG starting values for old chi^2 functions */
+  double bg_centers[2][32];      /* BG central values for old chi^2 functions */
 };
 
 #endif /* GLB_TYPES_H 1 */

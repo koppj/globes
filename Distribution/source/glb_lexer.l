@@ -40,6 +40,7 @@
 %s defx
 %s deff
 %x comment
+%x linecomment
 %x str
 
 
@@ -84,10 +85,11 @@ LID      ![a-zA-Z][a-zA-Z0-9_]*
 
 %%
 
-  
+"//"         {cond_buf=YY_START;BEGIN(linecomment);}
+<linecomment>[^\n]*     /* eat anything that's not a '\n' */
+<linecomment>\n         {++glb_line_num; BEGIN(cond_buf);}
 
 "/*"         {cond_buf=YY_START;BEGIN(comment);}
-
 <comment>[^*\n]*        /* eat anything that's not a '*' */
 <comment>"*"+[^*/\n]*   /* eat up '*'s not followed by '/'s */
 <comment>\n             ++glb_line_num;

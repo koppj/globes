@@ -39,6 +39,7 @@
 #include "glb_lexer.h"  
 #include "glb_parser_type.h"
 #include "glb_fluxes.h"
+#include "glb_sys.h"
 
 
 
@@ -62,6 +63,7 @@
 #define DOUBLE_LIST_INDEXED_SL 14
 #define DOUBLE_LIST_INDEXED_BL 15
 #define COUNTER 16
+#define DOUBLE_PAIR 17
 #define GMAX 1E100
 
   static int exp_count=1;
@@ -76,8 +78,8 @@
   static glb_option_type opt;
   static glb_flux flt;
   static glb_xsec xsc;
-  static int errordim_sys_on;    /* Temporary storage for the old numerical errordims */
-  static int errordim_sys_off;
+  static int errordim_sys_on=-1;         /* Temp. storage for the old numerical errordims */
+  static int errordim_sys_off=-1;
   static char *context;
 
 
@@ -114,11 +116,12 @@
     {"$numofbins",COUNTER,0,500,&buff.numofbins,NULL,"global"},
     {"$simbinsize",DOUBLE_LIST,0,GMAX,&buff.simbinsize,
      &buff.simbins,"global"},
+/* JK - Has been removed
     {"$errorfunction",INT,0,1,&buff.errorfunction,NULL,"global"}, 
     {"@treshold_setttings" ,DOUBLE_INDEXED_PAIR,
      0,100,&buff.bgtcenter[0],&loc_count,"rule"},
     {"@treshold_error" ,DOUBLE_INDEXED_PAIR,
-     0,100,&buff.bgterror[0],&loc_count,"rule"}, 
+     0,100,&buff.bgterror[0],&loc_count,"rule"}, */
 #endif /* GLB_OLD_AEDL */
     {"$sampling_points" ,COUNTER,0,500,&buff.simbins,NULL,"global"}, 
     {"$sampling_min" ,DOUBLE,0,GMAX,&buff.simtresh,NULL,"global"},
@@ -181,12 +184,17 @@
    {"energy",UNTYPE,-1,1,NULL,&buff.num_of_sm,"global"},
    {"@energy",ENERGY_MATRIX,-1,GMAX,&buff.smear[0],&loc_count,"energy"},
 
-   {"@signalerror",DOUBLE_INDEXED_PAIR
-    ,0,100,&buff.signalruleerror[0],&loc_count,"rule"},
+   {"@signalerror",DOUBLE_INDEXED_PAIR,
+    0,100,&buff.signal_errors[0],&loc_count,"rule"},
    {"@backgrounderror",DOUBLE_INDEXED_PAIR,
-    0,100,&buff.bgerror[0],&loc_count,"rule"},
-   {"@backgroundcenter",DOUBLE_INDEXED_PAIR
-    ,0,100,&buff.bgcenter[0],&loc_count,"rule"},
+    0,100,&buff.bg_errors[0],&loc_count,"rule"},
+   {"@backgroundcenter",DOUBLE_INDEXED_PAIR,
+    0,100,&buff.bg_centers[0],&loc_count,"rule"},
+
+   {"@sys_on_errors",DOUBLE_LIST_INDEXED,0,GMAX,
+    &buff.sys_on_errors[0],&loc_count,"rule"},
+   {"@sys_off_errors",DOUBLE_LIST_INDEXED,0,GMAX,
+    &buff.sys_off_errors[0],&loc_count,"rule"},
    
 
    {"@energy_window" ,DOUBLE_INDEXED_PAIR_INV,0,GMAX,&buff.energy_window[0],
@@ -223,11 +231,18 @@
   
 
    {NULL,UNTYPE,0,0,NULL,NULL,"global"}
-
-  
 };
 
 
+static void grp_start(char* name)
+   {
+     if(strncmp(name,"rule",4)==0 )
+       {
+         /* Reset variables to default values */
+         errordim_sys_on  = -1.0;
+         errordim_sys_off = -1.0; 
+       }
+   }
 
  
 static void grp_end(char* name)
@@ -279,32 +294,16 @@ static void grp_end(char* name)
 	   }
        }  
 
-     /* Parse old (numerical) errordims */
      if(strncmp(name,"rule",4)==0 )
        {
-         if (buff.sys_on_strings[buff.numofrules-1] == NULL)
-         {
-           if (errordim_sys_on >=0  &&  errordim_sys_on <= 99)
-           {
-             sprintf(tmp_errordim, "%d", errordim_sys_on);
-             buff.sys_on_strings[buff.numofrules-1] = strdup(tmp_errordim);
-//             glbSetChiFunctionInExperiment(&buff, buff.numofrules-1, GLB_ON,
-//                                           buff.sys_on_strings[buff.numofrules-1]);
-           }
-         }
+         int nr = buff.numofrules - 1;
 
-         if (buff.sys_off_strings[buff.numofrules-1] == NULL)
-         {
-           if (errordim_sys_off >=0  &&  errordim_sys_off <= 99)
-           {
-             sprintf(tmp_errordim, "%d", errordim_sys_off);
-             buff.sys_off_strings[buff.numofrules-1] = strdup(tmp_errordim);
-//             glbSetChiFunctionInExperiment(&buff, buff.numofrules-1, GLB_OFF,
-//                                           buff.sys_off_strings[buff.numofrules-1]);
-           }
-         }
+         /* Parse old (numerical) errordims */
+         if (buff.sys_on_strings[nr] == NULL  &&  errordim_sys_on >= 0)
+           buff.sys_on_strings[nr] = glbConvertErrorDim(errordim_sys_on);
+         if (buff.sys_off_strings[nr] == NULL  &&  errordim_sys_off >= 0)
+           buff.sys_off_strings[nr] = glbConvertErrorDim(errordim_sys_off);
        } 
-
 
      glb_free(context);
      context = (char *) strdup("global");
@@ -505,6 +504,23 @@ static int set_pair(char *name,double value,double value2,int scalar)
 	 strncmp(context,token_list[i].ctx,
 		 strlen(token_list[i].ctx))==0 )
 	{
+	     if(token_list[i].scalar==DOUBLE_PAIR)
+	       {
+		 if(value >= token_list[i].rl && value <= token_list[i].ru)
+		   {
+		    
+		     dbf=(double*) token_list[i].ptr;
+		     dbf[0]=(double) value;
+		     dbf[1]=(double) value2;
+		     return 0;
+		   }
+		 else       
+		   {
+		     fprintf(stderr,"Error: Value for %s out of range\n",
+			     token_list[i].token);
+		     return 2;
+		   }
+	       }
 	     
 	     if(token_list[i].scalar==INT_INDEXED_PAIR) //int
 	       {
@@ -1084,6 +1100,7 @@ seq:    exp  ','        {$$=list_cons(NULL,$1); }
   buf=list_cons(buf,$2);
   $$=buf;   
 }
+| '{' '}'      {$$=NULL;}
 | '{' seq '}'  {$$=$2; }
 | '{' exp '}'  {$$=list_cons(NULL,$2); }
 | IDN '=' seq        { if(set_exp_list($1,$3,3)==1) 
@@ -1116,6 +1133,7 @@ group: GID '(' NAME ')'
   loc_count=$3->value;
   glb_free(context);
   context =(char *) strdup($1);
+  grp_start(context);
 }
   GRPOPEN ingroup  GRPCLOSE { 
    
@@ -1781,6 +1799,7 @@ int glbInitExperiment(char *inf,glb_exp *in, int *counter)
   char tct[11];
   struct glb_experiment **ins;
   ins=(struct glb_experiment **) in;
+
   // yydebug=1;
   context=(char *) strdup("global");
   glb_smear_reset(&ibf);

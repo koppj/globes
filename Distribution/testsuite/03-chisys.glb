@@ -92,8 +92,7 @@ rule(#rule0)<
 
 	@errordim_sys_on = 	9
 	@errordim_sys_off = 2
-	@energy_window = 	         4  :	        50
-
+	@energy_window = 	         14  :	        45
 >
 
 rule(#rule1)<
@@ -102,11 +101,11 @@ rule(#rule1)<
 
 	@background =	         1@#ch3
 	@backgrounderror = 	     2e-06  :	    0.0001
-	@backgroundcenter = 	     1e-05  :	         0
+    	@backgroundcenter = 	     1e-05  :	         0
 
 	@errordim_sys_on = 	0
 	@errordim_sys_off = 2
-	@energy_window = 	         4  :	        50
+	@energy_window = 	         14  :	        45
 >
 
 rule(#rule2)<

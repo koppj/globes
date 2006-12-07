@@ -74,25 +74,9 @@ double* glb_calc_rates_1T[32];
 double* glb_calc_rates_1BG[32];
 double* glb_calc_rates_1BGT[32];
 double* glb_calc_energy_tab;
-double glb_glb_sig_norm_error[32];
-double glb_sig_tilt_error[32];
-double glb_bg_norm_error[32];
-double glb_bg_tilt_error[32];
 double glb_bg_norm_center[32];
 double glb_bg_tilt_center[32];
 
-
-static int errortype=1;
-double glb_tre_null_center[32];
-double glb_tre_tilt_center[32];
-double glb_tre_null_error[32];
-double glb_tre_tilt_error[32];
-
-/* this ensures that we have some bins below and
- * above the analysis range for properly calculating
- * the effect of an energy calibration uncertainty
- */
-double glb_calc_energy_window[32][2];
 
 int glb_calc_simbins;
 double glb_calc_simtresh;
@@ -104,9 +88,6 @@ static int channel_list[32][6];
 static int num_of_ch = 1;
 int glb_num_of_rules=1;
 
-
-/* workspace of glb_calc_simbins length */
-double *glb_calc_buffer;
 
 /* storing the channel result before glb_calc_smearing (glb_calc_simbins) */
 double *glb_calc_chrb_0[32];
@@ -481,64 +462,6 @@ inline static double BinEnergy(int i)
   return glb_bin_center(i,glb_calc_smear_data[0]);
 }
 
-void glb_set_error_function(int typ)
-{
-  errortype=typ;
-}
-
-int glb_check_error_function()
-{
-  return errortype;
-}
-
-inline double glb_window_function(double low,double up,int bin)
-{
-  double en = glb_calc_energy_tab[bin];
-
-  if (en > low && en < up)
-    return 1.0;
-  else
-    return 0.0;
-}
-
-inline double errorf(double x, double y, int bin)
-{
-  double xx;
-  double erg;
-  xx=glb_calc_energy_tab[bin];
-
-  switch(errortype)
-    {
-    case 1:
-      if(y<=0)
-	{
-	  if(xx<=x) 
-	    {
-	      erg=0;
-	    }
-	  else
-	    {
-	      erg=1;
-	    }
-	  
-	}
-      else
-	{
-	  erg= 0.5/y*xx + (0.5 - x*0.5/y);
-	  if(erg<=0) erg=0;
-	  if(erg>=1) erg=1;
-	}
-      break;
-    case 2:
-      erg=1/xx*y+1;
-      break;
-    default: erg=1; break;
-    }
-  return erg;
-}
-
-
-
 
 // FIXME: When fixing BUG#11, this will have to be modified, rewritten, or deleted
 //static void SmearAllChannelsTilt(int mode)
@@ -575,7 +498,8 @@ inline double errorf(double x, double y, int bin)
 void glb_set_rates()
 {
   int i, j, k, s;
-  double current_rule_rate;
+  double current_rule_rate; //FIXME remove
+  int ew_low, ew_high;
  
   for(j=0; j < bins; j++)
     glb_calc_energy_tab[j] = BinEnergy(j);
@@ -643,14 +567,14 @@ void glb_set_rates()
       glb_calc_signal_rates[i][j] = 0.0; 
       for (k=0; k < rule_length[i]; k++)
         glb_calc_signal_rates[i][j] += rule_coeff[i][k] * glb_calc_chra_0[rules[i][k]][j];
+    }
 
+    glbGetEnergyWindowBins(glb_current_exp, i, &ew_low, &ew_high);
+    for (j=ew_low; j <= ew_high; j++)
+    {
       /* Total */
-      current_rule_rate = glb_calc_signal_rates[i][j]
+      glb_calc_rates_0[i][j] = glb_calc_signal_rates[i][j]
                                + glb_calc_bg_rates[i][j]*glb_bg_norm_center[i];
-      glb_calc_rates_0[i][j] = current_rule_rate 
-              * errorf(glb_tre_null_center[i],glb_tre_tilt_center[i],j)
-              * glb_window_function(glb_calc_energy_window[i][0],
-                                    glb_calc_energy_window[i][1],j);
     }     
   }
 }
@@ -747,74 +671,6 @@ void glb_set_new_rates()
 /* // -----      Statistics Functions      ---- */
 /* // ---------------------------------------- */
 
-void glb_calc_set_energy_window(int i, double a, double b)
-{
-  glb_calc_energy_window[i][0]=a;
-  glb_calc_energy_window[i][1]=b;
-}
-
-void check_glb_calc_energy_window(int i,double *in)
-{
-  
-  in[0]=glb_calc_energy_window[i][0];
-  in[1]=glb_calc_energy_window[i][1];
-  
-}
-
-void glb_calc_set_tresh_center(int i, double a, double b)
-{
-  glb_tre_null_center[i]=a;
-  glb_tre_tilt_center[i]=b;
-}
-
-
-void glb_calc_set_tresh_errors(int i, double a, double b)
-{
-  glb_tre_null_error[i]=a;
-  glb_tre_tilt_error[i]=b;
-}
-
-void glb_calc_check_tresh_center(int i,double *in)
-{
-  
-  in[0]=glb_tre_null_center[i];
-  in[1]=glb_tre_tilt_center[i];
-  
-}
-
-void glb_calc_check_tresh_errors(int i,double *in)
-{
-  
-  in[0]=glb_tre_null_error[i];
-  in[1]=glb_tre_tilt_error[i];
-  
-}
-
-
-void glb_set_signal_errors(int i,double norm, double tilt)
-{
-  glb_glb_sig_norm_error[i]=norm;
-  glb_sig_tilt_error[i]=tilt;
-}
-
-double* glb_calc_check_signal_errors(int i)
-{
-  double* erg;
-  erg=(double*) glb_malloc(2*sizeof(double));
-  erg[0]=glb_glb_sig_norm_error[i];
-  erg[1]=glb_sig_tilt_error[i];
-  return erg;
-}
-
-double* glb_calc_check_bg_errors(int i)
-{
-  double* erg;
-  erg=(double*) glb_malloc(2*sizeof(double));
-  erg[0]=glb_bg_norm_error[i];
-  erg[1]=glb_bg_tilt_error[i];
-  return erg;
-}
-
 double* glb_calc_check_bg_center(int i)
 {
   double* erg;
@@ -822,12 +678,6 @@ double* glb_calc_check_bg_center(int i)
   erg[0]=glb_bg_norm_center[i];
   erg[1]=glb_bg_tilt_center[i];
   return erg;
-}
-
-void glb_set_bg_errors(int i,double norm, double tilt)
-{
-  glb_bg_norm_error[i]=norm;
-  glb_bg_tilt_error[i]=tilt;
 }
 
 void glb_set_bg_center(int i,double norm, double tilt)
@@ -888,18 +738,6 @@ inline double glb_likelihood(double true_rate, double fit_rate)
 /* } */
 
 
-//FIXME Remove
-//inline double glb_list_likelihood(double* ratest, double* ratesm)
-//{
-//  /* needed by user_chi.c */
-//  register int i;
-//
-//  double sum = 0;
-//  for (i=0; i< bins; i++)
-//    sum += glb_likelihood(ratest[i],ratesm[i]);
-//  return sum;
-//}
-
 inline double glb_prior(double x, double center, double sigma)
 {
   double tmp = (x - center)/sigma;
@@ -907,273 +745,8 @@ inline double glb_prior(double x, double center, double sigma)
 }  
 
 
-/* now comes a whole bunch of functions which calculate different chi^2 for different situations */
-
-// standard chi^2
-//double glb_chi_sys_w_bg(double x[5])
-//{
-//  
-//  double erg;
-//  int i;
-//  
-//
-//  // The following code admittedly does not look very nice, but it's fast because
-//  // it decouples consecutive instructions, enabling modern processor to partially
-//  // parallelise them
-//  for (i=0; i < bins; i++)
-//    glb_chirate[i] = x[1]*glb_calc_rates_1[glb_rule_number][i];
-//  for (i=0; i < bins; i++)
-//    glb_chirate[i] += x[2]*glb_calc_rates_1T[glb_rule_number][i];
-//  for (i=0; i < bins; i++)
-//    glb_chirate[i] += x[3]*glb_calc_rates_1BG[glb_rule_number][i];
-//  for (i=0; i < bins; i++)
-//    glb_chirate[i] += x[4]*glb_calc_rates_1BGT[glb_rule_number][i];
-//  for (i=0; i < bins; i++)
-//    glb_chirate[i] *= errorf(glb_tre_null_center[glb_rule_number],
-//                             glb_tre_tilt_center[glb_rule_number], i);
-//  for (i=0; i < bins; i++)
-//    glb_chirate[i] *= glb_window_function(glb_calc_energy_window[glb_rule_number][0],
-//                                          glb_calc_energy_window[glb_rule_number][1],i);
-//  
-//  
-///*  for (i=0;i<bins;i++)
-//    {
-//      glb_chirate[i]= 
-//	(x[1]*glb_calc_rates_1[glb_rule_number][i]+
-//	x[2]*glb_calc_rates_1T[glb_rule_number][i]+
-//	x[3]*glb_calc_rates_1BG[glb_rule_number][i]+
-//	x[4]*glb_calc_rates_1BGT[glb_rule_number][i]) * errorf(glb_tre_null_center[glb_rule_number],glb_tre_tilt_center[glb_rule_number],i)
-//	*glb_window_function(glb_calc_energy_window[glb_rule_number][0],glb_calc_energy_window[glb_rule_number][1],i);  
-//    }*/
-// 
-//  erg = glb_list_likelihood(glb_calc_rates_0[glb_rule_number],glb_chirate)+
-//    glb_prior(x[1],1,glb_glb_sig_norm_error[glb_rule_number])+
-//    glb_prior(x[2],0,glb_sig_tilt_error[glb_rule_number])+
-//    glb_prior(x[3],glb_bg_norm_center[glb_rule_number],glb_bg_norm_error[glb_rule_number])+
-//    glb_prior(x[4],glb_bg_tilt_center[glb_rule_number],glb_bg_tilt_error[glb_rule_number]);
-//  
-//  return erg;
-//  
-//}
-//
-//// standard chi^2
-//double glb_chi_spec(double x[2])
-//{
-//  
-//  double erg;
-//  int i;
-//  
-//  
-//  
-//  for (i=0;i<bins;i++)
-//    {
-//      glb_chirate[i]= 
-//	(x[1]*glb_calc_rates_1[glb_rule_number][i]+
-//	 glb_bg_norm_center[glb_rule_number]*glb_calc_rates_1BG[glb_rule_number][i]) 
-//	* errorf(glb_tre_null_center[glb_rule_number],glb_tre_tilt_center[glb_rule_number],i)
-//	*glb_window_function(glb_calc_energy_window[glb_rule_number][0],glb_calc_energy_window[glb_rule_number][1],i);
-//    
-//    }
-// 
-//  erg = glb_list_likelihood(glb_calc_rates_0[glb_rule_number],glb_chirate);
-//  
-//  return erg;
-//  
-//}
-//
-//// split chi^2 total rates + spectrum
-//double glb_chi_split(double x[6])
-//{
-//   
-//  double erg;
-//  double r0;
-//  double r1;
-//  int i;
-//  r1=0;
-//  r0=0;
-//  
-// 
-//  for (i=0;i<bins;i++)
-//    {
-//      r1 += 
-//	(1.0*glb_calc_rates_1[glb_rule_number][i]+
-//	x[2]*glb_calc_rates_1T[glb_rule_number][i]+
-//	x[3]*glb_calc_rates_1BG[glb_rule_number][i]+
-//	x[4]*glb_calc_rates_1BGT[glb_rule_number][i]) * 
-//	errorf(glb_tre_null_center[glb_rule_number],glb_tre_tilt_center[glb_rule_number],i)
-//	*glb_window_function(glb_calc_energy_window[glb_rule_number][0],glb_calc_energy_window[glb_rule_number][1],i);
-//     
-//      glb_chirate[i]= 
-//	(x[1]*glb_calc_rates_1[glb_rule_number][i]+
-//	x[2]*glb_calc_rates_1T[glb_rule_number][i]+
-//	x[3]*glb_calc_rates_1BG[glb_rule_number][i]+
-//	x[4]*glb_calc_rates_1BGT[glb_rule_number][i]) * 
-//	errorf(glb_tre_null_center[glb_rule_number],glb_tre_tilt_center[glb_rule_number],i)
-//	*glb_window_function(glb_calc_energy_window[glb_rule_number][0],glb_calc_energy_window[glb_rule_number][1],i); 
-//      
-//     
-//      
-//      r0 += glb_calc_rates_0[glb_rule_number][i];
-//
-//    }
-//
-//
-//  
-//  
-//  erg =  
-//    likelihood(r0,r1)+
-//    glb_list_likelihood(glb_calc_rates_0[glb_rule_number],glb_chirate)+
-//    //glb_prior(x[1],1,glb_glb_sig_norm_error[glb_rule_number])+
-//    glb_prior(x[2],0,glb_sig_tilt_error[glb_rule_number])+
-//    glb_prior(x[3],glb_bg_norm_center[glb_rule_number],glb_bg_norm_error[glb_rule_number])+
-//    glb_prior(x[4],glb_bg_tilt_center[glb_rule_number],glb_bg_tilt_error[glb_rule_number]);
-//  
-//  return erg;
-//  
-//}
-//
-//double glb_chi_sys_w_bg2(double x[7])
-//{
-//  
-//  double erg;
-//  int i;
-// 
-//  for (i=0;i<bins;i++)
-//    {
-//      glb_chirate[i]= 
-//	(x[1]*glb_calc_rates_1[glb_rule_number][i]+
-//	x[2]*glb_calc_rates_1T[glb_rule_number][i]+
-//	x[3]*glb_calc_rates_1BG[glb_rule_number][i]+
-//	x[4]*glb_calc_rates_1BGT[glb_rule_number][i]) * errorf(x[5],x[6] ,i)
-//	*glb_window_function(glb_calc_energy_window[glb_rule_number][0],glb_calc_energy_window[glb_rule_number][1],i);
-//    
-//    }
-// 
-//  erg = glb_list_likelihood(glb_calc_rates_0[glb_rule_number],glb_chirate)+
-//    glb_prior(x[1],1,glb_glb_sig_norm_error[glb_rule_number])+
-//    glb_prior(x[2],0,glb_sig_tilt_error[glb_rule_number])+
-//    glb_prior(x[3],glb_bg_norm_center[glb_rule_number],glb_bg_norm_error[glb_rule_number])+
-//    glb_prior(x[4],glb_bg_tilt_center[glb_rule_number],glb_bg_tilt_error[glb_rule_number])+
-//    glb_prior(x[5],glb_tre_null_center[glb_rule_number],glb_tre_null_error[glb_rule_number])+
-//    glb_prior(x[6],glb_tre_tilt_center[glb_rule_number],glb_tre_tilt_error[glb_rule_number]);
-//
-//  
-//  return erg;
-//  
-//}
-//
-////total rates
-//double glb_chi_sys_w_bgtot(double x[5])
-//{
-//  
-//  double erg;
-//  double r0;
-//  double r1;
-//  int i;
-// 
-//  r1=0;
-//  r0=0;
-//  
-//  for (i=0;i<bins;i++)
-//    {
-//      glb_chirate[i]= 
-//	(x[1]*glb_calc_rates_1[glb_rule_number][i]+
-//	x[2]*glb_calc_rates_1T[glb_rule_number][i]+
-//	x[3]*glb_calc_rates_1BG[glb_rule_number][i]+
-//	x[4]*glb_calc_rates_1BGT[glb_rule_number][i])
-//	*glb_window_function(glb_calc_energy_window[glb_rule_number][0],glb_calc_energy_window[glb_rule_number][1],i);
-//    }
-//  for (i=0;i<bins;i++)
-//    {
-//      r1 += glb_chirate[i];
-//      r0 += glb_calc_rates_0[glb_rule_number][i];
-//    }
-//  
-//  erg = likelihood(r0,r1)+
-//    glb_prior(x[1],1,glb_glb_sig_norm_error[glb_rule_number])+
-//    glb_prior(x[2],0,glb_sig_tilt_error[glb_rule_number])+
-//    glb_prior(x[3],glb_bg_norm_center[glb_rule_number],glb_bg_norm_error[glb_rule_number])+
-//    glb_prior(x[4],glb_bg_tilt_center[glb_rule_number],glb_bg_tilt_error[glb_rule_number]);
-//  
-//  return erg;
-//  
-//}
-//
-//double glb_chi_sys_w_bgtot2(double x[5])
-//{
-//  
-//  double erg;
-//  int i;
-//  double r0;
-//  double r1;
-//  r0=0;
-//  r1=0;
-//
-//  
-//  
-//  for (i=0;i<bins;i++)
-//    {
-//      glb_chirate[i]= 
-//	(x[1]*glb_calc_rates_1[glb_rule_number][i]+
-//	x[2]*glb_calc_rates_1T[glb_rule_number][i]+
-//	x[3]*glb_calc_rates_1BG[glb_rule_number][i]+
-//	x[4]*glb_calc_rates_1BGT[glb_rule_number][i]) * 
-//	errorf(glb_tre_null_center[glb_rule_number],glb_tre_tilt_center[glb_rule_number],i)
-//	*glb_window_function(glb_calc_energy_window[glb_rule_number][0],glb_calc_energy_window[glb_rule_number][1],i);
-//     
-//    }
-//  
-// for (i=0;i<bins;i++)
-//    {
-//      r1 += glb_chirate[i];
-//      r0 += glb_calc_rates_0[glb_rule_number][i];
-//    } 
-//
-// 
-// erg = likelihood(r0,r1)+
-//   glb_prior(x[1],1,glb_glb_sig_norm_error[glb_rule_number])+
-//    glb_prior(x[2],0,glb_sig_tilt_error[glb_rule_number])+
-//    glb_prior(x[3],glb_bg_norm_center[glb_rule_number],glb_bg_norm_error[glb_rule_number])+
-//    glb_prior(x[4],glb_bg_tilt_center[glb_rule_number],glb_bg_tilt_error[glb_rule_number]);
-//  
-//  return erg;
-//  
-//}
-//
-//// new tilting function in chi^2
-//double glb_chi_sys_w_bg_calib(double x[5])
-//{
-//  
-//  double erg;
-//  int i;
-//
-//  glb_shift_energy_scale(x[2],glb_calc_rates_1[glb_rule_number],glb_calc_rates_1T[glb_rule_number]);
-//  glb_shift_energy_scale(x[4],glb_calc_rates_1BG[glb_rule_number],glb_calc_rates_1BGT[glb_rule_number]);
-//  //fprintf(stderr,"Tilt x[2] %lf\n",x[2]);
-//  //fprintf(stderr,"first bin %lf %lf\n",glb_calc_rates_1[glb_rule_number][10],glb_calc_rates_1T[glb_rule_number][10]); 
-//  for (i=0;i<bins;i++)
-//    {
-//      glb_chirate[i]= 
-//	(x[1]*glb_calc_rates_1T[glb_rule_number][i]+
-//	 x[3]*glb_calc_rates_1BGT[glb_rule_number][i]) 
-//	* errorf(glb_tre_null_center[glb_rule_number],glb_tre_tilt_center[glb_rule_number],i)
-//	* glb_window_function(glb_calc_energy_window[glb_rule_number][0],glb_calc_energy_window[glb_rule_number][1],i);
-//      
-//    }
-//  
-//  erg = glb_list_likelihood(glb_calc_rates_0[glb_rule_number],glb_chirate)+
-//    glb_prior(x[1],1,glb_glb_sig_norm_error[glb_rule_number])+
-//    glb_prior(x[2],0,glb_sig_tilt_error[glb_rule_number])+
-//    glb_prior(x[3],glb_bg_norm_center[glb_rule_number],glb_bg_norm_error[glb_rule_number])+
-//    glb_prior(x[4],glb_bg_tilt_center[glb_rule_number],glb_bg_tilt_error[glb_rule_number]);
-//  
-//  return erg;
-//  
-//}
-
-
 /***************************************************************************
- * Here are reimplementations of the above chi^2 functions, conforming to  *
+ * Here are reimplementations of the chi^2 functions, conforming to        *
  * the user-defined systematics interface                                  *
  ***************************************************************************/
 
@@ -1183,34 +756,62 @@ inline double glb_prior(double x, double center, double sigma)
  * chi^2 including the standard signal and background errors, as well as   *
  * spectral information                                                    *
  ***************************************************************************/
-double glb_chi_sys_w_bg(int exp, int rule, double *x, int n_params)
+double glb_chi_sys_w_bg(int exp, int rule, int n_params, double *x, double *errors)
 {
-//  printf("glb_chi_sys_w_bg: rule %d\n", rule);
   double *true_rates       = glbGetRuleRatePtr(exp, rule);
   double *signal_fit_rates = glbGetSignalFitRatePtr(exp, rule);
   double *bg_fit_rates     = glbGetBGFitRatePtr(exp, rule);
+  double bg_norm_center, bg_tilt_center;
+  double bg_norm, bg_tilt;
+  int ew_low, ew_high;
   double fit_rate, true_rate;
   double chi2 = 0.0;
   int i;
 
-  for (i=0; i < glbGetNumberOfBins(exp); i++)
+  glbGetEnergyWindowBins(exp, rule, &ew_low, &ew_high);
+  glbGetBGCenters(exp, rule, &bg_norm_center, &bg_tilt_center);
+  bg_norm = bg_norm_center * (1.0 + x[2]);
+  bg_tilt = bg_tilt_center + x[3];
+  for (i=ew_low; i <= ew_high; i++)
   {
-    fit_rate = x[0]*signal_fit_rates[i] + x[1]*signal_fit_rates[i] // FIXME TILT
-                + x[2]*bg_fit_rates[i] + x[3]*bg_fit_rates[i]; // FIXME TILT
-    fit_rate *= errorf(glb_tre_null_center[rule],
-                       glb_tre_tilt_center[rule], i);  //FIXME
-    fit_rate *= glb_window_function(glb_calc_energy_window[rule][0],
-                                    glb_calc_energy_window[rule][1], i);  // FIXME
-    
+    fit_rate = (1.0+x[0])*signal_fit_rates[i] + x[1]*signal_fit_rates[i] // FIXME TILT
+                + bg_norm*bg_fit_rates[i] + bg_tilt*bg_fit_rates[i]; // FIXME TILT
     chi2 += glb_likelihood(true_rates[i], fit_rate);
   }
 
-  chi2 += // FIXME
-    glb_prior(x[0],1,glb_glb_sig_norm_error[rule])+
-    glb_prior(x[1],0,glb_sig_tilt_error[rule])+
-    glb_prior(x[2],glb_bg_norm_center[rule],glb_bg_norm_error[rule])+
-    glb_prior(x[3],glb_bg_tilt_center[rule],glb_bg_tilt_error[rule]);
- 
+  chi2 += glb_prior(x[0], 0.0, errors[0])
+            + glb_prior(x[1], 0.0, errors[1])
+            + glb_prior(bg_norm, bg_norm_center, errors[2])
+            + glb_prior(bg_tilt, bg_tilt_center, errors[3]);
+
+  return chi2;
+}
+
+
+/***************************************************************************
+ * Function glb_chi_no_sys                                                 *
+ ***************************************************************************
+ * chi^2 without systematical errors                                       *
+ ***************************************************************************/
+double glb_chi_no_sys(int exp, int rule, int n_params, double *x, double *errors)
+{
+  double *true_rates       = glbGetRuleRatePtr(exp, rule);
+  double *signal_fit_rates = glbGetSignalFitRatePtr(exp, rule);
+  double *bg_fit_rates     = glbGetBGFitRatePtr(exp, rule);
+  double bg_norm_center, bg_tilt_center;
+  int ew_low, ew_high;
+  double fit_rate, true_rate;
+  double chi2 = 0.0;
+  int i;
+
+  glbGetEnergyWindowBins(exp, rule, &ew_low, &ew_high);
+  glbGetBGCenters(exp, rule, &bg_norm_center, &bg_tilt_center);
+  for (i=ew_low; i <= ew_high; i++)
+  {
+    fit_rate = (signal_fit_rates[i] + bg_norm_center * bg_fit_rates[i]);
+    chi2 += glb_likelihood(true_rates[i], fit_rate);
+  }
+
   return chi2;
 }
 
@@ -1221,189 +822,107 @@ double glb_chi_sys_w_bg(int exp, int rule, double *x, int n_params)
  * chi^2 with spectral information, an unconstrained signal normalization  *
  * error, and no background errors                                         *
  ***************************************************************************/
-double glb_chi_spec(int exp, int rule, double *x, int n_params)
+double glb_chi_spec(int exp, int rule, int n_params, double *x, double *errors)
 {
   double *true_rates       = glbGetRuleRatePtr(exp, rule);
   double *signal_fit_rates = glbGetSignalFitRatePtr(exp, rule);
   double *bg_fit_rates     = glbGetBGFitRatePtr(exp, rule);
+  double bg_norm_center, bg_tilt_center;
+  int ew_low, ew_high;
   double fit_rate, true_rate;
   double chi2 = 0.0;
   int i;
 
-  for (i=0; i < glbGetNumberOfBins(exp); i++)
+  glbGetEnergyWindowBins(exp, rule, &ew_low, &ew_high);
+  glbGetBGCenters(exp, rule, &bg_norm_center, &bg_tilt_center);
+  for (i=ew_low; i <= ew_high; i++)
   {
-    fit_rate = x[0] * signal_fit_rates[i]
-                      + glb_bg_norm_center[rule] * bg_fit_rates[i];
-    fit_rate *= errorf(glb_tre_null_center[rule],
-                       glb_tre_tilt_center[rule], i);  //FIXME
-    fit_rate *= glb_window_function(glb_calc_energy_window[rule][0],
-                                    glb_calc_energy_window[rule][1], i);  // FIXME
-    
+    fit_rate = (1.0+x[0])*signal_fit_rates[i] + bg_norm_center*bg_fit_rates[i];
     chi2 += glb_likelihood(true_rates[i], fit_rate);
   }
   
   return chi2;
 }
 
-// split chi^2 total rates + spectrum
-//
-// FIXME JK - What is this function supposed to do? The code doesn't
-// make too much physical sense to me
-/*double glb_chi_split(int exp, int rule, double *x, int n_params)
-{
-  double erg;
-  double r0;
-  double r1;
-  int i;
-  r1=0;
-  r0=0;
-  
-  for (i=0;i<bins;i++)
-    {
-      r1 += 
-	(1.0*glb_calc_rates_1[glb_rule_number][i]+
-	x[1]*glb_calc_rates_1T[glb_rule_number][i]+
-	x[2]*glb_calc_rates_1BG[glb_rule_number][i]+
-	x[3]*glb_calc_rates_1BGT[glb_rule_number][i]) * 
-	errorf(glb_tre_null_center[glb_rule_number],glb_tre_tilt_center[glb_rule_number],i)
-	*glb_window_function(glb_calc_energy_window[glb_rule_number][0],glb_calc_energy_window[glb_rule_number][1],i);
-     
-      glb_chirate[i]= 
-	(x[0]*glb_calc_rates_1[glb_rule_number][i]+
-	x[1]*glb_calc_rates_1T[glb_rule_number][i]+
-	x[2]*glb_calc_rates_1BG[glb_rule_number][i]+
-	x[3]*glb_calc_rates_1BGT[glb_rule_number][i]) * 
-	errorf(glb_tre_null_center[glb_rule_number],glb_tre_tilt_center[glb_rule_number],i)
-	*glb_window_function(glb_calc_energy_window[glb_rule_number][0],glb_calc_energy_window[glb_rule_number][1],i); 
-      
-      r0 += glb_calc_rates_0[glb_rule_number][i];
-    }
-
-  erg =  
-    glb_likelihood(r0,r1)+
-    glb_list_likelihood(glb_calc_rates_0[glb_rule_number],glb_chirate)+
-    //glb_prior(x[1],1,glb_glb_sig_norm_error[glb_rule_number])+
-    glb_prior(x[2],0,glb_sig_tilt_error[glb_rule_number])+
-    glb_prior(x[3],glb_bg_norm_center[glb_rule_number],glb_bg_norm_error[glb_rule_number])+
-    glb_prior(x[4],glb_bg_tilt_center[glb_rule_number],glb_bg_tilt_error[glb_rule_number]);
-  
-  return erg;
-}*/
-
-
-// FIXME JK - shall we keep this?
-/*double glb_chi_sys_w_bg2(int exp, int rule, double *x, int n_params)
-{
-  
-  double erg;
-  int i;
- 
-  for (i=0;i<bins;i++)
-    {
-      glb_chirate[i]= 
-	(x[0]*glb_calc_rates_1[glb_rule_number][i]+
-	x[1]*glb_calc_rates_1T[glb_rule_number][i]+
-	x[2]*glb_calc_rates_1BG[glb_rule_number][i]+
-	x[3]*glb_calc_rates_1BGT[glb_rule_number][i]) * errorf(x[4],x[5] ,i)
-	*glb_window_function(glb_calc_energy_window[glb_rule_number][0],glb_calc_energy_window[glb_rule_number][1],i);
-    
-    }
- 
-  erg = glb_list_likelihood(glb_calc_rates_0[glb_rule_number],glb_chirate)+
-    glb_prior(x[0],1,glb_glb_sig_norm_error[glb_rule_number])+
-    glb_prior(x[1],0,glb_sig_tilt_error[glb_rule_number])+
-    glb_prior(x[2],glb_bg_norm_center[glb_rule_number],glb_bg_norm_error[glb_rule_number])+
-    glb_prior(x[3],glb_bg_tilt_center[glb_rule_number],glb_bg_tilt_error[glb_rule_number])+
-    glb_prior(x[4],glb_tre_null_center[glb_rule_number],glb_tre_null_error[glb_rule_number])+
-    glb_prior(x[5],glb_tre_tilt_center[glb_rule_number],glb_tre_tilt_error[glb_rule_number]);
-
-  
-  return erg;
-  
-}*/
 
 /***************************************************************************
  * Function glb_chi_sys_w_bgtot                                            *
  ***************************************************************************
  * chi^2 including the standard signal and background errors, but          *
- * considering only total rates, and omitting errorf                       *
+ * considering only total rates                                            *
  ***************************************************************************/
-double glb_chi_sys_w_bgtot(int exp, int rule, double *x, int n_params)
+double glb_chi_sys_w_bgtot(int exp, int rule, int n_params, double *x, double *errors)
 {
   double *true_rates       = glbGetRuleRatePtr(exp, rule);
   double *signal_fit_rates = glbGetSignalFitRatePtr(exp, rule);
   double *bg_fit_rates     = glbGetBGFitRatePtr(exp, rule);
+  double bg_norm_center, bg_tilt_center;
+  double bg_norm, bg_tilt;
+  int ew_low, ew_high;
   double fit_rate, true_rate;
   double total_fit_rate, total_true_rate;
   double chi2 = 0.0;
   int i;
 
+  glbGetEnergyWindowBins(exp, rule, &ew_low, &ew_high);
+  glbGetBGCenters(exp, rule, &bg_norm_center, &bg_tilt_center);
+  bg_norm = bg_norm_center * (1.0 + x[2]);
+  bg_tilt = bg_tilt_center + x[3];
+
   total_fit_rate  = 0.0;
   total_true_rate = 0.0;
-  for (i=0; i < glbGetNumberOfBins(exp); i++)
+  for (i=ew_low; i <= ew_high; i++)
   {
-    fit_rate = x[0]*signal_fit_rates[i] + x[1]*signal_fit_rates[i] // FIXME TILT
-                + x[2]*bg_fit_rates[i] + x[3]*bg_fit_rates[i]; // FIXME TILT
-    fit_rate *= glb_window_function(glb_calc_energy_window[rule][0],
-                                    glb_calc_energy_window[rule][1], i);  // FIXME
+    fit_rate = (1+x[0])*signal_fit_rates[i] + x[1]*signal_fit_rates[i] // FIXME TILT
+                + bg_norm*bg_fit_rates[i] + bg_tilt*bg_fit_rates[i]; // FIXME TILT
     total_fit_rate  += fit_rate;
     total_true_rate += true_rates[i];
   }
 
   chi2 = glb_likelihood(total_true_rate, total_fit_rate);
 
-  // FIXME
-  chi2 += 
-    glb_prior(x[0],1,glb_glb_sig_norm_error[rule])+
-    glb_prior(x[1],0,glb_sig_tilt_error[rule])+
-    glb_prior(x[2],glb_bg_norm_center[rule],glb_bg_norm_error[rule])+
-    glb_prior(x[3],glb_bg_tilt_center[rule],glb_bg_tilt_error[rule]);
-  
+  chi2 += glb_prior(x[0], 0.0, errors[0])
+            + glb_prior(x[1], 0.0, errors[1])
+            + glb_prior(bg_norm, bg_norm_center, errors[2])
+            + glb_prior(bg_tilt, bg_tilt_center, errors[3]);
+
   return chi2;
 }
 
 
 /***************************************************************************
- * Function glb_chi_sys_w_bgtot2                                           *
+ * Function glb_chi_no_sys_tot                                             *
  ***************************************************************************
- * chi^2 including the standard signal and background errors, but          *
- * considering only total rates, and including errorf                      *
+ * chi^2 without systematical errors, and considering only total rates     *
  ***************************************************************************/
-double glb_chi_sys_w_bgtot2(int exp, int rule, double *x, int n_params)
+double glb_chi_no_sys_tot(int exp, int rule, int n_params, double *x, double *errors)
 {
-//  printf("glb_chi_sys_w_bg_tot2: rule %d\n", rule);
   double *true_rates       = glbGetRuleRatePtr(exp, rule);
   double *signal_fit_rates = glbGetSignalFitRatePtr(exp, rule);
   double *bg_fit_rates     = glbGetBGFitRatePtr(exp, rule);
+  double bg_norm_center, bg_tilt_center;
+  int ew_low, ew_high;
   double fit_rate, true_rate;
   double total_fit_rate, total_true_rate;
   double chi2 = 0.0;
   int i;
 
+  glbGetEnergyWindowBins(exp, rule, &ew_low, &ew_high);
+  glbGetBGCenters(exp, rule, &bg_norm_center, &bg_tilt_center);
   total_fit_rate  = 0.0;
   total_true_rate = 0.0;
-  for (i=0; i < glbGetNumberOfBins(exp); i++)
+  for (i=ew_low; i <= ew_high; i++)
   {
-    fit_rate = x[0]*signal_fit_rates[i] + x[1]*signal_fit_rates[i] // FIXME TILT
-                + x[2]*bg_fit_rates[i] + x[3]*bg_fit_rates[i]; // FIXME TILT
-    fit_rate *= errorf(glb_tre_null_center[rule],
-                       glb_tre_tilt_center[rule], i);  //FIXME
-    fit_rate *= glb_window_function(glb_calc_energy_window[rule][0],
-                                    glb_calc_energy_window[rule][1], i);  // FIXME
+    fit_rate = (signal_fit_rates[i] + bg_norm_center*bg_fit_rates[i]);
     total_fit_rate  += fit_rate;
     total_true_rate += true_rates[i];
   }
 
   chi2 = glb_likelihood(total_true_rate, total_fit_rate);
 
-  chi2 += // FIXME
-    glb_prior(x[0],1,glb_glb_sig_norm_error[rule])+
-    glb_prior(x[1],0,glb_sig_tilt_error[rule])+
-    glb_prior(x[2],glb_bg_norm_center[rule],glb_bg_norm_error[rule])+
-    glb_prior(x[3],glb_bg_tilt_center[rule],glb_bg_tilt_error[rule]);
-  
   return chi2;
 }
+
 
 /***************************************************************************
  * Function glb_chi_sys_w_bg_calib                                         *
@@ -1411,37 +930,38 @@ double glb_chi_sys_w_bgtot2(int exp, int rule, double *x, int n_params)
  * chi^2 including the standard signal and background errors, as well as   *
  * spectral information. Energy tilt is replaced by energy calibration.    *
  ***************************************************************************/
-double glb_chi_sys_w_bg_calib(int exp, int rule, double *x, int n_params)
+double glb_chi_sys_w_bg_calib(int exp, int rule, int n_params, double *x, double *errors)
 {
-//  printf("glb_chi_sys_w_bg_calib: rule %d\n", rule);
   double *true_rates       = glbGetRuleRatePtr(exp, rule);
   double signal_fit_rates[glbGetNumberOfBins(exp)];
   double bg_fit_rates[glbGetNumberOfBins(exp)];
+  double bg_norm_center, bg_tilt_center;
+  double bg_norm, bg_tilt;
+  int ew_low, ew_high;
   double fit_rate, true_rate;
   double chi2 = 0.0;
   int i;
 
+  glbGetEnergyWindowBins(exp, rule, &ew_low, &ew_high);
+  glbGetBGCenters(exp, rule, &bg_norm_center, &bg_tilt_center);
+  bg_norm = bg_norm_center * (1.0 + x[2]);
+  bg_tilt = bg_tilt_center + x[3];
+  
   glbShiftEnergyScale(x[1], glbGetSignalFitRatePtr(exp, rule),
                       signal_fit_rates, glbGetNumberOfBins(exp));
-  glbShiftEnergyScale(x[3], glbGetBGFitRatePtr(exp, rule),
+  glbShiftEnergyScale(bg_tilt, glbGetBGFitRatePtr(exp, rule),
                       bg_fit_rates, glbGetNumberOfBins(exp));
 
-  for (i=0; i < glbGetNumberOfBins(exp); i++)
+  for (i=ew_low; i <= ew_high; i++)
   {
-    fit_rate = x[0]*signal_fit_rates[i] + x[2]*bg_fit_rates[i];
-    fit_rate *= errorf(glb_tre_null_center[rule],
-                       glb_tre_tilt_center[rule], i);  //FIXME
-    fit_rate *= glb_window_function(glb_calc_energy_window[rule][0],
-                                    glb_calc_energy_window[rule][1], i);  // FIXME
-    
+    fit_rate = (1.0+x[0])*signal_fit_rates[i] + bg_norm*bg_fit_rates[i];
     chi2 += glb_likelihood(true_rates[i], fit_rate);
   }
 
-  chi2 += // FIXME
-    glb_prior(x[0],1,glb_glb_sig_norm_error[glb_rule_number])+
-    glb_prior(x[1],0,glb_sig_tilt_error[glb_rule_number])+
-    glb_prior(x[2],glb_bg_norm_center[glb_rule_number],glb_bg_norm_error[glb_rule_number])+
-    glb_prior(x[3],glb_bg_tilt_center[glb_rule_number],glb_bg_tilt_error[glb_rule_number]);
+  chi2 += glb_prior(x[0], 0.0, errors[0])
+            + glb_prior(x[1], 0.0, errors[1])
+            + glb_prior(bg_norm, bg_norm_center, errors[2])
+            + glb_prior(bg_tilt, bg_tilt_center, errors[3]);
   
   return chi2;
 }
@@ -1475,7 +995,6 @@ void glb_remove_calc_pointers()
       glb_calc_chrb_0[k]=NULL;
       glb_calc_chrb_1[k]=NULL;
     }
-  glb_calc_buffer=NULL;
   smm=NULL;
 
 }

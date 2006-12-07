@@ -300,7 +300,6 @@ void glbInitExp(glb_exp ins)
   for(i=0;i<32;i++) in->sys_on_strings[i]=NULL;
   for(i=0;i<32;i++) in->sys_off_strings[i]=NULL;
   for(i=0;i<32;i++) in->sys_on_off[i]=GLB_ON;
-  in->errorfunction=-1;
   in->baseline=-1;
   in->emin=-1;
   in->emax=-1;
@@ -314,28 +313,31 @@ void glbInitExp(glb_exp ins)
   for(i=0;i<32;i++) in->lengthofrules[i]=-1;
   for(i=0;i<32;i++) in->rulescoeff[i]=NULL;
   for(i=0;i<32;i++) in->rulechannellist[i]=NULL;
-  for(i=0;i<32;i++) in->signalruleerror[0][i]=-1; 
-  for(i=0;i<32;i++) in->signalruleerror[1][i]=-1;
   for(i=0;i<32;i++) in->lengthofbgrules[i]=-1;
   for(i=0;i<32;i++) in->bgrulescoeff[i]=NULL;
   for(i=0;i<32;i++) in->bgrulechannellist[i]=NULL;
-  for(i=0;i<32;i++) in->bgcenter[0][i]=-1;
-  for(i=0;i<32;i++) in->bgcenter[1][i]=-1;
-  for(i=0;i<32;i++) in->bgerror[0][i]=-1;
-  for(i=0;i<32;i++) in->bgerror[1][i]=-1;
-  for(i=0;i<32;i++) in->bgtcenter[0][i]=-1; 
-  for(i=0;i<32;i++) in->bgtcenter[1][i]=-1;
-  for(i=0;i<32;i++) in->bgterror[0][i]=-1;
-  for(i=0;i<32;i++) in->bgterror[1][i]=-1;
+  for(i=0;i<32;i++) in->bg_centers[0][i]=1.0;
+  for(i=0;i<32;i++) in->bg_centers[1][i]=0.0;
+  for(i=0;i<32;i++) in->signal_errors[0][i]=-1; 
+  for(i=0;i<32;i++) in->signal_errors[1][i]=-1;
+  for(i=0;i<32;i++) in->signal_startvals[0][i]=0.0; 
+  for(i=0;i<32;i++) in->signal_startvals[1][i]=0.0;
+  for(i=0;i<32;i++) in->bg_errors[0][i]=-1;
+  for(i=0;i<32;i++) in->bg_errors[1][i]=-1;
+  for(i=0;i<32;i++) in->bg_startvals[0][i]=0.0;
+  for(i=0;i<32;i++) in->bg_startvals[1][i]=0.0;
+  for(i=0;i<32;i++) in->sys_on_errors[i]=NULL;
+  for(i=0;i<32;i++) in->sys_on_startvals[i]=NULL;
+  for(i=0;i<32;i++) in->sys_off_errors[i]=NULL;
+  for(i=0;i<32;i++) in->sys_off_startvals[i]=NULL;
   for(i=0;i<32;i++) {in->smear_data[i]=NULL;}
   for(i=0;i<32;i++) in->smear[i]=NULL;
   for(i=0;i<32;i++) in->lowrange[i]=NULL;
   for(i=0;i<32;i++) in->uprange[i]=NULL; 
- for(i=0;i<32;i++) in->chrb_0[i]=NULL; 
- for(i=0;i<32;i++) in->chrb_1[i]=NULL; 
- for(i=0;i<32;i++) in->chra_0[i]=NULL; 
- for(i=0;i<32;i++) in->chra_1[i]=NULL; 
- in->buffer=NULL;
+  for(i=0;i<32;i++) in->chrb_0[i]=NULL; 
+  for(i=0;i<32;i++) in->chrb_1[i]=NULL; 
+  for(i=0;i<32;i++) in->chra_0[i]=NULL; 
+  for(i=0;i<32;i++) in->chra_1[i]=NULL; 
   in->simtresh=-1;
   in->simbeam=-1;
   in->simbins=-1; 
@@ -354,6 +356,8 @@ void glbInitExp(glb_exp ins)
   for(i=0;i<32;i++) in->user_post_smearing_background[i]=NULL;
   for(i=0;i<32;i++) in->energy_window[i][0]=-1;
   for(i=0;i<32;i++) in->energy_window[i][1]=-1;
+  for(i=0;i<32;i++) in->energy_window_bins[i][0]=-1;
+  for(i=0;i<32;i++) in->energy_window_bins[i][1]=-1;
   for(i=0;i<32;i++)
     {
       in->SignalRates[i]=NULL;
@@ -399,6 +403,11 @@ void glbFreeExp(glb_exp ins)
       my_free(in->bgrulechannellist[i]);
     }
  
+  for(i=0;i<in->numofrules;i++)
+  {
+    my_free(in->sys_on_strings[i]);
+    my_free(in->sys_off_strings[i]);
+  }
 
   
   for(i=0;i<32;i++) glb_smear_free(in->smear_data[i]);
@@ -420,7 +429,6 @@ void glbFreeExp(glb_exp ins)
       my_free(in->user_pre_smearing_background[i]);
       my_free(in->user_post_smearing_background[i]);
     } 
-  my_free(in->buffer);
   my_free(in->lengthtab);
   my_free(in->densitytab);
   my_free(in->densitybuffer);
@@ -434,6 +442,10 @@ void glbFreeExp(glb_exp ins)
       my_free(in->rates1T[i]);
       my_free(in->rates1BG[i]);
       my_free(in->rates1BGT[i]);
+      my_free(in->sys_on_errors[i]);
+      my_free(in->sys_on_startvals[i]);
+      my_free(in->sys_off_errors[i]);
+      my_free(in->sys_off_startvals[i]);
     }
   my_free(in->energy_tab);
   my_free(in);
@@ -530,10 +542,13 @@ static int setup_density_profile(glb_exp ins)
 int glbDefaultExp(glb_exp ins)
 {
   int i,k,status,def,ct;
+  int sys_dim;
   
   
   struct glb_experiment *in;
   in=(struct glb_experiment *) ins;
+  double *tmp_errorlist;
+  double tmp;
  
   
   
@@ -587,22 +602,102 @@ int glbDefaultExp(glb_exp ins)
 	}
     }
 
+  /* Initialization of systematics data */
   for (i=0; i < in->numofrules; i++)
-  {
-    // FIXME Shall we be so strict here, or should we use some default?
-    // (was default formerly)
+  { 
     if (in->sys_on_strings[i] == NULL)
-      { glb_error("No chi^2 function specified."); status=-1; }
-    else if (glbSetChiFunctionInExperiment(in, i, GLB_ON, in->sys_on_strings[i]) != 0)
-      { glb_error("Unknown chi^2 function specified."); status=-1; }
-    
-    if (in->sys_off_strings[i] == NULL)
-      { glb_error("No chi^2 function specified."); status=-1; }
-    else if (glbSetChiFunctionInExperiment(in, i, GLB_OFF, in->sys_off_strings[i]) != 0)
-      { glb_error("Unknown chi^2 function specified."); status=-1; }
-  }
+      { glb_error("No chi^2 function specified"); status=-1; }
+    else
+    {
+      tmp_errorlist = in->sys_on_errors[i];
+      in->sys_on_errors[i] = NULL;
 
-  if(in->errorfunction==-1){in->errorfunction=0;def=-1;}
+      /* Check length of error list and make sure that all sigma are > 0.0 */
+      sys_dim = glbGetSysDim(in->sys_on_strings[i]);
+      if (sys_dim >= 0)
+      {
+        if (tmp_errorlist != NULL)
+        {
+          for (k=0; tmp_errorlist[k] > 0.0; k++)
+            ;
+          if (k != sys_dim)
+            { glb_error("Invalid systematical error list @sys_on_errors"); status=-1; }
+        }
+      }
+      else
+        { glb_error("Invalid systematics specification"); status=-1; }
+          
+      // FIXME Shall we be so strict here, or should we use some default?
+      // (was default formerly)
+      if (glbSetChiFunctionInExperiment(in, i, GLB_ON, in->sys_on_strings[i],
+                                        tmp_errorlist) != 0)
+        { glb_error("Invalid systematics specification"); status=-1; }
+
+      glb_free(tmp_errorlist);
+    }
+
+    /* Treatment of parameters for systematics OFF is equivalent to systematics ON */
+    if (in->sys_off_strings[i] == NULL)
+      { glb_error("No chi^2 function specified"); status=-1; }
+    else
+    {
+      tmp_errorlist = in->sys_off_errors[i];
+      in->sys_off_errors[i] = NULL;
+
+      /* Check length of error list and make sure that all sigma are > 0.0 */
+      sys_dim = glbGetSysDim(in->sys_off_strings[i]);
+      if (sys_dim >= 0)
+      {
+        if (tmp_errorlist != NULL)
+        {
+          for (k=0; tmp_errorlist[k] > 0.0; k++)
+            ;
+          if (k != sys_dim)
+            { glb_error("Invalid systematical error list @sys_off_errors"); status=-1; }
+        }
+      }
+      else
+        { glb_error("Invalid systematics specification"); status=-1; }
+          
+      // FIXME Shall we be so strict here, or should we use some default?
+      // (was default formerly)
+      if (glbSetChiFunctionInExperiment(in, i, GLB_OFF, in->sys_off_strings[i],
+                                        tmp_errorlist) != 0)
+        { glb_error("Invalid systematics specification"); status=-1; }
+
+      glb_free(tmp_errorlist);
+    }
+    
+/*    printf("\nRule %d:", i);
+    printf("\nErrors ON:     ");
+    if (in->sys_on_errors[i] != NULL)
+      for (k=0; k < 5; k++)
+        printf("%g\t", in->sys_on_errors[i][k]);
+    else
+      printf("NULL\t");
+    printf("\nStartvals ON:  ");
+    if (in->sys_on_startvals[i] != NULL)
+      for (k=0; k < 5; k++)
+        printf("%g\t", in->sys_on_startvals[i][k]);
+    else
+      printf("NULL\t");
+    printf("\nErrors OFF:    ");
+    if (in->sys_off_errors[i] != NULL)
+      for (k=0; k < 5; k++)
+        printf("%g\t", in->sys_off_errors[i][k]);
+    else
+      printf("NULL\t");
+    printf("\nStartvals OFF: ");
+    if (in->sys_off_startvals[i] != NULL)
+      for (k=0; k < 5; k++)
+        printf("%g\t", in->sys_off_startvals[i][k]);
+    else
+      printf("NULL\t");*/
+  }
+//  getchar();
+
+
+    
   if(in->baseline==-1){glb_error("No baseline specified!");status=-1;}
   if(in->emin==-1){glb_error("No emin specified!");status=-1;}
   if(in->emax==-1){glb_error("No emax specified!");status=-1;}
@@ -630,32 +725,12 @@ int glbDefaultExp(glb_exp ins)
       status=-1;}
       if(in->rulechannellist[i]==NULL){glb_error("No rulechannellist" 
 						  " specified!");status=-1;}
-      if(in->signalruleerror[0][i]==-1){glb_error("No signalruleerror[0]"
-						   " specified!");status=-1;} 
-      if(in->signalruleerror[1][i]==-1){glb_error("No signalruleerros[1]"
-						   " specified!");status=-1;}
       if(in->lengthofbgrules[i]==-1){glb_error("No lengthofbgrules"
 						" specified!");status=-1;}
       if(in->bgrulescoeff[i]==NULL){glb_error("No bgrulescoeff specified!");
       status=-1;}
       if(in->bgrulechannellist[i]==NULL){glb_error("No bgruloechannellist"
 						    " specified!");status=-1;}
-      if(in->bgcenter[0][i]==-1){glb_error("No bgcenter[0] specified!");
-      status=-1;}
-      if(in->bgcenter[1][i]==-1){glb_error("No bgcenter[1] specified!");
-      status=-1;}
-      if(in->bgerror[0][i]==-1){glb_error("No bgerror[0] specified!");
-      status=-1;}
-      if(in->bgerror[1][i]==-1){glb_error("No bgerror[1] specified!");
-      status=-1;}
-      /* if(in->bgtcenter[0][i]==-1){glb_error("No bgtcenter[0] specified!");
-      status=-1;} 
-      if(in->bgtcenter[1][i]==-1){glb_error("No bgtcenter[1] specified!");
-      status=-1;}
-      if(in->bgterror[0][i]==-1){glb_error("No bgterror[0] specified!");
-      status=-1;}
-      if(in->bgterror[1][i]==-1){glb_error("No bgterror[1] specified!");
-      status=-1;}*/
     }
  
 
@@ -797,8 +872,28 @@ int glbDefaultExp(glb_exp ins)
 	      status=-1;}
 	    }
 	}
+      
       if(in->energy_window[i][0]==-1){in->energy_window[i][0]=in->emin;def=-1;}
       if(in->energy_window[i][1]==-1){in->energy_window[i][1]=in->emax;def=-1;}
+
+      if (in->energy_window[i][0] > in->energy_window[i][1])
+      {
+        tmp                     = in->energy_window[i][1];
+        in->energy_window[i][1] = in->energy_window[i][0];
+        in->energy_window[i][0] = tmp;
+      }
+
+      /* Calculate bin ranges corresponding to the energy window,
+       * trying to reproduce the behaviour of the old glb_window_function */
+      in->energy_window_bins[i][0] = (int) ( 0.5 + in->numofbins //FIXME
+             * (in->energy_window[i][0] - in->emin) / (in->emax - in->emin) );
+      if (in->energy_window_bins[i][0] > in->numofbins)
+        in->energy_window_bins[i][0] = in->numofbins;
+      
+      in->energy_window_bins[i][1] = (int) ( -0.5 + in->numofbins
+             * (in->energy_window[i][1] - in->emin) / (in->emax - in->emin) );
+      if (in->energy_window_bins[i][0] < 0)
+        in->energy_window_bins[i][0] = 0;
     }
   for(i=0;i<in->numofrules;i++)
     {
@@ -813,15 +908,18 @@ int glbDefaultExp(glb_exp ins)
         glb_error("No memory for ratevectors allocated!");
         status=-1;
       }
-
-      if(in->chrb_0[i]==NULL || in->chrb_1[i]==NULL ||
-         in->chra_0[i]==NULL || in->chra_1[i]==NULL ||
-	 in->buffer==NULL)
-      {
-        glb_error("No memory for convolution allocated!");
-        status=-1;
-      }
     }
+
+  for(i=0; i < in->numofchannels; i++)
+  {
+    if(in->chrb_0[i]==NULL || in->chrb_1[i]==NULL ||
+       in->chra_0[i]==NULL || in->chra_1[i]==NULL)
+    {
+      glb_error("No memory for convolution allocated!");
+      status=-1;
+    }
+  }
+
   if(in->energy_tab==NULL){glb_error("energy_tab not allocated!");
   status=-1;}
   // okay thats missing
@@ -889,7 +987,6 @@ static void MMovePointers(struct glb_experiment *in)
   for(k=0;k<in->num_of_fluxes;k++) glb_calc_fluxes[k]=in->fluxes[k];
   for(k=0;k<in->num_of_xsecs;k++) glb_calc_xsecs[k]=in->xsecs[k];
   glb_calc_energy_tab = in->energy_tab;
-  glb_calc_buffer=in->buffer;
   return;
 }
 
@@ -922,7 +1019,6 @@ static struct glb_experiment MInitMemory0(struct glb_experiment in)
 	      out.BackgroundRates[k] = (double*) glb_malloc(len*sizeof(double)); 
 	    }
 	}
-      out.buffer=(double*) glb_malloc(l2*sizeof(double));
       out.energy_tab= (double*) glb_malloc(len*sizeof(double)); 
     }
   for(k=0;k<out.numofchannels;k++)
@@ -985,17 +1081,6 @@ void glbSetExperiment(glb_exp in)
       break;
     }
 
-  //  set_type(s->beamtype);
-  glb_set_error_function(s->errorfunction);
- 
-
-  //analog of SetBase
-
- 
-
-
- 
- 
 
   // pointer moving for density profile
   glb_set_baseline(s->baseline);
@@ -1030,28 +1115,14 @@ void glbSetExperiment(glb_exp in)
     {
       glb_set_rule(i,s->lengthofrules[i],
 		   (int*) s->rulechannellist[i],s->rulescoeff[i]);
-      glb_set_signal_errors(i,
-			    (double) s->signalruleerror[0][i],
-			    (double) s->signalruleerror[1][i]);
       glb_set_bg_rule(i,s->lengthofbgrules[i],
 			      s->bgrulechannellist[i],s->bgrulescoeff[i]);
-      glb_set_bg_center(i,
-			(double) s->bgcenter[0][i],(double) s->bgcenter[1][i]);
-      glb_set_bg_errors(i,(double) s->bgerror[0][i],(double) s->bgerror[1][i]);
-      glb_calc_set_tresh_center(i,(double) s->bgtcenter[0][i],
-				(double) s->bgtcenter[1][i]);
-      glb_calc_set_tresh_errors(i,(double) s->bgterror[0][i],
-				(double) s->bgterror[1][i]);
+      glb_set_bg_center(i,(double) s->bg_centers[0][i],(double) s->bg_centers[1][i]);
      
       // this is preliminary (0 should be replaced by i)
       glb_calc_simbins=s->simbins;
       glb_calc_simtresh=s->simtresh;
       glb_calc_simbeam=s->simbeam;
-      //--------------------------
-
-      glb_calc_set_energy_window(i,s->energy_window[i][0],
-				 s->energy_window[i][1]);
-     
     }
 
   for(i=0;i<s->num_of_sm;i++)

@@ -1176,7 +1176,7 @@ double glbGetNormalizationInRule(int exp, int rule, int signal)
     res=1.0;
 
   if(signal==GLB_BG)
-    res=((struct glb_experiment *) glb_experiment_list[exp])->bgcenter[0][rule];
+    res=((struct glb_experiment *) glb_experiment_list[exp])->bg_centers[0][rule];
 
   return res;
 } 
@@ -1698,135 +1698,7 @@ glb_init(char *name)
    */
 }
 
-/* Toggle Systemtatics */
 
-static int
-glb_switch_systematics(int experiment, int rule, int on_off)
-{
-  int i;
-  struct glb_experiment *in;
-  if((on_off!=GLB_ON)&&(on_off!=GLB_OFF)) {
-    glb_error("Invalid value for on_off");
-    return -1;
-  }
-
-  in=(struct glb_experiment *) glb_experiment_list[experiment];
-  if(rule==GLB_ALL)
-  {
-    for(i=0;i<in->numofrules;i++)
-      in->sys_on_off[i] = on_off;
-  }
-  else if((rule >= 0)&&(rule < in->numofrules ))
-    in->sys_on_off[rule] = on_off;
-  else 
-  {
-    glb_error("Invalid value for rule number");
-    return -1;
-  }
-  return 0;
-}
-
-int
-glbSwitchSystematics(int experiment, int rule, int on_off)
-{
-  int i,s=0;
-  if(experiment==GLB_ALL)
-    {
-      for(i=0;i<glb_num_of_exps;i++) 
-	s+=glb_switch_systematics(i, rule, on_off);
-    }
-  else if((experiment >= 0)&&(experiment < glb_num_of_exps))
-    {
-	s+=glb_switch_systematics(experiment, rule, on_off);
-    }
-  else 
-    {
-      glb_error("Invalid value for experiment number");
-      return -1;
-    }
-  return s;
-}
-
-// FIXME Rewrite for new systematics
-//static int
-//glb_set_systematics(int experiment, int rule, int on_off, int value)
-//{
-//  int i;
-//  struct glb_experiment *in;
-//  if((on_off!=GLB_ON)&&(on_off!=GLB_OFF)) {
-//    glb_error("Invalid value for on_off");
-//    return -1;
-//  }
-//
-//  in=(struct glb_experiment *) glb_experiment_list[experiment];
-//  if(rule==GLB_ALL)
-//    {
-//      for(i=0;i<in->numofrules;i++) {
-//	if(on_off==GLB_ON) in->errordim_sys_on[i]=value;
-//	if(on_off==GLB_OFF) in->errordim_sys_off[i]=value;
-//      }
-//    }
-//  else if((rule >= 0)&&(rule < in->numofrules ))
-//    {
-//      i=rule;
-//      if(on_off==GLB_ON) in->errordim_sys_on[i]=value;
-//      if(on_off==GLB_OFF) in->errordim_sys_off[i]=value;
-//    }
-//  else 
-//    {
-//      glb_error("Invalid value for rule number");
-//      return -1;
-//    }
-//  return 0;
-//}
-//
-//
-//int 
-//glbSetErrorDim(int experiment, int rule, int on_off, int value)
-//{
-//  int i,s=0;
-//  if(experiment==GLB_ALL)
-//    {
-//      for(i=0;i<glb_num_of_exps;i++) 
-//	s+=glb_set_systematics(i, rule, on_off, value);
-//    }
-//  else if((experiment >= 0)&&(experiment < glb_num_of_exps))
-//    {
-//	s+=glb_set_systematics(experiment, rule, on_off,value);
-//    }
-//  else 
-//    {
-//      glb_error("Invalid value for experiment number");
-//      return -1;
-//    }
-//  return s;
-//}
-//
-//int 
-//glbGetErrorDim(int experiment, int rule, int on_off)
-//{
-//  int s=0;
-//  struct glb_experiment *in;
-//  if((on_off!=GLB_ON)&&(on_off!=GLB_OFF)) {
-//    glb_error("Invalid value for on_off");
-//    return -1;
-//  }
-//  if((experiment >= 0)&&(experiment < glb_num_of_exps))
-//    {
-//      in=(struct glb_experiment *) glb_experiment_list[experiment];
-//      if((rule >= 0)&&(rule < in->numofrules )) 
-//	{
-//	  if(on_off==GLB_ON) s=in->errordim_sys_on[rule];
-//	  if(on_off==GLB_OFF) s=in->errordim_sys_off[rule];
-//	}
-//    }
-//  else 
-//    {
-//      glb_error("Invalid value for experiment number");
-//      return -1;
-//    }
-//  return s;
-//}
 
 
 /* Here comes a bunch of set/get functions.
@@ -1900,246 +1772,87 @@ glbGetTargetMass(int experiment)
   return -1.0;
 }
 
-int glbSetSignalErrors(int experiment, int rule, double norm, double tilt)
-{
-  struct glb_experiment *in;
-  int i,k;
-  /* Testing the arguments */
-  if((norm <= 0) || (tilt <= 0)) { glb_error("Errors have to be positive");
-  return -1;}
 
-  /* Testing the experiment number */
-  if(!(((experiment >= 0)&&(experiment < glb_num_of_exps))
-       ||(experiment==GLB_ALL))) { 
-    glb_error("Invalid value for experiment number");
-    return -1;}
-
-  for(i=0;i<glb_num_of_exps;i++)
-    {
-      if(experiment!=GLB_ALL) i=experiment;
-      in=(struct glb_experiment *) glb_experiment_list[i];
-      /* Testing the rule number */
-      if(!(((rule >= 0)&&(rule < in->numofrules))
-	   ||(rule==GLB_ALL))) { 
-	glb_error("Invalid value for rule number");
-	return -1;}     
-      for(k=0;k<in->numofrules;k++)
-	{
-	   if(rule!=GLB_ALL) k=rule;
-	   /* Here should come the assignment */
-	  
-	   in->signalruleerror[0][k]=norm;
-	   in->signalruleerror[1][k]=tilt;
-	   
-	   if(rule!=GLB_ALL) break;
-	}
-
-      if(experiment!=GLB_ALL) break;
-    }
-  return 0;
-}
-
-
-int 
-glbGetSignalErrors(int experiment, int rule, double *norm, double *tilt)
-{
-  struct glb_experiment *in;
-  int i,k;
-  /* Testing the arguments */
-  if((norm == NULL) || (tilt == NULL)) { 
-    glb_error("Input pointers may not be NULL");
-  return -1;}
-
-  /* Testing the experiment number */
-  if(!(((experiment >= 0)&&(experiment < glb_num_of_exps)))) { 
-    glb_error("Invalid value for experiment number");
-    return -1;}
-
-  for(i=0;i<glb_num_of_exps;i++)
-    {
-      if(experiment!=GLB_ALL) i=experiment;
-      in=(struct glb_experiment *) glb_experiment_list[i];
-      /* Testing the rule number */
-      if(!(((rule >= 0)&&(rule < in->numofrules)))) { 
-	glb_error("Invalid value for rule number");
-	return -1;}     
-      for(k=0;k<in->numofrules;k++)
-	{
-	   if(rule!=GLB_ALL) k=rule;
-	   /* Here should come the assignment */
-	  
-	   *norm=in->signalruleerror[0][k];
-	   *tilt=in->signalruleerror[1][k];
-	   
-	   if(rule!=GLB_ALL) break;
-	}
-
-      if(experiment!=GLB_ALL) break;
-    }
-  return 0;
-}
-
-/* same for BG errors */
-
-int glbSetBGErrors(int experiment, int rule, double norm, double tilt)
-{
-  struct glb_experiment *in;
-  int i,k;
-  /* Testing the arguments */
-  if((norm <= 0) || (tilt <= 0)) { glb_error("Errors have to be positive");
-  return -1;}
-
-  /* Testing the experiment number */
-  if(!(((experiment >= 0)&&(experiment < glb_num_of_exps))
-       ||(experiment==GLB_ALL))) { 
-    glb_error("Invalid value for experiment number");
-    return -1;}
-
-  for(i=0;i<glb_num_of_exps;i++)
-    {
-      if(experiment!=GLB_ALL) i=experiment;
-      in=(struct glb_experiment *) glb_experiment_list[i];
-      /* Testing the rule number */
-      if(!(((rule >= 0)&&(rule < in->numofrules))
-	   ||(rule==GLB_ALL))) { 
-	glb_error("Invalid value for rule number");
-	return -1;}     
-      for(k=0;k<in->numofrules;k++)
-	{
-	   if(rule!=GLB_ALL) k=rule;
-	   /* Here should come the assignment */
-	   in->bgerror[0][k]=norm;
-	   in->bgerror[1][k]=tilt;
-	   
-	   
-	   if(rule!=GLB_ALL) break;
-	}
-
-      if(experiment!=GLB_ALL) break;
-    }
-  return 0;
-}
-
-
-int 
-glbGetBGErrors(int experiment, int rule, double *norm, double *tilt)
-{
-  struct glb_experiment *in;
-  int i,k;
-  /* Testing the arguments */
-  if((norm == NULL) || (tilt == NULL)) { 
-    glb_error("Input pointers may not be NULL");
-  return -1;}
-
-  /* Testing the experiment number */
-  if(!(((experiment >= 0)&&(experiment < glb_num_of_exps)))) { 
-    glb_error("Invalid value for experiment number");
-    return -1;}
-
-  for(i=0;i<glb_num_of_exps;i++)
-    {
-      if(experiment!=GLB_ALL) i=experiment;
-      in=(struct glb_experiment *) glb_experiment_list[i];
-      /* Testing the rule number */
-      if(!(((rule >= 0)&&(rule < in->numofrules)))) { 
-	glb_error("Invalid value for rule number");
-	return -1;}     
-      for(k=0;k<in->numofrules;k++)
-	{
-	   if(rule!=GLB_ALL) k=rule;
-	   /* Here should come the assignment */
-	  
-	   *norm=in->bgerror[0][k];
-	   *tilt=in->bgerror[1][k];
-	   
-	   if(rule!=GLB_ALL) break;
-	}
-
-      if(experiment!=GLB_ALL) break;
-    }
-  return 0;
-}
-
-/* same for BG errors */
-
-int glbSetBGCenters(int experiment, int rule, double norm, double tilt)
-{
-  struct glb_experiment *in;
-  int i,k;
-  /* Testing the arguments */
-  if((norm <= 0) || (tilt <= 0)) { glb_error("Errors have to be positive");
-  return -1;}
-
-  /* Testing the experiment number */
-  if(!(((experiment >= 0)&&(experiment < glb_num_of_exps))
-       ||(experiment==GLB_ALL))) { 
-    glb_error("Invalid value for experiment number");
-    return -1;}
-
-  for(i=0;i<glb_num_of_exps;i++)
-    {
-      if(experiment!=GLB_ALL) i=experiment;
-      in=(struct glb_experiment *) glb_experiment_list[i];
-      /* Testing the rule number */
-      if(!(((rule >= 0)&&(rule < in->numofrules))
-	   ||(rule==GLB_ALL))) { 
-	glb_error("Invalid value for rule number");
-	return -1;}     
-      for(k=0;k<in->numofrules;k++)
-	{
-	   if(rule!=GLB_ALL) k=rule;
-	   /* Here should come the assignment */
-	   in->bgcenter[0][k]=norm;
-	   in->bgcenter[1][k]=tilt;
-	   
-	   
-	   if(rule!=GLB_ALL) break;
-	}
-
-      if(experiment!=GLB_ALL) break;
-    }
-  return 0;
-}
-
-
-int 
-glbGetBGCenters(int experiment, int rule, double *norm, double *tilt)
-{
-  struct glb_experiment *in;
-  int i,k;
-  /* Testing the arguments */
-  if((norm == NULL) || (tilt == NULL)) { 
-    glb_error("Input pointers may not be NULL");
-  return -1;}
-
-  /* Testing the experiment number */
-  if(!(((experiment >= 0)&&(experiment < glb_num_of_exps)))) { 
-    glb_error("Invalid value for experiment number");
-    return -1;}
-
-  for(i=0;i<glb_num_of_exps;i++)
-    {
-      if(experiment!=GLB_ALL) i=experiment;
-      in=(struct glb_experiment *) glb_experiment_list[i];
-      /* Testing the rule number */
-      if(!(((rule >= 0)&&(rule < in->numofrules)))) { 
-	glb_error("Invalid value for rule number");
-	return -1;}     
-      for(k=0;k<in->numofrules;k++)
-	{
-	   if(rule!=GLB_ALL) k=rule;
-	   /* Here should come the assignment */
-	  
-	   *norm=in->bgcenter[0][k];
-	   *tilt=in->bgcenter[1][k];
-	   
-	   if(rule!=GLB_ALL) break;
-	}
-
-      if(experiment!=GLB_ALL) break;
-    }
-  return 0;
-}
+//FIXME Re-Implement
+///* same for BG errors */
+//int glbSetBGCenters(int experiment, int rule, double norm, double tilt)
+//{
+//  struct glb_experiment *in;
+//  int i,k;
+//  /* Testing the arguments */
+//  if((norm <= 0) || (tilt <= 0)) { glb_error("Errors have to be positive");
+//  return -1;}
+//
+//  /* Testing the experiment number */
+//  if(!(((experiment >= 0)&&(experiment < glb_num_of_exps))
+//       ||(experiment==GLB_ALL))) { 
+//    glb_error("Invalid value for experiment number");
+//    return -1;}
+//
+//  for(i=0;i<glb_num_of_exps;i++)
+//    {
+//      if(experiment!=GLB_ALL) i=experiment;
+//      in=(struct glb_experiment *) glb_experiment_list[i];
+//      /* Testing the rule number */
+//      if(!(((rule >= 0)&&(rule < in->numofrules))
+//	   ||(rule==GLB_ALL))) { 
+//	glb_error("Invalid value for rule number");
+//	return -1;}     
+//      for(k=0;k<in->numofrules;k++)
+//	{
+//	   if(rule!=GLB_ALL) k=rule;
+//	   /* Here should come the assignment */
+//	   in->bgcenter[0][k]=norm;
+//	   in->bgcenter[1][k]=tilt;
+//	   
+//	   
+//	   if(rule!=GLB_ALL) break;
+//	}
+//
+//      if(experiment!=GLB_ALL) break;
+//    }
+//  return 0;
+//}
+//
+//
+//int 
+//glbGetBGCenters(int experiment, int rule, double *norm, double *tilt)
+//{
+//  struct glb_experiment *in;
+//  int i,k;
+//  /* Testing the arguments */
+//  if((norm == NULL) || (tilt == NULL)) { 
+//    glb_error("Input pointers may not be NULL");
+//  return -1;}
+//
+//  /* Testing the experiment number */
+//  if(!(((experiment >= 0)&&(experiment < glb_num_of_exps)))) { 
+//    glb_error("Invalid value for experiment number");
+//    return -1;}
+//
+//  for(i=0;i<glb_num_of_exps;i++)
+//    {
+//      if(experiment!=GLB_ALL) i=experiment;
+//      in=(struct glb_experiment *) glb_experiment_list[i];
+//      /* Testing the rule number */
+//      if(!(((rule >= 0)&&(rule < in->numofrules)))) { 
+//	glb_error("Invalid value for rule number");
+//	return -1;}     
+//      for(k=0;k<in->numofrules;k++)
+//	{
+//	   if(rule!=GLB_ALL) k=rule;
+//	   /* Here should come the assignment */
+//	  
+//	   *norm=in->bgcenter[0][k];
+//	   *tilt=in->bgcenter[1][k];
+//	   
+//	   if(rule!=GLB_ALL) break;
+//	}
+//
+//      if(experiment!=GLB_ALL) break;
+//    }
+//  return 0;
+//}
 
 const char *glbVersionOfExperiment(int experiment)
 {
@@ -2432,6 +2145,57 @@ glbGetFilterInExperiment(int experiment)
     }
   return out;
 }
+
+
+int
+glbGetEnergyWindow(int experiment, int rule, double *low, double *high)
+{
+  struct glb_experiment *in;
+  
+  if (low == NULL  ||  high == NULL)
+    { glb_error("glbGetEnergyWindow: Input pointers may not be NULL"); return -1; }
+
+  if (experiment >= 0  &&  experiment < glb_num_of_exps)
+  {
+    in = glb_experiment_list[experiment];
+    if (rule >= 0 && rule < in->numofrules)
+    {
+      *low  = in->energy_window[rule][0];
+      *high = in->energy_window[rule][1];
+    }
+    else
+      { glb_error("glbGetEnergyWindow: Invalid rule number"); return -1; }
+  }
+  else
+    { glb_error("glbGetEnergyWindow: Invalid experiment number"); return -1; }
+  
+}
+
+
+int
+glbGetEnergyWindowBins(int experiment, int rule, int *low, int *high)
+{
+  struct glb_experiment *in;
+  
+  if (low == NULL  ||  high == NULL)
+    { glb_error("glbGetEnergyWindow: Input pointers may not be NULL"); return -1; }
+
+  if (experiment >= 0  &&  experiment < glb_num_of_exps)
+  {
+    in = glb_experiment_list[experiment];
+    if (rule >= 0 && rule < in->numofrules)
+    {
+      *low  = in->energy_window_bins[rule][0];
+      *high = in->energy_window_bins[rule][1];
+    }
+    else
+      { glb_error("glbGetEnergyWindow: Invalid rule number"); return -1; }
+  }
+  else
+    { glb_error("glbGetEnergyWindow: Invalid experiment number"); return -1; }
+  
+}
+
 
 /* Accessing parser meta-information */
 

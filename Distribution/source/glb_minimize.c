@@ -242,10 +242,11 @@ int glb_free_minimizer()
 // JK - FIXME - This should be solved more elegantly
 static glb_chi_function glb_current_chi_function;
 static int glb_current_n_sys;
+static double *glb_current_errorlist;
 double glb_chi_callback(double *params)
 {
   return glb_current_chi_function(glb_current_exp, glb_rule_number,
-                                  &(params[1]), glb_current_n_sys);
+             glb_current_n_sys, &(params[1]), glb_current_errorlist);
 }
 
 
@@ -372,24 +373,32 @@ static double ChiS0_Rule(int rule)
     sys = exp->sys_off[rule];
     
   mat  = glb_alloc_mat(1, sys->dim, 1, sys->dim);
-  sp   = glb_alloc_vec(1, 6); // that is the maximal length //FIXME
+  sp   = glb_alloc_vec(1, sys->dim);
   init_mat(mat, sys->dim);
-  sp[1] = 1;
-  sp[2] = 0;
-  sp[3] = glb_bg_norm_center[rule];
-  sp[4] = glb_bg_tilt_center[rule];
-  sp[5] = glb_tre_null_center[rule];
-  sp[6] = glb_tre_tilt_center[rule];
+
+  /* Prepare data for callback function */  
   glb_current_chi_function = sys->chi_func;
   glb_current_n_sys        = sys->dim;
+  if (exp->sys_on_off[rule] == GLB_ON)
+  {
+    glb_current_errorlist = exp->sys_on_errors[rule];
+    for (i=0; i < sys->dim; i++)
+      sp[i+1] = exp->sys_on_startvals[rule][i];
+  }
+  else
+  {
+    glb_current_errorlist = exp->sys_off_errors[rule];
+    for (i=0; i < sys->dim; i++)
+      sp[i+1] = exp->sys_off_startvals[rule][i];
+  }
   if (glb_powell(sp, mat, sys->dim, TOLSYS, &it, &res, &glb_chi_callback) != 0)
   {
     glb_warning("Systematics minimization failed.");
     return -res;
   }
-  glb_free_vec(sp, 1, 6);
+  glb_free_vec(sp, 1, sys->dim);
   glb_free_mat(mat, 1, sys->dim, 1, sys->dim);
-
+  
   glb_rule_number = 0;
   return res;
 }
@@ -439,16 +448,6 @@ static double Chi(double x[])
   glb_hook_set_oscillation_parameters(p);
   glbFreeParams(p);
     
-//FIXME Remove
-//  double nsp[glbGetNumOfOscParams()-6+1];
-//  glb_set_c_vacuum_parameters(x[0],x[1],x[2],x[3]);
-//  glb_set_c_squared_masses(0,x[4],x[5]);
-//  if(glbGetNumOfOscParams()>6)
-//  {
-//	for(i=0;i<glbGetNumOfOscParams()-6;i++) nsp[i]=x[i+6];
-//	glb_set_c_ns_params(nsp);
-//  }
-  
   for (i=0;i<glb_num_of_exps;i++)
     {
       glbSetExperiment(glb_experiment_list[i]);
@@ -480,21 +479,9 @@ static double SingleChi(double x[glbGetNumOfOscParams()+1],int exp)
   glb_hook_set_oscillation_parameters(p);
   glbFreeParams(p);
 
-//FIXME remove
-//  double nsp[glbGetNumOfOscParams()-6+1];
-//  glb_set_c_vacuum_parameters(x[0], x[1],x[2],x[3]);
-//  glb_set_c_squared_masses(0,x[4],x[5]);
-//  if(glbGetNumOfOscParams()>6)
-//  {
-//	for(i=0;i<glbGetNumOfOscParams()-6;i++) nsp[i]=x[i+6];
-//	glb_set_c_ns_params(nsp);
-//  }
-
-      glbSetExperiment(glb_experiment_list[exp]);
-      glb_set_profile_scaling(x[glbGetNumOfOscParams()],exp);
-      glb_set_new_rates();
-     
-
+  glbSetExperiment(glb_experiment_list[exp]);
+  glb_set_profile_scaling(x[glbGetNumOfOscParams()],exp);
+  glb_set_new_rates();
 
   glbSetExperiment(glb_experiment_list[exp]);
   if (setjmp(env)==1) 
@@ -519,20 +506,9 @@ static double SingleRuleChi(double x[glbGetNumOfOscParams()+1],int exp, int rule
   glb_hook_set_oscillation_parameters(p);
   glbFreeParams(p);
 
-// FIXME Remove
-//  double nsp[glbGetNumOfOscParams()-6+1];
-//  glb_set_c_vacuum_parameters(x[0], x[1],x[2],x[3]);
-//  glb_set_c_squared_masses(0,x[4],x[5]);
-//  if(glbGetNumOfOscParams()>6)
-//  {
-//	for(i=0;i<glbGetNumOfOscParams()-6;i++) nsp[i]=x[i+6];
-//	glb_set_c_ns_params(nsp);
-//  }
-
-      glbSetExperiment(glb_experiment_list[exp]);
-      glb_set_profile_scaling(x[glbGetNumOfOscParams()],exp);
-      glb_set_new_rates();
-     
+  glbSetExperiment(glb_experiment_list[exp]);
+  glb_set_profile_scaling(x[glbGetNumOfOscParams()],exp);
+  glb_set_new_rates();
 
   glbSetExperiment(glb_experiment_list[exp]);
   erg=ChiS0_Rule(rule);
@@ -842,15 +818,6 @@ static double MD_chi_NP(double x[])
   glb_hook_set_oscillation_parameters(p);
   glbFreeParams(p);
 
-// FIXME Remove
-//  glb_set_c_vacuum_parameters(y[0],y[1],y[2],y[3]);
-//  glb_set_c_squared_masses(0,y[4],y[5]);
-//  if(glbGetNumOfOscParams()>6)
-//  {
-//	for(i=0;i<glbGetNumOfOscParams()-6;i++) nsp[i]=y[i+6];
-//	glb_set_c_ns_params(nsp);
-//  }
-  
   for (i=0;i<glb_num_of_exps;i++)
     {
       glbSetExperiment(glb_experiment_list[i]);
@@ -951,15 +918,6 @@ static double chi_NP(double x[])
   glb_hook_set_oscillation_parameters(p);
   glbFreeParams(p);
 
-// FIXME Remove
-//  glb_set_c_vacuum_parameters(y[0],y[1],y[2],y[3]);
-//  glb_set_c_squared_masses(0,y[4],y[5]);
-//  if(glbGetNumOfOscParams()>6)
-//  {
-//	for(i=0;i<glbGetNumOfOscParams()-6;i++) nsp[i]=y[i+6];
-//	glb_set_c_ns_params(nsp);
-//  }
-  
   glbSetExperiment(glb_experiment_list[glb_single_experiment_number]);
   glb_set_profile_scaling(y[glbGetNumOfOscParams()],glb_single_experiment_number);
   glb_set_new_rates();

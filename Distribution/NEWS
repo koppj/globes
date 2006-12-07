@@ -577,7 +577,31 @@ documented!
        - Removed the now unused array chirate in glb_experiment
        Verification: Testsuite
 
+07/12/2006 JK
+       - Introduced empty lists {} in AEDL
+       - Introduced new directives @sys_on_errors and @sys_off_errors
+       - Introduced C++-style ('//') comments in AEDL
+       - Removed bgtcenter, bgterror, buffer from struct glb_experiment
+       - Removed all undocumented chi^2 functions
+       - Re-implemented large parts of the systematics routines:
+           * Errors are kept in arrays of arbitrary length
+           * Old signal/bg error arrays do still exist, and for the
+             old (built-in) chi^2 functions, they are kept consistent
+             with the new error arrays
+           * removed errorf
+           * removed glb_window_function; energy window is now implemented
+             by modified loop boundaries
+           * Introduced new glbGet-functions for energy window
+           * All errors have central value 0 (this can always be achieved
+             by redefinition)
+           * The old bg_center is still valid, but only the built-in
+             chi^2 functions take it into account
+           * Modified all relevant glbSet/glbGet functions
+       Verifiation: Testsuite 03/04/05/06 yield only minor deviations, which
+         are expected due to the rearrangement of FP operations in the chi^2
+         functions
+         Various dedicated tests for the Set/Get-Functions etc.
+                    
 
 
 
-           

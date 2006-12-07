@@ -68,23 +68,15 @@ void glbInit(char *name)
 			    glb_builtin_prior_input_errors);
   
   /* Register built-in chi^2 functions */
-  // FIXME: JK - These names have to be modified
-  glbDefineChiFunction(&glb_chi_sys_w_bg,       4, "glb_chi_sys_w_bg");
-  glbDefineChiFunction(&glb_chi_sys_w_bg,       0, "glb_no_sys");
-  glbDefineChiFunction(&glb_chi_sys_w_bgtot2,   4, "glb_chi_sys_w_bgtot2");
-  glbDefineChiFunction(&glb_chi_spec,           1, "glb_chi_spec");
-  glbDefineChiFunction(&glb_chi_sys_w_bgtot2,   0, "glb_no_sys_totalrates");
-  glbDefineChiFunction(&glb_chi_sys_w_bg_calib, 4, "glb_chi_sys_w_bg_calib");
-
-  // FIXME: Check that old errordims 2 and 8 work as expected
-
-  /* Register deprecated names for chi^2 functions */
-  glbDefineChiFunction(&glb_chi_sys_w_bg,       4, "0");
-  glbDefineChiFunction(&glb_chi_sys_w_bg,       0, "2");
-  glbDefineChiFunction(&glb_chi_sys_w_bgtot2,   4, "4");
-  glbDefineChiFunction(&glb_chi_spec,           1, "7");
-  glbDefineChiFunction(&glb_chi_sys_w_bgtot2,   0, "8");
-  glbDefineChiFunction(&glb_chi_sys_w_bg_calib, 4, "9");
+  /* When making any changes here, don't forget to update the array
+   * glb_2011_compatible_chi_functions in glb_sys.c and the functions
+   * glbConvertErrorDim and glbGetErrorDim */
+  glbDefineChiFunction(&glb_chi_sys_w_bg,       4, "sysSpectrumTilt");
+  glbDefineChiFunction(&glb_chi_no_sys,         0, "sysNoSysSpectrum");
+  glbDefineChiFunction(&glb_chi_sys_w_bgtot,    4, "sysTotalRatesTilt");
+  glbDefineChiFunction(&glb_chi_spec,           1, "sysSpectrumOnly");
+  glbDefineChiFunction(&glb_chi_no_sys_tot,     0, "sysNoSysTotalRates");
+  glbDefineChiFunction(&glb_chi_sys_w_bg_calib, 4, "sysSpectrumCalib");
 }
 
 

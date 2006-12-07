@@ -113,8 +113,11 @@ void *glb_realloc (void *ptr, size_t size)
 
 void glb_free(void *ptr)
 {
-  free(ptr);
-  ptr=NULL;
+  if (ptr != NULL)
+  {
+    free(ptr);
+    ptr=NULL;   // FIXME This has no effect
+  }
 }
 
 FILE *glb_fopen(const char *filename, const char *mode)

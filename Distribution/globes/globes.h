@@ -95,7 +95,8 @@ typedef struct glb_experiment *glb_exp;
 typedef float(*pt2Func)(float, float);  // JK - What is this good for ???
 
 /* User-defined chi^2 function */
-typedef double (*glb_chi_function)(int exp, int rule, double *params, int n_params);
+typedef double (*glb_chi_function)(int exp, int rule, int n_params,
+                                   double *params, double *errors);
 
 /* User-defined glb_probability_matrix and glb_set/get_oscillation_parameters */
 typedef int (*glb_probability_matrix_function)(double P[3][3], int cp_sign, double E,
@@ -124,6 +125,7 @@ extern glb_exp glb_experiment_list[32];
 #endif
 extern int glb_rule_number;
 
+
 /* Function declarations */
 /* --------------------- */
 BEGIN_C_DECLS
@@ -133,15 +135,15 @@ void glbInit(char *name);
 
 
 /* Loading of AEDL files */
-glb_exp glbAllocExp();
+glb_exp glbAllocExp();                                                             // new?
 void glbClearExperimentList();
 void glbDefineAEDLVariable(const char *name, double value);
 void glbClearAEDLVariables();
 int glbInitExperiment(char *inf, glb_exp *in, int *counter);
 void glbSetExperiment(glb_exp in);   // JK - Why does this have to be in globes.h ?
 int glbDefaultExp(glb_exp ins);      //               "
-void glbInitExp(glb_exp ins);
-void glbFreeExp(glb_exp ins);
+void glbInitExp(glb_exp ins);        //               "
+void glbFreeExp(glb_exp ins);        //               "
 
 int glbNameToValue(int exp, const char* context, const char *name);
 const char *glbValueToName(int exp,const char* context, int value);
@@ -151,12 +153,12 @@ const char *glbValueToName(int exp,const char* context, int value);
 int glbTestReleaseVersion(const char *version);
 int glbTestLibraryVersion(const char *version);
 const char *glbVersionOfExperiment(int experiment);
-int glbSetVerbosityLevel(int level);
+int glbSetVerbosityLevel(int level);                                               //new?
 
 
 /* Handling of oscillation parameter data structure */
 glb_params glbAllocParams();
-void glbFreeParams(glb_params stale);
+void glbFreeParams(glb_params stale);                                              //new?
 glb_params glbDefineParams(glb_params in, double theta12, double theta13,
                            double theta23, double delta, double dm21, double dm31);
 glb_params glbCopyParams(const glb_params source, glb_params dest);
@@ -169,14 +171,23 @@ int glbGetIteration(const glb_params in);
 void glbPrintParams(FILE *stream, const glb_params in);
 
 int glbSetOscillationParameters(const glb_params in);
+int glbSetInputErrors(const glb_params in);
 int glbGetOscillationParameters(glb_params in);
+int glbGetInputErrors(glb_params in);
+
+// JK - The former function names glbSet/GetStartingValues have caused some confusion
+// in the past, since they do NOT set the starting values but the _central_ values.
+// The starting values are set via the parameters of glbChiXXX.
+// What should we do about this?
+int glbSetStartingValues(const glb_params in);
+int glbGetStartingValues(glb_params in);
 
 
 /* Screen output */
 int glbShowRuleRates(FILE *stream, int exp, int rule, int pos,
                      int effi, int bgi, int coeffi, int signal);
 int glbShowChannelRates(FILE *stream, int exp, int channel, int smearing, int effi, int bgi);
-int glbShowChannelProbs(FILE *stream, int exp, int channel, int smearing, int effi, int bgi);
+int glbShowChannelProbs(FILE *stream, int exp, int channel, int smearing, int effi, int bgi);//new?
 void glbPrintDelimiter(FILE *stream, int character);  // JK - Why is this in globes.h; should it be documented?
 void *glbSetChannelPrintFunction(void *fp);           //                "
 void glbSetPrintDelimiters(const char *left,const char *middle,  //     "
@@ -205,12 +216,12 @@ int glbGetProjection(glb_projection in);
 
 double glbChiSys(const glb_params in,int experiment, int rule);
 double glbChiTheta13(const glb_params in, glb_params out, int exp);
-double glbChiTheta12(const glb_params in, glb_params out, int exp);
+double glbChiTheta12(const glb_params in, glb_params out, int exp);                //new
 double glbChiTheta23(const glb_params in, glb_params out, int exp);
 double glbChiDelta(const glb_params in, glb_params out, int exp);
-double glbChiDm21(const glb_params in, glb_params out, int exp);
-double glbChiDm31(const glb_params in, glb_params out, int exp);
-double glbChiTheta13Delta(const glb_params in, glb_params out, int exp);
+double glbChiDm21(const glb_params in, glb_params out, int exp);                   //new
+double glbChiDm31(const glb_params in, glb_params out, int exp);                   //new
+double glbChiTheta13Delta(const glb_params in, glb_params out, int exp);           //new
 double glbChiNP(const glb_params in, glb_params out, int exp);
 double glbChiAll(const glb_params in, glb_params out, int exp);
 
@@ -228,7 +239,7 @@ int glbGetProfileDataInExperiment(int exp,size_t *layers, double** length,
 int glbSetProfileDataInExperiment(int exp, size_t layers,const double* length,
                                   const double* density);
 int glbSetBaselineInExperiment(int exp, double baseline);
-int glbGetProfileTypeInExperiment(int exp);
+int glbGetProfileTypeInExperiment(int exp);   // new or typo in Manual ("InExperiment" missing)
 double glbGetBaselineInExperiment(int exp);
 
 
@@ -244,15 +255,17 @@ double glbGetSourcePower(int experiment, int flux_ident);
 double glbGetRunningTime(int experiment, int flux_ident);
 int glbGetFilterStateInExperiment(int experiment); 
 double glbGetFilterInExperiment(int experiment);
-int glbGetNumberOfSimBins(int exp);
-int glbGetNumberOfBins(int exp);
+int glbGetEnergyWindow(int experiment, int rule, double *low, double *high);       //new
+int glbGetEnergyWindowBins(int experiment, int rule, int *low_bin, int *high_bin); //new
+int glbGetNumberOfSimBins(int exp);                                                //new?
+int glbGetNumberOfBins(int exp);                                                   //new
 int glbGetNumberOfRules(int exp);
 int glbGetNumberOfChannels(int exp);
 int glbGetLengthOfRule(int exp, int rule, int signal);
 double glbGetNormalizationInRule(int exp, int rule, int signal);
 int glbGetChannelInRule(int exp, int rule, int pos, int signal);
 double glbGetCoefficientInRule(int exp, int rule, int pos, int signal);
-int glbGetNumberOfFluxes(int exp);
+int glbGetNumberOfFluxes(int exp);                                                 //new?
 double glbFlux(int experiment, int flux_ident, 
         double energy, double distance, int flavour, int anti);
 double glbXSection(int experiment, int xsec_ident,double energy,int flavour,
@@ -260,129 +273,83 @@ double glbXSection(int experiment, int xsec_ident,double energy,int flavour,
 
 
 /* User-defined Systematics */
-int glbDefineChiFunction(glb_chi_function chi_func, int dim, const char *name);
-int glbSetChiFunction(int exp, int rule, int on_off, const char *sys_id); 
-//int glbSwitchSystematics(int experiment, int rule, int on_off);
-//int glbSetSignalErrors(int experiment, int rule, double norm, double tilt);
-//int glbSetSignalCenters(int experiment, int rule, double norm, double tilt);         // JK - new
-//int glbSetSignalStartingValues(int experiment, int rule, double norm, double tilt);  // JK - new
-//int glbSetBGErrors(int experiment, int rule, double norm, double tilt);
-//int glbSetBGCenters(int experiment, int rule, double norm, double tilt);
-//int glbSetBGStartingValues(int experiment, int rule, double norm, double tilt);      // JK - new
-//int glbSetSysErrorsList(int experiment, int rule, const double *sys_list);           // JK - new
-//int glbSetSysCentersList(int experiment, int rule, const double *sys_list);          // JK - new
-//int glbSetSysStartingValuesList(int experiment, int rule, const double *sys_list);   // JK - new
+int glbDefineChiFunction(glb_chi_function chi_func, int dim, const char *name);    //new
+int glbSetChiFunction(int exp, int rule, int on_off, const char *sys_id, double *errors); 
+int glbSwitchSystematics(int exp, int rule, int on_off);
+int glbSetSignalErrors(int exp, int rule, double norm, double tilt);
+int glbSetSignalStartingValues(int exp, int rule, double norm, double tilt);       //new
+int glbSetBGErrors(int exp, int rule, double norm, double tilt);
+int glbSetBGCenters(int exp, int rule, double norm, double tilt);
+int glbSetBGStartingValues(int exp, int rule, double norm, double tilt);           //new
+int glbSetSysErrorsList(int exp, int rule, int on_off, const double *sys_list);    //new
+int glbSetSysStartingValuesList(int exp, int rule, int on_off, const double *sys_list);//new
 
-//void glbGetChiFunction(int experiment, int rule, int on_off, char *sys_id);
-       // JK - new, replaces glbGetErrorDim
-//glb_chi_function glbGetChiFunctionPtr(int experiment, int rule, int on_off);         // JK - new
-//int glbGetSignalErrors(int experiment, int rule, double *norm, double *tilt);
-//int glbGetSignalCenters(int experiment, int rule, double *norm, double *tilt);       // JK - new
-//int glbGetSignalStartingValues(int experiment, int rule, double *norm, double *tilt);// JK - new
-//int glbGetBGErrors(int experiment, int rule, double *norm, double *tilt);
-//int glbGetBGCenters(int experiment, int rule, double *norm, double *tilt);
-//int glbGetBGStartingValues(int experiment, int rule, double *norm, double *tilt);    // JK - new
-//int glbGetSysErrorsList(int experiment, int rule, double *sys_list);                 // JK - new
-//int glbGetSysCentersList(int experiment, int rule, double *sys_list);                // JK - new
-//int glbGetSysStartingValuesList(int experiment, int rule, double *sys_list);         // JK - new
+int glbGetSysDim(const char *name);                                                //new
+int glbGetSysDimInExperiment(int exp, int rule, int on_off);                       //new
+int glbGetChiFunction(int exp, int rule, int on_off, char *sys_id);                //new
+glb_chi_function glbGetChiFunctionPtr(const char *name);                           //new
+glb_chi_function glbGetChiFunctionPtrInExperiment(int exp, int rule, int on_off);  //new
+int glbGetSysOnOffState(int exp, int rule);                                        //new
+int glbGetSignalErrors(int exp, int rule, double *norm, double *tilt);
+int glbGetSignalStartingValues(int exp, int rule, double *norm, double *tilt);     //new
+int glbGetBGErrors(int exp, int rule, double *norm, double *tilt);
+int glbGetBGCenters(int exp, int rule, double *norm, double *tilt);
+int glbGetBGStartingValues(int exp, int rule, double *norm, double *tilt);         //new
+double *glbGetSysErrorsListPtr(int exp, int rule, int on_off);                     //new
+double *glbGetSysStartingValuesListPtr(int exp, int rule, int on_off);             //new
 
-void glbShiftEnergyScale(double g, double *rates_in, double *rates_out, int n_bins);
+void glbShiftEnergyScale(double g, double *rates_in, double *rates_out, int n_bins);//new
 
 
 /* Modules and user-defined priors */
-int glbProbeModule(const char *module_name, int verbosity);
-glb_dlhandle glbOpenModule(const char *module_name);
-int glbCloseModule(glb_dlhandle stale);
-void *glbSymModule(glb_dlhandle module,const char *symbol_name);
+int glbProbeModule(const char *module_name, int verbosity);                        //new
+glb_dlhandle glbOpenModule(const char *module_name);                               //new
+int glbCloseModule(glb_dlhandle stale);                                            //new
+void *glbSymModule(glb_dlhandle module,const char *symbol_name);                   //new
 
 #ifndef SWIG
-int glbRegisterPriorFunction(double (*prior)(const glb_params),
+int glbRegisterPriorFunction(double (*prior)(const glb_params),                    //new
                              int (*starting)(const glb_params),
                              int (*error)(const glb_params));
 #endif /* SWIG */
-int glbUsePrior(glb_dlhandle module);
+int glbUsePrior(glb_dlhandle module);                                              //new
 
 
-/* Implementation of non-standard physics */  //FIXME tdb
+/* Implementation of non-standard physics */
 int glbRegisterProbabilityEngine(int n_parameters,
                  glb_probability_matrix_function prob_func,
                  glb_set_oscillation_parameters_function set_params_func,
-                 glb_get_oscillation_parameters_function get_params_func);
-int glbGetNumOfOscParams();
+                 glb_get_oscillation_parameters_function get_params_func);         //new
+int glbGetNumOfOscParams();                                                        //new
 
 
 /* Access to event rate vectors */
 double glbTotalRuleRate(int exp, int rule, int pos,int effi, 
 			int bgi, int coeffi, int signal);
-double *glbGetChannelRatePtr(int exp, int channel, int pre_post);
-double *glbGetRuleRatePtr(int exp, int rule);
-double *glbGetSignalRatePtr(int exp, int rule);
-double *glbGetBGRatePtr(int exp, int rule);
-double *glbGetChannelFitRatePtr(int exp, int channel, int pre_post);
+double *glbGetChannelRatePtr(int exp, int channel, int pre_post);                  //new
+double *glbGetRuleRatePtr(int exp, int rule);                                      //new
+double *glbGetSignalRatePtr(int exp, int rule);                                    //new
+double *glbGetBGRatePtr(int exp, int rule);                                        //new
+double *glbGetChannelFitRatePtr(int exp, int channel, int pre_post);               //new
 //double *glbRuleFitRatePtr(int exp, int rule);
     // JK - new; this will not be implemented since the BG normalization is
     // usually free and thus only known during chi^2 calculation
-double *glbGetSignalFitRatePtr(int exp, int rule);
-double *glbGetBGFitRatePtr(int exp, int rule);
+double *glbGetSignalFitRatePtr(int exp, int rule);                                 //new
+double *glbGetBGFitRatePtr(int exp, int rule);                                     //new
 
-double *glbGetEfficiencyPtr(int exp, int channel, int pre_post);
-double *glbGetBackgroundPtr(int exp, int channel, int pre_post);
+double *glbGetEfficiencyPtr(int exp, int channel, int pre_post);                   //new
+double *glbGetBackgroundPtr(int exp, int channel, int pre_post);                   //new
 
 
 /* Access to the probablity engine */
 double glbVacuumProbability(int initial_flavour, int final_flavour,
                             int cp_sign, double E, double L);
-double glbConstantDensityProbability(int initial_flavour, int final_flavour,
+double glbConstantDensityProbability(int initial_flavour, int final_flavour,       //new
                             int cp_sign, double E, double L, double rho);
 double glbProfileProbability(int exp,int initial_flavour, int final_flavour,
                             int panti, double energy);
-double glbFilteredConstantDensityProbability(int exp,int initial_flavour,
+double glbFilteredConstantDensityProbability(int exp,int initial_flavour,          //new
                             int final_flavour, int panti, double energy);
-
-
-/**********************************************************************/
-
-
-
-
-/* setting all the priors needed for projections */
-
-int glbSetStartingValues(const glb_params in);
-int glbSetInputErrors(const glb_params in);
-int glbGetStartingValues(glb_params in);
-int glbGetInputErrors(glb_params in);
-
-/* Functions for user-defined chi^2 calculations */
-
-void glbSetUserChi(int exp, int rule, glb_chi_function chi_func, int dim,
-                   double params[], double errors[], char *info);
-int glbGetCurrentExp();
-int glbGetCurrentRule();
-
-
-
-
-int glbSetErrorDim(int experiment, int rule, int on_off, int value);
-int glbGetErrorDim(int experiment, int rule, int on_off);
-
-int glbSwitchSystematics(int experiment, int rule, int on_off);
-
-
-
-int glbSetSignalErrors(int experiment, int rule, double norm, double tilt);
-int glbGetSignalErrors(int experiment, int rule, double *norm, double *tilt);
-
-int glbSetBGErrors(int experiment, int rule, double norm, double tilt);
-int glbGetBGErrors(int experiment, int rule, double *norm, double *tilt);
-
-int glbSetBGCenters(int experiment, int rule, double norm, double tilt);
-int glbGetBGCenters(int experiment, int rule, double *norm, double *tilt);
-
-
-
-/* Matter profile access */
-int glbGetProfileData(size_t *layers, double** length, double** density);
-
 
 
 
@@ -395,21 +362,45 @@ int glbGetProfileData(size_t *layers, double** length, double** density);
 
 //  #define GLB_OSCP (glbGetNumOfOscParams())  // FIXME JK - Is this OK?
     
-  double glbChiTheta(const glb_params in, glb_params out, int exp);     /* Replaced by glbChiTheta13 */
-  double glbChiDms(const glb_params in, glb_params out, int exp);       /* Replaced by glbChiDm21 */
-  double glbChiDm(const glb_params in, glb_params out, int exp);        /* Replaced by glbChiDm31 */
-  double glbChiThetaDelta(const glb_params in, glb_params out, int exp);/* Replaced by glbChiTheta13Delta */
+  /* Replaced by glbChiTheta13 */
+  double glbChiTheta(const glb_params in, glb_params out, int exp);
 
-  int glbGetUserData(double **data, size_t *length,                     /* Replaced by glbGetUserDataPtr */
+  /* Replaced by glbChiDm21 */
+  double glbChiDms(const glb_params in, glb_params out, int exp);
+
+  /* Replaced by glbChiDm31 */
+  double glbChiDm(const glb_params in, glb_params out, int exp);
+
+  /* Replaced by glbChiTheta13Delta */
+  double glbChiThetaDelta(const glb_params in, glb_params out, int exp);
+
+
+  /* Replaced by glbGetUserDataPtr */
+  int glbGetUserData(double **data, size_t *length,
                      int exp, int channel,int smearing, int bgeff);
-  int glbGetChannelRates(double **data, size_t *length,                 /* Replaced by glbChannelRatePtr */
-                         int exp, int channel,int smearing);
-  void glbResetRateStack();                                             /* Obsolete */
 
-  int glbSetFilterState(int on_off);                                    /* No longer implemented */
-  int glbGetFilterState();
+  /* Replaced by glbChannelRatePtr */
+  int glbGetChannelRates(double **data, size_t *length,
+                         int exp, int channel,int smearing);
+  
+  /* Replaced by glbGetProfileDataInExperiment */
+  int glbGetProfileData(size_t *layers, double** length, double** density);
+  
+  
+  void glbResetRateStack();                   /* Obsolete */
+  
+  int glbSetFilterState(int on_off);          /* No longer implemented */
+  int glbGetFilterState();                    // FIXME
   int glbSetFilter(double filter);
   double glbGetFilter();
+
+
+  /* Replaced by glbSetChiFunction */
+  int glbSetErrorDim(int experiment, int rule, int on_off, int errordim);
+
+  /* Replaced by glbGetChiFunction */
+  int glbGetErrorDim(int experiment, int rule, int on_off);
+
 
   #ifdef GLB_EXPERIMENTAL
   /* These functions are part of the user-defined chi^2 interface and will

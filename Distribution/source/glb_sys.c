@@ -29,7 +29,673 @@
 /* Global variables */
 glb_systematic *glb_sys_list;   /* Connected list of systematics definitions */
 
+static const char *glb_2011_compatible_chi_functions[] = 
+  {
+    "sysSpectrumTilt",
+    "sysNoSysSpectrum",
+    "sysTotalRatesTilt",
+    "sysSpectrumOnly",
+    "sysNoSysTotalRates",
+    "sysSpectrumCalib",
+    ""    /* The last entry must be the empty string for loops to terminate */
+  };
 
+
+
+/***************************************************************************
+ *          I N T E R N A L   H E L P E R   F U N C T I O N S              *
+ ***************************************************************************/
+
+/***************************************************************************
+ * Function glbIsChiFunction2011Comptabile                                 *
+ ***************************************************************************
+ * Determines whether a given, named chi^2 function is compatible to       *
+ * those from GLoBES 2.0.11 in the sense that it understands the           *
+ * @signal_error and @background_error directives, as well as the          *
+ * corresponding API functions.                                            *
+ ***************************************************************************/
+int glbIsChiFunction2011Compatible(const char *name)
+{
+  int i;
+
+  for (i=0; glb_2011_compatible_chi_functions[i][0] != '\0'; i++)
+    if (strcmp(name, glb_2011_compatible_chi_functions[i]) == 0)
+      return 1;
+
+  return 0;
+}
+
+
+/***************************************************************************
+ * Function glbFindChiFunctionByName                                       *
+ ***************************************************************************
+ * Returns a pointer to the glb_systematic structure for the chi^2         *
+ * function with the given name                                            *
+ ***************************************************************************/
+glb_systematic *glbFindChiFunctionByName(const char *name)
+{
+  glb_systematic *sys;
+  
+  for (sys = glb_sys_list; sys != NULL; sys = sys->next)
+    if (strcmp(name, sys->name) == 0)
+      break;
+
+  if (sys == NULL)
+  {
+    glb_error("glbFindChiFunctionByName: Unknown chi^2 function specified");
+    return NULL;
+  }
+
+  return sys;
+}
+
+
+/***************************************************************************
+ * Function glbConvertErrorDim                                             *
+ ***************************************************************************
+ * Returns the name of the chi^2 function belonging to the given GLoBES    *
+ * 2.0.11 errordim.                                                        *
+ * The function allocates memory for the name string, which has to be      *
+ * freed by the caller.                                                    *
+ ***************************************************************************/
+char *glbConvertErrorDim(int errordim)
+{
+  char name[50];
+  
+  switch (errordim)
+  {
+    case 0:
+      strcpy(name, "sysSpectrumTilt");
+      break;
+    case 2:
+      strcpy(name, "sysNoSysSpectrum");
+      break;
+    case 4:
+      strcpy(name, "sysTotalRatesTilt");
+      break;
+    case 7:
+      strcpy(name, "sysSpectrumOnly");
+      break;
+    case 8:
+      strcpy(name, "sysNoSysTotalRates");
+      break;
+    case 9:
+      strcpy(name, "sysSpectrumCalib");
+      break;
+    default:
+      glb_error("glbConvertErrorDim: Invalid errordim");
+      return NULL;
+  }
+
+  return strdup(name);
+}
+
+
+/***************************************************************************
+ * Function glbSetChiFunctionInRule                                        *
+ ***************************************************************************
+ * This internal helper function is called by glbSetChiFunctionInExperiment*
+ * Its parameters are similar to those of glbSetChiFunction, but it does   *
+ * allow experiment=GLB_ALL or rule=GLB_ALL                                *
+ ***************************************************************************/
+int glbSetChiFunctionInRule(struct glb_experiment *exp, int rule, int on_off,
+                            const char *sys_id, double *errors)
+{
+  glb_systematic *sys;
+  double tmp_errorlist[5];
+  int k;
+  
+  /* Something tells me that people will come up with the idea to pass
+   * exp->sys_on_errors; this has to be blockes */
+  if (errors != NULL  &&  errors == exp->sys_on_errors[rule])
+  {
+    glb_error("glbSetChiFunctionInRule: Invalid error array");
+    return -1;
+  }
+  
+  /* Find requested glb_sys_list entry */
+  if ((sys=glbFindChiFunctionByName(sys_id)) == NULL)
+  {
+    glb_error("glbSetChiFunctionInRule: Unknown chi^2 function specified");
+    return -1;
+  }
+
+  /* Allow @signal_error/@background_error directives for old chi^2 functions */
+  if (errors == NULL  &&  sys->dim > 0)
+  {
+    if (glbIsChiFunction2011Compatible(sys_id))
+    {
+      if (exp->signal_errors[0][rule] > 0.0  &&  exp->signal_errors[1][rule] > 0.0 &&
+          exp->bg_errors[0][rule] > 0.0  &&  exp->bg_errors[1][rule] > 0.0)
+      {
+        tmp_errorlist[0] = exp->signal_errors[0][rule];
+        tmp_errorlist[1] = exp->signal_errors[1][rule];
+        tmp_errorlist[2] = exp->bg_errors[0][rule];
+        tmp_errorlist[3] = exp->bg_errors[1][rule];
+        tmp_errorlist[4] = -1.0;
+        errors = tmp_errorlist;
+      }
+      else
+      {
+        glb_error("glbSetChiFunctionInRule: Incomplete systematics definition");
+        return -1;
+      }
+    }
+    else
+    {
+      glb_error("glbSetChiFunctionInRule: Invalid error array");
+      return -1;
+    }
+  }
+
+ 
+  if (on_off == GLB_ON)
+  {
+    if (rule >= 0 && rule < exp->numofrules)
+    {
+      /* Set new chi^2 function */
+      exp->sys_on[rule] = sys;
+      if (exp->sys_on_strings[rule] != NULL)  free(exp->sys_on_strings[rule]);
+      exp->sys_on_strings[rule] = strdup(sys->name);
+
+      /* Copy error array and set central/starting values */
+      if (sys->dim > 0)
+      {
+        glb_free(exp->sys_on_errors[rule]);
+        glb_free(exp->sys_on_startvals[rule]);
+        exp->sys_on_errors[rule]    = (double *) glb_malloc(sizeof(double) * (sys->dim+1));
+        exp->sys_on_startvals[rule] = (double *) glb_malloc(sizeof(double) * (sys->dim+1));
+        if (exp->sys_on_errors[rule] != NULL  &&  exp->sys_on_startvals[rule] != NULL)
+        {
+          for (k = 0; k < sys->dim; k++)
+          {
+            exp->sys_on_errors[rule][k]    = errors[k];
+            exp->sys_on_startvals[rule][k] = 0.0;
+          }
+          exp->sys_on_errors[rule][sys->dim]    = -1.0;
+          exp->sys_on_startvals[rule][sys->dim] = -1.0;
+        }
+      }
+      else
+      {
+        glb_free(exp->sys_on_errors[rule]);      exp->sys_on_errors[rule]    = NULL;
+        glb_free(exp->sys_on_startvals[rule]);   exp->sys_on_startvals[rule] = NULL;
+      }
+    }
+    else
+    {
+      glb_error("glbSetChiFunctionInRule: Invalid rule number");
+      return -1;
+    }
+  }
+  else if (on_off == GLB_OFF)
+  {
+    if (rule >= 0 && rule < exp->numofrules)
+    {
+      /* Set new chi^2 function */
+      exp->sys_off[rule] = sys;
+      if (exp->sys_off_strings[rule] != NULL)  free(exp->sys_off_strings[rule]);
+      exp->sys_off_strings[rule] = strdup(sys->name);
+
+      /* Copy error array and set central/starting values */
+      if (sys->dim > 0)
+      {
+        glb_free(exp->sys_off_errors[rule]);
+        glb_free(exp->sys_off_startvals[rule]);
+        exp->sys_off_errors[rule]    = (double *) glb_malloc(sizeof(double) * (sys->dim+1));
+        exp->sys_off_startvals[rule] = (double *) glb_malloc(sizeof(double) * (sys->dim+1));
+        if (exp->sys_off_errors[rule] != NULL  &&  exp->sys_off_startvals[rule] != NULL)
+        {
+          for (k = 0; k < sys->dim; k++)
+          {
+            exp->sys_off_errors[rule][k]    = errors[k];
+            exp->sys_off_startvals[rule][k] = 0.0;
+          }
+          exp->sys_off_errors[rule][sys->dim]    = -1.0;
+          exp->sys_off_startvals[rule][sys->dim] = -1.0;
+        }
+      }
+      else
+      {
+        glb_free(exp->sys_off_errors[rule]);      exp->sys_off_errors[rule]    = NULL;
+        glb_free(exp->sys_off_startvals[rule]);   exp->sys_off_startvals[rule] = NULL;
+      }
+    }
+    else
+    {
+      glb_error("glbSetChiFunctionInRule: Invalid rule number");
+      return -1;
+    }
+  }
+  else
+  {
+    glb_error("glbSetChiFunctionInRule: on_off must be GLB_ON or GLB_OFF");
+    return -1;
+  }
+
+  /* Make sure that the error list and the old signal_error / bg_error arrays
+   * are consistent */
+  if (glbIsChiFunction2011Compatible(sys_id) && sys->dim > 0)
+  {
+    exp->signal_errors[0][rule]    = errors[0];
+    exp->signal_startvals[0][rule] = 0.0;
+  }
+  if (glbIsChiFunction2011Compatible(sys_id) && sys->dim > 1)
+  {
+    exp->signal_errors[1][rule]    = errors[1];
+    exp->signal_startvals[1][rule] = 0.0;
+  }
+  if (glbIsChiFunction2011Compatible(sys_id) && sys->dim > 2)
+  {
+    exp->bg_errors[0][rule]        = errors[2];
+    exp->bg_startvals[0][rule]     = 0.0;
+  }
+  if (glbIsChiFunction2011Compatible(sys_id) && sys->dim > 3)
+  {
+    exp->bg_errors[1][rule]        = errors[3];
+    exp->bg_startvals[1][rule]     = 0.0;
+  }
+  
+  return 0;
+}
+
+
+/***************************************************************************
+ * Function glbSetChiFunctionInExperiment                                  *
+ ***************************************************************************
+ * This internal helper function is called by glbSetChiFunction. Its       *
+ * parameters are similar to those of glbSetChiFunction, but it does not   *
+ * allow experiment=GLB_ALL, and the sys_id string is replaced by a        *
+ * pointer.                                                                *
+ ***************************************************************************/
+int glbSetChiFunctionInExperiment(struct glb_experiment *exp, int rule, int on_off,
+                                  const char *sys_id, double *errors)
+{
+  int j;
+  
+  if (rule == GLB_ALL)
+  {
+    for (j=0; j < exp->numofrules; j++)
+      if (glbSetChiFunctionInRule(exp, j, on_off, sys_id, errors) != 0)
+        return -1;
+  }
+  else
+    return glbSetChiFunctionInRule(exp, rule, on_off, sys_id, errors);
+
+  return 0;
+}
+
+
+/***************************************************************************
+ * Function glbSwitchSystematicsInExperiment                               *
+ ***************************************************************************
+ * This internal helper function is called by glbSwitchSystematics. Its    *
+ * parameters are similar to those of glbSwitchSystematics, but it does    *
+ * not allow experiment=GLB_ALL                                            *
+ ***************************************************************************/
+int glbSwitchSystematicsInExperiment(int experiment, int rule, int on_off)
+{
+  int i;
+  struct glb_experiment *in;
+  
+  if(on_off != GLB_ON  &&  on_off!=GLB_OFF)
+  {
+    glb_error("glbSwitchSystematicsInExperiment: Invalid value for on_off");
+    return -1;
+  }
+
+  in = (struct glb_experiment *) glb_experiment_list[experiment];
+  if(rule == GLB_ALL)
+  {
+    for(i=0; i < in->numofrules; i++)
+      in->sys_on_off[i] = on_off;
+  }
+  else if (rule >= 0  &&  rule < in->numofrules)
+    in->sys_on_off[rule] = on_off;
+  else 
+  {
+    glb_error("glbSwitchSystematicsInExperiment: Invalid value for rule number");
+    return -1;
+  }
+  return 0;
+}
+
+
+/***************************************************************************
+ * Function glbSetSignalErrorsInRule                                       *
+ ***************************************************************************
+ * This internal helper function is similar to glbSetSignalErrors, but     *
+ * it does not allow exp or rule to be GLB_ALL.                            *
+ ***************************************************************************/
+int glbSetSignalErrorsInRule(int exp, int rule, double norm, double tilt)
+{
+  struct glb_experiment *in;
+  
+  if (exp >= 0  &&  exp < glb_num_of_exps)
+  {
+    in = glb_experiment_list[exp];
+    if (rule >= 0  &&  rule < in->numofrules)
+    {
+      if (norm > 0  &&  tilt > 0)
+      {
+        /* Set errors */
+        in->signal_errors[0][rule] = norm;
+        in->signal_errors[1][rule] = tilt;
+
+        /* If we are using GLoBES 2.0.11 compatible systematics, they
+         * should be affected by SetSignal/BGErrors */
+        if (glbIsChiFunction2011Compatible(in->sys_on_strings[rule]))
+        {
+          if (glbGetSysDimInExperiment(exp, rule, GLB_ON) > 0)
+            in->sys_on_errors[rule][0] = in->signal_errors[0][rule];
+          if (glbGetSysDimInExperiment(exp, rule, GLB_ON) > 1)
+            in->sys_on_errors[rule][1] = in->signal_errors[1][rule];
+        }
+        if (glbIsChiFunction2011Compatible(in->sys_off_strings[rule]))
+        {
+          if (glbGetSysDimInExperiment(exp, rule, GLB_OFF) > 0)
+            in->sys_off_errors[rule][0] = in->signal_errors[0][rule];
+          if (glbGetSysDimInExperiment(exp, rule, GLB_OFF) > 1)
+            in->sys_off_errors[rule][1] = in->signal_errors[1][rule];
+        }
+      }
+      else
+        { glb_error("glbSetSignalErrorsInRule: Errors must be > 0"); return -1; }
+    }
+    else
+      { glb_error("glbSetSignalErrorsInRule: Invalid rule number"); return -1; }
+  }
+  else
+    { glb_error("glbSetSignalErrorsInRule: Invalid experiment number"); return -1; }
+
+  return 0; 
+}
+
+
+/***************************************************************************
+ * Function glbSetBGErrorsInRule                                           *
+ ***************************************************************************
+ * This internal helper function is similar to glbSetBGErrors, but         *
+ * it does not allow exp or rule to be GLB_ALL.                            *
+ ***************************************************************************/
+int glbSetBGErrorsInRule(int exp, int rule, double norm, double tilt)
+{
+  struct glb_experiment *in;
+  
+  if (exp >= 0  &&  exp < glb_num_of_exps)
+  {
+    in = glb_experiment_list[exp];
+    if (rule >= 0  &&  rule < in->numofrules)
+    {
+      if (norm > 0  &&  tilt > 0)
+      {
+        /* Set errors */
+        in->bg_errors[0][rule] = norm;
+        in->bg_errors[1][rule] = tilt;
+
+        /* If we are using GLoBES 2.0.11 compatible systematics, they
+         * should be affected by SetSignal/BGErrors */
+        if (glbIsChiFunction2011Compatible(in->sys_on_strings[rule]))
+        {
+          if (glbGetSysDimInExperiment(exp, rule, GLB_ON) > 2)
+            in->sys_on_errors[rule][2] = in->bg_errors[0][rule];
+          if (glbGetSysDimInExperiment(exp, rule, GLB_ON) > 3)
+            in->sys_on_errors[rule][3] = in->bg_errors[1][rule];
+        }
+        if (glbIsChiFunction2011Compatible(in->sys_off_strings[rule]))
+        {
+          if (glbGetSysDimInExperiment(exp, rule, GLB_OFF) > 2)
+            in->sys_off_errors[rule][2] = in->bg_errors[0][rule];
+          if (glbGetSysDimInExperiment(exp, rule, GLB_OFF) > 3)
+            in->sys_off_errors[rule][3] = in->bg_errors[1][rule];
+        }
+      }
+      else
+        { glb_error("glbSetBGErrorsInRule: Errors must be > 0"); return -1; }
+    }
+    else
+      { glb_error("glbSetBGErrorsInRule: Invalid rule number"); return -1; }
+  }
+  else
+    { glb_error("glbSetBGErrorsInRule: Invalid experiment number"); return -1; }
+
+  return 0; 
+}
+
+
+/***************************************************************************
+ * Function glbSetSysErrorsListInRule                                      *
+ ***************************************************************************
+ * This internal helper function is similar to glbSetSysErrorsList, but    *
+ * it does not allow exp or rule to be GLB_ALL.                            *
+ ***************************************************************************/
+int glbSetSysErrorsListInRule(int exp, int rule, int on_off, const double *sys_list)
+{
+  struct glb_experiment *in;
+  int i;
+  
+  if (sys_list == NULL)
+    { glb_error("glbSetSysErrorsListInRule: Input list is NULL"); return -1; }
+  
+  if (exp >= 0  &&  exp < glb_num_of_exps)
+  {
+    in = glb_experiment_list[exp];
+    if (rule >= 0  &&  rule < in->numofrules)
+    {
+      if (on_off == GLB_ON)
+      {
+        for (i=0; i < glbGetSysDimInExperiment(exp, rule, on_off); i++)
+          in->sys_on_errors[rule][i] = sys_list[i];
+
+        /* For GLoBES 2.0.11-compatible chi^2 functions, make sure that the
+         * errorlist and the signal/bg errors are consistent */
+        if (glbIsChiFunction2011Compatible(in->sys_on_strings[rule]))
+        {
+          if (glbGetSysDimInExperiment(exp, rule, on_off) > 0)
+            in->signal_errors[0][rule] = sys_list[0];
+          if (glbGetSysDimInExperiment(exp, rule, on_off) > 1)
+            in->signal_errors[1][rule] = sys_list[1];
+          if (glbGetSysDimInExperiment(exp, rule, on_off) > 2)
+            in->bg_errors[0][rule]     = sys_list[2];
+          if (glbGetSysDimInExperiment(exp, rule, on_off) > 3)
+            in->bg_errors[1][rule]     = sys_list[3];
+        }
+      }
+      else if (on_off == GLB_OFF)
+      {
+        for (i=0; i < glbGetSysDimInExperiment(exp, rule, on_off); i++)
+          in->sys_off_errors[rule][i] = sys_list[i];
+        
+        if (glbIsChiFunction2011Compatible(in->sys_off_strings[rule]))
+        {
+          if (glbGetSysDimInExperiment(exp, rule, on_off) > 0)
+            in->signal_errors[0][rule] = sys_list[0];
+          if (glbGetSysDimInExperiment(exp, rule, on_off) > 1)
+            in->signal_errors[1][rule] = sys_list[1];
+          if (glbGetSysDimInExperiment(exp, rule, on_off) > 2)
+            in->bg_errors[0][rule]     = sys_list[2];
+          if (glbGetSysDimInExperiment(exp, rule, on_off) > 3)
+            in->bg_errors[1][rule]     = sys_list[3];
+        }
+      }
+      else
+        { glb_error("glbSetSysErrorsListInRule: on_off must be GLB_ON or GLB_OFF"); return -1; }
+    }
+    else
+      { glb_error("glbSetSysErrorsListInRule: Invalid rule number"); return -1; }
+  }
+  else
+    { glb_error("glbSetSysErrorsListInRule: Invalid experiment number"); return -1; }
+
+  return 0; 
+}
+
+
+/***************************************************************************
+ * Function glbSetSignalStartingValuesInRule                               *
+ ***************************************************************************
+ * This internal helper function is similar to glbSetSignalStartingValues, *
+ * but it does not allow exp or rule to be GLB_ALL.                        *
+ ***************************************************************************/
+int glbSetSignalStartingValuesInRule(int exp, int rule, double norm, double tilt)
+{
+  struct glb_experiment *in;
+  
+  if (exp >= 0  &&  exp < glb_num_of_exps)
+  {
+    in = glb_experiment_list[exp];
+    if (rule >= 0  &&  rule < in->numofrules)
+    {
+      /* Set starting values */
+      in->signal_startvals[0][rule] = norm;
+      in->signal_startvals[1][rule] = tilt;
+
+      /* If we are using GLoBES 2.0.11 compatible systematics, they
+       * should be affected by SetSignal/BGStartingValues */
+      if (glbIsChiFunction2011Compatible(in->sys_on_strings[rule]))
+      {
+        if (glbGetSysDimInExperiment(exp, rule, GLB_ON) > 0)
+          in->sys_on_startvals[rule][0] = in->signal_startvals[0][rule];
+        if (glbGetSysDimInExperiment(exp, rule, GLB_ON) > 1)
+          in->sys_on_startvals[rule][1] = in->signal_startvals[1][rule];
+      }
+      if (glbIsChiFunction2011Compatible(in->sys_off_strings[rule]))
+      {
+        if (glbGetSysDimInExperiment(exp, rule, GLB_OFF) > 0)
+          in->sys_off_startvals[rule][0] = in->signal_startvals[0][rule];
+        if (glbGetSysDimInExperiment(exp, rule, GLB_OFF) > 1)
+          in->sys_off_startvals[rule][1] = in->signal_startvals[1][rule];
+      }
+    }
+    else
+      { glb_error("glbSetSignalStartingValuesInRule: Invalid rule number"); return -1; }
+  }
+  else
+    { glb_error("glbSetSignalStartingValuesInRule: Invalid experiment number"); return -1; }
+
+  return 0; 
+}
+
+
+/***************************************************************************
+ * Function glbSetBGStartingValuesInRule                                   *
+ ***************************************************************************
+ * This internal helper function is similar to glbSetBGStartingValues, but *
+ * it does not allow exp or rule to be GLB_ALL.                            *
+ ***************************************************************************/
+int glbSetBGStartingValuesInRule(int exp, int rule, double norm, double tilt)
+{
+  struct glb_experiment *in;
+  
+  if (exp >= 0  &&  exp < glb_num_of_exps)
+  {
+    in = glb_experiment_list[exp];
+    if (rule >= 0  &&  rule < in->numofrules)
+    {
+      /* Set starting values */
+      in->bg_startvals[0][rule] = norm;
+      in->bg_startvals[1][rule] = tilt;
+
+      /* If we are using GLoBES 2.0.11 compatible systematics, they
+       * should be affected by SetSignal/BGStartingValues */
+      if (glbIsChiFunction2011Compatible(in->sys_on_strings[rule]))
+      {
+        if (glbGetSysDimInExperiment(exp, rule, GLB_ON) > 2)
+          in->sys_on_startvals[rule][2] = in->bg_startvals[0][rule];
+        if (glbGetSysDimInExperiment(exp, rule, GLB_ON) > 3)
+          in->sys_on_startvals[rule][3] = in->bg_startvals[1][rule];
+      }
+      if (glbIsChiFunction2011Compatible(in->sys_off_strings[rule]))
+      {
+        if (glbGetSysDimInExperiment(exp, rule, GLB_OFF) > 2)
+          in->sys_off_startvals[rule][2] = in->bg_startvals[0][rule];
+        if (glbGetSysDimInExperiment(exp, rule, GLB_OFF) > 3)
+          in->sys_off_startvals[rule][3] = in->bg_startvals[1][rule];
+      }
+    }
+    else
+      { glb_error("glbSetBGStartingValuesInRule: Invalid rule number"); return -1; }
+  }
+  else
+    { glb_error("glbSetBGStartingValuesInRule: Invalid experiment number"); return -1; }
+
+  return 0; 
+}
+
+
+/***************************************************************************
+ * Function glbSetSysStartingValuesListInRule                              *
+ ***************************************************************************
+ * This internal helper function is similar to glbSetSysStartingValuesList,*
+ * but it does not allow exp or rule to be GLB_ALL.                        *
+ ***************************************************************************/
+int glbSetSysStartingValuesListInRule(int exp, int rule, int on_off, const double *sys_list)
+{
+  struct glb_experiment *in;
+  int i;
+  
+  if (sys_list == NULL)
+    { glb_error("glbSetSysStartingValuesListInRule: Input list is NULL"); return -1; }
+  
+  if (exp >= 0  &&  exp < glb_num_of_exps)
+  {
+    in = glb_experiment_list[exp];
+    if (rule >= 0  &&  rule < in->numofrules)
+    {
+      if (on_off == GLB_ON)
+      {
+        for (i=0; i < glbGetSysDimInExperiment(exp, rule, on_off); i++)
+          in->sys_on_startvals[rule][i] = sys_list[i];
+
+        /* For GLoBES 2.0.11-compatible chi^2 functions, make sure that the
+         * errorlist and the signal/bg errors are consistent */
+        if (glbIsChiFunction2011Compatible(in->sys_on_strings[rule]))
+        {
+          if (glbGetSysDimInExperiment(exp, rule, on_off) > 0)
+            in->signal_startvals[0][rule] = sys_list[0];
+          if (glbGetSysDimInExperiment(exp, rule, on_off) > 1)
+            in->signal_startvals[1][rule] = sys_list[1];
+          if (glbGetSysDimInExperiment(exp, rule, on_off) > 2)
+            in->bg_startvals[0][rule]     = sys_list[2];
+          if (glbGetSysDimInExperiment(exp, rule, on_off) > 3)
+            in->bg_startvals[1][rule]     = sys_list[3];
+        }
+      }
+      else if (on_off == GLB_OFF)
+      {
+        for (i=0; i < glbGetSysDimInExperiment(exp, rule, on_off); i++)
+          in->sys_off_startvals[rule][i] = sys_list[i];
+        
+        if (glbIsChiFunction2011Compatible(in->sys_off_strings[rule]))
+        {
+          if (glbGetSysDimInExperiment(exp, rule, on_off) > 0)
+            in->signal_startvals[0][rule] = sys_list[0];
+          if (glbGetSysDimInExperiment(exp, rule, on_off) > 1)
+            in->signal_startvals[1][rule] = sys_list[1];
+          if (glbGetSysDimInExperiment(exp, rule, on_off) > 2)
+            in->bg_startvals[0][rule]     = sys_list[2];
+          if (glbGetSysDimInExperiment(exp, rule, on_off) > 3)
+            in->bg_startvals[1][rule]     = sys_list[3];
+        }
+      }
+      else
+        { glb_error("glbSetSysStartingValuesListInRule: on_off must be GLB_ON or GLB_OFF");
+          return -1; }
+    }
+    else
+      { glb_error("glbSetSysStartingValuesListInRule: Invalid rule number"); return -1; }
+  }
+  else
+    { glb_error("glbSetSysStartingValuesListInRule: Invalid experiment number"); return -1; }
+
+  return 0; 
+}
+
+  
+
+/***************************************************************************
+ *                       A P I   F U N C T I O N S                         *
+ ***************************************************************************/
 
 /***************************************************************************
  * Function glbDefineChiFunction                                           *
@@ -45,6 +711,12 @@ glb_systematic *glb_sys_list;   /* Connected list of systematics definitions */
 int glbDefineChiFunction(glb_chi_function chi_func, int dim, const char *name)
 {
   glb_systematic *old_root = glb_sys_list;   /* Save old list root */
+
+  if (dim < 0)
+  {
+    glb_error("glbDefineChiFunction: Dimension of parameter space must be >= 0");
+    return -1;
+  }
   
   /* Create new list entry */
   glb_sys_list = (glb_systematic *) glb_malloc(sizeof(glb_systematic));
@@ -66,78 +738,6 @@ int glbDefineChiFunction(glb_chi_function chi_func, int dim, const char *name)
 
 
 /***************************************************************************
- * Function glbSetChiFunctionInExperiment                                  *
- ***************************************************************************
- * This internal helper function is called by glbSetChiFunction. Its       *
- * parameters are similar to those of glbSetChiFunction, but it does not   *
- * allow experiment=GLB_ALL, and the sys_id string is replaced by a        *
- * pointer.                                                                *
- ***************************************************************************/
-int glbSetChiFunctionInExperiment(struct glb_experiment *exp, int rule, int on_off,
-                                  const char *sys_id)
-{
-  glb_systematic *sys;
-  int j;
-  
-  /* Find requested glb_sys_list entry */
-  for (sys = glb_sys_list; sys != NULL; sys = sys->next)
-    if (strcmp(sys_id, sys->name) == 0)
-      break;
-
-  if (sys == NULL)
-  {
-    glb_error("glbSetChiFunctionInExperiment: Unknown chi^2 function specified.");
-    return -1;
-  }
-
-  if (on_off == GLB_ON)
-  {
-    if (rule == GLB_ALL)
-      for (j=0; j < exp->numofrules; j++)
-      {
-        exp->sys_on[j] = sys;
-        if (exp->sys_on_strings[j] != NULL)  free(exp->sys_on_strings[j]);
-        exp->sys_on_strings[j] = strdup(sys->name);
-      }
-    else if (rule >= 0 && rule < exp->numofrules)
-    {
-      exp->sys_on[rule] = sys;
-      if (exp->sys_on_strings[rule] != NULL)  free(exp->sys_on_strings[rule]);
-      exp->sys_on_strings[rule] = strdup(sys->name);
-    }
-    else
-    {
-      glb_error("glbSetChiFunctionInExperiment: Invalid rule number");
-      return -1;
-    }
-  }
-  else
-  {
-    if (rule == GLB_ALL)
-      for (j=0; j < exp->numofrules; j++)
-      {
-        exp->sys_off[j] = sys;
-        if (exp->sys_off_strings[j] != NULL)  free(exp->sys_off_strings[j]);
-        exp->sys_off_strings[j] = strdup(sys->name);
-      }
-    else if (rule >= 0 && rule < exp->numofrules)
-    {
-      exp->sys_off[rule] = sys;
-      if (exp->sys_off_strings[rule] != NULL)  free(exp->sys_off_strings[rule]);
-      exp->sys_off_strings[rule] = strdup(sys->name);
-    }
-    else
-    {
-      glb_error("glbSetChiFunctionInExperiment: Invalid rule number");
-      return -1;
-    }
-  }
-
-  return 0;
-}
-
-
-/***************************************************************************
  * Function glbSetChiFunction                                              *
  ***************************************************************************
  * Selects a chi^2 function for a specific rule and experiment             *
@@ -148,1405 +748,939 @@ int glbSetChiFunctionInExperiment(struct glb_experiment *exp, int rule, int on_o
  *   on_off: The systematics state (GLB_ON or GLB_OFF) for which this      *
  *           chi^2 function is intended                                    *
  *   sys_id: The name of the chi^2 function set by glbDefineChiFunction    *
+ *   errors: A list of numerical values for the systematical errors        *
  ***************************************************************************/
-int glbSetChiFunction(int exp, int rule, int on_off, const char *sys_id)
+int glbSetChiFunction(int exp, int rule, int on_off, const char *sys_id, double *errors)
 {
   int i;
 
   if (exp == GLB_ALL)
   {
     for (i=0; i < glb_num_of_exps; i++)
-      if (glbSetChiFunctionInExperiment(glb_experiment_list[i], rule, on_off, sys_id) != 0)
+      if (glbSetChiFunctionInExperiment(glb_experiment_list[i], rule, on_off,
+                                        sys_id, errors) != 0)
         return -1;
   }
   else
-    return glbSetChiFunctionInExperiment(glb_experiment_list[exp], rule, on_off, sys_id);
+  {
+    if (exp >= 0  &&  exp < glb_num_of_exps)
+      return glbSetChiFunctionInExperiment(glb_experiment_list[exp], rule, on_off,
+                                           sys_id, errors);
+    else
+    {
+      glb_error("glbSetChiFunction: Invalid experiment number");
+      return -1;
+    }
+  }
+
+  return 0;
+}
+
+
+/***************************************************************************
+ * Function glbGetChiFunction                                              *
+ ***************************************************************************
+ * Returns the name of the chi^2 function of a given experiment and rule.  *
+ * The user must ensure that the string sys_id is large enough to hold the *
+ * name of the chi^2 function.                                             *
+ ***************************************************************************/
+int glbGetChiFunction(int exp, int rule, int on_off, char *sys_id)
+{
+  if (exp >= 0  &&  exp < glb_num_of_exps)
+  {
+    if (rule >= 0 && rule < glb_experiment_list[exp]->numofrules)
+    {
+      if (on_off == GLB_ON)
+      {
+        if (glb_experiment_list[exp]->sys_on_strings[rule] != NULL)
+          strcpy(sys_id, glb_experiment_list[exp]->sys_on_strings[rule]);
+        else
+          { glb_error("glbGetChiFunction: No chi^2 function defined for this rule");
+            return -1; }
+      }
+      else if (on_off == GLB_OFF)
+      {
+        if (glb_experiment_list[exp]->sys_off_strings[rule] != NULL)
+          strcpy(sys_id, glb_experiment_list[exp]->sys_off_strings[rule]);
+        else
+          { glb_error("glbGetChiFunction: No chi^2 function defined for this rule");
+            return -1; }
+      }
+      else
+      {
+        glb_error("glbGetChiFunction: on_off must be GLB_ON or GLB_OFF");
+        return -1;
+      }
+    }
+    else
+      { glb_error("glbGetChiFunction: Invalid rule number"); return -1; }
+  }
+  else
+    { glb_error("glbGetChiFunction: Invalid experiment number"); return -1; }
+
+  return 0;
+}
+
+
+/***************************************************************************
+ * Function glbGetChiFunctionPtrInExperiment                               *
+ ***************************************************************************
+ * Returns a pointer to a given named chi^2 function.                      *
+ ***************************************************************************/
+glb_chi_function glbGetChiFunctionPtr(const char *name)
+{
+  glb_systematic *sys;
+  
+  /* Find requested glb_sys_list entry */
+  if ((sys=glbFindChiFunctionByName(name)) == NULL)
+  {
+    glb_error("glbGetChiFunctionPtr: Unknown chi^2 function specified");
+    return NULL;
+  }
+
+  return sys->chi_func;
+}
+
+
+/***************************************************************************
+ * Function glbGetChiFunctionPtrInExperiment                               *
+ ***************************************************************************
+ * Returns a pointer to the chi^2 function of a given experiment and rule. *
+ ***************************************************************************/
+glb_chi_function glbGetChiFunctionPtrInExperiment(int exp, int rule, int on_off)
+{
+  if (exp >= 0  &&  exp < glb_num_of_exps)
+  {
+    if (rule >= 0 && rule < glb_experiment_list[exp]->numofrules)
+    {
+      if (on_off == GLB_ON)
+        return glb_experiment_list[exp]->sys_on[rule]->chi_func;
+      else if (on_off == GLB_OFF)
+        return glb_experiment_list[exp]->sys_off[rule]->chi_func;
+      else
+      {
+        glb_error("glbGetChiFunctionPtr: on_off must be GLB_ON or GLB_OFF");
+        return NULL;
+      }
+    }
+    else
+      { glb_error("glbGetChiFunctionPtr: Invalid rule number"); return NULL; }
+  }
+  else
+    { glb_error("glbGetChiFunctionPtr: Invalid experiment number"); return NULL; }
+
+  return NULL;
+}
+
+
+/***************************************************************************
+ * Function glbSetErrorDim                                                 *
+ ***************************************************************************
+ * Selects a new chi^2 function via the old, numerical error-dimensions    *
+ ***************************************************************************/
+int glbSetErrorDim(int exp, int rule, int on_off, int errordim)
+{
+  char *name;
+  int status;
+  
+  /* Convert the error dimension to the name of a chi^2 function */
+  if ((name=glbConvertErrorDim(errordim)) == NULL)
+  {
+    glb_error("glbSetErrorDim: Invalid error dimensions");
+    return -1;
+  }
+
+  status = glbSetChiFunction(exp, rule, on_off, name, NULL);
+
+  glb_free(name);
+  return status;
+}
+
+
+/***************************************************************************
+ * Function glbGetErrorDim                                                 *
+ ***************************************************************************
+ * Returns the chi^2 function of a given experiment and rule as one of the *
+ * old error dimension.                                                    *
+ ***************************************************************************/
+int glbGetErrorDim(int exp, int rule, int on_off)
+{
+  char sys_id[100];
+  int i;
+  
+  if (glbGetChiFunction(exp, rule, on_off, sys_id) != 0)
+  {
+    glb_error("glbGetErrorDim: Invalid parameters");
+    return -1;
+  }
+
+  /* OK, this is not very elegant, but it's a deprecated function anyway ... */
+  if (strcmp(sys_id, "sysSpectrumTilt") == 0)
+    return 0;
+  else if (strcmp(sys_id, "sysNoSysSpectrum") == 0)
+    return 2;
+  else if (strcmp(sys_id, "sysTotalRatesTilt") == 0)
+    return 4;
+  else if (strcmp(sys_id, "sysSpectrumOnly") == 0)
+    return 7;
+  else if (strcmp(sys_id, "sysNoSysTotalRates") == 0)
+    return 8;
+  else if (strcmp(sys_id, "sysSpectrumCalib") == 0)
+    return 9;
+  else
+  {
+    glb_error("glbGetErrorDim: No error dimension associated with this chi^2 function");
+    return -1;
+  }
+
+  return -1;
+}
+
+
+/***************************************************************************
+ * Function glbGetSysDim                                                   *
+ ***************************************************************************
+ * Returns the dimension of the systematics parameter space expected by    *
+ * a specific chi^2 function                                               *
+ ***************************************************************************/
+int glbGetSysDim(const char *name)
+{
+  glb_systematic *sys;
+  
+  /* Find requested glb_sys_list entry */
+  if ((sys=glbFindChiFunctionByName(name)) == NULL)
+  {
+    glb_error("glbGetSysDim: Unknown chi^2 function specified");
+    return -1;
+  }
+
+  return sys->dim;
+}
+
+
+/***************************************************************************
+ * Function glbGetSysDimInExperiment                                       *
+ ***************************************************************************
+ * Returns the dimension of the systematics parameter space expected by    *
+ * the chi^2 function of a specific rule in a specific experiment          *
+ ***************************************************************************/
+int glbGetSysDimInExperiment(int exp, int rule, int on_off)
+{
+  if (exp >= 0  &&  exp < glb_num_of_exps)
+  {
+    if (rule >= 0 && rule < glb_experiment_list[exp]->numofrules)
+    {
+      if (on_off == GLB_ON)
+      {
+        if (glb_experiment_list[exp]->sys_on[rule] != NULL)
+          return glb_experiment_list[exp]->sys_on[rule]->dim;
+        else
+          { glb_error("glbGetSysDimInExperiment: No chi^2 function defined for this rule");
+            return -1; }
+      }
+      else if (on_off == GLB_OFF)
+      {
+        if (glb_experiment_list[exp]->sys_off[rule] != NULL)
+          return glb_experiment_list[exp]->sys_off[rule]->dim;
+        else
+          { glb_error("glbGetSysDimInExperiment: No chi^2 function defined for this rule");
+            return -1; }
+      }
+      else
+      {
+        glb_error("glbGetSysDimInExperiment: on_off must be GLB_ON or GLB_OFF");
+        return -1;
+      }
+    }
+    else
+      { glb_error("glbGetSysDimInExperiment: Invalid rule number"); return -1; }
+  }
+  else
+    { glb_error("glbGetSysDimInExperiment: Invalid experiment number"); return -1; }
+
+  return -1;
+}
+
+
+/***************************************************************************
+ * Function glbSwitchSystematics                                           *
+ ***************************************************************************
+ * Switches between the GLB_ON and GLB_OFF systematics definitions for a   *
+ * given experiment and rule (both can be GLB_ALL)                         *
+ ***************************************************************************/
+int glbSwitchSystematics(int experiment, int rule, int on_off)
+{
+  int i, s=0;
+  
+  if (experiment == GLB_ALL)
+  {
+    for(i=0; i < glb_num_of_exps; i++) 
+      s += glbSwitchSystematicsInExperiment(i, rule, on_off);
+  }
+  else if (experiment >= 0  &&  experiment < glb_num_of_exps)
+  {
+    s += glbSwitchSystematicsInExperiment(experiment, rule, on_off);
+  }
+  else 
+  {
+    glb_error("glbSwitchSystematics: Invalid value for experiment number");
+    return -1;
+  }
+  
+  return s;
+}
+
+
+/***************************************************************************
+ * Function glbGetSysOnOffState                                            *
+ ***************************************************************************
+ * Returns whether systematics are switched on (GLB_ON) or off (GLB_OFF)   *
+ * in a given experiment and rule.                                         *
+ ***************************************************************************/
+int glbGetSysOnOffState(int exp, int rule)
+{
+  struct glb_experiment *in;
+
+  if (exp >= 0  &&  exp < glb_num_of_exps)
+  {
+    in = glb_experiment_list[exp];
+    if (rule >= 0 && rule < in->numofrules)
+      return in->sys_on_off[rule];
+    else
+      { glb_error("glbGetSysOnOffState: Invalid rule number"); return -1; }
+  }
+  else
+    { glb_error("glbGetSysOnOffState: Invalid experiment number"); return -1; }
+  
+  return 0;  
+}
+
+
+/***************************************************************************
+ * Function glbSetSignalErrors                                             *
+ ***************************************************************************
+ * Sets the signal norm and energy errors.                                 *
+ * Note that these values are only meaningful for the old chi^2 functions  *
+ * that are compatible with GLoBES 2.0.11 (i.e. their errorlist looks like *
+ * { signal_norm, signal_energy, bg_norm, bg_energy } )                    *
+ ***************************************************************************/
+int glbSetSignalErrors(int exp, int rule, double norm, double tilt)
+{
+  struct glb_experiment *in;
+  int i, k;
+  
+  if (exp == GLB_ALL)
+  {
+    for(i=0; i < glb_num_of_exps; i++) 
+    {
+      in = glb_experiment_list[i];
+      if (rule == GLB_ALL)
+      {
+        for (k=0; k < in->numofrules; k++)
+          if (glbSetSignalErrorsInRule(i, k, norm, tilt) != 0)
+            return -1;;
+      }
+      else if (rule >= 0 && rule < in->numofrules)
+      {
+        if (glbSetSignalErrorsInRule(i, rule, norm, tilt) != 0)
+          return -1;
+      }
+      else
+        { glb_error("glbSetSignalErrors: Invalid rule number"); return -1; }
+    }
+  }
+  else if (exp >= 0  &&  exp < glb_num_of_exps)
+  {
+    in = glb_experiment_list[exp];
+    if (rule == GLB_ALL)
+    {
+      for (k=0; k < in->numofrules; k++)
+        if (glbSetSignalErrorsInRule(exp, k, norm, tilt) != 0)
+          return -1;
+    }
+    else if (rule >= 0 && rule < in->numofrules)
+    {
+      if (glbSetSignalErrorsInRule(exp, rule, norm, tilt) != 0)
+        return -1;
+    }
+    else
+      { glb_error("glbSetSignalErrors: Invalid rule number"); return -1; }
+  }
+  else 
+    { glb_error("glbSetSignalErrors: Invalid experiment number"); return -1; }
+
+  return 0;
+}
+
+
+/***************************************************************************
+ * Function glbGetSignalErrors                                             *
+ ***************************************************************************
+ * Writes the signal norm and energy errors for a given experiment and     *
+ * rule into the variables norm and tilt.                                  *
+ * Note that this function is only meaningful for the old chi^2 functions  *
+ * that are compatible with GLoBES 2.0.11 (i.e. their errorlist looks like *
+ * { signal_norm, signal_energy, bg_norm, bg_energy } )                    *
+ ***************************************************************************/
+int glbGetSignalErrors(int exp, int rule, double *norm, double *tilt)
+{
+  struct glb_experiment *in;
+
+  if (norm == NULL  ||  tilt == NULL)
+    { glb_error("glbGetSignalErrors: Input pointers may not be NULL"); return -1; }
+  
+  if (exp >= 0  &&  exp < glb_num_of_exps)
+  {
+    in = glb_experiment_list[exp];
+    if (rule >= 0 && rule < in->numofrules)
+    {
+      *norm = in->signal_errors[0][rule];
+      *tilt = in->signal_errors[1][rule];
+    }
+    else
+      { glb_error("glbGetSignalErrors: Invalid rule number"); return -1; }
+  }
+  else
+    { glb_error("glbGetSignalErrors: Invalid experiment number"); return -1; }
+  
+  return 0;  
+}
+  
+
+/***************************************************************************
+ * Function glbSetBGErrors                                                 *
+ ***************************************************************************
+ * Sets the background norm and energy errors.                             *
+ * Note that these values are only meaningful for the old chi^2 functions  *
+ * that are compatible with GLoBES 2.0.11 (i.e. their errorlist looks like *
+ * { signal_norm, signal_energy, bg_norm, bg_energy } )                    *
+ ***************************************************************************/
+int glbSetBGErrors(int exp, int rule, double norm, double tilt)
+{
+  struct glb_experiment *in;
+  int i, k;
+  
+  if (exp == GLB_ALL)
+  {
+    for(i=0; i < glb_num_of_exps; i++) 
+    {
+      in = glb_experiment_list[i];
+      if (rule == GLB_ALL)
+      {
+        for (k=0; k < in->numofrules; k++)
+          if (glbSetBGErrorsInRule(i, k, norm, tilt) != 0)
+            return -1;;
+      }
+      else if (rule >= 0 && rule < in->numofrules)
+      {
+        if (glbSetBGErrorsInRule(i, rule, norm, tilt) != 0)
+          return -1;
+      }
+      else
+        { glb_error("glbSetBGErrors: Invalid rule number"); return -1; }
+    }
+  }
+  else if (exp >= 0  &&  exp < glb_num_of_exps)
+  {
+    in = glb_experiment_list[exp];
+    if (rule == GLB_ALL)
+    {
+      for (k=0; k < in->numofrules; k++)
+        if (glbSetBGErrorsInRule(exp, k, norm, tilt) != 0)
+          return -1;
+    }
+    else if (rule >= 0 && rule < in->numofrules)
+    {
+      if (glbSetBGErrorsInRule(exp, rule, norm, tilt) != 0)
+        return -1;
+    }
+    else
+      { glb_error("glbSetBGErrors: Invalid rule number"); return -1; }
+  }
+  else 
+    { glb_error("glbSetBGErrors: Invalid experiment number"); return -1; }
+
+  return 0;
+}
+
+
+/***************************************************************************
+ * Function glbGetBGErrors                                                 *
+ ***************************************************************************
+ * Writes the background norm and energy errors for a given experiment and *
+ * rule into the variables norm and tilt.                                  *
+ * Note that this function is only meaningful for the old chi^2 functions  *
+ * that are compatible with GLoBES 2.0.11 (i.e. their errorlist looks like *
+ * { signal_norm, signal_energy, bg_norm, bg_energy } )                    *
+ ***************************************************************************/
+int glbGetBGErrors(int exp, int rule, double *norm, double *tilt)
+{
+  struct glb_experiment *in;
+
+  if (norm == NULL  ||  tilt == NULL)
+    { glb_error("glbGetBGErrors: Input pointers may not be NULL"); return -1; }
+  
+  if (exp >= 0  &&  exp < glb_num_of_exps)
+  {
+    in = glb_experiment_list[exp];
+    if (rule >= 0 && rule < in->numofrules)
+    {
+      *norm = in->bg_errors[0][rule];
+      *tilt = in->bg_errors[1][rule];
+    }
+    else
+      { glb_error("glbGetBGErrors: Invalid rule number"); return -1; }
+  }
+  else
+    { glb_error("glbGetBGErrors: Invalid experiment number"); return -1; }
+  
+  return 0;  
+}
+
+
+/***************************************************************************
+ * Function glbSetBGCenters                                                *
+ ***************************************************************************
+ * Sets the background norm and energy central values.                     *
+ ***************************************************************************/
+int glbSetBGCenters(int exp, int rule, double norm, double tilt)
+{
+  struct glb_experiment *in;
+  int i, k;
+  
+  if (exp == GLB_ALL)
+  {
+    for(i=0; i < glb_num_of_exps; i++) 
+    {
+      in = glb_experiment_list[i];
+      if (rule == GLB_ALL)
+      {
+        for (k=0; k < in->numofrules; k++)
+        {
+          in->bg_centers[0][k] = norm;
+          in->bg_centers[1][k] = tilt;
+        }
+      }
+      else if (rule >= 0 && rule < in->numofrules)
+      {
+        in->bg_centers[0][rule] = norm;
+        in->bg_centers[1][rule] = tilt;
+      }
+      else
+        { glb_error("glbSetBGCenters: Invalid rule number"); return -1; }
+    }
+  }
+  else if (exp >= 0  &&  exp < glb_num_of_exps)
+  {
+    in = glb_experiment_list[exp];
+    if (rule == GLB_ALL)
+    {
+      for (k=0; k < in->numofrules; k++)
+      {
+        in->bg_centers[0][k] = norm;
+        in->bg_centers[1][k] = tilt;
+      }
+    }
+    else if (rule >= 0 && rule < in->numofrules)
+    {
+      in->bg_centers[0][rule] = norm;
+      in->bg_centers[1][rule] = tilt;
+    }
+    else
+      { glb_error("glbSetBGCenters: Invalid rule number"); return -1; }
+  }
+  else 
+    { glb_error("glbSetBGCenters: Invalid experiment number"); return -1; }
+
+  return 0;
+}
+
+
+/***************************************************************************
+ * Function glbGetBGCenters                                                *
+ ***************************************************************************
+ * Writes the background norm and energy central values for a given        *
+ * experiment and rule into the variables norm and tilt.                   *
+ ***************************************************************************/
+int glbGetBGCenters(int exp, int rule, double *norm, double *tilt)
+{
+  struct glb_experiment *in;
+
+  if (norm == NULL  ||  tilt == NULL)
+    { glb_error("glbGetBGCenters: Input pointers may not be NULL"); return -1; }
+  
+  if (exp >= 0  &&  exp < glb_num_of_exps)
+  {
+    in = glb_experiment_list[exp];
+    if (rule >= 0 && rule < in->numofrules)
+    {
+      *norm = in->bg_centers[0][rule];
+      *tilt = in->bg_centers[1][rule];
+    }
+    else
+      { glb_error("glbGetBGCenters: Invalid rule number"); return -1; }
+  }
+  else
+    { glb_error("glbGetBGCenters: Invalid experiment number"); return -1; }
+  
+  return 0;  
+}
+
+
+/***************************************************************************
+ * Function glbSetSysErrorsList                                            *
+ ***************************************************************************
+ * Sets the systematical error list for a given experiment and rule.       *
+ ***************************************************************************/
+int glbSetSysErrorsList(int exp, int rule, int on_off, const double *sys_list)
+{
+  struct glb_experiment *in;
+  int i, k;
+  
+  if (exp == GLB_ALL)
+  {
+    for(i=0; i < glb_num_of_exps; i++) 
+    {
+      in = glb_experiment_list[i];
+      if (rule == GLB_ALL)
+      {
+        for (k=0; k < in->numofrules; k++)
+          if (glbSetSysErrorsListInRule(i, k, on_off, sys_list) != 0)
+            return -1;;
+      }
+      else if (rule >= 0 && rule < in->numofrules)
+      {
+        if (glbSetSysErrorsListInRule(i, rule, on_off, sys_list) != 0)
+          return -1;
+      }
+      else
+        { glb_error("glbSetSysErrorsList: Invalid rule number"); return -1; }
+    }
+  }
+  else if (exp >= 0  &&  exp < glb_num_of_exps)
+  {
+    in = glb_experiment_list[exp];
+    if (rule == GLB_ALL)
+    {
+      for (k=0; k < in->numofrules; k++)
+        if (glbSetSysErrorsListInRule(exp, k, on_off, sys_list) != 0)
+          return -1;
+    }
+    else if (rule >= 0 && rule < in->numofrules)
+    {
+      if (glbSetSysErrorsListInRule(exp, rule, on_off, sys_list) != 0)
+        return -1;
+    }
+    else
+      { glb_error("glbSetSysErrorsList: Invalid rule number"); return -1; }
+  }
+  else 
+    { glb_error("glbSetSysErrorsList: Invalid experiment number"); return -1; }
+
+  return 0;
+}
+
+
+/***************************************************************************
+ * Function glbGetSysErrorsListPtr                                         *
+ ***************************************************************************
+ * Returns a pointer to the systematical error list of a specific          *
+ * experiment, rule, and on/off state.                                     *
+ ***************************************************************************/
+double *glbGetSysErrorsListPtr(int exp, int rule, int on_off)
+{
+  struct glb_experiment *in;
+
+  if (exp >= 0  &&  exp < glb_num_of_exps)
+  {
+    in = glb_experiment_list[exp];
+    if (rule >= 0 && rule < in->numofrules)
+    {
+      if (on_off == GLB_ON)
+        return in->sys_on_errors[rule];
+      else if (on_off == GLB_OFF)
+        return in->sys_off_errors[rule];
+      else
+        { glb_error("glbGetSysErrorsListPtr: on_off must be GLB_ON or GLB_OFF"); return NULL; }
+    }
+    else
+      { glb_error("glbGetSysErrorsListPtr: Invalid rule number"); return NULL; }
+  }
+  else
+    { glb_error("glbGetSysErrorsListPtr: Invalid experiment number"); return NULL; }
+  
+  return NULL;
+}
+
+
+/***************************************************************************
+ * Function glbSetSignalStartingValues                                     *
+ ***************************************************************************
+ * Sets the signal norm and energy starting values.                        *
+ * Note that these values are only meaningful for the old chi^2 functions  *
+ * that are compatible with GLoBES 2.0.11 (i.e. their errorlist looks like *
+ * { signal_norm, signal_energy, bg_norm, bg_energy } )                    *
+ ***************************************************************************/
+int glbSetSignalStartingValues(int exp, int rule, double norm, double tilt)
+{
+  struct glb_experiment *in;
+  int i, k;
+  
+  if (exp == GLB_ALL)
+  {
+    for(i=0; i < glb_num_of_exps; i++) 
+    {
+      in = glb_experiment_list[i];
+      if (rule == GLB_ALL)
+      {
+        for (k=0; k < in->numofrules; k++)
+          if (glbSetSignalStartingValuesInRule(i, k, norm, tilt) != 0)
+            return -1;;
+      }
+      else if (rule >= 0 && rule < in->numofrules)
+      {
+        if (glbSetSignalStartingValuesInRule(i, rule, norm, tilt) != 0)
+          return -1;
+      }
+      else
+        { glb_error("glbSetSignalStartingValues: Invalid rule number"); return -1; }
+    }
+  }
+  else if (exp >= 0  &&  exp < glb_num_of_exps)
+  {
+    in = glb_experiment_list[exp];
+    if (rule == GLB_ALL)
+    {
+      for (k=0; k < in->numofrules; k++)
+        if (glbSetSignalStartingValuesInRule(exp, k, norm, tilt) != 0)
+          return -1;
+    }
+    else if (rule >= 0 && rule < in->numofrules)
+    {
+      if (glbSetSignalStartingValuesInRule(exp, rule, norm, tilt) != 0)
+        return -1;
+    }
+    else
+      { glb_error("glbSetSignalStartingValues: Invalid rule number"); return -1; }
+  }
+  else 
+    { glb_error("glbSetSignalStartingValues: Invalid experiment number"); return -1; }
+
+  return 0;
+}
+
+
+/***************************************************************************
+ * Function glbGetSignalStartingValues                                     *
+ ***************************************************************************
+ * Writes the signal norm and energy starting values for a given           *
+ * experiment and rule into the variables norm and tilt.                   *
+ * Note that this function is only meaningful for the old chi^2 functions  *
+ * that are compatible with GLoBES 2.0.11 (i.e. their errorlist looks like *
+ * { signal_norm, signal_energy, bg_norm, bg_energy } )                    *
+ ***************************************************************************/
+int glbGetSignalStartingValues(int exp, int rule, double *norm, double *tilt)
+{
+  struct glb_experiment *in;
+
+  if (norm == NULL  ||  tilt == NULL)
+    { glb_error("glbGetSignalStartingValues: Input pointers may not be NULL"); return -1; }
+  
+  if (exp >= 0  &&  exp < glb_num_of_exps)
+  {
+    in = glb_experiment_list[exp];
+    if (rule >= 0 && rule < in->numofrules)
+    {
+      *norm = in->signal_startvals[0][rule];
+      *tilt = in->signal_startvals[1][rule];
+    }
+    else
+      { glb_error("glbGetSignalStartingValues: Invalid rule number"); return -1; }
+  }
+  else
+    { glb_error("glbGetSignalStartingValues: Invalid experiment number"); return -1; }
+  
+  return 0;  
+}
+  
+
+/***************************************************************************
+ * Function glbSetBGStartingValues                                         *
+ ***************************************************************************
+ * Sets the background norm and energy starting values.                    *
+ * Note that these values are only meaningful for the old chi^2 functions  *
+ * that are compatible with GLoBES 2.0.11 (i.e. their errorlist looks like *
+ * { signal_norm, signal_energy, bg_norm, bg_energy } )                    *
+ ***************************************************************************/
+int glbSetBGStartingValues(int exp, int rule, double norm, double tilt)
+{
+  struct glb_experiment *in;
+  int i, k;
+  
+  if (exp == GLB_ALL)
+  {
+    for(i=0; i < glb_num_of_exps; i++) 
+    {
+      in = glb_experiment_list[i];
+      if (rule == GLB_ALL)
+      {
+        for (k=0; k < in->numofrules; k++)
+          if (glbSetBGStartingValuesInRule(i, k, norm, tilt) != 0)
+            return -1;;
+      }
+      else if (rule >= 0 && rule < in->numofrules)
+      {
+        if (glbSetBGStartingValuesInRule(i, rule, norm, tilt) != 0)
+          return -1;
+      }
+      else
+        { glb_error("glbSetBGStartingValues: Invalid rule number"); return -1; }
+    }
+  }
+  else if (exp >= 0  &&  exp < glb_num_of_exps)
+  {
+    in = glb_experiment_list[exp];
+    if (rule == GLB_ALL)
+    {
+      for (k=0; k < in->numofrules; k++)
+        if (glbSetBGStartingValuesInRule(exp, k, norm, tilt) != 0)
+          return -1;
+    }
+    else if (rule >= 0 && rule < in->numofrules)
+    {
+      if (glbSetBGStartingValuesInRule(exp, rule, norm, tilt) != 0)
+        return -1;
+    }
+    else
+      { glb_error("glbSetBGStartingValues: Invalid rule number"); return -1; }
+  }
+  else 
+    { glb_error("glbSetBGStartingValues: Invalid experiment number"); return -1; }
+
+  return 0;
+}
+
+
+/***************************************************************************
+ * Function glbGetBGStartingValues                                         *
+ ***************************************************************************
+ * Writes the background norm and energy starting values for a given       *
+ * experiment and rule into the variables norm and tilt.                   *
+ * Note that this function is only meaningful for the old chi^2 functions  *
+ * that are compatible with GLoBES 2.0.11 (i.e. their errorlist looks like *
+ * { signal_norm, signal_energy, bg_norm, bg_energy } )                    *
+ ***************************************************************************/
+int glbGetBGStartingValues(int exp, int rule, double *norm, double *tilt)
+{
+  struct glb_experiment *in;
+
+  if (norm == NULL  ||  tilt == NULL)
+    { glb_error("glbGetBGStartingValues: Input pointers may not be NULL"); return -1; }
+  
+  if (exp >= 0  &&  exp < glb_num_of_exps)
+  {
+    in = glb_experiment_list[exp];
+    if (rule >= 0 && rule < in->numofrules)
+    {
+      *norm = in->bg_startvals[0][rule];
+      *tilt = in->bg_startvals[1][rule];
+    }
+    else
+      { glb_error("glbGetBGStartingValues: Invalid rule number"); return -1; }
+  }
+  else
+    { glb_error("glbGetBGStartingValues: Invalid experiment number"); return -1; }
+  
+  return 0;  
+}
+
+
+/***************************************************************************
+ * Function glbSetSysStartingValuesList                                    *
+ ***************************************************************************
+ * Sets the systematics starting value list for a given experiment and     *
+ * rule.                                                                   *
+ ***************************************************************************/
+int glbSetSysStartingValuesList(int exp, int rule, int on_off, const double *sys_list)
+{
+  struct glb_experiment *in;
+  int i, k;
+  
+  if (exp == GLB_ALL)
+  {
+    for(i=0; i < glb_num_of_exps; i++) 
+    {
+      in = glb_experiment_list[i];
+      if (rule == GLB_ALL)
+      {
+        for (k=0; k < in->numofrules; k++)
+          if (glbSetSysStartingValuesListInRule(i, k, on_off, sys_list) != 0)
+            return -1;;
+      }
+      else if (rule >= 0 && rule < in->numofrules)
+      {
+        if (glbSetSysStartingValuesListInRule(i, rule, on_off, sys_list) != 0)
+          return -1;
+      }
+      else
+        { glb_error("glbSetSysStartingValuesList: Invalid rule number"); return -1; }
+    }
+  }
+  else if (exp >= 0  &&  exp < glb_num_of_exps)
+  {
+    in = glb_experiment_list[exp];
+    if (rule == GLB_ALL)
+    {
+      for (k=0; k < in->numofrules; k++)
+        if (glbSetSysStartingValuesListInRule(exp, k, on_off, sys_list) != 0)
+          return -1;
+    }
+    else if (rule >= 0 && rule < in->numofrules)
+    {
+      if (glbSetSysStartingValuesListInRule(exp, rule, on_off, sys_list) != 0)
+        return -1;
+    }
+    else
+      { glb_error("glbSetSysStartingValuesList: Invalid rule number"); return -1; }
+  }
+  else 
+    { glb_error("glbSetSysStartingValuesList: Invalid experiment number"); return -1; }
+
+  return 0;
+}
+
+
+/***************************************************************************
+ * Function glbGetSysStartingValuesListPtr                                 *
+ ***************************************************************************
+ * Returns a pointer to the systematics starting value list of a specific  *
+ * experiment, rule, and on/off state.                                     *
+ ***************************************************************************/
+double *glbGetSysStartingValuesListPtr(int exp, int rule, int on_off)
+{
+  struct glb_experiment *in;
+
+  if (exp >= 0  &&  exp < glb_num_of_exps)
+  {
+    in = glb_experiment_list[exp];
+    if (rule >= 0 && rule < in->numofrules)
+    {
+      if (on_off == GLB_ON)
+        return in->sys_on_startvals[rule];
+      else if (on_off == GLB_OFF)
+        return in->sys_off_startvals[rule];
+      else
+        { glb_error("glbGetSysStartingValuesListPtr: on_off must be GLB_ON or GLB_OFF");
+          return NULL; }
+    }
+    else
+      { glb_error("glbGetSysStartingValuesListPtr: Invalid rule number"); return NULL; }
+  }
+  else
+    { glb_error("glbGetSysStartingValuesListPtr: Invalid experiment number"); return NULL; }
+  
+  return NULL;
 }
 
 
 
-//// The following part of this file contains highly experimental functions for
-//// handling user-defined systematics which are not documented.
-//// If you want to implement your own systematics, user the routines above and
-//// follow their documentation
-//#ifdef GLB_EXPERIMENTAL
-//
-//#include <stdio.h>
-//#include <stdlib.h>
-//#include <math.h>
-//#include <globes/globes.h>
-//#include "glb_rate_engine.h"
-//#include "glb_multiex.h"
-//#include "glb_minimize.h"
-//
-//
-//
-//double my_chi(double x[])
-//{     
-//  double erg; 
-//  double y[5],z[5];
-//  y[1]=x[1]+x[5];
-//  y[2]=x[2]+x[6];
-//  y[3]=x[3];
-//  y[4]=x[4];
-//  z[1]=x[7]+x[5];
-//  z[2]=x[8]+x[6];
-//  z[3]=x[9];
-//  z[4]=x[10];
-//
-//  glbSetExperiment(glb_experiment_list[0]);
-//  erg=glb_chi_sys_w_bg_calib(y);
-//  glbSetExperiment(glb_experiment_list[1]);
-//  erg+=glb_chi_sys_w_bg_calib(z);
-//  erg+=glb_prior(x[5],glb_sys_centers[4],glb_sys_errors[4])+
-//    glb_prior(x[6],glb_sys_centers[5],glb_sys_errors[5]);
-//  return erg;
-//}
-//
-//double my_chi2(double x[])
-//{     
-//  double erg; 
-//  int i;
-//
-//  glbShiftEnergyScale(x[2]+x[6],glb_experiment_list[0]->rates1[glb_rule_number],
-//      glb_experiment_list[0]->rates1T[glb_rule_number],glb_experiment_list[0]->numofbins);
-//  glbShiftEnergyScale(x[4],glb_experiment_list[0]->rates1BG[glb_rule_number],
-//      glb_experiment_list[0]->rates1BGT[glb_rule_number],glb_experiment_list[0]->numofbins);
-//
-//  for (i=0;i<glb_experiment_list[0]->numofbins;i++)
-//    {
-//
-//     
-//      glb_chirate[i]= 
-//	((x[1]+x[5])*glb_experiment_list[0]->rates1T[glb_rule_number][i]+
-//	 x[3]*glb_experiment_list[0]->rates1BGT[glb_rule_number][i]) 
-//
-//	* glb_window_function(glb_experiment_list[0]->energy_window[glb_rule_number][0],glb_experiment_list[0]->energy_window[glb_rule_number][1],i);
-//      
-//    }  
-//  erg = glb_list_likelihood(glb_experiment_list[0]->rates0[glb_rule_number],glb_chirate)+
-//    glb_prior(x[1],glb_sys_centers[0],glb_sys_errors[0])+
-//    glb_prior(x[2],glb_sys_centers[1],glb_sys_errors[1])+
-//    glb_prior(x[3],glb_sys_centers[2],glb_sys_errors[2])+
-//    glb_prior(x[4],glb_sys_centers[3],glb_sys_errors[3]);
-//
-//  glbShiftEnergyScale(x[8]+x[6],glb_experiment_list[1]->rates1[glb_rule_number],
-//	    glb_experiment_list[1]->rates1T[glb_rule_number],glb_experiment_list[1]->numofbins);
-//  glbShiftEnergyScale(x[10],glb_experiment_list[1]->rates1BG[glb_rule_number],
-//	    glb_experiment_list[1]->rates1BGT[glb_rule_number],glb_experiment_list[1]->numofbins);
-//
-//  for (i=0;i<glb_experiment_list[1]->numofbins;i++)
-//    {
-//      glb_chirate[i]= 
-//	((x[7]+x[5])*glb_experiment_list[1]->rates1T[glb_rule_number][i]+
-//	 x[9]*glb_experiment_list[1]->rates1BGT[glb_rule_number][i]) 
-//
-//		* glb_window_function(glb_experiment_list[1]->energy_window[glb_rule_number][0],glb_experiment_list[1]->energy_window[glb_rule_number][1],i);
-//    }
-//  
-//  erg += glb_list_likelihood(glb_experiment_list[1]->rates0[glb_rule_number],glb_chirate)+
-//    glb_prior(x[7],glb_sys_centers[6],glb_sys_errors[6])+
-//    glb_prior(x[8],glb_sys_centers[7],glb_sys_errors[7])+
-//    glb_prior(x[9],glb_sys_centers[8],glb_sys_errors[8])+
-//    glb_prior(x[10],glb_sys_centers[9],glb_sys_errors[9]);
-//  erg+=glb_prior(x[5],glb_sys_centers[4],glb_sys_errors[4])+
-//    glb_prior(x[6],glb_sys_centers[5],glb_sys_errors[5]);
-// 
-//  return erg;
-//}
-//
-//static char mch3[]="This a full blown reactor setup with near and far detector.\n"
-//"Additionally it also includes what is called shape error\n"
-//"in Nucl. Phys. B 665 (2003) 487\n";
-//
-//double my_chi3(double x[])
-//{
-//  
-//  double erg; 
-//  int i;
-//
-// 
-// 
-//
-//  for (i=0;i<glb_experiment_list[0]->numofbins;i++)
-//    {
-//
-//     
-//      glb_chirate[i]= 
-//	((x[1]+x[5]+x[11+i])*glb_experiment_list[0]->rates1[glb_rule_number][i]+
-//	 x[3]*glb_experiment_list[0]->rates1BG[glb_rule_number][i]) 
-//
-//	* glb_window_function(glb_experiment_list[0]->energy_window[glb_rule_number][0],glb_experiment_list[0]->energy_window[glb_rule_number][1],i);
-//      
-//    }
-//
-//  glbShiftEnergyScale(x[2]+x[6],glb_chirate,
-//	   glb_experiment_list[0]->rates1T[glb_rule_number],glb_experiment_list[0]->numofbins);  
-//  
-//  erg = glb_list_likelihood(glb_experiment_list[0]->rates0[glb_rule_number],
-//	   glb_experiment_list[0]->rates1T[glb_rule_number])+
-//    glb_prior(x[1],glb_sys_centers[0],glb_sys_errors[0])+
-//    glb_prior(x[2],glb_sys_centers[1],glb_sys_errors[1])+
-//    glb_prior(x[3],glb_sys_centers[2],glb_sys_errors[2])+
-//    glb_prior(x[4],glb_sys_centers[3],glb_sys_errors[3]);
-//
-///*   glbShiftEnergyScale(x[8]+x[6],glb_experiment_list[1]->rates1[glb_rule_number], */
-///* 	    glb_experiment_list[1]->rates1T[glb_rule_number],glb_experiment_list[1]->numofbins); */
-///*   glbShiftEnergyScale(x[10],glb_experiment_list[1]->rates1BG[glb_rule_number], */
-///* 	    glb_experiment_list[1]->rates1BGT[glb_rule_number],glb_experiment_list[1]->numofbins); */
-//
-//  for (i=0;i<glb_experiment_list[1]->numofbins;i++)
-//    {
-//      glb_chirate[i]= 
-//	((x[7]+x[5]+x[11+i])*glb_experiment_list[1]->rates1[glb_rule_number][i]+
-//	 x[9]*glb_experiment_list[1]->rates1BG[glb_rule_number][i]) 
-//
-//		* glb_window_function(glb_experiment_list[1]->energy_window[glb_rule_number][0],glb_experiment_list[1]->energy_window[glb_rule_number][1],i);
-//    }
-//  glbShiftEnergyScale(x[8]+x[6],glb_chirate,
-//	    glb_experiment_list[1]->rates1T[glb_rule_number],glb_experiment_list[1]->numofbins);  
-//  erg += glb_list_likelihood(glb_experiment_list[1]->rates0[glb_rule_number]
-//			 ,glb_experiment_list[1]->rates1T[glb_rule_number])+
-//    glb_prior(x[7],glb_sys_centers[6],glb_sys_errors[6])+
-//    glb_prior(x[8],glb_sys_centers[7],glb_sys_errors[7])+
-//    glb_prior(x[9],glb_sys_centers[8],glb_sys_errors[8])+
-//    glb_prior(x[10],glb_sys_centers[9],glb_sys_errors[9]);
-//  erg+=glb_prior(x[5],glb_sys_centers[4],glb_sys_errors[4])+
-//    glb_prior(x[6],glb_sys_centers[5],glb_sys_errors[5]);
-//  for (i=0;i<glb_experiment_list[1]->numofbins;i++)
-//    {
-//      erg+=glb_prior(x[11+i],glb_sys_centers[10+i],glb_sys_errors[10+i]);
-//    } 
-//
-//  return erg;
-//}
-//
-//#define NBG 200
-//
-//static double bgvec[5][NBG][2];
-//
-//void BGLoader(char* filename, int number)
-//{
-//  int i;
-//  FILE *fp = fopen(filename,"r");
-//  if (fp!=NULL)
-//    {
-//      for (i=0; i<=NBG; i++) fscanf(fp,"%lf %lf",
-//				    &bgvec[number][i][0],
-//				    &bgvec[number][i][1]);
-//      fclose(fp);
-//    }
-//  else
-//    {
-//      fprintf(stderr,"Error: Could not open %s\n",filename); 
-//    }
-//  
-//}
-//
-//double back(double en, int ident)
-//{
-//  double incre;
-//  double ergebnis;  
-//  int lowerind;
-//  int higherind;
-//  double energy;
-//  double norm[4]={1.2453,3.28348,6.19681,6.25757};
-//  energy=1000.0*en-0.8;//converting to Thomas' units 
-//
-//  incre = (bgvec[ident][NBG-1][0]-bgvec[ident][0][0])/(NBG-1);
-//  lowerind = floor((energy-bgvec[ident][0][0])/incre); 
-//  higherind = lowerind + 1;
-//  
-//  if (lowerind<0 || higherind>NBG-1) ergebnis=0.0; 
-//  else
-//  {
-//    ergebnis=((bgvec[ident][higherind][1]-bgvec[ident][lowerind][1])*
-//	      (((energy-bgvec[ident][0][0])/incre)-lowerind)+
-//	      bgvec[ident][lowerind][1]);
-//  }
-//  //fprintf(stderr,"%lf %lf %d %lf\n",ergebnis, incre,lowerind,en);
-//  
-//  return ergebnis*norm[ident];
-//}
-//
-//static char mch4[]="This a full blown reactor setup with near and far detector.\n"
-//"Additionally it also includes several backgrounds from Thomas\n";
-//
-//
-//
-//
-//double my_chi4(double x[])
-//{
-//  
-//  double erg; 
-//  int i,k;
-//  double *chi0, *chi1;
-//
-//  
-//  // getting the norms right for the background
-//  double NORM_ND=pow(1.1,2)/pow(glb_experiment_list[0]->baseline,2)
-//    *glb_experiment_list[0]->targetmass/100.0;
-//  double NORM_FD=pow(1.1,2)/pow(glb_experiment_list[1]->baseline,2)
-//    *glb_experiment_list[0]->targetmass/100.0;
-//  // creating a buffer
-//  chi0=(double *) malloc(sizeof(double)*glb_experiment_list[0]->numofbins);
-//  chi1=(double *) malloc(sizeof(double)*glb_experiment_list[1]->numofbins);
-//  //adding the backgrounds to the zero vectors 
-//  for (i=0;i<glb_experiment_list[0]->numofbins;i++)
-//    {
-//      chi0[i]= glb_experiment_list[0]->rates0[glb_rule_number][i];
-//      chi1[i]= glb_experiment_list[1]->rates0[glb_rule_number][i];
-//    }
-//  for (i=0;i<glb_experiment_list[0]->numofbins;i++)
-//    {
-//      for(k=0;k<4;k++)
-//	{
-//	  chi0[i] += 
-//	    glb_sys_centers[k+10]*back(glb_calc_energy_tab[i],k)*NORM_ND;
-//	  chi1[i] += 
-//	    glb_sys_centers[k+10]*back(glb_calc_energy_tab[i],k)*NORM_FD;
-//	}
-//
-//      // here the error lies we need a buffer !!!
-//
-//
-//    }
-//
-//  glbShiftEnergyScale(x[2]+x[6],glb_experiment_list[0]->rates1[glb_rule_number],
-//      glb_experiment_list[0]->rates1T[glb_rule_number],glb_experiment_list[0]->numofbins);
-//  glbShiftEnergyScale(x[4],glb_experiment_list[0]->rates1BG[glb_rule_number],
-//      glb_experiment_list[0]->rates1BGT[glb_rule_number],glb_experiment_list[0]->numofbins);
-//
-//  for (i=0;i<glb_experiment_list[0]->numofbins;i++)
-//    {
-//
-//     
-//      glb_chirate[i]= 
-//	((x[1]+x[5])*glb_experiment_list[0]->rates1T[glb_rule_number][i]+
-//	 x[3]*glb_experiment_list[0]->rates1BGT[glb_rule_number][i]
-//	 +x[11]*NORM_ND*back(glb_calc_energy_tab[i],0)
-//	 +x[12]*NORM_ND*back(glb_calc_energy_tab[i],1)
-//	 +x[13]*NORM_ND*back(glb_calc_energy_tab[i],2)
-//	 +x[14]*NORM_ND*back(glb_calc_energy_tab[i],3)
-//
-//
-//) 
-//
-//	* glb_window_function(glb_experiment_list[0]->energy_window[glb_rule_number][0],glb_experiment_list[0]->energy_window[glb_rule_number][1],i);
-//      
-//    }  
-//  erg = glb_list_likelihood(chi0,glb_chirate)+
-//    glb_prior(x[1],glb_sys_centers[0],glb_sys_errors[0])+
-//    glb_prior(x[2],glb_sys_centers[1],glb_sys_errors[1])+
-//    glb_prior(x[3],glb_sys_centers[2],glb_sys_errors[2])+
-//    glb_prior(x[4],glb_sys_centers[3],glb_sys_errors[3]);
-//
-//  glbShiftEnergyScale(x[8]+x[6],glb_experiment_list[1]->rates1[glb_rule_number],
-//	    glb_experiment_list[1]->rates1T[glb_rule_number],glb_experiment_list[1]->numofbins);
-//  glbShiftEnergyScale(x[10],glb_experiment_list[1]->rates1BG[glb_rule_number],
-//	    glb_experiment_list[1]->rates1BGT[glb_rule_number],glb_experiment_list[1]->numofbins);
-//
-//  for (i=0;i<glb_experiment_list[1]->numofbins;i++)
-//    {
-//      glb_chirate[i]= 
-//	((x[7]+x[5])*glb_experiment_list[1]->rates1T[glb_rule_number][i]+
-//	 x[9]*glb_experiment_list[1]->rates1BGT[glb_rule_number][i]
-//	 +x[11]*NORM_FD*back(glb_calc_energy_tab[i],0)
-//	 +x[12]*NORM_FD*back(glb_calc_energy_tab[i],1)
-//	 +x[13]*NORM_FD*back(glb_calc_energy_tab[i],2)
-//	 +x[14]*NORM_FD*back(glb_calc_energy_tab[i],3)
-//	 ) 
-//
-//		* glb_window_function(glb_experiment_list[1]->energy_window[glb_rule_number][0],glb_experiment_list[1]->energy_window[glb_rule_number][1],i);
-//    }
-//  
-//  erg += glb_list_likelihood(chi1,glb_chirate)+
-//    glb_prior(x[7],glb_sys_centers[6],glb_sys_errors[6])+
-//    glb_prior(x[8],glb_sys_centers[7],glb_sys_errors[7])+
-//    glb_prior(x[9],glb_sys_centers[8],glb_sys_errors[8])+
-//    glb_prior(x[10],glb_sys_centers[9],glb_sys_errors[9]);
-//  erg+=glb_prior(x[5],glb_sys_centers[4],glb_sys_errors[4])+
-//    glb_prior(x[6],glb_sys_centers[5],glb_sys_errors[5]);
-//  erg+=glb_prior(x[11],glb_sys_centers[10],glb_sys_errors[10])
-//    +glb_prior(x[12],glb_sys_centers[11],glb_sys_errors[11])
-//    +glb_prior(x[13],glb_sys_centers[12],glb_sys_errors[12])
-//    +glb_prior(x[14],glb_sys_centers[13],glb_sys_errors[13]);
-//  free(chi1);
-//  free(chi0);  
-//  return erg;
-//  
-//}
-//
-//
-//double my_chi5(double x[])
-//{
-//  
-//  double erg; 
-//  int i,k;
-//  double *chi0=NULL;
-//  double *chi1=NULL;
-//  // getting the norms right for the background
-//  double NORM_ND=pow(1.1,2)/pow(glb_experiment_list[0]->baseline,2)
-//    *glb_experiment_list[0]->targetmass/100.0;
-//  double NORM_FD=pow(1.1,2)/pow(glb_experiment_list[1]->baseline,2)
-//    *glb_experiment_list[1]->targetmass/100.0;
-//
-// // creating a buffer
-//  chi0=(double *) malloc(sizeof(double)*glb_experiment_list[0]->numofbins);
-//  chi1=(double *) malloc(sizeof(double)*glb_experiment_list[1]->numofbins);
-//
-//  //adding the backgrounds to the zero vectors
-//
-//  for (i=0;i<glb_experiment_list[0]->numofbins;i++)
-//    {
-//      chi0[i]= glb_experiment_list[0]->rates0[glb_rule_number][i];
-//      chi1[i]= glb_experiment_list[1]->rates0[glb_rule_number][i];
-//    }
-//  for (i=0;i<glb_experiment_list[0]->numofbins;i++)
-//    {
-//      for(k=0;k<4;k++)
-//	{
-//	  chi0[i] += 
-//	    glb_sys_centers[k+10]*back(glb_calc_energy_tab[i],k)*NORM_ND;
-//	  chi1[i] += 
-//	    glb_sys_centers[k+10]*back(glb_calc_energy_tab[i],k)*NORM_FD;
-//	}
-//    }
-//
-//
-//
-//  for (i=0;i<glb_experiment_list[0]->numofbins;i++)
-//    {
-//      glb_chirate[i]= 
-//	((x[1]+x[5])*glb_experiment_list[0]->rates1[glb_rule_number][i]+
-//	 x[3]*glb_experiment_list[0]->rates1BG[glb_rule_number][i] 
-//	 +x[11]*NORM_ND*back(glb_calc_energy_tab[i],0)
-//	 +x[12]*NORM_ND*back(glb_calc_energy_tab[i],1)
-//	 +x[13]*NORM_ND*back(glb_calc_energy_tab[i],2)
-//	 +x[14]*NORM_ND*back(glb_calc_energy_tab[i],3)
-//	 ) 	
-//	* glb_window_function(glb_experiment_list[0]->energy_window[glb_rule_number][0],
-//			  glb_experiment_list[0]->energy_window[glb_rule_number][1],i); 
-//    }  
-//
-//  
-//  glbShiftEnergyScale(x[2]+x[6],glb_chirate,
-//	    glb_experiment_list[0]->rates1T[glb_rule_number],glb_experiment_list[0]->numofbins);
-//  erg = glb_list_likelihood(chi0,glb_experiment_list[0]->rates1T[glb_rule_number])+
-//    glb_prior(x[1],glb_sys_centers[0],glb_sys_errors[0])+
-//    glb_prior(x[2],glb_sys_centers[1],glb_sys_errors[1])+
-//    glb_prior(x[3],glb_sys_centers[2],glb_sys_errors[2])+
-//    glb_prior(x[4],glb_sys_centers[3],glb_sys_errors[3]);
-//
-//  glbShiftEnergyScale(x[8]+x[6],glb_experiment_list[1]->rates1[glb_rule_number],
-//	    glb_experiment_list[1]->rates1T[glb_rule_number],glb_experiment_list[1]->numofbins);
-//  glbShiftEnergyScale(x[10],glb_experiment_list[1]->rates1BG[glb_rule_number],
-//	    glb_experiment_list[1]->rates1BGT[glb_rule_number],glb_experiment_list[1]->numofbins);
-//
-//  for (i=0;i<glb_experiment_list[1]->numofbins;i++)
-//    {
-//      glb_chirate[i]= 
-//	((x[7]+x[5])*glb_experiment_list[1]->rates1[glb_rule_number][i]+
-//	 x[9]*glb_experiment_list[0]->rates1BG[glb_rule_number][i] 
-//	 +x[11]*NORM_FD*back(glb_calc_energy_tab[i],0)
-//	 +x[12]*NORM_FD*back(glb_calc_energy_tab[i],1)
-//	 +x[13]*NORM_FD*back(glb_calc_energy_tab[i],2)
-//	 +x[14]*NORM_FD*back(glb_calc_energy_tab[i],3)
-//	 ) 
-//	* glb_window_function(glb_experiment_list[1]->energy_window[glb_rule_number][0],
-//			  glb_experiment_list[1]->energy_window[glb_rule_number][1],i);
-//    }
-//  
-//  glbShiftEnergyScale(x[8]+x[6],glb_chirate,
-//	    glb_experiment_list[1]->rates1T[glb_rule_number],glb_experiment_list[1]->numofbins);
-//  erg += glb_list_likelihood(chi1,glb_experiment_list[1]->rates1T[glb_rule_number])+
-//    glb_prior(x[7],glb_sys_centers[6],glb_sys_errors[6])+
-//    glb_prior(x[8],glb_sys_centers[7],glb_sys_errors[7])+
-//    glb_prior(x[9],glb_sys_centers[8],glb_sys_errors[8])+
-//    glb_prior(x[10],glb_sys_centers[9],glb_sys_errors[9]);
-//  erg+=glb_prior(x[5],glb_sys_centers[4],glb_sys_errors[4])+
-//    glb_prior(x[6],glb_sys_centers[5],glb_sys_errors[5]);
-//  erg+=glb_prior(x[11],glb_sys_centers[10],glb_sys_errors[10])
-//    +glb_prior(x[12],glb_sys_centers[11],glb_sys_errors[11])
-//    +glb_prior(x[13],glb_sys_centers[12],glb_sys_errors[12])
-//    +glb_prior(x[14],glb_sys_centers[13],glb_sys_errors[13]);
-//  
-//  // for having acces to the BG vector
-//  for (i=0;i<glb_experiment_list[0]->numofbins;i++)
-//    {
-//      for(k=0;k<4;k++)
-//	{
-//	glb_chirate[i]= 
-//	    glb_sys_centers[k+10]*back(glb_calc_energy_tab[i],k)*NORM_FD;
-//	  
-//	}
-//    }
-//
-//  free(chi0);
-//  free(chi1);
-//
-//  return erg;
-//}
-//
-//
-//
-//double my_chi6(double x[])
-//{
-//  
-//  double erg; 
-//  int i,k;
-//  double *chi0=NULL;
-//  double *chi1=NULL;
-//  // getting the norms right for the background
-//  double NORM_ND=pow(1.1,2)/pow(glb_experiment_list[0]->baseline,2)
-//    *glb_experiment_list[0]->targetmass/100.0;
-//  double NORM_FD=pow(1.1,2)/pow(glb_experiment_list[1]->baseline,2)
-//    *glb_experiment_list[1]->targetmass/100.0;
-//
-//  // creating a buffer
-//  chi0=(double *) malloc(sizeof(double)*glb_experiment_list[0]->numofbins);
-//  chi1=(double *) malloc(sizeof(double)*glb_experiment_list[1]->numofbins);
-//
-//  //adding the backgrounds to the zero vectors
-//
-//  for (i=0;i<glb_experiment_list[0]->numofbins;i++)
-//    {
-//      chi0[i]= glb_experiment_list[0]->rates0[glb_rule_number][i];
-//      chi1[i]= glb_experiment_list[1]->rates0[glb_rule_number][i];
-//    }
-//  for (i=0;i<glb_experiment_list[0]->numofbins;i++)
-//    {
-//      for(k=0;k<4;k++)
-//	{
-//	  chi0[i] += 
-//	    glb_sys_centers[k+10]*back(glb_calc_energy_tab[i],k)*NORM_ND;
-//	  chi1[i] += 
-//	    glb_sys_centers[k+14]*back(glb_calc_energy_tab[i],k)*NORM_FD;
-//	}
-//    }
-//
-//
-//
-//  for (i=0;i<glb_experiment_list[0]->numofbins;i++)
-//    {
-//      glb_chirate[i]= 
-//	((x[1]+x[5])*glb_experiment_list[0]->rates1[glb_rule_number][i]+
-//	 x[3]*glb_experiment_list[0]->rates1BG[glb_rule_number][i] 
-//	 +x[11]*NORM_ND*back(glb_calc_energy_tab[i],0)
-//	 +x[12]*NORM_ND*back(glb_calc_energy_tab[i],1)
-//	 +x[13]*NORM_ND*back(glb_calc_energy_tab[i],2)
-//	 +x[14]*NORM_ND*back(glb_calc_energy_tab[i],3)
-//	 ) 	
-//	* glb_window_function(glb_experiment_list[0]->energy_window[glb_rule_number][0],
-//			  glb_experiment_list[0]->energy_window[glb_rule_number][1],i); 
-//    }  
-//
-//  
-//  glbShiftEnergyScale(x[2]+x[6],glb_chirate,
-//	    glb_experiment_list[0]->rates1T[glb_rule_number],glb_experiment_list[0]->numofbins);
-//  erg = glb_list_likelihood(chi0,glb_experiment_list[0]->rates1T[glb_rule_number])+
-//    glb_prior(x[1],glb_sys_centers[0],glb_sys_errors[0])+
-//    glb_prior(x[2],glb_sys_centers[1],glb_sys_errors[1])+
-//    glb_prior(x[3],glb_sys_centers[2],glb_sys_errors[2])+
-//    glb_prior(x[4],glb_sys_centers[3],glb_sys_errors[3]);
-//
-//  glbShiftEnergyScale(x[8]+x[6],glb_experiment_list[1]->rates1[glb_rule_number],
-//	    glb_experiment_list[1]->rates1T[glb_rule_number],glb_experiment_list[1]->numofbins);
-//  glbShiftEnergyScale(x[10],glb_experiment_list[1]->rates1BG[glb_rule_number],
-//	    glb_experiment_list[1]->rates1BGT[glb_rule_number],glb_experiment_list[1]->numofbins);
-//
-//  for (i=0;i<glb_experiment_list[1]->numofbins;i++)
-//    {
-//      glb_chirate[i]= 
-//	((x[7]+x[5])*glb_experiment_list[1]->rates1[glb_rule_number][i]+
-//	 x[9]*glb_experiment_list[0]->rates1BG[glb_rule_number][i] 
-//	 +x[15]*NORM_FD*back(glb_calc_energy_tab[i],0)
-//	 +x[16]*NORM_FD*back(glb_calc_energy_tab[i],1)
-//	 +x[17]*NORM_FD*back(glb_calc_energy_tab[i],2)
-//	 +x[18]*NORM_FD*back(glb_calc_energy_tab[i],3)
-//	 ) 
-//	* glb_window_function(glb_experiment_list[1]->energy_window[glb_rule_number][0],
-//			  glb_experiment_list[1]->energy_window[glb_rule_number][1],i);
-//    }
-//  
-//  glbShiftEnergyScale(x[8]+x[6],glb_chirate,
-//	    glb_experiment_list[1]->rates1T[glb_rule_number],glb_experiment_list[1]->numofbins);
-//  erg += glb_list_likelihood(chi1,glb_experiment_list[1]->rates1T[glb_rule_number])+
-//    glb_prior(x[7],glb_sys_centers[6],glb_sys_errors[6])+
-//    glb_prior(x[8],glb_sys_centers[7],glb_sys_errors[7])+
-//    glb_prior(x[9],glb_sys_centers[8],glb_sys_errors[8])+
-//    glb_prior(x[10],glb_sys_centers[9],glb_sys_errors[9]);
-//  erg+=glb_prior(x[5],glb_sys_centers[4],glb_sys_errors[4])+
-//    glb_prior(x[6],glb_sys_centers[5],glb_sys_errors[5]);
-//  erg+=glb_prior(x[11],glb_sys_centers[10],glb_sys_errors[10])
-//    +glb_prior(x[12],glb_sys_centers[11],glb_sys_errors[11])
-//    +glb_prior(x[13],glb_sys_centers[12],glb_sys_errors[12])
-//    +glb_prior(x[14],glb_sys_centers[13],glb_sys_errors[13]);
-//  erg+=glb_prior(x[15],glb_sys_centers[14],glb_sys_errors[14])
-//    +glb_prior(x[16],glb_sys_centers[15],glb_sys_errors[15])
-//    +glb_prior(x[17],glb_sys_centers[16],glb_sys_errors[16])
-//    +glb_prior(x[18],glb_sys_centers[17],glb_sys_errors[17]);
-//  
-//  // for having acces to the BG vector
-//  for (i=0;i<glb_experiment_list[0]->numofbins;i++)
-//    {
-//      for(k=0;k<4;k++)
-//	{
-//	glb_chirate[i]= 
-//	    glb_sys_centers[k+10]*back(glb_calc_energy_tab[i],k)*NORM_FD;
-//	  
-//	}
-//    }
-//
-//  free(chi0);
-//  free(chi1);
-//
-//  return erg;
-//}
-//
-//static char mch7[]="This setup includes most of the things we have:\n"
-//"   a near and a far detector\n"
-//"   2% bin-to-bin shape uncertainty (near and far correlated)\n"
-//"   2.5% flux uncertainty\n"
-//"   0.6% relative normalization\n"
-//"   0.5% relative energy calibration\n"
-//"   four types of background:\n"
-//"      flat (0.004), accidental (0.002), cosmogenic I (0.002),"
-//" cosmogenic I (0.002)\n"
-//"   including 50% error on each background"; 
-//
-//double my_chi7(double x[])
-//{
-//  
-//  double erg; 
-//  int i,k;
-//  double *chi0=NULL;
-//  double *chi1=NULL;
-//  // getting the norms right for the background
-//  double NORM_ND=pow(1.1,2)/pow(glb_experiment_list[0]->baseline,2)
-//    *glb_experiment_list[0]->targetmass/100.0;
-//  double NORM_FD=pow(1.1,2)/pow(glb_experiment_list[1]->baseline,2)
-//    *glb_experiment_list[1]->targetmass/100.0;
-//
-//  // creating a buffer
-//  chi0=(double *) malloc(sizeof(double)*glb_experiment_list[0]->numofbins);
-//  chi1=(double *) malloc(sizeof(double)*glb_experiment_list[1]->numofbins);
-//
-//  //adding the backgrounds to the zero vectors
-//
-//  for (i=0;i<glb_experiment_list[0]->numofbins;i++)
-//    {
-//      chi0[i]= glb_experiment_list[0]->rates0[glb_rule_number][i];
-//      chi1[i]= glb_experiment_list[1]->rates0[glb_rule_number][i];
-//    }
-//  for (i=0;i<glb_experiment_list[0]->numofbins;i++)
-//    {
-//      for(k=0;k<4;k++)
-//	{
-//	  chi0[i] += 
-//	    glb_sys_centers[k+10]*back(glb_calc_energy_tab[i],k)*NORM_ND;
-//	  chi1[i] += 
-//	    glb_sys_centers[k+14]*back(glb_calc_energy_tab[i],k)*NORM_FD;
-//	}
-//    }
-//
-//
-//
-//  for (i=0;i<glb_experiment_list[0]->numofbins;i++)
-//    {
-//      glb_chirate[i]= 
-//	((x[1]+x[5]+x[19+i])*glb_experiment_list[0]->rates1[glb_rule_number][i]+
-//	 x[3]*glb_experiment_list[0]->rates1BG[glb_rule_number][i] 
-//	 +x[11]*NORM_ND*back(glb_calc_energy_tab[i],0)
-//	 +x[12]*NORM_ND*back(glb_calc_energy_tab[i],1)
-//	 +x[13]*NORM_ND*back(glb_calc_energy_tab[i],2)
-//	 +x[14]*NORM_ND*back(glb_calc_energy_tab[i],3)
-//	 ) 	
-//	* glb_window_function(glb_experiment_list[0]->energy_window[glb_rule_number][0],
-//			  glb_experiment_list[0]->energy_window[glb_rule_number][1],i); 
-//    }  
-//
-//  
-//  glbShiftEnergyScale(x[2]+x[6],glb_chirate,
-//	    glb_experiment_list[0]->rates1T[glb_rule_number],glb_experiment_list[0]->numofbins);
-//  erg = glb_list_likelihood(chi0,glb_experiment_list[0]->rates1T[glb_rule_number])+
-//    glb_prior(x[1],glb_sys_centers[0],glb_sys_errors[0])+
-//    glb_prior(x[2],glb_sys_centers[1],glb_sys_errors[1])+
-//    glb_prior(x[3],glb_sys_centers[2],glb_sys_errors[2])+
-//    glb_prior(x[4],glb_sys_centers[3],glb_sys_errors[3]);
-//
-//  glbShiftEnergyScale(x[8]+x[6],glb_experiment_list[1]->rates1[glb_rule_number],
-//	    glb_experiment_list[1]->rates1T[glb_rule_number],glb_experiment_list[1]->numofbins);
-//  glbShiftEnergyScale(x[10],glb_experiment_list[1]->rates1BG[glb_rule_number],
-//	    glb_experiment_list[1]->rates1BGT[glb_rule_number],glb_experiment_list[1]->numofbins);
-//
-//  for (i=0;i<glb_experiment_list[1]->numofbins;i++)
-//    {
-//      glb_chirate[i]= 
-//	((x[7]+x[5]+x[19+i])*glb_experiment_list[1]->rates1[glb_rule_number][i]+
-//	 x[9]*glb_experiment_list[0]->rates1BG[glb_rule_number][i] 
-//	 +x[15]*NORM_FD*back(glb_calc_energy_tab[i],0)
-//	 +x[16]*NORM_FD*back(glb_calc_energy_tab[i],1)
-//	 +x[17]*NORM_FD*back(glb_calc_energy_tab[i],2)
-//	 +x[18]*NORM_FD*back(glb_calc_energy_tab[i],3)
-//	 ) 
-//	* glb_window_function(glb_experiment_list[1]->energy_window[glb_rule_number][0],
-//			  glb_experiment_list[1]->energy_window[glb_rule_number][1],i);
-//    }
-//  
-//  glbShiftEnergyScale(x[8]+x[6],glb_chirate,
-//	    glb_experiment_list[1]->rates1T[glb_rule_number],glb_experiment_list[1]->numofbins);
-//
-//  erg += glb_list_likelihood(chi1,glb_experiment_list[1]->rates1T[glb_rule_number])+
-//    glb_prior(x[7],glb_sys_centers[6],glb_sys_errors[6])+
-//    glb_prior(x[8],glb_sys_centers[7],glb_sys_errors[7])+
-//    glb_prior(x[9],glb_sys_centers[8],glb_sys_errors[8])+
-//    glb_prior(x[10],glb_sys_centers[9],glb_sys_errors[9]);
-//  erg+=glb_prior(x[5],glb_sys_centers[4],glb_sys_errors[4])+
-//    glb_prior(x[6],glb_sys_centers[5],glb_sys_errors[5]);
-//  erg+=glb_prior(x[11],glb_sys_centers[10],glb_sys_errors[10])
-//    +glb_prior(x[12],glb_sys_centers[11],glb_sys_errors[11])
-//    +glb_prior(x[13],glb_sys_centers[12],glb_sys_errors[12])
-//    +glb_prior(x[14],glb_sys_centers[13],glb_sys_errors[13]);
-//  erg+=glb_prior(x[15],glb_sys_centers[14],glb_sys_errors[14])
-//    +glb_prior(x[16],glb_sys_centers[15],glb_sys_errors[15])
-//    +glb_prior(x[17],glb_sys_centers[16],glb_sys_errors[16])
-//    +glb_prior(x[18],glb_sys_centers[17],glb_sys_errors[17]);
-//  
-//  for (i=0;i<glb_experiment_list[0]->numofbins;i++)
-//    {
-//      erg+=glb_prior(x[19+i],glb_sys_centers[18+i],glb_sys_errors[18+i]);
-//    }
-//
-//  // for having acces to the BG vector
-//  for (i=0;i<glb_experiment_list[0]->numofbins;i++)
-//    {
-//      for(k=0;k<4;k++)
-//	{
-//	glb_chirate[i]= 
-//	    glb_sys_centers[k+10]*back(glb_calc_energy_tab[i],k)*NORM_FD;
-//	  
-//	}
-//    }
-//
-//  free(chi0);
-//  free(chi1);
-//
-//  return erg;
-//}
-//
-//static char mch8[]="This setup includes most of the things we have:\n"
-//"   a near and a far detector\n"
-//"   2% bin-to-bin shape uncertainty (near and far correlated)\n"
-//"   2.5% flux uncertainty\n"
-//"   0.6% relative normalization\n"
-//"   0.5% relative energy calibration\n"
-//"   four types of background:\n"
-//"      flat (0.004), accidental (0.002), cosmogenic I (0.002),"
-//" cosmogenic I (0.002)\n"
-//"   including 50% error on each background\n"
-//"since this is not enough ;-) there is also\n"
-//"   a 0.005 uncorrelated flat background (Gaußian chi^2)\n"
-//"   with 50% uncertainty";
-//
-//static char mch9[]="This setup includes most of the things we have:\n"
-//"   a near and a far detector\n"
-//"   2% bin-to-bin shape uncertainty (near and far correlated)\n"
-//"   2.5% flux uncertainty\n"
-//"   0.6% relative normalization\n"
-//"   0.5% relative energy calibration\n"
-//"   four types of background:\n"
-//"      flat (0.004), accidental (0.002), cosmogenic I (0.002),"
-//" cosmogenic I (0.002)\n"
-//"   including 50% error on each background\n"
-//"   same as 8 but w/o uncorrelated background";
-//
-//// this does not cost much, we just need a Gaußian chi^2
-//
-//
-//
-//double gauss(double ex, double th, double fbg)
-//{
-//  double ti;
-//  ti=fabs(fbg)+fabs(ex);
-//  if(ti!=0) return pow((ex-th),2)/ti;
-//  else return 0;
-//}
-//
-//double list_gauss(double *ex, double *th, double fb)
-//{
-//  int i;
-//  double erg=0;
-//  for(i=0;i<glb_experiment_list[0]->numofbins;i++) erg+= gauss(ex[i],th[i],fb);
-//  return erg;
-//}
-//
-//
-//// missing target mass in the calculation of the flat background !
-//double my_chi8(double x[])
-//{
-//  
-//  double erg; 
-//  int i,k;
-//  double *chi0=NULL;
-//  double *chi1=NULL;
-//
-//  //Here we have a nice example of how it should not look like
-//  // By-passing the usual flux system is not a very clever idea
-//  // obviously ...
-//
-//  // getting the norms right for the background
-//  double NORM_ND=pow(1.1,2)/pow(glb_experiment_list[0]->baseline,2)
-//    *glb_experiment_list[0]->targetmass/100.0;
-//  double NORM_FD=pow(1.1,2)/pow(glb_experiment_list[1]->baseline,2)
-//    *glb_experiment_list[1]->targetmass/100.0;
-//  double fsk_ND=pow(
-//		    (glb_experiment_list[0]->targetmass/315.809)*
-//		    (pow(1.1,2)/pow(glb_experiment_list[0]->baseline,2)
-//		     *60000.0/glb_experiment_list[0]->numofbins*0.5*0.005),2);
-//  double fsk_FD=pow(
-//		    (glb_experiment_list[1]->targetmass/315.809)*
-//		    (pow(1.1,2)/pow(glb_experiment_list[1]->baseline,2)
-//		     *60000.0/glb_experiment_list[1]->numofbins*0.5*0.005),2);
-//  double frg_ND=sqrt(fsk_ND)/0.5;
-//  double frg_FD=sqrt(fsk_FD)/0.5;
-// 
-// /*  fsk_ND= pow(60000.0/glb_experiment_list[0]->numofbins*0.5*0.005,2); */
-///*   fsk_FD=fsk_ND; */
-///*   frg_ND=sqrt(fsk_ND)/0.5; */
-///*   frg_FD=sqrt(fsk_FD)/0.5; */
-///*   fsk_FD=0; */
-///*   fsk_ND=0; */
-// 
-//  // creating a buffer
-//  chi0=(double *) malloc(sizeof(double)*glb_experiment_list[0]->numofbins);
-//  chi1=(double *) malloc(sizeof(double)*glb_experiment_list[1]->numofbins);
-//
-//  //adding the backgrounds to the zero vectors
-//
-//  for (i=0;i<glb_experiment_list[0]->numofbins;i++)
-//    {
-//      chi0[i]= glb_experiment_list[0]->rates0[glb_rule_number][i]+frg_ND;
-//      chi1[i]= glb_experiment_list[1]->rates0[glb_rule_number][i]+frg_FD;
-//    }
-//  for (i=0;i<glb_experiment_list[0]->numofbins;i++)
-//    {
-//      for(k=0;k<4;k++)
-//	{
-//	  chi0[i] += 
-//	    glb_sys_centers[k+10]*back(glb_calc_energy_tab[i],k)*NORM_ND;
-//	  chi1[i] += 
-//	    glb_sys_centers[k+14]*back(glb_calc_energy_tab[i],k)*NORM_FD;
-//	}
-//    
-//    }
-//
-//
-//
-//  for (i=0;i<glb_experiment_list[0]->numofbins;i++)
-//    {
-//      glb_chirate[i]= 
-//	((x[1]+x[5]+x[19+i])*glb_experiment_list[0]->rates1[glb_rule_number][i]+
-//	 x[3]*glb_experiment_list[0]->rates1BG[glb_rule_number][i] 
-//	 +x[11]*NORM_ND*back(glb_calc_energy_tab[i],0)
-//	 +x[12]*NORM_ND*back(glb_calc_energy_tab[i],1)
-//	 +x[13]*NORM_ND*back(glb_calc_energy_tab[i],2)
-//	 +x[14]*NORM_ND*back(glb_calc_energy_tab[i],3)
-//	+frg_ND) 	
-//	* glb_window_function(glb_experiment_list[0]->energy_window[glb_rule_number][0],
-//			  glb_experiment_list[0]->energy_window[glb_rule_number][1],i); 
-//    }  
-//
-//  
-//  glbShiftEnergyScale(x[2]+x[6],glb_chirate,
-//	    glb_experiment_list[0]->rates1T[glb_rule_number],glb_experiment_list[0]->numofbins);
-//  erg = list_gauss(chi0,glb_experiment_list[0]->rates1T[glb_rule_number],fsk_ND)+
-//    glb_prior(x[1],glb_sys_centers[0],glb_sys_errors[0])+
-//    glb_prior(x[2],glb_sys_centers[1],glb_sys_errors[1])+
-//    glb_prior(x[3],glb_sys_centers[2],glb_sys_errors[2])+
-//    glb_prior(x[4],glb_sys_centers[3],glb_sys_errors[3]);
-//
-//  glbShiftEnergyScale(x[8]+x[6],glb_experiment_list[1]->rates1[glb_rule_number],
-//	    glb_experiment_list[1]->rates1T[glb_rule_number],glb_experiment_list[1]->numofbins);
-//  glbShiftEnergyScale(x[10],glb_experiment_list[1]->rates1BG[glb_rule_number],
-//	    glb_experiment_list[1]->rates1BGT[glb_rule_number],glb_experiment_list[1]->numofbins);
-//
-//  for (i=0;i<glb_experiment_list[1]->numofbins;i++)
-//    {
-//      glb_chirate[i]= 
-//	((x[7]+x[5]+x[19+i])*glb_experiment_list[1]->rates1[glb_rule_number][i]+
-//	 x[9]*glb_experiment_list[0]->rates1BG[glb_rule_number][i] 
-//	 +x[15]*NORM_FD*back(glb_calc_energy_tab[i],0)
-//	 +x[16]*NORM_FD*back(glb_calc_energy_tab[i],1)
-//	 +x[17]*NORM_FD*back(glb_calc_energy_tab[i],2)
-//	 +x[18]*NORM_FD*back(glb_calc_energy_tab[i],3)
-//	 +frg_FD
-//	 ) 
-//	* glb_window_function(glb_experiment_list[1]->energy_window[glb_rule_number][0],
-//			  glb_experiment_list[1]->energy_window[glb_rule_number][1],i);
-//    }
-//  
-//  glbShiftEnergyScale(x[8]+x[6],glb_chirate,
-//	    glb_experiment_list[1]->rates1T[glb_rule_number],glb_experiment_list[1]->numofbins);
-//
-//  erg += list_gauss(chi1,glb_experiment_list[1]->rates1T[glb_rule_number],fsk_FD)+
-//    glb_prior(x[7],glb_sys_centers[6],glb_sys_errors[6])+
-//    glb_prior(x[8],glb_sys_centers[7],glb_sys_errors[7])+
-//    glb_prior(x[9],glb_sys_centers[8],glb_sys_errors[8])+
-//    glb_prior(x[10],glb_sys_centers[9],glb_sys_errors[9]);
-//  erg+=glb_prior(x[5],glb_sys_centers[4],glb_sys_errors[4])+
-//    glb_prior(x[6],glb_sys_centers[5],glb_sys_errors[5]);
-//  erg+=glb_prior(x[11],glb_sys_centers[10],glb_sys_errors[10])
-//    +glb_prior(x[12],glb_sys_centers[11],glb_sys_errors[11])
-//    +glb_prior(x[13],glb_sys_centers[12],glb_sys_errors[12])
-//    +glb_prior(x[14],glb_sys_centers[13],glb_sys_errors[13]);
-//  erg+=glb_prior(x[15],glb_sys_centers[14],glb_sys_errors[14])
-//    +glb_prior(x[16],glb_sys_centers[15],glb_sys_errors[15])
-//    +glb_prior(x[17],glb_sys_centers[16],glb_sys_errors[16])
-//    +glb_prior(x[18],glb_sys_centers[17],glb_sys_errors[17]);
-//  
-//  for (i=0;i<glb_experiment_list[0]->numofbins;i++)
-//    {
-//      erg+=glb_prior(x[19+i],glb_sys_centers[18+i],glb_sys_errors[18+i]);
-//    }
-//
-//  // for having acces to the BG vector
-//  for (i=0;i<glb_experiment_list[0]->numofbins;i++)
-//    {
-//      for(k=0;k<4;k++)
-//	{
-//	glb_chirate[i]= 
-//	    glb_sys_centers[k+10]*back(glb_calc_energy_tab[i],k)*NORM_FD;
-//	  
-//	}
-//    }
-//
-//  free(chi0);
-//  free(chi1);
-//
-//  return erg;
-//}
-//
-//
-//double my_chi9(double x[])
-//{
-//  
-//  double erg; 
-//  int i,k;
-//  double *chi0=NULL;
-//  double *chi1=NULL;
-//  // getting the norms right for the background
-//  double NORM_ND=pow(1.1,2)/pow(glb_experiment_list[0]->baseline,2)
-//    *glb_experiment_list[0]->targetmass/100.0;
-//  double NORM_FD=pow(1.1,2)/pow(glb_experiment_list[1]->baseline,2)
-//    *glb_experiment_list[1]->targetmass/100.0;
-//
-//  // creating a buffer
-//  chi0=(double *) malloc(sizeof(double)*glb_experiment_list[0]->numofbins);
-//  chi1=(double *) malloc(sizeof(double)*glb_experiment_list[1]->numofbins);
-//
-//  //adding the backgrounds to the zero vectors
-//
-//  for (i=0;i<glb_experiment_list[0]->numofbins;i++)
-//    {
-//      chi0[i]= glb_experiment_list[0]->rates0[glb_rule_number][i];
-//      chi1[i]= glb_experiment_list[1]->rates0[glb_rule_number][i];
-//    }
-//  for (i=0;i<glb_experiment_list[0]->numofbins;i++)
-//    {
-//      for(k=0;k<4;k++)
-//	{
-//	  chi0[i] += 
-//	    glb_sys_centers[k+10]*back(glb_calc_energy_tab[i],k)*NORM_ND;
-//	  chi1[i] += 
-//	    glb_sys_centers[k+14]*back(glb_calc_energy_tab[i],k)*NORM_FD;
-//	}
-//    }
-//
-//
-//
-//  for (i=0;i<glb_experiment_list[0]->numofbins;i++)
-//    {
-//      glb_chirate[i]= 
-//	((x[1]+x[5]+x[19+i])*glb_experiment_list[0]->rates1[glb_rule_number][i]+
-//	 x[3]*glb_experiment_list[0]->rates1BG[glb_rule_number][i] 
-//	 +x[11]*NORM_ND*back(glb_calc_energy_tab[i],0)
-//	 +x[12]*NORM_ND*back(glb_calc_energy_tab[i],1)
-//	 +x[13]*NORM_ND*back(glb_calc_energy_tab[i],2)
-//	 +x[14]*NORM_ND*back(glb_calc_energy_tab[i],3)
-//	 ) 	
-//	* glb_window_function(glb_experiment_list[0]->energy_window[glb_rule_number][0],
-//			  glb_experiment_list[0]->energy_window[glb_rule_number][1],i); 
-//    }  
-//
-//  
-//  glbShiftEnergyScale(x[2]+x[6],glb_chirate,
-//	    glb_experiment_list[0]->rates1T[glb_rule_number],glb_experiment_list[0]->numofbins);
-//  erg = list_gauss(chi0,glb_experiment_list[0]->rates1T[glb_rule_number],0)+
-//    glb_prior(x[1],glb_sys_centers[0],glb_sys_errors[0])+
-//    glb_prior(x[2],glb_sys_centers[1],glb_sys_errors[1])+
-//    glb_prior(x[3],glb_sys_centers[2],glb_sys_errors[2])+
-//    glb_prior(x[4],glb_sys_centers[3],glb_sys_errors[3]);
-//
-//  glbShiftEnergyScale(x[8]+x[6],glb_experiment_list[1]->rates1[glb_rule_number],
-//	    glb_experiment_list[1]->rates1T[glb_rule_number],glb_experiment_list[1]->numofbins);
-//  glbShiftEnergyScale(x[10],glb_experiment_list[1]->rates1BG[glb_rule_number],
-//	    glb_experiment_list[1]->rates1BGT[glb_rule_number],glb_experiment_list[1]->numofbins);
-//
-//  for (i=0;i<glb_experiment_list[1]->numofbins;i++)
-//    {
-//      glb_chirate[i]= 
-//	((x[7]+x[5]+x[19+i])*glb_experiment_list[1]->rates1[glb_rule_number][i]+
-//	 x[9]*glb_experiment_list[0]->rates1BG[glb_rule_number][i] 
-//	 +x[15]*NORM_FD*back(glb_calc_energy_tab[i],0)
-//	 +x[16]*NORM_FD*back(glb_calc_energy_tab[i],1)
-//	 +x[17]*NORM_FD*back(glb_calc_energy_tab[i],2)
-//	 +x[18]*NORM_FD*back(glb_calc_energy_tab[i],3)
-//	 ) 
-//	* glb_window_function(glb_experiment_list[1]->energy_window[glb_rule_number][0],
-//			  glb_experiment_list[1]->energy_window[glb_rule_number][1],i);
-//    }
-//  
-//  glbShiftEnergyScale(x[8]+x[6],glb_chirate,
-//	    glb_experiment_list[1]->rates1T[glb_rule_number],glb_experiment_list[1]->numofbins);
-//
-//  erg += list_gauss(chi1,glb_experiment_list[1]->rates1T[glb_rule_number],0)+
-//    glb_prior(x[7],glb_sys_centers[6],glb_sys_errors[6])+
-//    glb_prior(x[8],glb_sys_centers[7],glb_sys_errors[7])+
-//    glb_prior(x[9],glb_sys_centers[8],glb_sys_errors[8])+
-//    glb_prior(x[10],glb_sys_centers[9],glb_sys_errors[9]);
-//  erg+=glb_prior(x[5],glb_sys_centers[4],glb_sys_errors[4])+
-//    glb_prior(x[6],glb_sys_centers[5],glb_sys_errors[5]);
-//  erg+=glb_prior(x[11],glb_sys_centers[10],glb_sys_errors[10])
-//    +glb_prior(x[12],glb_sys_centers[11],glb_sys_errors[11])
-//    +glb_prior(x[13],glb_sys_centers[12],glb_sys_errors[12])
-//    +glb_prior(x[14],glb_sys_centers[13],glb_sys_errors[13]);
-//  erg+=glb_prior(x[15],glb_sys_centers[14],glb_sys_errors[14])
-//    +glb_prior(x[16],glb_sys_centers[15],glb_sys_errors[15])
-//    +glb_prior(x[17],glb_sys_centers[16],glb_sys_errors[16])
-//    +glb_prior(x[18],glb_sys_centers[17],glb_sys_errors[17]);
-//  
-//  for (i=0;i<glb_experiment_list[0]->numofbins;i++)
-//    {
-//      erg+=glb_prior(x[19+i],glb_sys_centers[18+i],glb_sys_errors[18+i]);
-//    }
-//
-//  // for having acces to the BG vector
-//  for (i=0;i<glb_experiment_list[0]->numofbins;i++)
-//    {
-//      for(k=0;k<4;k++)
-//	{
-//	glb_chirate[i]= 
-//	    glb_sys_centers[k+10]*back(glb_calc_energy_tab[i],k)*NORM_FD;
-//	  
-//	}
-//    }
-//
-//  free(chi0);
-//  free(chi1);
-//
-//  return erg;
-//}
-//
-//
-//
-//double my_chi10(double x[])
-//{
-//  
-//  double erg; 
-//  int i,k;
-//  double b1,b2,b3,b4;
-//  double sl,th,thf;
-//  double *chi0=NULL;
-//  double *chi1=NULL;
-//  double *ri0=NULL;
-//  double *ri1=NULL;
-//
-//  // getting the norms right for the background
-//  double NORM_ND=pow(1.1,2)/pow(glb_experiment_list[0]->baseline,2)
-//    *glb_experiment_list[0]->targetmass/100.0;
-//  double NORM_FD=pow(1.1,2)/pow(glb_experiment_list[1]->baseline,2)
-//    *glb_experiment_list[1]->targetmass/100.0;
-//  double fsk_ND=pow(
-//		    (glb_experiment_list[0]->targetmass/315.809)*
-//		    (pow(1.1,2)/pow(glb_experiment_list[0]->baseline,2)
-//		     *60000.0/glb_experiment_list[0]->numofbins*0.5*0.005),2);
-//  double fsk_FD=pow(
-//		    (glb_experiment_list[1]->targetmass/315.809)*
-//		    (pow(1.1,2)/pow(glb_experiment_list[1]->baseline,2)
-//		     *60000.0/glb_experiment_list[1]->numofbins*0.5*0.005),2);
-//  double frg_ND=sqrt(fsk_ND)/0.5;
-//  double frg_FD=sqrt(fsk_FD)/0.5;
-// 
-//  // creating a buffer
-//  chi0=(double *) malloc(sizeof(double)*glb_experiment_list[0]->numofbins);
-//  chi1=(double *) malloc(sizeof(double)*glb_experiment_list[1]->numofbins);
-//  // creating a buffer
-//  ri0=(double *) malloc(sizeof(double)*glb_experiment_list[0]->numofbins);
-//  ri1=(double *) malloc(sizeof(double)*glb_experiment_list[1]->numofbins);
-//
-//  //adding the backgrounds to the zero vectors
-//
-//  for (i=0;i<glb_experiment_list[0]->numofbins;i++)
-//    {
-//      chi0[i]= glb_experiment_list[0]->rates0[glb_rule_number][i]+frg_ND;
-//      chi1[i]= glb_experiment_list[1]->rates0[glb_rule_number][i]+frg_FD;
-//    }
-//  for (i=0;i<glb_experiment_list[0]->numofbins;i++)
-//    {
-//      for(k=0;k<4;k++)
-//	{
-//	  chi0[i] += 
-//	    glb_sys_centers[k+10]*back(glb_calc_energy_tab[i],k)*NORM_ND;
-//	  chi1[i] += 
-//	    glb_sys_centers[k+14]*back(glb_calc_energy_tab[i],k)*NORM_FD;
-//	}
-//    
-//    }
-//
-//
-//  for (i=0;i<glb_experiment_list[0]->numofbins;i++)
-//    {
-//
-//      b2= glb_window_function(glb_experiment_list[0]->energy_window[glb_rule_number][0],
-//			  glb_experiment_list[0]->energy_window[glb_rule_number][1],i); 
-//      b1=x[3]*glb_experiment_list[0]->rates1BG[glb_rule_number][i] 
-//	+x[11]*NORM_ND*back(glb_calc_energy_tab[i],0)
-//	+x[12]*NORM_ND*back(glb_calc_energy_tab[i],1)
-//	+x[13]*NORM_ND*back(glb_calc_energy_tab[i],2)
-//	+x[14]*NORM_ND*back(glb_calc_energy_tab[i],3)
-//	+frg_ND;
-//
-//      b3=glb_window_function(glb_experiment_list[1]->energy_window[glb_rule_number][0],
-//			  glb_experiment_list[1]->energy_window[glb_rule_number][1],i);
-//      
-//      b4= x[9]*glb_experiment_list[0]->rates1BG[glb_rule_number][i] 
-//	 +x[15]*NORM_FD*back(glb_calc_energy_tab[i],0)
-//	 +x[16]*NORM_FD*back(glb_calc_energy_tab[i],1)
-//	 +x[17]*NORM_FD*back(glb_calc_energy_tab[i],2)
-//	 +x[18]*NORM_FD*back(glb_calc_energy_tab[i],3)
-//	+frg_FD;
-//      th=glb_experiment_list[0]->rates1[glb_rule_number][i];
-//      thf=glb_experiment_list[1]->rates1[glb_rule_number][i];
-//
-//   
-//      sl=
-//	(thf*(frg_ND + chi0[i])*(-b4 + chi1[i]) - 
-//	 th*(frg_FD + chi1[i])*(b1 - chi0[i] + th*(x[1] + x[5])) 
-//	 -(frg_ND + chi0[i])*(x[5] + x[7])*pow(thf,2))*
-//	pow(0.02,2)*
-//	pow((frg_ND + chi0[i])*pow(thf,2)*
-//	    pow(0.02,2) + 
-//	    (frg_FD + chi1[i])*(frg_ND + chi0[i] + 
-//			       pow(th,2)*pow(0.02,2)),-1);
-//      ri0[i]= 
-//	((x[1]+x[5]+sl)*th+b1)*b2;
-//      ri1[i]= 
-//	((x[7]+x[5]+sl)*thf+b4)*b3;	
-//
-//    }  
-//
-//  
-//  glbShiftEnergyScale(x[2]+x[6],ri0,
-//	    glb_experiment_list[0]->rates1T[glb_rule_number],glb_experiment_list[0]->numofbins);
-//  erg = list_gauss(chi0,glb_experiment_list[0]->rates1T[glb_rule_number],fsk_ND)+
-//    glb_prior(x[1],glb_sys_centers[0],glb_sys_errors[0])+
-//    glb_prior(x[2],glb_sys_centers[1],glb_sys_errors[1])+
-//    glb_prior(x[3],glb_sys_centers[2],glb_sys_errors[2])+
-//    glb_prior(x[4],glb_sys_centers[3],glb_sys_errors[3]);
-//
-//  glbShiftEnergyScale(x[8]+x[6],glb_experiment_list[1]->rates1[glb_rule_number],
-//	    glb_experiment_list[1]->rates1T[glb_rule_number],glb_experiment_list[1]->numofbins);
-//  glbShiftEnergyScale(x[10],glb_experiment_list[1]->rates1BG[glb_rule_number],
-//	    glb_experiment_lis[ti]->rates1BGT[glb_rule_number],glb_experiment_list[1]->numofbins);
-//
-//
-//  glbShiftEnergyScale(x[8]+x[6],ri1,
-//	    glb_experiment_list[1]->rates1T[glb_rule_number],glb_experiment_list[1]->numofbins);
-//
-//  erg += list_gauss(chi1,glb_experiment_list[1]->rates1T[glb_rule_number],fsk_FD)+
-//    glb_prior(x[7],glb_sys_centers[6],glb_sys_errors[6])+
-//    glb_prior(x[8],glb_sys_centers[7],glb_sys_errors[7])+
-//    glb_prior(x[9],glb_sys_centers[8],glb_sys_errors[8])+
-//    glb_prior(x[10],glb_sys_centers[9],glb_sys_errors[9]);
-//  erg+=glb_prior(x[5],glb_sys_centers[4],glb_sys_errors[4])+
-//    glb_prior(x[6],glb_sys_centers[5],glb_sys_errors[5]);
-//  erg+=glb_prior(x[11],glb_sys_centers[10],glb_sys_errors[10])
-//    +glb_prior(x[12],glb_sys_centers[11],glb_sys_errors[11])
-//    +glb_prior(x[13],glb_sys_centers[12],glb_sys_errors[12])
-//    +glb_prior(x[14],glb_sys_centers[13],glb_sys_errors[13]);
-//  erg+=glb_prior(x[15],glb_sys_centers[14],glb_sys_errors[14])
-//    +glb_prior(x[16],glb_sys_centers[15],glb_sys_errors[15])
-//    +glb_prior(x[17],glb_sys_centers[16],glb_sys_errors[16])
-//    +glb_prior(x[18],glb_sys_centers[17],glb_sys_errors[17]);
-//  
-// 
-//
-//  // for having acces to the BG vector
-//  for (i=0;i<glb_experiment_list[0]->numofbins;i++)
-//    {
-//      for(k=0;k<4;k++)
-//	{
-//	glb_chirate[i]= 
-//	    glb_sys_centers[k+10]*back(glb_calc_energy_tab[i],k)*NORM_FD;
-//	  
-//	}
-//    }
-//
-//  free(chi0);
-//  free(chi1);
-//  free(ri0);
-//  free(ri1);
-//  return erg;
-//}
-//
-//
-//
-//double my_chi11(double x[])
-//{
-//  
-//  double erg; 
-//  int i,k;
-//  double *b1, *b2, *b3, *b4;
-//  double sl, *th, *thf;
-//  double *chi0=NULL;
-//  double *chi1=NULL;
-//  double *ri0=NULL;
-//  double *ri1=NULL;
-//
-//  // getting the norms right for the background
-//  double NORM_ND=pow(1.1,2)/pow(glb_experiment_list[0]->baseline,2)
-//    *glb_experiment_list[0]->targetmass/100.0;
-//  double NORM_FD=pow(1.1,2)/pow(glb_experiment_list[1]->baseline,2)
-//    *glb_experiment_list[1]->targetmass/100.0;
-//  double fsk_ND=pow(
-//		    (glb_experiment_list[0]->targetmass/315.809)*
-//		    (pow(1.1,2)/pow(glb_experiment_list[0]->baseline,2)
-//		     *60000.0/glb_experiment_list[0]->numofbins*0.5*0.005),2);
-//  double fsk_FD=pow(
-//		    (glb_experiment_list[1]->targetmass/315.809)*
-//		    (pow(1.1,2)/pow(glb_experiment_list[1]->baseline,2)
-//		     *60000.0/glb_experiment_list[1]->numofbins*0.5*0.005),2);
-//  double frg_ND=sqrt(fsk_ND)/0.5;
-//  double frg_FD=sqrt(fsk_FD)/0.5;
-// 
-//  // creating a buffer
-//  chi0=(double *) malloc(sizeof(double)*glb_experiment_list[0]->numofbins);
-//  chi1=(double *) malloc(sizeof(double)*glb_experiment_list[1]->numofbins);
-//  // creating a buffer
-//  ri0=(double *) malloc(sizeof(double)*glb_experiment_list[0]->numofbins);
-//  ri1=(double *) malloc(sizeof(double)*glb_experiment_list[1]->numofbins);
-//
-//  b1=(double *) malloc(sizeof(double)*glb_experiment_list[0]->numofbins);
-//  b2=(double *) malloc(sizeof(double)*glb_experiment_list[0]->numofbins);
-//  b3=(double *) malloc(sizeof(double)*glb_experiment_list[0]->numofbins);
-//  b4=(double *) malloc(sizeof(double)*glb_experiment_list[0]->numofbins);
-//
-//  th=(double *) malloc(sizeof(double)*glb_experiment_list[0]->numofbins);
-//  thf=(double *) malloc(sizeof(double)*glb_experiment_list[0]->numofbins);
-// 
-//  //adding the backgrounds to the zero vectors
-//
-//  for (i=0;i<glb_experiment_list[0]->numofbins;i++)
-//    {
-//      chi0[i]= glb_experiment_list[0]->rates0[glb_rule_number][i]+frg_ND;
-//      chi1[i]= glb_experiment_list[1]->rates0[glb_rule_number][i]+frg_FD;
-//    }
-//  for (i=0;i<glb_experiment_list[0]->numofbins;i++)
-//    {
-//      for(k=0;k<4;k++)
-//	{
-//	  chi0[i] += 
-//	    glb_sys_centers[k+10]*back(glb_calc_energy_tab[i],k)*NORM_ND;
-//	  chi1[i] += 
-//	    glb_sys_centers[k+14]*back(glb_calc_energy_tab[i],k)*NORM_FD;
-//	}
-//    
-//    }
-//  
-//  glbShiftEnergyScale(x[8]+x[6],glb_experiment_list[1]->rates1[glb_rule_number],
-//	    glb_experiment_list[1]->rates1T[glb_rule_number],glb_experiment_list[1]->numofbins);
-//  glbShiftEnergyScale(x[10],glb_experiment_list[1]->rates1BG[glb_rule_number],
-//	    glb_experiment_list[1]->rates1BGT[glb_rule_number],glb_experiment_list[1]->numofbins);
-//
-//
-//  for (i=0;i<glb_experiment_list[0]->numofbins;i++)
-//    {
-//      
-//      b2[i]= glb_window_function(glb_experiment_list[0]->energy_window[glb_rule_number][0],
-//			  glb_experiment_list[0]->energy_window[glb_rule_number][1],i); 
-//      b1[i]=(x[3]*glb_experiment_list[0]->rates1BG[glb_rule_number][i] 
-//	     +x[11]*NORM_ND*back(glb_calc_energy_tab[i],0)
-//	     +x[12]*NORM_ND*back(glb_calc_energy_tab[i],1)
-//	     +x[13]*NORM_ND*back(glb_calc_energy_tab[i],2)
-//	     +x[14]*NORM_ND*back(glb_calc_energy_tab[i],3)
-//	     +frg_ND)*b2[i];
-//      
-//      b3[i]=glb_window_function(glb_experiment_list[1]->energy_window[glb_rule_number][0],
-//			    glb_experiment_list[1]->energy_window[glb_rule_number][1],i);
-//      
-//      // this presumably not correct it should read
-//      // glb_experiment_list[1]->rates1BG...
-//      b4[i]= (x[9]*glb_experiment_list[0]->rates1BG[glb_rule_number][i] 
-//		    +x[15]*NORM_FD*back(glb_calc_energy_tab[i],0)
-//		    +x[16]*NORM_FD*back(glb_calc_energy_tab[i],1)
-//		    +x[17]*NORM_FD*back(glb_calc_energy_tab[i],2)
-//		    +x[18]*NORM_FD*back(glb_calc_energy_tab[i],3)
-//		    +frg_FD)*b3[i];
-//      th[i]=glb_experiment_list[0]->rates1[glb_rule_number][i]*b2[i];
-//      thf[i]=glb_experiment_list[1]->rates1[glb_rule_number][i]*b3[i];
-//      
-//    }
-//  
-//  glbShiftEnergyScale(x[2]+x[6],b1,glb_chirate,glb_experiment_list[0]->numofbins);
-//  for (i=0;i<glb_experiment_list[0]->numofbins;i++) b1[i]=glb_chirate[i];
-//  glbShiftEnergyScale(x[2]+x[6],th,glb_chirate,glb_experiment_list[0]->numofbins);
-//  for (i=0;i<glb_experiment_list[0]->numofbins;i++) th[i]=glb_chirate[i]; 
-//
-//
-//  glbShiftEnergyScale(x[8]+x[6],b4,glb_chirate,glb_experiment_list[0]->numofbins);
-//  for (i=0;i<glb_experiment_list[0]->numofbins;i++) b4[i]=glb_chirate[i];
-//  glbShiftEnergyScale(x[8]+x[6],thf,glb_chirate,glb_experiment_list[1]->numofbins);
-//  for (i=0;i<glb_experiment_list[0]->numofbins;i++) thf[i]=glb_chirate[i];
-// 
-//
-//
-//  glbShiftEnergyScale(x[2]+x[6],ri0,
-//	    glb_experiment_list[0]->rates1T[glb_rule_number],glb_experiment_list[0]->numofbins);
-//  glbShiftEnergyScale(x[8]+x[6],ri1,
-//	    glb_experiment_list[1]->rates1T[glb_rule_number],glb_experiment_list[1]->numofbins);
-//
-//  
-//  for  (i=0;i<glb_experiment_list[0]->numofbins;i++)
-//    {
-//      sl=
-//	(thf[i]*(frg_ND + chi0[i])*(-b4[i] + chi1[i]) - 
-//	 th[i]*(frg_FD + chi1[i])*(b1[i] - chi0[i] + th[i]*(x[1] + x[5])) 
-//	 -(frg_ND + chi0[i])*(x[5] + x[7])*pow(thf[i],2))*
-//	pow(0.02,2)*
-//	pow((frg_ND + chi0[i])*pow(thf[i],2)*
-//	    pow(0.02,2) + 
-//	    (frg_FD + chi1[i])*(frg_ND + chi0[i] + 
-//				pow(th[i],2)*pow(0.02,2)),-1);
-//      ri0[i]= 
-//	((x[1]+x[5]+sl)* th[i]+b1[i]);
-//      ri1[i]= 
-//	((x[7]+x[5]+sl)* thf[i]+b4[i]);	
-//      
-//    }  
-//
-//  
-// 
-//  erg = list_gauss(chi0,ri0,fsk_ND)+
-//    glb_prior(x[1],glb_sys_centers[0],glb_sys_errors[0])+
-//    glb_prior(x[2],glb_sys_centers[1],glb_sys_errors[1])+
-//    glb_prior(x[3],glb_sys_centers[2],glb_sys_errors[2])+
-//    glb_prior(x[4],glb_sys_centers[3],glb_sys_errors[3]);
-//
-//  erg += list_gauss(chi1,ri1,fsk_FD)+
-//    glb_prior(x[7],glb_sys_centers[6],glb_sys_errors[6])+
-//    glb_prior(x[8],glb_sys_centers[7],glb_sys_errors[7])+
-//    glb_prior(x[9],glb_sys_centers[8],glb_sys_errors[8])+
-//    glb_prior(x[10],glb_sys_centers[9],glb_sys_errors[9]);
-//  erg+=glb_prior(x[5],glb_sys_centers[4],glb_sys_errors[4])+
-//    glb_prior(x[6],glb_sys_centers[5],glb_sys_errors[5]);
-//  erg+=glb_prior(x[11],glb_sys_centers[10],glb_sys_errors[10])
-//    +glb_prior(x[12],glb_sys_centers[11],glb_sys_errors[11])
-//    +glb_prior(x[13],glb_sys_centers[12],glb_sys_errors[12])
-//    +glb_prior(x[14],glb_sys_centers[13],glb_sys_errors[13]);
-//  erg+=glb_prior(x[15],glb_sys_centers[14],glb_sys_errors[14])
-//    +glb_prior(x[16],glb_sys_centers[15],glb_sys_errors[15])
-//    +glb_prior(x[17],glb_sys_centers[16],glb_sys_errors[16])
-//    +glb_prior(x[18],glb_sys_centers[17],glb_sys_errors[17]);
-//  
-// 
-//
-//  // for having acces to the BG vector
-//  for (i=0;i<glb_experiment_list[0]->numofbins;i++)
-//    {
-//      for(k=0;k<4;k++)
-//	{
-//	glb_chirate[i]= 
-//	    glb_sys_centers[k+10]*back(glb_calc_energy_tab[i],k)*NORM_FD;
-//	  
-//	}
-//    }
-//
-//  free(chi0);
-//  free(chi1);
-//  free(ri0);
-//  free(ri1);
-//  free(b1);
-//  free(b2);
-//  free(b3);
-//  free(b4);
-//  free(th);
-//  free(thf);
-//  return erg;
-//}
-//
-//char mch10[]="Same as eight, but with analytic treatment of the shape error.";
-//
-//
-//void glb_add_sys()
-//{
-//  double sp[6];
-//  double e[6];
-//  int i;
-//  double s[100];
-//  double eq[100];
-//  double sp1[]={1,0,1,0,0,0,1,0,1,0};
-//  double e1[]={0.006,0.005,0.005,0.006,0.025,0.025,0.006,0.005,0.005,0.006};
-//  sp[0]=1;
-//  sp[1]=0;
-//  sp[2]=glb_bg_norm_center[0];
-//  sp[3]=glb_bg_tilt_center[0];
-//  
-//  sys_list[0]=glb_init_systematic(glb_chi_sys_w_bg,4,&sp[0],&e[0],glb_evaluate_chi,"");
-// 
-//  sys_list[1]=glb_init_systematic(my_chi,10,&sp1[0],&e1[0],glb_evaluate_chi,"");
-//  sys_list[2]=glb_init_systematic(my_chi2,10,&sp1[0],&e1[0],glb_evaluate_chi,"");
-//  for(i=10;i<100;i++) s[i]=0;
-//  for(i=10;i<100;i++) eq[i]=0.02;
-//  for(i=0;i<10;i++) s[i]=sp1[i];
-//  for(i=0;i<10;i++) eq[i]=e1[i];
-//  sys_list[3]=glb_init_systematic(my_chi3,10+glb_experiment_list[0]->numofbins,
-//			&s[0],&eq[0],glb_evaluate_chi,mch3); 
-//  
-//  // Loading the backgrounds 
-//
-//  BGLoader("flat.dat",0);
-//  BGLoader("accidental.dat",1);
-//  BGLoader("cosmogenic1.dat",2);
-//  BGLoader("cosmogenic2.dat",3);
-//  for(i=10;i<14;i++) s[i]=0.002;
-//  s[10]=0.004;
-//  for(i=10;i<14;i++) eq[i]=s[i]*0.5;
-//
-//
-//  sys_list[4]=glb_init_systematic(my_chi4,14,&s[0],&eq[0],glb_evaluate_chi,mch4); 
-//  sys_list[5]=glb_init_systematic(my_chi5,14,&s[0],&eq[0],glb_evaluate_chi,mch4);
-//  for(i=14;i<18;i++) s[i]=0.002;
-//  s[14]=0.004;
-//  for(i=14;i<18;i++) eq[i]=s[i]*0.5;
-//  sys_list[6]=glb_init_systematic(my_chi6,18,&s[0],&eq[0],glb_evaluate_chi,mch4); 
-//  sys_list[7]=glb_init_systematic(my_chi7,18+glb_experiment_list[0]->numofbins
-//			,&s[0],&eq[0],glb_evaluate_chi,mch7); 
-//  sys_list[8]=glb_init_systematic(my_chi8,18+glb_experiment_list[0]->numofbins
-//		      ,&s[0],&eq[0],glb_evaluate_chi,mch8); 
-//  sys_list[9]=glb_init_systematic(my_chi9,18+glb_experiment_list[0]->numofbins
-//		      ,&s[0],&eq[0],glb_evaluate_chi,mch9); 
-//  sys_list[10]=glb_init_systematic(my_chi10,18
-//		      ,&s[0],&eq[0],glb_evaluate_chi,"obsolete"); 
-//  sys_list[11]=glb_init_systematic(my_chi11,18
-//		      ,&s[0],&eq[0],glb_evaluate_chi,mch10); 
-//}
-//
-//#else /* GLB_EXPERIMENTAL */
-//
-//void glb_add_sys()
-//{
-//  return;
-//}
-//
-//#endif /* GLB_EXPERIMENTAL */

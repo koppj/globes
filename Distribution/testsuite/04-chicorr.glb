@@ -102,7 +102,7 @@ rule(#rule1)<
 
 	@background =	         1@#ch3
 	@backgrounderror = 	     2e-06  :	    0.0001
-	@backgroundcenter = 	     1e-05  :	         0
+    	@backgroundcenter = 	     1e-05  :	         0
 
 	@errordim_sys_on = 	0
 	@errordim_sys_off = 2

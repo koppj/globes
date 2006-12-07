@@ -26,8 +26,22 @@
 
 extern glb_systematic *glb_sys_list;
 
+int glbIsChiFunction2011Compatible(const char *name);
+glb_systematic *glbFindChiFunctionByName(const char *name);
+char *glbConvertErrorDim(int errordim);
+
+int glbSetChiFunctionInRule(struct glb_experiment *exp, int rule, int on_off,
+                            const char *sys_id, double *errors);
 int glbSetChiFunctionInExperiment(struct glb_experiment *exp, int rule, int on_off,
-                                  const char * sys_id);
+                                  const char *sys_id, double *errors);
+int glbSwitchSystematicsInExperiment(int experiment, int rule, int on_off);
+
+int glbSetSignalErrorsInRule(int exp, int rule, double norm, double tilt);
+int glbSetBGErrorsInRule(int exp, int rule, double norm, double tilt);
+int glbSetSysErrorsListInRule(int exp, int rule, int on_off, const double *sys_list);
+int glbSetSignalStartingValuesInRule(int exp, int rule, double norm, double tilt);
+int glbSetBGStartingValuesInRule(int exp, int rule, double norm, double tilt);
+int glbSetSysStartingValuesListInRule(int exp, int rule, int on_off, const double *sys_list);
 
 
 #endif /* GLB_SYS_H */
