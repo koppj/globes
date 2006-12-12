@@ -40,7 +40,7 @@
 #define GLB_COMPAT
 
 /* Number of neutrino flavours */
-#define GLB_NU_FLAVOURS             3
+#define GLB_NU_FLAVOURS  3
 
 /* Number of oscillation parameters                                         */
 /* ---> May need to be modified when implementing non-standard physics <--- */
@@ -135,7 +135,7 @@ void glbInit(char *name);
 
 
 /* Loading of AEDL files */
-glb_exp glbAllocExp();                                                             // new?
+glb_exp glbAllocExp();               // JK - Why is this in globes.h?
 void glbClearExperimentList();
 void glbDefineAEDLVariable(const char *name, double value);
 void glbClearAEDLVariables();
@@ -175,12 +175,8 @@ int glbSetInputErrors(const glb_params in);
 int glbGetOscillationParameters(glb_params in);
 int glbGetInputErrors(glb_params in);
 
-// JK - The former function names glbSet/GetStartingValues have caused some confusion
-// in the past, since they do NOT set the starting values but the _central_ values.
-// The starting values are set via the parameters of glbChiXXX.
-// What should we do about this?
-int glbSetStartingValues(const glb_params in);
-int glbGetStartingValues(glb_params in);
+int glbSetCentralValues(const glb_params in);                                      //new
+int glbGetCentralValues(glb_params in);                                            //new
 
 
 /* Screen output */
@@ -395,26 +391,29 @@ double glbFilteredConstantDensityProbability(int exp,int initial_flavour,       
   double glbGetFilter();
 
 
-  /* Replaced by glbSetChiFunction */
+  /* Replaced by glbSet/GetChiFunction */
   int glbSetErrorDim(int experiment, int rule, int on_off, int errordim);
-
-  /* Replaced by glbGetChiFunction */
   int glbGetErrorDim(int experiment, int rule, int on_off);
 
+  /* Renamed to glbSet/GetCentralValues */
+  int glbSetStartingValues(const glb_params in);
+  int glbGetStartingValues(glb_params in);
 
-  #ifdef GLB_EXPERIMENTAL
-  /* These functions are part of the user-defined chi^2 interface and will
-   * not be documented in this release. I you want to use this feature
-   * compile libglobes with '-DGLB_EXPERIMENTAL' and define GLB_EXPERIMENTAL
-   * before you include globes.h into your program.
-   */
-    char* glbSetSys(int select, int rule, int experiment);
-    void glbSetSysErrors(double *val, int rule, int experiment);
-    void glbSetSysCenter(double *val, int rule, int experiment);
-  #endif /* GLB_EXPERIMENTAL */
+//  #ifdef GLB_EXPERIMENTAL
+//  /* These functions are part of the user-defined chi^2 interface and will
+//   * not be documented in this release. I you want to use this feature
+//   * compile libglobes with '-DGLB_EXPERIMENTAL' and define GLB_EXPERIMENTAL
+//   * before you include globes.h into your program.
+//   */
+//    char* glbSetSys(int select, int rule, int experiment);
+//    void glbSetSysErrors(double *val, int rule, int experiment);
+//    void glbSetSysCenter(double *val, int rule, int experiment);
+//  #endif /* GLB_EXPERIMENTAL */
 #endif  /* #ifdef GLB_COMPAT */
 
 
 END_C_DECLS
 
-#endif /* GLS_GLOBES_H 1 */
+#endif /* #ifndef __GLOBES_H */
+
+

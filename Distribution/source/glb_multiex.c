@@ -550,8 +550,6 @@ int glbDefaultExp(glb_exp ins)
   double *tmp_errorlist;
   double tmp;
  
-  
-  
   status=0;
   def=0;
   status+=setup_density_profile(ins);
@@ -667,7 +665,8 @@ int glbDefaultExp(glb_exp ins)
 
       glb_free(tmp_errorlist);
     }
-    
+
+// FIXME remove
 /*    printf("\nRule %d:", i);
     printf("\nErrors ON:     ");
     if (in->sys_on_errors[i] != NULL)
@@ -873,8 +872,16 @@ int glbDefaultExp(glb_exp ins)
 	    }
 	}
       
-      if(in->energy_window[i][0]==-1){in->energy_window[i][0]=in->emin;def=-1;}
-      if(in->energy_window[i][1]==-1){in->energy_window[i][1]=in->emax;def=-1;}
+      if (in->energy_window[i][0] == -1  ||  in->energy_window[i][0] < in->emin)
+      {
+        in->energy_window[i][0] = in->emin;
+        def=-1;
+      }
+      if (in->energy_window[i][1] == -1  ||  in->energy_window[i][1] > in->emax)
+      {
+        in->energy_window[i][1]=in->emax;
+        def=-1;
+      }
 
       if (in->energy_window[i][0] > in->energy_window[i][1])
       {

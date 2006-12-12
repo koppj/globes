@@ -482,6 +482,13 @@ glbSetOscillationParameters(const glb_params in)
 int
 glbSetStartingValues(const glb_params in)
 {
+  return glbSetCentralValues(in);   /* Has been renamed in GLoBES 3.0 */
+}
+
+
+int
+glbSetCentralValues(const glb_params in)
+{
   int i,s=0;
   double nsp[glbGetNumOfOscParams()-6+1];
   if(in==NULL) return -1;
@@ -541,6 +548,13 @@ glbGetOscillationParameters(glb_params in)
 
 int
 glbGetStartingValues(glb_params in)
+{
+  return glbGetCentralValues(in);   /* Has been renamed in GLoBES 3.0 */
+}
+
+  
+int
+glbGetCentralValues(glb_params in)
 {
   int i;
   double *t;
@@ -1772,87 +1786,6 @@ glbGetTargetMass(int experiment)
   return -1.0;
 }
 
-
-//FIXME Re-Implement
-///* same for BG errors */
-//int glbSetBGCenters(int experiment, int rule, double norm, double tilt)
-//{
-//  struct glb_experiment *in;
-//  int i,k;
-//  /* Testing the arguments */
-//  if((norm <= 0) || (tilt <= 0)) { glb_error("Errors have to be positive");
-//  return -1;}
-//
-//  /* Testing the experiment number */
-//  if(!(((experiment >= 0)&&(experiment < glb_num_of_exps))
-//       ||(experiment==GLB_ALL))) { 
-//    glb_error("Invalid value for experiment number");
-//    return -1;}
-//
-//  for(i=0;i<glb_num_of_exps;i++)
-//    {
-//      if(experiment!=GLB_ALL) i=experiment;
-//      in=(struct glb_experiment *) glb_experiment_list[i];
-//      /* Testing the rule number */
-//      if(!(((rule >= 0)&&(rule < in->numofrules))
-//	   ||(rule==GLB_ALL))) { 
-//	glb_error("Invalid value for rule number");
-//	return -1;}     
-//      for(k=0;k<in->numofrules;k++)
-//	{
-//	   if(rule!=GLB_ALL) k=rule;
-//	   /* Here should come the assignment */
-//	   in->bgcenter[0][k]=norm;
-//	   in->bgcenter[1][k]=tilt;
-//	   
-//	   
-//	   if(rule!=GLB_ALL) break;
-//	}
-//
-//      if(experiment!=GLB_ALL) break;
-//    }
-//  return 0;
-//}
-//
-//
-//int 
-//glbGetBGCenters(int experiment, int rule, double *norm, double *tilt)
-//{
-//  struct glb_experiment *in;
-//  int i,k;
-//  /* Testing the arguments */
-//  if((norm == NULL) || (tilt == NULL)) { 
-//    glb_error("Input pointers may not be NULL");
-//  return -1;}
-//
-//  /* Testing the experiment number */
-//  if(!(((experiment >= 0)&&(experiment < glb_num_of_exps)))) { 
-//    glb_error("Invalid value for experiment number");
-//    return -1;}
-//
-//  for(i=0;i<glb_num_of_exps;i++)
-//    {
-//      if(experiment!=GLB_ALL) i=experiment;
-//      in=(struct glb_experiment *) glb_experiment_list[i];
-//      /* Testing the rule number */
-//      if(!(((rule >= 0)&&(rule < in->numofrules)))) { 
-//	glb_error("Invalid value for rule number");
-//	return -1;}     
-//      for(k=0;k<in->numofrules;k++)
-//	{
-//	   if(rule!=GLB_ALL) k=rule;
-//	   /* Here should come the assignment */
-//	  
-//	   *norm=in->bgcenter[0][k];
-//	   *tilt=in->bgcenter[1][k];
-//	   
-//	   if(rule!=GLB_ALL) break;
-//	}
-//
-//      if(experiment!=GLB_ALL) break;
-//    }
-//  return 0;
-//}
 
 const char *glbVersionOfExperiment(int experiment)
 {

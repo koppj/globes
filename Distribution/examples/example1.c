@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
   double sdm = 7e-5;
   double ldm = 2e-3;
   
-	/* Initialize parameter vector(s) */
+  /* Initialize parameter vector(s) */
   glb_params true_values = glbAllocParams();
   glb_params test_values = glbAllocParams();
 

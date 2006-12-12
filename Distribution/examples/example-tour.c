@@ -55,12 +55,12 @@ int main(int argc, char *argv[])
   
 
   /* Define my standard oscillation parameters */
-  double theta12 = asin(sqrt(0.8))/2;
+  double theta12 = asin(sqrt(0.3));
   double theta13 = asin(sqrt(0.001))/2;
   double theta23 = M_PI/4;
   double deltacp = M_PI/2;
-  double sdm = 7e-5;
-  double ldm = 2.0e-3;
+  double sdm = 7.9e-5;
+  double ldm = 2.6e-3;
  
   /* Initialize one experiment NuFact.glb */
   glbInitExperiment("NuFact.glb",&glb_experiment_list[0],&glb_num_of_exps); 
@@ -111,11 +111,11 @@ int main(int argc, char *argv[])
   /* 10% for each of the solar parameters, 5% for the matter density */
   glbDefineParams(input_errors,theta12*0.1,0,0,0,sdm*0.1,0);
   glbSetDensityParams(input_errors,0.05,GLB_ALL);
-  glbSetStartingValues(true_values);
+  glbSetCentralValues(true_values);
   glbSetInputErrors(input_errors);
   
   /* Let's do the some with correlations included: */
-  chi2 = glbChiTheta(fit_values,minimum,GLB_ALL); 
+  chi2 = glbChiTheta13(fit_values,minimum,GLB_ALL); 
   fprintf(stream,"chi2 with correlations: %g \n",chi2);
   fprintf(stream,"Position of minimum: theta12,theta13,theta23,delta,sdm,ldm,rho\n");
   glbPrintParams(stream,minimum);  
@@ -124,7 +124,7 @@ int main(int argc, char *argv[])
 
   /* Check what the difference is if we keep in addition deltacp fixed. */
   /* This corresponds to projection onto theta13-deltacp-plane */
-  chi2 = glbChiThetaDelta(fit_values,minimum,GLB_ALL);
+  chi2 = glbChiTheta13Delta(fit_values,minimum,GLB_ALL);
   fprintf(stream,"chi2 with correlations other than with deltacp: %g \n\n",chi2);
   
   /* Similarly: what if we only take into account correlation with deltacp? */
@@ -147,7 +147,7 @@ int main(int argc, char *argv[])
   glbDefineParams(input_errors,theta12*0.1,0,0,0,sdm*0.1,ldm/3);
   glbDefineParams(starting_values,theta12,theta13,theta23,deltacp,sdm,-ldm);
   glbSetDensityParams(input_errors,0.05,GLB_ALL);
-  glbSetStartingValues(starting_values);
+  glbSetCentralValues(starting_values);
   glbSetInputErrors(input_errors);
   chi2=glbChiAll(starting_values,minimum,GLB_ALL); 
   fprintf(stream,"chi2 at minimum: %g \n",chi2);
@@ -216,15 +216,15 @@ int main(int argc, char *argv[])
      can be none at a positive value found at small enough chi2, there is none (Magic Baseline) */  
   glbDefineParams(input_errors,theta12*0.1,0,0,0,sdm*0.1,0);
   glbSetDensityParams(input_errors,0.05,GLB_ALL);
-  glbSetStartingValues(true_values);
+  glbSetCentralValues(true_values);
   glbSetInputErrors(input_errors);
-  chi2 = glbChiTheta(fit_values,minimum,0); 
+  chi2 = glbChiTheta13(fit_values,minimum,0); 
   fprintf(stream,"chi2 with correlations for 3000km: %g \n",chi2);
   glbPrintParams(stream,minimum);  
-  chi2b = glbChiTheta(fit_values,minimum,1); 
+  chi2b = glbChiTheta13(fit_values,minimum,1); 
   fprintf(stream,"\nchi2 with correlations for 7500km: %g \n",chi2b);
   glbPrintParams(stream,minimum);  
-  chi2sum = glbChiTheta(fit_values,minimum,GLB_ALL); 
+  chi2sum = glbChiTheta13(fit_values,minimum,GLB_ALL); 
   fprintf(stream,"\nchi2 with correlations for combination: %g \n",chi2sum);
   glbPrintParams(stream,minimum);  
   fprintf(stream,"\nThe sum of the two chi2s is %g, whereas the total chi2 is %g !\n\n",chi2+chi2b,chi2sum);
@@ -233,7 +233,7 @@ int main(int argc, char *argv[])
   glbDefineParams(input_errors,theta12*0.1,theta13,theta23,deltacp,sdm*0.1,ldm/3);
   glbDefineParams(starting_values,theta12,theta13,theta23,deltacp,sdm,-ldm);
   glbSetDensityParams(input_errors,0.05,GLB_ALL);
-  glbSetStartingValues(starting_values);
+  glbSetCentralValues(starting_values);
   glbSetInputErrors(input_errors);
   chi2=glbChiAll(starting_values,minimum,0); 
   fprintf(stream,"chi2 at minimum, L=3000km: %g \n",chi2);

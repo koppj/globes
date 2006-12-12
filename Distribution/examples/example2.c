@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
   double sdm = 7e-5;
   double ldm = 2e-3;
   
-	/* Initialize parameter and projection vector(s) */
+  /* Initialize parameter and projection vector(s) */
   glb_params true_values = glbAllocParams();
   glb_params test_values = glbAllocParams();
   glb_params input_errors = glbAllocParams();
@@ -71,7 +71,7 @@ int main(int argc, char *argv[])
   /* Set starting values and input errors for all projections */  
   glbDefineParams(input_errors,theta12*0.1,0,0,0,sdm*0.1,0);  
   glbSetDensityParams(input_errors,0.05,GLB_ALL);
-  glbSetStartingValues(true_values);
+  glbSetCentralValues(true_values);
   glbSetInputErrors(input_errors);
 
   /* Set two-parameter projection onto s22th13-axis: only deltacp free! */
@@ -94,7 +94,7 @@ int main(int argc, char *argv[])
       res1=glbChiNP(test_values,NULL,GLB_ALL);
       
       /* Compute Chi^2 for full correlation: minimize over all but theta13 */
-      res2=glbChiTheta(test_values,NULL,GLB_ALL);
+      res2=glbChiTheta13(test_values,NULL,GLB_ALL);
   
       AddToOutput(x,res1,res2);
   }

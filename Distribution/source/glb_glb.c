@@ -71,12 +71,13 @@ void glbInit(char *name)
   /* When making any changes here, don't forget to update the array
    * glb_2011_compatible_chi_functions in glb_sys.c and the functions
    * glbConvertErrorDim and glbGetErrorDim */
-  glbDefineChiFunction(&glb_chi_sys_w_bg,       4, "sysSpectrumTilt");
-  glbDefineChiFunction(&glb_chi_no_sys,         0, "sysNoSysSpectrum");
-  glbDefineChiFunction(&glb_chi_sys_w_bgtot,    4, "sysTotalRatesTilt");
-  glbDefineChiFunction(&glb_chi_spec,           1, "sysSpectrumOnly");
-  glbDefineChiFunction(&glb_chi_no_sys_tot,     0, "sysNoSysTotalRates");
-  glbDefineChiFunction(&glb_chi_sys_w_bg_calib, 4, "sysSpectrumCalib");
+  glbDefineChiFunction(&glbChiSpectrumTilt,     4, "chiSpectrumTilt");
+  glbDefineChiFunction(&glbChiNoSysSpectrum,    0, "chiNoSysSpectrum");
+  glbDefineChiFunction(&glbChiSpectrumOnly,     1, "chiSpectrumOnly");
+  glbDefineChiFunction(&glbChiTotalRatesTilt,   4, "chiTotalRatesTilt");
+  glbDefineChiFunction(&glbChiNoSysTotalRates,  0, "chiNoSysTotalRates");
+  glbDefineChiFunction(&glbChiSpectrumCalib,    4, "chiSpectrumCalib");
+  glbDefineChiFunction(&glbChiZero,             0, "chiZero");
 }
 
 

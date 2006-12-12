@@ -240,9 +240,9 @@ parse_opt (int key, char *arg, struct argp_state *state)
       if (state->arg_num > 1)
 	/* Too many arguments. */
 	argp_usage (state);
-     
-      arguments->args[state->arg_num]=arg;
-      
+      else
+//      arguments->args[state->arg_num]=arg;
+        arguments->args[state->arg_num]=strdup(arg);    
       break;
       
     case ARGP_KEY_END:
@@ -393,10 +393,13 @@ int main(int argc, char *argv[])
   void *print_buf;
   FILE *stream;
   int i,rv,s;
+  char *p=NULL;
   struct arguments arguments;
   glb_params oscp;
-  double osc[]={0.553574,0.160875,M_PI/4,0.0,0.00007,0.003};
+  double *osc=NULL;
+
   
+ 
   /* This serves to make globes working, even with --disable-shared */
   //  LTDL_SET_PRELOADED_SYMBOLS(); 
 
@@ -432,6 +435,29 @@ int main(int argc, char *argv[])
   glbSetPrintDelimiters(arguments.left,arguments.middle,arguments.right);
   glbSetVerbosityLevel(arguments.verbosity);
   
+  /* Values of oscillation parameters, taken from hep-ph/0405172v5.
+   * The value of theta_13 is the 2-sigma limit */
+  if (glbGetNumOfOscParams() < 6)
+    {
+      fprintf(stderr, "ERROR: Usage of less than 6 oscillation parameters "
+                      "is not supported.\n");
+      exit(1);
+    }
+  osc = (double *) glb_malloc(sizeof(*osc) * glbGetNumOfOscParams());
+  osc[0] = 0.57964;                 /* theta_12 */
+  osc[1] = 0.15878;                 /* theta_13 */
+  osc[2] = M_PI/4;                  /* theta_23 */
+  osc[3] = 0.0;                     /* delta_CP */
+  osc[4] = 7.9e-5;                  /* dm_21    */
+  osc[5] = 2.6e-3;                  /* dm_31    */
+//                   0.553574,        /* theta_12 */
+//                   0.160875,        /* theta_13 */
+//                   M_PI/4,          /* theta_23 */
+//                   0.0,             /* delta_CP */
+//                   0.00007,         /* dm_21    */
+//                   0.003            /* dm_31    */
+
+
   /* Redirecting the output stream according to -o=FILE */
   if(arguments.output_file==NULL) stream=stdout;
   else
@@ -451,29 +477,45 @@ int main(int argc, char *argv[])
   central_values=getenv("GLB_CENTRAL_VALUES");
   if(central_values!=NULL)
     {
-      rv=sscanf(central_values,"%lf , %lf , %lf , %lf , %lf , %lf",&osc[0],
-	     &osc[1],&osc[2],&osc[3],&osc[4],&osc[5]);
-      if(rv!=glbGetNumOfOscParams()) 
-	{
-	  fprintf(stderr,"%s: FATAL: Wrong format for oscillation"
-		  " parameters from environment variable GLB_CENTRAL_VALUES\n"
-		  ,argv[0]);
-	  exit(1);
-	}
+      p=central_values;
+      for (i=0; i < glbGetNumOfOscParams(); i++)
+        {
+          if (p != NULL)
+            rv=sscanf(p, "%lf", &osc[i]);
+          else
+            rv=0;
+          if (rv < 1)
+            {
+              fprintf(stderr,"%s: FATAL: Wrong format for oscillation"
+                      " parameters from environment variable GLB_CENTRAL_VALUES\n"
+                      ,argv[0]);
+              exit(1);
+            }
+          if ((p=strchr(p, ',')) != NULL)
+            p++;    /* Go to character after the delimiter */
+        }
     }
 
 
   /* Lexing the oscillation parameters as given by -p='1,2,3...' */
   if(arguments.params!=NULL)
     {
-      rv=sscanf(arguments.params,"%lf , %lf , %lf , %lf , %lf , %lf",&osc[0],
-	     &osc[1],&osc[2],&osc[3],&osc[4],&osc[5]);
-      if(rv!=glbGetNumOfOscParams()) 
-	{
-	  fprintf(stderr,"%s: FATAL: Wrong format for oscillation"
-		  " parameters\n ",argv[0]);
-	  exit(1);
-	}
+      p=arguments.params;
+      for (i=0; i < glbGetNumOfOscParams(); i++)
+        {
+          if (p != NULL)
+            rv=sscanf(p, "%lf", &osc[i]);
+          else
+            rv=0;
+          if (rv < 1)
+            {
+	      fprintf(stderr,"%s: FATAL: Wrong format for oscillation"
+		      " parameters\n ",argv[0]);
+              exit(1);
+            }
+          if ((p=strchr(p, ',')) != NULL)
+            p++;    /* Go to character after the delimiter */
+        }
     }
  
 #ifdef TEST
@@ -488,8 +530,6 @@ int main(int argc, char *argv[])
   /* Processing the argument file */
   s=glbInitExperiment(arguments.args[0],&glb_experiment_list[0],
 		      &glb_num_of_exps);
-
-  
   
 
   /* Testing for failure */
@@ -506,15 +546,19 @@ int main(int argc, char *argv[])
 
   /* Computing the rates */
   oscp=glbAllocParams();
-
-  oscp=glbDefineParams(oscp,osc[0],
-		       osc[1],osc[2],osc[3],osc[4],osc[5]);
-  
-  if(arguments.oscillation==0) oscp=glbDefineParams(oscp,0,
-		       0,0,0,osc[4],osc[5]);
-  
+  if(arguments.oscillation==0)
+    {
+      for (i=0; i < glbGetNumOfOscParams(); i++)
+            glbSetOscParams(oscp, 0.0, i);
+      glbSetOscParams(oscp, osc[4], GLB_DM_21);
+      glbSetOscParams(oscp, osc[5], GLB_DM_31);
+    }
+  else
+    {
+      for (i=0; i < glbGetNumOfOscParams(); i++)
+        glbSetOscParams(oscp, osc[i], i);
+    }
   glbSetOscillationParameters(oscp);
-  
   glbSetRates();
 
   
@@ -626,6 +670,7 @@ int main(int argc, char *argv[])
   /* Cleaning up */  
   glbFreeParams(oscp);
   if(stream!=stdout) fclose(stream);
+  if(osc!=NULL) glb_free(osc);
   exit(0); 
 }
 

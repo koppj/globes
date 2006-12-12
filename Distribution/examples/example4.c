@@ -101,11 +101,11 @@ double CalcProjection(double theldm,double thex,glb_params start_vector)
      contributions from the priors */  
   glbDefineParams(starting_values,theta12,theta13,
                                    theta23,deltacp,sdm,theldm*thesign);
-  glbSetStartingValues(starting_values);
+  glbSetCentralValues(starting_values);
   glbSetInputErrors(input_errors);
 
   start_vector=glbSetOscParams(start_vector,thetheta13,GLB_THETA_13);
-  double res=glbChiTheta(start_vector,minimum,GLB_ALL);
+  double res=glbChiTheta13(start_vector,minimum,GLB_ALL);
   
   /* Trick for next run: Find position of minimum better by using deltacp of prior 
      calculation; note that this modifies the vectors in the main routine! */
@@ -129,7 +129,7 @@ double FindDeg(glb_params deg_pos,double theldm)
   glbDefineParams(starting_values,theta12,theta13,theta23,deltacp,sdm,-theldm);  
   glbDefineParams(input_errors,theta12*0.1,0,0,0,sdm*0.1,theldm/3);  
   glbSetDensityParams(input_errors,0.05,GLB_ALL);
-  glbSetStartingValues(starting_values);
+  glbSetCentralValues(starting_values);
   glbSetInputErrors(input_errors);
   double CL=glbChiAll(starting_values,deg_pos,GLB_ALL); 
 
@@ -148,9 +148,9 @@ int main(int argc, char *argv[])
 
   /* Set standard oscillation parameters */
   theta12 = asin(sqrt(0.8))/2;
-  theta13 = 0;
+  theta13 = 0.0;
   theta23 = M_PI/4;
-  deltacp = 0;
+  deltacp = M_PI/2;
   sdm = 7e-5;
   ldm = 2e-3;
 

@@ -583,6 +583,7 @@ documented!
        - Introduced C++-style ('//') comments in AEDL
        - Removed bgtcenter, bgterror, buffer from struct glb_experiment
        - Removed all undocumented chi^2 functions
+       - New functions glbGetEnergyWindow() and glbGetEnergyWindowBins()
        - Re-implemented large parts of the systematics routines:
            * Errors are kept in arrays of arbitrary length
            * Old signal/bg error arrays do still exist, and for the
@@ -597,11 +598,22 @@ documented!
            * The old bg_center is still valid, but only the built-in
              chi^2 functions take it into account
            * Modified all relevant glbSet/glbGet functions
+       - All internal chi^2 functions now use the new interface
        Verifiation: Testsuite 03/04/05/06 yield only minor deviations, which
          are expected due to the rearrangement of FP operations in the chi^2
          functions
          Various dedicated tests for the Set/Get-Functions etc.
                     
+12/12/2006 JK
+       - Added example5
+       - Replaced calls to deprecated functions in the old examples
+       - Renamed systematics functions to glbChiXXX (I hope this does not
+         cause confusion with glbChiSys, glbChiTheta13, etc.)
+       - Now clipping energy window to emin/emax to prevent problems when using
+         glbGetEnergyWindowBins().
+       - Updated oscillation parameters (from hep-ph/0405172v5) in globes.c
+       - globes command now supports more than 6 oscillation parameters
 
+       
 
 

@@ -1819,6 +1819,7 @@ int glbInitExperiment(char *inf,glb_exp *in, int *counter)
   glb_file_id=(char*) strdup(inf);
   glbResetEOF();
   k=yyparse ();
+
   glb_fclose(yyin);
   glb_free(context);
   glb_free(glb_file_id);

@@ -503,7 +503,7 @@ SWIG_UnpackDataName(const char *c, void *ptr, size_t sz, const char *name) {
  * perl5.swg
  *
  * Perl5 runtime library
- * $Header: /home/lin/globes/cvs-noaccess/Projects/GLOBES/Distribution/globes/globes_perl.c,v 1.14 2006/12/07 16:57:46 globes Exp $
+ * $Header: /home/lin/globes/cvs-noaccess/Projects/GLOBES/Distribution/globes/globes_perl.c,v 1.15 2006/12/12 18:23:46 globes Exp $
  * ----------------------------------------------------------------------------- */
 
 #define SWIGPERL
@@ -2022,7 +2022,7 @@ XS(_wrap_glbGetInputErrors) {
 }
 
 
-XS(_wrap_glbSetStartingValues) {
+XS(_wrap_glbSetCentralValues) {
     {
         glb_params arg1 = (glb_params) (glb_params)0 ;
         int result;
@@ -2030,14 +2030,14 @@ XS(_wrap_glbSetStartingValues) {
         dXSARGS;
         
         if ((items < 1) || (items > 1)) {
-            SWIG_croak("Usage: glbSetStartingValues(in);");
+            SWIG_croak("Usage: glbSetCentralValues(in);");
         }
         {
             if (SWIG_ConvertPtr(ST(0), (void **) &arg1, SWIGTYPE_p_glb_params_type,0) < 0) {
-                SWIG_croak("Type error in argument 1 of glbSetStartingValues. Expected _p_glb_params_type");
+                SWIG_croak("Type error in argument 1 of glbSetCentralValues. Expected _p_glb_params_type");
             }
         }
-        result = (int)glbSetStartingValues(arg1);
+        result = (int)glbSetCentralValues(arg1);
         
         ST(argvi) = sv_newmortal();
         sv_setiv(ST(argvi++), (IV) result);
@@ -2049,7 +2049,7 @@ XS(_wrap_glbSetStartingValues) {
 }
 
 
-XS(_wrap_glbGetStartingValues) {
+XS(_wrap_glbGetCentralValues) {
     {
         glb_params arg1 = (glb_params) 0 ;
         int result;
@@ -2057,14 +2057,14 @@ XS(_wrap_glbGetStartingValues) {
         dXSARGS;
         
         if ((items < 1) || (items > 1)) {
-            SWIG_croak("Usage: glbGetStartingValues(in);");
+            SWIG_croak("Usage: glbGetCentralValues(in);");
         }
         {
             if (SWIG_ConvertPtr(ST(0), (void **) &arg1, SWIGTYPE_p_glb_params_type,0) < 0) {
-                SWIG_croak("Type error in argument 1 of glbGetStartingValues. Expected _p_glb_params_type");
+                SWIG_croak("Type error in argument 1 of glbGetCentralValues. Expected _p_glb_params_type");
             }
         }
-        result = (int)glbGetStartingValues(arg1);
+        result = (int)glbGetCentralValues(arg1);
         
         ST(argvi) = sv_newmortal();
         sv_setiv(ST(argvi++), (IV) result);
@@ -5634,6 +5634,60 @@ XS(_wrap_glbGetErrorDim) {
 }
 
 
+XS(_wrap_glbSetStartingValues) {
+    {
+        glb_params arg1 = (glb_params) (glb_params)0 ;
+        int result;
+        int argvi = 0;
+        dXSARGS;
+        
+        if ((items < 1) || (items > 1)) {
+            SWIG_croak("Usage: glbSetStartingValues(in);");
+        }
+        {
+            if (SWIG_ConvertPtr(ST(0), (void **) &arg1, SWIGTYPE_p_glb_params_type,0) < 0) {
+                SWIG_croak("Type error in argument 1 of glbSetStartingValues. Expected _p_glb_params_type");
+            }
+        }
+        result = (int)glbSetStartingValues(arg1);
+        
+        ST(argvi) = sv_newmortal();
+        sv_setiv(ST(argvi++), (IV) result);
+        XSRETURN(argvi);
+        fail:
+        ;
+    }
+    croak(Nullch);
+}
+
+
+XS(_wrap_glbGetStartingValues) {
+    {
+        glb_params arg1 = (glb_params) 0 ;
+        int result;
+        int argvi = 0;
+        dXSARGS;
+        
+        if ((items < 1) || (items > 1)) {
+            SWIG_croak("Usage: glbGetStartingValues(in);");
+        }
+        {
+            if (SWIG_ConvertPtr(ST(0), (void **) &arg1, SWIGTYPE_p_glb_params_type,0) < 0) {
+                SWIG_croak("Type error in argument 1 of glbGetStartingValues. Expected _p_glb_params_type");
+            }
+        }
+        result = (int)glbGetStartingValues(arg1);
+        
+        ST(argvi) = sv_newmortal();
+        sv_setiv(ST(argvi++), (IV) result);
+        XSRETURN(argvi);
+        fail:
+        ;
+    }
+    croak(Nullch);
+}
+
+
 XS(_wrap_PInit) {
     {
         char *arg1 = (char *) 0 ;
@@ -5805,8 +5859,8 @@ static swig_command_info swig_commands[] = {
 {"globesc::glbSetInputErrors", _wrap_glbSetInputErrors},
 {"globesc::glbGetOscillationParameters", _wrap_glbGetOscillationParameters},
 {"globesc::glbGetInputErrors", _wrap_glbGetInputErrors},
-{"globesc::glbSetStartingValues", _wrap_glbSetStartingValues},
-{"globesc::glbGetStartingValues", _wrap_glbGetStartingValues},
+{"globesc::glbSetCentralValues", _wrap_glbSetCentralValues},
+{"globesc::glbGetCentralValues", _wrap_glbGetCentralValues},
 {"globesc::glbShowRuleRates", _wrap_glbShowRuleRates},
 {"globesc::glbShowChannelRates", _wrap_glbShowChannelRates},
 {"globesc::glbShowChannelProbs", _wrap_glbShowChannelProbs},
@@ -5926,6 +5980,8 @@ static swig_command_info swig_commands[] = {
 {"globesc::glbGetFilter", _wrap_glbGetFilter},
 {"globesc::glbSetErrorDim", _wrap_glbSetErrorDim},
 {"globesc::glbGetErrorDim", _wrap_glbGetErrorDim},
+{"globesc::glbSetStartingValues", _wrap_glbSetStartingValues},
+{"globesc::glbGetStartingValues", _wrap_glbGetStartingValues},
 {"globesc::PInit", _wrap_PInit},
 {0,0}
 };

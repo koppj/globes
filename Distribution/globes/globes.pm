@@ -76,8 +76,8 @@ package globes;
 *glbSetInputErrors = *globesc::glbSetInputErrors;
 *glbGetOscillationParameters = *globesc::glbGetOscillationParameters;
 *glbGetInputErrors = *globesc::glbGetInputErrors;
-*glbSetStartingValues = *globesc::glbSetStartingValues;
-*glbGetStartingValues = *globesc::glbGetStartingValues;
+*glbSetCentralValues = *globesc::glbSetCentralValues;
+*glbGetCentralValues = *globesc::glbGetCentralValues;
 *glbShowRuleRates = *globesc::glbShowRuleRates;
 *glbShowChannelRates = *globesc::glbShowChannelRates;
 *glbShowChannelProbs = *globesc::glbShowChannelProbs;
@@ -197,6 +197,8 @@ package globes;
 *glbGetFilter = *globesc::glbGetFilter;
 *glbSetErrorDim = *globesc::glbSetErrorDim;
 *glbGetErrorDim = *globesc::glbGetErrorDim;
+*glbSetStartingValues = *globesc::glbSetStartingValues;
+*glbGetStartingValues = *globesc::glbGetStartingValues;
 *PInit = *globesc::PInit;
 
 # ------- VARIABLE STUBS --------

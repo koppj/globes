@@ -63,3 +63,22 @@ void AddToOutput(double n1,double n2,double n3)
    }
  }
 }
+
+void AddToOutput2(double n1,double n2)
+{
+ if(strlen(THEFILE)==0) printf("%g %g \n",n1,n2);
+ else 
+ {
+   FILE* f=fopen(THEFILE, "a");
+   if (!f)
+   {
+     printf("File cannot be opened!\n");
+     THEFILE[0]=0;
+   }
+   else
+   {
+    fprintf(f,"%g %g \n",n1,n2);
+    fclose(f);
+   }
+ }
+}

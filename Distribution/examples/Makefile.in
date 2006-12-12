@@ -53,8 +53,8 @@ endif
 
 
 
-BIN = example-tour example-static example1 example2 example3 example4
-OBJ = example-tour.o example-tour-s.o example1.o example2.o example3.o example4.o myio.o
+BIN = example-tour example-static example1 example2 example3 example4 example5
+OBJ = example-tour.o example-tour-s.o example1.o example2.o example3.o example4.o example5.o myio.o
 
 example-tour: example-tour.o
 	gcc example-tour.o -o example-tour $(LDFLAGS) $(local_LDFLAGS)
@@ -77,6 +77,9 @@ example3: example3.o myio.o
 
 example4: example4.o myio.o
 	gcc example4.o myio.o -o example4  $(LDFLAGS) $(local_LDFLAGS)
+
+example5: example5.o myio.o
+	gcc example5.o myio.o -o example5  $(LDFLAGS) $(local_LDFLAGS)
 
 # g++ is necessary because the syntax in the examples does not strictly
 # follow ANSI C for pedagogical reasons

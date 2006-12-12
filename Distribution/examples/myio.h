@@ -30,3 +30,8 @@ void InitOutput(char* filename, char* headline);
 
 /* Add line to standard output with three numbers */
 void AddToOutput(double n1,double n2,double n3);
+
+/* Add line to standard output with two numbers */
+void AddToOutput2(double n1,double n2);
+
+
