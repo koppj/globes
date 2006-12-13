@@ -614,6 +614,9 @@ documented!
        - Updated oscillation parameters (from hep-ph/0405172v5) in globes.c
        - globes command now supports more than 6 oscillation parameters
 
-       
-
+13/12/2006 JK
+       - Modified parameters of glbShiftEnergyScale (introduced emin, emax)
+       - New function glbGetEminEmax, required during chi^2 calculations
+       - Removed deprecated arrays rates1T and rates1BGT from glb_experiment
+       - Fixed BUG#11 (non-working "tilt")
 

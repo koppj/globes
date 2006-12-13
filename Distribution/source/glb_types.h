@@ -421,9 +421,7 @@ struct glb_experiment {
   double* BackgroundRates[32];/* "True" background event rates for all rules */
   double* rates0[32];         /* "True" event rates for all rules */
   double* rates1[32];         /* Fitted signal rates for all rules */
-  double* rates1T[32];        /* Fitted and tilted signal rates for all rules *///FIXME remove
   double* rates1BG[32];       /* Fitted background rates for all rules */
-  double* rates1BGT[32];      /* Fitted and tilted background rates for all rules *///FIXME remove
 
   /** Systematics functions and on/off states */
   int sys_on_off[32];         /* Systematics switch (GLB_ON/GLB_OFF)     */

@@ -364,9 +364,7 @@ void glbInitExp(glb_exp ins)
       in->BackgroundRates[i]=NULL;
       in->rates0[i]=NULL;
       in->rates1[i]=NULL;
-      in->rates1T[i]=NULL;
       in->rates1BG[i]=NULL;
-      in->rates1BGT[i]=NULL;
     }
   in->energy_tab=NULL;
   for(i=0;i<32;i++) in->no_osc_background[i]=NULL;
@@ -439,9 +437,7 @@ void glbFreeExp(glb_exp ins)
       my_free(in->BackgroundRates[i]);
       my_free(in->rates0[i]);
       my_free(in->rates1[i]);
-      my_free(in->rates1T[i]);
       my_free(in->rates1BG[i]);
-      my_free(in->rates1BGT[i]);
       my_free(in->sys_on_errors[i]);
       my_free(in->sys_on_startvals[i]);
       my_free(in->sys_off_errors[i]);
@@ -908,9 +904,7 @@ int glbDefaultExp(glb_exp ins)
 	 in->BackgroundRates[i]==NULL||
 	 in->rates0[i]==NULL||
 	 in->rates1[i]==NULL||
-	 in->rates1T[i]==NULL||
-	 in->rates1BG[i]==NULL||
-	 in->rates1BGT[i]==NULL)
+	 in->rates1BG[i]==NULL)
       {
         glb_error("No memory for ratevectors allocated!");
         status=-1;
@@ -971,9 +965,7 @@ static void MMovePointers(struct glb_experiment *in)
     { 
       glb_calc_rates_0[k] = in->rates0[k];
       glb_calc_rates_1[k] = in->rates1[k];
-      glb_calc_rates_1T[k] = in->rates1T[k];
       glb_calc_rates_1BG[k] = in->rates1BG[k];
-      glb_calc_rates_1BGT[k] = in->rates1BGT[k];
       glb_calc_signal_rates[k] = in->SignalRates[k]; 
       glb_calc_bg_rates[k] = in->BackgroundRates[k];
       /* FIXME -- wrong number */ 
@@ -1016,9 +1008,7 @@ static struct glb_experiment MInitMemory0(struct glb_experiment in)
 	{ 
 	  out.rates0[k] =  (double*) glb_malloc( len*sizeof(double));
 	  out.rates1[k] = (double*) glb_malloc( len*sizeof(double));
-	  out.rates1T[k] = (double*) glb_malloc( len*sizeof(double));
 	  out.rates1BG[k] = (double*) glb_malloc( len*sizeof(double));
-	  out.rates1BGT[k] = (double*) glb_malloc( len*sizeof(double));
 	  if(out.simbins<=0) glb_error("Too few simbins defined!");
 	  else
 	    {

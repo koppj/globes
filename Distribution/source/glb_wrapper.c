@@ -2081,6 +2081,25 @@ glbGetFilterInExperiment(int experiment)
 
 
 int
+glbGetEminEmax(int experiment, double *emin, double *emax)
+{
+  struct glb_experiment *in;
+  
+  if (emin == NULL  ||  emax == NULL)
+    { glb_error("glbGetEminEmax: Input pointers may not be NULL"); return -1; }
+
+  if (experiment >= 0  &&  experiment < glb_num_of_exps)
+  {
+    in = glb_experiment_list[experiment];
+    *emin = in->emin;
+    *emax = in->emax;
+  }
+  else
+    { glb_error("glbGetEminEmax: Invalid experiment number"); return -1; }
+}
+
+
+int
 glbGetEnergyWindow(int experiment, int rule, double *low, double *high)
 {
   struct glb_experiment *in;
@@ -2101,7 +2120,6 @@ glbGetEnergyWindow(int experiment, int rule, double *low, double *high)
   }
   else
     { glb_error("glbGetEnergyWindow: Invalid experiment number"); return -1; }
-  
 }
 
 
@@ -2126,7 +2144,6 @@ glbGetEnergyWindowBins(int experiment, int rule, int *low, int *high)
   }
   else
     { glb_error("glbGetEnergyWindow: Invalid experiment number"); return -1; }
-  
 }
 
 

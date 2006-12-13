@@ -125,6 +125,7 @@ package globes;
 *glbGetRunningTime = *globesc::glbGetRunningTime;
 *glbGetFilterStateInExperiment = *globesc::glbGetFilterStateInExperiment;
 *glbGetFilterInExperiment = *globesc::glbGetFilterInExperiment;
+*glbGetEminEmax = *globesc::glbGetEminEmax;
 *glbGetEnergyWindow = *globesc::glbGetEnergyWindow;
 *glbGetEnergyWindowBins = *globesc::glbGetEnergyWindowBins;
 *glbGetNumberOfSimBins = *globesc::glbGetNumberOfSimBins;

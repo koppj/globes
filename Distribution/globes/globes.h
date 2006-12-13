@@ -251,6 +251,7 @@ double glbGetSourcePower(int experiment, int flux_ident);
 double glbGetRunningTime(int experiment, int flux_ident);
 int glbGetFilterStateInExperiment(int experiment); 
 double glbGetFilterInExperiment(int experiment);
+int glbGetEminEmax(int experiment, double *emin, double *emax);                    //new
 int glbGetEnergyWindow(int experiment, int rule, double *low, double *high);       //new
 int glbGetEnergyWindowBins(int experiment, int rule, int *low_bin, int *high_bin); //new
 int glbGetNumberOfSimBins(int exp);                                                //new?
@@ -294,7 +295,8 @@ int glbGetBGStartingValues(int exp, int rule, double *norm, double *tilt);      
 double *glbGetSysErrorsListPtr(int exp, int rule, int on_off);                     //new
 double *glbGetSysStartingValuesListPtr(int exp, int rule, int on_off);             //new
 
-void glbShiftEnergyScale(double g, double *rates_in, double *rates_out, int n_bins);//new
+void glbShiftEnergyScale(double g, double *rates_in, double *rates_out,            //new
+                         int n_bins, double emin, double emax);
 
 
 /* Modules and user-defined priors */

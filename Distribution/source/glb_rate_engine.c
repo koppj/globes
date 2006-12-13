@@ -70,9 +70,7 @@ static double* BGrule_coeff[32];
 // ---------------------------------
 double* glb_calc_rates_0[32];
 double* glb_calc_rates_1[32];
-double* glb_calc_rates_1T[32];
 double* glb_calc_rates_1BG[32];
-double* glb_calc_rates_1BGT[32];
 double* glb_calc_energy_tab;
 double glb_bg_norm_center[32];
 double glb_bg_tilt_center[32];
@@ -463,33 +461,6 @@ inline static double BinEnergy(int i)
 }
 
 
-// FIXME: When fixing BUG#11, this will have to be modified, rewritten, or deleted
-//static void SmearAllChannelsTilt(int mode)
-//{
-//  int i,k,l,s;
-//  
-//  for(k=0;k<num_of_ch;k++)
-//    {
-//      if(!((mode!=GLB_MODE_TRUE)&&((channel_list[k][2]>9)||(channel_list[k][3]>9))))
-//	{
-//	  s=channel_list[k][5];
-//	  for(i=0;i<bins;i++)
-//	    {
-//	      glb_calc_chra[k][i]=0;
-//	      for(l=glb_calc_lowrange[s][i]; l<glb_calc_uprange[s][i]+1; l++)
-//		{
-//		  glb_calc_chra[k][i] += glb_calc_smearing[s][i][l-glb_calc_lowrange[s][i]]
-//		    *glb_calc_chrb[k][l]
-//		    *glb_sbin_center(l,glb_calc_smear_data[s]);
-//		}
-//	      glb_calc_chra[k][i]=glb_calc_chra[k][i] * glb_calc_user_post_sm_channel[k][i]
-//		+ glb_calc_user_post_sm_background[k][i];
-//	    }
-//	}
-//    }
-//}
-
-
 /***************************************************************************
  * Function glb_set_rates                                                  *
  ***************************************************************************
@@ -644,25 +615,6 @@ void glb_set_new_rates()
         glb_calc_rates_1[i][j] += rule_coeff[i][k] * glb_calc_chra_1[rules[i][k]][j];
     }
   }
-   
-  
-  /* FIXME add. glb_calc_buffer for tiltet rates prob. safer */
-//  SmearAllChannelsTilt(GLB_MODE_FIT);  FIXME JK - Here is BUG#11
-//  for (i=0;i<glb_num_of_rules;i++)
-//  {
-//    for (j=0; j < bins; j++)
-//      glb_calc_rates_1T[i][j] = glb_calc_signal_rates[i][j];
-//    for (j=0; j < bins; j++)
-//      glb_calc_rates_1BGT[i][j] = glb_calc_bg_rates[i][j];
-//  }
-//  
-  for (i=0;i<glb_num_of_rules;i++)
-  {
-    for (j=0; j < bins; j++)
-      glb_calc_rates_1T[i][j] = glb_calc_rates_1[i][j];
-    for (j=0; j < bins; j++)
-      glb_calc_rates_1BGT[i][j] = glb_calc_rates_1BG[i][j];
-  }
 }
 
 
@@ -688,34 +640,6 @@ void glb_set_bg_center(int i,double norm, double tilt)
 
 
 
-
-/***************************************************************************
- * Function glbShiftEnergyScale                                            *
- ***************************************************************************
- * Applies an energy calibration error of magnitude b to rates_in and      *
- * stores the result in rates_out.                                         *
- ***************************************************************************/
-void glbShiftEnergyScale(double b, double *rates_in, double *rates_out, int n_bins)
-{
-  int i, k;
-  double t0 = n_bins * treshold / (glb_get_max_energy() - treshold);
-  double delta;
-
-  for (i=0; i < n_bins; i++)
-  {
-    delta = b * (i + t0 + 0.5) + i;
-    k     = (int) floor(delta);
-
-    if (k < 0 || k > n_bins - 1)
-      rates_out[i] = 0.0;
-    else if (k == n_bins - 1) /* This prevents reading beyond array boundaries */
-      rates_out[i] = (1 + b) * (rates_in[k] * (delta - k) + rates_in[k]);
-    else
-      rates_out[i] = (1 + b) * ((rates_in[k+1] - rates_in[k]) * (delta - k) + rates_in[k]);
-  }
-}
-
-
 // function for avoiding malloc problems
 void glb_remove_calc_pointers()
 {
@@ -732,9 +656,7 @@ void glb_remove_calc_pointers()
       glb_calc_bg_rates[k]=NULL; 
       glb_calc_rates_0[k]=NULL;
       glb_calc_rates_1[k]=NULL;
-      glb_calc_rates_1T[k]=NULL;
       glb_calc_rates_1BG[k]=NULL;
-      glb_calc_rates_1BGT[k]=NULL;
       glb_calc_energy_tab=NULL;
       glb_calc_efficiencies[k]=NULL;
       glb_calc_const_background[k]=NULL;

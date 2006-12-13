@@ -503,7 +503,7 @@ SWIG_UnpackDataName(const char *c, void *ptr, size_t sz, const char *name) {
  * perl5.swg
  *
  * Perl5 runtime library
- * $Header: /home/lin/globes/cvs-noaccess/Projects/GLOBES/Distribution/globes/globes_perl.c,v 1.15 2006/12/12 18:23:46 globes Exp $
+ * $Header: /home/lin/globes/cvs-noaccess/Projects/GLOBES/Distribution/globes/globes_perl.c,v 1.16 2006/12/13 12:35:51 globes Exp $
  * ----------------------------------------------------------------------------- */
 
 #define SWIGPERL
@@ -3498,6 +3498,41 @@ XS(_wrap_glbGetFilterInExperiment) {
 }
 
 
+XS(_wrap_glbGetEminEmax) {
+    {
+        int arg1 ;
+        double *arg2 = (double *) 0 ;
+        double *arg3 = (double *) 0 ;
+        int result;
+        int argvi = 0;
+        dXSARGS;
+        
+        if ((items < 3) || (items > 3)) {
+            SWIG_croak("Usage: glbGetEminEmax(experiment,emin,emax);");
+        }
+        arg1 = (int) SvIV(ST(0));
+        {
+            if (SWIG_ConvertPtr(ST(1), (void **) &arg2, SWIGTYPE_p_double,0) < 0) {
+                SWIG_croak("Type error in argument 2 of glbGetEminEmax. Expected _p_double");
+            }
+        }
+        {
+            if (SWIG_ConvertPtr(ST(2), (void **) &arg3, SWIGTYPE_p_double,0) < 0) {
+                SWIG_croak("Type error in argument 3 of glbGetEminEmax. Expected _p_double");
+            }
+        }
+        result = (int)glbGetEminEmax(arg1,arg2,arg3);
+        
+        ST(argvi) = sv_newmortal();
+        sv_setiv(ST(argvi++), (IV) result);
+        XSRETURN(argvi);
+        fail:
+        ;
+    }
+    croak(Nullch);
+}
+
+
 XS(_wrap_glbGetEnergyWindow) {
     {
         int arg1 ;
@@ -4584,11 +4619,13 @@ XS(_wrap_glbShiftEnergyScale) {
         double *arg2 = (double *) 0 ;
         double *arg3 = (double *) 0 ;
         int arg4 ;
+        double arg5 ;
+        double arg6 ;
         int argvi = 0;
         dXSARGS;
         
-        if ((items < 4) || (items > 4)) {
-            SWIG_croak("Usage: glbShiftEnergyScale(g,rates_in,rates_out,n_bins);");
+        if ((items < 6) || (items > 6)) {
+            SWIG_croak("Usage: glbShiftEnergyScale(g,rates_in,rates_out,n_bins,emin,emax);");
         }
         arg1 = (double) SvNV(ST(0));
         
@@ -4603,7 +4640,11 @@ XS(_wrap_glbShiftEnergyScale) {
             }
         }
         arg4 = (int) SvIV(ST(3));
-        glbShiftEnergyScale(arg1,arg2,arg3,arg4);
+        arg5 = (double) SvNV(ST(4));
+        
+        arg6 = (double) SvNV(ST(5));
+        
+        glbShiftEnergyScale(arg1,arg2,arg3,arg4,arg5,arg6);
         
         
         XSRETURN(argvi);
@@ -5908,6 +5949,7 @@ static swig_command_info swig_commands[] = {
 {"globesc::glbGetRunningTime", _wrap_glbGetRunningTime},
 {"globesc::glbGetFilterStateInExperiment", _wrap_glbGetFilterStateInExperiment},
 {"globesc::glbGetFilterInExperiment", _wrap_glbGetFilterInExperiment},
+{"globesc::glbGetEminEmax", _wrap_glbGetEminEmax},
 {"globesc::glbGetEnergyWindow", _wrap_glbGetEnergyWindow},
 {"globesc::glbGetEnergyWindowBins", _wrap_glbGetEnergyWindowBins},
 {"globesc::glbGetNumberOfSimBins", _wrap_glbGetNumberOfSimBins},
