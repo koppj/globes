@@ -428,13 +428,13 @@ int main(int argc, char *argv[])
   for (i=0; i < MAX_SYS; i++)
     sys_startval[i] = 0.0;
 
-  /* Set standard oscillation parameters */
-  theta12 = asin(sqrt(0.8))/2;
-  theta13 = asin(sqrt(0.001))/2;
+  /* Set standard oscillation parameters (cf. hep-ph/0405172v5) */
+  theta12 = asin(sqrt(0.3));
+  theta13 = 0.0;
   theta23 = M_PI/4;
   deltacp = M_PI/2;
-  sdm = 7e-5;
-  ldm = 2e-3;
+  sdm = 7.9e-5;
+  ldm = 2.6e-3;
 
   glbInit(argv[0]);                    /* Initialize GLoBES and define chi^2 functions */
   glbDefineChiFunction(&chiDCNorm,     5,          "chiDCNorm");
@@ -480,7 +480,7 @@ int main(int argc, char *argv[])
    * as defined in the AEDL files */
   InitOutput(MYFILE2,"Format: Running time   Log(10,s22th13) sens. \n"); 
   ComputeSensitivityCurve();
-  
+
   /* Calculate sensitivity curve with the above + spectral error
    * Since chiDCSpectral computes the complete chi^2 for the whole problem, it
    * must be called only for ONE of the two experiments */
