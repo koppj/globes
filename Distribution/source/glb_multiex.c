@@ -41,6 +41,7 @@
 #include "glb_types.h"
 #include "glb_multiex.h"
 #include "glb_version.h"
+#include "glb_sys.h"
 
 #define FLOAT double
 
@@ -888,7 +889,7 @@ int glbDefaultExp(glb_exp ins)
 
       /* Calculate bin ranges corresponding to the energy window,
        * trying to reproduce the behaviour of the old glb_window_function */
-      in->energy_window_bins[i][0] = (int) ( 0.5 + in->numofbins //FIXME
+      in->energy_window_bins[i][0] = (int) ( 0.5 + in->numofbins
              * (in->energy_window[i][0] - in->emin) / (in->emax - in->emin) );
       if (in->energy_window_bins[i][0] > in->numofbins)
         in->energy_window_bins[i][0] = in->numofbins;

@@ -503,7 +503,7 @@ SWIG_UnpackDataName(const char *c, void *ptr, size_t sz, const char *name) {
  * perl5.swg
  *
  * Perl5 runtime library
- * $Header: /home/lin/globes/cvs-noaccess/Projects/GLOBES/Distribution/globes/globes_perl.c,v 1.16 2006/12/13 12:35:51 globes Exp $
+ * $Header: /home/lin/globes/cvs-noaccess/Projects/GLOBES/Distribution/globes/globes_perl.c,v 1.17 2006/12/14 19:14:11 globes Exp $
  * ----------------------------------------------------------------------------- */
 
 #define SWIGPERL

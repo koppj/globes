@@ -6,11 +6,11 @@ AM_YFLAGS =  -d
 lib_LTLIBRARIES = libglobes.la
 libglobes_la_SOURCES =  glb_minimize.c glb_error.c glb_path.c glb_multiex.c \
  glb_version.c glb_rate_engine.c  glb_parser.y glb_min_sup.c glb_fluxes.c \
- glb_smear.c glb_lexer.l glb_probability.cc glb_profile.c glb_sys.c glb_wrapper.c \
+ glb_smear.c glb_lexer.l glb_probability.c glb_profile.c glb_sys.c glb_wrapper.c \
  glb_minimize.h glb_error.h glb_path.h glb_parser_addons.h glb_multiex.h \
  glb_probability.h glb_smear.h glb_rate_engine.h glb_types.h glb_parser.h \
  glb_min_sup.h  glb_version.h glb_lexer.h glb_fluxes.h glb_parser_type.h \
- glb_wrapper.h glb_profile.h glb_sys.h glb_glb.c  glb_prior.h glb_prior.c glb_compat.c
+ glb_wrapper.h glb_profile.h glb_sys.h glb_glb.c glb_prior.h glb_prior.c glb_compat.c
 
 
 libglobes_la_LDFLAGS = @LIBS@ -version-info @GLBLIBVERSION@
@@ -21,5 +21,5 @@ libglobes_la_LDFLAGS += $(top_builddir)/lib/libgnu.la
 
 
 bin_PROGRAMS = globes
-globes_SOURCES =  globes.c 
+globes_SOURCES = globes.c 
 globes_LDADD = libglobes.la @LIBS@ -lstdc++ 

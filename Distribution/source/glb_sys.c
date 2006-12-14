@@ -22,6 +22,7 @@
 #include <math.h>
 #include <string.h>
 #include <globes/globes.h>
+#include "glb_error.h"
 #include "glb_multiex.h"
 #include "glb_rate_engine.h"
 #include "glb_minimize.h"
@@ -196,7 +197,7 @@ int glbSetChiFunctionInRule(struct glb_experiment *exp, int rule, int on_off,
     {
       /* Set new chi^2 function */
       exp->sys_on[rule] = sys;
-      if (exp->sys_on_strings[rule] != NULL)  free(exp->sys_on_strings[rule]);
+      if (exp->sys_on_strings[rule] != NULL)  glb_free(exp->sys_on_strings[rule]);
       exp->sys_on_strings[rule] = strdup(sys->name);
 
       /* Copy error array and set central/starting values */

@@ -57,6 +57,7 @@ void glbInit(char *name)
   glb_sys_list = NULL;
 
   /* Setup default probability engine */
+  glb_init_probability_engine();
   glbRegisterProbabilityEngine(-1, NULL, NULL, NULL);
   glbRegisterProbabilityEngine(6, &glb_probability_matrix,
                                   &glb_set_oscillation_parameters,

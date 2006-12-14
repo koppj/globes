@@ -24,23 +24,24 @@
 
 
 
-#ifndef GLS_OSZPROB_H
-#define GLS_OSZPROB_H 1
+#ifndef GLB_OSZPROB_H
+#define GLB_OSZPROB_H 1
 
+#include <complex.h>
 #include <gsl/gsl_complex.h>
 #include <globes/globes.h>
 
-// Constants
-// ---------
- //#define GLB_V_FACTOR        7.56e-14   // Conversion factor for matter potentials
-#define GLB_V_FACTOR        7.5e-14   // Conversion factor for matter potentials
-//#define GLB_Ne_MANTLE       0.497      // Effective electron numbers for calculation
-#define GLB_Ne_MANTLE       0.5
-#define GLB_Ne_CORE         0.468      //   of MSW potentials
+/* Constants */
+//#define GLB_V_FACTOR        7.56e-14   /* Conversion factor for matter potentials */
+#define GLB_V_FACTOR        7.5e-14   /* Conversion factor for matter potentials */
+//#define GLB_Ne_MANTLE       0.497      /* Effective electron numbers for calculation */
+#define GLB_Ne_MANTLE       0.5        /* Effective electron numbers for calculation */
+#define GLB_Ne_CORE         0.468      /*   of MSW potentials                        */
+#define V_THRESHOLD 0.001*GLB_V_FACTOR*GLB_Ne_MANTLE  /* The minimum matter potential below */
+                                                      /* which vacuum algorithms are used   */
+#define M_SQRT3  1.73205080756887729352744634151      /* sqrt(3) */
 
-
-// External variables
-// ------------------
+/* External variables */
 extern int glb_oscp;
 extern glb_probability_matrix_function glb_hook_probability_matrix;
 extern glb_set_oscillation_parameters_function glb_hook_set_oscillation_parameters;
@@ -48,27 +49,29 @@ extern glb_get_oscillation_parameters_function glb_hook_get_oscillation_paramete
 
 
 
-// Macros
-// ------
-#define SQR(x)      ((x)*(x))                              // x^2 
-#define SQR_ABS(x)  (SQR(GSL_REAL(x)) + SQR(GSL_IMAG(x)))  // |x|^2
+/* Macros */
+#define SQR(x)      ((x)*(x))                        /* x^2   */
+#define SQR_ABS(x)  (SQR(creal(x)) + SQR(cimag(x)))  /* |x|^2 */
 
 
-// Functions
-// ---------
-BEGIN_C_DECLS
-
-int glb_33_zheev(gsl_complex A[3][3], gsl_complex Q[3][3], double lambda[3]);
-double glb_profile_probability(int pl, int pm, int panti, double pen);
+/* Functions */
+inline void zhetrd3(double complex A[3][3], double complex Q[3][3],
+                    double d[3], double e[2]);
+int zheevc3(double complex A[3][3], double w[3]);
+int zheevq3(double complex A[3][3], double complex Q[3][3], double w[3]);
+int zheevh3(double complex A[3][3], double complex Q[3][3], double w[3]);
+int glb_init_probability_engine();
+int glb_free_probability_engine();
+int glb_set_oscillation_parameters(glb_params p);
+int glb_get_oscillation_parameters(glb_params p);
+int glb_hamiltonian_cd(double E, double V, int cp_sign);
+int glb_S_matrix_cd(double E, double L, double V, int cp_sign);
+int glb_filtered_probability_matrix_cd(double P[3][3], double E, double L,
+                                       double V, double sigma, int cp_sign);
 int glb_probability_matrix(double P[3][3], int cp_sign, double E,
     int psteps, const double *length, const double *density,
     double filter_sigma);
-int glb_filtered_probability_matrix_cd(double E, double L, double V, double sigma, int cp_sign);
-int glb_set_oscillation_parameters(glb_params p);
-int glb_get_oscillation_parameters(glb_params p);
 
-END_C_DECLS
-
-#endif /* GLS_OSZPROB_H */
+#endif /* GLB_OSZPROB_H */
 
 

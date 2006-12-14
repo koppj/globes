@@ -32,6 +32,7 @@
 #include <argp.h>
 #include <ctype.h>
 #include <ltdl.h>
+#include "glb_error.h"
 
 
 #include <globes/globes.h>

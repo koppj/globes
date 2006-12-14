@@ -81,11 +81,8 @@ example4: example4.o myio.o
 example5: example5.o myio.o
 	gcc example5.o myio.o -o example5  $(LDFLAGS) $(local_LDFLAGS)
 
-# g++ is necessary because the syntax in the examples does not strictly
-# follow ANSI C for pedagogical reasons
-
 %.o : %.c
-	g++ $(CFLAGS) $(local_CFLAGS) -c $< $(INCFLAGS)
+	gcc $(CFLAGS) $(local_CFLAGS) -c $< $(INCFLAGS)
 .PHONY: clean
 clean:
 	rm -f $(BIN) $(OBJ)

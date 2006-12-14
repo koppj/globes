@@ -60,6 +60,7 @@
 #include "glb_fluxes.h"
 #include "glb_rate_engine.h"
 #include "glb_min_sup.h"
+#include "glb_minimize.h"
 #include "glb_types.h"
 #include "glb_multiex.h"
 #include "glb_error.h"

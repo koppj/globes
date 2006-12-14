@@ -82,8 +82,8 @@
   static int errordim_sys_off=-1;
   static char *context;
 
-
-
+  int yyerror (const char *s);           /* Forward declaration to suppress compiler warning */
+  
 
   typedef struct
   {

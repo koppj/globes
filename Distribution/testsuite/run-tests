@@ -3,7 +3,6 @@
 # GLoBES Testsuite
 # ---------------------------------------------------------
 
-#export TESTS="03-chisys"
 export TESTS="03-chisys 04-chicorr 05-chideg 06-chibars"
 #export TESTS="01-probabilities 02-probabilities-filtered"
 

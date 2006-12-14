@@ -7284,6 +7284,7 @@ AC_SUBST([am__untar])
 
 m4_include([m4/alloca.m4])
 m4_include([m4/argp.m4])
+m4_include([m4/autoconf-2.60.m4])
 m4_include([m4/exitfail.m4])
 m4_include([m4/extensions.m4])
 m4_include([m4/getopt.m4])

@@ -47,19 +47,19 @@ DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/alloca.m4 \
-	$(top_srcdir)/m4/argp.m4 $(top_srcdir)/m4/exitfail.m4 \
-	$(top_srcdir)/m4/extensions.m4 $(top_srcdir)/m4/getopt.m4 \
-	$(top_srcdir)/m4/gnulib.m4 $(top_srcdir)/m4/inttypes_h.m4 \
-	$(top_srcdir)/m4/mempcpy.m4 $(top_srcdir)/m4/my_gsl.m4 \
-	$(top_srcdir)/m4/obstack.m4 $(top_srcdir)/m4/onceonly_2_57.m4 \
-	$(top_srcdir)/m4/restrict.m4 $(top_srcdir)/m4/rpm.m4 \
-	$(top_srcdir)/m4/stdint_h.m4 $(top_srcdir)/m4/strcase.m4 \
-	$(top_srcdir)/m4/strchrnul.m4 $(top_srcdir)/m4/strndup.m4 \
-	$(top_srcdir)/m4/strnlen.m4 $(top_srcdir)/m4/swig.m4 \
-	$(top_srcdir)/m4/swig_perl.m4 $(top_srcdir)/m4/sysexits.m4 \
-	$(top_srcdir)/m4/uintmax_t.m4 $(top_srcdir)/m4/ulonglong.m4 \
-	$(top_srcdir)/m4/unlocked-io.m4 $(top_srcdir)/acinclude.m4 \
-	$(top_srcdir)/configure.in
+	$(top_srcdir)/m4/argp.m4 $(top_srcdir)/m4/autoconf-2.60.m4 \
+	$(top_srcdir)/m4/exitfail.m4 $(top_srcdir)/m4/extensions.m4 \
+	$(top_srcdir)/m4/getopt.m4 $(top_srcdir)/m4/gnulib.m4 \
+	$(top_srcdir)/m4/inttypes_h.m4 $(top_srcdir)/m4/mempcpy.m4 \
+	$(top_srcdir)/m4/my_gsl.m4 $(top_srcdir)/m4/obstack.m4 \
+	$(top_srcdir)/m4/onceonly_2_57.m4 $(top_srcdir)/m4/restrict.m4 \
+	$(top_srcdir)/m4/rpm.m4 $(top_srcdir)/m4/stdint_h.m4 \
+	$(top_srcdir)/m4/strcase.m4 $(top_srcdir)/m4/strchrnul.m4 \
+	$(top_srcdir)/m4/strndup.m4 $(top_srcdir)/m4/strnlen.m4 \
+	$(top_srcdir)/m4/swig.m4 $(top_srcdir)/m4/swig_perl.m4 \
+	$(top_srcdir)/m4/sysexits.m4 $(top_srcdir)/m4/uintmax_t.m4 \
+	$(top_srcdir)/m4/ulonglong.m4 $(top_srcdir)/m4/unlocked-io.m4 \
+	$(top_srcdir)/acinclude.m4 $(top_srcdir)/configure.in
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
@@ -246,7 +246,7 @@ SUBDIRS = lib source data globes
 INCLUDES = $(F2CINC) $(GSLINC)
 EXTRA_DIST = examples/Makefile.in examples/example1.c	      \
   examples/example3.c examples/myio.c examples/example-tour.c \
-  examples/example2.c examples/example4.c examples/myio.h     \
+  examples/example2.c examples/example4.c examples/example5.c examples/myio.h \
   examples/XCC.dat examples/NuFact.glb BUGS globes.m4
 
 

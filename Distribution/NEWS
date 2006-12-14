@@ -620,3 +620,11 @@ documented!
        - Removed deprecated arrays rates1T and rates1BGT from glb_experiment
        - Fixed BUG#11 (non-working "tilt")
 
+14/12/2006 JK
+       - Exchanged eigenvalue routine in glb_probability
+       - Probability engine is now in C99 instead of C++
+       - Removed C++ test from configure.in, added C99 test
+          ==> GLoBES will now be compiled with option -std=gnu99
+              This seems to make the compiler more picky in some respects
+       - Optimized chi^2 functions in example5
+       - Examples now compile with gcc (instead of g++)
