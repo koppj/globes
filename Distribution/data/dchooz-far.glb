@@ -1,0 +1,85 @@
+%!GLoBES
+/* AEDL file for the Double CHOOZ far detector
+ *
+ * Copyright 2004 The GLoBES Team
+ *
+ * If you modify this file you have to rename it.
+ *
+ * If you are using this file for producing a scientific publication
+ * or a talk please cite the following references and check the supporting
+ * files for a similar comment.
+ * 
+ #* @Article{Huber:2006vr,
+ #*    author    = "Huber, P. and Kopp, Joachim and Lindner, M. and Rolinec, M.
+ #*                 and Winter, W.",
+ #*    title     = "From Double Chooz to Triple Chooz: Neutrino physics at the
+ #*                 Chooz  reactor complex",
+ #*    journal   = "JHEP",
+ #*    volume    = "05",
+ #*    year      = "2006",
+ #*    pages     = "072",
+ #*    eprint    = "hep-ph/0601266",
+ #*    SLACcitation  = "%%CITATION = HEP-PH 0601266;%%"
+ #* }
+ */
+
+   
+$version="1.8.1"
+
+/* Beam data */
+flux(#Reactor)<
+        @flux_file = "Reactor.dat"
+        @time      = 5
+        @power     = 8.4 /* GWth */
+        @norm      = 12.687e-13 /* Far detector is more efficient than near detector */
+>
+
+/* Baseline */
+$profiletype = 3
+$densitytab  = { 1e-6 }
+$lengthtab   = { 1.05 }
+
+
+/* General information on detector */
+$target_mass = 10.16  /* tons */
+$bins        = 62
+$emin        = 0.0018
+$emax        = 0.008
+
+/* Technical information */
+$filter_state = 0 
+$filter_value = 1000000 
+
+/* Energy Resolution */
+energy(#ERES)<
+        @type = 1
+        @sigma_function = #inverse_beta
+        @sigma_e = {0.05,0,0}
+>
+
+/* Cross sections */
+cross(#Reactor_CC)<
+        @cross_file = "XCCreactor.dat"
+>
+
+/* Channels                                                                                     */
+/* Syntax @channel =       Flux : CP sign : initial : final  : cross       : energy resolution  */
+/*                              :         : flavor  : flavor : sections    : function           */
+channel(#nu_e_disappearance_CC)<
+        @channel   =    #Reactor:      -  :      e  :      e : #Reactor_CC : #ERES
+>
+
+/* Rules */
+rule(#rule0)<
+        @signal     = 1.0@#nu_e_disappearance_CC
+        @background = 0.0@#nu_e_disappearance_CC   /* No background */
+        @energy_window = 0.0015 : 0.01
+
+        @sys_off_function = "chiNoSysSpectrum"
+        @sys_off_errors   = {}
+        @sys_on_function  = "chiDCNorm"
+        @sys_on_errors    = { 0.02,    0.006,        0.006,       0.005,     0.005   }
+                         /* { Flux, Fid. mass FD, Fid. mass ND, Energy FD, Energy ND } */
+>
+
+
