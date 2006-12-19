@@ -28,7 +28,6 @@
 #define GLB_OSZPROB_H 1
 
 #include <complex.h>
-#include <gsl/gsl_complex.h>
 #include <globes/globes.h>
 
 /* Constants */

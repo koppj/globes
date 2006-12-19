@@ -207,6 +207,13 @@ int glb_init_minimizer()
   s_para_tab = (int *) glb_malloc((glbGetNumOfOscParams()+1) * sizeof(s_para_tab[0]));
   s_index_tab = (int *) glb_malloc((glbGetNumOfOscParams()+1) * sizeof(s_index_tab[0]));
 
+  /* Initialize input errors and central values */
+  for (i=0; i < glbGetNumOfOscParams()+1; i++)
+  {
+    inp_errs[i] = 0.0;
+    start[i] = 0.0;
+  }
+
   /* Select default projection */
   for (i=0; i < glbGetNumOfOscParams()+32; i++)
     para_tab[i] = GLB_FREE;

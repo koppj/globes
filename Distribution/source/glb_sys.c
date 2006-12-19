@@ -797,7 +797,7 @@ double glbChiNoSysSpectrum(int exp, int rule, int n_params, double *x, double *e
   glbGetBGCenters(exp, rule, &bg_norm_center, &bg_tilt_center);
   for (i=ew_low; i <= ew_high; i++)
   {
-    fit_rate = (signal_fit_rates[i] + bg_norm_center * bg_fit_rates[i]);
+    fit_rate = signal_fit_rates[i] + bg_norm_center * bg_fit_rates[i];
     chi2 += glb_likelihood(true_rates[i], fit_rate);
   }
 

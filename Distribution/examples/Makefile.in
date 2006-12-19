@@ -53,8 +53,9 @@ endif
 
 
 
-BIN = example-tour example-static example1 example2 example3 example4 example5
-OBJ = example-tour.o example-tour-s.o example1.o example2.o example3.o example4.o example5.o myio.o
+BIN = example-tour example-static example1 example2 example3 example4 example5 example6
+OBJ = example-tour.o example-tour-s.o example1.o example2.o example3.o example4.o \
+      example5.o example6.o myio.o
 
 example-tour: example-tour.o
 	gcc example-tour.o -o example-tour $(LDFLAGS) $(local_LDFLAGS)
@@ -80,6 +81,9 @@ example4: example4.o myio.o
 
 example5: example5.o myio.o
 	gcc example5.o myio.o -o example5  $(LDFLAGS) $(local_LDFLAGS)
+
+example6: example6.o myio.o
+	gcc example6.o myio.o -o example6  $(LDFLAGS) $(local_LDFLAGS)
 
 %.o : %.c
 	gcc $(CFLAGS) $(local_CFLAGS) -c $< $(INCFLAGS)

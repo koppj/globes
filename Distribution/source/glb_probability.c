@@ -29,7 +29,6 @@
 #include <gsl/gsl_matrix.h>
 #include <gsl/gsl_blas.h>
 #include <globes/globes.h>
-#include "glb_error.h"
 #include "glb_wrapper.h"
 #include "glb_minimize.h"
 #include "glb_probability.h"
@@ -453,7 +452,7 @@ int glb_init_probability_engine()
   S1 = gsl_matrix_complex_calloc(GLB_NU_FLAVOURS, GLB_NU_FLAVOURS);
   T0 = gsl_matrix_complex_calloc(GLB_NU_FLAVOURS, GLB_NU_FLAVOURS);
 
-  return GLB_SUCCESS;
+  return 0;
 }
 
 
@@ -474,7 +473,7 @@ int glb_free_probability_engine()  // FIXME This is never called --> memory leak
   if (Q!=NULL)      { gsl_matrix_complex_free(H);   H = NULL; }
   if (Q!=NULL)      { gsl_matrix_complex_free(U);   U = NULL; }
 
-  return GLB_SUCCESS;
+  return 0;
 }
 
 
@@ -524,7 +523,7 @@ int glb_set_oscillation_parameters(glb_params p)
   gsl_blas_zgemm(CblasNoTrans, CblasNoTrans, GSL_COMPLEX_ONE, U, T,             /* H0=U.T */
                  GSL_COMPLEX_ZERO, H0_template);
   gsl_matrix_complex_free(T);
-  return GLB_SUCCESS;
+  return 0;
 }
 
 
@@ -536,7 +535,7 @@ int glb_set_oscillation_parameters(glb_params p)
 int glb_get_oscillation_parameters(glb_params p)
 {
   glbDefineParams(p, th12, th13, th23, delta, mq[1] - mq[0], mq[2] - mq[0]);
-  return GLB_SUCCESS;
+  return 0;
 }
 
 
@@ -570,7 +569,7 @@ int glb_hamiltonian_cd(double E, double V, int cp_sign)
   }
  
   _H[0][0] = _H[0][0] + cp_sign*V;
-  return GLB_SUCCESS;
+  return 0;
 }
 
 
@@ -618,11 +617,11 @@ int glb_S_matrix_cd(double E, double L, double V, int cp_sign)
     double complex (*_H)[3] = (double complex (*)[3]) gsl_matrix_complex_ptr(H,0,0);
     
     /* Calculate neutrino Hamiltonian */
-    if ((status=glb_hamiltonian_cd(E, V, cp_sign)) != GLB_SUCCESS)
+    if ((status=glb_hamiltonian_cd(E, V, cp_sign)) != 0)
       return status;
     
     /* Calculate eigenvalues of Hamiltonian */
-    if ((status=zheevh3(_H, _Q, _lambda)) != GLB_SUCCESS)
+    if ((status=zheevh3(_H, _Q, _lambda)) != 0)
       return status;
   }
 
@@ -670,7 +669,7 @@ int glb_S_matrix_cd(double E, double L, double V, int cp_sign)
       p++;
     }
 
-  return GLB_SUCCESS;
+  return 0;
 }
 
 
@@ -721,11 +720,11 @@ int glb_filtered_probability_matrix_cd(double P[3][3], double E, double L, doubl
     double complex (*_H)[3] = (double complex (*)[3]) gsl_matrix_complex_ptr(H,0,0);
     
     /* Calculate neutrino Hamiltonian */
-    if ((status=glb_hamiltonian_cd(E, V, cp_sign)) != GLB_SUCCESS)
+    if ((status=glb_hamiltonian_cd(E, V, cp_sign)) != 0)
       return status;
     
     /* Calculate eigenvalues of Hamiltonian */
-    if ((status=zheevh3(_H, _Q, _lambda)) != GLB_SUCCESS)
+    if ((status=zheevh3(_H, _Q, _lambda)) != 0)
       return status;
   }
 
@@ -752,7 +751,7 @@ int glb_filtered_probability_matrix_cd(double P[3][3], double E, double L, doubl
       }
     }
     
-  return GLB_SUCCESS;
+  return 0;
 }
 
 
@@ -766,8 +765,8 @@ int glb_filtered_probability_matrix_cd(double P[3][3], double E, double L, doubl
  *   cp_sign: +1 for neutrinos, -1 for antineutrinos                       *
  *   E:       Neutrino energy (in GeV)                                     *
  *   psteps:  Number of layers in the matter density profile               *
- *   length:  Lengths of the layers in the matter density profile          *
- *   density: The matter densities                                         *
+ *   length:  Lengths of the layers in the matter density profile in km    *
+ *   density: The matter densities in g/cm^3                               *
  *   filter_sigma: Width of low-pass filter or <0 for no filter            *
  ***************************************************************************/
 int glb_probability_matrix(double P[3][3], int cp_sign, double E,
@@ -786,7 +785,7 @@ int glb_probability_matrix(double P[3][3], int cp_sign, double E,
       glb_filtered_probability_matrix_cd(P, E, KM_TO_EV(length[0]), density[0]*GLB_V_FACTOR*GLB_Ne_MANTLE,
           filter_sigma, cp_sign);
     else
-      return GLBERR_NOT_IMPLEMENTED;
+      return -1;
   }
   else                                        /* Without low-pass filter */
   {
@@ -796,7 +795,7 @@ int glb_probability_matrix(double P[3][3], int cp_sign, double E,
       for (i=0; i < psteps; i++)
       {
         status = glb_S_matrix_cd(E, KM_TO_EV(length[i]), density[i]*GLB_V_FACTOR*GLB_Ne_MANTLE, cp_sign);
-        if (status != GLB_SUCCESS)
+        if (status != 0)
           return status;
         gsl_blas_zgemm(CblasNoTrans, CblasNoTrans, GSL_COMPLEX_ONE, S, S1, /* T0 = S.S1 */
                        GSL_COMPLEX_ZERO, T0);
@@ -807,7 +806,7 @@ int glb_probability_matrix(double P[3][3], int cp_sign, double E,
     else
     {
       status = glb_S_matrix_cd(E, KM_TO_EV(length[0]), density[0]*GLB_V_FACTOR*GLB_Ne_MANTLE, cp_sign);
-      if (status != GLB_SUCCESS)
+      if (status != 0)
         return status;
     }
 
@@ -826,7 +825,7 @@ int glb_probability_matrix(double P[3][3], int cp_sign, double E,
   }
   getchar();*/
 
-  return GLB_SUCCESS;
+  return 0;
 }
 
 
@@ -879,7 +878,7 @@ int glbRegisterProbabilityEngine(int n_parameters,
   /* Reallocate arrays for minimizer */
   glb_init_minimizer();
 
-  return GLB_SUCCESS;
+  return 0;
 }
 
 

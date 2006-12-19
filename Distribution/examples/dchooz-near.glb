@@ -1,12 +1,34 @@
 %!GLoBES
-/* AEDL file for the Double CHOOZ near detector  */
+/* AEDL file for the Double CHOOZ near detector
+ *
+ * Copyright 2004 The GLoBES Team
+ *
+ * If you modify this file you have to rename it.
+ *
+ * If you are using this file for producing a scientific publication
+ * or a talk please cite the following references and check the supporting
+ * files for a similar comment.
+ *
+ #* @Article{Huber:2006vr,
+ #*    author    = "Huber, P. and Kopp, Joachim and Lindner, M. and Rolinec, M.
+ #*                 and Winter, W.",
+ #*    title     = "From Double Chooz to Triple Chooz: Neutrino physics at the
+ #*                 Chooz  reactor complex",
+ #*    journal   = "JHEP",
+ #*    volume    = "05",
+ #*    year      = "2006",
+ #*    pages     = "072",
+ #*    eprint    = "hep-ph/0601266",
+ #*    SLACcitation  = "%%CITATION = HEP-PH 0601266;%%"
+ #* }
+ */
    
 $version="1.8.1"
 
 /* Beam data */
 flux(#Reactor)<
         @flux_file = "Reactor.dat"
-        @time      = runtime
+        @time      = 5
         @power     = 8.4 /* GWth */
         @norm      = 6.38156e-13   /* ND is less efficient than FD */
 >

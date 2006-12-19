@@ -28,7 +28,7 @@ flux(#Reactor)<
 	@flux_file="Reactor.dat"
 	@time = 5
 	@power = 4 /* GW thermal */
-	@norm = 1.1584e-13 
+	@norm = 1.1584e-12 
 >
 
 $target_mass = 	        20  /* tons */

@@ -469,7 +469,6 @@ inline static double BinEnergy(int i)
 void glb_set_rates()
 {
   int i, j, k, s;
-  double current_rule_rate; //FIXME remove
   int ew_low, ew_high;
  
   for(j=0; j < bins; j++)

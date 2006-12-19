@@ -628,3 +628,15 @@ documented!
               This seems to make the compiler more picky in some respects
        - Optimized chi^2 functions in example5
        - Examples now compile with gcc (instead of g++)
+
+19/12/2006 JK
+       - Modifications to example5 (chi^2 is now compoletely based on the
+         appendix of hep-ph/0303232 and thus faster)
+       - New example6 --- Non-Standard-Interactions
+       - Modified @norm in Reactor1.glb and Reactor2.glb from 1.1584e-13
+         to 1.1584e-12
+
+*********Version 2.3.16
+
+
+  

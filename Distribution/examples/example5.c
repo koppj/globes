@@ -72,6 +72,7 @@ const double logs22th13_precision = 0.005; /* Desired precision of log(sin[th13]
 #define MAX_SYS 200
 double sys_errors[MAX_SYS];       /* Uncertainties of systematics params */
 double sys_startval[MAX_SYS];     /* Starting values for systematics minimizer */
+double sigma_binbin = 0.0;        /* Bin-to-bin error */
 
 #define EXP_FAR  0
 #define EXP_NEAR 1
@@ -96,14 +97,16 @@ inline double square(double x)
   return x*x;
 }
 
-/* Poisson likelihood */
-inline double likelihood(double true_rate, double fit_rate)
+/* Gauss likelihood (this is sufficient here due to the large event numbers
+ * in a reactor experiment; for other setups, one should use Poisson statistics) */
+inline double likelihood(double true_rate, double fit_rate, double sqr_sigma)
 {
-  if (fit_rate > 0)
-    return 2*(true_rate - fit_rate) + 2*fit_rate * log(fit_rate/true_rate);
+  if (sqr_sigma > 0)
+    return square(true_rate - fit_rate) / sqr_sigma;
   else
-    return 2*(true_rate - fit_rate);
+    return 0.0;
 }
+
 
 
 /***************************************************************************
@@ -151,12 +154,12 @@ double chiDCNorm(int exp, int rule, int n_params, double *x, double *errors)
     /* Statistical part of chi^2 for far detector
      * Normalization is affected by flux error x[0] and fiducial mass error x[1] */
     fit_rate  = signal_norm_F * signal_fit_rates_F[i];
-    chi2 += likelihood(true_rates_F[i], fit_rate);
+    chi2 += likelihood(true_rates_F[i], fit_rate, true_rates_F[i]);
 
     /* Statistical part of chi^2 for near detector
      * Normalization is affected by flux error x[0] and fiducial mass error x[2] */
     fit_rate  = signal_norm_N * signal_fit_rates_N[i];
-    chi2 += likelihood(true_rates_N[i], fit_rate);
+    chi2 += likelihood(true_rates_N[i], fit_rate, true_rates_N[i]);
   }
 
   /* Systematical part of chi^2 (= priors) */
@@ -180,6 +183,8 @@ double chiDCNorm(int exp, int rule, int n_params, double *x, double *errors)
  *   x[3]: Energy calibration error - far detector                         *
  *   x[4]: Energy calibration error - near detector                        *
  *   x[5]...x[5+nBins-1]: Spectral error                                   *
+ * and the bin-to-bin error sigma_binbin. The calculation is based on      *
+ * Eq. (9) of hep-ph/0303232.                                              *
  ***************************************************************************/
 double chiDCSpectral(int exp, int rule, int n_params, double *x, double *errors)
 {
@@ -212,81 +217,17 @@ double chiDCSpectral(int exp, int rule, int n_params, double *x, double *errors)
   {
     /* Statistical part of chi^2 for far detector
      * Normalization is affected by flux error x[0], fiducial mass error x[1],
-     * and spectral perturbations x[5+i] */
+     * spectral perturbations x[5+i], and bin-to-bin error sigma_binbin */
     fit_rate  = (signal_norm_F + x[5+i]) * signal_fit_rates_F[i];
-    chi2 += likelihood(true_rates_F[i], fit_rate);
+    chi2 += likelihood( true_rates_F[i], fit_rate, 
+                    true_rates_F[i] * (1.0 + true_rates_F[i]*square(sigma_binbin)) );
 
     /* Statistical part of chi^2 for near detector
      * Normalization is affected by flux error x[0], fiducial mass error x[2],
-     * and spectral perturbations x[5+i] */
+     * spectral perturbations x[5+i], and bin-to-bin error sigma_binbin */
     fit_rate  = (signal_norm_N + x[5+i]) * signal_fit_rates_N[i];
-    chi2 += likelihood(true_rates_N[i], fit_rate);
-  }
-
-  /* Systematical part of chi^2 (= priors) */
-  for (i=0; i < n_params; i++)
-    chi2 += square(x[i] / errors[i]);
-
-  /* Save the systematics parameters as starting values for the next step */
-  for (i=0; i < n_params; i++)
-    sys_startval[i] = x[i];
-
-  return chi2;
-}  
-
-
-/***************************************************************************
- * Calculate chi^2 for Double Chooz, including the following systematical  *
- * errors:                                                                 *
- *   x[0]: Flux normalization of reactor                                   *
- *   x[1]: Fiducial mass error - far detector                              *
- *   x[2]: Fiducial mass error - near detector                             *
- *   x[3]: Energy calibration error - far detector                         *
- *   x[4]: Energy calibration error - near detector                        *
- *   x[5]...x[5+nBins-1]: Spectral error                                   *
- *   x[5+nBins]...x[5+2*nBins-1]: Bin-to-bin uncorrelated error - FD       *
- *   x[5+2*nBins]...x[5+3*nBins-1]: Bin-to-bin uncorrelated error - ND     *
- ***************************************************************************/
-double chiDCBinBin(int exp, int rule, int n_params, double *x, double *errors)
-{
-  int n_bins = glbGetNumberOfBins(EXP_FAR);
-  double *true_rates_N = glbGetRuleRatePtr(EXP_NEAR, 0);
-  double *true_rates_F = glbGetRuleRatePtr(EXP_FAR, 0);
-  double signal_fit_rates_N[n_bins];
-  double signal_fit_rates_F[n_bins];
-  double signal_norm_N, signal_norm_F;
-  int ew_low, ew_high;
-  double emin, emax;
-  double fit_rate;
-  double chi2 = 0.0;
-  int i;
-
-  /* Request simulated energy interval and analysis energy window */
-  glbGetEminEmax(exp, &emin, &emax);
-  glbGetEnergyWindowBins(exp, rule, &ew_low, &ew_high);
-
-  /* Apply energy calibration error */
-  glbShiftEnergyScale(x[3], glbGetSignalFitRatePtr(EXP_FAR, 0),
-                      signal_fit_rates_F, n_bins, emin, emax);
-  glbShiftEnergyScale(x[4], glbGetSignalFitRatePtr(EXP_NEAR, 0),
-                      signal_fit_rates_N, n_bins, emin, emax);
-
-  /* Loop over all bins in energy window */
-  signal_norm_F = 1.0 + x[0] + x[1];
-  signal_norm_N = 1.0 + x[0] + x[2];
-  for (i=ew_low; i <= ew_high; i++)
-  {
-    /* Statistical part of chi^2 for far detector
-     * Normalization is affected by flux error x[0], fiducial mass error x[1],
-     * spectral perturbations x[5+i], and bin-to-bin errors x[5+2*n_bins+i] */
-    fit_rate  = (signal_norm_F + x[5+i] + x[5+n_bins+i]) * signal_fit_rates_F[i];
-    chi2 += likelihood(true_rates_F[i], fit_rate);
-
-    /* Statistical part of chi^2 for near detector
-     * Normalization is affected by flux error x[0], fiducial mass error x[2],
-     * spectral perturbations x[5+i], and bin-to-bin errors x[5+2*n_bins+i] */
-    fit_rate  = (signal_norm_N + x[5+i] + x[5+2*n_bins+i]) * signal_fit_rates_N[i];
-    chi2 += likelihood(true_rates_N[i], fit_rate);
+    chi2 += likelihood( true_rates_N[i], fit_rate, 
+                    true_rates_N[i] * (1.0 + true_rates_N[i]*square(sigma_binbin)) );
   }
 
   /* Systematical part of chi^2 (= priors) */
@@ -324,7 +265,6 @@ double DoChiSquare(double x, void *dummy)
    * Correlations are unimportant in reactor experiments, so glbChiSys is sufficient */
   chi2 = glbChiSys(test_values, GLB_ALL, GLB_ALL);
   
-//  printf("chi2 = %g\n", chi2);
   return chi2 - chi2_goal;
 }
 
@@ -390,7 +330,6 @@ void ComputeSensitivityCurve()
         x_lo = x_sens[j-1] - deviation;
         x_hi = min(x_sens[j-1] + deviation, -0.001);
       }
-//      printf("%g %g %g\n", x_lo, x_hi, deviation);
       gsl_status = gsl_root_fsolver_set(s, &gsl_func, x_lo, x_hi);
       deviation *= 2;
     } while (gsl_status != GSL_SUCCESS);
@@ -402,8 +341,6 @@ void ComputeSensitivityCurve()
       x_lo       = gsl_root_fsolver_x_lower(s);
       x_hi       = gsl_root_fsolver_x_upper(s);
       gsl_status = gsl_root_test_interval (x_lo, x_hi, logs22th13_precision, 0);
-     
-//      printf("%g %g\n", t, x); 
     } while (gsl_status == GSL_CONTINUE && iter < max_iter);
     
     /* Save results */
@@ -437,9 +374,8 @@ int main(int argc, char *argv[])
   ldm = 2.6e-3;
 
   glbInit(argv[0]);                    /* Initialize GLoBES and define chi^2 functions */
-  glbDefineChiFunction(&chiDCNorm,     5,          "chiDCNorm");
-  glbDefineChiFunction(&chiDCSpectral, 5+n_bins,   "chiDCSpectral");
-  glbDefineChiFunction(&chiDCBinBin,   5+3*n_bins, "chiDCBinBin");
+  glbDefineChiFunction(&chiDCNorm,     5,        "chiDCNorm");
+  glbDefineChiFunction(&chiDCSpectral, 5+n_bins, "chiDCSpectral");
 
   gsl_set_error_handler(&gslError);    /* Initialize GSL root finder */
   gsl_func.function = &DoChiSquare;
@@ -490,7 +426,8 @@ int main(int argc, char *argv[])
   for (i=0; i < sys_dim; i++)         /* Normalization and energy calibration errors */
     sys_errors[i] = old_sys_errors[i];
   for (i=sys_dim; i < sys_dim + n_bins; i++)
-    sys_errors[i]           = 0.02;                                /* Spectral error */
+    sys_errors[i] = 0.02;                                          /* Spectral error */
+  sigma_binbin = 0.0;                          /* No bin-to-bin error for the moment */
   glbSetChiFunction(EXP_FAR, 0, GLB_ON, "chiDCSpectral", sys_errors);
   glbSetChiFunction(EXP_NEAR, 0, GLB_ON, "chiZero", sys_errors);
   ComputeSensitivityCurve();
@@ -498,26 +435,13 @@ int main(int argc, char *argv[])
   /* Calculate sensitivity curve with the above + bin-to-bin error
    * (uncorrelated between near and far detectors */
   InitOutput(MYFILE4,"Format: Running time   Log(10,s22th13) sens. \n"); 
-  for (i=sys_dim; i < sys_dim + n_bins; i++)
-  {
-    sys_errors[i+n_bins]   = 0.005;              /* Bin-to-bin error far detector  */
-    sys_errors[i+2*n_bins] = 0.005;              /* Bin-to-bin error near detector */
-  }
-  glbSetChiFunction(EXP_FAR, 0, GLB_ON, "chiDCBinBin", sys_errors);
-  glbSetChiFunction(EXP_NEAR, 0, GLB_ON, "chiZero", sys_errors);
+  sigma_binbin = 0.005;
   ComputeSensitivityCurve();
 
   /* Calculate sensitivity curve with a different bin-to-bin error */
   InitOutput(MYFILE5,"Format: Running time   Log(10,s22th13) sens. \n"); 
-  for (i=sys_dim; i < sys_dim + n_bins; i++)
-  {
-    sys_errors[i+n_bins]   = 0.02;               /* Bin-to-bin error far detector  */
-    sys_errors[i+2*n_bins] = 0.02;               /* Bin-to-bin error near detector */
-  }
-  glbSetChiFunction(EXP_FAR, 0, GLB_ON, "chiDCBinBin", sys_errors);
-  glbSetChiFunction(EXP_NEAR, 0, GLB_ON, "chiZero", sys_errors);
+  sigma_binbin = 0.02;
   ComputeSensitivityCurve();
-  
   
   /* Clean up */
   glbFreeParams(true_values);

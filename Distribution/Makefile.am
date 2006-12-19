@@ -6,8 +6,11 @@ INCLUDES = $(F2CINC) $(GSLINC)
 
 EXTRA_DIST = examples/Makefile.in examples/example1.c	      \
   examples/example3.c examples/myio.c examples/example-tour.c \
-  examples/example2.c examples/example4.c examples/example5.c examples/myio.h \
-  examples/XCC.dat examples/NuFact.glb BUGS globes.m4
+  examples/example2.c examples/example4.c examples/example5.c examples/example6.c \
+  examples/myio.h \
+  examples/NuFact.glb examples/dchooz-far.glb examples/dchooz-near.glb \
+  examples/Reactor1.glb examples/Reactor.dat examples/XCC.dat examples/XCCreactor.dat \
+  BUGS globes.m4
 
 # that is only needed if the testsuite should go into the release
 # testsuite/01-probabilities.c             testsuite/03-chisys.glb   testsuite/06-chibars.c \
