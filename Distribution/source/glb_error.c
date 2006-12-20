@@ -98,13 +98,13 @@ glb_fatal (const char *message)
 void
 glb_exp_error (const struct glb_experiment *exp, const char *message)
 {
-  char s[30];
+  char s[100];
   int v=0;
   if (exp == NULL  ||  exp->filename == NULL)
     glb_error(message);
   else
   {
-    sprintf(s, "ERROR in experiment %s", exp->filename);
+    sprintf(s, "ERROR in experiment %.60s", exp->filename);
     if(verbosity_level >= 1) v=1;
     error (-1, s, message,v);
   }
@@ -113,7 +113,7 @@ glb_exp_error (const struct glb_experiment *exp, const char *message)
 void
 glb_rule_error (const struct glb_experiment *exp, int rule, const char *message)
 {
-  char s[50];
+  char s[100];
   int v=0;
   if (exp == NULL  ||  exp->filename == NULL)
     glb_error(message);
@@ -121,7 +121,7 @@ glb_rule_error (const struct glb_experiment *exp, int rule, const char *message)
     glb_exp_error(exp, message);
   else
   {
-    sprintf(s, "ERROR in experiment %s, rule %d", exp->filename, rule);
+    sprintf(s, "ERROR in experiment %.60s, rule %d", exp->filename, rule);
     if(verbosity_level >= 1) v=1;
     error (-1, s, message,v);
   }

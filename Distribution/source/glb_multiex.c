@@ -416,8 +416,12 @@ void glbFreeExp(glb_exp ins)
     {
       my_free(in->lowrange[i]);
       my_free(in->uprange[i]);
-      for(j=0;j<in->numofbins;j++) my_free(in->smear[i][j]);
-      my_free(in->smear[i]);
+      if (in->smear != NULL  &&  in->smear[i] != NULL)
+      {
+        for(j=0;j<in->numofbins;j++)
+          my_free(in->smear[i][j]);
+        my_free(in->smear[i]);
+      }
     }
   for(i=0;i<in->numofchannels;i++) 
     {
@@ -534,7 +538,6 @@ static int setup_density_profile(glb_exp ins)
       ins->baseline=ttl;
     }
   
-  
   return s;
 }
 
@@ -551,6 +554,7 @@ int glbDefaultExp(glb_exp ins)
 
   status=0;
   def=0;
+
   status+=setup_density_profile(ins);
   if(in->version==NULL) 
     {
@@ -558,12 +562,11 @@ int glbDefaultExp(glb_exp ins)
       def=-1;
       in->version=(char *) strdup(glb_release_version);
     }
- 
+
   if(glbTestReleaseVersion(in->version)<0) {
     glb_warning("AEDL file has a more recent version number than the"
 		" installed globes package");}
-   
-
+  
   if(in->num_of_xsecs<1)  {glb_exp_error(in, "No X-section selected!");status=-1;}
   if(in->num_of_xsecs>31)  {glb_exp_error(in, "To many X-sections!");status=-1;}
   if(in->num_of_fluxes<1)  {glb_exp_error(in, "No flux selected!");status=-1;}

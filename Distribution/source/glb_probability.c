@@ -461,7 +461,7 @@ int glb_init_probability_engine()
  ***************************************************************************
  * Destroys internal data structures of the probability engine.            *
  ***************************************************************************/
-int glb_free_probability_engine()  // FIXME This is never called --> memory leak
+int glb_free_probability_engine()
 {
   if (T0!=NULL)     { gsl_matrix_complex_free(T0);  T0 = NULL; }
   if (S1!=NULL)     { gsl_matrix_complex_free(S1);  S1 = NULL; }

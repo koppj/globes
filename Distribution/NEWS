@@ -648,4 +648,6 @@ documented!
        - GLoBES now complains if a projection is incompletely defined, but
          uses GLB_FREE as default as before (this was e.g. an error in
          example2)
+       - Fixed segfault that occured during cleanup of the smearing matrix
+         e.g. if the version string was invalid
   

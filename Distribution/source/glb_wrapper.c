@@ -1687,7 +1687,8 @@ void glb_clean_up()
  for(i=0;i<glb_path_vector_length;i++)
    glb_free((char *) glb_path_vector[i]);
  glb_free((char **) glb_path_vector);
- 
+ glb_free_minimizer();
+ glb_free_probability_engine();
 }
 
 
