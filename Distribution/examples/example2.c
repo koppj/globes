@@ -76,7 +76,8 @@ int main(int argc, char *argv[])
 
   /* Set two-parameter projection onto s22th13-axis: only deltacp free! */
   glbDefineProjection(theta13_projection,GLB_FIXED,GLB_FIXED,GLB_FIXED,
-   GLB_FREE,GLB_FIXED,GLB_FIXED);
+    GLB_FREE,GLB_FIXED,GLB_FIXED);
+  glbSetDensityProjectionFlag(theta13_projection, GLB_FREE, GLB_ALL);
   glbSetProjection(theta13_projection); 
 
   /* Iteration over all values to be computed */

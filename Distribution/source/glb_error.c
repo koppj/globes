@@ -32,6 +32,7 @@
 #include <string.h>
 #include <stdio.h>
 
+#include "glb_error.h"
 #include <globes/globes.h>
 
 /* this insures that the exit status of our program has the
@@ -92,6 +93,38 @@ glb_fatal (const char *message)
 {
   /* A FATAL message always is displayed */
   error (EXIT_FAILURE, "FATAL", message,1);
+}
+
+void
+glb_exp_error (const struct glb_experiment *exp, const char *message)
+{
+  char s[30];
+  int v=0;
+  if (exp == NULL  ||  exp->filename == NULL)
+    glb_error(message);
+  else
+  {
+    sprintf(s, "ERROR in experiment %s", exp->filename);
+    if(verbosity_level >= 1) v=1;
+    error (-1, s, message,v);
+  }
+}
+
+void
+glb_rule_error (const struct glb_experiment *exp, int rule, const char *message)
+{
+  char s[50];
+  int v=0;
+  if (exp == NULL  ||  exp->filename == NULL)
+    glb_error(message);
+  else if (rule < 0  ||  rule >= exp->numofrules)
+    glb_exp_error(exp, message);
+  else
+  {
+    sprintf(s, "ERROR in experiment %s, rule %d", exp->filename, rule);
+    if(verbosity_level >= 1) v=1;
+    error (-1, s, message,v);
+  }
 }
 
 /* ----- making the system calls safe ----- */

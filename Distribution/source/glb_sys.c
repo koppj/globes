@@ -149,7 +149,8 @@ int glbSetChiFunctionInRule(struct glb_experiment *exp, int rule, int on_off,
   
   /* Something tells me that people will come up with the idea to pass
    * exp->sys_on_errors; this has to be blockes */
-  if (errors != NULL  &&  errors == exp->sys_on_errors[rule])
+  if (errors != NULL  &&
+        (errors == exp->sys_on_errors[rule]  ||  errors == exp->sys_off_errors[rule]))
   {
     glb_error("glbSetChiFunctionInRule: Invalid error array");
     return -1;
@@ -277,22 +278,22 @@ int glbSetChiFunctionInRule(struct glb_experiment *exp, int rule, int on_off,
 
   /* Make sure that the error list and the old signal_error / bg_error arrays
    * are consistent */
-  if (glbIsChiFunction2011Compatible(sys_id) && sys->dim > 0)
+  if (glbIsChiFunction2011Compatible(sys->name) && sys->dim > 0)
   {
     exp->signal_errors[0][rule]    = errors[0];
     exp->signal_startvals[0][rule] = 0.0;
   }
-  if (glbIsChiFunction2011Compatible(sys_id) && sys->dim > 1)
+  if (glbIsChiFunction2011Compatible(sys->name) && sys->dim > 1)
   {
     exp->signal_errors[1][rule]    = errors[1];
     exp->signal_startvals[1][rule] = 0.0;
   }
-  if (glbIsChiFunction2011Compatible(sys_id) && sys->dim > 2)
+  if (glbIsChiFunction2011Compatible(sys->name) && sys->dim > 2)
   {
     exp->bg_errors[0][rule]        = errors[2];
     exp->bg_startvals[0][rule]     = 0.0;
   }
-  if (glbIsChiFunction2011Compatible(sys_id) && sys->dim > 3)
+  if (glbIsChiFunction2011Compatible(sys->name) && sys->dim > 3)
   {
     exp->bg_errors[1][rule]        = errors[3];
     exp->bg_startvals[1][rule]     = 0.0;
@@ -1010,7 +1011,7 @@ int glbDefineChiFunction(glb_chi_function chi_func, int dim, const char *name)
   {
     glb_sys_list->chi_func = chi_func;
     glb_sys_list->dim      = dim;
-    glb_sys_list->name     = (char *) glb_malloc(strlen(name));
+    glb_sys_list->name     = (char *) glb_malloc(strlen(name)+1);
     if (glb_sys_list->name != NULL)
     {
       strcpy(glb_sys_list->name, name);

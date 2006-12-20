@@ -42,10 +42,6 @@
 /* Number of neutrino flavours */
 #define GLB_NU_FLAVOURS  3
 
-/* Number of oscillation parameters                                         */
-/* ---> May need to be modified when implementing non-standard physics <--- */
-//#define GLB_OSCP 6
-
 
 // JK - I prefer enums over #defines since they are parsed by the compiler,
 // which is more intelligent than the pre-processor.

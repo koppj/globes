@@ -259,7 +259,8 @@ glb_osc_proj_type *glb_alloc_osc_proj_type()
   temp=(glb_osc_proj_type *) glb_malloc(sizeof(glb_osc_proj_type));
   temp->osc_params=(int *) glb_malloc(sizeof(int) *  glbGetNumOfOscParams()); 
   temp->length = (size_t) glbGetNumOfOscParams();
-  for(i=0;i<glbGetNumOfOscParams();i++) temp->osc_params[i]=GLB_FREE;
+  for(i=0;i<glbGetNumOfOscParams();i++) temp->osc_params[i]=GLB_UNDEFINED;
+//FIXME Remove  for(i=0;i<glbGetNumOfOscParams();i++) temp->osc_params[i]=GLB_FREE;
   return temp;
 }
 
@@ -276,7 +277,8 @@ glb_density_proj_type *glb_alloc_density_proj_type()
   temp=(glb_density_proj_type *) glb_malloc(sizeof(glb_density_proj_type));
   temp->density_params=(int *) glb_malloc(sizeof(int)*glb_num_of_exps);
   temp->length=(size_t) glb_num_of_exps;
-  for(i=0;i<glb_num_of_exps;i++) temp->density_params[i]=GLB_FREE;
+//FIXME Remove  for(i=0;i<glb_num_of_exps;i++) temp->density_params[i]=GLB_FREE;
+  for(i=0;i<glb_num_of_exps;i++) temp->density_params[i]=GLB_UNDEFINED;
   return temp;
 }
 

@@ -3550,6 +3550,7 @@ void glb_copy_buff()
 {
   /* I am not sure how well this assigment really works */
   buff.names=copy_names(buff.names);
+  buff.filename=strdup(glb_file_id);
   buff_list[exp_count]=buff; 
   exp_count++;
 }

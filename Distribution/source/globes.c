@@ -445,18 +445,20 @@ int main(int argc, char *argv[])
       exit(1);
     }
   osc = (double *) glb_malloc(sizeof(*osc) * glbGetNumOfOscParams());
-  osc[0] = 0.57964;                 /* theta_12 */
-  osc[1] = 0.15878;                 /* theta_13 */
+  osc[0] = 0.553574;                /* theta_12 */
+  osc[1] = 0.160875;                /* theta_13 */
   osc[2] = M_PI/4;                  /* theta_23 */
   osc[3] = 0.0;                     /* delta_CP */
-  osc[4] = 7.9e-5;                  /* dm_21    */
-  osc[5] = 2.6e-3;                  /* dm_31    */
-//                   0.553574,        /* theta_12 */
-//                   0.160875,        /* theta_13 */
-//                   M_PI/4,          /* theta_23 */
-//                   0.0,             /* delta_CP */
-//                   0.00007,         /* dm_21    */
-//                   0.003            /* dm_31    */
+  osc[4] = 0.00007;                 /* dm_21    */
+  osc[5] = 0.003;                   /* dm_31    */
+
+  /* Here are new parameters from hep-ph/0405172v5 */
+//  osc[0] = 0.57964;                 /* theta_12 */
+//  osc[1] = 0.15878;                 /* theta_13 */
+//  osc[2] = M_PI/4;                  /* theta_23 */
+//  osc[3] = 0.0;                     /* delta_CP */
+//  osc[4] = 7.9e-5;                  /* dm_21    */
+//  osc[5] = 2.6e-3;                  /* dm_31    */
 
 
   /* Redirecting the output stream according to -o=FILE */

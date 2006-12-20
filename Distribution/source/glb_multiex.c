@@ -285,6 +285,7 @@ void glbInitExp(glb_exp ins)
   struct glb_experiment *in;
   in=(struct glb_experiment *) ins;
   in->version=NULL;
+  in->filename=NULL;
   in->names=NULL;
   in->num_of_fluxes=-1;
   in->density_profile_type=-1;
@@ -386,6 +387,7 @@ void glbFreeExp(glb_exp ins)
   in=(struct glb_experiment *) ins;
   glb_free_names(in->names);
   glb_free(in->version);
+  glb_free(in->filename);
   for(i=0;i<32;i++)glb_flux_free(in->fluxes[i]);
   for(i=0;i<32;i++)glb_xsec_free(in->xsecs[i]);
 
@@ -474,7 +476,7 @@ static int setup_density_profile(glb_exp ins)
   struct glb_experiment *in;
   in=(struct glb_experiment *) ins;
   if(ins->density_profile_type==-1) 
-    {glb_error("No profile type specified");s=-1;}
+    {glb_exp_error(in, "No profile type specified");s=-1;}
   if(ins->density_profile_type==1)
     {
       glb_free(ins->lengthtab);
@@ -488,7 +490,7 @@ static int setup_density_profile(glb_exp ins)
 	}
       else
 	{
-	  glb_error("Baseline must be a positive number");
+	  glb_exp_error(in, "Baseline must be a positive number");
 	  s=-1;
 	}
     }
@@ -509,14 +511,14 @@ static int setup_density_profile(glb_exp ins)
 	    }
 	  else
 	    {
-	      glb_error("Densitysteps must be a positive number");
+	      glb_exp_error(in, "Densitysteps must be a positive number");
 	      s=-1;
 	    }
 	      
 	}
       else
 	{
-	  glb_error("Baseline must be a positive number");
+	  glb_exp_error(in, "Baseline must be a positive number");
 	  s=-1;
 	}
     }
@@ -546,7 +548,7 @@ int glbDefaultExp(glb_exp ins)
   in=(struct glb_experiment *) ins;
   double *tmp_errorlist;
   double tmp;
- 
+
   status=0;
   def=0;
   status+=setup_density_profile(ins);
@@ -562,15 +564,16 @@ int glbDefaultExp(glb_exp ins)
 		" installed globes package");}
    
 
-  if(in->num_of_xsecs<1)  {glb_error("No X-section selected!");status=-1;}
-  if(in->num_of_xsecs>31)  {glb_error("To many X-sections!");status=-1;}
-  if(in->num_of_fluxes<1)  {glb_error("No flux selected!");status=-1;}
-  if(in->num_of_fluxes>31)  {glb_error("To many fluxes!");status=-1;}
+  if(in->num_of_xsecs<1)  {glb_exp_error(in, "No X-section selected!");status=-1;}
+  if(in->num_of_xsecs>31)  {glb_exp_error(in, "To many X-sections!");status=-1;}
+  if(in->num_of_fluxes<1)  {glb_exp_error(in, "No flux selected!");status=-1;}
+  if(in->num_of_fluxes>31)  {glb_exp_error(in, "To many fluxes!");status=-1;}
   if(in->num_of_fluxes>0&&in->num_of_fluxes<32)
     {
       for(i=0;i<in->num_of_fluxes;i++)
 	{
-	  if(in->fluxes[i]==NULL) {glb_error("Flux specs missing");status=-1;}
+	  if(in->fluxes[i]==NULL)
+            { glb_exp_error(in, "Flux specs missing"); status=-1; }
 	  else
 	    {
 	      if(glb_default_flux(in->fluxes[i])==0)
@@ -585,8 +588,8 @@ int glbDefaultExp(glb_exp ins)
     {
       for(i=0;i<in->num_of_xsecs;i++)
 	{
-	  if(in->xsecs[i]==NULL) {glb_error("X-section specs missing")
-				    ;status=-1;}
+	  if(in->xsecs[i]==NULL)
+            { glb_exp_error(in, "X-section specs missing"); status=-1; }
 	  else
 	    {
 	      if(glb_default_xsec(in->xsecs[i])==0)
@@ -601,7 +604,7 @@ int glbDefaultExp(glb_exp ins)
   for (i=0; i < in->numofrules; i++)
   { 
     if (in->sys_on_strings[i] == NULL)
-      { glb_error("No chi^2 function specified"); status=-1; }
+      { glb_rule_error(in, i, "No chi^2 function specified"); status=-1; }
     else
     {
       tmp_errorlist = in->sys_on_errors[i];
@@ -616,24 +619,27 @@ int glbDefaultExp(glb_exp ins)
           for (k=0; tmp_errorlist[k] > 0.0; k++)
             ;
           if (k != sys_dim)
-            { glb_error("Invalid systematical error list @sys_on_errors"); status=-1; }
+          {
+            glb_rule_error(in, i, "Invalid systematical error list @sys_on_errors");
+            status=-1;
+          }
         }
       }
       else
-        { glb_error("Invalid systematics specification"); status=-1; }
+        { glb_rule_error(in, i, "Invalid systematics specification"); status=-1; }
           
       // FIXME Shall we be so strict here, or should we use some default?
       // (was default formerly)
       if (glbSetChiFunctionInExperiment(in, i, GLB_ON, in->sys_on_strings[i],
                                         tmp_errorlist) != 0)
-        { glb_error("Invalid systematics specification"); status=-1; }
+        { glb_rule_error(in, i, "Invalid systematics specification"); status=-1; }
 
       glb_free(tmp_errorlist);
     }
 
     /* Treatment of parameters for systematics OFF is equivalent to systematics ON */
     if (in->sys_off_strings[i] == NULL)
-      { glb_error("No chi^2 function specified"); status=-1; }
+      { glb_rule_error(in, i, "No chi^2 function specified"); status=-1; }
     else
     {
       tmp_errorlist = in->sys_off_errors[i];
@@ -648,85 +654,60 @@ int glbDefaultExp(glb_exp ins)
           for (k=0; tmp_errorlist[k] > 0.0; k++)
             ;
           if (k != sys_dim)
-            { glb_error("Invalid systematical error list @sys_off_errors"); status=-1; }
+          { 
+            glb_rule_error(in, i, "Invalid systematical error list @sys_off_errors");
+            status=-1;
+          }
         }
       }
       else
-        { glb_error("Invalid systematics specification"); status=-1; }
+        { glb_rule_error(in, i, "Invalid systematics specification"); status=-1; }
           
       // FIXME Shall we be so strict here, or should we use some default?
       // (was default formerly)
       if (glbSetChiFunctionInExperiment(in, i, GLB_OFF, in->sys_off_strings[i],
                                         tmp_errorlist) != 0)
-        { glb_error("Invalid systematics specification"); status=-1; }
+        { glb_rule_error(in, i, "Invalid systematics specification"); status=-1; }
 
       glb_free(tmp_errorlist);
     }
-
-// FIXME remove
-/*    printf("\nRule %d:", i);
-    printf("\nErrors ON:     ");
-    if (in->sys_on_errors[i] != NULL)
-      for (k=0; k < 5; k++)
-        printf("%g\t", in->sys_on_errors[i][k]);
-    else
-      printf("NULL\t");
-    printf("\nStartvals ON:  ");
-    if (in->sys_on_startvals[i] != NULL)
-      for (k=0; k < 5; k++)
-        printf("%g\t", in->sys_on_startvals[i][k]);
-    else
-      printf("NULL\t");
-    printf("\nErrors OFF:    ");
-    if (in->sys_off_errors[i] != NULL)
-      for (k=0; k < 5; k++)
-        printf("%g\t", in->sys_off_errors[i][k]);
-    else
-      printf("NULL\t");
-    printf("\nStartvals OFF: ");
-    if (in->sys_off_startvals[i] != NULL)
-      for (k=0; k < 5; k++)
-        printf("%g\t", in->sys_off_startvals[i][k]);
-    else
-      printf("NULL\t");*/
   }
-//  getchar();
-
 
     
-  if(in->baseline==-1){glb_error("No baseline specified!");status=-1;}
-  if(in->emin==-1){glb_error("No emin specified!");status=-1;}
-  if(in->emax==-1){glb_error("No emax specified!");status=-1;}
-  if(in->numofbins==-1){glb_error("numofbins is not set!");status=-1;}
-  if(in->numofbins<=0) { glb_error("Too few bins defined!");status=-1;}
+  if(in->baseline==-1){glb_exp_error(in, "No baseline specified!");status=-1;}
+  if(in->emin==-1){glb_exp_error(in, "No emin specified!");status=-1;}
+  if(in->emax==-1){glb_exp_error(in, "No emax specified!");status=-1;}
+  if(in->numofbins==-1){glb_exp_error(in, "numofbins is not set!");status=-1;}
+  if(in->numofbins<=0) { glb_exp_error(in, "Too few bins defined!");status=-1;}
 
   /* It's okay if they are NULL or anything else ;-) */
   if(in->binsize==NULL) {in->binsize=NULL;}
   if(in->simbinsize==NULL) {in->simbinsize=NULL;}
   
-  if(in->targetmass==-1){glb_error("No targetmass specified!");status=-1;}
+  if(in->targetmass==-1){glb_exp_error(in, "No targetmass specified!");status=-1;}
  
   if(in->numofchannels==-1){
-    glb_error("numofchannels not specified!");status=-1;}
+    glb_exp_error(in, "numofchannels not specified!");status=-1;}
   
   for(i=0;i<6;i++){
-    if(in->listofchannels[i]==NULL){glb_error("listofchannels not specified!");
-				      status=-1;}}
-  if(in->numofrules==-1){glb_error("numofrules not specified!");status=-1;}
+    if(in->listofchannels[i]==NULL)
+      {  glb_exp_error(in, "listofchannels not specified!"); status=-1;}
+  }
+  if(in->numofrules==-1){glb_exp_error(in, "numofrules not specified!");status=-1;}
   for(i=0;i<in->numofrules;i++)
     {
-      if(in->lengthofrules[i]==-1){glb_error("No targetmass specified!");
-      status=-1;}
-      if(in->rulescoeff[i]==NULL){glb_error("No rulescoeff specified!");
-      status=-1;}
-      if(in->rulechannellist[i]==NULL){glb_error("No rulechannellist" 
-						  " specified!");status=-1;}
-      if(in->lengthofbgrules[i]==-1){glb_error("No lengthofbgrules"
-						" specified!");status=-1;}
-      if(in->bgrulescoeff[i]==NULL){glb_error("No bgrulescoeff specified!");
-      status=-1;}
-      if(in->bgrulechannellist[i]==NULL){glb_error("No bgruloechannellist"
-						    " specified!");status=-1;}
+      if(in->lengthofrules[i]==-1)
+        { glb_rule_error(in, i, "No targetmass specified!"); status=-1; }
+      if(in->rulescoeff[i]==NULL)
+        { glb_rule_error(in, i, "No rulescoeff specified!"); status=-1; }
+      if(in->rulechannellist[i]==NULL)
+        { glb_rule_error(in, i, "No rulechannellist specified!"); status=-1; }
+      if(in->lengthofbgrules[i]==-1)
+        { glb_rule_error(in, i, "No lengthofbgrules specified!"); status=-1; }
+      if(in->bgrulescoeff[i]==NULL)
+        {  glb_rule_error(in, i, "No bgrulescoeff specified!"); status=-1; }
+      if(in->bgrulechannellist[i]==NULL)
+        { glb_rule_error(in, i, "No bgruloechannellist specified!"); status=-1; }
     }
  
 
@@ -734,7 +715,7 @@ int glbDefaultExp(glb_exp ins)
   if(in->filter_value==-1){in->filter_value=0;def=-1;}
   
   if(in->num_of_sm==-1){
-    glb_error("No smearing data specified!");status=-1;}
+    glb_exp_error(in, "No smearing data specified!");status=-1;}
   
   for(i=0;i<in->num_of_sm;i++) 
     {
@@ -764,24 +745,21 @@ int glbDefaultExp(glb_exp ins)
 	  in->simtresh=in->smear_data[i]->e_sim_min;
 	  in->simbeam=in->smear_data[i]->e_sim_max;
 	  in->simbins=in->smear_data[i]->simbins;
-	
- 
-
-      }
+        }
       
     
 
-      if(in->smear[i]==NULL){glb_error("No smear matrix defined!");
+      if(in->smear[i]==NULL){glb_exp_error(in, "No smear matrix defined!");
       status=-1;}
-      if(in->lowrange[i]==NULL){glb_error("No lowrange defined!");status=-1;}
-      if(in->uprange[i]==NULL){glb_error("No uprange defined!");status=-1;}
+      if(in->lowrange[i]==NULL){glb_exp_error(in, "No lowrange defined!");status=-1;}
+      if(in->uprange[i]==NULL){glb_exp_error(in, "No uprange defined!");status=-1;}
 
     }
-      if(in->simtresh==-1){glb_error("No simtresh defined!");status=-1;}
-      if(in->simbeam==-1){glb_error("No simbeam defined!");status=-1;}  
-      if(in->simbins==-1){glb_error("No simbins defined!");status=-1;}
-      if(in->simbins<in->numofbins){glb_error("Less sampling points than"
-					      " bins");status=-1;} 
+      if(in->simtresh==-1){glb_exp_error(in, "No simtresh defined!");status=-1;}
+      if(in->simbeam==-1){glb_exp_error(in, "No simbeam defined!");status=-1;}  
+      if(in->simbins==-1){glb_exp_error(in, "No simbins defined!");status=-1;}
+      if(in->simbins<in->numofbins){glb_exp_error(in, "Less sampling points than bins");
+                                    status=-1;} 
   //---------------------------------------------------------
 
     *in=MInitMemory0(*in);
@@ -791,16 +769,16 @@ int glbDefaultExp(glb_exp ins)
   
   if(in->density_center==-1){in->density_center=1;def=-1;}
   if(in->density_error==-1){in->density_error=0.05;def=-1;}
-  if(in->psteps==-1){glb_error("psteps not defined!");status=-1;}
-  if(in->lengthtab==NULL){glb_error("lengthtab not allocated!");status=-1;}
-  if(in->densitytab==NULL){glb_error("densitytab not allocated!");status=-1;}
-  if(in->densitybuffer==NULL){glb_error("densitybuffer not allocated!");
+  if(in->psteps==-1){glb_exp_error(in, "psteps not defined!");status=-1;}
+  if(in->lengthtab==NULL){glb_exp_error(in, "lengthtab not allocated!");status=-1;}
+  if(in->densitytab==NULL){glb_exp_error(in, "densitytab not allocated!");status=-1;}
+  if(in->densitybuffer==NULL){glb_exp_error(in, "densitybuffer not allocated!");
   status=-1;}
   // here we use lot of defaults -- and its not that clear how many
   // there are numofrules ? numofchannels ?
   for(i=0;i<in->numofchannels;i++)
     {
-      if(in->simbins<=0) glb_error("Too few simbins defined!");
+      if(in->simbins<=0) glb_exp_error(in, "Too few simbins defined!");
       else
 	{
 
@@ -815,9 +793,11 @@ int glbDefaultExp(glb_exp ins)
 	  else
 	    {
 	      for(ct=0;in->user_pre_smearing_channel[i][ct]!=-1;ct++) ct=ct;
-	      if(ct!=in->simbins) {glb_error("user_pre_smearing_channel"
-					     " has not simbins elements");
-	      status=-1;}
+	      if(ct!=in->simbins)
+              {
+                glb_exp_error(in, "user_pre_smearing_channel has not simbins elements");
+                status=-1;
+              }
 	    }
 	    
 	  if(in->user_pre_smearing_background[i]==NULL)
@@ -831,9 +811,11 @@ int glbDefaultExp(glb_exp ins)
 	  else
 	    {
 	      for(ct=0;in->user_pre_smearing_background[i][ct]!=-1;ct++) ct=ct;
-	      if(ct!=in->simbins) {glb_error("user_pre_smearing_background"
-					     " has not simbins elements");
-	      status=-1;}
+	      if(ct!=in->simbins)
+              {
+                glb_exp_error(in, "user_pre_smearing_background has not simbins elements");
+                status=-1;
+              }
 	    }
 	    
 	  if(in->user_post_smearing_channel[i]==NULL)
@@ -847,9 +829,11 @@ int glbDefaultExp(glb_exp ins)
 	  else
 	    {
 	      for(ct=0;in->user_post_smearing_channel[i][ct]!=-1;ct++) ct=ct;
-	      if(ct!=in->numofbins) {glb_error("user_post_smearing_channel"
-					     " has not numofbins elements");
-	      status=-1;}
+	      if(ct!=in->numofbins)
+              {
+                glb_exp_error(in, "user_post_smearing_channel has not numofbins elements");
+                status=-1;
+              }
 	    }
 	  if(in->user_post_smearing_background[i]==NULL)
 	    {
@@ -863,9 +847,11 @@ int glbDefaultExp(glb_exp ins)
 	    {
 	      for(ct=0;in->user_post_smearing_background[i][ct]!=-1;ct++) 
 		ct=ct;
-	      if(ct!=in->numofbins) {glb_error("user_post_smearing_background"
-					     " has not numofbins elements");
-	      status=-1;}
+	      if(ct!=in->numofbins)
+              {
+                glb_exp_error(in, "user_post_smearing_background has not numofbins elements");
+                status=-1;
+              }
 	    }
 	}
       
@@ -907,7 +893,7 @@ int glbDefaultExp(glb_exp ins)
 	 in->rates1[i]==NULL||
 	 in->rates1BG[i]==NULL)
       {
-        glb_error("No memory for ratevectors allocated!");
+        glb_rule_error(in, i, "No memory for ratevectors allocated!");
         status=-1;
       }
     }
@@ -917,13 +903,15 @@ int glbDefaultExp(glb_exp ins)
     if(in->chrb_0[i]==NULL || in->chrb_1[i]==NULL ||
        in->chra_0[i]==NULL || in->chra_1[i]==NULL)
     {
-      glb_error("No memory for convolution allocated!");
+      glb_exp_error(in, "No memory for convolution allocated!");
       status=-1;
     }
   }
 
-  if(in->energy_tab==NULL){glb_error("energy_tab not allocated!");
+  if(in->energy_tab==NULL){glb_exp_error(in, "energy_tab not allocated!");
   status=-1;}
+
+
   // okay thats missing
   /*
     for(i=0;i<32;i++) in->no_osc_background[i]=NULL;
@@ -1002,7 +990,7 @@ static struct glb_experiment MInitMemory0(struct glb_experiment in)
   if(out.numofbins>=out.simbins) l2=out.numofbins;
   else l2=out.simbins;
   if(len<=0) 
-    {glb_error("Too few bins defined!");}
+    {glb_exp_error(&in, "Too few bins defined!");}
   else
     {
       for (k=0;k<out.numofrules;k++) 
@@ -1010,7 +998,7 @@ static struct glb_experiment MInitMemory0(struct glb_experiment in)
 	  out.rates0[k] =  (double*) glb_malloc( len*sizeof(double));
 	  out.rates1[k] = (double*) glb_malloc( len*sizeof(double));
 	  out.rates1BG[k] = (double*) glb_malloc( len*sizeof(double));
-	  if(out.simbins<=0) glb_error("Too few simbins defined!");
+	  if(out.simbins<=0) glb_exp_error(&in, "Too few simbins defined!");
 	  else
 	    {
 	      out.SignalRates[k] = (double*) glb_malloc(len*sizeof(double));
@@ -1022,21 +1010,21 @@ static struct glb_experiment MInitMemory0(struct glb_experiment in)
   for(k=0;k<out.numofchannels;k++)
     {
       if (out.simbins <= 0)
-        glb_error("Too few simbins defined!");
+        glb_exp_error(&in, "Too few simbins defined!");
       else
       {
         out.chrb_0[k] = (double*) glb_malloc(out.simbins*sizeof(double)); 
         out.chrb_1[k] = (double*) glb_malloc(out.simbins*sizeof(double)); 
       }
       if (out.numofbins <= 0)
-        glb_error("Too few bins defined!"); 
+        glb_exp_error(&in, "Too few bins defined!"); 
       else
       {
         out.chra_0[k] = (double*) glb_malloc(out.numofbins*sizeof(double));
         out.chra_1[k] = (double*) glb_malloc(out.numofbins*sizeof(double));
       }
     } 
-  if(out.psteps<=0) glb_error("Too few density steps defined!");
+  if(out.psteps<=0) glb_exp_error(&in, "Too few density steps defined!");
   else if (out.densitybuffer==NULL) out.densitybuffer=(double*) 
 				      glb_malloc(out.psteps*sizeof(double));
   return out;

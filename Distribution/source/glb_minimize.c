@@ -216,9 +216,11 @@ int glb_init_minimizer()
 
   /* Select default projection */
   for (i=0; i < glbGetNumOfOscParams()+32; i++)
-    para_tab[i] = GLB_FREE;
+//FIXME Remove    para_tab[i] = GLB_FREE;
+    para_tab[i] = GLB_UNDEFINED;
   for (i=0; i < glbGetNumOfOscParams()+1; i++)
-    s_para_tab[i] = GLB_FREE;
+//FIXME Remove    s_para_tab[i] = GLB_FREE;
+    s_para_tab[i] = GLB_UNDEFINED;
 }
 
 
@@ -708,32 +710,46 @@ int glb_set_solar_starting_values(double a)
 
 static void SelectProjection(int *vec)
 {
+  int status=0;
   int i,c,c1,c2;
 
-  for(i=0;i<glbGetNumOfOscParams()+glb_num_of_exps;i++) para_tab[i]=vec[i];
+  for(i=0;i<glbGetNumOfOscParams()+glb_num_of_exps;i++)
+    {
+      if (vec[i] != GLB_FREE  &&  vec[i] != GLB_FIXED)
+        {
+          status = -1;
+          para_tab[i] = GLB_FREE;
+        }
+      else
+        para_tab[i] = vec[i];
+    }
+
+  if (status != 0)
+    glb_error("SelectProjection: Projection partly undefined. Using default GLB_FREE");
+  
   c=0;
   c1=0;
   c2=0;
   for(i=0;i<glbGetNumOfOscParams()+glb_num_of_exps;i++)
     {
-      if(para_tab[i]==1) c++;
+      if(para_tab[i]==GLB_FREE) c++;
     }
   for(i=0;i<glbGetNumOfOscParams()+glb_num_of_exps;i++)
     {
-      if(para_tab[i]==1) 
+      if(para_tab[i]==GLB_FREE) 
 	{
 	  index_tab[c1]=i;
 	  c1++;
 	}
-      else if(para_tab[i]==0)
+      else if(para_tab[i]==GLB_FIXED)
 	{
 	  index_tab[c+c2]=i;
 	  c2++;
 	}
-      else
+      else//FIXME Remove
 	{
 	  glb_fatal("SelectProjection input error\n");
-	} 
+	}
     }
   n_free=c;
   n_fix=c2;
@@ -832,7 +848,7 @@ static double MD_chi_NP(double x[])
       glb_set_profile_scaling(y[glbGetNumOfOscParams()+i],i);
       glb_set_new_rates();
     }
-  
+
   erg2=ChiS();
   // adding  the user defined prior
   // shoufling the parameter vector y into an glb_params structure
@@ -870,10 +886,30 @@ static double MD_chi_NP(double x[])
 
 static void single_SelectProjection(int set)
 {
+  int status=0;
   int i,c,c1,c2;
 
-  for(i=0;i<glbGetNumOfOscParams();i++) s_para_tab[i]=para_tab[i];
+  for(i=0;i<glbGetNumOfOscParams();i++)
+    {
+      if (para_tab[i] != GLB_FREE  && para_tab[i] != GLB_FIXED)
+        {
+          status = -1;
+          para_tab[i] = GLB_FREE;
+        }
+      s_para_tab[i]=para_tab[i];
+    }
+  if (para_tab[glbGetNumOfOscParams()+set] != GLB_FREE  &&
+      para_tab[glbGetNumOfOscParams()+set] != GLB_FIXED)
+    {
+      status = -1;
+      para_tab[glbGetNumOfOscParams()+set] = GLB_FREE;
+    }
   s_para_tab[glbGetNumOfOscParams()]=para_tab[glbGetNumOfOscParams()+set];
+
+  if (status != 0)
+    glb_error("single_SelectProjection: Projection partly undefined. Using default GLB_FREE");
+
+  
   c=0;
   c1=0;
   c2=0;
@@ -893,10 +929,10 @@ static void single_SelectProjection(int set)
 	  s_index_tab[c+c2]=i;
 	  c2++;
 	}
-      else
+/*FIXME Remove      else
 	{
 	  fprintf(stderr,"SelectProjection input error\n");
-	} 
+	} */
     }
  
   s_n_free=c;
@@ -997,7 +1033,7 @@ static double internal_glbSingleChiNP(const glb_params in, glb_params out,
 
   glb_single_experiment_number=exp;
   
-  //creating memory 
+   //creating memory 
   single_SelectProjection(exp);
 
   dim=s_n_free;
@@ -1071,6 +1107,8 @@ static double internal_glbChiNP(const glb_params in, glb_params out)
   //creating memory 
  
   
+  SelectProjection(para_tab);  /* This dummy call forces a check of the projection */
+
   dim=n_free;
   
   mat2=glb_alloc_mat(1,dim,1,dim);
@@ -1088,7 +1126,7 @@ static double internal_glbChiNP(const glb_params in, glb_params out)
 	return -1;
       }
   }
-  
+ 
   for(i=0;i<glbGetNumOfOscParams();i++) x[i]=glbGetOscParams(in,i);
   for(i=0;i<glb_num_of_exps;i++) x[i+glbGetNumOfOscParams()]=glbGetDensityParams(in,i);
 

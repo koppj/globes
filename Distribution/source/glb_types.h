@@ -153,6 +153,9 @@ struct glb_experiment {
   /* Version string */
   char *version;
 
+  /* Name of AEDL file on which this experiment is based */
+  char *filename;
+
   /* This contains the parsing meta-information like names of rules etc. */
   glb_naming *names;
   

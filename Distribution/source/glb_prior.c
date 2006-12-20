@@ -90,6 +90,7 @@ double glb_builtin_prior_prior(const glb_params in)
   double res=0;
   glb_projection pro;
   pro=glbAllocProjection();
+
   glbGetProjection(pro);
   for(i=0;i<glbGetNumOfOscParams();i++)
     {   

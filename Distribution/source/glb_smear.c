@@ -44,6 +44,7 @@
 
 #include "glb_error.h"
 #include "glb_types.h"
+#include "glb_multiex.h"
 #include "glb_smear.h"
 
 
@@ -210,10 +211,10 @@ int glb_default_smear(glb_smear *in,const struct glb_experiment *head)
   int s,d,i;
   s=0;
   d=0;
-  if(in->type==-1) {glb_error("Smearing type has not been defined!");s=-1;}
-  if(in->numofbins==-1) {glb_error("Number of bins has not been defined!");
+  if(in->type==-1) {glb_exp_error(head, "Smearing type has not been defined!");s=-1;}
+  if(in->numofbins==-1) {glb_exp_error(head, "Number of bins has not been defined!");
   s=-1;}
-  if(in->numofbins<=0) {glb_error("Number of bins must be positive!");
+  if(in->numofbins<=0) {glb_exp_error(head, "Number of bins must be positive!");
   s=-1;}
 
   /* simbins, simtresh and simbeam are no longer defaultized here
@@ -221,19 +222,19 @@ int glb_default_smear(glb_smear *in,const struct glb_experiment *head)
    *
    *  if(in->simbins==-1) {in->simbins=in->numofbins;d=2;}
    *  if(in->simbins <=0) 
-   * {glb_error("Number of simbins must be positive!");s=-1;}
+   * {glb_exp_error(head, "Number of simbins must be positive!");s=-1;}
    */
-  if(in->e_min==-1) {glb_error("No minimal energy defined!");s=-1;}
-  if(in->e_min<=0) {glb_error("Minimal energy must be positive!");s=-1;}
-  if(in->e_max==-1) {glb_error("No maximal energy defined!");s=-1;}
+  if(in->e_min==-1) {glb_exp_error(head, "No minimal energy defined!");s=-1;}
+  if(in->e_min<=0) {glb_exp_error(head, "Minimal energy must be positive!");s=-1;}
+  if(in->e_max==-1) {glb_exp_error(head, "No maximal energy defined!");s=-1;}
   if(in->e_max<=in->e_min) {glb_error("Maximal energy must be larger than"
 				      " the minimal energy!");s=-1;}
   if(in->e_sim_min!=-1||in->e_sim_max!=-1) 
     {
       if(in->e_sim_min<=0) 
-	{glb_error("Minimal sim energy must be positive!");s=-1;}
+	{glb_exp_error(head, "Minimal sim energy must be positive!");s=-1;}
       if(in->e_sim_max<=in->e_sim_min) 
-	{glb_error("Maximal sim energy must belarger than the minimal"
+	{glb_exp_error(head, "Maximal sim energy must belarger than the minimal"
 		   " sim energy!");s=-1;}
     }
   /*

@@ -638,5 +638,14 @@ documented!
 
 *********Version 2.3.16
 
-
+20/12/2006 JK
+       - globes binary uses again the former oscillation parameters
+         (not the new ones from hep-ph/0405172v5) for comparability reasons
+       - struct glb_experiment now has a member filename, containing the name
+         of the AEDL file
+       - More detailed error messages in DefaultExp()
+       - Fixed two buffer overflows in glb_sys.c
+       - GLoBES now complains if a projection is incompletely defined, but
+         uses GLB_FREE as default as before (this was e.g. an error in
+         example2)
   

@@ -29,6 +29,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "glb_types.h"
+
 // Error codes
 #define GLB_SUCCESS                 0  // No error, everything's fine
 #define GLBERR_INVALID_ARGS        -1  // A function has been given invalid arguments
@@ -54,6 +56,8 @@ extern int glbSetVerbosityLevel(int level);
 extern void glb_warning      (const char *message);
 extern void glb_error        (const char *message);
 extern void glb_fatal        (const char *message);
+extern void glb_exp_error    (const struct glb_experiment *exp, const char *message);
+extern void glb_rule_error   (const struct glb_experiment *exp, int rule, const char *message);
 
 extern void *glb_malloc (size_t size);
 extern void *glb_realloc (void *ptr, size_t size);

@@ -28,6 +28,9 @@
 
 #include <globes/globes.h>
 
+/* NIL value for the projection flag */
+#define GLB_UNDEFINED  -2
+
 typedef struct {
   double *osc_params;
   size_t length;
