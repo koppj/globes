@@ -27,7 +27,7 @@
  * minimizer instead of the standard algorithm, which uses nested minimizers
  * for oscillation and systematics parameters.
  */
-#define GLB_HYBRID_MINIMIZER
+//#define GLB_HYBRID_MINIMIZER
 
 double *glb_alloc_vec(int nl,int nh);
 double **glb_alloc_mat(int nrl,int nrh, int ncl,int nch);
