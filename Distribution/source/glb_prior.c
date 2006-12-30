@@ -103,7 +103,6 @@ double glb_builtin_prior_prior(const glb_params in)
   
   for(i=0;i<glb_num_of_exps;i++)
     {
-      
       if(glbGetDensityProjectionFlag(pro,i)==GLB_FREE) 
 	res += 
 	  sprior(glbGetDensityParams(in,i),
@@ -113,7 +112,7 @@ double glb_builtin_prior_prior(const glb_params in)
     }
 
   glbFreeProjection(pro);
- 
+
   return res;
 }
 

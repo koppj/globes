@@ -528,7 +528,7 @@ int glb_set_oscillation_parameters(glb_params p)
 
 
 /***************************************************************************
- * Function glb_set_oscillation_parameters                                 *
+ * Function glb_get_oscillation_parameters                                 *
  ***************************************************************************
  * Returns the current set of oscillation parameters.                      *
  ***************************************************************************/

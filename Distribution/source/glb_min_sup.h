@@ -23,6 +23,12 @@
 #ifndef GLB_MIN_SUP
 #define GLB_MIN_SUP 1
 
+/* Uncomment the following line to use the new, combined oscillation/systematics
+ * minimizer instead of the standard algorithm, which uses nested minimizers
+ * for oscillation and systematics parameters.
+ */
+#define GLB_HYBRID_MINIMIZER
+
 double *glb_alloc_vec(int nl,int nh);
 double **glb_alloc_mat(int nrl,int nrh, int ncl,int nch);
 void glb_free_vec(double *v,int nl,int nh);
@@ -33,5 +39,12 @@ int glb_powell(double p[],double **xi,int n,
 int glb_powell2(double p[],double **xi,int n,double ftol,
 		 int *iter,double *fret,
 		 double (*func)(double*));
+
+#ifdef GLB_HYBRID_MINIMIZER
+typedef double (*glb_minimize_func)(double *, int, void *);
+int glb_hybrid_minimizer(double *P, int n, int n_osc, double ftol, int *iter,
+                         double *fret, glb_minimize_func f, void *user_data);
+#endif
+
 
 #endif /* GLB_MIN_SUP */

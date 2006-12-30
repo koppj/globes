@@ -96,7 +96,7 @@ int main(int argc, char *argv[])
       
       /* Compute Chi^2 for full correlation: minimize over all but theta13 */
       res2=glbChiTheta13(test_values,NULL,GLB_ALL);
-  
+      
       AddToOutput(x,res1,res2);
   }
   

@@ -346,8 +346,6 @@ void glbInitExp(glb_exp ins)
 
   in->filter_state=-1;
   in->filter_value=-1;
-  in->density_center=-1;
-  in->density_error=-1;
   in->psteps=-1;
   in->lengthtab=NULL;
   in->densitytab=NULL;
@@ -716,7 +714,8 @@ int glbDefaultExp(glb_exp ins)
 
   if(in->filter_state==-1){in->filter_state=1;def=-1;}
   if(in->filter_value==-1){in->filter_value=0;def=-1;}
-  
+
+ 
   if(in->num_of_sm==-1){
     glb_exp_error(in, "No smearing data specified!");status=-1;}
   
@@ -765,13 +764,11 @@ int glbDefaultExp(glb_exp ins)
                                     status=-1;} 
   //---------------------------------------------------------
 
-    *in=MInitMemory0(*in);
+     *in=MInitMemory0(*in);
 
   //-------------------------------------------------------
 
   
-  if(in->density_center==-1){in->density_center=1;def=-1;}
-  if(in->density_error==-1){in->density_error=0.05;def=-1;}
   if(in->psteps==-1){glb_exp_error(in, "psteps not defined!");status=-1;}
   if(in->lengthtab==NULL){glb_exp_error(in, "lengthtab not allocated!");status=-1;}
   if(in->densitytab==NULL){glb_exp_error(in, "densitytab not allocated!");status=-1;}

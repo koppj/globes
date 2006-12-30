@@ -394,3 +394,414 @@ int glb_powell2(double p[],double **xi,int n,double ftol,
 #undef ITMAX
 #undef SQR
 #undef TOL
+
+
+#ifdef GLB_HYBRID_MINIMIZER
+
+/***************************************************************************
+ *         C O M B I N E D   O S C / S Y S   M I N I M I Z E R             *
+ ***************************************************************************/
+
+#define SQR(x)        ((x)*(x))
+#define MAX(a,b)      ((a) > (b) ? (a) : (b))
+#define SIGN(a,b)     ((b) > 0.0 ? fabs(a) : -fabs(a))
+#define SHFT(a,b,c,d) (a)=(b);(b)=(c);(c)=(d);
+                                          
+#define ITMAX_BRENT   100.0  /* Max. number of iterations in 1d Brent minimizer */
+#define ITMAX_POWELL  100.0  /* Max. number of iterations per dimensions in     */
+                             /*   hybrid Powell minimizer                       */
+                                              
+#define GOLD      1.618034
+#define CGOLD     0.3819660
+#define TINY      1.0e-20
+#define GLIMIT    100.0
+#define ZEPS      1.0e-10
+#define TOL_BRENT 2.0e-4
+
+
+/***************************************************************************
+ * Function glb_hybrid_eval_1d                                             *
+ ***************************************************************************
+ * This helper routine evaluates the function we are minimizing at the     *
+ * point p + u * xi                                                        *
+ ***************************************************************************
+ * Parameters:                                                             *
+ *   f:     The function to minimize                                       *
+ *   P:     The starting point                                             *
+ *   u:     The offset along direction xi                                  *
+ *   xi:    The direction over which we are currently minimizing           *
+ *   n:     Total number of dimensions                                     *
+ *   new_rates_flag: Determines whether rates should be recomputed in f    *
+ *   user_data: Arbitrary data to be passed to func                        *
+ ***************************************************************************/
+double glb_hybrid_eval_1d(glb_minimize_func f, double *P, double u, double *xi,
+                          int n, int new_rates_flag, void *user_data)
+{
+  int j;
+  double ux[n];
+  
+  for (j=0; j < n; j++)
+    ux[j] = P[j] + u * xi[j];
+  
+  return (*f)(ux, new_rates_flag, user_data);
+}
+                                              
+                                              
+/***************************************************************************
+ * Function glb_hybrid_bracket                                             *
+ ***************************************************************************
+ * Finds an interval bracketing the minimum of f along direction xi        *
+ ***************************************************************************
+ * Parameters:                                                             *
+ *   P:     The starting point                                             *
+ *   xi:    The direction over which minimization is requested             *
+ *   a, b, c: Output: Bracketing interval for the minimum in units of xi   *
+ *          The points fulfill a < b < c
+ *   n:     Total number of dimensions                                     *
+ *   f:     The function to minimize                                       *
+ *   new_rates_flag: Determines whether rates should be recomputed in f    *
+ *   user_data: Arbitrary data to be passed to func                        *
+ ***************************************************************************/
+int glb_hybrid_bracket(double *P, double *xi, double *a, double *b, double *c, int n,
+                       glb_minimize_func f, int new_rates_flag, void *user_data)
+{
+  double ax, bx, cx;
+  double fa, fb, fc, fu;
+  double u, ulim, q, r;
+  int i, j;
+
+  ax = 0.0;
+  bx = 1.0;
+  fa = glb_hybrid_eval_1d(f, P, ax, xi, n, new_rates_flag, user_data);
+  fb = glb_hybrid_eval_1d(f, P, bx, xi, n, new_rates_flag, user_data);
+
+  if (fb > fa)      /* Make sure we are moving downhill */
+  {
+    SHFT(u, ax, bx, u);
+    SHFT(u, fa, fb, u);
+  }
+  
+  cx = bx + GOLD * (bx - ax);
+  fc = glb_hybrid_eval_1d(f, P, cx, xi, n, new_rates_flag, user_data);
+
+  while (fb > fc)   /* Continue as long as minimum is not between ax, bx, and cx */
+  {
+    /* Quadratic extrapolation of ax, bx, cx */
+    r = (bx - ax) * (fb - fc);
+    q = (bx - cx) * (fb - fa);
+    u = bx - ((bx - cx)*q - (bx - ax)*r) / (2.0*SIGN(MAX(fabs(q-r),TINY), q-r));
+
+    ulim = bx + GLIMIT * (cx - bx);         /* Maximum magnification */
+    if ((bx - u) * (u - cx) > 0.0)           /* u is between b and c */
+    {
+      fu = glb_hybrid_eval_1d(f, P, u, xi, n, new_rates_flag, user_data);
+      if (fu < fc)                        /* Minimum between b and c */
+      {
+        ax = bx;    fa = fb;
+        bx = u;     fb = fu;
+        break;
+      }
+      else if (fu > fb)                   /* Minimum between a and b */
+      {
+        cx = u;     fc = fu;
+        break;
+      }
+      else    /* Parabolic fit was no use, use default magnification */
+      {
+        u  = cx + GOLD*(cx - bx);
+        fu = glb_hybrid_eval_1d(f, P, u, xi, n, new_rates_flag, user_data);
+      }
+    }
+    else if ((cx - u) * (u - ulim) > 0.0)   /* u between cx and ulim */
+    {
+      fu = glb_hybrid_eval_1d(f, P, u, xi, n, new_rates_flag, user_data);
+      if (fu < fc)
+      {
+        SHFT(bx, cx, u, cx+GOLD*(cx-bx));
+        SHFT(fb, fc, fu, glb_hybrid_eval_1d(f, P, u, xi, n, new_rates_flag, user_data));
+      }
+    }
+    else if ((u-ulim)*(ulim-cx) >= 0.0) /* u > ulim ==> limit to ulim */
+    {
+      u  = ulim;
+      fu = glb_hybrid_eval_1d(f, P, u, xi, n, new_rates_flag, user_data);
+    }
+    else                /* Reject parabola, use default magnification */
+    {
+      u  = cx + GOLD*(cx-bx);
+      fu = glb_hybrid_eval_1d(f, P, u, xi, n, new_rates_flag, user_data);
+    }
+    SHFT(ax, bx, cx, u);               /* Eliminate the oldest point */
+    SHFT(fa, fb, fc, fu);
+  }
+
+  *a = ((ax < cx) ? ax : cx);                    /* Ensure a < b < c */
+  *c = ((ax > cx) ? ax : cx);
+  *b = bx;
+
+  return 0;
+}
+
+
+/***************************************************************************
+ * Function glb_hybrid_linmin                                              *
+ ***************************************************************************
+ * Performs the minimization in one direction, using the Brent-Dekker      *
+ * algorithm.                                                              *
+ ***************************************************************************
+ * Parameters:                                                             *
+ *   P:     Input: The starting point                                      *
+ *          Output: The position of the minimum                            *
+ *   xi:    The direction over which minimization is requested             *
+ *   n:     Total number of dimensions                                     *
+ *   ftol:  Convergence criterion for Brent-Dekker minimizer               *
+ *   fret:  Input: Function value at the starting point                    *
+ *          Output: Function value at the estimated minimum                *
+ *   f:     The function to minimize                                       *
+ *   new_rates_flag: Determines whether rates should be recomputed in f    *
+ *   user_data: Arbitrary data to be passed to func                        *
+ ***************************************************************************/
+int glb_hybrid_linmin(double *P, double *xi, int n, double ftol,
+          double *fret, glb_minimize_func f, int new_rates_flag, void *user_data)
+{
+  double a, b, d, p, q, r, u, v, w, x, xm;
+  double fu, fv, fw, fx;
+  double tol1, tol2;
+  double e, etemp;
+  int iter, j;
+
+  /* Find bracketing interval */
+  if (glb_hybrid_bracket(P, xi, &a, &x, &b, n, f, new_rates_flag, user_data) != 0)
+    return -2;
+
+  /* Execute Brent-Dekker algorithm */
+  e = 0.0;
+  w = v = x;
+  fw = fv = fx = glb_hybrid_eval_1d(f, P, x, xi, n, new_rates_flag, user_data);
+  for (iter=1; iter <= 100; iter++)
+  {
+    xm = 0.5 * (a + b);
+
+    tol1 = ftol * fabs(x) + ZEPS;
+    tol2 = 2.0*tol1;
+    if (fabs(x - xm) <= tol2 - 0.5*(b - a))        /* Test for convergence */
+    {
+      for (j=0;j<n;j++) P[j]=P[j]+x*xi[j];
+      *fret = fx;
+      return 0;
+    }
+
+    if (fabs(e) > tol1)                   /* Construct trial parabolic fit */
+    {
+      r = (x-w) * (fx-fv);
+      q = (x-v) * (fx-fw);
+      p = (x-v)*q - (x-w)*r;
+      q = 2.0 * (q - r);
+      if (q > 0.0)
+      {
+        p = -p;
+      }
+      q = fabs(q);
+      etemp = e;
+      e = d;
+      if (fabs(p) >= fabs(0.5*q*etemp)  ||  p <= q*(a-x)  ||  p >= q*(b-x))
+      {    /* If parabolic fit is not acceptable, take golden section step */
+        e = (x>=xm) ? a-x : b-x;
+        d = CGOLD * e;
+      }
+      else
+      {
+        d = p / q;
+        u = x + d;
+        if (u-a < tol2  ||  b-u < tol2)    /* Never move by less than tol1 */
+          d = SIGN(tol1, xm -x);
+      }
+    }
+    else
+    {
+      e = (x>=xm) ? a-x : b-x;
+      d = CGOLD * e;
+    }
+    
+    u  = (fabs(d)>=tol1) ? x+d : x+SIGN(tol1,d);
+    fu = glb_hybrid_eval_1d(f, P, u, xi, n, new_rates_flag, user_data);
+    if (fu <= fx)
+    {
+      if (u >= x)
+        a = x;
+      else
+        b = x;
+      SHFT(v, w, x, u);
+      SHFT(fv, fw, fx, fu);
+    }
+    else
+    {
+      if (u < x)
+        a = u;
+      else
+        b = u;
+
+      if (fu <= fw  ||  w == x)
+      {
+        v = w;   fv = fw;
+        w = u;   fw = fu;
+      }
+      else if (fu <= fv  ||  v == x  ||  v == w)
+      {
+        v = u;   fv = fu;
+      }
+    }
+  }
+
+  glb_warning("glb_hybrid_linmin: No convergence in 1-dim Brent minimizer"); 
+
+  for (j=0;j<n;j++) P[j]=P[j]+x*xi[j];
+  *fret = fx;
+  return -1;
+}
+
+
+/***************************************************************************
+ * Function glb_iterate_hybrid_minimizer                                   *
+ ***************************************************************************
+ * The actual contents of the iteration loop of the Powell minimizer       *
+ ***************************************************************************
+ * Parameters:                                                             *
+ *   P:     Input: The starting point                                      *
+ *          Output: The new estimate for the minimum                       *
+ *   xi:    The current set of minimization directions                     *
+ *   n:     Total number of dimensions                                     *
+ *   n_min, n_max: The directions over which minimization is requested     *
+ *   ftol:  Relative decrease of function value signaling convergence      *
+ *   fret:  Input: Function value at the starting point                    *
+ *          Output: Function value at the estimated minimum                *
+ *   f:     The function to minimize                                       *
+ *   new_rates_flag: Determines whether rates should be recomputed in f    *
+ *   user_data: Arbitrary data to be passed to func                        *
+ ***************************************************************************/
+int glb_iterate_hybrid_minimizer(double *P, double *_xi, int n, int n_min, int n_max,
+                      double ftol, double *fret, glb_minimize_func f, int new_rates_flag,
+                      void *user_data)
+{
+  double del;
+  int ibig;
+  double (*xi)[n] = (double (*)[n]) _xi;
+  double pt[n], ptt[n], xit[n];
+  double fp, fptt, t;
+  int i, j;
+
+  fp = *fret;
+  for (j=0;j<n;j++) pt[j] = P[j];
+  
+  ibig = 0;
+  del  = 0.0;
+  for (i=n_min; i <= n_max; i++)
+  {
+    for (j=0;j<n;j++) xit[j] = xi[j][i];
+    fptt = *fret;
+    glb_hybrid_linmin(P, xit, n, TOL_BRENT, fret, f, new_rates_flag, user_data);
+    if (fptt - *fret > del)
+    {
+      del  = fptt - *fret;
+      ibig = i;
+    }
+  }
+
+  /* Check for convergence */
+  if (2.0 * (fp - *fret) <= ftol * (fabs(fp) + fabs(*fret)))
+    return 0;
+
+  for (j=0; j < n; j++)
+  {
+    ptt[j] = 2.0*P[j] - pt[j];
+    xit[j] = P[j] - pt[j];
+  }
+  fptt = (*f)(ptt, new_rates_flag, user_data);
+  if (fptt < fp)
+  {
+    t = 2.0 * (fp - 2.0*(*fret) + fptt) * SQR(fp - (*fret) - del) - del*SQR(fp-fptt);
+    if (t < 0.0)
+    {
+      glb_hybrid_linmin(P, xit, n, TOL_BRENT, fret, f, new_rates_flag, user_data);
+      for (j=0; j < n; j++)
+      {
+        xi[j][ibig]  = xi[j][n_max];
+        xi[j][n_max] = xit[j];
+      }
+    }
+  }
+
+  return 1;
+}
+
+
+/***************************************************************************
+ * Function glb_hybrid_minimizer                                           *
+ ***************************************************************************
+ * The central minimization function (based on Powell's method, as         *
+ * described in Press: Numerical Recipes). The function is designed        *
+ * to simultaneously minimize the oscillation and systematics parameters,  *
+ * and to keep track of whether it is necessary to recompute the event     *
+ * rates.                                                                  *
+ ***************************************************************************
+ * Parameters:                                                             *
+ *   P:     Input: The starting point (the first n_osc components must be  *
+ *          the oscillation parameters, the rest is for systematics)       *
+ *          Output: The position of the minimum                            *
+ *   n:     The total number of dimensions (oscillation + systematics)     *
+ *   n_osc: Number of oscillation parameters                               *
+ *   ftol:  Relative decrease of function value signaling convergence      *
+ *   iter:  Output: The number of required Powell iterations               *
+ *   fret:  Output: Function value at the minimum                          *
+ *   f:     The function to minimize                                       *
+ *   user_data: Arbitrary data to be passed to func                        *
+ ***************************************************************************/
+int glb_hybrid_minimizer(double *P, int n, int n_osc, double ftol, int *iter,
+                         double *fret, glb_minimize_func f, void *user_data)
+{
+  double xi[n][n];
+  int i, j;
+  int converged;
+
+  /* Choose orthogonal initial directions. Take the length of the direction
+   * vectors of the order of the respective starting value; if this is zero,
+   * take unit vector. */
+  for (i=0; i < n; i++)
+  {
+    for (j=i+1; j < n; j++)
+      xi[i][j] = xi[j][i] = 0.0;
+    if (fabs(P[i]) > ftol)
+      xi[i][i] = 0.1 * fabs(P[i]);
+    else
+      xi[i][i] = 1.0;
+  }
+  
+  *fret = (*f)(P, 1, user_data);
+  for (*iter=1; *iter < n*ITMAX_POWELL; (*iter)++)
+  {
+    converged = 1;
+    
+    /* Iterate minimizer in subspace of oscillation parameters */
+    if (glb_iterate_hybrid_minimizer(P, &xi[0][0], n, 0, n_osc-1, ftol, fret, f, 1, user_data) > 0)
+      converged = 0;
+
+    /* Force recomputation of event rates at the current minimum (it is not
+     * guaranteed, that the last function evaluation in glb_iterate_hybrid_minimizer
+     * was at the minimum) */
+    *fret = (*f)(P, 1, user_data);
+
+    /* Iterate minimizer in subspace of systematics parameters */
+    if (glb_iterate_hybrid_minimizer(P, &xi[0][0], n, n_osc, n-1, ftol, fret, f, 0, user_data) > 0)
+      converged = 0;
+
+    if (converged)
+      return 0;
+  }
+ 
+  glb_warning("glb_hybrid_minimizer: No convergence in n-dim Powell minimizer"); 
+  return -1;
+}
+
+#endif /* #ifdef GLB_HYBRID_MINIMIZER */
+
+

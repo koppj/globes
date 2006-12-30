@@ -51,8 +51,6 @@ void glbInit(char *name)
   atexit(final_clean);
   glb_init(name);
 
-  glb_builtin_prior_init();
-
   /* Initialize some global variables */
   glb_sys_list = NULL;
 
@@ -79,6 +77,9 @@ void glbInit(char *name)
   glbDefineChiFunction(&glbChiNoSysTotalRates,  0, "chiNoSysTotalRates");
   glbDefineChiFunction(&glbChiSpectrumCalib,    4, "chiSpectrumCalib");
   glbDefineChiFunction(&glbChiZero,             0, "chiZero");
+
+  /* Initialize built-in priors */
+  glb_builtin_prior_init();
 }
 
 

@@ -650,4 +650,24 @@ documented!
          example2)
        - Fixed segfault that occured during cleanup of the smearing matrix
          e.g. if the version string was invalid
-  
+ 
+30/12/2006 JK
+       - Fixed bug in glb_minimize.c: glbChiAll and glbChiTheta13Delta failing
+         to properly reset the projection when they are done
+       - Fixed bug in glb_multiex.c: GLoBES should not issue a warning if
+         density_center and density_error are not set, since there is no
+         possibility to set them in AEDL.
+       - GLoBES now complains if fit values, input errors, or central values are
+         incompletely defined. For the density fit/central values, only a
+         warning is issued, for all other parameters, it's an error. Nevertheless,
+         suitable defaults are used.
+       - Handling of input errors and central values in glb_minimize.c
+         has been greatly simplified.
+       - Implemented "hybrid" minimizer which interleaves minimization over
+         oscillation and systematics parameters, keeping the number of times
+         the event rates are re-computed as low as possible. This feature is
+         switches on by uncommenting the line
+           #define GLB_HYBRID_MINIMIZER
+         in glb_min_sup.h. 
+
+

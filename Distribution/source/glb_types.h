@@ -334,17 +334,6 @@ struct glb_experiment {
    */
   double filter_value;
 
-
-  /** The central value of the scaling factor for the matter density.
-  * It is a positive (incl. zero) number. The default is 1.
-  */
-  double density_center;
-
-  /** The relative 1 sigma error on the density. It is a positive 
-  * (incl. zero) number. The default is 0.
-  */ 
-  double density_error;
-
   /** The number of layers for the matter profile. It is a number greater
   * than 0. Default is 1.
   */

@@ -28,23 +28,34 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <float.h>
+#include <math.h>
 
 #include "glb_types.h"
 
-// Error codes
-#define GLB_SUCCESS                 0  // No error, everything's fine
-#define GLBERR_INVALID_ARGS        -1  // A function has been given invalid arguments
-#define GLBERR_UNINITIALIZED       -2  // An object has not been initialized properly
-#define GLBERR_MALLOC_FAILED       -3  // Memory allocation error
-#define GLBERR_FILE_NOT_FOUND      -4  // File not found
-#define GLBERR_INVALID_FILE_FORMAT -5  // Error in an input file
-#define GLBERR_GSL_ERROR           -6  // A call to a GSL routine failed
-#define GLBERR_NO_CONVERGENCE      -7  // Numerical algorithm failed to converge
-#define GLBERR_PREM_NOT_LOADED     -8  // Error with PREM profile data
-#define GLBERR_NOT_IMPLEMENTED     -9  // Requested a feature that has not been implemented yet
-#define GLBERR_DEPRECATED         -10  // Requested a deprecated feature
-#define GLBERR_GENERIC            -99  // Unspecified error
+/* Error codes */
+#define GLB_SUCCESS                 0  /* No error, everything's fine                           */
+#define GLBERR_INVALID_ARGS        -1  /* A function has been given invalid arguments           */
+#define GLBERR_UNINITIALIZED       -2  /* An object has not been initialized properly           */
+#define GLBERR_MALLOC_FAILED       -3  /* Memory allocation error                               */
+#define GLBERR_FILE_NOT_FOUND      -4  /* File not found                                        */
+#define GLBERR_INVALID_FILE_FORMAT -5  /* Error in an input file                                */
+#define GLBERR_GSL_ERROR           -6  /* A call to a GSL routine failed                        */
+#define GLBERR_NO_CONVERGENCE      -7  /* Numerical algorithm failed to converge                */
+#define GLBERR_PREM_NOT_LOADED     -8  /* Error with PREM profile data                          */
+#define GLBERR_NOT_IMPLEMENTED     -9  /* Requested a feature that has not been implemented yet */
+#define GLBERR_DEPRECATED         -10  /* Requested a deprecated feature                        */
+#define GLBERR_GENERIC            -99  /* Unspecified error                                     */
 
+
+/* Define NaN (not a number) */
+#ifdef NAN
+  #define GLB_NAN      NAN
+  #define GLB_ISNAN(x) isnan(x)
+#else
+  #define GLB_NAN      DBL_MAX
+  #define GLB_ISNAN(x) ((x) == DBL_MAX)
+#endif
 
 
 extern const char *glb_prog_name;

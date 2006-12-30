@@ -25,29 +25,41 @@
  * compatibility only
  */
 
-/* glbChiTheta: Replaced by glbChiTheta13 */
+/* glbChiTheta: Replaced by glbChiTheta13 in GLoBES 3.0 */
 double glbChiTheta(const glb_params in, glb_params out, int exp)
 {
   return glbChiTheta13(in, out, exp);
 }
 
-/* glbChiDms: Replaced by glbChiDm21 */
+/* glbChiDms: Replaced by glbChiDm21 in GLoBES 3.0 */
 double glbChiDms(const glb_params in, glb_params out, int exp)
 {
   return glbChiDm21(in, out, exp);
 }
 
-/* glbChiDm: Replaced by glbChiDm31 */
+/* glbChiDm: Replaced by glbChiDm31 in GLoBES 3.0 */
 double glbChiDm(const glb_params in, glb_params out, int exp)
 {
   return glbChiDm31(in, out, exp);
 }
 
-/* glbChiThetaDelta: Replaced by glbChiTheta13Delta */
+/* glbChiThetaDelta: Replaced by glbChiTheta13Delta in GLoBES 3.0 */
 double glbChiThetaDelta(const glb_params in, glb_params out, int exp)
 {
   return glbChiTheta13Delta(in, out, exp);
 }
 
 
+/* glbSetStartingValues: Replaced by glbSetCentralValues in GLoBES 3.0 */
+int glbSetStartingValues(const glb_params in)
+{
+  return glbSetCentralValues(in);
+}
 
+/* glbGetStartingValues: Replaced by glbGetCentralValues in GLoBES 3.0 */
+int glbGetStartingValues(glb_params in)
+{
+  return glbGetCentralValues(in);
+}
+
+ 

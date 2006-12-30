@@ -19,13 +19,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-
-
-
-
-
 #ifndef GLB_MMINIMIZE_H
 #define GLB_MMINIMIZE_H 1
+
+#include <glb_min_sup.h>
 
 
 BEGIN_C_DECLS
@@ -38,8 +35,6 @@ int glb_check_errordim(int rule);
 
 
 // setting all the glb_prior need for projections
-
-
 void glbSetDensityStartingValue(double start, int typ);
 void glbSetDensityInputError(double error, int typ);
 void glbSetDensityPrior(double start, double error, int typ);
@@ -61,22 +56,14 @@ double* glb_return_input_errors();
 double* glb_return_input_values();
 
 
+#ifdef GLB_HYBRID_MINIMIZER
+  int glb_invoke_hybrid_minimizer(int exp, int rule, double *x, double *chi2);
+#endif
+
 
 // various projections with th12 fixed for a single experiment
 // as determined by glb_single_experiment_number
 extern int glb_single_experiment_number;
-
-/* This will be part of the interface to arbitrary chi^2 functions and
- * minimizers. This is right now only needed by user_chi.c.
- */
-
-extern double *glb_sys_errors;
-extern double *glb_sys_centers;
-
-struct glb_systematic glb_init_systematic(double (*chi_func)(),int dimension,
-			    double *sp, double *errors, double (*evalf)(),
-			    char info[]);
-double glb_evaluate_chi(struct glb_systematic *in);
 
 END_C_DECLS
 

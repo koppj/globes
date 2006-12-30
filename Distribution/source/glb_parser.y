@@ -40,6 +40,7 @@
 #include "glb_parser_type.h"
 #include "glb_fluxes.h"
 #include "glb_sys.h"
+#include "glb_minimize.h"
 
 
 
@@ -1836,6 +1837,8 @@ int glbInitExperiment(char *inf,glb_exp *in, int *counter)
     }
   (*counter)= (*counter) + exp_count;
 
+  /* Reallocate data structures for the minimizer */
+  glb_init_minimizer();
 
   if(k!=0) return -1;
   

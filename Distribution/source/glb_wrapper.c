@@ -62,9 +62,19 @@ int glb_rule_number;
 glb_osc_type *glb_alloc_osc_type()
 {
   glb_osc_type *temp;
-  temp=(glb_osc_type *) glb_malloc(sizeof(glb_osc_type));
-  temp->osc_params=(double *) glb_malloc(sizeof(double) *  glbGetNumOfOscParams()); 
-  temp->length = (size_t) glbGetNumOfOscParams();
+  int i;
+  
+  temp = (glb_osc_type *) glb_malloc(sizeof(glb_osc_type));
+  if (temp != NULL)
+  {
+    temp->osc_params = (double *) glb_malloc(sizeof(double) * glbGetNumOfOscParams()); 
+    if (temp->osc_params != NULL)
+    {
+      for (i=0; i < glbGetNumOfOscParams(); i++)
+        temp->osc_params[i] = GLB_NAN;
+    }
+    temp->length = (size_t) glbGetNumOfOscParams();
+  }
   return temp;
 }
 
@@ -76,12 +86,20 @@ void glb_free_osc_type(glb_osc_type *stale)
 
 glb_density_type *glb_alloc_density_type()
 {
-  int i;
   glb_density_type *temp;
-  temp=(glb_density_type *) glb_malloc(sizeof(glb_density_type));
-  temp->density_params=(double *) glb_malloc(sizeof(double)*glb_num_of_exps);
-  temp->length=(size_t) glb_num_of_exps;
-  for(i=0;i<glb_num_of_exps;i++) temp->density_params[i]=1.0;
+  int i;
+  
+  temp = (glb_density_type *) glb_malloc(sizeof(glb_density_type));
+  if (temp != NULL)
+  {
+    temp->density_params = (double *) glb_malloc(sizeof(double)*glb_num_of_exps);
+    if (temp->density_params != NULL)
+    {
+      for(i=0; i < glb_num_of_exps; i++)
+        temp->density_params[i] = GLB_NAN;
+    }
+    temp->length = (size_t) glb_num_of_exps;
+  }
   return temp;
 }
 
@@ -95,17 +113,23 @@ glb_params glbAllocParams()
 {
   glb_params temp;
   temp=(glb_params) glb_malloc(sizeof(struct glb_params_type));
-  temp->osc=glb_alloc_osc_type();
-  temp->density=glb_alloc_density_type();
-  temp->iterations=0;
-  return (glb_params) temp;
+  if (temp != NULL)
+  {
+    temp->osc=glb_alloc_osc_type();
+    temp->density=glb_alloc_density_type();
+    temp->iterations=0;
+  }
+  return temp;
 }
 
 void glbFreeParams(glb_params stale)
 {
-  glb_free_osc_type(((struct glb_params_type *) stale)->osc);
-  glb_free_density_type(((struct glb_params_type *) stale)->density);
-  glb_free(stale);
+  if (stale != NULL)
+  {
+    glb_free_osc_type(((struct glb_params_type *) stale)->osc);
+    glb_free_density_type(((struct glb_params_type *) stale)->density);
+    glb_free(stale);
+  }
   stale = NULL;
 }
 
@@ -134,7 +158,7 @@ glb_params glbSetDensityParams(glb_params in,
     }
   else 
     {
-      glb_error("Density list length mismatch");
+      glb_error("glbSetDensityParams: Density list length mismatch");
       return NULL;
     }
   return in;
@@ -149,7 +173,7 @@ double glbGetDensityParams(const glb_params in, int which)
     }
   else 
     {
-      glb_error("Density list length mismatch");
+      glb_error("glbGetDensityParams: Density list length mismatch");
       return 0;
     }
   return out;
@@ -162,7 +186,7 @@ glb_params glbSetOscParams(glb_params in,
     in->osc->osc_params[which] = osc;
   else 
   {
-    glb_error("Oscillation list length mismatch");
+    glb_error("glbSetOscParams: Oscillation list length mismatch");
     return NULL;
   }
   return in;
@@ -177,7 +201,7 @@ double glbGetOscParams(const glb_params in, int which)
     }
   else 
     {
-      glb_error("Oscillation list length mismatch");
+      glb_error("glbGetOscParams: Oscillation list length mismatch");
       return 0;
     }
   return out;
@@ -260,7 +284,6 @@ glb_osc_proj_type *glb_alloc_osc_proj_type()
   temp->osc_params=(int *) glb_malloc(sizeof(int) *  glbGetNumOfOscParams()); 
   temp->length = (size_t) glbGetNumOfOscParams();
   for(i=0;i<glbGetNumOfOscParams();i++) temp->osc_params[i]=GLB_UNDEFINED;
-//FIXME Remove  for(i=0;i<glbGetNumOfOscParams();i++) temp->osc_params[i]=GLB_FREE;
   return temp;
 }
 
@@ -277,7 +300,6 @@ glb_density_proj_type *glb_alloc_density_proj_type()
   temp=(glb_density_proj_type *) glb_malloc(sizeof(glb_density_proj_type));
   temp->density_params=(int *) glb_malloc(sizeof(int)*glb_num_of_exps);
   temp->length=(size_t) glb_num_of_exps;
-//FIXME Remove  for(i=0;i<glb_num_of_exps;i++) temp->density_params[i]=GLB_FREE;
   for(i=0;i<glb_num_of_exps;i++) temp->density_params[i]=GLB_UNDEFINED;
   return temp;
 }
@@ -476,114 +498,18 @@ glbSetOscillationParameters(const glb_params in)
   if (in == NULL)
     return -1;
   else
-    glb_hook_set_oscillation_parameters(in);
-
-  return 0;
-}
-
-int
-glbSetStartingValues(const glb_params in)
-{
-  return glbSetCentralValues(in);   /* Has been renamed in GLoBES 3.0 */
-}
-
-
-int
-glbSetCentralValues(const glb_params in)
-{
-  int i,s=0;
-  double nsp[glbGetNumOfOscParams()-6+1];
-  if(in==NULL) return -1;
-
-  glb_set_solar_starting_values(glbGetOscParams(in,0));
-  glb_set_starting_values(glbGetOscParams(in,1),glbGetOscParams(in,2),
-		    glbGetOscParams(in,3),glbGetOscParams(in,4),
-		    glbGetOscParams(in,5),0);
-  if(glbGetNumOfOscParams()>6)
-  {
-	for(i=0;i<glbGetNumOfOscParams()-6;i++) nsp[i]=glbGetOscParams(in,6+i);
-	glb_set_ns_starting_values(nsp);
-  }
-
-  for(i=0;i<glb_num_of_exps;i++) 
-    glbSetDensityStartingValue(glbGetDensityParams(in,i),i);
-  s=glb_user_defined_starting_values(in);
-  return s;
-
-}
-
-int
-glbSetInputErrors(const glb_params in)
-{
-  int i,s=0;
-  double nsp[glbGetNumOfOscParams()-6+1];
-  if(in==NULL) return -1;
-
-  glb_set_solar_input_errors(glbGetOscParams(in,0));
-  glb_set_input_errors(glbGetOscParams(in,1),glbGetOscParams(in,2),
-		    glbGetOscParams(in,3),glbGetOscParams(in,4),
-		    glbGetOscParams(in,5),0);
-  if(glbGetNumOfOscParams()>6)
-  {
-	for(i=0;i<glbGetNumOfOscParams()-6;i++) nsp[i]=glbGetOscParams(in,6+i);
-	glb_set_ns_input_errors(nsp);
-  }
-
-  /* FIXME - the density glb_error.has the same size than the
-   * density_center, if the user does not use glbSetDensityParams.
-   * Furthermore the setting in the gls-file is ignored...!
-   */
-  for(i=0;i<glb_num_of_exps;i++) 
-    glbSetDensityInputError(glbGetDensityParams(in,i),i);  
-  s=glb_user_defined_input_errors(in);
-  return s;
-
+    return glb_hook_set_oscillation_parameters(in);
 }
 
 
 int 
 glbGetOscillationParameters(glb_params in)
 {
-  return glb_hook_get_oscillation_parameters(in);
+  if (in == NULL)
+    return -1;
+  else
+    return glb_hook_get_oscillation_parameters(in);
 }
-
-
-int
-glbGetStartingValues(glb_params in)
-{
-  return glbGetCentralValues(in);   /* Has been renamed in GLoBES 3.0 */
-}
-
-  
-int
-glbGetCentralValues(glb_params in)
-{
-  int i;
-  double *t;
-  if(in==NULL) return -1;
-  t=glb_return_input_values();
-  for(i=0;i<glbGetNumOfOscParams();i++) glbSetOscParams(in,t[i],i);
-  for(i=0;i<glb_num_of_exps;i++) glbSetDensityParams(in,t[i+glbGetNumOfOscParams()],i);
-  glb_free(t);
-  return 0;
-
-}
-
-int
-glbGetInputErrors(glb_params in)
-{
-  int i;
-  double *t;
-  if(in==NULL) return -1;
-  t=glb_return_input_errors();
-  for(i=0;i<glbGetNumOfOscParams();i++) glbSetOscParams(in,t[i],i);
-  for(i=0;i<glb_num_of_exps;i++) glbSetDensityParams(in,t[i+glbGetNumOfOscParams()],i);
-  glb_free(t);
-  return 0;
-
-}
-
-
 
 
 /* Here we have some "memory managament" functions, ie. things
@@ -600,6 +526,7 @@ glbClearExperimentList()
   for(i=0;i<32;i++) glb_experiment_list[i]=glbAllocExp();
   glb_num_of_exps=0;
   glbResetCounters();
+  glb_init_minimizer();   /* Re-initialize minimizer */
 }
 
 
