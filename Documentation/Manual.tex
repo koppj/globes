@@ -25,6 +25,7 @@
 \usepackage{ae,aecompl} % only for Type 1 fonts for readable pdf convert
 
 \newcommand{\glbxxx}{hep-ph/0407333}
+\newcommand{\glbxxxtwo}{hep-ph/XXYYZZZ}
 \newcommand{\capdef}{}
 \newcommand{\mycaption}[2][\capdef]{\renewcommand{\capdef}{#2}%
         \caption[#1]{{ %\itshape
@@ -204,7 +205,7 @@ General Long Baseline Experiment Simulator \\ }
 \vspace{0.5cm}
 
 \begin{center}
-{\large Patrick Huber$^a$, Manfred Lindner$^b$, Walter Winter$^c$}
+{\large Patrick Huber$^a$, Joachim Kopp$^b$, Manfred Lindner$^b$, \\ Mark Rolinec$^c$, Walter Winter$^d$}
 \end{center}
 
 \vspace{0.3cm}
@@ -217,7 +218,7 @@ General Long Baseline Experiment Simulator \\ }
 
 \end{center}
 
-\vspace{1cm}
+\vspace{0.5cm}
 
 \begin{center}
 \colorbox{black}{\includegraphics[width=7cm]{.save/earthint}}
@@ -230,7 +231,7 @@ General Long Baseline Experiment Simulator \\ }
 \vspace{1cm}
 
 \begin{center}
-Version from \today\ for \GLOBES\ 2.0.11
+Version from \today\ for \GLOBES\ 3.0
 \end{center}
 
 
@@ -238,21 +239,27 @@ Version from \today\ for \GLOBES\ 2.0.11
 \vfill
 \hrule
 
+\vspace*{0.1cm}
 
 {\em\small $^{\mathrm{a}}$%
-       Physics Department,
-       University of Wisconsin,
+       University of Wisconsin,  Physics Department,
        1150 University Av., Madison, WI 53706, USA}
 
-
 {\em\small $^{\mathrm{b}}$%
-       Institut f\"ur Theoretische Physik, Physik--Department,\\
-       Technische Universit\"at M\"unchen,
-       James--Franck--Strasse, D--85748 Garching, Germany}
+       Max--Planck--Institut f\"ur Kernphysik, 
+       Postfach 10~39~80, D--69029 Heidelberg, Germany} 
 
 {\em\small $^{\mathrm{c}}$%
-       Institute for Advanced Study, 
-       Einstein Drive, Princeton, NJ 08540, USA}
+       Technische Universit\"at M\"unchen,
+       Institut f\"ur Theoretische Physik, Physik--Department,\\
+       James--Franck--Strasse, D--85748 Garching, Germany}
+
+{\em\small $^{\mathrm{d}}$%
+       Universit\"at W\"urzburg, 
+       Lehrstuhl f\"ur theoretische Physik II, \\
+       Institut f\"ur theoretische Physik und Astrophysik, 
+       Am Hubland,
+       D-97074 W\"urzburg, Germany}
 
 %\end{titlepage}
 
@@ -268,7 +275,7 @@ Version from \today\ for \GLOBES\ 2.0.11
 \thispagestyle{empty}
 \bigskip
 \begin{quote}
-    Copyright \copyright  2004,2005  The GLoBES Team.
+    Copyright \copyright  2004--2007  The GLoBES Team.
     Permission is granted to copy, distribute and/or modify this document
     under the terms of the GNU Free Documentation License, Version 1.2
     or any later version published by the Free Software Foundation;
@@ -310,12 +317,13 @@ is, however, possible to simulate beams with bunch structure, since the
 time dependence of the neutrino source is physically only important to suppress backgrounds. 
 
 On the experiment definition side, either built-in neutrino fluxes
-(\eg, neutrino factory) or arbitrary fluxes can be used. Similarly,
+(\eg, neutrino factory, $\beta$-Beam) or arbitrary fluxes can be used. Similarly,
 arbitrary cross sections, energy dependent efficiencies, the
 energy resolution function, the considered oscillation channels, 
 backgrounds, and many other features can be specified. 
 For the systematics, energy
-normalization and calibration errors can be simulated. Note that
+normalization and calibration errors can be simulated in a straightforward way,
+or the systematics can be completely user-defined (Version 3.0 and higher). Note that
 the energy ranges and windows, as well as the bin widths can be
 (almost) arbitrarily chosen, which means that variable bin
 widths are allowed. Together with \GLOBES\ comes a number of
@@ -344,11 +352,17 @@ degenerate solutions.
 \GLOBES\ is developed for academic use. Thus, the \GLOBES\ Team would
 appreciate being given academic credit for it. Whenever you use \GLOBES\
 to produce a publication or a talk indicate that you have used \GLOBES\ and
-please cite the reference~\cite{globes_paper}
+please cite the following references~\cite{globes_paper,globes_paper_two}
 \begin{quote}
 P. Huber, M. Lindner and W. Winter\\
 Simulation of long baseline neutrino oscillation experiments with \GLOBES\\
-arXiv:\glbxxx.  
+Comput. Phys. Commun. 167 (2005) 195, arXiv:\glbxxx.   
+\end{quote}
+
+\begin{quote}
+P. Huber, J. Kopp, M. Lindner, M. Rolinec, and W. Winter\\
+TO BE DEFINED, NEEDS TO BE UPDATED [WW]\\
+arXiv:\glbxxxtwo.   
 \end{quote}
 but \emph{not} this manual. This manual itself is not a scientific 
 publication and will not be submitted to a scientific journal. 
@@ -370,7 +384,7 @@ of those publications would appreciate to be cited whenever their work
 is used. It is solely the user's responsibility 
 to make sure that he understands where the input material for \GLOBES\ comes
 from and if additional work has to be cited in addition to the 
-\GLOBES\ paper~\cite{globes_paper}. To assist with this task, we provide  the necessary information for the data coming along together with \GLOBES.
+\GLOBES\ papers~\cite{globes_paper,globes_paper_two}. To assist with this task, we provide  the necessary information for the data coming along together with \GLOBES.
 
 When using the built-in Earth matter density profile, the 
 original source is \Ref~\cite{Stacey}.
@@ -384,6 +398,74 @@ the \verb+-v3+ option to \verb+globes+ to see which files
 are included.
 
 It is recommended that you use the same style for your own input files, since, in case they are distributed, everybody will know how to correctly reference your work.
+
+\chapter*{What is new in \GLOBES ?}
+
+TO BE UPDATED [WW].
+
+Here we briefly summarize the main changes of the new GLoBES version. For details, please
+refer to the respective parts of the manual. Please note that any new \GLOBES\ version is
+compatible with older versions, \ie, old application software and AEDL files should also run with the new version. EXCEPTION: VERSION NUMBER IN AEDL REQUIRES? [WW] However, some function names and features will
+evolve during time, which means that outdated features may not be documented anymore.
+
+\section*{Version 3.0}
+\index{norm}{Version 3.0}
+
+Here comes a summary of the most important changes in this version for older users of GLoBES.
+
+\subsection*{New features}
+
+\begin{itemize}
+ \item
+  User-defined systematics to simulate experiments with correlated systematics \etc\ (such as
+reactor experiments); see \Sec~?
+ \item
+  User-defined priors to include arbitrary external information in the $\chi^2$ before
+marginalization over the oscillation parameters (such as to prevent minimizer from
+running into the wrong octant \etc); see \Sec~?
+\item
+  Non-standard physics support; see \Sec~?
+\item
+  Beta beam fluxes available as built-in fluxes; see \Sec~?
+\item
+  Enhanced support for parallelization, such as Condor; see \Sec~?
+\item
+  Updated AEDL files, new beta beam files; see \Sec~?
+\item
+ Faster probability engine
+\item
+  ...
+\end{itemize}
+
+\subsection*{Major changes}
+
+Most of the modifications below should not require that old pieces of software be changed. 
+However, the following changes are necessary:
+\begin{itemize}
+\item
+ AEDL requires now that {\tt \$version} be used to define the minimum version number this AEDL
+file is to be used with. With this requirement one can easily avoid that new AEDL
+files with new features be used with old versions of \GLOBES\ which may not recognize these features.
+\item
+ Some of the earlier AEDL files have been updated, changed names, or have been removed. In addition, new files have been added. Although old AEDL files will run as usual for compatibility, they will not be
+supported by the \GLOBES\ team anymore. You should make sure to keep these files when updating \GLOBES . 
+\item
+ ...
+\end{itemize}
+The following changes should not affect older software:
+\begin{itemize}
+\item
+ {\tt glbChi...} functions renamend for consistency
+\item
+ {\tt glbChiSetStartingValues} and {\tt glbChiGetStartingValues} renamed into 
+{\tt glbChiSetCentralValues} and {\tt glbChiGetCentralValues}
+\item
+ Systematics concept changed, concept of error dimensions removed
+\item
+ Some functions changed (such as for direct rate access)
+\item
+ ..
+\end{itemize}
 
 \cleardoublepage
 \tableofcontents
@@ -422,7 +504,7 @@ high-precision instruments, very much on the oscillation parameters.
 In general, it is quite simple to simulate superbeams and reactor
 experiments. However, because of the more complicated topology, the
 simulation of neutrino factories is much more difficult. In order
-to demonstrate some of these difficulties, we present in this manual only
+to demonstrate some of these difficulties, we present in this manual mainly
 examples with neutrino factories. These examples can be found in
 \Part~\ref{part:1} within the boxed pages. As complete files, they
 are also available in the \GLOBES\ software package.
@@ -481,7 +563,7 @@ declarations are done at that place where the variable is needed for the
 first time, which is at variance with C syntax but not with C++ syntax.
 That is the only way in which the examples deviate form ISO C. Moreover
 the actual numerical values of the results of the examples may be different
-from the ones in this manual. 
+from the ones in this manual.  (IS THAT STILL SO? [WW])
 
 \mainmatter
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -497,13 +579,6 @@ from the ones in this manual.
 \input{part2}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% PART III: Module Support
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% not yet!
-%\input{part3}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Appendix
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -512,29 +587,36 @@ from the ones in this manual.
 \addcontentsline{toc}{chapter}{Acknowledgments}
 
 We would like to thank Martin Freund, who wrote the very first
-version of a three-flavour matter profile treatment many years ago.
+version of a three-flavor matter profile treatment many years ago,
+and Thomas Schwetz, who has been pushing the software to the edge in the 
+past few years. Furthermore, we would like to thank Toshihiko Ota and WHO ELSE? [WW]
+for using and testing unpublished new features of the software.
 PH is especially thankful for the invaluable advice of Thomas Fischbacher on
-many design issues.
-In addition, we would like to thank
-Mark Rolinec for his help to translate the experiment descriptions
-into \AEDL, and for creating the illustrations in this manuscript.
+many design issues in the early stage of the project.
+% In addition, we would like to thank
+% Mark Rolinec for his help to translate the experiment descriptions
+% into \AEDL, and for creating the illustrations in this manuscript.
 Finally, thanks to all the people who have been pushing this project
 for many years, to the ones who have been continuing asking for the
 publication of the software, and the referees of several of our
 papers for suggestions which lead to improvements in the software.
 
-
-This work and the development of \GLOBES\ have been supported by:
+This work and the development of \GLOBES\ have over the years been supported by:
 \begin{itemize}
-\item Physik Department der Technischen Universit\"at M\"unchen
-\item Max-Planck-Institut f\"ur Physik
+\item Technische Universit\"at M\"unchen [All authors]
+\item Max-Planck-Institut f\"ur Physik, M\"unchen [PH]
 \item Sonderforschungsbereich 375 f\"ur Astro-Teilchenphysik\\
-der Deutschen Forschungsgemeinschaft
-\item Studienstiftung des Deutschen Volkes
-\item Institute for Advanced Study, Princeton
-\item W. M. Keck Foundation
-\item Physics Department of the University of Wisconsin, Madison
+der Deutschen Forschungsgemeinschaft [All authors]
+\item Studienstiftung des Deutschen Volkes [JK, WW]
+\item Institute for Advanced Study, Princeton [WW]
+\item W. M. Keck Foundation [WW]
+\item National Science Foundation [WW]
+\item University of Wisconsin, Madison [PH]
+\item Max-Planck-Institut f\"ur Kernphysik, Heidelberg [JK, ML]
+\item Emmy Noether-Programm der Deutschen Forschungsgemeinschaft [WW]
+\item Universit\"at W\"urzburg [WW]
 \end{itemize}
+
 
 \input{appendix}
 

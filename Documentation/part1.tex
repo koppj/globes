@@ -9,6 +9,8 @@
 \label{chapter:tour}
 \index{norm}{GLOBES tour@\GLOBES~tour}
 
+TOUR ITSELF (+EXAMPLE FILE) TO BE UPDATED. JK: PLEASE LET ME KNOW WHEN {\tt example-tour.c} IS FIXED. MAYBE WE SHOULD  ALSO UPDATE THE PARAMTER VALUES [WW].
+
 In this first chapter, we show a \GLOBES\ tour illustrating the
 main features of \GLOBES . The complete example  
 can be found as {\tt example-tour.c} in the \verb+example+ subdirectory 
@@ -27,13 +29,13 @@ Function & Purpose & Parameters \ra\ Result \\
 \multicolumn{3}{l}{{\bf Systematics only:}} \\
 \GLB{ChiSys} & $\chi^2$ with systematics only  & ({\tt glb\_params in, int exp, int rule}) \ra\  {\tt double} $\chi^2$ \\[0.2cm]
 \multicolumn{3}{l}{{\bf Projections onto axes:}} \\
-\GLB{ChiTheta} & Projection onto $\theta_{13}$-axis  &  ({\tt glb\_params in, glb\_params out, int exp}) \ra\  {\tt double} $\chi^2$ \\[0.1cm]
+\GLB{ChiTheta13} & Projection onto $\theta_{13}$-axis  &  ({\tt glb\_params in, glb\_params out, int exp}) \ra\  {\tt double} $\chi^2$ \\[0.1cm]
 \GLB{ChiDelta} & Projection onto $\deltacp$-axis  &  ({\tt glb\_params in, glb\_params out, int exp}) \ra\  {\tt double} $\chi^2$ \\[0.1cm]
 \GLB{ChiTheta23} & Projection onto $\theta_{23}$-axis  &  ({\tt glb\_params in, glb\_params out, int exp}) \ra\  {\tt double} $\chi^2$ \\[0.1cm]
-\GLB{ChiDm} & Projection onto $\ldm$-axis  &  ({\tt glb\_params in, glb\_params out, int exp}) \ra\  {\tt double} $\chi^2$ \\[0.1cm]
-\GLB{ChiDms} & Projection onto $\sdm$-axis  &  ({\tt glb\_params in, glb\_params out, int exp}) \ra\  {\tt double} $\chi^2$ \\[0.2cm]
+\GLB{ChiDm31} & Projection onto $\ldm$-axis  &  ({\tt glb\_params in, glb\_params out, int exp}) \ra\  {\tt double} $\chi^2$ \\[0.1cm]
+\GLB{ChiDm21} & Projection onto $\sdm$-axis  &  ({\tt glb\_params in, glb\_params out, int exp}) \ra\  {\tt double} $\chi^2$ \\[0.2cm]
 \multicolumn{3}{l}{{\bf Projection onto plane:}} \\
-\GLB{ChiThetaDelta} & Projection onto $\theta_{13}$-$\deltacp$-plane  &  ({\tt glb\_params in, glb\_params out, int exp}) \ra\  {\tt double} $\chi^2$ \\[0.2cm]
+\GLB{ChiTheta13Delta} & Projection onto $\theta_{13}$-$\deltacp$-plane  &  ({\tt glb\_params in, glb\_params out, int exp}) \ra\  {\tt double} $\chi^2$ \\[0.2cm]
 \multicolumn{3}{l}{{\bf Projection onto any hyper-plane:}} \\
 \GLB{ChiNP} & Projection onto any $n$-dimensional hyper-plane  &  ({\tt glb\_params in, glb\_params out, int exp}) \ra\  {\tt double} $\chi^2$ \newline
 Needs \GLB{SetProjection} before! \\[0.2cm]
@@ -44,7 +46,7 @@ Needs \GLB{SetProjection} before! \\[0.2cm]
 \end{center}
 \caption{\label{tab:stdfunctions} \index{norm}{Standard functions (table)} The \GLOBES\ standard function to obtain a $\chi^2$-value with systematics only or systematics and correlations. The parameters {\tt rule} and {\tt exp}
 can either be \GLBC{GLB\_ALL} for all initialized experiment or the
-experiment number ($0$ to \GLB{\_num\_of\_exps}-1) for a specific experiment. The format of \GLB{\_params} is discussed in detail in \Chapt~\ref{chapt:gettingstarted}. Note that all functions but {\tt glbChiSys} are using minimizers which have to be initialized with \GLB{SetInputErrors} and \GLB{SetStartingValues} first.}
+experiment number ($0$ to \GLB{\_num\_of\_exps}-1) for a specific experiment. The format of \GLB{\_params} is discussed in detail in \Chapt~\ref{chapt:gettingstarted}. Note that all functions but {\tt glbChiSys} are using minimizers which have to be initialized with \GLB{SetInputErrors} and \GLB{SetCentralValues} first.}
 \end{table}
 
 \vspace*{0.5cm}
@@ -133,7 +135,7 @@ Set errors for external parameters, too: 10\% for each of the solar parameters, 
 \gq{
  glbDefineParams(input\_errors,theta12*0.1,0,0,0,sdm*0.1,0); \\
  glbSetDensityParams(input\_errors,0.05,GLB\_ALL); \\
- glbSetStartingValues(true\_values); \\
+ glbSetCentralValues(true\_values); \\
  glbSetInputErrors(input\_errors);
 }
 Then we can calculate $\chi^2$ including the full multi-parameter
@@ -141,7 +143,7 @@ correlation, and show where \GLOBES\ actually found the minimum
 (note that this takes somewhat longer than systematics only). 
 This corresponds to a projection onto the $\stheta$-axis:
 \gq{
- chi2 = glbChiTheta(fit\_values,minimum,GLB\_ALL); \\ 
+ chi2 = glbChiTheta13(fit\_values,minimum,GLB\_ALL); \\ 
  fprintf(stream,"chi2 with correlations: \%g $\backslash$n",chi2); \\
  fprintf(stream,"Position of minimum: theta12, theta13, theta23, \\ \hspace*{0.5cm} delta, sdm, ldm, rho$\backslash$n"); \\
  glbPrintParams(stream,minimum); \\ 
@@ -161,7 +163,7 @@ correlation with every parameter except from $\deltacp$, \ie,
 we keep (in addition to $\theta_{13}$) $\deltacp$ fixed.
 This corresponds to projection onto the $\stheta$-$\deltacp$-plane:
 \gq{
- chi2 = glbChiThetaDelta(fit\_values,minimum,GLB\_ALL); \\
+ chi2 = glbChiTheta13Delta(fit\_values,minimum,GLB\_ALL); \\
 fprintf(stream,"chi2 with correlations other than with deltacp: \%g $\backslash$n$\backslash$n",chi2); 
 }
 \go{
@@ -202,7 +204,7 @@ inverted hierarchy, see page~\pageref{mass_ordering}.} of the sgn-degeneracy:
   glbDefineParams(starting\_values,theta12,theta13,theta23, \\
   \hspace*{0.5cm} deltacp,sdm,-ldm); \\
   glbSetDensityParams(input\_errors,0.05,GLB\_ALL); \\
-  glbSetStartingValues(starting\_values);\\
+  glbSetCentralValues(starting\_values);\\
   glbSetInputErrors(input\_errors);\\
   chi2=glbChiAll(starting\_values,minimum,GLB\_ALL);\\ 
   fprintf(stream,"chi2 at minimum: \%g $\backslash$n",chi2);\\
@@ -309,16 +311,16 @@ output vectors.
 \gq{
  glbDefineParams(input\_errors,theta12*0.1,0,0,0,sdm*0.1,0); \\
  glbSetDensityParams(input\_errors,0.05,GLB\_ALL); \\
- glbSetStartingValues(true\_values); \\
+ glbSetCentralValues(true\_values); \\
  glbSetInputErrors(input\_errors); \\
- chi2 = glbChiTheta(fit\_values,minimum,0);\\ 
+ chi2 = glbChiTheta13(fit\_values,minimum,0);\\ 
   fprintf(stream,"chi2 with correlations for 3000km: \%g $\backslash$n",chi2); \\
  glbPrintParams(stream,minimum); \\ 
-  chi2b = glbChiTheta(fit\_values,minimum,1); \\ 
+  chi2b = glbChiTheta13(fit\_values,minimum,1); \\ 
  fprintf(stream,"$\backslash$nchi2 with correlations for 7500km: \\
   \hspace*{0.5cm}  \%g $\backslash$n",chi2b); \\
   glbPrintParams(stream,minimum); \\ 
- chi2sum = glbChiTheta(fit\_values,minimum,GLB\_ALL); \\ 
+ chi2sum = glbChiTheta13(fit\_values,minimum,GLB\_ALL); \\ 
  fprintf(stream,"$\backslash$nchi2 with correlations for combination: \\
   \hspace*{0.5cm} \%g $\backslash$n",chi2sum); \\
  glbPrintParams(stream,minimum); \\ 
@@ -352,7 +354,7 @@ experiments.
 glbDefineParams(starting\_values,theta12,theta13,theta23, \\
 \hspace*{0.5cm} deltacp,sdm,-ldm);\\
   glbSetDensityParams(input\_errors,0.05,GLB\_ALL);\\
-  glbSetStartingValues(starting\_values);\\
+  glbSetCentralValues(starting\_values);\\
   glbSetInputErrors(input\_errors);\\
   \\
   chi2=glbChiAll(starting\_values,minimum,0); \\ 
@@ -424,8 +426,8 @@ the \verb+Makefile+ in the \verb+examples+
  directory. The  \verb+Makefile+ has been correctly setup by the 
 \verb+configure+
 script to take into account details of the installation on your system. Thus
-you've just to type \verb+make+ and you're done.
-\footnote{The  data files (\AEDL\ and supporting files) needed by the
+you've just to type \verb+make+ and you're done.\footnote{The  
+data files (\AEDL\ and supporting files) needed by the
 examples are already in place.} This \verb+Makefile+ very well serves
 as a template for your own applications.
 \index{norm}{Compilation!of application programs}
@@ -466,8 +468,8 @@ int main(int argc, char *argv[]) \\
 \\
  \hspace*{0.5cm} glbInit(argv[0]); \hspace*{0.5cm} /* Initialize GLoBES library */ \\
 \\  
-  \hspace*{0.5cm} glbInitExperiment("NuFact.glb",\&glb\_experiment\_list[0], \\
-  \hspace*{1cm} \&glb\_num\_of\_exps); \hspace*{0.5cm} /* Initialize experiment NuFact.glb */\\
+  \hspace*{0.5cm} glbInitExperiment("NFstandard.glb",\&glb\_experiment\_list[0], \\
+  \hspace*{1cm} \&glb\_num\_of\_exps); \hspace*{0.5cm} /* Initialize experiment NFstandard.glb */\\
 \\  
   \hspace*{0.5cm}  /* Initialize housemade output function */\\
   \hspace*{0.5cm} 
@@ -541,7 +543,7 @@ $P_{\mathrm{Tg}} \simeq  4 \, \mathrm{MW}$ & \cite{Huber:2002mx} \\[0.1cm]
 \end{center}
 \mycaption{\label{tab:experiments} \index{norm}{Experiment files (table)}
 \index{norm}{glb files@{\tt glb}-files} 
-Pre-defined experiment prototypes, their filenames (to be used in \GLB{InitExperiment}), their short descriptions, and the references in which they are originally used and discussed (except from minor modifications, such as a
+TO BE UPDATED BY MR; POSSIBLY MORE DETAILED DESCRIPTION IN APPENDIX [WW]. Pre-defined experiment prototypes, their filenames (to be used in \GLB{InitExperiment}), their short descriptions, and the references in which they are originally used and discussed (except from minor modifications, such as a
 different implementation of the energy threshold function). Note that
 some of these experiments are outdated in terms of integrated luminosities,
 baseline, fluxes, efficiencies, or other factors. In any case these file are installed along with \GLOBES.}
@@ -576,32 +578,36 @@ In general, many \GLOBES\ functions take the experiment number as
 a parameter, which runs from $0$ to \GLB{\_num\_of\_exps}-1 in the order of their initialization in the program.\footnote{Note that
 the global variable {\tt glb\_num\_of\_exps} must not be modified by the
 user.} In addition, using the parameter value \GLBC{GLB\_ALL} as
-experiment number initiates a combined analysis of all loaded experiments.
+experiment number (for example, in the {\tt glbChi...} functions) initiates a combined analysis of all loaded experiments.
 \index{norm}{GLB ALL@{\tt GLB\_ALL}}
 \index{constants}{{\tt GLB\_ALL}}
 
-In general \GLBC{GLB\_ALL} can be used in many cases where there is an argument
-selecting `$i$ out of $N$', \eg\ the 1st experiment out of 5, or the 5th
-rule of 20. In those cases  using \GLBC{GLB\_ALL} is equivalent to
-calling the corresponding function for \emph{all} $i$ in $N$  and `add' 
-the effect of each
-invocation, like in
-\begin{quote}
-\verb&for (i=0;i<N;i++) result += some_function(i);&\\
-is the same as\\
-\verb&result = some_function(GLB_ALL);&
-\end{quote}
-Here the meaning of `add' is, that whatever the desired result of calling
-\verb+some_function+ is, this result is obtained for each $i$ in $N$, \eg\ 
-setting the baseline in all experiments to a certain value or
-or compute the $\chi^2$ for each experiment and return the total result.
-There are however some functions where the action performed or the result
-is so complex that is not possible or sensible to perform this for all $i$
-in $N$. Calling these functions with  \GLBC{GLB\_ALL} as argument will 
-in any case result in an exit status indicating
-failure and the function will produce an 
-error message\footnote{if the verbosity
-level is set accordingly}.
+% THIS PART IS CONFUSING, BECAUSE THE EXPLAINED BEHAVIOR IS DIFFERENT FROM THE glbChi-functions
+% (THE MARGINALIZATION IS PERFORMED AFTER THE CHI2 IS ADDED! ONE MAY GET A DIFFERENT IMPRESSION
+% FROM THIS DESCRIPTION). THEREFORE, I HAVE REMOVED IT [WW].
+%
+% In general \GLBC{GLB\_ALL} can be used in many cases where there is an argument
+% selecting `$i$ out of $N$', \eg\ the 1st experiment out of 5, or the 5th
+% rule of 20. In those cases  using \GLBC{GLB\_ALL} is equivalent to
+% calling the corresponding function for \emph{all} $i$ in $N$  and `add' 
+% the effect of each
+% invocation, such as in
+% \begin{quote}
+% \verb&for (i=0;i<N;i++) result += some_function(i);&\\
+% is the same as\\
+% \verb&result = some_function(GLB_ALL);&
+% \end{quote}
+% Here the meaning of `add' is, that whatever the desired result of calling
+% \verb+some_function+ is, this result is obtained for each $i$ in $N$, \eg\ 
+% setting the baseline in all experiments to a certain value or
+% or compute the $\chi^2$ for each experiment and return the total result.
+% There are however some functions where the action performed or the result
+% is so complex that is not possible or sensible to perform this for all $i$
+% in $N$. Calling these functions with  \GLBC{GLB\_ALL} as argument will 
+% in any case result in an exit status indicating
+% failure and the function will produce an 
+% error message\footnote{if the verbosity
+% level is set accordingly}.
 
  
 \index{norm}{Experiment!list}
@@ -610,17 +616,17 @@ For storing the experiments, \GLOBES\ uses the initially empty list of experimen
 \begin{function}
 \index{norm}{Experiment initialization}
 \GLBNS{InitExperiment}
-{\tt int glbInitExperiment(char *inf, glb\_exp *in, int *counter)}
- adds a single experiment with the filename {\tt inf} to the list of currently loaded experiments. The {\tt counter} is a pointer to the 
- variable containing the number of experiments, and the experiment {\tt in}
+{\tt int glbInitExperiment(char *infile, glb\_exp *ptr, int *counter)}
+ adds a single experiment with the filename {\tt infile} to the list of currently loaded experiments. The {\tt counter} is a pointer to the 
+ variable containing the number of experiments, and the experiment {\tt ptr}
  points to the beginning of the experiment list. The function returns
  zero if it was successful. 
 \end{function}
 Normally, a typical  call of {\tt glbInitExperiment} is 
 \begin{quote}
-{\tt glbInitExperiment("NuFact.glb",\&glb\_experiment\_list[0],\\  \hspace*{8cm} \&glb\_num\_of\_exps); }
+{\tt glbInitExperiment("NFstandard.glb",\&glb\_experiment\_list[0],\\  \hspace*{8cm} \&glb\_num\_of\_exps); }
 \end{quote}
-In this case, the experiment in the file {\tt NuFact.glb} is added to the internal global list of experiments, and the experiment counter is increased. The
+In this case, the experiment in the file {\tt NFstandard.glb} is added to the internal global list of experiments, and the experiment counter is increased. The
 experiment then has the number {\tt glb\_num\_of\_exps}-1. The elements
 of the experiment list have the type \GLB{\_exp}, which the
 user will not need to access directly in most cases. The experiment definition files, which usually end with {\tt .glb}, and any
@@ -739,7 +745,8 @@ running mode, one can scale them independently.
 Before we can set the simulated event rates or access any oscillation
 parameters, we need to become familiar with the concept \GLOBES\ uses
 for oscillation parameters. In order to transfer sets of oscillation
-parameter vectors $(\theta_{12}, \theta_{13}, \theta_{23}, \deltacp, \sdm, \ldm)$, the parameter type \GLB{\_params} is used. In general,
+parameter vectors $(\theta_{12}, \theta_{13}, \theta_{23}, \deltacp, \sdm, \ldm)$
+as well as some other information, the parameter type \GLB{\_params} is used. In general,
  this type is often
 transferred to and from \GLOBES\ functions. Therefore, the memory 
 for these vectors has to be reserved (allocated) before they can be used, 
@@ -749,7 +756,7 @@ of the type {\tt glb\_params} for the input or output to the functions. As
 an input parameter, the pointer has to be created and point towards a valid
 parameter structure, where the oscillation parameters are read from. As
 an output parameter, the pointer has to be created, too, and point towards
-a structure which will contain the return values will be written to.
+a structure which the return values will be written to.
 This parameter transfer concept seems to be very sophisticated, but, as we
 will see in the next chapters, it hides a lot of complicated parameter 
 mappings which otherwise need to be done by the user. For example, not
@@ -776,19 +783,6 @@ experiments are initialized.
 Similarly, any change in the number of experiments requires that the
 parameter structures be re-initialized, \ie, freed and allocated again.
 
-\label{mass_ordering}
-\index{norm}{Mass hierarchy}
-\paragraph{Note:} Inverting the mass hierarchy is not
-precisely the same than to change from $\Delta m^2_{31}
-\rightarrow -\Delta m^2_{31}$.
-In this case the absolute value of $\Delta m^2_{32}$ changes also, which
-introduces a new frequency to the problem. Therefore, if we assume
-normal hierarchy  whenever $\Delta m^2_{31}>0$, the corresponding
-point in parameters space for inverted hierarchy is given by $\Delta 
-m^2_{31}\rightarrow - \Delta m^2_{31} + \Delta m^2_{21}$, because
-with this defintion the absolute value of  $\Delta m^2_{32}$ is unchanged
-and no new frequency is introduced.\\
-
 
 
 Another piece of information will be returned from the minimizers 
@@ -810,7 +804,7 @@ needed for a parameter vector {\tt stale} and sets the pointer to {\tt NULL}.
 \end{function}
 \begin{function}
 \GLBNS{DefineParams}
-{\tt glb\_params glbDefineParams(glb\_params in, double theta12, double theta13,double theta23, double delta, double dms, double dma)} assigns
+{\tt glb\_params glbDefineParams(glb\_params in, double theta12, double theta13,double theta23, double delta, double dm21, double dm31)} assigns
 the complete set of oscillation parameters to the vector {\tt in}, which has
 to be allocated before. The return value is the pointer to {\tt in} if 
 the assignment was successful, and {\tt NULL} otherwise.
@@ -845,7 +839,7 @@ returns the value of the oscillation parameter {\tt which} in the
 structure {\tt in}.
 \end{function}
 In both of these functions, the parameter {\tt which} runs from
-$0$ to $5$, where the parameters in \GLOBES\ always have the order $\theta_{12}$, $\theta_{13}$, $\theta_{23}$, $\deltacp$, $\sdm$, $\ldm$.
+$0$ to $5$ (or the number of oscillation parameters-1), where the parameters in \GLOBES\ always have the order $\theta_{12}$, $\theta_{13}$, $\theta_{23}$, $\deltacp$, $\sdm$, $\ldm$.
 Alternatively to the number, the constants \GLBC{GLB\_THETA\_12}, \GLBC{GLB\_THETA\_13}, \GLBC{GLB\_THETA\_23}, \GLBC{GLB\_DELTA\_CP}, 
 \GLBC{GLB\_DM\_SOL}, or \GLBC{GLB\_DM\_ATM} can be used.
 
@@ -951,17 +945,17 @@ versions. It is up to the user to implement mechanisms into the
 program and \AEDL\ files to check whether
 \begin{itemize}
 \item
- The program should only run with this specific version of \GLOBES
-\item
- The program can only run with a minimum version of \GLOBES
+ The program should only run with this specific version of \GLOBES .
 \item
  The program can only run up to a certain \GLOBES\ version.
+\item
+ The program can only run with a minimum version of \GLOBES .
+\item
+ The program and AEDL file versions are compatible.
 \end{itemize}
-The same holds for \AEDL\ files: For example, 
-some features may not be supported by earlier versions of \GLOBES\ anymore.
-The program can then check the version of the \AEDL\ file and break if it is
-too old.
-
+However, note that GLOBES~3.0 and higher requires that the \GLOBES\ version be at least as new as the
+version the AEDL file was written for.
+%
 The functions in \GLOBES\ for version control are:
 \begin{function}
 \GLBNS{TestReleaseVersion}
@@ -976,10 +970,12 @@ the {\tt version} string of the format ``X.Y.Z'' is exactly the
 used \GLOBES\ version, $1$ if it is older, and $-1$ if it is newer.
 Note that the library and \GLOBES\ versions are not the same. 
 \end{function}
+WHAT IS THE DIFFERENCE BETWEEN THE LIBRARY AND GLOBES VERSION???? [WW]
 \begin{function}
 \GLBNS{VersionOfExperiment} 
 {\tt const char* glbVersionOfExperiment(int experiment)} returns
-the version string of the experiment number {\tt experiment}.
+the version string of the experiment number {\tt experiment} (set by
+{\tt \$version} in AEDL).
 The version string is allocated within the experiment structure, which means
 that it cannot be altered and must not be freed by the
 user.
@@ -1432,8 +1428,8 @@ with switching off the constraint on $\ldm$.
 In order to set the starting values and input errors, two function have to
  be called {\em before the usage of any minimizer}:
 \begin{function}
-\GLBNS{SetStartingValues}
-{\tt int glbSetStartingValues(const glb\_params in)} sets the starting values for all of the following minimizer calls to {\tt in}.
+\GLBNS{SetCentralValues}
+{\tt int glbSetCentralValues(const glb\_params in)} sets the starting values for all of the following minimizer calls to {\tt in}.
 \end{function}
 \begin{function}
 \GLBNS{SetInputErrors}
@@ -1445,8 +1441,8 @@ In order to set the starting values and input errors, two function have to
 Accordingly, there are functions to return the actually set starting values
 and input errors:
 \begin{function}
-\GLBNS{GetStartingValues}
-{\tt int glbGetStartingValues(glb\_params out)} writes the currently
+\GLBNS{GetCentralValues}
+{\tt int glbGetCentralValues(glb\_params out)} writes the currently
 set starting values to {\tt out}.
 \end{function}
 \begin{function}
@@ -1469,7 +1465,7 @@ and $5\%$ matter density uncertainties for all experiments looks like this:
 {\tt
  glbDefineParams(input\_errors,theta12*0.1,0,0,0,sdm*0.1,0);\\  
  glbSetDensityParams(input\_errors,0.05,GLB\_ALL);\\
- glbSetStartingValues(true\_values);\\
+ glbSetCentralValues(true\_values);\\
  glbSetInputErrors(input\_errors);\\
 }
 \end{quote}
@@ -1531,7 +1527,7 @@ This example demonstrates how to project the fit manifold onto the $\stheta$-axi
   /* Set starting values and input errors for all projections */  \\
   glbDefineParams(input\_errors,theta12*0.1,0,0,0,sdm*0.1,0);\\  
   glbSetDensityParams(input\_errors,0.05,GLB\_ALL);\\
-  glbSetStartingValues(true\_values);\\
+  glbSetCentralValues(true\_values);\\
   glbSetInputErrors(input\_errors);\\
 \\
   /* Define my own two-parameter projection for glbChiNP: Only deltacp is free! */ \\
@@ -1552,7 +1548,7 @@ This example demonstrates how to project the fit manifold onto the $\stheta$-axi
 \hspace*{0.5cm} res1=glbChiNP(test\_values,NULL,GLB\_ALL); \\
       \\
 \hspace*{0.5cm} /* Compute Chi2 for full correlation: minimize over all but theta13 */ \\
-\hspace*{0.5cm} res2=glbChiTheta(test\_values,NULL,GLB\_ALL); \\
+\hspace*{0.5cm} res2=glbChiTheta13(test\_values,NULL,GLB\_ALL); \\
   \\
 \hspace*{0.5cm} AddToOutput(x,res1,res2);\\
   \} \\
@@ -1585,8 +1581,8 @@ The projection onto the $\stheta$- (or $\deltacp$-) axis is performed by fixing 
 The following functions are some of the simplest minimizers 
 provided by \GLOBES :
 \begin{function}
-\GLBNS{ChiTheta}
-{\tt double glbChiTheta(const glb\_params in, glb\_params out, int exp)}
+\GLBNS{ChiTheta13}
+{\tt double glbChiTheta13(const glb\_params in, glb\_params out, int exp)}
 returns the projected $\chi^2$ onto the $\theta_{13}$-axis for the  experiment {\tt exp}. For the simulation of all initialized experiments,
 use {\tt GLB\_ALL} for {\tt exp}. The values in {\tt in} are the guessed fit values for the minimizer (all parameters other than $\theta_{13}$) and the fixed fit value of $\theta_{13}$. The actually determined parameters at the minimum are returned in {\tt out}, where $\theta_{13}$ is still at
 its fixed value. If {\tt out} is set to {\tt NULL}, this information will not be returned.
@@ -1617,8 +1613,8 @@ solution in $\ldm$, priors can be used to force it into the tested
 minimum. In addition, the number of iterations used allows an optimization
 of the convergence speed. 
 % 
-Note that before any minimization, \GLB{SetStartingValues} 
-and \GLB{SetInputErrors} have to be used at least once. In addition, note that the resulting $\chi^2$ of {\tt glbChiTheta} (or {\tt glbChiDelta}) for the combination of more than one experiment is not 
+Note that before any minimization, \GLB{SetCentralValues} 
+and \GLB{SetInputErrors} have to be used at least once. In addition, note that the resulting $\chi^2$ of {\tt glbChiTheta13} (or {\tt glbChiDelta}) for the combination of more than one experiment is not 
 equal to the sum of the individual $\chi^2$-values anymore. This has two reasons: First, the topology of the fit manifold is altered by the addition of $\chi^2$-values of different experiments. Thus, after the minimization, the position of the minimum can be different to the ones of the individual experiments. Second, the priors for the external knowledge on the parameters are only added once -- independent of the number of experiments.
 
 \index{norm}{Matter density!scaling factor}
@@ -1629,7 +1625,7 @@ are present, since each experiment may face other matter density conditions.
 The minimizers of individual experiments ``know'' which
 experiment they are currently treating, which means that they only returned the
 matter density scaling factor of the appropriate experiment.
-For example, calculating {\tt glbChiTheta} for the last experiment
+For example, calculating {\tt glbChiTheta13} for the last experiment
 number, the last density value will be returned.
 This approach turns out to be extremely useful together with the
 simulation of more than one experiment. One can, for instance, locate the
@@ -1649,7 +1645,7 @@ for neutrino factories because of the $(\deltacp, \theta_{13})$-degeneracy, wher
 to use the true values. A strong indication for a wrong guessing 
 are discontinuous jumps in the projected $\chi^2$-function, where the minimizer jumps from one minimum to another. In such cases, the starting point of the minimizer has to be adjusted to help it find the true minimum.
 
-Other examples for projections onto a parameter axis while keeping exactly one parameter fixed are \GLB{ChiTheta23}, \GLB{ChiDm}, and \GLB{ChiDms}, which
+Other examples for projections onto a parameter axis while keeping exactly one parameter fixed are \GLB{ChiTheta23}, \GLB{ChiDm31}, and \GLB{ChiDm21}, which
 can be found in \Tab~\ref{tab:stdfunctions} on page~\pageref{tab:stdfunctions}.
 
 
@@ -1663,8 +1659,8 @@ minimized over.
 The corresponding function is 
 \index{norm}{Projection!$\theta_{13}$-$\deltacp$-plane}
 \begin{function}
-\GLBNS{ChiThetaDelta}
-{\tt double glbChiThetaDelta(const glb\_params in, glb\_params out, int exp)} returns the projected $\chi^2$ onto the $\theta_{13}$-$\deltacp$-plane for the  experiment {\tt exp}. For the simulation of all initialized experiments,
+\GLBNS{ChiTheta13Delta}
+{\tt double glbChiTheta13Delta(const glb\_params in, glb\_params out, int exp)} returns the projected $\chi^2$ onto the $\theta_{13}$-$\deltacp$-plane for the  experiment {\tt exp}. For the simulation of all initialized experiments,
 use {\tt GLB\_ALL} for {\tt exp}. The values in {\tt in} are the guessed fit values for the minimizer (all parameters other than $\theta_{13}$ and $\deltacp$) and the fixed fit values of $\theta_{13}$ and $\deltacp$. The actually determined parameters at the minimum are returned in {\tt out}, where $\theta_{13}$ and $\deltacp$ are still at their fixed values. If {\tt out} is set to {\tt NULL}, this information will not be returned.
 \end{function}
 This function works analogously to the ones in the last section. They can, for example, be used to obtain a figure similar to \figu{projex}, left.
@@ -1678,7 +1674,7 @@ one-dimensional list). Therefore, the overall computational effort is
 much higher, \ie, in the order of hours. In many cases, it is therefore
 convenient to run {\tt glbChiSys} first to obtain a picture of
 the manifold and to adjust the parameter ranges. Then, one can run
-{\tt glbChiThetaDelta} for a complete evaluation of the problem
+{\tt glbChiTheta13Delta} for a complete evaluation of the problem
 including correlations.
 
 \begin{table}[t!]
@@ -1715,7 +1711,7 @@ provided. The purpose of {\tt glb\_projection} is to tell \GLOBES\
 what parameters are fixed, and what are minimized over. Thus, in
 comparison to {\tt glb\_params}, it does not take values for the
 parameters, but flags \GLBC{GLB\_FIXED} or \GLBC{GLB\_FREE}.
-For example, the projection onto the $\theta_{13}$-axis {\tt glbChiTheta}
+For example, the projection onto the $\theta_{13}$-axis {\tt glbChiTheta13}
 is nothing else than a special case of {\tt glbChiNP} with $\theta_{13}$
 fixed and all the other parameters free. Similar to {\tt glb\_params},
 the type {\tt glb\_projection} has to be allocated first, and freed
@@ -1793,7 +1789,7 @@ and let it run into the minimum.  The following code excerpt  corresponds to fin
   glbDefineParams(input\_errors,theta12*0.1,0,0,0,sdm*0.1,ldm/3); \\ 
   glbSetDensityParams(input\_errors,0.05,GLB\_ALL); \\
   \\
-  glbSetStartingValues(starting\_values); \\
+  glbSetCentralValues(starting\_values); \\
   glbSetInputErrors(input\_errors); \\
   \\
   /* Localize degenerate solution by minimization over all parameters */ \\
@@ -1827,16 +1823,27 @@ confidence level.
 
 The example on page~\pageref{ex:sgndeg} illustrates how to locate the $\mathrm{sgn}(\ldm)$-degeneracy and show the corresponding degenerate solution in the $\stheta$-$\deltacp$-plane together with the original solution.
 In this case, the position of the degeneracy can be easily guessed to be 
-at the true parameter values but with inverted\footnote{For a exact 
-definition of 
-inverted hierarchy, see page~\pageref{mass_ordering}.} $\ldm$. The minimizer then runs off the plane of these parameters into the local minimum. It is very important to take into account the position of the degeneracy off this plane, since the actual $\chi^2$ in the minimum is probably lower than in the plane. Thus, the degeneracy may not even appear at the chosen confidence level in the plane, but it does appear at the real minimum. The two sections through the fit manifold shown in the figure on page~\pageref{ex:sgndeg} therefore do not appear at the same oscillation parameter values (except from the ones shown in the 
-figure).\footnote{The discussed figure on page~\pageref{ex:sgndeg} is produced by  {\tt glbChiSys} and thus only represents a section through the fit manifold. For the projection including correlations, one may rather want to use {\tt glbChiThetaDelta}.} 
+at the true parameter values but with inverted  $\ldm$.
+The minimizer then runs off the plane of these parameters into the local minimum. It is very important to take into account the position of the degeneracy off this plane, since the actual $\chi^2$ in the minimum is probably lower than in the plane. Thus, the degeneracy may not even appear at the chosen confidence level in the plane, but it does appear at the real minimum. The two sections through the fit manifold shown in the figure on page~\pageref{ex:sgndeg} therefore do not appear at the same oscillation parameter values.\footnote{The discussed figure on page~\pageref{ex:sgndeg} is produced by  {\tt glbChiSys} and thus only represents a section through the fit manifold. For the projection including correlations, one may rather want to use {\tt glbChiTheta13Delta}.} 
+
+\label{mass_ordering}
+\index{norm}{Mass hierarchy}
+\paragraph{Note:} Inverting the mass hierarchy is not
+precisely the same than to change from $\Delta m^2_{31}
+\rightarrow -\Delta m^2_{31}$.
+In this case the absolute value of $\Delta m^2_{32}$ changes also, which
+introduces a new frequency to the problem. Therefore, if we assume
+normal hierarchy  whenever $\Delta m^2_{31}>0$, the corresponding
+point in parameters space for inverted hierarchy is given by $\Delta 
+m^2_{31}\rightarrow - \Delta m^2_{31} + \Delta m^2_{21}$, because
+with this defintion the absolute value of  $\Delta m^2_{32}$ is unchanged
+and no new frequency is introduced.\\
 
 \index{norm}{Advanced tricks}
 For the more advanced reader, a number of tricks can be useful for the numerical localization of degenerate solutions:
 \begin{description}
 \item[Minimum $\boldsymbol{\chi^2}$ larger than threshold.] If a located degeneracy has a minimum $\chi^2$ larger than the corresponding confidence level threshold for the discussed quantity of interest, the degeneracy can be immediately ignored. This saves a lot of computation time.
-\item[Locating degeneracies in more complicated topologies.] For more complicated topologies, such as for neutrino factories, it is often useful to use multi-step location procedures or analytical knowledge. For example, for a numerical procedure, one may first of all switch off the systematics and keep $\stheta$ or $\deltacp$ fixed, \ie, use {\tt glbChiTheta}, where $\stheta$ or $\deltacp$ is fixed at the best-fit value. The result can then be used as a starting point for {\tt glbChiAll} for the individual experiments with the systematics switched on again. 
+\item[Locating degeneracies in more complicated topologies.] For more complicated topologies, such as for neutrino factories, it is often useful to use multi-step location procedures or analytical knowledge. For example, for a numerical procedure, one may first of all switch off the systematics and keep $\stheta$ or $\deltacp$ fixed, \ie, use {\tt glbChiTheta13}, where $\stheta$ or $\deltacp$ is fixed at the best-fit value. The result can then be used as a starting point for {\tt glbChiAll} for the individual experiments with the systematics switched on again. 
 \item[Forcing the minimizer into the targeted solution.]
 In addition to switching off the systematics, it can be useful to reduce the input errors during some steps of the localization process in order to make the minimizer not to run away too much from the targeted solution.
 The example on page~\pageref{ex:sgndeg} illustrates this with the
@@ -2294,7 +2301,7 @@ double CalcNoSystematics(double theldm,double thex) \\
 The complete code can be found as {\tt example4.c} with the software,
 which consists of many of the applications from the earlier examples.
 In addition, it uses a little trick: It avoids falling into the wrong
- solution with {\tt glbChiTheta}
+ solution with {\tt glbChiTheta13}
 by using the fit value of $\deltacp$ from the step before as prediction
 of the position of the current calculation.
 
@@ -2609,7 +2616,7 @@ effect, \ie, we keep it completely free but assume it to be zero as null hypothe
  glbSetOscParams(input\_errors,0,MY\_FV);  \\
  glbSetDensityParams(input\_errors,0.05,GLB\_ALL); \\
  glbSetOscillationParameters(); glbSetRates(); \\
- glbSetStartingValues(true\_values);glbSetInputErrors(input\_errors); \\
+ glbSetCentralValues(true\_values);glbSetInputErrors(input\_errors); \\
  \\
  glbDefineProjection(my\_proj,GLB\_FREE,GLB\_FIXED,GLB\_FREE,\\
   \hspace*{2cm} GLB\_FREE,GLB\_FREE,GLB\_FREE); \\
@@ -2622,9 +2629,9 @@ effect, \ie, we keep it completely free but assume it to be zero as null hypothe
  res=glbChiNP(fit\_values,minimum,GLB\_ALL); 
 }}
 \end{quote}
-This code fragment illustrates the implementation of a {\tt glbChiTheta} function
+This code fragment illustrates the implementation of a {\tt glbChiTheta13} function
 including the non-standard effect, which is being marginalized over.
-Alternatively, one could define a {\tt glbChiTheta} fixing the non-standard
+Alternatively, one could define a {\tt glbChiTheta13} fixing the non-standard
 parameter, or include external constrainys to limit its size. Therefore, 
 there is no ``standard'' treatment of new physics effects incorporated
 in \GLOBES .
