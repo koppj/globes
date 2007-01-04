@@ -1117,8 +1117,8 @@ double chiDCNorm(int exp, int rule, int np, double *x, double *errors) \\
   \hspace*{0.3cm} double signal\_fit\_rates\_N[n\_bins]; double signal\_fit\_rates\_F[n\_bins]; \\
   \hspace*{0.3cm} double signal\_norm\_N, signal\_norm\_F; \\
   \hspace*{0.3cm} int ew\_low, ew\_high, i; \\
-  \hspace*{0.3cm} double emin, emax, fit\_rate;  double chi2 = 0.0; \\
-  \\
+  \hspace*{0.3cm} double emin, emax, fit\_rate;  double chi2 = 0.0; 
+
    \hspace*{0.3cm} /* Request simulated energy interval and analysis energy window */ \\
    \hspace*{0.3cm} glbGetEminEmax(exp, \&emin, \&emax); \\
    \hspace*{0.3cm} glbGetEnergyWindowBins(exp, rule, \&ew\_low, \&ew\_high); 
@@ -1137,7 +1137,7 @@ double chiDCNorm(int exp, int rule, int np, double *x, double *errors) \\
   \hspace*{0.6cm}  /* Statistical part of chi2 for far detector */ \\
   \hspace*{0.6cm}  fit\_rate  = signal\_norm\_F * signal\_fit\_rates\_F[i]; \\
   \hspace*{0.6cm}  chi2 += likelihood(true\_rates\_F[i], fit\_rate, true\_rates\_F[i]); \\
-   \\
+   
   \hspace*{0.6cm}  /* Statistical part of chi2 for near detector  */ \\
   \hspace*{0.6cm}  fit\_rate  = signal\_norm\_N * signal\_fit\_rates\_N[i]; \\
   \hspace*{0.6cm}  chi2 += likelihood(true\_rates\_N[i], fit\_rate, true\_rates\_N[i]); \\
@@ -1391,7 +1391,7 @@ the $n$-dimensional fit manifold onto the respective axis. Similarly, one can
 project the fit manifold onto a plane, such as the $\stheta$-$\deltacp$-plane,
  if one wants to show the allowed
 region in this plane with all the other parameter correlations included. 
-In practice, this projection is very difficult: a grid-based method would 
+In practice, this projection (or marginalization) is very difficult: a grid-based method would 
 need $(N_{\mathrm{grid}})^n$ function calls of {\tt glbChiSys} to 
 calculate the projection onto one dimension 
 including the full $n$-parameter correlation, where 
@@ -1408,9 +1408,9 @@ illustrate this minimization process later. It turns out
 that such a minimizer can include a full $6$-parameter correlation 
 with of the order of $1\, 000$ function calls of {\tt glbChiSys}. For the 
 minimization we use a derivative free method due to Powell in a 
-modified~\cite{Brent:1973} version\footnote{Not needing derivatives is
-highly desired since the event rate depends in a non-linear way on the
-oscillation parameters, thus there is no easy analytical way
+modified~\cite{Brent:1973} version\footnote{Not to need derivatives is
+highly desired, since the event rate depends in a non-linear way on the
+oscillation parameters. Thus, there is no easy analytical way
 to obtain derivatives of the $\chi^2$ function.}.
 
 Thus, for each point on the projection axis/plane, one can obtain a result within about $10$ to $30$ seconds on a modern computer, which means that the complete measurement precision for one fixed true parameter set can be obtained in as much as $10$ to $15$ minutes. One can easily imagine that such a minimizer makes more sophisticated applications possible with the help of overnight calculations, such as showing the dependencies on the true parameter values.
@@ -1421,10 +1421,10 @@ to find \emph{all} local minima of a function. In practice this means using
  a local minimizer, one may end up in an unwanted local minimum and not in 
 the investigated (possibly global) one or 
 one may miss a local minimum which affects the results\footnote{NB -- 
-Implementing a grid-based method which guarantee to find all local minima is
+Implementing a grid-based method which guarantees to find all local minima is
 not straightforward either, to say the least.}. 
-The only way out of this dilemma is to use some heuristic approach, \ie\
-although one can not guarantee anything one can use schemes which work
+The only way out of this dilemma is to use some heuristic approach, \ie , 
+one can use schemes which work
 in most cases and announce their failure loudly. In order to use such a
 heuristic some (analytical or numerical) knowledge on the topology of 
 the fit manifold is necessary. With this knowledge it is possible
@@ -1442,10 +1442,10 @@ of the many analytical discussions of this issue can be used. This means
  that one can implicitly use the analytical knowledge to obtain 
 better predictions for the location of a minimum. One can easily imagine 
 that the used methods then also depend
-on the region of the parameter space. In this manual, we only use
+on the region of the parameter space. In this manual, we mainly use
 examples with a neutrino factory, since some of these complications
-can be illustrated there. Albeit the methods described here are neither
-complete nor will they work everywhere in the parameter space. It is
+can be illustrated there. Note that the methods described here are neither
+complete, nor will they work everywhere in the parameter space. It is
 in any case up to the user to make sure that the results are what he/she
 thinks.
 
@@ -1459,7 +1459,7 @@ previously found ones it will not influence the value of the projected
 value. 
 Thus, one can only run the danger to obtain a too optimistic solution 
 if one does not find the other local minima appearing 
-below the chosen confidence level. Thus, with this approach and proper usage,
+below the chosen confidence level. With this approach and proper usage,
  it should not possible to produce a too pessimistic solution. 
 However, if one is not careful enough to locate
 all local minima, one can easily produce too optimistic solutions.
@@ -1470,7 +1470,7 @@ This danger can be summarized as follows:
 
 \index{norm}{External information!priors} 
 \index{norm}{External information!input errors} 
-\index{norm}{External information!starting values}
+\index{norm}{External information!central values}
 In many cases, the fit manifold is restricted by the knowledge 
 from earlier experiments. For example, the knowledge on the solar 
 parameters will in most cases be supplied by the solar neutrino experiments. 
@@ -1485,11 +1485,11 @@ are determined externally with infinitively high precisions. As this
 is a quite strong assumption, one should \emph{always} check the 
 consequences of relaxing it and using realistic errors. Only if such
 a test has demonstrated that the impact of the uncertainty on a 
-given fit parameter is negligible it can be assumed as fixed safely. 
+given fit parameter is negligible, it can be assumed as fixed safely. 
  The inclusion of external input in \GLOBES\ is done by the use of 
 Gau\ss ian {\em priors}: We assume that an external measurement has 
 determined the measured parameter to be at the central value 
-(which we call {\em starting value}) with a $1 \sigma$ Gau\ss ian error 
+(which we call {\em central value}) with a $1 \sigma$ Gau\ss ian error 
 (which we call {\em input error}). The explicit definition of these 
 priors will be shown in the next section. 
 
@@ -1513,12 +1513,12 @@ scaling factor \index{norm}{Matter density!scaling factor} $\hat{\rho}$
 \ee
 This example is a very simple one, since in fact the
 minimization is simultaneously performed over all priors and free oscillation 
-parameters. In \equ{priors}, $\hat{\rho}^0$ is the {\em starting value} of the 
+parameters. In \equ{priors}, $\hat{\rho}^0$ is the {\em central value} of the 
 prior, and $\sigma_{\hat{\rho}}$ the $1 \sigma$ absolute (half width) 
 {\em input error}. Thus, it is assumed that an external measurement has 
 determined the matter density with a precision (input error) 
 $\sigma_{\hat{\rho}}$ at the central value $\hat{\rho}^0$. Usually, 
-the starting value is fixed at the best-fit value, and the input error 
+the central value is fixed at the best-fit value, and the input error 
 to the $1 \sigma$ half width of the external measurement. For the matter 
 density, $\hat{\rho}^0$  is usually set to $1.0$ corresponding to
 the actual matter density profile such as given by the experiment
@@ -1527,19 +1527,18 @@ relative matter density uncertainty (\eg, $0.05$ for 5\% uncertainty).
 
 In principle, one can set the priors for the matter density and all oscillation parameters. For example, if the disappearance channels of the experiment determine the leading oscillation parameters with unprecedented
 precisions, one can omit the respective input errors. In \GLOBES , a
-value of $0$ corresponds\footnote{to be precise, a value for the error
+value of $0$ corresponds\footnote{To be precise, a value for the error
 in between $-10^{-12}$ and $+10^{-12}$} to neglecting the prior. If, however,
  earlier external measurements provide better information, one can set their 
-absolute precisions with the input errors. The starting values are usually 
+absolute precisions with the input errors. The central values are usually 
 chosen to be the best-fit values of this external experiments, such as
 for the input from solar experiments. In some cases, it may be
 necessary to adjust them, such as for artificial constraints to the
-oscillation parameters. In other cases, minor modifications of the 
-starting values can cause a faster convergence of the algorithm.
+oscillation parameters. 
 For example, for the investigation of the
 opposite-sign solution, one can use the prior to constrain $\ldm$
 in order to force the minimizer not to  fall into the (unwanted) 
-true-sign solution. In this case, the starting value of $\ldm$ would 
+true-sign solution. In this case, the central value of $\ldm$ would 
 be set to $\rho^0_{\ldm} = - \ldm$, and a $\sigma_{\ldm}$ of the order 
 of $\ldm$ would be imposed. For the algorithm, it would 
 then be rather difficult 
@@ -1552,12 +1551,12 @@ position of the previously found minimum as starting position but now
 with switching off the constraint on $\ldm$.
 
 \index{norm}{External information!input errors} 
-\index{norm}{External information!starting values}
-In order to set the starting values and input errors, two function have to
+\index{norm}{External information!central values}
+In order to set the central values and input errors, two function have to
  be called {\em before the usage of any minimizer}:
 \begin{function}
 \GLBNS{SetCentralValues}
-{\tt int glbSetCentralValues(const glb\_params in)} sets the starting values for all of the following minimizer calls to {\tt in}.
+{\tt int glbSetCentralValues(const glb\_params in)} sets the central values for all of the following minimizer calls to {\tt in}.
 \end{function}
 \begin{function}
 \GLBNS{SetInputErrors}
@@ -1566,12 +1565,12 @@ In order to set the starting values and input errors, two function have to
  An input error of $0$ corresponds to not taking into account the
  respective prior.
 \end{function}
-Accordingly, there are functions to return the actually set starting values
+Accordingly, there are functions to return the actually set central values
 and input errors:
 \begin{function}
 \GLBNS{GetCentralValues}
 {\tt int glbGetCentralValues(glb\_params out)} writes the currently
-set starting values to {\tt out}.
+set central values to {\tt out}.
 \end{function}
 \begin{function}
 \GLBNS{GetInputErrors}
@@ -1597,11 +1596,11 @@ and $5\%$ matter density uncertainties for all experiments looks like this:
  glbSetInputErrors(input\_errors);\\
 }
 \end{quote}
-In this example, the starting values are set to 
+In this example, the central values are set to 
 the true (simulated) values. Remember that initially the 
 matter density scaling factors are 
 all $1.0$, which means that they do not need to be adjusted for the
-starting values.
+central values.
 
 \index{norm}{Minimizer!priors}
 \index{norm}{External information!priors}
@@ -1619,7 +1618,7 @@ more advanced \GLOBES\ user:
 \item
  Priors are not used for parameters which are not minimized over, \ie, 
  kept fixed. This will be important together with arbitrary projections
- using \GLB{ChiNP}. A more subtile consequence is the comparison
+ using \GLB{ChiNP}. A more subtle consequence is the comparison
  of fit manifold sections and projections for the solutions where
  the absolute minimum $\chi^2$ is larger than zero, \ie, degeneracies
  other than the true solution. In this case, the sections and
@@ -1628,7 +1627,7 @@ more advanced \GLOBES\ user:
  For example, projecting the $\mathrm{sgn}(\ldm)$-degeneracy onto
  the $\theta_{13}$-$\deltacp$-plane and comparing it with the section
  (all other parameters fixed), the section region would in many cases be 
- larger than the projection region if the priors are not added to the
+ larger than the projection region if the priors were not added to the
  section. At the true solution, this problem usually does not occur
  because the prior contributions are close to zero.    
 \item
@@ -1636,7 +1635,8 @@ Currently, \GLOBES\ only supports Gau\ss ian priors for the individual
 oscillation parameters. Especially for the solar parameters, this is only
  an approximation, since they are imposed on $\theta_{12}$ and not
  on $\sin 2 \theta_{12}$, $\sin 2 \theta_{12} \cdot \sdm$, or $\sin  
- \theta_{12}$. Later versions of  \GLOBES\ may include more alternatives.
+ \theta_{12}$. \GLOBES\ 3.0 and higher provide an alternative
+to that by the concept of user-defined priors.
  \end{enumerate}
 
  
@@ -1652,7 +1652,7 @@ This example demonstrates how to project the fit manifold onto the $\stheta$-axi
 
 \begin{quote}
 {\tt {\scriptsize
-  /* Set starting values and input errors for all projections */  \\
+  /* Set central values and input errors for all projections */  \\
   glbDefineParams(input\_errors,theta12*0.1,0,0,0,sdm*0.1,0);\\  
   glbSetDensityParams(input\_errors,0.05,GLB\_ALL);\\
   glbSetCentralValues(true\_values);\\
@@ -1776,7 +1776,6 @@ are discontinuous jumps in the projected $\chi^2$-function, where the minimizer 
 Other examples for projections onto a parameter axis while keeping exactly one parameter fixed are \GLB{ChiTheta23}, \GLB{ChiDm31}, and \GLB{ChiDm21}, which
 can be found in \Tab~\ref{tab:stdfunctions} on page~\pageref{tab:stdfunctions}.
 
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section[Projection onto any hyperplane]{Projection onto any hyperplane}
 \index{norm}{Projection!hyperplane}
@@ -1860,7 +1859,7 @@ Similarly, the currently assigned projection can be returned with:
 {\tt int glbGetProjection(glb\_projection out)} writes the currently
 set projection to {\tt out}. The return value is $0$ if successful, and $-1$ if unsuccessful.
 \end{function}
-After setting the starting values, input errors, and the projection, 
+After setting the central values, input errors, and the projection, 
 we can run the minimizer:
 \begin{function}
 \GLBNS{ChiNP}
@@ -1886,6 +1885,110 @@ $\deltacp$ only looks like this:
 In this case, only the correlation with $\deltacp$ is taken into account.
 Note that in the  example on page~\pageref{ex:corrproj} this projection
 is compared with the result including the full multi-parameter correlation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{User-defined priors}
+\index{norm}{User-defined priors}
+
+\example{Non-Gaussian external solar input}{
+\label{ex:userprior}
+
+This examples demonstrates how to use a non-Gaussian error for the
+external solar mixing angle input instead of a Gaussian error.
+The user-defined prior function reads as follows and is very similar to the standard prior:
+\begin{quote}
+{\tt {\footnotesize
+ double my\_prior(const glb\_params in) \\
+\{ \\
+  \hspace*{0.5cm} glb\_params central\_values = glbAllocParams(); \\
+  \hspace*{0.5cm} glb\_params input\_errors = glbAllocParams(); \\
+  \hspace*{0.5cm}  glb\_projection p = glbAllocProjection(); \\
+  \hspace*{0.5cm}  glbGetCentralValues(central\_values); \\
+  \hspace*{0.5cm}  glbGetInputErrors(input\_errors); \\
+  \hspace*{0.5cm}  glbGetProjection(p); \\
+  \hspace*{0.5cm}  int i; \\
+  \hspace*{0.5cm}  double pv = 0.0; \\
+  \hspace*{0.5cm}  double fitvalue,centralvalue,inputerror; 
+
+ \hspace*{0.5cm} /* Add oscillation parameter priors */ \\
+  \hspace*{0.5cm}  for(i=0;i<6;i++) \\
+  \hspace*{0.5cm} if(glbGetProjectionFlag(p,i)==GLB\_FREE) \\
+  \hspace*{0.5cm} \{ \\
+  \hspace*{1cm} fitvalue=glbGetOscParams(in,i); \\
+  \hspace*{1cm} centralvalue=glbGetOscParams(central\_values,i); \\
+  \hspace*{1cm} inputerror=glbGetOscParams(input\_errors,i); \\
+  \hspace*{1cm} if(inputerror>1e-12) 
+  \hspace*{1cm} \{ \\
+  \hspace*{1.5cm} if(i==GLB\_THETA\_12) /* Prior on $\sin^2 \theta_{12}$ */ \\ 
+\hspace*{2.0cm} pv+=square((square(sin(startvalue))-fitvalue)/inputerror);\\ 
+  \hspace*{1.5cm} else \\ 
+  \hspace*{2.0cm}  pv+=square((startvalue-fitvalue)/inputerror); \\
+  \hspace*{1cm} \} \\
+  \hspace*{0.5cm} \} 
+
+\hspace*{0.5cm} /* Add matter parameter priors */ \\
+  \hspace*{0.5cm} for(i=0;i<glb\_num\_of\_exps;i++) \\
+  \hspace*{0.5cm} if(glbGetDensityProjectionFlag(p,i)==GLB\_FREE) \\
+  \hspace*{0.5cm} \{ \\
+  \hspace*{1cm}  fitvalue=glbGetDensityParams(in,i); \\
+  \hspace*{1cm}  centralvalue=1.0; \\
+  \hspace*{1cm}  inputerror=glbGetDensityParams(input\_errors,i); \\
+  \hspace*{1cm}  if(inputerror>1e-12) \\
+  \hspace*{1.5cm}   pv+=square((centralvalue-fitvalue)/inputerror); \\
+  \hspace*{0.5cm} \} 
+
+  \hspace*{0.5cm} glbFreeParams(central\_values); \\
+  \hspace*{0.5cm} glbFreeParams(input\_errors); \\
+  \hspace*{0.5cm} glbFreeProjection(p); \\
+  \hspace*{0.5cm} return pv; \\
+\}
+}
+}
+
+Note that this prior interprets the central values and input errors in terms of  $\sin^2 \theta_{12}$
+instead of $\theta_{12}$.
+\end{quote}
+}
+
+
+THIS CHAPTER MAY NEED SOME MODIFICATIONS, SINCENOT YET FINALLY IMPLEMENTED! [WW]
+
+
+User-defined priors are an advanced concept of \GLOBES\ 3.0 and higher. Therefore,
+this section can be jumped over in a first reading of the manual.
+They allow for arbitrary priors being added to the $\chi^2$ after the systematics
+minimization and before the marginalization over the oscillation parameters (\cf, \equ{priors}).
+Therefore, compared to user-defined systematics, they depend on the oscillation
+parameters only, but not on the systematics parameters. Examples for applications
+are non-Gaussian external input, the combination with externally simulated experiments, and the
+constraint to certain parameter-subspaces (such as a specific octant).
+
+The following function replaces the standard priors by user defined ones and has to be used
+after {\tt glbInit}:
+\begin{function}
+\GLBNS{glbRegisterPriorFunction}
+{\tt 
+glbRegisterPriorFunction(double (*prior)(const glb\_params), int (*starting)(const glb\_params), int (*error)(const glb\_params))} registers a user-defined prior function {\tt prior}. 
+\end{function}
+DO WE REALLY NEED THE {\tt starting} AND {\tt error} VARIABLES? WHAT ARE THEY GOOD FOR? 
+DOES THAT MAKE SOMTHING FASTER? [WW]
+
+The prior function has to be any function using one parameter {\tt glb\_params} containing the fit values.
+We show an example for a user-defined prior on page~\pageref{ex:userprior}. This prior
+will simply be registered with
+\begin{quote}
+{\tt
+ glbInit(argv[0]); \\
+ glbRegisterPriorFunction(my\_prior,NULL,NULL);
+}
+\end{quote}
+and replaces the standard prior of \GLOBES . It behaves exactly as the standard prior, but
+the solar mixing angle is interpreted as $\sin^2 \theta_{12}$ instead of $\theta_{12}$. Therefore,
+a Gaussian error is imposed on $\sin^2 \theta_{12}$ instead of $\theta_{12}$, and the central
+values and input errors are interpreted in terms of $\sin^2 \theta_{12}$ as well. Note that
+one does not need to know if the prior was called for one experiment only or all experiments,
+since this information is implicitely given by the different density projection flags being set
+accordingly. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Locating degenerate solutions}
