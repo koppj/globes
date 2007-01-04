@@ -1090,90 +1090,187 @@ spectral information. For details, we refer to \Chapt~\ref{chapt:running}.
 \index{norm}{Systematics!user-defined}
 \label{sec:userchi}
 
-For some experimental setups the built-in systematics functions are not sufficient
+
+
+\example{Systematics for a reactor setup with near and far detector}{\label{ex:syst}
+\index{norm}{Systematics!Example, user-defined}
+
+The following code fragment from the much more extensive {\tt example5.c}
+calculates $\chi^2$ for a reactor setup with two detectors
+including five different systematical errors: the flux normalization
+of the reactor ({\tt x[0]}), the fiducial mass uncertainties of the far
+({\tt x[1]}) and near ({\tt x[2]}) detector, and energy calibration errors for the far
+({\tt x[3]}) and near ({\tt x[4]}) detectors.  The calculation follows
+\equ{chi2reactor}, but includes the energy calibration.
+
+\begin{quote}{\tt \footnotesize
+
+double likelihood(double true\_rate, double fit\_rate, double sqr\_sigma) \\
+\{ if (sqr\_sigma > 0) return square(true\_rate - fit\_rate) / sqr\_sigma; else return 0.0; \} 
+
+double chiDCNorm(int exp, int rule, int np, double *x, double *errors) \\
+\{ \\
+  \hspace*{0.3cm} const EXP\_FAR = 0; const EXP\_NEAR = 1; \\
+  \hspace*{0.3cm} int n\_bins = glbGetNumberOfBins(EXP\_FAR); \\
+  \hspace*{0.3cm} double *true\_rates\_N = glbGetRuleRatePtr(EXP\_NEAR, 0); \\
+  \hspace*{0.3cm} double *true\_rates\_F = glbGetRuleRatePtr(EXP\_FAR, 0); \\
+  \hspace*{0.3cm} double signal\_fit\_rates\_N[n\_bins]; double signal\_fit\_rates\_F[n\_bins]; \\
+  \hspace*{0.3cm} double signal\_norm\_N, signal\_norm\_F; \\
+  \hspace*{0.3cm} int ew\_low, ew\_high, i; \\
+  \hspace*{0.3cm} double emin, emax, fit\_rate;  double chi2 = 0.0; \\
+  \\
+   \hspace*{0.3cm} /* Request simulated energy interval and analysis energy window */ \\
+   \hspace*{0.3cm} glbGetEminEmax(exp, \&emin, \&emax); \\
+   \hspace*{0.3cm} glbGetEnergyWindowBins(exp, rule, \&ew\_low, \&ew\_high); 
+
+  \hspace*{0.3cm} /* Apply energy calibration error */ \\
+  \hspace*{0.3cm} glbShiftEnergyScale(x[3], glbGetSignalFitRatePtr(EXP\_FAR, 0), \\
+  \hspace*{0.9cm}                    signal\_fit\_rates\_F, n\_bins, emin, emax); \\
+  \hspace*{0.3cm} glbShiftEnergyScale(x[4], glbGetSignalFitRatePtr(EXP\_NEAR, 0), \\
+  \hspace*{0.9cm}                    signal\_fit\_rates\_N, n\_bins, emin, emax); 
+
+  \hspace*{0.3cm} /* Loop over all bins in energy window */ \\
+  \hspace*{0.3cm} signal\_norm\_F = 1.0 + x[0] + x[1]; \\
+  \hspace*{0.3cm} signal\_norm\_N = 1.0 + x[0] + x[2]; \\
+  \hspace*{0.3cm} for (i=ew\_low; i <= ew\_high; i++) \\
+  \hspace*{0.3cm} \{ \\
+  \hspace*{0.6cm}  /* Statistical part of chi2 for far detector */ \\
+  \hspace*{0.6cm}  fit\_rate  = signal\_norm\_F * signal\_fit\_rates\_F[i]; \\
+  \hspace*{0.6cm}  chi2 += likelihood(true\_rates\_F[i], fit\_rate, true\_rates\_F[i]); \\
+   \\
+  \hspace*{0.6cm}  /* Statistical part of chi2 for near detector  */ \\
+  \hspace*{0.6cm}  fit\_rate  = signal\_norm\_N * signal\_fit\_rates\_N[i]; \\
+  \hspace*{0.6cm}  chi2 += likelihood(true\_rates\_N[i], fit\_rate, true\_rates\_N[i]); \\
+  \hspace*{0.3cm} \} 
+
+  \hspace*{0.3cm} /* Systematical part of chi2 (= priors) */ \\
+  \hspace*{0.3cm} for (i=0; i < np; i++)  chi2 += square(x[i]/errors[i]);
+
+ \hspace*{0.3cm} return chi2; \\
+\} 
+}
+\end{quote}
+}
+
+For some experimental setups, the built-in systematics functions are not sufficient
 because they cannot handle systematical errors that are correlated between different
-parts of a multi-detector or multi-source setup. Therefore \GLOBES\ allows the user
+parts of a multi-detector setup. Therefore \GLOBES\ allows the user
 to override the default $\chi^2$ calculation. The reader who wants to use this
-feature should be familiar with \Sec~\ref{sec:channel} and~\Sec~\ref{sec:rules}
-of the \AEDL\ manual.
+feature should be familiar with \Secs~\ref{sec:event_rates},~\ref{sec:channel}, and~\ref{sec:rules}
+of the manual. Note that this is an advanced topic, which requires \GLOBES\ 3.0 or
+higher. It can be omitted in a first reading of the manuscript.
 
-To specify a user-defined $\chi^2$ algorithm, the following function can be used:
+User-defined systematics is, compared to the built-in systematics, a compound between
+the AEDL definition and some source code defining the behavior. In the simplest case,
+the AEDL file defines user-defined systematics for a specific rule and gives it a 
+name/identifier,  as will as it defines the systematical errors. The source code has then to match this AEDL
+definition -- therefore, make sure to use only unique identifiers. 
+Ones needs to register the user-defined systematics in the 
+source code (typically after {\tt glbInit}) with
 \begin{function}
-\GLBNS{SetUserChi}
-{\tt void glbSetUserChi(int exp,int rule,double (*chi\_func)(double x[]),int dim,%
-double centers[],double errors[],char *info)} tells \GLOBES\ to use {\tt chi\_func}
-instead of the builtin functions to calculate $\chi^2$ for experiment {\tt exp} and
-rule {\tt rule}. These parameters can take the value \GLBC{GLB\_ALL} to specify that
-{\tt chi\_func} should be called once for each experiment or each rule. {\tt dim} is
-the number of variables parametrizing the systematical errors, while {\tt centers[]}
-and {\tt errors[]} give their central values and standard deviations, respectively.
-When \GLOBES\ calls {\tt chi\_func}, the parameter array {\tt x[]} will contain
-the values of the systematics parameters for which $\chi^2$ should be calculated.
-Deviating from the standard conventions, the entries of {\tt x[]} will start at index 1
-(The indices for {\tt params} are {\tt errors} in the call to {\tt glbSetUserChi} start
-at 0 as usual).
+\GLBNS{DefineChiFunction}
+{\tt int glbDefineChiFunction(glb\_chi\_function chi\_func, int dim, const char *name)}
+ tells \GLOBES\ to register the user-defined systematics $\chi^2$ function {\tt chi\_func} 
+identified by the string {\tt name} with {\tt dim} systematics parameters. Returns zero, if successful.
 \end{function}
+The user-defined systematics function itself has to have the pre-defined type 
+\begin{function}
+\GLBNS{\_chi\_function}
+{\tt double (*glb\_chi\_function)(int exp, int rule, int dim, double *params, double *errors)}.
+In this function type, {\tt exp} is the experiment number, {\tt rule} is the rule number, {\tt dim} is the number of systematics parameters, {\tt params} is an array of the systematics auxiliary parameters themselves, and {\tt errors} is an array with the systematical errors. Note the the central values for {\tt params} are $0$, which means that $0$ corresponds to the un-modified rates. The array indices are running from $0$ to {\tt dim}-1.
+\end{function}
+Note that this function will be called many times by the \GLOBES\ minimizers.
+Therefore the function should be as efficient as possible. In many cases, it is also recommendable to use different functions for different rules, since the fewer auxiliary parameters in the minimization, the faster the routine will be. In addition, note that complicated systematics with many parameters may introduce complicated (unknown) topologies for the minimization, which means that the minimizers may
+end up in a local minimum instead of the global minimum. \GLOBES\ provides the function \GLB{SetSysStartingValuesList} to change the starting values of the minimizer in the case of
+ convergence problems (see below).
+A typical implementation may look like the following code, where ``{\tt chiDCNorm}'' is the identifier
+assigned in the AEDL definition:
+\begin{quote}
+{\tt
+  double chiDCNorm(int exp, int rule, int dim, double *x, \\
+  \hspace*{0.5cm} double *errors) \\
+  \{ \\
+   \hspace*{0.5cm} double chi2 = 0.0; \\
+   \hspace*{0.5cm} int i; \\
+   \\
+   \hspace*{0.5cm} ... /* Some code to calculate the chi2 */ \\
+   \\
+    \hspace*{0.5cm} /* Here the systematics priors (penalties) are added: */ \\
+    \hspace*{0.5cm} for(i=0;i<dim;i++) chi2 += (x[i]*x[i]/errors[i]/errors[i]);
+    \hspace*{0.5cm} return chi2; \\
+  \} \\
+   \\
+  int main(int argc,char*argv[]) \\
+ \{ \\ 
+  \hspace*{0.5cm} ... \\
+  \hspace*{0.5cm} glbInit(agrv[0]); \\
+  \hspace*{0.5cm} glbDefineChiFunction(\&chiDCNorm,5,"chiDCNorm"); \\
+  \hspace*{0.5cm} ... \\
+ \} \\
+}
+\end{quote}
+During running time, it is also possible to change the user-defined systematics of an experiment or
+rule (as compared to the systematics assigned in the AEDL file or earlier) with the following function:
+\begin{function}
+\GLBNS{SetChiFunction}
+{\tt int glbSetChiFunction(int exp, int rule, int on\_off, const char *name, double *errors)}
+ tells \GLOBES\ to use the registered user-defined systematics identified by the string {\tt name}
+instead of the built-in systematics
+to calculate $\chi^2$ for the experiment {\tt exp} and the rule {\tt rule}. 
+Both of the parameters {\tt exp} and {\tt rule} can take the value \GLBC{GLB\_ALL} to specify that the
+user-defined systematics can be used for each experiment or each rule. The parameter 
+{\tt on\_off} determines if the systematics function should be used for systematics on
+{\tt GLB\_ON} or systematics off {\tt GLB\_OFF}.
+The array {\tt errors} sets the systematical errors in the order they
+are defined in the AEDL file (running from $0$ to the number of systematics parameters-1). 
+Returns zero, if successful.
+\end{function}
+Note that the new user-defined systematics has to be registered with {\tt glbDefineChiFunction} first. 
 
-In addition to calling {\tt glbSetUserChi}, {\tt @errordim\_sys\_on} has to be set
-to 20 in the \AEDL\ file (see~\Sec~\ref{sec:rules}).
+The $\chi^2$ function {\tt glb\_chi\_function} may use a number of helper functions for
+for the $\chi^2$ calculation. Some of these functions may not be directly related to user-defined
+systematics, but may be mainly used in this context:
+\begin{function}
+\GLBNS{GetEminEmax}
+{\tt int glbGetEminEmax(int experiment, double *emin, double *emax)} returns the
+energy range [{\tt emin},{\tt emax}] covered by the binning as defined in the AEDL file for the experiment
+{\tt experiment}.
+\end{function}
+\begin{function}
+\GLBNS{GetEnergyWindow}
+{\tt int glbGetEnergyWindow(int exp, int rule, double *low, double *high)} returns the
+energy window [{\tt low},{\tt high}] defined in the AEDL file for the experiment
+{\tt exp} and rule {\tt rule}.
+\end{function}
+\begin{function}
+\GLBNS{GetEnergyWindowBins}
+{\tt int glbGetEnergyWindowBins(int exp, int rule, int *lowbin, int *highbin)} returns the
+energy window in terms of bin numbers [{\tt lowbin},{\tt highbin}] corresponding to the energy window defined in the AEDL file for the experiment {\tt exp} and rule {\tt rule}.
+\end{function}
+\begin{function}
+\GLBNS{GetNumberOfBins}
+{\tt int glbGetNumberOfBins(int exp)} returns the number of bins for the experiment {\tt exp}.
+\end{function}
+\begin{function}
+\GLBNS{GetNumberOfSimBins}
+{\tt int glbGetNumberOfSimBins(int exp)} returns the number of sampling points for the experiment {\tt exp}.
+\end{function}
+SHOULD THIS NOT BE CALLED {\tt glbGetNumberOfSamplingPoints}??? [WW]
 
-Note that {\tt chi\_func} will be called many times by the \GLOBES\ minimizers.
-Therefore the function should be as efficient as possible. The function
-will need low-level access to internal \GLOBES\ data. Therefore the following
-routines are provided:
+A very useful function to include energy calibration errors is
 \begin{function}
-\GLBNS{GetCurrentExp}
-{\tt int glbGetCurrentExp()} gives the number of the experiment for which
-{\tt chi\_func} has been called.
+\GLBNS{ShiftEnergyScale}
+{\tt glbShiftEnergyScale(double b, double *rates\_in, double *rates\_out,int bins, double emin, double emax)}
+shifts the energy scale in {\tt rates\_in} by the amount {\tt b} and stores the result in 
+{\tt rates\_out}. The parameters {\tt emin} and {\tt emax} denote the minimal and maximal energy
+as obtained with {\tt glbGetEminEmax}.
 \end{function}
-\begin{function}
-\GLBNS{GetCurrentRule}
-{\tt int glbGetCurrentRule()} gives the number of the rule in the current experiment
-for which {\tt chi\_func} has been called.
-\end{function}
-\begin{function}
-\GLBNS{GetObservedBinInRule}
-{\tt double glbGetObservedBinInRule(int exp,int rule,int bin)} returns the number of
-signal events for experiment {\tt exp}, rule {\tt rule} and bin {\tt bin}, as calculated
-in the preceding call to {\tt glbSetRates}.
-\end{function}
-\begin{function}
-\GLBNS{GetSignalBinInRule}
-{\tt double glbGetSignalBinInRule(int exp,int rule,int bin)} returns the number of
-signal events for experiment {\tt exp}, rule {\tt rule} and bin {\tt bin}, calculated
-for the oscillation parameter values that are currently being tested.
-\end{function}
-\begin{function}
-\GLBNS{GetBackgroundBinInRule}
-{\tt double glbGetBackgroundBinInRule(int exp,int rule,int bin)} returns the number of
-background events for experiment {\tt exp}, rule {\tt rule} and bin {\tt bin}, calculated
-for the oscillation parameter values that are currently being tested.
-\end{function}
-\begin{function}
-\GLBNS{GetChannelBin}
-{\tt double glbGetChannelBin(int exp,int channel,int bin)} returns the number of
-signal events for experiment {\tt exp}, channel {\tt channel} and bin {\tt bin}, calculated
-for the oscillation parameter values that are currently being tested.
-\end{function}
-\begin{function}
-\GLBNS{ShiftSignalEnergyScale}
-{\tt int glbShiftSignalEnergyScale(int exp,int rule,double amount)} applies an energy
-calibration error of magnitude {\tt amount} to the signal event rates in experiment
-{\tt exp} and rule {\tt rule}. Subsequent calls to {\tt glbGetSignalBinInRule} will
-return the modified event rates. For details on energy calibration errors, see
-\Sec~\ref{sec:rules}.
-\end{function}
-\begin{function}
-\GLBNS{ShiftBackgroundEnergyScale}
-{\tt int glbShiftBackgroundEnergyScale(int exp,int rule,double amount)} applies an energy
-calibration error of magnitude {\tt amount} to the background event rates in experiment
-{\tt exp} and rule {\tt rule}. Subsequent calls to {\tt glbGetBackgroundBinInRule} will
-return the modified event rates. For details on energy calibration errors, see
-\Sec~\ref{sec:rules}.
-\end{function}
+DOES THAT ALSO WORK WITH VARIABLE BINS? WHAT IS THE MEAING OF EMIN AND EMAX? [WW]
+For details on energy calibration errors, see \Sec~\ref{sec:rules}.
+%
+In addition, in order to implement user-defined systematics, one usually needs low-level access to the event rate vectors using \GLB{GetRuleRatePtr}, \GLB{GetSignalFitRatePtr}, \GLB{GetBGFitRatePtr} and possibly other functions described in \Sec~\ref{sec:event_rates}. We recommend that you familiarize yourself with these functions at this point.
 
-Typical applications for user-defined systematics are reactor neutrino experiments,
-where systematics play a crucial role. For a setup with near and far detectors,
+Let us now discuss a simple example.  Typical applications for user-defined systematics are reactor neutrino experiments, where systematics play a crucial role. For a setup with near and far detectors,
 the formula for $\chi^2$ is
 \begin{align}
   \chi^2 =& \sum_{i=1}^{\textrm{\# of bins}} \sum_{d = N,F}2
@@ -1188,61 +1285,92 @@ $T_{d,i}$ are the event rates for the parameter values that are currently being 
 $a_R$, $a_N$ and $a_F$ parametrize the small uncertainties in the reactor flux and the fiducial
 mass of the two detectors. In this example their central values are assumed to be zero,
 while their standard deviations are $\sigma_R$, $\sigma_N$ and $\sigma_F$.
-
+%
 The first line of \equ{chi2reactor} is the standard $\chi^2$ expression for
 the Poisson distribution, while the terms in the second line are penalties
-for deviations of the systematics parameters from their central values.
-
-
-\example{Systematics for a reactor setup with near and far detector}{
-The following code fragment calculates $\chi^2$ for a reactor setup with
-a far detector (experiment 0) and a near detector (experiment 1),
-including six different systematical errors: the flux normalization
-of the reactor ({\tt x[1]}), the fiducial mass uncertainties of the far
-({\tt x[2]}) and near ({\tt x[3]}) detector, the normalization of the
-background ({\tt x[4]}) and energy calibration errors for the far
-({\tt x[5]}) and near ({\tt x[6]}) detectors. We assume that the central
-values and errors of these parameters are stored in the global arrays
-{\tt sys\_centers} and {\tt sys\_errors}. The calculation follows
-\equ{chi2reactor}.
-
-\begin{quote}{\tt \footnotesize
-  double chi2nearfar(double *x)                                                 \\
-  \{                                                                            \\
-\hspace*{0.5 cm}      double chi2 = 0;                                          \\
-\hspace*{0.5 cm}      double chirate, measured\_rate;                           \\
-\hspace*{0.5 cm}                                                                \\
-\hspace*{0.5 cm}      /* Assign complete chi\textasciicircum2 to first experiment */ \\
-\hspace*{0.5 cm}      if (glbGetCurrentExp() != 0)  return 0;                   \\
-\hspace*{0.5 cm}                                                                \\
-\hspace*{0.5 cm}      glbShiftSignalEnergyScale(0, 0, x[5]);   /* Apply E calib. error */ \\
-\hspace*{0.5 cm}      glbShiftSignalEnergyScale(1, 0, x[6]);                    \\
-\hspace*{0.5 cm}      glbShiftBackgroundEnergyScale(0, 0, x[5]);                \\
-\hspace*{0.5 cm}      glbShiftBackgroundEnergyScale(1, 0, x[6]);                \\
-\hspace*{0.5 cm}      for (int i=0; i < NBINS; i++) \{                          \\
-\hspace*{1.0 cm}        /* Statistical part of chi\textasciicircum2 for far detector */ \\
-\hspace*{1.0 cm}        chirate = (x[1]+x[2]) * glbGetSignalBinInRule(0,0,i) +  \\
-\hspace*{2.0 cm}                        (x[4]+x[3]) * glbGetBackgroundBinInRule(0,0,i);\\
-\hspace*{1.0 cm}        measured\_rate = glbGetObservedBinInRule(0,0,i);        \\
-\hspace*{1.0 cm}        chi2 += 2 * (measured\_rate - chirate);                 \\
-\hspace*{1.0 cm}        if (measured\_rate > 0  \&\&  chirate > 0)              \\
-\hspace*{1.5 cm}          chi2 += 2 * chirate * log(chirate / measured\_rate);  \\
-\hspace*{1.0 cm}                                                                \\
-\hspace*{1.0 cm}        /* Statistical part of chi\textasciicircum2 for near detector */ \\
-\hspace*{1.0 cm}        chirate = (x[1]+x[3]) * glbGetSignalBinInRule(1,0,i) +  \\
-\hspace*{2.0 cm}                        (x[4]+x[3]) * glbGetBackgroundBinInRule(1,0,i);\\
-\hspace*{1.0 cm}        measured\_rate = glbGetObservedBinInRule(1,0,i);        \\
-\hspace*{1.0 cm}        chi2 += 2 * (measured\_rate - chirate);                 \\
-\hspace*{1.0 cm}        if (measured\_rate > 0  \&\&  chirate > 0)              \\
-\hspace*{1.5 cm}          chi2 += 2 * chirate * log(chirate / measured\_rate);  \\
-\hspace*{0.5 cm}      \}                                                        \\
-\hspace*{0.5 cm}      for (int j=0; j < 6; j++)  /* Penalties */                \\
-\hspace*{1.0 cm}        chi2 += square((x[j+1] - sys\_centers[j]) / sys\_errors[j]);\\
-\hspace*{0.5 cm}      return chi2;                                              \\
-  \}                                                                            
+for deviations of the systematics parameters from their central values. 
+%
+We use two AEDL files for this experiment, one for the far detector and one for the
+near detector.
+The corresponding rule definition ($\nu_e$ disappearance) in the far detector AEDL-file is
+\begin{quote}
+{\tt
+rule(\#rule0)< \\
+\hspace*{0.5cm}        @signal     = 1.0@\#nu\_e\_disappearance\_CC \\
+\hspace*{0.5cm}        @background = 0.0@\#nu\_e\_disappearance\_CC   /* No background */ \\
+\hspace*{0.5cm} @energy\_window = 0.0015 : 0.01 \\
+\\
+\hspace*{0.5cm}        @sys\_off\_function = "chiNoSysSpectrum" \\
+\hspace*{0.5cm}        @sys\_off\_errors   = \{ \} \\
+\hspace*{0.5cm}        @sys\_on\_function  = "chiDCNorm" \\
+\hspace*{0.5cm}        @sys\_on\_errors    = \{ 0.02,    0.006,        0.006,       0.005,     0.005   \} \\
+\hspace*{0.5cm}        \mbox{ // \{ Flux, Fid. mass FD, Fid. mass ND, Energy FD, Energy ND \} } \\
+> 
 }
 \end{quote}
+In this case, the systematics is called ``{\tt chiDCNorm}'' for systematics on, whereas systematics
+off is computed with spectral information, but without systematical errors.
+For the near detector AEDL-file, we have instead
+\begin{quote}
+{\tt
+rule(\#rule0)< \\
+\hspace*{0.5cm}        @signal     = 1.0@\#nu\_e\_disappearance\_CC \\
+\hspace*{0.5cm}        @background = 0.0@\#nu\_e\_disappearance\_CC   /* No background */ \\
+\hspace*{0.5cm} @energy\_window = 0.0015 : 0.01 \\
+\\
+\hspace*{0.5cm}        @sys\_off\_function = "chiNoSysSpectrum" \\
+\hspace*{0.5cm}        @sys\_off\_errors   = \{ \} \\
+\hspace*{0.5cm}        @sys\_on\_function  = "chiZero" \\
+\hspace*{0.5cm}        @sys\_on\_errors    = \{ \} \\
+> 
 }
+\end{quote}
+In this case, the systematics {\tt chiZero} is used for systematics on, which means that there will
+be no active $\chi^2$ calculation in this rule. With this definition, the user-defined systematics
+will only be called once for the far detector. However, the rates from the near detector will be 
+passively provided for the common $\chi^2$ function.
+You can find the corresponding files {\tt dchooz-near.glb} and {\tt dchooz-far.glb}, you will need for {\tt example5.c}, in the example directory. 
+%
+We show the implementation of the $\chi^2$ function in the example on page~\pageref{ex:syst},
+where we in addition include an uncorrelated energy calibration error.
+MAYBE: ADDITIONAL PLOT TO SHOW RESULT? [WW]
+
+Further functions useful in the context of user-defined systematics are:
+\begin{function}
+\GLBNS{SetSysErrorsList} 
+{\tt int glbSetSysErrorsList(int exp, int rule, int on\_off, const double *sys\_list)}
+changes the systematical errors defined in the AEDL file in experiment {\tt exp} and 
+rule {\tt rule} to the values in {\tt sys\_list}. This change can be perfomed for
+systematics on or systematics off by using {\tt GLB\_ON} or {\tt GLB\_OFF} for {\tt on\_off}. 
+\end{function}
+\begin{function}
+\GLBNS{SetSysErrorsListPtr} 
+{\tt double* glbSetSysErrorsListPtr(int exp, int rule, int on\_off)}
+returns a pointer to the list of systematical errors as defined in the AEDL file in experiment {\tt exp} and 
+rule {\tt rule}. Choose
+systematics on or systematics off by using {\tt GLB\_ON} or {\tt GLB\_OFF} for {\tt on\_off}. 
+\end{function}
+In addition, in some cases the systematics minimization may not converge very fast or not at all, because it end up in a local minimum. In this case, one can change the starting values of the minimizer, \ie, the
+starting point from which the local minimizer rolls into the local minimum.
+\begin{function}
+\GLBNS{SetSysStartingValuesList} 
+{\tt int glbSetSysStartingValuesList(int exp, int rule, int on\_off, const double *sys\_list)}
+sets the starting values of the local systematics minimizer in experiment {\tt exp} and 
+rule {\tt rule} to the values in {\tt sys\_list}. This change can be perfomed for
+systematics on or systematics off by using {\tt GLB\_ON} or {\tt GLB\_OFF} for {\tt on\_off}. 
+Usually, zero is used for all starting values. 
+\end{function}
+IS THAT CORRECT (THAT ZERO IS USUALLY USED)? [WW]
+\begin{function}
+\GLBNS{GetSysStartingValuesListPtr} 
+{\tt double *glbGetSysStartingValuesListPtr(int exp, int rule, int on\_off, const double *sys\_list)}
+returns the starting values of the local systematics minimizer in experiment {\tt exp} and 
+rule {\tt rule}. This list can be obtained for
+systematics on or systematics off by using {\tt GLB\_ON} or {\tt GLB\_OFF} for {\tt on\_off}.
+\end{function}
+A useful trick is often to use the minimum from the last run as starting values for the next one
+if the input parameters are only slighltly changed. One can obtain the minimum from the last run 
+from the last call of the $\chi^2$ function (\cf, {\tt example5.c}).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
