@@ -31,6 +31,10 @@
  * to facilitate the cooperation between AEDL and C.
  */
 
+/* this serves to handle the 5.2 fudge factor in versions prior to 3.0
+ */
+#define GLB_OLD_NORM -99
+
 struct glb_naming
 {
   char *name; /* name of symbol      */   

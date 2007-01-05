@@ -27,21 +27,41 @@
 %option noyywrap
 
 
-%x incl
-%s grp
-%s rule
-%s chl
-%s energy
-%s cross
-%s flux
-%s defr
-%s defc
-%s defe
-%s defx
-%s deff
-%x comment
-%x linecomment
-%x str
+/* This here caused an unpleasant problem:
+ * things like
+ * %s rule
+ * would cause a 
+ * #define rule xxx
+ * statement in glb_lexer.c and that in turn causes
+ * trouble with inlcude files which contain
+ * glbXXX(int rule)
+ * because this will be expanded by the preprocessor to
+ * glbXXX(int xxx)
+ * which then causes a stupid error of the form
+ * parse error before numeric constant
+ * The flex manual says that these things have global scope
+ * but as usual I read the manual after the fact
+ * PH
+ */
+
+
+%x glb_lexer_incl
+%s glb_lexer_grp
+%s glb_lexer_rule
+%s glb_lexer_chl
+%s glb_lexer_energy
+%s glb_lexer_cross
+%s glb_lexer_flux
+%s glb_lexer_nuflux
+%s glb_lexer_defr
+%s glb_lexer_defc
+%s glb_lexer_defe
+%s glb_lexer_defx
+%s glb_lexer_deff
+%s glb_lexer_defnf
+%x glb_lexer_comment
+%x glb_lexer_linecomment
+%x glb_lexer_str
 
 
 %{
@@ -85,15 +105,15 @@ LID      ![a-zA-Z][a-zA-Z0-9_]*
 
 %%
 
-"//"         {cond_buf=YY_START;BEGIN(linecomment);}
-<linecomment>[^\n]*     /* eat anything that's not a '\n' */
-<linecomment>\n         {++glb_line_num; BEGIN(cond_buf);}
+"//"         {cond_buf=YY_START;BEGIN(glb_lexer_linecomment);}
+<glb_lexer_linecomment>[^\n]*     /* eat anything that's not a '\n' */
+<glb_lexer_linecomment>\n         {++glb_line_num; BEGIN(cond_buf);}
 
-"/*"         {cond_buf=YY_START;BEGIN(comment);}
-<comment>[^*\n]*        /* eat anything that's not a '*' */
-<comment>"*"+[^*/\n]*   /* eat up '*'s not followed by '/'s */
-<comment>\n             ++glb_line_num;
-<comment>"*"+"/"        BEGIN(cond_buf);
+"/*"         {cond_buf=YY_START;BEGIN(glb_lexer_comment);}
+<glb_lexer_comment>[^*\n]*        /* eat anything that's not a '*' */
+<glb_lexer_comment>"*"+[^*/\n]*   /* eat up '*'s not followed by '/'s */
+<glb_lexer_comment>\n             ++glb_line_num;
+<glb_lexer_comment>"*"+"/"        BEGIN(cond_buf);
 
 {EOE}   {
 glb_copy_buff();
@@ -102,17 +122,18 @@ glbReset();
 
 
 <INITIAL>{
-rule    {BEGIN(defr);yylval.name=yytext;return GID;}
-channel {BEGIN(defc);yylval.name=yytext;return GID;}
-energy  {BEGIN(defe);yylval.name=yytext;return GID;}
-cross   {BEGIN(defx);yylval.name=yytext;return GID;}
-flux    {BEGIN(deff);yylval.name=yytext;return GID;}
+rule    {BEGIN(glb_lexer_defr);yylval.name=yytext;return GID;}
+channel {BEGIN(glb_lexer_defc);yylval.name=yytext;return GID;}
+energy  {BEGIN(glb_lexer_defe);yylval.name=yytext;return GID;}
+cross   {BEGIN(glb_lexer_defx);yylval.name=yytext;return GID;}
+flux    {BEGIN(glb_lexer_deff);yylval.name=yytext;return GID;}
+nuflux    {BEGIN(glb_lexer_defnf);yylval.name=yytext;return GID;}
 }
 
-include             {cond_buf_i=YY_START;BEGIN(incl);}
+include             {cond_buf_i=YY_START;BEGIN(glb_lexer_incl);}
 
-<incl>[ \t]*      /* eat the whitespace */
-<incl>[^ \t\n]+   { /* got the include file name */
+<glb_lexer_incl>[ \t]*      /* eat the whitespace */
+<glb_lexer_incl>[^ \t\n]+   { /* got the include file name */
 if ( include_stack_ptr >= MAX_INCLUDE_DEPTH )
 {
 fprintf( stderr, "FATAL: Includes nested too deeply\n" );
@@ -179,18 +200,18 @@ glb_file_id=file_name_buf[include_stack_ptr];
 }
 
 
-<rule,chl,energy,cross,flux>[<]  {
+<glb_lexer_rule,glb_lexer_chl,glb_lexer_energy,glb_lexer_cross,glb_lexer_flux,glb_lexer_nuflux>[<]  {
 yylval.name=yytext;
 
 return GRPOPEN;}
 
-<chl>@channel          {
+<glb_lexer_chl>@channel          {
 yylval.name=yytext;
 
 return CHANNEL;}
 
-<chl>"+" {yylval.in=+1;return PM;}
-<chl>"-" {yylval.in=-1;return PM;}
+<glb_lexer_chl>"+" {yylval.in=+1;return PM;}
+<glb_lexer_chl>"-" {yylval.in=-1;return PM;}
 
 [eE][lectronLECTRON]* {yylval.in=1;return FLAVOR;}
 [mM][uonUON]*  {yylval.in=2;return FLAVOR;}
@@ -201,40 +222,40 @@ NOSC_[mM][uonUON]*  {yylval.in=12;return FLAVOR;}
 NOSC_[tT][auAU]* {yylval.in=13;return FLAVOR;}
 
 
-<energy>@energy         {
+<glb_lexer_energy>@energy         {
 yylval.name=yytext;
 
 return ENERGY;}
 
-<rule>@signal           {
+<glb_lexer_rule>@signal           {
 yylval.name=yytext;
 
 return SIGNAL;}
 
-<rule>@background          {
+<glb_lexer_rule>@background          {
 yylval.name=yytext;
 
 return BG;}
 
-<rule>@sys_on_function   {
+<glb_lexer_rule>@sys_on_function   {
 yylval.name=yytext;
 return SYS_ON_FUNCTION;
 }
 
-<rule>@sys_off_function   {
+<glb_lexer_rule>@sys_off_function   {
 yylval.name=yytext;
 return SYS_OFF_FUNCTION;
 }
 
 
 
-\" {cond_buf_str=YY_START;BEGIN(str);}
+\" {cond_buf_str=YY_START;BEGIN(glb_lexer_str);}
 
-<str>\" {BEGIN(cond_buf_str);}
+<glb_lexer_str>\" {BEGIN(cond_buf_str);}
 
-<str>\n {glb_fatal("Lexer error: Unterminated string");exit(1);}
+<glb_lexer_str>\n {glb_fatal("Lexer error: Unterminated string");exit(1);}
 
-<str>{FN} {
+<glb_lexer_str>{FN} {
 yylval.name=yytext;
 return FNAME;}
 
@@ -243,18 +264,30 @@ yylval.name=yytext;
 return VERS;
 }
 
-<cross>@cross_file           {
+<glb_lexer_cross>@cross_file           {
 yylval.name=yytext;
 return CROSS;}
 
-<flux>@flux_file          {
+<glb_lexer_flux>@flux_file          {
 yylval.name=yytext;
 return FLUXP;}
 
 
-<flux>@flux_file_m           {
+<glb_lexer_flux>@flux_file_m           {
 yylval.name=yytext;
 return FLUXM;}
+
+
+
+
+<glb_lexer_nuflux>@flux_file          {
+yylval.name=yytext;
+return NUFLUX;}
+
+
+<glb_lexer_nuflux>@flux_file_m           {
+yylval.name=yytext;
+return NUFLUX;}
 
 
 :        {return RULESEP;}
@@ -262,12 +295,12 @@ return FLUXM;}
 
 
 
-<defr>#{ID}        {glb_namerec *s;
+<glb_lexer_defr>#{ID}        {glb_namerec *s;
 s = glb_getname (yytext,"rule");
 if (s == 0) 
 s = glb_putname (yytext,"rule",NAME); 
 BEGIN(INITIAL);
-BEGIN(rule); 
+BEGIN(glb_lexer_rule); 
 if(strcmp(s->context,"rule")!=0) 
 {yylval.nameptr=s;return RDF;}
 
@@ -276,12 +309,12 @@ yylval.nameptr = s;
 return s->type;
 }
 
-<defc>#{ID}        {glb_namerec *s;
+<glb_lexer_defc>#{ID}        {glb_namerec *s;
 s = glb_getname (yytext,"channel");
 if (s == 0) 
 s = glb_putname (yytext,"channel",NAME);
 BEGIN(INITIAL);
-BEGIN(chl); 
+BEGIN(glb_lexer_chl); 
 if(strcmp(s->context,"channel")!=0) 
 {yylval.nameptr=s;return RDF;}
  
@@ -290,12 +323,12 @@ yylval.nameptr = s;
 return s->type;
 }
 
-<defe>#{ID}        {glb_namerec *s;
+<glb_lexer_defe>#{ID}        {glb_namerec *s;
 s = glb_getname (yytext,"energy");
 if (s == 0) 
 s = glb_putname (yytext,"energy",NAME);
 BEGIN(INITIAL);
-BEGIN(energy);
+BEGIN(glb_lexer_energy);
 if(strcmp(s->context,"energy")!=0) 
 {yylval.nameptr=s;return RDF;}
  
@@ -304,12 +337,12 @@ yylval.nameptr = s;
 return s->type;
 }
 
-<defx>#{ID}        {glb_namerec *s;
+<glb_lexer_defx>#{ID}        {glb_namerec *s;
 s = glb_getname (yytext,"cross");
 if (s == 0) 
 s = glb_putname (yytext,"cross",NAME);
 BEGIN(INITIAL);
-BEGIN(cross);
+BEGIN(glb_lexer_cross);
 if(strcmp(s->context,"cross")!=0) 
 {yylval.nameptr=s;return RDF;}
  
@@ -319,13 +352,27 @@ return s->type;
 }
 
 
-<deff>#{ID}        {glb_namerec *s;
+<glb_lexer_deff>#{ID}        {glb_namerec *s;
 s = glb_getname (yytext,"flux");
 if (s == 0) 
 s = glb_putname (yytext,"flux",NAME);
 BEGIN(INITIAL);
-BEGIN(flux);
+BEGIN(glb_lexer_flux);
 if(strcmp(s->context,"flux")!=0) 
+{yylval.nameptr=s;return RDF;}
+ 
+yylval.nameptr = s; 
+ 
+return s->type;
+}
+
+<glb_lexer_defnf>#{ID}        {glb_namerec *s;
+s = glb_getname (yytext,"nuflux");
+if (s == 0) 
+s = glb_putname (yytext,"nuflux",NAME);
+BEGIN(INITIAL);
+BEGIN(glb_lexer_nuflux);
+if(strcmp(s->context,"nuflux")!=0) 
 {yylval.nameptr=s;return RDF;}
  
 yylval.nameptr = s; 
@@ -340,12 +387,12 @@ yylval.nameptr = s;
 return s->type; 
 }
 
-<rule,chl,energy,cross,flux>[>]        {
+<glb_lexer_rule,glb_lexer_chl,glb_lexer_energy,glb_lexer_cross,glb_lexer_flux,glb_lexer_nuflux>[>]        {
 BEGIN(INITIAL);
 return GRPCLOSE;}
 
 
-<chl,rule,energy,cross,flux>@{ID} {
+<glb_lexer_chl,glb_lexer_rule,glb_lexer_energy,glb_lexer_cross,glb_lexer_flux,glb_lexer_nuflux>@{ID} {
 yylval.name=yytext;
 return IDN;
 }
@@ -428,8 +475,8 @@ void glb_lexer_cleanup() {
          yy_current_buffer = 0;
      }
 }
-
 */
+
 
 
 void glb_lexer_cleanup() {

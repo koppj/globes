@@ -25,7 +25,7 @@
      
 %{
 #define YYDEBUG 1
-
+  
 #include <math.h>
 #include <ctype.h>
 #include <stdio.h>
@@ -41,8 +41,6 @@
 #include "glb_fluxes.h"
 #include "glb_sys.h"
 #include "glb_minimize.h"
-
-
 
 #define TWICE 100  
 
@@ -225,6 +223,21 @@
     {"@stored_ions",DOUBLE,0,GMAX,&flt.stored_muons,NULL,"flux"},
  
 
+
+    {"nuflux",UNTYPE,0,20,NULL,&buff.num_of_fluxes,"global"},
+    {"@flux_file",CHAR,0,20,&flt.file_name,NULL,"nuflux"},
+
+    {"@builtin",INT,1,4,&flt.builtin,NULL,"nuflux"},
+    {"@time",DOUBLE,0,GMAX,&flt.time,NULL,"nuflux"},
+    {"@power",DOUBLE,0,GMAX,&flt.target_power,NULL,"nuflux"},
+    {"@stored_muons",DOUBLE,0,GMAX,&flt.stored_muons,NULL,"nuflux"},
+    {"@parent_energy",DOUBLE,0,GMAX,&flt.parent_energy,NULL,"nuflux"},
+    {"@norm",DOUBLE,0,GMAX,&flt.norm,NULL,"nuflux"},
+    {"@gamma",DOUBLE,0,GMAX,&flt.gamma,NULL,"nuflux"},
+    {"@end_point",DOUBLE,0,GMAX,&flt.end_point,NULL,"nuflux"},
+    {"@stored_ions",DOUBLE,0,GMAX,&flt.stored_muons,NULL,"nuflux"},
+ 
+
    {"@type" ,INT,1,2,&ibf.type,&loc_count,"energy"},
    {"@sigma_e" ,DOUBLE_LIST,0,GMAX,&ibf.sigma,&ibf.num_of_params,"energy"},
    {"@sigma_function" ,FUN,0,1000,&ibf.sig_f,NULL,"energy"},
@@ -273,6 +286,24 @@ static void grp_end(char* name)
 
      if(strncmp(name,"flux",4)==0 )
        {
+	
+	 if(buff.num_of_fluxes > 0)   
+	   {
+	     glb_error("The 'flux' directive is deprecated.\n"
+		       "The flux normalization may not be what you expect.\n" 
+		       "Please, consult the manual!");
+	     if(flt.builtin<=0) flt.builtin=GLB_OLD_NORM;
+	     if(buff.fluxes[buff.num_of_fluxes-1]==NULL)
+	       buff.fluxes[buff.num_of_fluxes-1]=glb_flux_alloc();
+	     buff.fluxes[buff.num_of_fluxes-1]=
+	       cpy_glb_flux(buff.fluxes[buff.num_of_fluxes-1],&flt);
+	    glb_flux_reset(&flt);
+	   }
+       }  
+
+
+     if(strncmp(name,"nuflux",6)==0 )
+       {
 	 if(buff.num_of_fluxes > 0)   
 	   {
 	     if(buff.fluxes[buff.num_of_fluxes-1]==NULL)
@@ -294,6 +325,8 @@ static void grp_end(char* name)
 	     glb_xsec_reset(&xsc);
 	   }
        }  
+
+
 
      if(strncmp(name,"rule",4)==0 )
        {
@@ -998,7 +1031,7 @@ static int set_exp_energy(char *name, glb_List **value)
 %token <val> NUM
 %token <nameptr> SFNCT
 %token <tptr> LVAR VAR FNCT   /* Variable and Function */
-%token <name> IDN CROSS FLUXP FLUXM
+%token <name> IDN CROSS FLUXP FLUXM NUFLUX
 %token <name> SYS_ON_FUNCTION SYS_OFF_FUNCTION
 %token <name> GRP GID FNAME VERS
 %token <in> SIGNAL BG GRPOPEN GRPCLOSE PM FLAVOR
@@ -1014,6 +1047,8 @@ static int set_exp_energy(char *name, glb_List **value)
 %type <nameptr> name
 %type <name> cross 
 %type <name> flux
+%type <name> nuflux
+
 %type <name> version
 
 %expect 20
@@ -1051,6 +1086,7 @@ line:   '\n'
 | rule '\n' {}
 | cross '\n' {/* printf("%s\n",$1);*/}
 | flux '\n' {/* printf("%s\n",$1);*/}
+| nuflux '\n' {/* printf("%s\n",$1);*/}
 ;
 
 
@@ -1150,6 +1186,8 @@ ingroup: /* empty */
 | channel {}
 | cross {}
 | flux {}
+| nuflux {}
+
 ;
 
 version: VERS '=' FNAME {
@@ -1167,10 +1205,22 @@ cross: CROSS '=' FNAME {
 flux: FLUXP '=' FNAME {
   //load_flux($3,loc_count-1,1);
   flt.file_name=strdup($3);
+ 
   //if(set_exp($1,$3,0)==1) yyerror("Unknown identifier");
   $$=$3;
 }
 ;
+
+
+nuflux: NUFLUX '=' FNAME {
+  //load_flux($3,loc_count-1,1);
+  flt.file_name=strdup($3);
+ 
+  //if(set_exp($1,$3,0)==1) yyerror("Unknown identifier");
+  $$=$3;
+}
+;
+
 
 rule: SYS_ON_FUNCTION '=' FNAME {
   buff.sys_on_strings[buff.numofrules-1] = strdup($3);

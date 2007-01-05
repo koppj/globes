@@ -670,4 +670,15 @@ documented!
            #define GLB_HYBRID_MINIMIZER
          in glb_min_sup.h. 
 
+05/01/2007 PH
+       - Implemented 'nuflux' in AEDL which now uses the right
+       normalization, i.e. 1, for user-defined fluxes. This does aways
+       with the spurious factor of 5.1989. If an old file still uses
+       'flux' an error will be issued. The remainin task is now to
+       move all glb-files, which use user-defined fluxes to the new
+       'nuflux' form and to correctly multiply the normalization by
+       the above factor.
+       - In doing that, I discovered an unpleasant bug in glb_lexer.l,
+       which now is fixed. Look into the file if you want to know
+       more.
 

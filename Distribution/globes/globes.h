@@ -94,6 +94,7 @@ typedef float(*pt2Func)(float, float);  // JK - What is this good for ???
 typedef double (*glb_chi_function)(int exp, int rule, int n_params,
                                    double *params, double *errors);
 
+
 /* User-defined glb_probability_matrix and glb_set/get_oscillation_parameters */
 typedef int (*glb_probability_matrix_function)(double P[3][3], int cp_sign, double E,
                   int psteps, const double *length, const double *density,

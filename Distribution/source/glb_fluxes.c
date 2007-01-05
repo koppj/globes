@@ -284,7 +284,7 @@ void glb_init_fluxtables(glb_flux *data,int pos)
   if(data->builtin==3) builtin_flux_setup(data,&bb_flux,pos,+1);
   if(data->builtin==4) builtin_flux_setup(data,&bb_flux,pos,-1);
 
-  if(data->builtin==0) glb_flux_loader(data,pos,+1);
+  if(data->builtin==0||data->builtin==GLB_OLD_NORM) glb_flux_loader(data,pos,+1);
   
 }
 
@@ -306,7 +306,12 @@ static double norm2(int type)
       break;
     case 4: erg=NORM*100; //NUMI Beam (9@712) 
       break;
-    default: erg=NORM*295*295*9.92033*1E6;
+    case GLB_OLD_NORM: erg=NORM*295*295*9.92033*1E6;
+      /* here we try to eliminate the stupide 5.2 factor 
+       *    default: erg=NORM*295*295*9.92033*1E6; */
+      break;
+    default: erg=1.0 ;
+
       break;
     }
   return erg;
