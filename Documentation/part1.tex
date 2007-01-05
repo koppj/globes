@@ -1226,49 +1226,42 @@ are defined in the AEDL file (running from $0$ to the number of systematics para
 Returns zero, if successful.
 \end{function}
 Note that the new user-defined systematics has to be registered with {\tt glbDefineChiFunction} first. 
+One can also return the systematics function name by 
+\begin{function}
+\GLBNS{GetChiFunction}
+{\tt int glbGetChiFunction(int exp, int rule, int on\_off, char *sys\_id)}
+returns the name of the systematics $\chi^2$ function of a given experiment {\tt exp} and rule {\tt rule} for
+systematics on or off as given by {\tt on\_off}. The user must 
+ensure that the return string {\tt sys\_id} is large enough to hold the name of the function.
+\end{function}
+Similarly, a pointer to the systematics function can be returned either by name, or by experiment and rule selection:
+\begin{function}
+\GLBNS{GetChiFunctionPtr}
+{\tt glb\_chi\_function glbGetChiFunctionPtr(const char *name)}
+returns a pointer to the systematics $\chi^2$ function with a specified name {\tt name}.
+\end{function}
+\begin{function}
+\GLBNS{GetChiFunctionPtrInExperiment}
+{\tt glb\_chi\_function glbGetChiFunctionPtrInExperiment(int exp, int rule, int on\_off)}
+returns a pointer to the systematics $\chi^2$ function of experiment {\tt exp} and rule {\tt rule}.
+Systematics on or off can be accessed by {\tt on\_off}.
+\end{function}
 
 The $\chi^2$ function {\tt glb\_chi\_function} may use a number of helper functions for
-for the $\chi^2$ calculation. Some of these functions may not be directly related to user-defined
-systematics, but may be mainly used in this context:
-\begin{function}
-\GLBNS{GetEminEmax}
-{\tt int glbGetEminEmax(int experiment, double *emin, double *emax)} returns the
-energy range [{\tt emin},{\tt emax}] covered by the binning as defined in the AEDL file for the experiment
-{\tt experiment}.
-\end{function}
-\begin{function}
-\GLBNS{GetEnergyWindow}
-{\tt int glbGetEnergyWindow(int exp, int rule, double *low, double *high)} returns the
-energy window [{\tt low},{\tt high}] defined in the AEDL file for the experiment
-{\tt exp} and rule {\tt rule}.
-\end{function}
-\begin{function}
-\GLBNS{GetEnergyWindowBins}
-{\tt int glbGetEnergyWindowBins(int exp, int rule, int *lowbin, int *highbin)} returns the
-energy window in terms of bin numbers [{\tt lowbin},{\tt highbin}] corresponding to the energy window defined in the AEDL file for the experiment {\tt exp} and rule {\tt rule}.
-\end{function}
-\begin{function}
-\GLBNS{GetNumberOfBins}
-{\tt int glbGetNumberOfBins(int exp)} returns the number of bins for the experiment {\tt exp}.
-\end{function}
-\begin{function}
-\GLBNS{GetNumberOfSimBins}
-{\tt int glbGetNumberOfSimBins(int exp)} returns the number of sampling points for the experiment {\tt exp}.
-\end{function}
-SHOULD THIS NOT BE CALLED {\tt glbGetNumberOfSamplingPoints}??? [WW]
-
+for the $\chi^2$ calculation. 
 A very useful function to include energy calibration errors is
 \begin{function}
 \GLBNS{ShiftEnergyScale}
 {\tt glbShiftEnergyScale(double b, double *rates\_in, double *rates\_out,int bins, double emin, double emax)}
 shifts the energy scale in {\tt rates\_in} by the amount {\tt b} and stores the result in 
 {\tt rates\_out}. The parameters {\tt emin} and {\tt emax} denote the minimal and maximal energy
-as obtained with {\tt glbGetEminEmax}.
+as obtained with \GLB{glbGetEminEmax}.
 \end{function}
 DOES THAT ALSO WORK WITH VARIABLE BINS? WHAT IS THE MEAING OF EMIN AND EMAX? [WW]
 For details on energy calibration errors, see \Sec~\ref{sec:rules}.
 %
-In addition, in order to implement user-defined systematics, one usually needs low-level access to the event rate vectors using \GLB{GetRuleRatePtr}, \GLB{GetSignalFitRatePtr}, \GLB{GetBGFitRatePtr} and possibly other functions described in \Sec~\ref{sec:event_rates}. We recommend that you familiarize yourself with these functions at this point.
+In addition, in order to implement user-defined systematics, one usually needs low-level access to the event rate vectors using \GLB{GetRuleRatePtr}, \GLB{GetSignalFitRatePtr}, \GLB{GetBGFitRatePtr} and possibly other functions described in \Sec~\ref{sec:event_rates}. Additionally, the
+functions \GLB{GetEminEmax}, \GLB{GetEnergyWindow}, \GLB{GetEnergyWindowBins}, and \GLB{GetNumberOfBins} from \Sec~\ref{sec:aedl_names} are useful.  We recommend that you familiarize yourself with these functions at this point.
 
 Let us now discuss a simple example.  Typical applications for user-defined systematics are reactor neutrino experiments, where systematics play a crucial role. For a setup with near and far detectors,
 the formula for $\chi^2$ is
@@ -1889,6 +1882,7 @@ is compared with the result including the full multi-parameter correlation.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{User-defined priors}
 \index{norm}{User-defined priors}
+\label{sec:userdefined}
 
 \example{Non-Gaussian external solar input}{
 \label{ex:userprior}
@@ -2088,8 +2082,19 @@ to avoid a significant contribution of the prior to the final $\chi^2$.
 Alternatively, one could once again run {\tt glbChiAll} with the located 
 minimum as {\tt in} vector, and $\ldm$ kept free.
 \item[Finding degeneracies with multiple experiments.] For multiple experiments, it turns out to be useful to locate the degeneracies for individual experiments first. Then, all of the found degeneracies below the threshold can be tested for the combination of all experiments.
+\item[Tracking algorithm.] If one scans a large portion of the parameter space with different input values, it is often useful to use the output from the previous minimization as educated guess for the next minimization. This works often very well if the degeneracy can be located in a part of the parameter space and the input parameter values change slowly enough (adiabatic transformation of the fit manifold). 
+\item[Pre-scanning the parameter space.] In some cases, a very fast procedure can be a pre-scan 
+of the relevant parameters using the very fast {\tt glbChiSys}. For example, for the intrinsic degeneracy, the location of the degeneracy in the $(\deltacp,\theta_{13})$ plane can easily and quickly found with {\tt glbChiSys} while keeping the other parameters fixed. Use this location then as a starting point for {\tt glbChiAll}.
+\item[Manual scan of a subspace.] In some cases, the minimizer easily ends up in the wrong/unwanted solution, which is in most cases the already known best-fit solution. For example, for the octant degeneracy location, it is difficult to prevent the minimizer from running into the best-fit octant. In this case, one can scan one parameter (such as $\theta_{23}$) on a grid by choosing only valid values, and use {\tt glbChiNP} to marginalize over the other ones (while keeping \eg\ $\theta_{23}$ fixed). Therefore, the 6-parameter minimization is split into a 1-parameter manual minimization and a 5-parameter simultaneous minimization. Advantage: Runs with all \GLOBES\ versions. Disadvantage: Very slow. 
+\item[Using Schwetz-priors (\GLOBES\ 3.0 and higher).] An elegant and fast method to prevent the minimizer from running into parts of the parameter space is to use user-defined priors and add a penalty as soon as a taboo zone is entered (\cf, \Sec~\ref{sec:userdefined}). This method was initially suggested by Thomas Schwetz.
+\item[Using total rates.] In order to systematically locate all degeneracies (the eight-fold degeneracy), relatively reliable methods use the total appearance neutrino and antineutrino event rates of the experiment to determine educated guesses. The method goes as follows: Plot the curves with equal total rate in the $\sin^2 2 \theta_{13}$-$\delta_{\mathrm{CP}}$-plane for both neutrinos and antineutrinos using the same rates as in the best-fit point. The curves will intersect at the intrinsic degeneracy (if it all). Plot the same curves for the same rates with $\mathrm{sgn}(\Delta m_{31}^2)$ flipped. Again you will find a maximum of two intersection points. Now do the same for $\pi/2 - \theta_{23}$ flipped, and for  $\mathrm{sgn}(\Delta m_{31}^2)$ combined with $\pi/2 - \theta_{23}$ flipped (mixed degeneracy). You will find at most two more intersection points in each case.
+The results should look somewhat like this, where the best-fit point is not marked (the marks correspond to the points where the discrete degeneracies are located according to this specific algorithm):
+\begin{center}
+\includegraphics[width=0.95\textwidth]{ircurves}
+\end{center}
+ Altogether, there is a maximum of eight intersection points in the $\sin^2 2 \theta_{13}$-$\delta_{\mathrm{CP}}$-plane, one of which is the best-fit point. These points can be using as starting points of the minimizer to locate the eight-fold degeneracy. Note that similar methods using the $\chi^2$ instead of the total rates have also been successfully used in the past. 
 \end{description}
-Finally, note that any degenerate solution below the confidence level threshold which can not be located makes the result appear better than it actually is. Thus, one should be careful with the determination of the degenerate solutions in order to find all of them.
+Finally, note that any degenerate solution below the confidence level threshold which cannot be located makes the result appear better than it actually is. Thus, one should be careful with the determination of the degenerate solutions in order to find all of them.
 \index{norm}{Degeneracies|)}
 
 
@@ -2121,87 +2126,54 @@ is the one of experiment {\tt exp}. The parameter
 The matter density profile including baseline is the one from the last
 evaluated experiment. 
 \end{function}
+For a constant matter density profile, it is sufficient to specify the oscillation channel with
+\begin{function}
+\GLBNS{ConstantDensityProbability}
+{\tt double glbConstantDensityProbability(int l, int m, int panti, double E, double L, double rho)} returns the neutrino oscillation probability $\nu_l \rightarrow \nu_m$ for the energy {\tt E} in constant matter, where the matter density profile
+has the constant density {\tt rho} and the baseline is {\tt L}. The parameter
+{\tt panti} is $+1$ for neutrinos and $-1$ for antineutrinos.
+\end{function}
+If one in addition wants to use the low-pass filter feature in \GLOBES\ (see \Sec~\ref{sec:energy}), can can use
+\begin{function}
+\GLBNS{FilteredConstantDensityProbability}
+{\tt double glbFilteredConstantDensityProbability(int exp, int l, int m, int panti, double E)} returns the neutrino oscillation probability $\nu_l \rightarrow \nu_m$ for the energy {\tt E} in constant matter, where the matter density and baseline, as well as the filter properties are taken from experiment {\tt exp}. The parameter {\tt panti} is $+1$ for neutrinos and $-1$ for antineutrinos.
+\end{function}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{\AEDL\ names}
-\index{norm}{AEDL@\AEDL!names}
+\section{Information from \AEDL\ files}
 \label{sec:aedl_names}
 
-Since in \AEDL\ rules, cross section, fluxes etc. carry a `name' by
-which they can be refered to and in C they cary only an integer as
-index it is sometimes difficult to figure out the correct correspondence.
-Therefore the information about this correspondence obtained during
-parsing is stored and can be accessed within C by these two functions.
+In some cases, it is necessary to obtain information from the \AEDL\
+files. Very basic information is supplied with
 \begin{function}
-\GLBNS{NameToValue}
-{\tt int glbNameToValue(int exp, const char* context, const char *name)}
-Converts an \AEDL\ name given as argument {\tt name} into the corresponding
-C index. The variable {\tt context} describes wether this name belongs
-to a rule, channel, flux, energy or cross type environment. {\tt exp}
-is the number of the experiment and can not be {\tt GLB\_ALL}. It returns
-either the index in case of success or {\tt -1} in case the name was not
-found. 
-\end{function}
-
-
-\begin{function}
-\GLBNS{ValueToName}
-{\tt const char *glbValueToName(int exp,const char* context, int value)}
-Converts a C index given as argument {\tt value} into the corresponding 
-\AEDL\ name. The variable {\tt context} describes wether the index belongs
-to a rule, channel, flux, energy or cross type environment. {\tt exp}
-is the number of the experiment and can not be {\tt GLB\_ALL}. It returns
-either the name in case of success or {\tt NULL} in case the name was not
-found. The returned string must not be modified.
-\end{function}
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Event rates}
-\index{norm}{Event rates}
-\label{sec:event_rates}
-One can also return event rates in \GLOBES , but this feature
-requires some knowledge about the experiment definition. 
-In fact, many of these functions are very advanced, which means
-that the reader who wants to use them should be familiar with
-\Secs~\ref{sec:channel} and~\Sec~\ref{sec:rules} of the \AEDL\ manual.
-
-\index{norm}{Event rates}
-\GLOBES\ currently supports rule-based and channel-based event rate functions, where the information is in written into a file
-or returned in a list. The rule-based functions are:
-\begin{function}
-\GLBNS{ShowRuleRates}
-{\tt int glbShowRuleRates(FILE* stream, int exp, int rule, int pos,
-int effi, int bgi, int coeffi, int signal)} prints the binned rule rates as
-list with energy and event rate to the file {\tt stream} (either an
-open file, or {\tt stdout}). A specific experiment {\tt exp} and a 
-specific rule {\tt rule} have to be chosen, as well as the signal
-or background rate {\tt signal} (either \GLBC{GLB\_SIG} or \GLBC{GLB\_BG}).
-The position {\tt pos} refers to the component within the signal or 
-background, and can also be {\tt GLB\_ALL}. The function may return
-the rates with (\GLBC{GLB\_W\_COEFF}) or without (\GLBC{GLB\_WO\_COEFF})
-overall efficiency coefficient, as it is specified by {\tt coeffi}. 
-In addition, it may contain the post-smearing efficiencies (set
-{\tt effi} to \GLBC{GLB\_W\_EFF} or \GLBC{GLB\_WO\_EFF}), and the
-post-smearing backgrounds (set
-{\tt bgi} to \GLBC{GLB\_W\_BG} or \GLBC{GLB\_WO\_BG}). The pre-smearing
-efficiencies and backgrounds cannot be accessed at the rule level.
-The return value
-is $0$ if successful, and $-1$ if unsuccessful.
+\GLBNS{GetEminEmax}
+{\tt int glbGetEminEmax(int experiment, double *emin, double *emax)} returns the
+energy range [{\tt emin},{\tt emax}] covered by the binning as defined in the AEDL file for the experiment
+{\tt experiment}.
 \end{function}
 \begin{function}
-\GLBNS{TotalRuleRate}
-{\tt double glbTotalRuleRate(int exp, int rule, int pos,
-int effi, int bgi, int coeffi, int signal)} returns the total rates with
-the same parameters as {\tt glbShowRuleRates}.
+\GLBNS{GetEnergyWindow}
+{\tt int glbGetEnergyWindow(int exp, int rule, double *low, double *high)} returns the
+energy window [{\tt low},{\tt high}] defined in the AEDL file for the experiment
+{\tt exp} and rule {\tt rule}.
 \end{function}
-The function {\tt glbTotalRuleRate} is especially useful if
-one wants to draw bi-rate graphs with total event rates, or look
-for the $(\deltacp,\theta_{13})$-degeneracy by the intersection of 
-neutrino and antineutrino constant event rate curves.
-%
+\begin{function}
+\GLBNS{GetEnergyWindowBins}
+{\tt int glbGetEnergyWindowBins(int exp, int rule, int *lowbin, int *highbin)} returns the
+energy window in terms of bin numbers [{\tt lowbin},{\tt highbin}] corresponding to the energy window defined in the AEDL file for the experiment {\tt exp} and rule {\tt rule}.
+\end{function}
+\begin{function}
+\GLBNS{GetNumberOfBins}
+{\tt int glbGetNumberOfBins(int exp)} returns the number of bins for the experiment {\tt exp}.
+\end{function}
+\begin{function}
+\GLBNS{GetNumberOfSimBins}
+{\tt int glbGetNumberOfSimBins(int exp)} returns the number of sampling points for the experiment {\tt exp}.
+\end{function}
+SHOULD THIS NOT BE CALLED {\tt glbGetNumberOfSamplingPoints}??? [WW]
+
 In order to obtain information on the structure of the rules, 
-a number of additional functions are provided:
+a number of functions are provided:
 \begin{function}
 \GLBNS{GetNumberOfRules}
 {\tt int glbGetNumberOfRules(int exp)} returns the number of
@@ -2238,9 +2210,104 @@ of the experiment {\tt exp}.
 The parameter {\tt signal} refers to signal (\GLBC{GLB\_SIG}) or background
 (\GLBC{GLB\_BG}).
 \end{function}
+%
+Similarly to the rules, one can find the number of channels of an experiment:
+\begin{function}
+\GLBNS{GetNumberOfChannels}
+{\tt int glbGetNumberOfChannels(int exp)} returns the number of 
+channels of experiment {\tt exp}.
+\end{function} 
 
 
-In addition, \GLOBES\ has channel-based rate functions:
+\index{norm}{AEDL@\AEDL!names}
+Since in \AEDL\ rules, cross section, fluxes etc. carry a `name' by
+which they can be refered to and in C they cary only an integer as
+index it is sometimes difficult to figure out the correct correspondence.
+Therefore the information about this correspondence obtained during
+parsing is stored and can be accessed within C by these two functions.
+\begin{function}
+\GLBNS{NameToValue}
+{\tt int glbNameToValue(int exp, const char* context, const char *name)}
+Converts an \AEDL\ name given as argument {\tt name} into the corresponding
+C index. The variable {\tt context} describes wether this name belongs
+to a rule, channel, flux, energy or cross type environment. {\tt exp}
+is the number of the experiment and can not be {\tt GLB\_ALL}. It returns
+either the index in case of success or {\tt -1} in case the name was not
+found. 
+\end{function}
+
+\begin{function}
+\GLBNS{ValueToName}
+{\tt const char *glbValueToName(int exp,const char* context, int value)}
+Converts a C index given as argument {\tt value} into the corresponding 
+\AEDL\ name. The variable {\tt context} describes wether the index belongs
+to a rule, channel, flux, energy or cross type environment. {\tt exp}
+is the number of the experiment and can not be {\tt GLB\_ALL}. It returns
+either the name in case of success or {\tt NULL} in case the name was not
+found. The returned string must not be modified.
+\end{function}
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Event rates}
+\index{norm}{Event rates}
+\label{sec:event_rates}
+One can also return event rates in \GLOBES , but this feature
+requires some knowledge about the experiment definition. 
+In fact, many of these functions are very advanced, which means
+that the reader who wants to use them should be familiar with
+\Secs~\ref{sec:channel} and~\Sec~\ref{sec:rules} of the \AEDL\ manual.
+Note that some of the event rate access has changed in \GLOBES\ 3.0,
+because user-defined systematics requires very fast access which was
+not possible with the old method.
+
+A very simple function is for the total rate
+\begin{function}
+\GLBNS{TotalRuleRate}
+{\tt double glbTotalRuleRate(int exp, int rule, int pos,
+int effi, int bgi, int coeffi, int signal)} returns the total rates.
+A specific experiment {\tt exp} and a 
+specific rule {\tt rule} have to be chosen, as well as the signal
+or background rate {\tt signal} (either \GLBC{GLB\_SIG} or \GLBC{GLB\_BG}).
+The position {\tt pos} refers to the component within the signal or 
+background, and can also be {\tt GLB\_ALL}. The function may return
+the rates with (\GLBC{GLB\_W\_COEFF}) or without (\GLBC{GLB\_WO\_COEFF})
+overall efficiency coefficient, as it is specified by {\tt coeffi}. 
+In addition, it may contain the post-smearing efficiencies (set
+{\tt effi} to \GLBC{GLB\_W\_EFF} or \GLBC{GLB\_WO\_EFF}), and the
+post-smearing backgrounds (set
+{\tt bgi} to \GLBC{GLB\_W\_BG} or \GLBC{GLB\_WO\_BG}). The pre-smearing
+efficiencies and backgrounds cannot be accessed at the rule level.
+\end{function}
+The function {\tt glbTotalRuleRate} is especially useful if
+one wants to draw bi-rate graphs with total event rates, or look
+for the $(\deltacp,\theta_{13})$-degeneracy by the intersection of 
+neutrino and antineutrino constant event rate curves.
+
+There are several functions to directly print or save the event rate
+information:
+\begin{function}
+\GLBNS{ShowRuleRates}
+{\tt int glbShowRuleRates(FILE* stream, int exp, int rule, int pos,
+int effi, int bgi, int coeffi, int signal)} prints the binned rule rates as
+list with energy and event rate to the file {\tt stream} (either an
+open file, or {\tt stdout}). A specific experiment {\tt exp} and a 
+specific rule {\tt rule} have to be chosen, as well as the signal
+or background rate {\tt signal} (either \GLBC{GLB\_SIG} or \GLBC{GLB\_BG}).
+The position {\tt pos} refers to the component within the signal or 
+background, and can also be {\tt GLB\_ALL}. The function may return
+the rates with (\GLBC{GLB\_W\_COEFF}) or without (\GLBC{GLB\_WO\_COEFF})
+overall efficiency coefficient, as it is specified by {\tt coeffi}. 
+In addition, it may contain the post-smearing efficiencies (set
+{\tt effi} to \GLBC{GLB\_W\_EFF} or \GLBC{GLB\_WO\_EFF}), and the
+post-smearing backgrounds (set
+{\tt bgi} to \GLBC{GLB\_W\_BG} or \GLBC{GLB\_WO\_BG}). The pre-smearing
+efficiencies and backgrounds cannot be accessed at the rule level.
+The return value
+is $0$ if successful, and $-1$ if unsuccessful.
+\end{function}
 \begin{function}
 \GLBNS{ShowChannelRates}
 {\tt int glbShowChannelRates(FILE *stream,
@@ -2261,58 +2328,107 @@ account if the rates are returned before the energy smearing.
 The return value
 is $0$ if successful, and $-1$ if unsuccessful.
 \end{function}
+
+\index{norm}{Event rates}
+For rate vectors, \GLOBES\ currently supports rule-based and channel-based event rate functions, where typically pointers on the rate vectors are returned. The following pointer-based functions are currently supported:
 \begin{function}
-\GLBNS{GetChannelRates}
-{\tt int glbGetChannelRates(double** data,
-size\_t* length, int exp, int channel, int smearing)}
-writes the binned raw channel rates to the list {\tt data}
-and the length of this list to {\tt length}. 
-A specific experiment {\tt exp} and a 
-specific channel {\tt channel} have to be chosen.
-The function may return
-the rates before ({\tt smearing} is \GLBC{GLB\_PRE}) or after ({\tt smearing} is \GLBC{GLB\_POST})
-the energy smearing, where no user-defined data
-(pre-/post-smearing efficiencies or backgrounds) are taken into account.
-The return value is $-1$ if unsuccessful.
+\GLBNS{GetChannelRatePtr}
+{\tt double *glbGetChannelRatePtr(int exp, int ch, int pre\_post)} returns a 
+pointer on the simulated rate vector of experiment {\tt exp} and channel {\tt ch}. Either
+pre-smearing ({\tt pre\_post} is {\tt GLB\_PRE}) or post-smearing ({\tt pre\_post} is {\tt GLB\_POST})
+rates can be accessed.
 \end{function}
 \begin{function}
-\GLBNS{GetUserData}
-{\tt int glbGetUserData(double** data,
-size\_t* length, int exp, int channel, int smearing, int bgeff)}
-writes the binned user-defined backgrounds or efficiencies 
-to the list {\tt data} and the length of this list to {\tt length}. 
-A specific experiment {\tt exp} and a 
-specific channel {\tt channel} have to be chosen.
-The function may return
-the pre- ({\tt smearing} is \GLBC{GLB\_PRE}) or post- ({\tt smearing} is \GLBC{GLB\_POST}) smearing backgrounds ({\tt bgeff} is \GLBC{GLB\_BG}) 
-or efficiencies ({\tt bgeff} is \GLBC{GLB\_EFF}). 
-The return value is $-1$ if unsuccessful.
+\GLBNS{GetRuleRatePtr}
+{\tt double *glbGetRuleRatePtr(int exp, int rule)} returns a 
+pointer on the simulated rate vector of experiment {\tt exp} and rule {\tt rule}.
 \end{function}
-Since \GLOBES\ reserves the memory for the lists returned in these
-functions, which it allocates on an internal stack, one has to reset
-the stack at the end of the rates access with
 \begin{function}
-\GLBNS{ResetRateStack}
-{\tt void glbResetRateStack()} resets the rate stack used for the
-lists returned from {\tt glbGetChannelRates} or {\tt glbGetUserData}.
+\GLBNS{GetSignalRatePtr}
+{\tt double *glbGetSignalRatePtr(int exp, int rule)} returns a 
+pointer on the simulated signal rate vector of experiment {\tt exp} and rule {\tt rule}.
 \end{function}
-A code excerpt to show the channel rates may look like this:
+\begin{function}
+\GLBNS{GetBGRatePtr}
+{\tt double *glbGetBGRatePtr(int exp, int rule)} returns a 
+pointer on the simulated background rate vector of experiment {\tt exp} and rule {\tt rule}.
+\end{function}
+\begin{function}
+\GLBNS{GetChannelFitRatePtr}
+{\tt double *glbGetChannelFitRatePtr(int exp, int ch, int pre\_post)} returns a 
+pointer on the fit rate vector of experiment {\tt exp} and channel {\tt ch}. Either
+pre-smearing ({\tt pre\_post} is {\tt GLB\_PRE}) or post-smearing ({\tt pre\_post} is {\tt GLB\_POST})
+rates can be accessed.
+\end{function}
+\begin{function}
+\GLBNS{GetSignalFitRatePtr}
+{\tt double *glbGetSignalFitRatePtr(int exp, int rule)} returns a 
+pointer on the fit signal rate vector of experiment {\tt exp} and rule {\tt rule}.
+\end{function}
+\begin{function}
+\GLBNS{GetBGFitRatePtr}
+{\tt double *glbGetBGFitRatePtr(int exp, int rule)} returns a 
+pointer on the fit background rate vector of experiment {\tt exp} and rule {\tt rule}.
+\end{function}
+A simple example how to use these functions to print a rate vector is
 \begin{quote}
 {\tt
- double* rates; \\
-  size\_t length; \\
-  glbGetChannelRates(\&rates,\&length,0,0,GLB\_PRE); \\
-  int i; \\
-  for(i=0;i<length;i++) printf("\%g $\backslash$n",rates[i]); \\
-  glbResetRateStack(); \\
+ int i; \\
+   int n\_bins = glbGetNumberOfBins(EXP\_FAR); \\
+  double *true\_rates\_N = glbGetRuleRatePtr(0, 0); \\
+  printf("Simulated rates, experiment 0, rule 0: $\backslash$n"); \\
+  for(i=0;i<n\_bins;i++) printf("\% g ",true\_rates\_N[i]); \\
+  printf("$\backslash$n");
 }
 \end{quote}
-Finally, one can find the number of channels of an experiment:
-\begin{function}
-\GLBNS{GetNumberOfChannels}
-{\tt int glbGetNumberOfChannels(int exp)} returns the number of 
-channels of experiment {\tt exp}.
-\end{function}
+
+% OLD FUNCTIONS:
+% \begin{function}
+% \GLBNS{GetChannelRates}
+% {\tt int glbGetChannelRates(double** data,
+% size\_t* length, int exp, int channel, int smearing)}
+% writes the binned raw channel rates to the list {\tt data}
+% and the length of this list to {\tt length}. 
+% A specific experiment {\tt exp} and a 
+% specific channel {\tt channel} have to be chosen.
+% The function may return
+% the rates before ({\tt smearing} is \GLBC{GLB\_PRE}) or after ({\tt smearing} is \GLBC{GLB\_POST})
+% the energy smearing, where no user-defined data
+% (pre-/post-smearing efficiencies or backgrounds) are taken into account.
+% The return value is $-1$ if unsuccessful.
+% \end{function}
+% \begin{function}
+% \GLBNS{GetUserData}
+% {\tt int glbGetUserData(double** data,
+% size\_t* length, int exp, int channel, int smearing, int bgeff)}
+% writes the binned user-defined backgrounds or efficiencies 
+% to the list {\tt data} and the length of this list to {\tt length}. 
+% A specific experiment {\tt exp} and a 
+% specific channel {\tt channel} have to be chosen.
+% The function may return
+% the pre- ({\tt smearing} is \GLBC{GLB\_PRE}) or post- ({\tt smearing} is \GLBC{GLB\_POST}) smearing backgrounds ({\tt bgeff} is \GLBC{GLB\_BG}) 
+% or efficiencies ({\tt bgeff} is \GLBC{GLB\_EFF}). 
+% The return value is $-1$ if unsuccessful.
+% \end{function}
+% Since \GLOBES\ reserves the memory for the lists returned in these
+% functions, which it allocates on an internal stack, one has to reset
+% the stack at the end of the rates access with
+% \begin{function}
+% \GLBNS{ResetRateStack}
+% {\tt void glbResetRateStack()} resets the rate stack used for the
+% lists returned from {\tt glbGetChannelRates} or {\tt glbGetUserData}.
+% \end{function}
+% A code excerpt to show the channel rates may look like this:
+% \begin{quote}
+% {\tt
+%  double* rates; \\
+%   size\_t length; \\
+%   glbGetChannelRates(\&rates,\&length,0,0,GLB\_PRE); \\
+%   int i; \\
+%   for(i=0;i<length;i++) printf("\%g $\backslash$n",rates[i]); \\
+%   glbResetRateStack(); \\
+% }
+% \end{quote}
 
 \section{Fluxes and cross sections}
 \index{norm}{Flux} \index{norm}{Cross section}
@@ -2336,6 +2452,13 @@ and polarity {\tt anti} ($+1$: neutrinos, $-1$: antineutrinos) at the energy {\t
 int ident, double E, int l, int anti)} returns
 the cross section of experiment {\tt exp}, 
 cross section number {\tt ident} for the flavor $\nu_l$ and polarity {\tt anti} ($+1$: neutrinos, $-1$: antineutinos) at the energy {\tt E}.
+\end{function}
+%
+The number of fluxes can be obtained with
+\begin{function}
+\GLBNS{GetNumberOfFluxes}
+{\tt int glbGetNumberOfFluxes(int exp)} returns the number of 
+fluxes defined in experiment {\tt exp}.
 \end{function}
 
 
@@ -2370,8 +2493,8 @@ in the \AEDL\ file (average density, PREM profile with a given
 number of steps, or arbitrary profile). One can check the currently
 used profile type with
 \begin{function}
-\GLBNS{GetProfileType}
-{\tt int glbGetProfileType(int exp)} returns the matter density profile
+\GLBNS{GetProfileTypeInExperiment}
+{\tt int glbGetProfileTypeInExperiment(int exp)} returns the matter density profile
 type of experiment {\tt exp}.
 \end{function}
 For each profile type, one can easily change the baseline with {\tt glbSetBaselineInExperiment},
@@ -2554,9 +2677,13 @@ limits at the $3 \sigma$ confidence level, where we do not include the
 Changing the systematics at running time can be useful to investigate
 the impact factors affecting the measurement.
 In \GLOBES , the systematics is defined rule-based, \ie, each rule
-has its own systematics. In addition, \AEDL\ requires that it has to be
+has its own systematics. 
+In addition, \GLOBES\ supports dual systematics, \ie, \AEDL\ requires that it has to be
 defined in each rule what ``Systematics on'' and ``Systematics off'' means.
-Therefore, it is usually very simple to switch the systematics on and off:
+In principle, these two sets correspond to two completely different systematics
+implementations, and it is up to the \AEDL\ authors to define what that means.
+From the point of view of the API, it is very simple to switch the systematics on and off, \ie,
+to switch between the two systematics modes:
 \begin{function}
 \GLBNS{SwitchSystematics}
 {\tt int glbSwitchSystematics(int exp, int rule, int on\_off)}
@@ -2564,30 +2691,39 @@ switches the systematics in experiment {\tt exp} and rule {\tt rule}
 on ({\tt on\_off} is \GLBC{GLB\_ON}) or off ({\tt on\_off} is \GLBC{GLB\_OFF}). For the experiment or
 rule index, one can also use \GLBC{GLB\_ALL}. 
 \end{function}
+One can also return the systematics state with
+\begin{function}
+\GLBNS{GetSysOnOffState}
+{\tt int glbGetSysOnOffState(int exp, int rule)}
+returns the systematics state in experiment {\tt exp} and rule {\tt rule}. 
+\end{function}
 In the example on page~\pageref{ex:barcharts}, the application of
 {\tt glbSwitchSystematics} is demonstrated to show the impact of
 systematics, correlations, and degeneracies.
+Note that also the systematics function itself may be changed during running time,
+as described in \Sec~\ref{sec:userchi}.
 
-\index{norm}{Error dimension}
-The error dimension (for the definition, see \Sec~\ref{sec:rules}) can also be accessed directly with 
-\begin{function}
-\GLBNS{SetErrorDim}
-{\tt int glbSetErrorDim(int exp, int rule, int on\_off, int value)}
-sets the error dimension for systematics on ({\tt on\_off} is \GLBC{GLB\_ON}) or off ({\tt on\_off} is \GLBC{GLB\_OFF}) of experiment {\tt exp} and rule {\tt rule} to the value {\tt value}. The function returns
-$-1$ if not successful.
-\end{function}
-\begin{function}
-\GLBNS{GetErrorDim}
-{\tt int glbGetErrorDim(int exp, int rule, int on\_off)}
-returns the error dimension for systematics on ({\tt on\_off} is \GLBC{GLB\_ON}) or off ({\tt on\_off} is \GLBC{GLB\_OFF}) of experiment {\tt exp} and rule {\tt rule}.
-\end{function}
+% \index{norm}{Error dimension}
+% The error dimension (for the definition, see \Sec~\ref{sec:rules}) can also be accessed directly with 
+% \begin{function}
+% \GLBNS{SetErrorDim}
+% {\tt int glbSetErrorDim(int exp, int rule, int on\_off, int value)}
+% sets the error dimension for systematics on ({\tt on\_off} is \GLBC{GLB\_ON}) or off ({\tt on\_off} is \GLBC{GLB\_OFF}) of experiment {\tt exp} and rule {\tt rule} to the value {\tt value}. The function returns
+% $-1$ if not successful.
+% \end{function}
+% \begin{function}
+% \GLBNS{GetErrorDim}
+% {\tt int glbGetErrorDim(int exp, int rule, int on\_off)}
+% returns the error dimension for systematics on ({\tt on\_off} is \GLBC{GLB\_ON}) or off ({\tt on\_off} is \GLBC{GLB\_OFF}) of experiment {\tt exp} and rule {\tt rule}.
+% \end{function}
 
 \index{norm}{Signal!errors}
 \index{norm}{Background!errors}
 \index{norm}{Background!centers}
 Except from the general treatment of systematics, one can read out
-and write the signal and background errors, as well as the background
-centers. For the definitions of these quantities, see \Sec~\ref{sec:rules}.
+and write the signal and background errors for standard pre-defined systematics.
+For user-defined systematics, see \Sec~\ref{sec:userchi}, and 
+for the definitions of these quantities, see \Sec~\ref{sec:rules}.
 \begin{function}
 \GLBNS{SetSignalErrors}
 {\tt int glbSetSignalErrors(int exp, int rule, double norm, double tilt)}
@@ -2612,23 +2748,27 @@ to {\tt norm} (normalization error) and {\tt tilt} (tilt/calibration error).
 writes the background errors of experiment {\tt exp} and rule {\tt rule}
 to {\tt norm} (normalization error) and {\tt tilt} (tilt/calibration error).
 \end{function}
-\begin{function}
-\GLBNS{SetBGCenters}
-{\tt int glbSetBGCenters(int exp, int rule, double norm, double tilt)}
-sets the background centers of experiment {\tt exp} and rule {\tt rule}
-to {\tt norm} (normalization center) and {\tt tilt} (tilt/calibration center).
-\end{function}
-\begin{function}
-\GLBNS{GetBGCenters}
-{\tt int glbGetBGCenters(int exp, int rule, double* norm, double* tilt)}
-writes the background centers of experiment {\tt exp} and rule {\tt rule}
-to {\tt norm} (normalization center) and {\tt tilt} (tilt/calibration center).
-\end{function}
+% ELIMINATED FROM DOC, BECAUSE WE WANT TO AVOID THE BG CENTERS IN THE FUTURE (CONFUSION) [WW]
+%
+% \begin{function}
+% \GLBNS{SetBGCenters}
+% {\tt int glbSetBGCenters(int exp, int rule, double norm, double tilt)}
+% sets the background centers of experiment {\tt exp} and rule {\tt rule}
+% to {\tt norm} (normalization center) and {\tt tilt} (tilt/calibration center).
+% \end{function}
+% \begin{function}
+% \GLBNS{GetBGCenters}
+% {\tt int glbGetBGCenters(int exp, int rule, double* norm, double* tilt)}
+% writes the background centers of experiment {\tt exp} and rule {\tt rule}
+% to {\tt norm} (normalization center) and {\tt tilt} (tilt/calibration center).
+% \end{function}
 As usual, all these functions return $-1$ if they were not successful.
 
 \section{External parameters in \AEDL\ files}
 \label{sec:aedlparams}
 \index{norm}{AEDL@\AEDL!external parameters}
+
+TO BE EXTENDED BY LIST HANDLING (TRANSFER LISTS IN AEDL VARIABLES). STATUS? [WW].
 
 Using external parameters in \AEDL\ files is a very powerful feature
 to change experiment parameters at running time which require that
@@ -2696,15 +2836,15 @@ the filter functions, we refer to \Sec~\ref{sec:energy} of
 the \AEDL\ manual.
 
 In particular, there are a number of functions:
-\begin{function}
-\GLBNS{SetFilterState}
-{\tt int glbSetFilterState(int on\_off)} sets the currently
-used filter state to on (\GLBC{GLB\_ON}) or off (\GLBC{GLB\_OFF}).
-\end{function}
-\begin{function}
-\GLBNS{GetFilterState}
-{\tt int glbGetFilterState()} returns the currently used filter state.
-\end{function}
+% \begin{function}
+% \GLBNS{SetFilterState}
+% {\tt int glbSetFilterState(int on\_off)} sets the currently
+% used filter state to on (\GLBC{GLB\_ON}) or off (\GLBC{GLB\_OFF}).
+% \end{function}
+% \begin{function}
+% \GLBNS{GetFilterState}
+% {\tt int glbGetFilterState()} returns the currently used filter state.
+% \end{function}
 \begin{function}
 \GLBNS{SetFilterStateInExperiment}
 {\tt int glbSetFilterStateInExperiment(int exp, int on\_off)} sets the filter state in experiment {\tt exp} to on (\GLBC{GLB\_ON}) or off (\GLBC{GLB\_OFF}).
@@ -2714,15 +2854,15 @@ used filter state to on (\GLBC{GLB\_ON}) or off (\GLBC{GLB\_OFF}).
 {\tt int glbGetFilterStateInExperiment(int exp)} returns the filter state of experiment {\tt exp}.
 \end{function}
 Analogously, the filter value can be accessed:
-\begin{function}
-\GLBNS{SetFilter}
-{\tt int glbSetFilter(double filter)} sets the currently used filter to the
-value {\tt filter}.
-\end{function}
-\begin{function}
-\GLBNS{GetFilter}
-{\tt double glbGetFilter()} returns the currently used filter value.
-\end{function}
+% \begin{function}
+% \GLBNS{SetFilter}
+% {\tt int glbSetFilter(double filter)} sets the currently used filter to the
+% value {\tt filter}.
+% \end{function}
+% \begin{function}
+% \GLBNS{GetFilter}
+% {\tt double glbGetFilter()} returns the currently used filter value.
+% \end{function}
 \begin{function}
 \GLBNS{SetFilterInExperiment}
 {\tt int glbSetFilterInExperiment(int exp, double filter)} sets the filter  in experiment {\tt exp} to the value {\tt value}.
