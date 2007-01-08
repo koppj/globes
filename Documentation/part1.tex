@@ -1256,7 +1256,7 @@ A very useful function to include energy calibration errors is
 {\tt glbShiftEnergyScale(double b, double *rates\_in, double *rates\_out,int bins, double emin, double emax)}
 shifts the energy scale in {\tt rates\_in} by the amount {\tt b} and stores the result in 
 {\tt rates\_out}. The parameters {\tt emin} and {\tt emax} denote the minimal and maximal energy
-as obtained with \GLB{glbGetEminEmax}. Requires constant energy bin widths!
+as obtained with \GLB{GetEminEmax}. Requires constant energy bin widths!
 \end{function}
 For details on energy calibration errors, see \Sec~\ref{sec:rules}.
 %
@@ -1970,7 +1970,7 @@ constraint to certain parameter-subspaces (such as a specific octant).
 The following function replaces the standard priors by user defined ones and has to be used
 after {\tt glbInit}:
 \begin{function}
-\GLBNS{glbRegisterPriorFunction}
+\GLBNS{RegisterPriorFunction}
 {\tt 
 glbRegisterPriorFunction(double (*prior)(const glb\_params), int (*starting)(const glb\_params), int (*error)(const glb\_params))} registers a user-defined prior function {\tt prior}. 
 \end{function}
@@ -2888,48 +2888,60 @@ The return value of all {\tt Set-} functions is $-1$ if they were not successful
 \index{norm}{Non-standard physics}
 
 In this chapter, we discuss how to simulate non-standard physics with \GLOBES , \ie, physics
-beyond three-flavor neutrino oscillations. For the first time, this feature was used in \Ref~\cite{Blennow:2005yk},
-and it has become a standard feature of \GLOBES\ starting from version 3.0 (CHECK). Since the 
-computation of oscilltion probabilities, and therefore the flavor transition probabilities, is the core basic
-element of \GLOBES , the introduction of non-standard physics requires that one produce a new version branch
-of the software, \ie, the software has to be re-compiled after the modification of the probability engine.
-Below, we will demonstrate how and where to do the necessary mofifications, and how to simulate non-standard
-physics in the application software using the ``new'' \GLOBES .
+beyond three-flavor neutrino oscillations. For the first time, this feature was used as experimental 
+feature in \Ref~\cite{Blennow:2005yk},
+and it has become a standard feature of \GLOBES\ starting from version 3.0. Since the 
+computation of oscillation probabilities, and therefore the flavor transition probabilities, is the core basic
+element of \GLOBES , the introduction of non-standard physics requires fimiliarity with the
+probability calculation in \GLOBES . It is therefore an advanced topic.
+Below, we will demonstrate how and where to do the necessary modifications, and how to simulate non-standard
+physics in the application software.
 
 \section{Modification of \GLOBES }
 
-In order to modify \GLOBES , first install a current version of GLOBES (version larger than X.X.X CHECK) as
-a new branch, \ie, in a new directory, and rename the directory \GLOBES\ expanded into. 
-Using multiple versions of \GLOBES , it is, in general, advisable
-to specify the installation directory of all used versions manually (see ``Installation without
-root privilege'' in {\tt INSTALL} file). For instance, if the current ``standard'' version of \GLOBES\ is
-installed in {\tt GLOBES/Versions}, you may use {\tt GLOBES/NSVersion} for the non-standard version
-specified in {\tt configure}. Do not forget to rename the directory \GLOBES\ tar-ball expanded into: For instance,
-change the name from {\tt globes-3.0.0} to {\tt globes-3.0.0nsi}. 
-Then you can modify the source code in the sub-directories of {\tt globes-3.0.0nsi}, such as {\tt globes-3.0.0nsi/source}.
-In particular, we will be interested in modifying {\tt glb\_probability.cc}, which contains the
-Hamiltonian in the routine {\tt ComputeMixingMatrix}.
-%
-In general, the steps to introduce non-standard physics as follows:
-\begin{enumerate}
-\item
- Change the number of oscillation parameters in {\tt GLB\_OSCP} from six (standard) to the
- new number $6+N$, where $N$ is the number of non-standard parameters. 
- This change has to be done in the header file {\tt globes.h} in the sub-directory {\tt globes}
- where the tar-ball was extracted into,  {\em as well as} in the {\tt include/globes} sub-directory
- where the non-standard version was installed into (such as {\tt GLOBES/NSVersion/include/globes}).
-\item 
- Modify {\tt glb\_probability.cc} to include the non-standard effects. The parameters
- can be accessed by {\tt nsparams[0]}, {\tt nsparams[1]}, ..., {\tt nsparams[N-1]}.
-\item
- Re-compile the software using \\
- {\tt make} \\
- {\tt make install}
-\end{enumerate}
-Now your version of \GLOBES\ uses $6+N$ transition parameters, the six standard oscillation parameters,
-and $N$ additional ones. 
+\GLOBES\ 3.0 and higher does not require a re-compilation of the software to simulate non-standard physics.
+However, the probability engine has to be changed, which one would usually do by copying the respective parts from {\tt glb\_probability.c} (in the {\tt source} sub-directory). Therefore, for sophisticated applications, familiarity with this file is required. A number of comments are provided in this file to keep it self-explanatory.
+The key function types are
+\begin{function}
+\GLBNS{\_set\_oscillation\_parameters\_function}
+{\tt int (*glb\_set\_oscillation\_parameters\_function)(glb\_params p)} reads the fundamental oscillation parameters
+obtained from {\tt p} and stores them into global variables accessible to {\tt glb\_probability\_matrix\_function}. In addition, it can be used to pre-compute quantities which are dependent on the oscillation paramaters only for efficiency.
+\end{function}
+\begin{function}
+\GLBNS{\_get\_oscillation\_parameters\_function}
+{\tt int (*glb\_get\_oscillation\_parameters\_function)(glb\_params p)} returns the fundamental oscillation parameters
+in {\tt p} which are obtained from the global variables accessible to {\tt glb\_probability\_matrix\_function}.
+\end{function}
+\begin{function}
+\GLBNS{\_probability\_matrix\_function}
+{\tt int (*glb\_probability\_matrix\_function)(double P[3][3], int cp\_sign, double E,
+                  int psteps, const double *lengths, const double *densities,
+                  double filter\_sigma)} calculates the neutrino oscillation probability matrix to be returned in {\tt P}. The {\tt cp\_sign} is +1 for neutrinos and -1 for antineutrinos. In addition, the matter density profile to be used is characterized by the number of steps {\tt psteps}, the lengths of the matter density layers in the list {\tt lengths}, and the corresponding densities in the list {\tt densities}. The parameter {\tt filter\_sigma} defines the width of the low-pass filter to be used, or no filter usage if negative.
+\end{function}
+These three function types correspond to the standard implementation functions \GLB{\_set\_oscillation\_parameters}, \GLB{\_get\_oscillation\_parameters}, and \GLB{\_probability\_matrix} in {\tt glb\_probability.c} of the source code of \GLOBES , where one can find the standard behavior and use it by cut and paste (including the variables and code used by these functions).
 
-\section{Using a non-standard version of \GLOBES }
+In order to use non-standard physics in \GLOBES , one needs re-define the three above functions and register them after {\tt glbInit} with
+\begin{function}
+\GLBNS{RegisterProbabilityEngine}
+{\tt int glbRegisterProbabilityEngine(int n\_parameters,
+                 glb\_probability\_matrix\_function prob\_func, \\
+                 glb\_set\_oscillation\_parameters\_function set\_params\_func, \\
+                 glb\_get\_oscillation\_parameters\_function get\_params\_func)} registers a probability
+engine for the simulation of non-standard physics with {\tt n\_parameters} oscillation parameters ({\tt n\_parameters} $\ge6$). The three functions {\tt prob\_func}, {\tt set\_params\_func}, and {get\_params\_func} 
+will be used with the function types defined above.         
+\end{function}
+The number of oscillation parameters can, at any time, be obtained with
+\begin{function}
+\GLBNS{GetNumOfOscParams}
+{\tt  int glbGetNumOfOscParams()} returns the number of oscillation parameters.
+\end{function}
+
+HIER BIN ICH GERADE [WW].
+
+Example part here for non-standard implementation? [WW]
+
+
+\section{Using non-standard physics in the application software}
 
 Using more than six transition parameters in \GLOBES , you will have to maintain the additional parameters. 
 For example, there are no standard routines in \GLOBES\ which define projections including more than six parameters, 
