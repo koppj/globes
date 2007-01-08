@@ -9,7 +9,8 @@
 \label{chapter:tour}
 \index{norm}{GLOBES tour@\GLOBES~tour}
 
-TOUR ITSELF (+EXAMPLE FILE) TO BE UPDATED. JK: PLEASE LET ME KNOW WHEN {\tt example-tour.c} IS FIXED. MAYBE WE SHOULD  ALSO UPDATE THE PARAMTER VALUES [WW].
+TOUR ITSELF (+EXAMPLE FILE) TO BE UPDATED (VALUES MAY HAVE CHANGED DUE TO AEDL FILE DEFINITION
+CHANGES ETC. MAYBE ONLY COMMENT ABOUT THAT [WW].
 
 In this first chapter, we show a \GLOBES\ tour illustrating the
 main features of \GLOBES . The complete example  
@@ -66,7 +67,7 @@ double ldm = 2e-3;
 }
 Load one neutrino factory experiment:
 \gq{
-glbInitExperiment("NuFact.glb",\&glb\_experiment\_list[0], \\ \hspace*{4cm} \&glb\_num\_of\_exps);
+glbInitExperiment("NFstandard.glb",\&glb\_experiment\_list[0], \\ \hspace*{4cm} \&glb\_num\_of\_exps);
 } 
 Initialize a number of parameter vectors we are going to use later:
 \gq{
@@ -236,9 +237,9 @@ Then we clear the experiment list and load the new experiments:
  \\
   glbClearExperimentList(); \\
 \\
- glbInitExperiment("NuFact.glb",\&glb\_experiment\_list[0], \\
+ glbInitExperiment("NFstandard.glb",\&glb\_experiment\_list[0], \\
  \hspace*{0.5cm} \&glb\_num\_of\_exps);\\
-  glbInitExperiment("NuFact.glb",\&glb\_experiment\_list[0], \\
+  glbInitExperiment("NFstandard.glb",\&glb\_experiment\_list[0], \\
  \hspace*{0.5cm} \&glb\_num\_of\_exps);
 }
 \go{
@@ -1255,9 +1256,8 @@ A very useful function to include energy calibration errors is
 {\tt glbShiftEnergyScale(double b, double *rates\_in, double *rates\_out,int bins, double emin, double emax)}
 shifts the energy scale in {\tt rates\_in} by the amount {\tt b} and stores the result in 
 {\tt rates\_out}. The parameters {\tt emin} and {\tt emax} denote the minimal and maximal energy
-as obtained with \GLB{glbGetEminEmax}.
+as obtained with \GLB{glbGetEminEmax}. Requires constant energy bin widths!
 \end{function}
-DOES THAT ALSO WORK WITH VARIABLE BINS? WHAT IS THE MEAING OF EMIN AND EMAX? [WW]
 For details on energy calibration errors, see \Sec~\ref{sec:rules}.
 %
 In addition, in order to implement user-defined systematics, one usually needs low-level access to the event rate vectors using \GLB{GetRuleRatePtr}, \GLB{GetSignalFitRatePtr}, \GLB{GetBGFitRatePtr} and possibly other functions described in \Sec~\ref{sec:event_rates}. Additionally, the
@@ -1337,8 +1337,8 @@ rule {\tt rule} to the values in {\tt sys\_list}. This change can be perfomed fo
 systematics on or systematics off by using {\tt GLB\_ON} or {\tt GLB\_OFF} for {\tt on\_off}. 
 \end{function}
 \begin{function}
-\GLBNS{SetSysErrorsListPtr} 
-{\tt double* glbSetSysErrorsListPtr(int exp, int rule, int on\_off)}
+\GLBNS{GetSysErrorsListPtr} 
+{\tt double* glbGetSysErrorsListPtr(int exp, int rule, int on\_off)}
 returns a pointer to the list of systematical errors as defined in the AEDL file in experiment {\tt exp} and 
 rule {\tt rule}. Choose
 systematics on or systematics off by using {\tt GLB\_ON} or {\tt GLB\_OFF} for {\tt on\_off}. 
@@ -1353,7 +1353,6 @@ rule {\tt rule} to the values in {\tt sys\_list}. This change can be perfomed fo
 systematics on or systematics off by using {\tt GLB\_ON} or {\tt GLB\_OFF} for {\tt on\_off}. 
 Usually, zero is used for all starting values. 
 \end{function}
-IS THAT CORRECT (THAT ZERO IS USUALLY USED)? [WW]
 \begin{function}
 \GLBNS{GetSysStartingValuesListPtr} 
 {\tt double *glbGetSysStartingValuesListPtr(int exp, int rule, int on\_off, const double *sys\_list)}
@@ -1765,9 +1764,20 @@ into the wrong minimum, the fit value of $\deltacp$ is guessed from \figu{projex
 for neutrino factories because of the $(\deltacp, \theta_{13})$-degeneracy, whereas it is for superbeams often sufficient
 to use the true values. A strong indication for a wrong guessing 
 are discontinuous jumps in the projected $\chi^2$-function, where the minimizer jumps from one minimum to another. In such cases, the starting point of the minimizer has to be adjusted to help it find the true minimum.
-
+%
 Other examples for projections onto a parameter axis while keeping exactly one parameter fixed are \GLB{ChiTheta23}, \GLB{ChiDm31}, and \GLB{ChiDm21}, which
 can be found in \Tab~\ref{tab:stdfunctions} on page~\pageref{tab:stdfunctions}.
+
+Since the number of different parameter vectors used by \GLOBES\ may be a bit confusing, we summarize the most common parameter sets used in the calculations:
+\begin{description}
+\item[The simulated/true values] are the values set in \GLB{SetRates}.
+\item[The fit values] are the values in the first parameter {\tt in} of {\tt glbChiTheta13} (and the other minimization functions) which are {\em fixed} by definition (such as $\theta_{13}$ for {\tt glbChiTheta13}). 
+\item[The starting point/educated guess for the minimizer] are the values in the first parameter {\tt in} of {\tt glbChiTheta13} (and the other minimization functions) which are {\em free} by definition (such as all but $\theta_{13}$ for {\tt glbChiTheta13}). 
+\item[The minimization result] of the marginalization process are the values in the second parameter {\tt out} of {\tt glbChiTheta13} (and the other minimization functions) which are {\em free} by definition (such as all but $\theta_{13}$ for {\tt glbChiTheta13}). The other values in {\tt out} still correspond to the fit values. 
+\item[The position of external priors,] \ie, the best-fit values of external input, is set by \GLB{SetCenralValues}.
+\item[The magnitude of external errors,] \ie, the errors themselves of external input, is set by \GLB{SetInputErrors}.
+\end{description}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section[Projection onto any hyperplane]{Projection onto any hyperplane}
@@ -2167,10 +2177,9 @@ energy window in terms of bin numbers [{\tt lowbin},{\tt highbin}] corresponding
 {\tt int glbGetNumberOfBins(int exp)} returns the number of bins for the experiment {\tt exp}.
 \end{function}
 \begin{function}
-\GLBNS{GetNumberOfSimBins}
-{\tt int glbGetNumberOfSimBins(int exp)} returns the number of sampling points for the experiment {\tt exp}.
+\GLBNS{GetNumberOfSamplingPoints}
+{\tt int glbGetNumberOfSamplingPoints(int exp)} returns the number of sampling points for the experiment {\tt exp}.
 \end{function}
-SHOULD THIS NOT BE CALLED {\tt glbGetNumberOfSamplingPoints}??? [WW]
 
 In order to obtain information on the structure of the rules, 
 a number of functions are provided:
