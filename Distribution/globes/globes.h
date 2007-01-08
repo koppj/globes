@@ -139,6 +139,7 @@ void glbInit(char *name);
 glb_exp glbAllocExp();               // JK - Why is this in globes.h?
 void glbClearExperimentList();
 void glbDefineAEDLVariable(const char *name, double value);
+void glbDefineAEDLList(const char *name, double *list, size_t length);
 void glbClearAEDLVariables();
 int glbInitExperiment(char *inf, glb_exp *in, int *counter);
 void glbSetExperiment(glb_exp in);   // JK - Why does this have to be in globes.h ?

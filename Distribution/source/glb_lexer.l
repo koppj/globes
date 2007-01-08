@@ -101,7 +101,7 @@ RL       @signal
 DIGIT    [0-9]
 IVAL     $[a-zA-Z][a-zA-Z0-9_]*
 ID       [a-zA-Z][a-zA-Z0-9_]*
-LID      ![a-zA-Z][a-zA-Z0-9_]*
+LID      %[a-zA-Z][a-zA-Z0-9_]*
 
 %%
 

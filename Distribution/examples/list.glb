@@ -29,14 +29,14 @@ $version="2.3.15"
 
 
 
-flux(#one)<
+nuflux(#one)<
 @builtin = 2
 @parent_energy = 50
 @stored_muons = 2e+20 
 @time = 2.5
 >
 
-flux(#two)<
+nuflux(#two)<
 @builtin = 1
 @parent_energy = 50
 @stored_muons = 2e+20
@@ -87,7 +87,7 @@ cross(#NC)<
 /* 	 Channels 	 */
 
 
-/* We now have variables for lists: they start with '!' and work like
+/* We now have variables for lists: they start with '%' and work like
  * other variable as well. Morver functions are threaded over list, by
  * applying the function to each element and returning a list. The
  * orginal lsit is destroyed in that process. Hence, you will need to
@@ -98,12 +98,12 @@ cross(#NC)<
  * variables of AEDL you have to use 'copy()'.
  */
 
-!effs={0.071875, 0.215625, 0.359375, 0.503125, 
+%effs={0.071875, 0.215625, 0.359375, 0.503125, 
 	0.646875, 0.790625, 0.934375, 1, 1,1,
 	1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
 
 
-!energ={5.15,7.45,9.75,12.05,14.35,16.65,18.95,
+%energ={5.15,7.45,9.75,12.05,14.35,16.65,18.95,
 	21.25,23.55,25.85,28.15,30.45,32.75,
 	35.05,37.35,39.65,41.95,44.25,46.55,48.85 }
 
@@ -114,10 +114,10 @@ cross(#NC)<
  * $sampling_max).
  */
 
-!bc=bincenter[]
+%bc=bincenter()
 
 /* AEDL now has interpolation built-in. The syntax is
- * !(!xvals,!yvals,interpolation_order|!points) and this returns a new
+ * %(!xvals,!yvals,interpolation_order|!points) and this returns a new
  * list. 'interpolation_order' can be 1 for linear interpolation or 2
  * for using cubic splines (see gsl manual). !xvals and !yvals have to
  * have the same length and !xval must be a monotonous increasing set
@@ -127,7 +127,7 @@ cross(#NC)<
 /* This example here, allows to define our standard threshold
  * independtly of the number of bins used */
 
-!inter=!(!energ,!effs,1|!bc)
+%inter = interpolation(%energ,%effs,1,%bc)
 
 /* For debugging purposes a simple printing facility has been added,
  * called 'echo()' and 'echon()'. They will print any number or list
@@ -135,9 +135,8 @@ cross(#NC)<
  * (echon). 'line(n)' will put n linefeeds.
  */
 
-echo(!inter)
-
-line(1)
+line(2)
+echo(%inter)
 
 channel(#nu_mu_appearance)<
 	@channel = #two: +: e: m: #CC: #sm0 
@@ -148,22 +147,31 @@ channel(#nu_mu_appearance)<
  * overlapp and things like freeing memory or memcopy will fail. 
  */
 
-        @post_smearing_efficiencies= copy(!inter)
+        @post_smearing_efficiencies= copy(%inter)
+
+/* this is equivalent to using
+ *
+ * @post_smearing_efficiencies := %inter
+ */
+
 >
+
+interpolation(8)
+
 
 channel(#nu_mu_bar_appearance)<
 	@channel = 	#one:	-:	e:	m:	#CC:    #sm0
-	@post_smearing_efficiencies= copy(!inter)
+	@post_smearing_efficiencies :=  %inter 
 >
 
 channel(#nu_mu_bar_disappearance)<
 	@channel = 	#two:	-:	m:	m:	#CC:    #sm0
-	@post_smearing_efficiencies= copy(!inter)
+	@post_smearing_efficiencies := %inter
 >	
 
 channel(#nu_mu_disappearance)<
 	@channel = 	#one:	+:	m:	m:	#CC:    #sm0
-	@post_smearing_efficiencies= copy(!inter)
+	@post_smearing_efficiencies := %inter
 >
 
 channel(#nu_NC_bckg)<

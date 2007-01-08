@@ -682,7 +682,23 @@ documented!
        which now is fixed. Look into the file if you want to know
        more.
 
+
+08/01/2007 PH
+      - Adapted the AEDL list syntax as far as possible to the
+      suggestions made by various people. Have a look into
+      examples/list.glb. Most important changes are:
+	! -> %
+	!( , , | ) -> interpolation( , , , )
+	@xxx = copy(%list) -> @xxx := %list (the old syntax still
+	works, since sometimes one may really want to copy a list)
+
+      - Created glbDefineAEDLList(const char *name,double *list,
+      size_t length), which does what you would expect. Make sure to
+      define your "name" with a leading '%' otherwise you will get an
+      error.
+
 08/01/2007 JK
        - Renamed glbGetNumberOfSimBins --> glbGetNumberOfSamplingPoints
        - Added function glbSelectMinimizer
        - Added user_data pointer to all user-defined functions
+

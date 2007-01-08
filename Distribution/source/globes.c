@@ -1,5 +1,5 @@
 /* GLoBES -- General LOng Baseline Experiment Simulator
- * (C) 2002 - 2004,  The GLoBES Team
+ * (C) 2002 - 2007,  The GLoBES Team
  *
  * GLoBES is mainly intended for academic purposes. Proper
  * credit must be given if you use GLoBES or parts of it. Please
@@ -47,15 +47,28 @@
 #endif /* TEST */
 
 const char *argp_program_version =
-"globes "VERSION"\n(C) 2002 - 2005 The GLoBES Team\n"
+"globes "VERSION"\n(C) 2002 - 2007 The GLoBES Team\n"
 "This is free software see the source for copying conditions. There is NO\n"
 "warranty; not even for MERCHANTABILITY or"
 " FITNESS FOR A PARTICULAR PURPOSE.";
 const char *argp_program_bug_address =
-"<globes@ph.tum.de>";
+"<globes@mpi-hd.mpg.de>";
 
-static void parse_definition(const char *in)
+/* This should be a bullet proof parser for definitions of AEDL
+ * variable or lists. It expects the format inside the list to be
+ * '1,2,3', where '1, 3 ,4 , 9.3' also would be okay. It uses 'strtod'
+ * to get the double and tests for - any errors during the call to
+ * 'strtod', like an overflow.
+ */
+
+
+static int parse_definition(const char *str)
 {
+  size_t c=0,vec=0;
+  double *result=NULL;
+  double res;
+  char *endp;
+  char *wrk;
   const char *delim="=";
   double val;
   char *token=NULL;
@@ -63,9 +76,12 @@ static void parse_definition(const char *in)
   char *rhs=NULL;
   char *inc=NULL;
   size_t length=0;
+  size_t s=0;
 
-  inc=strdup(in);
-  if(inc==NULL) return;
+  if(!str) return 0;
+
+  inc=strdup(str);
+  if(inc==NULL) return 0;
   token=strtok(inc,delim);
   if(token!=NULL) 
     {
@@ -79,17 +95,48 @@ static void parse_definition(const char *in)
      length++;
     }
   
-  if(length!=2) {
-    glb_free(lhs);
-    glb_free(rhs);
-    fprintf(stderr,"ERROR: Definition is not of form 'DEFINITION=VALUE'\n");
-    return;}
-  val=atof(rhs);
-  glbDefineAEDLVariable(lhs,val);
-  glb_free(lhs);
-  glb_free(rhs);
-  return;
+  
+
+  wrk=rhs;
+
+  s=strlen(rhs);
+
+  if(rhs[0]=='{' && rhs[s-1]=='}') {wrk=strncpy(wrk,&rhs[1],s-1);vec=1;}
+  else wrk=strdup(rhs);
+
+
+
+  while(wrk)
+    {
+      errno=0;
+      res=strtod(wrk,&endp);
+     
+      if(errno) {fprintf(stderr,"globes: ERROR: While parsing input the following"
+			 " error occured\nFATAL: '%s'\n",
+                         strerror(errno));exit(1);}
+
+      if(endp&&strcmp(wrk,endp)==0) {break;}
+  
+      wrk=endp;
+      /* Eat up trailing white space */
+      while(isspace(wrk[0])) wrk++;
+      /* Take care of the separator */
+      if(wrk[0]==','||wrk[0]=='\0') wrk++;
+      c++;
+      result = (double* ) glb_realloc(result, c * sizeof(double));
+      result[c-1]=res;
+     
+    }
+
+  if(c==1&&vec==0&& lhs[0] != '\%') glbDefineAEDLVariable(lhs,result[0]);
+  else if (c>0&&vec==1) glbDefineAEDLList(lhs,result,c);
+  else {fprintf(stderr,"globes: ERROR: Confusion about vector vs scalar definition.\n");c=0;}
+  glb_free(result);
+  glb_free(wrk);
+  glb_free(inc);
+  return c;
 }
+
 
 /* Program documentation. */
 static char doc[] ="Rate computation for GLoBES";
@@ -105,8 +152,7 @@ static struct argp_option options[] ={
   {"rule",'r', "NUMBER", OPTION_ARG_OPTIONAL, 
    "Show rates for a rule given by NUMBER,\n"
    "   if no argument is given all rules are shown" }, 
-  {"experiment",'e', "NUMBER",0 ,   
-   "For multiple experiments, chose experiment number " },
+  {"experiment",'e', "NUMBER",0 ,"For multiple experiments, chose experiment number" },
   {"output",   'o', "FILE", 0,
    "Output to FILE instead of standard output" },
   {"parameters",'p',"PARAMETERS",0,
@@ -127,7 +173,7 @@ static struct argp_option options[] ={
   {"simple-printing",'S',0,0,"simple-printing"},
   {"Oscillation",'O',0,0,"Standards oscillations"},
   {"No-oscillation",'N',0,0,"Oscillations switched off"},
-  {"Define",'D',"DEFINITION",0,"Define AEDL variable"},
+  {"Define",'D',"DEFINITION",0,"Define AEDL variable or list"},
   {"Left",'L',"STRING",0,"Left delimiter used in formatting output"},
   {"Right",'R',"STRING",0,"Right delimiter used in"
    " formatting output"},
@@ -520,8 +566,12 @@ int main(int argc, char *argv[])
             p++;    /* Go to character after the delimiter */
         }
     }
+
+
  
 #ifdef TEST
+
+glbDefineAEDLList("%para", osc,6);
   
   fprintf(stderr,"... seems to work\n now to something real ...\n");
   glb_load_prior("prior-template.la",&prf);

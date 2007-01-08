@@ -1,5 +1,5 @@
 /* GLoBES -- General LOng Baseline Experiment Simulator
- * (C) 2002 - 2004,  The GLoBES Team
+ * (C) 2002 - 2007,  The GLoBES Team
  *
  * GLoBES is mainly intended for academic purposes. Proper
  * credit must be given if you use GLoBES or parts of it. Please
@@ -25,7 +25,7 @@
      
 %{
 #define YYDEBUG 1
-  
+  //    yydebug=1;
 #include <math.h>
 #include <ctype.h>
 #include <stdio.h>
@@ -1030,7 +1030,7 @@ static int set_exp_energy(char *name, glb_List **value)
 
 %token <val> NUM
 %token <nameptr> SFNCT
-%token <tptr> LVAR VAR FNCT   /* Variable and Function */
+%token <tptr> BOGUS LVAR VAR FNCT   /* Variable and Function */
 %token <name> IDN CROSS FLUXP FLUXM NUFLUX
 %token <name> SYS_ON_FUNCTION SYS_OFF_FUNCTION
 %token <name> GRP GID FNAME VERS
@@ -1038,7 +1038,7 @@ static int set_exp_energy(char *name, glb_List **value)
 %token <in> NOGLOBES CHANNEL
 %token <in> RULESEP RULEMULT ENERGY
 %token <nameptr> NAME RDF NDEF
-%type <ptr> seq 
+%type <ptr> seq listcopy
 %type <ptrq> rule brule srule ene
 %type <dpt> rulepart 
 %type <val> exp 
@@ -1100,7 +1100,11 @@ $$ = $3; }
 | IDN '=' SFNCT        { if(set_fnct($1,$3->sf)==1) yyerror("Unknown identifier");}
 | IDN '=' exp RULESEP exp  { if(set_pair($1,$3,$5,0)==1) yyerror("Unknown identifier");
 $$ = $3; }
-| FNCT '(' exp ')'   { $$ = (*($1->value.fnctptr))($3); }
+| FNCT '(' exp ')'   {
+  /* added safety in case the function pointer is NULL, which is
+     sometimes useful for special functions */
+  if($1->value.fnctptr==NULL) yyerror("Improper use of special function");
+  else $$ = (*($1->value.fnctptr))($3); }
 
 | exp '+' exp        { $$ = $1 + $3;                    }
 | exp '-' exp        { $$ = $1 - $3;                    }
@@ -1113,6 +1117,14 @@ $$ = $3; }
 | NDEF               {yyerror("Unknown name");YYERROR;}
 ;
 
+
+
+listcopy: IDN RULESEP '=' LVAR {
+  glb_List *ltemp;
+  ltemp=thread_list(&glb_list_copy,0,0,$4->list); 
+  if(set_exp_list($1,ltemp,3)==1) yyerror("Unknown identifier");
+  $$ = ltemp;
+}
 
 
 
@@ -1140,16 +1152,22 @@ seq:    exp  ','        {$$=list_cons(NULL,$1); }
 | '{' '}'      {$$=NULL;}
 | '{' seq '}'  {$$=$2; }
 | '{' exp '}'  {$$=list_cons(NULL,$2); }
+
+
 | IDN '=' seq        { if(set_exp_list($1,$3,3)==1) 
   yyerror("Unknown identifier");
  $$ = $3; }
+
 //| FNCT '{' exp '}'   { $$ = ($1->value.lfnctptr)($3); }
 | FNCT '(' seq ')' {$$ = thread_list($1->value.fnctptr,$1->reverse,$1->destroy,$3);}
-| FNCT '['']' {$$ = (*($1->value.lfnctptr))();}
+| FNCT '('')' {$$ = (*($1->value.lfnctptr))();}
 | LVAR                { $$ = $1->list;              }
 | LVAR '=' seq        { $$ = $3; $1->list = $3;/* printf("%s ",$1->name);showlist($3);printf("\n");*/ }
-| '!''(' seq ',' seq ',' exp  '|'seq')'          {$$=glb_interpolation($3,$5,floor($7),$9);}
+| FNCT '(' seq ',' seq ',' exp  ','seq')'          {$$=glb_interpolation($3,$5,floor($7),$9);}
+| listcopy {}
 ;
+
+
 
 rulepart: exp RULEMULT exp { 
 
@@ -1383,7 +1401,7 @@ yyerror (const char *s)  /* Called by yyparse on error */
 {
   if(yydebug==1) fprintf(stderr,"*****************************************\n");
   fprintf (stderr,"%s: ERROR: %s in file [%s]: in line %d\n",
-	   glb_prog_name,s,glb_file_id,glb_line_num);
+	   glb_prog_name,s,glb_file_id,glb_line_num+1);
   if(yydebug==1) fprintf(stderr,"*****************************************\n");
   return 0;
 }
@@ -1466,6 +1484,7 @@ static struct glb_init arith_fncts[] =
     {"echo",echo,0,-1},
     {"echon",echon,0,-1},
     {"line",line,0,-1},
+    {"interpolation",NULL,0,0},
     {NULL, NULL,0,0}
      };
 
@@ -1588,9 +1607,10 @@ init_table (void)
   /* Copying the contents of pre_sym_table to sym_table */
   for (i=0; ptr !=0; i++)
     {
-      p=glb_putsym(ptr->name,VAR);
+      p=glb_putsym(ptr->name,ptr->type);
       p->value.var=ptr->value.var;
-      ptr=ptr->next;
+      if(ptr->list!=NULL) p->list=thread_list(&glb_list_copy,0,0,ptr->list); 
+    ptr=ptr->next;
     }
   
   for (i = 0; sig_fncts[i].fname != 0; i++)
@@ -1626,6 +1646,7 @@ free_presymtable()
     while(ptr != (glb_symrec *) NULL)
       {	
 	glb_free(ptr->name);
+	if(ptr->list!=NULL){ list_free(ptr->list);}
 	dummy=ptr->next;
 	glb_free(ptr);
 	ptr=dummy;  
@@ -1681,6 +1702,7 @@ static glb_naming *glb_putnames (char *sym_name, char *context, int value,
   ptr->context = (char *) glb_malloc (strlen (context) + 1);
   strcpy (ptr->context,context);
   ptr->value = value; /* set value to -1 for new ones  */
+  
   ptr->next = (struct glb_naming *) in;
   //in = ptr;
   return ptr;
@@ -1720,6 +1742,7 @@ glb_namerec *glb_putname (char *sym_name, char *context, int sym_type)
   strcpy (ptr->context,context);
   ptr->type = sym_type;
   ptr->value = -1; /* set value to -1 for new ones  */
+  
   ptr->next = (struct glb_namerec *)name_table;
   name_table = ptr;
   return ptr;
@@ -1745,6 +1768,7 @@ glb_putpresym (const char *sym_name, int sym_type)
   strcpy (ptr->name,sym_name);
   ptr->type = sym_type;
   ptr->value.var = 0; /* set value to 0 even if fctn.  */
+  ptr->list=NULL;
   ptr->next = (struct glb_symrec *) pre_sym_table;
   pre_sym_table = ptr;
   return ptr;
@@ -1780,6 +1804,25 @@ void glbClearAEDLVariables()
 {
    if(pre_sym_table!=NULL) free_presymtable(); 
 }
+
+
+/* same for lists */
+
+void glbDefineAEDLList(const char *name, double *list, size_t length)
+{
+  size_t i;
+  glb_symrec *ptr;
+  if(name==NULL) return;   
+  if(name[0]!='%'){ fprintf(stderr,"ERROR: AEDL lists have to start with '%'\n");return;}
+  ptr=glb_getpresym(name);
+  if(ptr==0) ptr = glb_putpresym (name, LVAR);
+  for(i=0;i<length;i++) {ptr->list=list_cons(ptr->list,list[i]);
+  }
+  
+  return;
+}
+
+
 
 
 void glb_copy_buff()
