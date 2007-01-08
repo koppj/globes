@@ -341,11 +341,11 @@ static void CalcAllProbs(double en, double baseline)
   int status;
   
   if ((status=glb_hook_probability_matrix(Probs, +1, en, e->psteps, e->lengthtab, e->densitybuffer,
-          (e->filter_state == GLB_ON) ? e->filter_value : -1.0)) != GLB_SUCCESS)
+          (e->filter_state == GLB_ON) ? e->filter_value : -1.0, glb_probability_user_data)) != GLB_SUCCESS)
     glb_error("Calculation of oscillation probabilities failed.");
 
   if ((status=glb_hook_probability_matrix(ProbsAnti, -1, en, e->psteps, e->lengthtab, e->densitybuffer,
-          (e->filter_state == GLB_ON) ? e->filter_value : -1.0)) != GLB_SUCCESS)
+          (e->filter_state == GLB_ON) ? e->filter_value : -1.0, glb_probability_user_data)) != GLB_SUCCESS)
     glb_error("Calculation of oscillation probabilities failed.");
 }
 

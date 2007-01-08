@@ -62,4 +62,9 @@ int glbGetStartingValues(glb_params in)
   return glbGetCentralValues(in);
 }
 
+/* glbGetNumberOfSimBins: Replaced by glbGetNumberOfSamplingPoints */
+int glbGetNumberOfSimBins(int exp)
+{
+  return glbGetNumberOfSamplingPoints(exp);
+}
  

@@ -498,7 +498,7 @@ glbSetOscillationParameters(const glb_params in)
   if (in == NULL)
     return -1;
   else
-    return glb_hook_set_oscillation_parameters(in);
+    return glb_hook_set_oscillation_parameters(in, glb_probability_user_data);
 }
 
 
@@ -508,7 +508,7 @@ glbGetOscillationParameters(glb_params in)
   if (in == NULL)
     return -1;
   else
-    return glb_hook_get_oscillation_parameters(in);
+    return glb_hook_get_oscillation_parameters(in, glb_probability_user_data);
 }
 
 
@@ -1034,7 +1034,7 @@ static int pos_range(int exp, int rule, int pos, int signal)
 
 /* Accessing channel and rule internals */
 
-int glbGetNumberOfSimBins(int exp)
+int glbGetNumberOfSamplingPoints(int exp)
 {
   if (exp_range(exp) !=0)
     return -1;
@@ -2140,7 +2140,8 @@ double glbVacuumProbability(int initial_flavour, int final_flavour,
   double P[3][3];
   int status;
  
-  if ((status=glb_hook_probability_matrix(P, cp_sign, E, 1, &L, &rho, -1.0)) != GLB_SUCCESS)
+  if ((status=glb_hook_probability_matrix(P, cp_sign, E, 1, &L, &rho, -1.0,
+                                          glb_probability_user_data)) != GLB_SUCCESS)
   {
     glb_error("Calculation of oscillation probabilities failed.");
     return -1.0;
@@ -2168,7 +2169,8 @@ double glbConstantDensityProbability(int initial_flavour, int final_flavour,
   double P[3][3];
   int status;
  
-  if ((status=glb_hook_probability_matrix(P, cp_sign, E, 1, &L, &rho, -1.0)) != GLB_SUCCESS)
+  if ((status=glb_hook_probability_matrix(P, cp_sign, E, 1, &L, &rho, -1.0,
+                                          glb_probability_user_data)) != GLB_SUCCESS)
   {
     glb_error("Calculation of oscillation probabilities failed.");
     return -1.0;
@@ -2206,7 +2208,7 @@ double glbProfileProbability(int exp,int initial_flavour, int final_flavour,
 
   glb_set_profile_scaling(1.0, exp);
   if ((status=glb_hook_probability_matrix(P, cp_sign, E, e->psteps, e->lengthtab,
-                                     e->densitybuffer, -1.0)) != GLB_SUCCESS)
+                      e->densitybuffer, -1.0, glb_probability_user_data)) != GLB_SUCCESS)
   {
     glb_error("Calculation of oscillation probabilities failed.");
     return -1.0;
@@ -2247,7 +2249,7 @@ double glbFilteredConstantDensityProbability(int exp,int initial_flavour, int fi
 
   glb_set_profile_scaling(1.0, exp);
   if ((status=glb_hook_probability_matrix(P, cp_sign, E, e->psteps, e->lengthtab, e->densitybuffer,
-      (e->filter_state == GLB_ON) ? e->filter_value : -1.0)) != GLB_SUCCESS)
+      (e->filter_state == GLB_ON) ? e->filter_value : -1.0, glb_probability_user_data)) != GLB_SUCCESS)
   {
     glb_error("Calculation of oscillation probabilities failed.");
     return -1.0;

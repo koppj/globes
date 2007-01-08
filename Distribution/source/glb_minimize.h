@@ -49,16 +49,14 @@ int glb_set_ns_input_errors(double v[]);
 int glb_set_ns_starting_values(double v[]);
 
 
-extern int (*glb_user_defined_starting_values)(const glb_params);
-extern int (*glb_user_defined_input_errors)(const glb_params);
+extern int (*glb_user_defined_starting_values)(const glb_params, void *user_data);
+extern int (*glb_user_defined_input_errors)(const glb_params, void *user_data);
 
 double* glb_return_input_errors();
 double* glb_return_input_values();
 
 
-#ifdef GLB_HYBRID_MINIMIZER
-  int glb_invoke_hybrid_minimizer(int exp, int rule, double *x, double *chi2);
-#endif
+int glb_invoke_hybrid_minimizer(int exp, int rule, double *x, double *chi2);
 
 
 // various projections with th12 fixed for a single experiment

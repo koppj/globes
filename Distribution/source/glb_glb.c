@@ -44,6 +44,7 @@ static void final_clean()
   return; 
 }
 
+int test=1234;
 void glbInit(char *name)
 {
   glb_dlhandle prior;
@@ -56,27 +57,32 @@ void glbInit(char *name)
 
   /* Setup default probability engine */
   glb_init_probability_engine();
-  glbRegisterProbabilityEngine(-1, NULL, NULL, NULL);
+  glbRegisterProbabilityEngine(-1, NULL, NULL, NULL, NULL);
   glbRegisterProbabilityEngine(6, &glb_probability_matrix,
                                   &glb_set_oscillation_parameters,
-                                  &glb_get_oscillation_parameters);
+                                  &glb_get_oscillation_parameters,
+                                  NULL);
+
+  /* Select default minimizer */
+  glbSelectMinimizer(GLB_MIN_DEFAULT);
 
   /* Setup default priors */  
-  glbRegisterPriorFunction( glb_builtin_prior_prior,
-			    glb_builtin_prior_starting_values,
-			    glb_builtin_prior_input_errors);
+  glbRegisterPriorFunction(glb_builtin_prior_prior,
+			   glb_builtin_prior_starting_values,
+			   glb_builtin_prior_input_errors,
+                           &test);
   
   /* Register built-in chi^2 functions */
   /* When making any changes here, don't forget to update the array
    * glb_2011_compatible_chi_functions in glb_sys.c and the functions
    * glbConvertErrorDim and glbGetErrorDim */
-  glbDefineChiFunction(&glbChiSpectrumTilt,     4, "chiSpectrumTilt");
-  glbDefineChiFunction(&glbChiNoSysSpectrum,    0, "chiNoSysSpectrum");
-  glbDefineChiFunction(&glbChiSpectrumOnly,     1, "chiSpectrumOnly");
-  glbDefineChiFunction(&glbChiTotalRatesTilt,   4, "chiTotalRatesTilt");
-  glbDefineChiFunction(&glbChiNoSysTotalRates,  0, "chiNoSysTotalRates");
-  glbDefineChiFunction(&glbChiSpectrumCalib,    4, "chiSpectrumCalib");
-  glbDefineChiFunction(&glbChiZero,             0, "chiZero");
+  glbDefineChiFunction(&glbChiSpectrumTilt,     4, "chiSpectrumTilt",    NULL);
+  glbDefineChiFunction(&glbChiNoSysSpectrum,    0, "chiNoSysSpectrum",   NULL);
+  glbDefineChiFunction(&glbChiSpectrumOnly,     1, "chiSpectrumOnly",    NULL);
+  glbDefineChiFunction(&glbChiTotalRatesTilt,   4, "chiTotalRatesTilt",  NULL);
+  glbDefineChiFunction(&glbChiNoSysTotalRates,  0, "chiNoSysTotalRates", NULL);
+  glbDefineChiFunction(&glbChiSpectrumCalib,    4, "chiSpectrumCalib",   NULL);
+  glbDefineChiFunction(&glbChiZero,             0, "chiZero",            NULL);
 
   /* Initialize built-in priors */
   glb_builtin_prior_init();

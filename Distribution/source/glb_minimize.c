@@ -69,10 +69,9 @@
 
 /* global variabels */
 int glb_single_experiment_number=GLB_ALL;
-#ifdef GLB_HYBRID_MINIMIZER
-  int glb_single_rule_number=GLB_ALL;
-  double glb_last_priors=0.0; /* Used to store prior terms between calls to glb_hybrid_chi_callback */
-#endif
+int glb_current_minimizer=GLB_MIN_DEFAULT;
+int glb_single_rule_number=GLB_ALL; /* Used to pass rule number to glb_hybrid_chi_callback in 1-exp mode */
+double glb_last_priors=0.0; /* Used to store prior terms between calls to glb_hybrid_chi_callback */
 
 
 /* Warning-- fiddling around with these in general may
@@ -129,9 +128,10 @@ static int s_n_free;
 static int s_n_fix;
 
 // the pointer to the userdefined prior function
-double (*glb_user_defined_prior)(const glb_params);
-int (*glb_user_defined_starting_values)(const glb_params);
-int (*glb_user_defined_input_errors)(const glb_params);
+double (*glb_user_defined_prior)(const glb_params, void *user_data);
+int (*glb_user_defined_starting_values)(const glb_params, void *user_data);
+int (*glb_user_defined_input_errors)(const glb_params, void *user_data);
+void *glb_prior_user_data=NULL;
 
 //-----------------------
 
@@ -315,12 +315,14 @@ static int* CheckProjection()
 /* with the appropriate parameters                         */
 // JK - FIXME - This should be solved more elegantly
 static glb_chi_function glb_current_chi_function;
+static void *glb_current_chi_user_data;
 static int glb_current_n_sys;
 static double *glb_current_errorlist;
 double glb_chi_callback(double *params)
 {
   return glb_current_chi_function(glb_current_exp, glb_rule_number,
-             glb_current_n_sys, &(params[1]), glb_current_errorlist);
+             glb_current_n_sys, &(params[1]), glb_current_errorlist,
+             glb_current_chi_user_data);
 }
 
 
@@ -374,8 +376,9 @@ static double ChiS0_Rule(int rule)
   init_mat(mat, sys->dim);
 
   /* Prepare data for callback function */  
-  glb_current_chi_function = sys->chi_func;
-  glb_current_n_sys        = sys->dim;
+  glb_current_chi_function  = sys->chi_func;
+  glb_current_n_sys         = sys->dim;
+  glb_current_chi_user_data = sys->user_data;
   if (exp->sys_on_off[rule] == GLB_ON)
   {
     glb_current_errorlist = exp->sys_on_errors[rule];
@@ -442,7 +445,7 @@ static double Chi(double x[])
   glb_params p = glbAllocParams();
   for (i=0; i < glbGetNumOfOscParams(); i++)
     p->osc->osc_params[i] = x[i];
-  glb_hook_set_oscillation_parameters(p);
+  glb_hook_set_oscillation_parameters(p, glb_probability_user_data);
   glbFreeParams(p);
     
   for (i=0;i<glb_num_of_exps;i++)
@@ -473,7 +476,7 @@ static double SingleChi(double x[glbGetNumOfOscParams()+1],int exp)
   glb_params p = glbAllocParams();
   for (i=0; i < glbGetNumOfOscParams(); i++)
     p->osc->osc_params[i] = x[i];
-  glb_hook_set_oscillation_parameters(p);
+  glb_hook_set_oscillation_parameters(p, glb_probability_user_data);
   glbFreeParams(p);
 
   glbSetExperiment(glb_experiment_list[exp]);
@@ -500,7 +503,7 @@ static double SingleRuleChi(double x[glbGetNumOfOscParams()+1],int exp, int rule
   glb_params p = glbAllocParams();
   for (i=0; i < glbGetNumOfOscParams(); i++)
     p->osc->osc_params[i] = x[i];
-  glb_hook_set_oscillation_parameters(p);
+  glb_hook_set_oscillation_parameters(p, glb_probability_user_data);
   glbFreeParams(p);
 
   glbSetExperiment(glb_experiment_list[exp]);
@@ -518,6 +521,7 @@ double glbChiSys(const glb_params in, int experiment, int rule)
 {
   int i;
   double res,x[32+glbGetNumOfOscParams()];
+  int old_proj[glbGetNumOfOscParams()+glb_num_of_exps];
 
   if(in==NULL)
     {
@@ -535,94 +539,102 @@ double glbChiSys(const glb_params in, int experiment, int rule)
         }
     }
 
-#ifdef GLB_HYBRID_MINIMIZER
-  for(i=0; i < glb_num_of_exps; i++)
-    {
-      x[i+glbGetNumOfOscParams()] = glbGetDensityParams(in,i);
-      if ((experiment==GLB_ALL || i==experiment)  &&  GLB_ISNAN(x[i+glbGetNumOfOscParams()]))
+  switch (glb_current_minimizer)
+  {
+    case GLB_MIN_POWELL:
+      for(i=0; i < glb_num_of_exps; i++)
         {
-          glb_warning("glbChiSys: Density parameters incompletely defined. Using default 1.0");
-          x[i+glbGetNumOfOscParams()] = 1.0;
-        }
-    }
-  
-  /* Define projection which keeps all oscillation and density parameters fixed */
-  int old_proj[glbGetNumOfOscParams()+glb_num_of_exps];
-  memcpy(old_proj, CheckProjection(), sizeof(*old_proj)*(glbGetNumOfOscParams()+glb_num_of_exps));
-  glb_projection new_proj=glbAllocProjection();
-  for (i=0; i < glbGetNumOfOscParams(); i++)
-    glbSetProjectionFlag(new_proj,GLB_FIXED,i);
-  glbSetDensityProjectionFlag(new_proj,GLB_FIXED,GLB_ALL);
-  glbSetProjection(new_proj);
-
-  /* Invoke minimizer */
-  glb_invoke_hybrid_minimizer(experiment, rule, x, &res);
-
-  SelectProjection(old_proj, 0);/* Don't check old_proj - it might still be at its default GLB_UNDEFINED */
-  glbFreeProjection(new_proj);
-#else
-  if(experiment==GLB_ALL)
-    {
-      if(rule==GLB_ALL)
-	{
-	  for(i=0; i < glb_num_of_exps; i++) 
+          x[i+glbGetNumOfOscParams()] = glbGetDensityParams(in,i);
+          if ((experiment==GLB_ALL || i==experiment)  &&  GLB_ISNAN(x[i+glbGetNumOfOscParams()]))
             {
-	      x[i+glbGetNumOfOscParams()] = glbGetDensityParams(in,i);
-              if (GLB_ISNAN(x[i+glbGetNumOfOscParams()]))
-                {
-                  glb_warning("glbChiSys: Density parameters incompletely defined. Using default 1.0");
-                  x[i+glbGetNumOfOscParams()] = 1.0;
-                }
+              glb_warning("glbChiSys: Density parameters incompletely defined. Using default 1.0");
+              x[i+glbGetNumOfOscParams()] = 1.0;
             }
-	  res=Chi(x);
-	}
-      else
-	{
-	  res=0;
-          for(i=0;i<glb_num_of_exps;i++)
-	    {   
-	      if(rule < glb_experiment_list[i]->numofrules)
-		{
-		  x[glbGetNumOfOscParams()] = glbGetDensityParams(in,i);
-                  if (GLB_ISNAN(x[glbGetNumOfOscParams()]))
+        }
+      
+      /* Define projection which keeps all oscillation and density parameters fixed */
+      memcpy(old_proj, CheckProjection(), sizeof(*old_proj)*(glbGetNumOfOscParams()+glb_num_of_exps));
+      glb_projection new_proj=glbAllocProjection();
+      for (i=0; i < glbGetNumOfOscParams(); i++)
+        glbSetProjectionFlag(new_proj,GLB_FIXED,i);
+      glbSetDensityProjectionFlag(new_proj,GLB_FIXED,GLB_ALL);
+      glbSetProjection(new_proj);
+
+      /* Invoke minimizer */
+      glb_invoke_hybrid_minimizer(experiment, rule, x, &res);
+
+      SelectProjection(old_proj, 0);   /* Don't check old_proj - it might still be GLB_UNDEFINED */
+      glbFreeProjection(new_proj);
+      break;
+      
+    case GLB_MIN_NESTED_POWELL:
+      if(experiment==GLB_ALL)
+        {
+          if(rule==GLB_ALL)
+            {
+              for(i=0; i < glb_num_of_exps; i++) 
+                {
+                  x[i+glbGetNumOfOscParams()] = glbGetDensityParams(in,i);
+                  if (GLB_ISNAN(x[i+glbGetNumOfOscParams()]))
                     {
                       glb_warning("glbChiSys: Density parameters incompletely defined. Using default 1.0");
-                      x[glbGetNumOfOscParams()] = 1.0;                
-                     }
-		  res += SingleRuleChi(x,i,rule);
-		}
-	      else
-		{glb_error("Invalid rule number");return -1;}
-	    }
-	}
-    }
-  else
-    {
-      if(experiment >= glb_num_of_exps) 
-	{
-	  glb_error("Failure in glbChiSys: 2nd argument must be smaller than"
-		    "glb_num_of_exps");
-	  return -1;
-	}
-      x[glbGetNumOfOscParams()] = glbGetDensityParams(in,experiment);
-      if (GLB_ISNAN(x[glbGetNumOfOscParams()]))
-        {
-          glb_warning("glbChiSys: Density parameters incompletely defined. Using default 1.0");
-          x[glbGetNumOfOscParams()] = 1.0;                
+                      x[i+glbGetNumOfOscParams()] = 1.0;
+                    }
+                }
+              res=Chi(x);
+            }
+          else
+            {
+              res=0;
+              for(i=0;i<glb_num_of_exps;i++)
+                {   
+                  if(rule < glb_experiment_list[i]->numofrules)
+                    {
+                      x[glbGetNumOfOscParams()] = glbGetDensityParams(in,i);
+                      if (GLB_ISNAN(x[glbGetNumOfOscParams()]))
+                        {
+                          glb_warning("glbChiSys: Density parameters incompletely defined. Using default 1.0");
+                          x[glbGetNumOfOscParams()] = 1.0;                
+                         }
+                      res += SingleRuleChi(x,i,rule);
+                    }
+                  else
+                    {glb_error("Invalid rule number");return -1;}
+                }
+            }
         }
-      if(rule==GLB_ALL) res=SingleChi(x,experiment);
-	else
-	  {
-	    if(rule >= glb_experiment_list[experiment]->numofrules)
-	      {
-		glb_error("Failure in glbChiSys: 3rd argument must be"
-			  " smaller than numofrules");
-		return -1;
-	      }
-	    res=SingleRuleChi(x,experiment,rule);
-	  }
-    }
-#endif
+      else
+        {
+          if(experiment >= glb_num_of_exps) 
+            {
+              glb_error("Failure in glbChiSys: 2nd argument must be smaller than"
+                        "glb_num_of_exps");
+              return -1;
+            }
+          x[glbGetNumOfOscParams()] = glbGetDensityParams(in,experiment);
+          if (GLB_ISNAN(x[glbGetNumOfOscParams()]))
+            {
+              glb_warning("glbChiSys: Density parameters incompletely defined. Using default 1.0");
+              x[glbGetNumOfOscParams()] = 1.0;                
+            }
+          if(rule==GLB_ALL) res=SingleChi(x,experiment);
+            else
+              {
+                if(rule >= glb_experiment_list[experiment]->numofrules)
+                  {
+                    glb_error("Failure in glbChiSys: 3rd argument must be"
+                              " smaller than numofrules");
+                    return -1;
+                  }
+                res=SingleRuleChi(x,experiment,rule);
+              }
+        }
+      break;
+      
+    default:
+      glb_error("glbChiSys: Invalid minimization algorithm");
+      return -1;
+  }
   
   return res;
 }
@@ -648,7 +660,7 @@ int glbSetInputErrors(const glb_params in)
   if (glbCopyParams(in, input_errors) == NULL)
     { glb_error("glbSetInputErrors: Failed to copy input errors"); return -2; }
 
-  return glb_user_defined_input_errors(input_errors);
+  return glb_user_defined_input_errors(input_errors, glb_prior_user_data);
 }
 
 
@@ -681,7 +693,7 @@ int glbSetCentralValues(const glb_params in)
   if (glbCopyParams(in, central_values) == NULL)
     { glb_error("glbSetCentralValues: Failed to copy central values"); return -2; }
 
-  return glb_user_defined_starting_values(central_values);
+  return glb_user_defined_starting_values(central_values, glb_prior_user_data);
 }
 
 
@@ -714,25 +726,26 @@ static double sglb_prior(double x, double center, double sigma)
   return (x-center)*(x-center)/sigma/sigma;
 }  
 
-static int my_default_sv(const glb_params in)
+static int my_default_sv(const glb_params in, void *user_data)
 {
   return 0;
 }
 
-static int my_default_er(const glb_params in)
+static int my_default_er(const glb_params in, void *user_data)
 {
   return 0;
 }
 
-static double my_default_prior(const glb_params in)
+static double my_default_prior(const glb_params in, void *user_data)
 {
   return 0;
 }
 
 // the user interface to register such a function ...
-int glbRegisterPriorFunction(double (*prior)(const glb_params),
-			     int (*starting)(const glb_params),
-			     int (*error)(const glb_params))
+int glbRegisterPriorFunction(double (*prior)(const glb_params, void *user_data),
+			     int (*starting)(const glb_params, void *user_data),
+			     int (*error)(const glb_params, void *user_data),
+                             void *user_data)
 {
   if(prior==NULL) 
     glb_user_defined_prior=my_default_prior;
@@ -749,7 +762,7 @@ int glbRegisterPriorFunction(double (*prior)(const glb_params),
   else
     glb_user_defined_input_errors=error;
 
-
+  glb_prior_user_data = user_data;
 
   return 0;
 }
@@ -772,7 +785,7 @@ static double MD_chi_NP(double x[])
   glb_params p = glbAllocParams();
   for (i=0; i < glbGetNumOfOscParams(); i++)
     p->osc->osc_params[i] = y[i];
-  glb_hook_set_oscillation_parameters(p);
+  glb_hook_set_oscillation_parameters(p, glb_probability_user_data);
   glbFreeParams(p);
 
   for (i=0;i<glb_num_of_exps;i++)
@@ -790,7 +803,7 @@ static double MD_chi_NP(double x[])
 						      y[i+glbGetNumOfOscParams()],i);
   glbSetIteration(prior_input,count);
 
-  erg2 = erg2 + glb_user_defined_prior(prior_input); 
+  erg2 = erg2 + glb_user_defined_prior(prior_input, glb_prior_user_data); 
 
   glbFreeParams(prior_input);
   return erg2;
@@ -870,7 +883,7 @@ static double chi_NP(double x[])
   glb_params p = glbAllocParams();
   for (i=0; i < glbGetNumOfOscParams(); i++)
     p->osc->osc_params[i] = y[i];
-  glb_hook_set_oscillation_parameters(p);
+  glb_hook_set_oscillation_parameters(p, glb_probability_user_data);
   glbFreeParams(p);
 
   glbSetExperiment(glb_experiment_list[glb_single_experiment_number]);
@@ -886,7 +899,7 @@ static double chi_NP(double x[])
   glbSetDensityParams(prior_input,y[glbGetNumOfOscParams()],glb_single_experiment_number);
   glbSetIteration(prior_input,count);
 
-  erg2 = erg2 + glb_user_defined_prior(prior_input); 
+  erg2 = erg2 + glb_user_defined_prior(prior_input, glb_prior_user_data); 
 
   glbFreeParams(prior_input);
   return erg2;
@@ -954,25 +967,37 @@ static double internal_glbSingleChiNP(const glb_params in, glb_params out,
           return GLB_NAN;
         }
     }
-#ifdef GLB_HYBRID_MINIMIZER
-  for(i=0; i < glb_num_of_exps; i++) 
-    {
-      x[i+glbGetNumOfOscParams()] = glbGetDensityParams(in,i);
-      if (i==exp  &&  GLB_ISNAN(x[i+glbGetNumOfOscParams()]))
+  
+  switch (glb_current_minimizer)
+  {
+    case GLB_MIN_POWELL:
+      for(i=0; i < glb_num_of_exps; i++) 
+        {
+          x[i+glbGetNumOfOscParams()] = glbGetDensityParams(in,i);
+          if (i==exp  &&  GLB_ISNAN(x[i+glbGetNumOfOscParams()]))
+            {
+              glb_warning("internal_glbSingleChiNP: Density parameters incompletely defined. "
+                          "Using default 1.0");
+              x[i+glbGetNumOfOscParams()] = 1.0;
+            }
+        }
+      break;
+
+    case GLB_MIN_NESTED_POWELL:
+      x[glbGetNumOfOscParams()] = glbGetDensityParams(in,exp);
+      if (GLB_ISNAN(x[glbGetNumOfOscParams()]))
         {
           glb_warning("internal_glbSingleChiNP: Density parameters incompletely defined. Using default 1.0");
-          x[i+glbGetNumOfOscParams()] = 1.0;
+          x[glbGetNumOfOscParams()] = 1.0;                
         }
-    }
-#else
-  x[glbGetNumOfOscParams()] = glbGetDensityParams(in,exp);
-  if (GLB_ISNAN(x[glbGetNumOfOscParams()]))
-    {
-      glb_warning("internal_glbSingleChiNP: Density parameters incompletely defined. Using default 1.0");
-      x[glbGetNumOfOscParams()] = 1.0;                
-    }
-#endif
+      break;
+      
+    default:
+      glb_error("internal_glbSingleChiNP: Invalid minimization algorithm");
+      return -1;
+  }
 
+  
   /* Check input errors and central values */
   glb_params op = glbAllocParams();
   glbGetOscillationParameters(op);
@@ -1012,51 +1037,60 @@ static double internal_glbSingleChiNP(const glb_params in, glb_params out,
     }
   }
   glbFreeParams(op);
-  if (glb_user_defined_input_errors(input_errors) != 0)
+  if (glb_user_defined_input_errors(input_errors, glb_prior_user_data) != 0)
     { glb_error("internal_glbSingleChiNP: Failed to set input errors"); return GLB_NAN; }
-  if (glb_user_defined_starting_values(central_values) != 0)
+  if (glb_user_defined_starting_values(central_values, glb_prior_user_data) != 0)
     { glb_error("internal_glbSingleChiNP: Failed to set central values"); return GLB_NAN; }
 
   
   /* Minimize over the free oscillation parameters */ 
-#ifdef GLB_HYBRID_MINIMIZER
-  glb_invoke_hybrid_minimizer(exp, GLB_ALL, x, &er1);
-  if (out != NULL)
+  switch (glb_current_minimizer)
   {
-    for (i=0; i < glbGetNumOfOscParams(); i++)
-      glbSetOscParams(out, x[i], i);
-    for (i=0; i < glb_num_of_exps; i++)
-      glbSetDensityParams(out, x[i+glbGetNumOfOscParams()], i);
+    case GLB_MIN_POWELL:
+      glb_invoke_hybrid_minimizer(exp, GLB_ALL, x, &er1);
+      if (out != NULL)
+      {
+        for (i=0; i < glbGetNumOfOscParams(); i++)
+          glbSetOscParams(out, x[i], i);
+        for (i=0; i < glb_num_of_exps; i++)
+          glbSetDensityParams(out, x[i+glbGetNumOfOscParams()], i);
+      }
+      break;
+
+    case GLB_MIN_NESTED_POWELL:
+      dim=s_n_free;
+      mat2=glb_alloc_mat(1,dim,1,dim);
+      sp2=glb_alloc_vec(1,dim);
+      init_mat(mat2,dim);
+      count=0;
+      for(i=0;i<glbGetNumOfOscParams()+1;i++) s_fix_params[i]=x[i];
+      for(i=0;i<s_n_free;i++) sp2[i+1]=x[s_index_tab[i]];
+      if (setjmp(env)==1) 
+        {
+          okay_flag=1;
+          return er1;  
+        }
+      if(glb_powell2(sp2,mat2,dim,TOLOSC,&it,&er1,chi_NP)!=0) count=-count;
+      if(out!=NULL)
+        {
+          for(i=0;i<s_n_free;i++) 
+            {
+              if(s_index_tab[i]<glbGetNumOfOscParams())
+                glbSetOscParams(out,sp2[i+1],s_index_tab[i]);
+              else
+                glbSetDensityParams(out,sp2[i+1],exp);
+            }
+          out=glbSetIteration(out,count);
+        }
+     
+      glb_free_vec(sp2,1,dim);
+      glb_free_mat(mat2,1,dim,1,dim);
+      break;
+
+    default:
+      glb_error("internal_glbSingleChiNP: Invalid minimization algorithm");
+      return -1;
   }
-#else
-  dim=s_n_free;
-  mat2=glb_alloc_mat(1,dim,1,dim);
-  sp2=glb_alloc_vec(1,dim);
-  init_mat(mat2,dim);
-  count=0;
-  for(i=0;i<glbGetNumOfOscParams()+1;i++) s_fix_params[i]=x[i];
-  for(i=0;i<s_n_free;i++) sp2[i+1]=x[s_index_tab[i]];
-  if (setjmp(env)==1) 
-    {
-      okay_flag=1;
-      return er1;  
-    }
-  if(glb_powell2(sp2,mat2,dim,TOLOSC,&it,&er1,chi_NP)!=0) count=-count;
-  if(out!=NULL)
-    {
-      for(i=0;i<s_n_free;i++) 
-	{
-	  if(s_index_tab[i]<glbGetNumOfOscParams())
-	    glbSetOscParams(out,sp2[i+1],s_index_tab[i]);
-	  else
-	    glbSetDensityParams(out,sp2[i+1],exp);
-	}
-      out=glbSetIteration(out,count);
-    }
- 
-  glb_free_vec(sp2,1,dim);
-  glb_free_mat(mat2,1,dim,1,dim);
-#endif /* GLB_HYBRID_MINIMIZER */
   
   glb_single_experiment_number=GLB_ALL;
   glbSetProjection(fbuf);
@@ -1156,50 +1190,59 @@ static double internal_glbChiNP(const glb_params in, glb_params out)
   }
   glbFreeProjection(proj);
   glbFreeParams(osc_params);
-  if (glb_user_defined_input_errors(input_errors) != 0)
+  if (glb_user_defined_input_errors(input_errors, glb_prior_user_data) != 0)
     { glb_error("internal_glbChiNP: Failed to set input errors"); return GLB_NAN; }
-  if (glb_user_defined_starting_values(central_values) != 0)
+  if (glb_user_defined_starting_values(central_values, glb_prior_user_data) != 0)
     { glb_error("internal_glbChiNP: Failed to set central values"); return GLB_NAN; }
 
 
   /* Minimize over the free oscillation parameters */ 
-#ifdef GLB_HYBRID_MINIMIZER
-  glb_invoke_hybrid_minimizer(GLB_ALL, GLB_ALL, x, &er1);
-  if (out != NULL)
+  switch (glb_current_minimizer)
   {
-    for (i=0; i < glbGetNumOfOscParams(); i++)
-      glbSetOscParams(out, x[i], i);
-    for (i=0; i < glb_num_of_exps; i++)
-      glbSetDensityParams(out, x[i+glbGetNumOfOscParams()], i);
+    case GLB_MIN_POWELL:
+      glb_invoke_hybrid_minimizer(GLB_ALL, GLB_ALL, x, &er1);
+      if (out != NULL)
+      {
+        for (i=0; i < glbGetNumOfOscParams(); i++)
+          glbSetOscParams(out, x[i], i);
+        for (i=0; i < glb_num_of_exps; i++)
+          glbSetDensityParams(out, x[i+glbGetNumOfOscParams()], i);
+      }
+      break;
+
+    case GLB_MIN_NESTED_POWELL:
+      dim=n_free;
+      mat2=glb_alloc_mat(1,dim,1,dim);
+      sp2=glb_alloc_vec(1,dim);
+      init_mat(mat2,dim);
+      count=0;
+      for(i=0;i<glbGetNumOfOscParams()+glb_num_of_exps;i++) fix_params[i]=x[i];
+      for(i=0;i<n_free;i++) sp2[i+1]=x[index_tab[i]];
+      if (setjmp(env)==1) 
+        {
+          okay_flag=1;
+          return er1;  
+        }
+      if(glb_powell2(sp2,mat2,dim,TOLOSC,&it,&er1,MD_chi_NP)!=0) count=-count;
+      if(out!=NULL)
+        {
+          for(i=0;i<n_free;i++) 
+            {
+              if(index_tab[i]<glbGetNumOfOscParams())
+                glbSetOscParams(out,sp2[i+1],index_tab[i]);
+              else
+                glbSetDensityParams(out,sp2[i+1],index_tab[i]-glbGetNumOfOscParams());
+            }
+          out=glbSetIteration(out,count);
+        }
+      glb_free_vec(sp2,1,dim);
+      glb_free_mat(mat2,1,dim,1,dim);  
+      break;
+
+    default:
+      glb_error("internal_glbChiNP: Invalid minimization algorithm");
+      return -1;
   }
-#else
-  dim=n_free;
-  mat2=glb_alloc_mat(1,dim,1,dim);
-  sp2=glb_alloc_vec(1,dim);
-  init_mat(mat2,dim);
-  count=0;
-  for(i=0;i<glbGetNumOfOscParams()+glb_num_of_exps;i++) fix_params[i]=x[i];
-  for(i=0;i<n_free;i++) sp2[i+1]=x[index_tab[i]];
-  if (setjmp(env)==1) 
-    {
-      okay_flag=1;
-      return er1;  
-    }
-  if(glb_powell2(sp2,mat2,dim,TOLOSC,&it,&er1,MD_chi_NP)!=0) count=-count;
-  if(out!=NULL)
-    {
-      for(i=0;i<n_free;i++) 
-	{
-	  if(index_tab[i]<glbGetNumOfOscParams())
-	    glbSetOscParams(out,sp2[i+1],index_tab[i]);
-	  else
-	    glbSetDensityParams(out,sp2[i+1],index_tab[i]-glbGetNumOfOscParams());
-	}
-      out=glbSetIteration(out,count);
-    }
-  glb_free_vec(sp2,1,dim);
-  glb_free_mat(mat2,1,dim,1,dim);  
-#endif /* GLB_HYBRID_MINIMIZER */
   
   return er1;
 }
@@ -1379,7 +1422,30 @@ glbGetProjection(glb_projection in)
 
 
 
-#ifdef GLB_HYBRID_MINIMIZER
+
+/***************************************************************************
+ * Function glbSelectMinimizer                                             *
+ ***************************************************************************
+ * Selects a minimization algorithm for use in subsequent calls to the     *
+ * glbChiXXX functions.                                                    *
+ ***************************************************************************
+ * Parameters:                                                             *
+ *   minimizer_ID: One of the GLB_MIN_XXX constants identifying a          *
+ *                 minimization algorithm.                                 *
+ ***************************************************************************/
+int glbSelectMinimizer(int minimizer_ID)
+{
+  if (minimizer_ID != GLB_MIN_NESTED_POWELL  &&
+      minimizer_ID != GLB_MIN_POWELL)
+  {
+    glb_error("glbSelectMinimizer: Invalid minimization algorithm requested");
+    return -1;
+  }
+
+  glb_current_minimizer = minimizer_ID;
+  return 0;
+}
+
 
 /***************************************************************************
  * Function glb_hybrid_chi_callback                                        *
@@ -1415,7 +1481,7 @@ double glb_hybrid_chi_callback(double *x, int new_rates_flag, void *user_data)
     p->iterations = ++count;
     
     /* Re-compute rates */
-    glb_hook_set_oscillation_parameters(p);
+    glb_hook_set_oscillation_parameters(p, glb_probability_user_data);
     for (i=0; i < glb_num_of_exps; i++)
     {
       if (glb_single_experiment_number!=GLB_ALL && glb_single_experiment_number!=i)
@@ -1426,7 +1492,7 @@ double glb_hybrid_chi_callback(double *x, int new_rates_flag, void *user_data)
     }
 
     /* Compute priors */
-    glb_last_priors = glb_user_defined_prior(p);
+    glb_last_priors = glb_user_defined_prior(p, glb_prior_user_data);
     glbFreeParams(p);
   }
   
@@ -1455,9 +1521,9 @@ double glb_hybrid_chi_callback(double *x, int new_rates_flag, void *user_data)
         y[k] = x[m++];
 
       if (exp->sys_on_off[j] == GLB_ON)
-        chi2 += (*(sys->chi_func))(i, j, this_dim, y, exp->sys_on_errors[j]);
+        chi2 += (*(sys->chi_func))(i, j, this_dim, y, exp->sys_on_errors[j], sys->user_data);
       else
-        chi2 += (*(sys->chi_func))(i, j, this_dim, y, exp->sys_off_errors[j]);
+        chi2 += (*(sys->chi_func))(i, j, this_dim, y, exp->sys_off_errors[j], sys->user_data);
     }
   }
   glb_free(y);
@@ -1483,7 +1549,7 @@ double glb_hybrid_chi_callback(double *x, int new_rates_flag, void *user_data)
  *         parameters, followed by the density parameters for _all_        *
  *         experiments, even if exp!=GLB_ALL.                              *
  *         Output: The position of the minimum                             *
- *   chi:  Output: The chi^2 value at the minimum
+ *   chi:  Output: The chi^2 value at the minimum                          *
  ***************************************************************************/
 int glb_invoke_hybrid_minimizer(int exp, int rule, double *x, double *chi2)
 {
@@ -1530,11 +1596,6 @@ int glb_invoke_hybrid_minimizer(int exp, int rule, double *x, double *chi2)
     }
   }
 
-//  printf("Starting hybrid minimizer, P = (");  // FIXME
-//  for (i=0; i < n_free+n_sys; i++)
-//    printf("%g, ", P[i]);
-//  printf("\n");
- 
   /* Prepare information for callback function, and invoke minimizer */
   glb_single_experiment_number = exp;
   glb_single_rule_number       = rule;
@@ -1553,7 +1614,5 @@ int glb_invoke_hybrid_minimizer(int exp, int rule, double *x, double *chi2)
 
   return 0;
 }
-
-#endif /* GLB_HYBRID_MINIMIZER */
 
 

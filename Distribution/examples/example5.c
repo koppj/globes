@@ -122,7 +122,8 @@ inline double likelihood(double true_rate, double fit_rate, double sqr_sigma)
  *   x[3]: Energy calibration error - far detector                         *
  *   x[4]: Energy calibration error - near detector                        *
  ***************************************************************************/
-double chiDCNorm(int exp, int rule, int n_params, double *x, double *errors)
+double chiDCNorm(int exp, int rule, int n_params, double *x, double *errors,
+                 void *user_data)
 {
   int n_bins = glbGetNumberOfBins(EXP_FAR);
   double *true_rates_N = glbGetRuleRatePtr(EXP_NEAR, 0);
@@ -186,7 +187,8 @@ double chiDCNorm(int exp, int rule, int n_params, double *x, double *errors)
  * and the bin-to-bin error sigma_binbin. The calculation is based on      *
  * Eq. (9) of hep-ph/0303232.                                              *
  ***************************************************************************/
-double chiDCSpectral(int exp, int rule, int n_params, double *x, double *errors)
+double chiDCSpectral(int exp, int rule, int n_params, double *x, double *errors,
+                     void *user_data)
 {
   int n_bins = glbGetNumberOfBins(EXP_FAR);
   double *true_rates_N = glbGetRuleRatePtr(EXP_NEAR, 0);
@@ -374,8 +376,8 @@ int main(int argc, char *argv[])
   ldm = 2.6e-3;
 
   glbInit(argv[0]);                    /* Initialize GLoBES and define chi^2 functions */
-  glbDefineChiFunction(&chiDCNorm,     5,        "chiDCNorm");
-  glbDefineChiFunction(&chiDCSpectral, 5+n_bins, "chiDCSpectral");
+  glbDefineChiFunction(&chiDCNorm,     5,        "chiDCNorm",     NULL);
+  glbDefineChiFunction(&chiDCSpectral, 5+n_bins, "chiDCSpectral", NULL);
 
   gsl_set_error_handler(&gslError);    /* Initialize GSL root finder */
   gsl_func.function = &DoChiSquare;

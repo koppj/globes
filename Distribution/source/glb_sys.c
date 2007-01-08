@@ -742,7 +742,8 @@ inline double glb_prior(double x, double center, double sigma)
  * chi^2 including the standard signal and background errors, as well as   *
  * spectral information                                                    *
  ***************************************************************************/
-double glbChiSpectrumTilt(int exp, int rule, int n_params, double *x, double *errors)
+double glbChiSpectrumTilt(int exp, int rule, int n_params, double *x, double *errors,
+                          void *user_data)
 {
   int n_bins = glbGetNumberOfBins(exp);
   double *true_rates       = glbGetRuleRatePtr(exp, rule);
@@ -783,7 +784,8 @@ double glbChiSpectrumTilt(int exp, int rule, int n_params, double *x, double *er
  ***************************************************************************
  * chi^2 without systematical errors                                       *
  ***************************************************************************/
-double glbChiNoSysSpectrum(int exp, int rule, int n_params, double *x, double *errors)
+double glbChiNoSysSpectrum(int exp, int rule, int n_params, double *x, double *errors,
+                           void *user_data)
 {
   double *true_rates       = glbGetRuleRatePtr(exp, rule);
   double *signal_fit_rates = glbGetSignalFitRatePtr(exp, rule);
@@ -812,7 +814,8 @@ double glbChiNoSysSpectrum(int exp, int rule, int n_params, double *x, double *e
  * chi^2 with spectral information, an unconstrained signal normalization  *
  * error, and no background errors                                         *
  ***************************************************************************/
-double glbChiSpectrumOnly(int exp, int rule, int n_params, double *x, double *errors)
+double glbChiSpectrumOnly(int exp, int rule, int n_params, double *x, double *errors,
+                          void *user_data)
 {
   double *true_rates       = glbGetRuleRatePtr(exp, rule);
   double *signal_fit_rates = glbGetSignalFitRatePtr(exp, rule);
@@ -843,7 +846,8 @@ double glbChiSpectrumOnly(int exp, int rule, int n_params, double *x, double *er
  * chi^2 including the standard signal and background errors, but          *
  * considering only total rates                                            *
  ***************************************************************************/
-double glbChiTotalRatesTilt(int exp, int rule, int n_params, double *x, double *errors)
+double glbChiTotalRatesTilt(int exp, int rule, int n_params, double *x, double *errors,
+                            void *user_data)
 {
   int n_bins = glbGetNumberOfBins(exp);
   double *true_rates       = glbGetRuleRatePtr(exp, rule);
@@ -891,7 +895,8 @@ double glbChiTotalRatesTilt(int exp, int rule, int n_params, double *x, double *
  ***************************************************************************
  * chi^2 without systematical errors, and considering only total rates     *
  ***************************************************************************/
-double glbChiNoSysTotalRates(int exp, int rule, int n_params, double *x, double *errors)
+double glbChiNoSysTotalRates(int exp, int rule, int n_params, double *x, double *errors,
+                             void *user_data)
 {
   double *true_rates       = glbGetRuleRatePtr(exp, rule);
   double *signal_fit_rates = glbGetSignalFitRatePtr(exp, rule);
@@ -926,7 +931,8 @@ double glbChiNoSysTotalRates(int exp, int rule, int n_params, double *x, double 
  * chi^2 including the standard signal and background errors, as well as   *
  * spectral information. Energy tilt is replaced by energy calibration.    *
  ***************************************************************************/
-double glbChiSpectrumCalib(int exp, int rule, int n_params, double *x, double *errors)
+double glbChiSpectrumCalib(int exp, int rule, int n_params, double *x, double *errors,
+                           void *user_data)
 {
   int n_bins = glbGetNumberOfBins(exp);
   double *true_rates = glbGetRuleRatePtr(exp, rule);
@@ -973,7 +979,8 @@ double glbChiSpectrumCalib(int exp, int rule, int n_params, double *x, double *e
  ***************************************************************************
  * Dummy chi^2 function which simply returns zero.                         *
  ***************************************************************************/
-double glbChiZero(int exp, int rule, int n_params, double *x, double *errors)
+double glbChiZero(int exp, int rule, int n_params, double *x, double *errors,
+                  void *user_data)
 {
   return 0.0;
 }
@@ -991,11 +998,14 @@ double glbChiZero(int exp, int rule, int n_params, double *x, double *errors)
  * calls to glbInitExperiment.                                             *
  ***************************************************************************
  * Parameters:                                                             *
- *   chi_func: A pointer to the chi^2 function                             *
- *   dim:      Number of systematics parameters handled by chi_func        *
- *   name:     The unique name for chi_func that appears in the AEDL file  *
+ *   chi_func:  A pointer to the chi^2 function                            *
+ *   dim:       Number of systematics parameters handled by chi_func       *
+ *   name:      The unique name for chi_func that appears in the AEDL file *
+ *   user_data: Arbitrary pointer which will be passed to the user-defined *
+ *              function                                                   *
  ***************************************************************************/
-int glbDefineChiFunction(glb_chi_function chi_func, int dim, const char *name)
+int glbDefineChiFunction(glb_chi_function chi_func, int dim, const char *name,
+                         void *user_data)
 {
   glb_systematic *old_root = glb_sys_list;   /* Save old list root */
 
@@ -1009,9 +1019,10 @@ int glbDefineChiFunction(glb_chi_function chi_func, int dim, const char *name)
   glb_sys_list = (glb_systematic *) glb_malloc(sizeof(glb_systematic));
   if (glb_sys_list != NULL)
   {
-    glb_sys_list->chi_func = chi_func;
-    glb_sys_list->dim      = dim;
-    glb_sys_list->name     = (char *) glb_malloc(strlen(name)+1);
+    glb_sys_list->chi_func  = chi_func;
+    glb_sys_list->dim       = dim;
+    glb_sys_list->user_data = user_data;
+    glb_sys_list->name      = (char *) glb_malloc(strlen(name)+1);
     if (glb_sys_list->name != NULL)
     {
       strcpy(glb_sys_list->name, name);

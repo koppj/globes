@@ -45,6 +45,7 @@ extern int glb_oscp;
 extern glb_probability_matrix_function glb_hook_probability_matrix;
 extern glb_set_oscillation_parameters_function glb_hook_set_oscillation_parameters;
 extern glb_get_oscillation_parameters_function glb_hook_get_oscillation_parameters;
+extern void *glb_probability_user_data;
 
 
 
@@ -61,15 +62,15 @@ int zheevq3(double complex A[3][3], double complex Q[3][3], double w[3]);
 int zheevh3(double complex A[3][3], double complex Q[3][3], double w[3]);
 int glb_init_probability_engine();
 int glb_free_probability_engine();
-int glb_set_oscillation_parameters(glb_params p);
-int glb_get_oscillation_parameters(glb_params p);
+int glb_set_oscillation_parameters(glb_params p, void *user_data);
+int glb_get_oscillation_parameters(glb_params p, void *user_data);
 int glb_hamiltonian_cd(double E, double V, int cp_sign);
 int glb_S_matrix_cd(double E, double L, double V, int cp_sign);
 int glb_filtered_probability_matrix_cd(double P[3][3], double E, double L,
                                        double V, double sigma, int cp_sign);
 int glb_probability_matrix(double P[3][3], int cp_sign, double E,
     int psteps, const double *length, const double *density,
-    double filter_sigma);
+    double filter_sigma, void *user_data);
 
 #endif /* GLB_OSZPROB_H */
 

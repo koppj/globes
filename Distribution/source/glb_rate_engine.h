@@ -105,13 +105,13 @@ double glb_window_function(double low,double up,int bin);
 
 
 /* chi^2 functions */
-double glbChiSpectrumTilt(int exp, int rule, int n_params, double *x, double *errors);
-double glbChiNoSysSpectrum(int exp, int rule, int n_params, double *x, double *errors);
-double glbChiSpectrumOnly(int exp, int rule, int n_params, double *x, double *errors);
-double glbChiTotalRatesTilt(int exp, int rule, int n_params, double *x, double *errors);
-double glbChiNoSysTotalRates(int exp, int rule, int n_params, double *x, double *errors);
-double glbChiSpectrumCalib(int exp, int rule, int n_params, double *x, double *errors);
-double glbChiZero(int exp, int rule, int n_params, double *x, double *errors);
+double glbChiSpectrumTilt(int exp, int rule, int n_params, double *x, double *errors, void *user_data);
+double glbChiNoSysSpectrum(int exp, int rule, int n_params, double *x, double *errors, void *user_data);
+double glbChiSpectrumOnly(int exp, int rule, int n_params, double *x, double *errors, void *user_data);
+double glbChiTotalRatesTilt(int exp, int rule, int n_params, double *x, double *errors, void *user_data);
+double glbChiNoSysTotalRates(int exp, int rule, int n_params, double *x, double *errors, void *user_data);
+double glbChiSpectrumCalib(int exp, int rule, int n_params, double *x, double *errors, void *user_data);
+double glbChiZero(int exp, int rule, int n_params, double *x, double *errors, void *user_data);
 
 
 

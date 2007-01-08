@@ -44,6 +44,7 @@ int glb_oscp;
 glb_probability_matrix_function glb_hook_probability_matrix;
 glb_set_oscillation_parameters_function glb_hook_set_oscillation_parameters;
 glb_get_oscillation_parameters_function glb_hook_get_oscillation_parameters;
+void *glb_probability_user_data=NULL;
 
 /* Internal temporary variables */
 gsl_matrix_complex *U=NULL; /* The vacuum mixing matrix                           */
@@ -483,7 +484,7 @@ int glb_free_probability_engine()
  * Sets the fundamental oscillation parameters and precomputes the mixing  *
  * matrix and part of the Hamiltonian.                                     *
  ***************************************************************************/
-int glb_set_oscillation_parameters(glb_params p)
+int glb_set_oscillation_parameters(glb_params p, void *user_data)
 {
   double complex (*_U)[GLB_NU_FLAVOURS]
     = (double complex (*)[GLB_NU_FLAVOURS]) gsl_matrix_complex_ptr(U, 0, 0);
@@ -532,7 +533,7 @@ int glb_set_oscillation_parameters(glb_params p)
  ***************************************************************************
  * Returns the current set of oscillation parameters.                      *
  ***************************************************************************/
-int glb_get_oscillation_parameters(glb_params p)
+int glb_get_oscillation_parameters(glb_params p, void *user_data)
 {
   glbDefineParams(p, th12, th13, th23, delta, mq[1] - mq[0], mq[2] - mq[0]);
   return 0;
@@ -768,10 +769,11 @@ int glb_filtered_probability_matrix_cd(double P[3][3], double E, double L, doubl
  *   length:  Lengths of the layers in the matter density profile in km    *
  *   density: The matter densities in g/cm^3                               *
  *   filter_sigma: Width of low-pass filter or <0 for no filter            *
+ *   user_data: Unused here, should be NULL                                *
  ***************************************************************************/
 int glb_probability_matrix(double P[3][3], int cp_sign, double E,
     int psteps, const double *length, const double *density,
-    double filter_sigma)
+    double filter_sigma, void *user_data)
 {
   int status;
   int i, j;
@@ -846,6 +848,7 @@ int glb_probability_matrix(double P[3][3], int cp_sign, double E,
  *   prob_func:       The replacement for glb_probability_matrix           *
  *   set_params_func: The replacement for glb_set_oscillation_parameters   *
  *   get_params_func: The replacement for glb_get_oscillation_parameters   *
+ *   user_data:       Arbitrary pointer, passed to user-defined functions  *
  * If n_parameters is <= 0, glb_oscp will be set to the default value of 6.*
  * If any of the pointer-valued arguments is NULL, the respective hook     *
  * will be reset to its default value.                                     *
@@ -853,7 +856,8 @@ int glb_probability_matrix(double P[3][3], int cp_sign, double E,
 int glbRegisterProbabilityEngine(int n_parameters,
                     glb_probability_matrix_function prob_func,
                     glb_set_oscillation_parameters_function set_params_func,
-                    glb_get_oscillation_parameters_function get_params_func)
+                    glb_get_oscillation_parameters_function get_params_func,
+                    void *user_data)
 {
   if (n_parameters <= 0)
     glb_oscp = 6;
@@ -874,6 +878,8 @@ int glbRegisterProbabilityEngine(int n_parameters,
     glb_hook_get_oscillation_parameters = get_params_func;
   else
     glb_hook_get_oscillation_parameters = &glb_get_oscillation_parameters;
+
+  glb_probability_user_data = user_data;
 
   /* Reallocate arrays for minimizer */
   glb_init_minimizer();

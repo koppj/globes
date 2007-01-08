@@ -84,7 +84,7 @@ static double sprior(double x, double center, double sigma)
  * parameters, and the prior accepts starting values as stored in sv
  * and input errors as stored in er. 
  */
-double glb_builtin_prior_prior(const glb_params in)
+double glb_builtin_prior_prior(const glb_params in, void *user_data)
 {
   int i;
   double res=0;
@@ -123,7 +123,7 @@ double glb_builtin_prior_prior(const glb_params in)
  *
  * Here we just copy the argument to our local buffer.
  */ 
-int glb_builtin_prior_starting_values(const glb_params in)
+int glb_builtin_prior_starting_values(const glb_params in, void *user_data)
 {
   if(glbCopyParams(in,sv)!=NULL) return 0;
   return -1;
@@ -136,7 +136,7 @@ int glb_builtin_prior_starting_values(const glb_params in)
  *
  * Here we just copy the argument to our local buffer.
  */ 
-int glb_builtin_prior_input_errors(const glb_params in)
+int glb_builtin_prior_input_errors(const glb_params in, void *user_data)
 { 
   if(glbCopyParams(in,er)!=NULL) return 0;
   return -1;

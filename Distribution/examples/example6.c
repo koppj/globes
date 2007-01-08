@@ -68,7 +68,7 @@ double sigma_E;
  * place to pre-compute the mixing matrix and parts of the Hamiltonian in  *
  * order to speed up the calls to the actual probability matrix function.  *
  ***************************************************************************/
-int my_set_oscillation_parameters(glb_params p)
+int my_set_oscillation_parameters(glb_params p, void *user_data)
 {
   th12    = glbGetOscParams(p, GLB_THETA_12);
   th13    = glbGetOscParams(p, GLB_THETA_13);
@@ -85,7 +85,7 @@ int my_set_oscillation_parameters(glb_params p)
 /***************************************************************************
  * Write oscillation parameters from internal data structures into p.      *
  ***************************************************************************/
-int my_get_oscillation_parameters(glb_params p)
+int my_get_oscillation_parameters(glb_params p, void *user_data)
 {
   glbSetOscParams(p, th12, GLB_THETA_12);
   glbSetOscParams(p, th13, GLB_THETA_13);
@@ -118,7 +118,7 @@ int my_get_oscillation_parameters(glb_params p)
  ***************************************************************************/
 int my_probability_matrix(double P[3][3], int cp_sign, double E, int psteps,
                           const double *length, const double *density,
-                          double filter_sigma)
+                          double filter_sigma, void *user_data)
 {
   int i, j;
   double L;
@@ -181,14 +181,16 @@ int main(int argc, char *argv[])
   double true_sigma_E = 0.0;
 
   /* Initialize libglobes */
-  glbInit(argv[0]); 
+  glbInit(argv[0]);
+  glbSelectMinimizer(GLB_MIN_POWELL);
  
   /* Register non-standard probability engine. This has to be done
    * before any calls to glbAllocParams() or glbAllocProjections() */
   glbRegisterProbabilityEngine(7,      /* Number of parameters */
                                &my_probability_matrix,
                                &my_set_oscillation_parameters,
-                               &my_get_oscillation_parameters);
+                               &my_get_oscillation_parameters,
+                               NULL);
 
   /* Initialize reactor experiment */
   glbInitExperiment("Reactor1.glb",&glb_experiment_list[0],&glb_num_of_exps); 

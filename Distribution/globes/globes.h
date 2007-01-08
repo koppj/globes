@@ -43,8 +43,6 @@
 #define GLB_NU_FLAVOURS  3
 
 
-// JK - I prefer enums over #defines since they are parsed by the compiler,
-// which is more intelligent than the pre-processor.
 enum glb_enum_oscillation_parameters
        { GLB_THETA_12 = 0, GLB_THETA_13 = 1, GLB_THETA_23 = 2,
          GLB_DELTA_CP = 3, GLB_DM_21 = 4, GLB_DM_31 = 5 };
@@ -58,6 +56,12 @@ enum glb_enum_param_fixed_free
        { GLB_FIXED = 0, GLB_FREE = 1 };
 enum glb_enum_efficiency_types
        { GLB_PRE = 1, GLB_POST = 2 };
+
+/* Available minimization algorithms */
+enum glb_enum_minimizers
+       { GLB_MIN_NESTED_POWELL, GLB_MIN_POWELL };
+#define GLB_MIN_DEFAULT  GLB_MIN_NESTED_POWELL
+
 
 #define GLB_EFF    1
 #define GLB_BG     2
@@ -92,15 +96,15 @@ typedef float(*pt2Func)(float, float);  // JK - What is this good for ???
 
 /* User-defined chi^2 function */
 typedef double (*glb_chi_function)(int exp, int rule, int n_params,
-                                   double *params, double *errors);
+                                   double *params, double *errors, void *user_data);
 
 
 /* User-defined glb_probability_matrix and glb_set/get_oscillation_parameters */
 typedef int (*glb_probability_matrix_function)(double P[3][3], int cp_sign, double E,
                   int psteps, const double *length, const double *density,
-                  double filter_sigma);
-typedef int (*glb_set_oscillation_parameters_function)(glb_params p);
-typedef int (*glb_get_oscillation_parameters_function)(glb_params p);
+                  double filter_sigma, void *user_data);
+typedef int (*glb_set_oscillation_parameters_function)(glb_params p, void *user_data);
+typedef int (*glb_get_oscillation_parameters_function)(glb_params p, void *user_data);
 
 
 /* External variables */
@@ -251,7 +255,7 @@ double glbGetFilterInExperiment(int experiment);
 int glbGetEminEmax(int experiment, double *emin, double *emax);                    //new
 int glbGetEnergyWindow(int experiment, int rule, double *low, double *high);       //new
 int glbGetEnergyWindowBins(int experiment, int rule, int *low_bin, int *high_bin); //new
-int glbGetNumberOfSimBins(int exp);                                                //new?
+int glbGetNumberOfSamplingPoints(int exp);                                         //new
 int glbGetNumberOfBins(int exp);                                                   //new
 int glbGetNumberOfRules(int exp);
 int glbGetNumberOfChannels(int exp);
@@ -267,7 +271,7 @@ double glbXSection(int experiment, int xsec_ident,double energy,int flavour,
 
 
 /* User-defined Systematics */
-int glbDefineChiFunction(glb_chi_function chi_func, int dim, const char *name);    //new
+int glbDefineChiFunction(glb_chi_function chi_func, int dim, const char *name, void *user_data); //new
 int glbSetChiFunction(int exp, int rule, int on_off, const char *sys_id, double *errors); 
 int glbSwitchSystematics(int exp, int rule, int on_off);
 int glbSetSignalErrors(int exp, int rule, double norm, double tilt);
@@ -303,9 +307,10 @@ int glbCloseModule(glb_dlhandle stale);                                         
 void *glbSymModule(glb_dlhandle module,const char *symbol_name);                   //new
 
 #ifndef SWIG
-int glbRegisterPriorFunction(double (*prior)(const glb_params),                    //new
-                             int (*starting)(const glb_params),
-                             int (*error)(const glb_params));
+int glbRegisterPriorFunction(double (*prior)(const glb_params, void *user_data),   //new
+                             int (*starting)(const glb_params, void *user_data),
+                             int (*error)(const glb_params, void *user_data),
+                             void *user_data);
 #endif /* SWIG */
 int glbUsePrior(glb_dlhandle module);                                              //new
 
@@ -314,7 +319,8 @@ int glbUsePrior(glb_dlhandle module);                                           
 int glbRegisterProbabilityEngine(int n_parameters,
                  glb_probability_matrix_function prob_func,
                  glb_set_oscillation_parameters_function set_params_func,
-                 glb_get_oscillation_parameters_function get_params_func);         //new
+                 glb_get_oscillation_parameters_function get_params_func,
+                 void *user_data);                                                 //new
 int glbGetNumOfOscParams();                                                        //new
 
 
@@ -345,6 +351,9 @@ double glbProfileProbability(int exp,int initial_flavour, int final_flavour,
                             int panti, double energy);
 double glbFilteredConstantDensityProbability(int exp,int initial_flavour,          //new
                             int final_flavour, int panti, double energy);
+
+/* Selecting a minization algorithm */
+int glbSelectMinimizer(int minimizer_ID);
 
 
 
@@ -398,6 +407,9 @@ double glbFilteredConstantDensityProbability(int exp,int initial_flavour,       
   int glbSetStartingValues(const glb_params in);
   int glbGetStartingValues(glb_params in);
 
+  /* Renamed to glbGetNumberOfSamplingPoints */
+  int glbGetNumberOfSimBins(int exp);
+  
 //  #ifdef GLB_EXPERIMENTAL
 //  /* These functions are part of the user-defined chi^2 interface and will
 //   * not be documented in this release. I you want to use this feature

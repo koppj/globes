@@ -396,8 +396,6 @@ int glb_powell2(double p[],double **xi,int n,double ftol,
 #undef TOL
 
 
-#ifdef GLB_HYBRID_MINIMIZER
-
 /***************************************************************************
  *         C O M B I N E D   O S C / S Y S   M I N I M I Z E R             *
  ***************************************************************************/
@@ -801,7 +799,5 @@ int glb_hybrid_minimizer(double *P, int n, int n_osc, double ftol, int *iter,
   glb_warning("glb_hybrid_minimizer: No convergence in n-dim Powell minimizer"); 
   return -1;
 }
-
-#endif /* #ifdef GLB_HYBRID_MINIMIZER */
 
 

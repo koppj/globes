@@ -682,3 +682,7 @@ documented!
        which now is fixed. Look into the file if you want to know
        more.
 
+08/01/2007 JK
+       - Renamed glbGetNumberOfSimBins --> glbGetNumberOfSamplingPoints
+       - Added function glbSelectMinimizer
+       - Added user_data pointer to all user-defined functions

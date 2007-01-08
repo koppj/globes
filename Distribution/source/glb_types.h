@@ -131,10 +131,11 @@ typedef struct {
 /* Data structure containing information about systematics functions */
 typedef struct glb_systematic
 {
-  glb_chi_function chi_func;   /* Pointer to the chi^2 function         */
-  int dim;                     /* Number of systematics parameters      */
-  char *name;                  /* Unique name of this chi^2 routine     */
-  struct glb_systematic *next; /* Pointer to next entry in glb_sys_list */
+  glb_chi_function chi_func;   /* Pointer to the chi^2 function                      */
+  int dim;                     /* Number of systematics parameters                   */
+  char *name;                  /* Unique name of this chi^2 routine                  */
+  void *user_data;             /* Arbitrary user-defined parameter for chi^2 routine */
+  struct glb_systematic *next; /* Pointer to next entry in glb_sys_list              */
 } glb_systematic;
 
 
