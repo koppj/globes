@@ -35,7 +35,7 @@
 #include "glb_error.h"
 
 
-#include <globes/globes.h>
+#include "globes/globes.h"
 
 #if HAVE_CONFIG_H
 #  include "config.h"
@@ -101,10 +101,10 @@ static int parse_definition(const char *str)
 
   s=strlen(rhs);
 
-  if(rhs[0]=='{' && rhs[s-1]=='}') {wrk=strncpy(wrk,&rhs[1],s-1);vec=1;}
-  else wrk=strdup(rhs);
+  if(rhs[0]=='{' && rhs[s-1]=='}') {wrk=strncpy(wrk,&rhs[1],s);vec=1;wrk[s-2]='\0';}
+  else wrk=strncpy(wrk,&rhs[0],s);
 
-
+  fprintf(stderr,"%s\n",wrk);
 
   while(wrk)
     {
@@ -128,12 +128,15 @@ static int parse_definition(const char *str)
      
     }
 
+
   if(c==1&&vec==0&& lhs[0] != '\%') glbDefineAEDLVariable(lhs,result[0]);
   else if (c>0&&vec==1) glbDefineAEDLList(lhs,result,c);
   else {fprintf(stderr,"globes: ERROR: Confusion about vector vs scalar definition.\n");c=0;}
+
   glb_free(result);
-  glb_free(wrk);
-  glb_free(inc);
+  //glb_free(wrk);
+   glb_free(inc);
+
   return c;
 }
 

@@ -1,4 +1,4 @@
-INCLUDES = -I$(top_srcdir) -I$(top_srcdir)/lib $(GSLINC)
+INCLUDES = -I$(top_builddir) -I$(top_srcdir) -I$(top_srcdir)/lib $(GSLINC) 
 
 
 AM_YFLAGS =  -d 
