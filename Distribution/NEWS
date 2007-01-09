@@ -702,3 +702,9 @@ documented!
        - Added function glbSelectMinimizer
        - Added user_data pointer to all user-defined functions
 
+08/01/2007 PH
+       - $version now mandatory in AEDL files, otherwise glb_fatal
+       will be called.
+
+       - Trying to a newer AEDL file than the release version will
+       produce an error, but the programm will continue.

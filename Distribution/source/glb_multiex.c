@@ -556,13 +556,13 @@ int glbDefaultExp(glb_exp ins)
   status+=setup_density_profile(ins);
   if(in->version==NULL) 
     {
-      glb_warning("Missing version in AEDL file");
+      glb_fatal("Missing version in AEDL file");
       def=-1;
       in->version=(char *) strdup(glb_release_version);
     }
 
   if(glbTestReleaseVersion(in->version)<0) {
-    glb_warning("AEDL file has a more recent version number than the"
+    glb_error("AEDL file has a more recent version number than the"
 		" installed globes package");}
   
   if(in->num_of_xsecs<1)  {glb_exp_error(in, "No X-section selected!");status=-1;}
