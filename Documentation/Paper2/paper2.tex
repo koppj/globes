@@ -260,6 +260,51 @@ HOWTO
  New minimization algorithm!?
 \ei
 
+Sophisticated \GLOBES\ simulations with several experiments and complicated
+parameter correlations can take several days to finish even on modern computers.
+To mitigate this problem as far as possible, we have taken several steps to
+optimize the performance of the multi-dimensional minimizations, which are at
+the heart of each \GLOBES\ $\chi^2$ analysis.
+
+Firstly, the \GLOBES\ minimizers distinguish between minimization over
+oscillation parameters and minimization over systematics parameters.
+This is necessary because each step in the oscillation parameter space
+requires a time-consuming re-computation of oscillation probabilities,
+while a modification of the systematics parameters does not. The standard
+procedure is to perform a full minimization in systematics space after each
+step in oscillation space. This avoids interference of the two categories
+of parameters, and is known to have excellent convergence properties.
+The numerical method that does the minimization is the Powell
+algorithm~\cite{Press:NumRecip}.
+
+In \GLOBES\ 3.0, we provide an alternative method, which does the full minimization
+in one go and is therefore several times faster in most cases. In this algorithm,
+each Powell iteration over oscillation parameters is followed by one iteration
+over systematics parameters. Since there may be some pathological cases where this
+interleaved minimization strategy behaves differently than the old method,
+it is by default not used in \GLOBES\ 3.0. This ensures maximal compatibility
+with old application programs, but it requires users who wish to benefit from the
+new algorithm to explicitly select it by an API function call.
+
+Besides optimizing the minimization functions, it is also mandatory to
+optimize the routines which are called by them to calculate $\chi^2$
+for one specific set of parameters. In particular, the computation of
+oscillation probabilities, which has to be done every time the oscillation
+parameters have changed, should be as efficient as possible. The most expensive
+step here is the diagonalization of the hermitian $3\times3$ neutrino Hamilton
+operator in matter. The LAPACK rotuines~\cite{Anderson:LAPACK}, which were
+used to solve this eigenproblem in previous versions of \GLOBES, turned out
+not to be the optimal choice because they are mainly optimized for very large
+matrices~\cite{Kopp:2006wp}. In the case of the small and usually well-conditioned
+matrices appearing in \GLOBES, they spend too much time evaluating their parameter
+list and planning the optimal diagonalization strategy. Therefore, \GLOBES\ now
+relies an algorithm which has been designed specifically for the diagonalization
+of hermitian $3\times3$ matrices. It is essentially the extremely fast analytical
+algorithm discussed in~\cite{Kopp:2006wp}, but for the rare cases where this may become
+inaccurate, it falls back to the QL method from~\cite{Press:NumRecip}.
+
+
+
 \section{Summary and conclusions}
 
 \begin{appendix}
