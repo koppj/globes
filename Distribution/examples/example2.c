@@ -62,7 +62,9 @@ int main(int argc, char *argv[])
   glb_projection theta13_projection = glbAllocProjection();  
 
   glbDefineParams(true_values,theta12,theta13,theta23,deltacp,sdm,ldm);
+  glbSetDensityParams(true_values,1.0,GLB_ALL);
   glbDefineParams(test_values,theta12,theta13,theta23,deltacp,sdm,ldm);  
+  glbSetDensityParams(test_values,1.0,GLB_ALL);
 
   /* The simulated data are computed */
   glbSetOscillationParameters(true_values);

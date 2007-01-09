@@ -182,7 +182,6 @@ int main(int argc, char *argv[])
 
   /* Initialize libglobes */
   glbInit(argv[0]);
-  glbSelectMinimizer(GLB_MIN_POWELL);
  
   /* Register non-standard probability engine. This has to be done
    * before any calls to glbAllocParams() or glbAllocProjections() */
@@ -204,9 +203,11 @@ int main(int argc, char *argv[])
   glbDefineParams(true_values,true_theta12,true_theta13,true_theta23,
                               true_deltacp,true_sdm,true_ldm);
   glbSetOscParams(true_values,true_sigma_E, GLB_SIGMA_E);   /* Non-standard parameter */
+  glbSetDensityParams(true_values,1.0,GLB_ALL);
   glbDefineParams(test_values,true_theta12,true_theta13,true_theta23,
                               true_deltacp,true_sdm,true_ldm);
   glbSetOscParams(test_values,true_sigma_E, GLB_SIGMA_E);   /* Non-standard parameter */
+  glbSetDensityParams(test_values,1.0,GLB_ALL);
 
   /* The simulated data are computed */
   glbSetOscillationParameters(true_values);

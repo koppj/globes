@@ -54,6 +54,7 @@ void SetOscParams(double theldm)
 {
  glb_params true_values = glbAllocParams();
  glbDefineParams(true_values,theta12,theta13,theta23,deltacp,sdm,theldm);
+ glbSetDensityParams(true_values,1.0,GLB_ALL);
  glbSetOscillationParameters(true_values);
  glbSetRates();
  glbFreeParams(true_values);  
@@ -66,6 +67,7 @@ double CalcSystematics(double theldm,double thex)
   double thetheta13=asin(sqrt(pow(10,thex)))/2;
   glb_params test_values = glbAllocParams();
   glbDefineParams(test_values,theta12,thetheta13,theta23,0.0,sdm,theldm);
+  glbSetDensityParams(test_values,1.0,GLB_ALL);
   double res=glbChiSys(test_values,GLB_ALL,GLB_ALL);
   glbFreeParams(test_values);  
   return res;
@@ -101,6 +103,7 @@ double CalcProjection(double theldm,double thex,glb_params start_vector)
      contributions from the priors */  
   glbDefineParams(starting_values,theta12,theta13,
                                    theta23,deltacp,sdm,theldm*thesign);
+  glbSetDensityParams(starting_values,1.0,GLB_ALL);
   glbSetCentralValues(starting_values);
   glbSetInputErrors(input_errors);
 
@@ -127,6 +130,7 @@ double FindDeg(glb_params deg_pos,double theldm)
   glb_params starting_values = glbAllocParams();
 
   glbDefineParams(starting_values,theta12,theta13,theta23,deltacp,sdm,-theldm);  
+  glbSetDensityParams(starting_values,1.0,GLB_ALL);
   glbDefineParams(input_errors,theta12*0.1,0,0,0,sdm*0.1,theldm/3);  
   glbSetDensityParams(input_errors,0.05,GLB_ALL);
   glbSetCentralValues(starting_values);
@@ -182,7 +186,9 @@ int main(int argc, char *argv[])
   /* Compute 3rd edges of bars: systematics on, projection onto s22th13 axis */
   InitOutput(MYFILE3,"Format: Log(10,s22th13)  chi^2:ldm=2e-3  chi^2:ldm=3.0e-3 \n"); 
   glbDefineParams(original1,theta12,theta13,theta23,deltacp,sdm,2.0e-3);
+  glbSetDensityParams(original1,1.0,GLB_ALL);
   glbDefineParams(original2,theta12,theta13,theta23,deltacp,sdm,3.0e-3);
+  glbSetDensityParams(original2,1.0,GLB_ALL);
   for(x=-7.0;x<-2.0+0.01;x=x+5.0/50)
   {
      res1=CalcProjection(2.0e-3,x,original1);

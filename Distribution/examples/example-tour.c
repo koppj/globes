@@ -52,15 +52,16 @@ int main(int argc, char *argv[])
   stream=stdout;
   /* Initialize libglobes */
   glbInit(argv[0]);
+  glbSetVerbosityLevel(2);
   
 
   /* Define my standard oscillation parameters */
-  double theta12 = asin(sqrt(0.3));
+  double theta12 = asin(sqrt(0.8))/2;
   double theta13 = asin(sqrt(0.001))/2;
   double theta23 = M_PI/4;
   double deltacp = M_PI/2;
-  double sdm = 7.9e-5;
-  double ldm = 2.6e-3;
+  double sdm = 7e-5;
+  double ldm = 2e-3;
  
   /* Initialize one experiment NuFact.glb */
   glbInitExperiment("NuFact.glb",&glb_experiment_list[0],&glb_num_of_exps); 
@@ -74,6 +75,7 @@ int main(int argc, char *argv[])
     
   /* Assign standard oscillation parameters */
   glbDefineParams(true_values,theta12,theta13,theta23,deltacp,sdm,ldm);
+  glbSetDensityParams(true_values,1.0,GLB_ALL);
 
   /* The simulated data are computed with "true_values" */
   glbSetOscillationParameters(true_values);
@@ -132,6 +134,7 @@ int main(int argc, char *argv[])
   glb_projection myprojection = glbAllocProjection();
   glbDefineProjection(myprojection,GLB_FIXED,GLB_FIXED,GLB_FIXED,GLB_FREE,
    GLB_FIXED,GLB_FIXED);
+  glbSetDensityProjectionFlag(myprojection,GLB_FREE,GLB_ALL);
   glbSetProjection(myprojection);
   chi2 = glbChiNP(fit_values,minimum,GLB_ALL);
   fprintf(stream,"chi2 with correlation only with deltacp: %g \n\n",chi2);
@@ -145,8 +148,9 @@ int main(int argc, char *argv[])
      
   /* Find position of sgn-degeneracy;  */
   glbDefineParams(input_errors,theta12*0.1,0,0,0,sdm*0.1,ldm/3);
-  glbDefineParams(starting_values,theta12,theta13,theta23,deltacp,sdm,-ldm);
   glbSetDensityParams(input_errors,0.05,GLB_ALL);
+  glbDefineParams(starting_values,theta12,theta13,theta23,deltacp,sdm,-ldm);
+  glbSetDensityParams(starting_values,1.0,GLB_ALL);
   glbSetCentralValues(starting_values);
   glbSetInputErrors(input_errors);
   chi2=glbChiAll(starting_values,minimum,GLB_ALL); 
@@ -188,6 +192,7 @@ int main(int argc, char *argv[])
 
   /* Assign standard oscillation parameters */
   glbDefineParams(true_values,theta12,theta13,theta23,deltacp,sdm,ldm);
+  glbSetDensityParams(true_values,1.0,GLB_ALL);
 
   /* The simulated data are computed with "true_values" */
   glbSetOscillationParameters(true_values);
@@ -231,10 +236,11 @@ int main(int argc, char *argv[])
   
   /* Find sgn-degeneracies for both experiments and test if they are still there for comb. */
   glbDefineParams(input_errors,theta12*0.1,theta13,theta23,deltacp,sdm*0.1,ldm/3);
-  glbDefineParams(starting_values,theta12,theta13,theta23,deltacp,sdm,-ldm);
   glbSetDensityParams(input_errors,0.05,GLB_ALL);
-  glbSetCentralValues(starting_values);
+  glbDefineParams(starting_values,theta12,theta13,theta23,deltacp,sdm,-ldm);
+  glbSetDensityParams(starting_values,1.0,GLB_ALL);
   glbSetInputErrors(input_errors);
+  glbSetCentralValues(starting_values);
   chi2=glbChiAll(starting_values,minimum,0); 
   fprintf(stream,"chi2 at minimum, L=3000km: %g \n",chi2);
   glbPrintParams(stream,minimum);  

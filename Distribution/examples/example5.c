@@ -43,11 +43,6 @@ char MYFILE2[]="test5b.dat";
 char MYFILE3[]="test5c.dat";
 char MYFILE4[]="test5d.dat";
 char MYFILE5[]="test5e.dat";
-//char MYFILE1[]="";
-//char MYFILE2[]="";
-//char MYFILE3[]="";
-//char MYFILE4[]="";
-//char MYFILE5[]="";
 
 /* "True" oscillation parameters */
 double theta12,theta13,theta23,deltacp,sdm,ldm;
@@ -311,7 +306,9 @@ void ComputeSensitivityCurve()
 
     /* Calculate "true" event rates */
     glbDefineParams(true_values,theta12,theta13,theta23,deltacp,sdm,ldm);
+    glbSetDensityParams(true_values,1.0,GLB_ALL);
     glbDefineParams(test_values,theta12,theta13,theta23,deltacp,sdm,ldm);  
+    glbSetDensityParams(test_values,1.0,GLB_ALL);
     glbDefineParams(input_errors, 0.1*theta12, 0, 0.15*theta23, 0, 0.05*sdm, 0.05*ldm);
     glbSetDensityParams(input_errors, 0.05, GLB_ALL);
     glbSetOscillationParameters(true_values);
@@ -402,7 +399,9 @@ int main(int argc, char *argv[])
   test_values  = glbAllocParams();
   input_errors = glbAllocParams();
   glbDefineParams(true_values,theta12,theta13,theta23,deltacp,sdm,ldm);
+  glbSetDensityParams(true_values,1.0,GLB_ALL);
   glbDefineParams(test_values,theta12,theta13,theta23,deltacp,sdm,ldm);  
+  glbSetDensityParams(test_values,1.0,GLB_ALL);
   glbDefineParams(input_errors, 0.1*theta12, 0, 0.15*theta23, 0, 0.05*sdm, 0.05*ldm);
   glbSetDensityParams(input_errors, 0.05, GLB_ALL);
   glbSetOscillationParameters(true_values);
