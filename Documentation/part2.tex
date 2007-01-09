@@ -35,7 +35,7 @@ to study beams with bunch structure, since the time dependence of the
 neutrino source is physically only important to suppress backgrounds. 
 \end{itemize}
 
-The description of the neutrino oscillation physics is, at least numerically, relatively simple. We use the {\em evolution operator method}~\cite{Ohlsson:1999um}  to compute the neutrino oscillation probabilities and divide the matter density profile into layers of constant matter density. For each of these layers, the Hamiltonian in matter is diagonalized in order to propagate the neutrino transition amplitudes. Finally, the transition probability is obtained by the absolute square of the total neutrino transition amplitudes. Depending on the precision of the studied experiment, this approach turns out to be precise enough in Earth matter even if only a small number matter density steps is used. Since we allow an uncertainty of the matter density profile, it is, in fact, in most cases sufficient to consider only one density step with the average matter density together with a matter density uncertainty~\cite{Ohlsson:2003ip}. Note that this approach may not be applicable to quickly varying extraterrestrial matter density profiles.
+The description of the neutrino oscillation physics is, at least numerically, relatively simple. We use the {\em evolution operator method} (see, \eg, \Ref~\cite{Ohlsson:1999um})  to compute the neutrino oscillation probabilities and divide the matter density profile into layers of constant matter density. For each of these layers, the Hamiltonian in matter is diagonalized in order to propagate the neutrino transition amplitudes. Finally, the transition probability is obtained by the absolute square of the total neutrino transition amplitudes. Depending on the precision of the studied experiment, this approach turns out to be precise enough in Earth matter even if only a small number matter density steps is used. Since we allow an uncertainty of the matter density profile, it is, in fact, in most cases sufficient to consider only one density step with the average matter density together with a matter density uncertainty~\cite{Ohlsson:2003ip}. Note that this approach may not be applicable to quickly varying extraterrestrial matter density profiles.
 
 While it is comparatively simple to define a general neutrino source 
 and to compute the oscillation physics, the general properties of a detector simulation are much more complicated. The basic assumption in building an abstract detector description is \emph{linearity}, \ie , that two neutrino events do not interfere with each other. Furthermore it is assumed that all information on the oscillation physics 
@@ -128,6 +128,12 @@ The first line of every experiment definition file has to be
 {\tt !\%GLoBES}
 \end{quote}
 in order not to confuse it with some other file format.
+In addition, \GLOBES\ 3.0 and higher requires the identification of the
+minimum \GLOBES\ version the \AEDL\ file can be used with:
+\begin{quote}
+{\tt \$version="3.0.0"}
+\end{quote}
+
 %
 First, we instruct \GLOBES\ to use the built-in source flux for a neutrino factory
 originating from stored $\mu^+$'s. This achieved by setting the {\tt @builtin} variable to $1$. Next, we specify the muon energy to be $50\,\mathrm{GeV}$ by the {\tt @parent\_energy} variable. We assume 
@@ -216,24 +222,28 @@ The last step is to encapsulate the channels into a rule:
 {\tt /* rules */}\\
 {\tt rule(\#rule1)<}\\
 {\tt \tb @signal = 0.45 @ \#appearance}\\
-{\tt \tb @signalerror = 0.001 : 0.0001}\\
+{\tt \tb @signalerror = 0.025 : 0.0001}\\
 {\tt \tb @background = 1.0e-05 @ \#disappearance}\\
-{\tt \tb @backgroundcenter = 1 : 0.0}\\
-{\tt \tb @backgrounderror = 0.05 : 0.0001}\\
-{\tt \tb @errordim\_sys\_on = 0}\\
-{\tt \tb @errordim\_sys\_off = 2}\\
+%{\tt \tb @backgroundcenter = 1 : 0.0}\\
+{\tt \tb @backgrounderror = 0.2 : 0.0001}\\
+{\tt \tb @sys\_on\_function = "chiSpectrumTilt"}\\
+{\tt \tb @sys\_off\_function = "chiNoSysSpectrum"}\\
 {\tt \tb @energy\_window = 4.0 : 50.0}\\
 {\tt >}
 \end{quote}
 The {\tt @signal} refers to the ``signal'' in our experiment. We use the
 above defined channel named {\tt \#appearance} with an constant overall
-efficiency of $0.45$. The signal error variable has two components: 
-The first one is the normalization error of the signal, here $0.1\%$. The second 
+efficiency of $0.45$ (in a more realistic simulation, one would introduce an
+energy threshold function). The signal error variable has two components: 
+The first one is the normalization error of the signal, here $2.5\%$. The second 
 one refers to the energy calibration error of the signal, which is defined 
 in \Sec~\ref{sec:energy}. The background variable
 specifies the composition of the beam background. In this (simplified) case, we
-use the fraction $1\cdot 10^{-5}$ of the channel named {\tt \#disappearance}, \ie , the muon neutrinos with a mis-identified charge. The background center variable allows to rescale the total background contribution from all background components
-simultaneously. It is only useful if there is more than one background component, otherwise it is usually $1$. The background error variable is defined such as the signal error variable, \ie\ we have a $5\%$ background uncertainty and a very small energy calibration error. The ``error dimension variable'' {\tt @errordim\_sys\_X} selects how the systematical errors are treated (\cf, \Tab~\ref{tab:error_dim}). 
+use the fraction $1\cdot 10^{-5}$ of the channel named {\tt \#disappearance}, \ie , the muon neutrinos with a mis-identified charge. 
+%The background center variable allows to rescale the total background contribution from all background components
+%simultaneously. It is only useful if there is more than one background component, otherwise it is usually $1$. 
+The background error variable is defined such as the signal error variable, \ie , we have a $20\%$ background uncertainty and a very small energy calibration error. In addition, the systematics treatment is specified
+in {\tt @sys\_on\_function} (for systematics switched on) and {\tt @sys\_off\_function} (for systematics switched off) -- see \Tab~\ref{tab:error_dim}. 
 
 The here defined experiment represents a first simplified version of a neutrino factory experiment. It still lacks the correct energy dependence of the efficiencies, the antineutrino disappearance channel, and the channels and rules for the symmetric operation with $\mu^-$ stored. However, it may serve as a simple, introductory example. In the next chapter, we will demonstrate that the AEDL is much more powerful than illustrated here.
 
@@ -245,12 +255,16 @@ The here defined experiment represents a first simplified version of a neutrino 
 We now give a short introduction to the syntax of AEDL.
  The first eight characters have to be {\tt \%!GLoBES}
 in order to avoid parsing megabytes of chunk
- and producing thousands of error messages. 
+ and producing thousands of error messages.  In addition, the version of the minimum
+\GLOBES\ version the \AEDL\ file is running with has to be defined by {\tt \$version}, such as
+{\tt \$version="3.0.0"}.
+\index{aedl}{version@{\tt \$version}}
 %
 Comments can be used such as in C:
 \begin{quote}
 {\tt /* This starts a comment\\
- and here the comment ends */
+ and here the comment ends */ \\
+// Another comment
 }
 \end{quote}
 There are pre-defined variables which all start with {\tt \$}. Their range
@@ -280,7 +294,7 @@ with the channel definition part:
 }
 \end{quote}
 The first part is the type of environment, which is {\tt channel} here. 
-There are the following types of environment in AEDL:
+There are the following types of environments in AEDL:
 \begin{quote}
 {\tt flux\\
 cross\\
@@ -311,7 +325,7 @@ page~\pageref{sec:aedl_names}).
 Within each environment type, there are several 
 variables beginning with {\tt @}, which can only be used within the 
 appropriate type of environment. In many cases, 
-they have a special syntax, such as {\tt @channel}.          
+they have a special syntax, such as {\tt @channel}.
 
 \index{aedl}{NEXT@{\tt \#NEXT\#}}
 If you want to have several experiments in one file, separate the different
@@ -333,12 +347,12 @@ As another feature of AEDL one can use include files with the {\tt include} comm
 \end{quote}
 With this include mechanism, one can use constructions such as 
 \begin{quote}
-{\tt    include  "NuFact.gls"\\
+{\tt    include  "Exp1.glb"\\
         \#NEXT\#\\
-        include   "JHFHK.gls"
+        include   "Exp2.glb"
 }
 \end{quote}
-in order to initialize a combined analysis of the experiments defined in the files {\tt NuFact.gls} and {\tt JHFHK.gls}. Note that one has 
+in order to initialize a combined analysis of the experiments defined in the files {\tt Exp1.glb} and {\tt Exp2.glb}. Note that one has 
 to use quotation marks for filenames in \AEDL.\index{norm}{File names}
 Even if one uses the
 automatic variable {\tt \#CC} in both experiments, 
@@ -364,7 +378,7 @@ In addition, some simple algebraic manipulations are possible, such as
 {\tt
 Pi+1\\
 \verb+Pi^2+\\
-sin(Pi/2)\\
+sin(Pi/2)
 }
 \end{quote}
 The following mathematical functions from {\tt <math.h>} are available: 
@@ -380,16 +394,82 @@ The following mathematical functions from {\tt <math.h>} are available:
 \index{aedl}{log10@{\tt log10}}
 \index{aedl}{exp@{\tt exp}}
 \index{aedl}{sqrt@{\tt sqrt}}
-
-
-
- 
+% 
 These functions can be used everywhere, where
 otherwise only a scalar number would appear. However, they can not be
 applied to lists, such as {\tt sin(\{1,2,3\})} will not work. 
 
 Finally, note that a line feed character \verb+\n+ is necessary at
  the end of the input -- alternatively you can put a comment at the end.
+
+\section{More advanced AEDL features}
+
+In \GLOBES\ 3.0 and higher, a number of new features can be used. The
+features in this section are slighlty more advanced and can be jumped over at a first reading of
+the manual. The
+most important one are lists as variables in \AEDL . They start with {\tt \%}, such as
+\begin{quote}
+{\tt
+\%effs = \{ 0.2, 0.4, 0.6, 0.8, 1.0, 1.0, 1.0 \}
+}
+\end{quote}
+Functions can be threaded over lists, \ie, by applying the function to each element
+and returning a list. Note that the original list will be destroyed by this
+process. Therefore, it is necessary to create a copy of your list if you want to
+use the original and the threading result. For that purpose, the {\tt copy}
+funcion is provided:
+\begin{quote}
+{\tt
+ listb = copy(lista) \\
+ listb := lista // Alternative method 
+}
+\end{quote}
+\index{aedl}{copy@{\tt copy}}
+You will also need to use {\tt copy} when you assign a list to an experiment structure (see below).
+
+Two helper functions {\tt bincenter()} 
+\index{aedl}{bincenter@{\tt bincenter}} and {\tt simbincenter} \index{aedl}{simbincenter@{\tt simbincenter}} return lists with the central energies of the bins or sampling points, respectively. For example,
+\begin{quote}
+{\tt
+ \%bc=bincenter() 
+}
+\end{quote}
+A very useful new features is an interpolation function which can directly interpolate a number of
+points and evaluate them at a different set of places. For example,
+\begin{quote}
+{\tt
+ \%energ = \{ 4.0,20.0,50.0 \} \\
+ \%effs = \{ 0.0,1.0,1.0 \} \\
+ \%ires = interpolation(\%energ,\%effs,1,\%bc) 
+}
+\end{quote}
+\index{aedl}{interpolation@{\tt interpolation}}
+interpolates the points with x-values {\tt \%energ} and y-values {\tt \%effs} with the interpolation order one (linear interpolation, third parameter) and evaluates the interpolation result at the bin centers obtained above, \ie, it returns a list of the y-values at the places specified by the last parameter. The only allowed interpolation orders are ``1'' (linear) and ``2'' (cubic splines). This example creates
+a neutrino factory energy threshold function linearly climbing from 0 to 1 between 4~GeV and 20~GeV. It can be directly used in a channel definition, \eg, 
+\begin{quote}
+{\tt
+ channel(\#nu\_mu\_appearance)< \\
+\hspace*{0.5cm}	@channel = \#mu\_plus: +: electron: muon: \#CC: \#MINOS\ \\
+\hspace*{0.5cm}	@post\_smearing\_efficiencies = copy(\%ires) \\
+>
+}
+\end{quote}
+
+
+For debugging purposes of lists and numbers, one can \GLOBES\ now supports output directly
+from \AEDL\ files:
+\begin{quote}
+{\tt 
+ R = 1.15 \\
+ echo(R) // Print without line feed \\
+ line(2) // Two line feeds \\
+ echon(ires) // Print with line feed 
+}
+\end{quote}
+\index{aedl}{echo@{\tt echo}}
+\index{aedl}{echon@{\tt echon}}
+\index{aedl}{line@{\tt line}}
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
