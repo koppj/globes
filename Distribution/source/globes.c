@@ -68,7 +68,7 @@ static int parse_definition(const char *str)
   double *result=NULL;
   double res;
   char *endp;
-  char *wrk;
+  char *wrk,*dummy;
   const char *delim="=";
   double val;
   char *token=NULL;
@@ -94,17 +94,16 @@ static int parse_definition(const char *str)
      rhs=strdup(token);
      length++;
     }
-  
-  
-
-  wrk=rhs;
 
   s=strlen(rhs);
 
-  if(rhs[0]=='{' && rhs[s-1]=='}') {wrk=strncpy(wrk,&rhs[1],s);vec=1;wrk[s-2]='\0';}
-  else wrk=strncpy(wrk,&rhs[0],s);
-
-  fprintf(stderr,"%s\n",wrk);
+  /* dummy is needed to keep a pointer to the beginning of the
+   * malloc'ed memory region.
+   */
+  dummy=glb_malloc((s+1)*sizeof(char));
+  wrk=dummy;
+  if(rhs[0]=='{' && rhs[s-1]=='}') {strncpy(wrk,&rhs[1],s);vec=1;wrk[s-2]='\0';}
+  else strncpy(wrk,&rhs[0],s);
 
   while(wrk)
     {
@@ -130,12 +129,14 @@ static int parse_definition(const char *str)
 
 
   if(c==1&&vec==0&& lhs[0] != '\%') glbDefineAEDLVariable(lhs,result[0]);
-  else if (c>0&&vec==1) glbDefineAEDLList(lhs,result,c);
+  else if (c>0&&vec==1 && lhs[0] == '%') glbDefineAEDLList(lhs,result,c);
   else {fprintf(stderr,"globes: ERROR: Confusion about vector vs scalar definition.\n");c=0;}
 
   glb_free(result);
-  //glb_free(wrk);
-   glb_free(inc);
+  glb_free(dummy);
+  glb_free(inc);
+  glb_free(rhs);
+  glb_free(lhs);
 
   return c;
 }
