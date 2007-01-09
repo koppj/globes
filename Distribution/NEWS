@@ -708,3 +708,33 @@ documented!
 
        - Trying to a newer AEDL file than the release version will
        produce an error, but the programm will continue.
+
+09/01/2007 PH
+       - Cleaning up globes.h, found a minor inconsistency in
+       glb_prior.h (the user_data stuff was missing). Removed all
+       hints of module functions in globes.h and few of those Joachim
+       has suggested.
+
+
+*********Version 2.4.0
+
+09/01/2007 PH
+	Perl extension are no longer built by default, only by user
+	request with '--enable-perl'.
+
+	Adapted 'globes-config' to a live without modules.
+
+	Changed the Makefile.in in examples to compile all targets by
+	default, not only example-tour in order to facilitate
+	testing. example-static is now compile without libtool, just
+	by using the '-static' flag to gcc.
+
+	Version 2.4.0 starts the pre-release series. The API is now
+	frozen and only bugfixes should happend from now on. In order
+	to facilitate testing, the version numbers should be increased
+	for *any* change like 2.4.x+1.
+
+	I updated the optional rpm building stuff.
+
+	I updated AUTHORS, TODO, README and INSTALL
+

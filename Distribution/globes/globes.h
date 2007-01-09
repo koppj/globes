@@ -1,5 +1,5 @@
 /* GLoBES -- General LOng Baseline Experiment Simulator
- * (C) 2002 - 2004,  The GLoBES Team
+ * (C) 2002 - 2007,  The GLoBES Team
  *
  * GLoBES is mainly intended for academic purposes. Proper
  * credit must be given if you use GLoBES or parts of it. Please
@@ -72,27 +72,20 @@ enum glb_enum_minimizers
 #define GLB_EARTH_RADIUS 6371.0 /* km */
 
 /* Unit conversion */
-//#define EV_TO_KM_FACTOR  1.973e-10
-#define EV_TO_KM_FACTOR  1.9747235e-10
-#define KM_TO_EV(x)      ((x) / EV_TO_KM_FACTOR)
-#define EV_TO_KM(x)      ((x) * EV_TO_KM_FACTOR)
+
+#define GLB_EV_TO_KM_FACTOR  1.9747235e-10
+#define GLB_KM_TO_EV(x)      ((x) / GLB_EV_TO_KM_FACTOR)
+#define GLB_EV_TO_KM(x)      ((x) * GLB_EV_TO_KM_FACTOR)
+
 
 
 /* Data structures */
 /* --------------- */
 
-// JK - I thought we had removes module handling ?!?
-/* In the application software we only need a handle for the
- * any lt_dlopen`ed module ...
- */
-typedef struct lt_dlhandle_struct *glb_dlhandle;
 
-// JK - I'm surprised that this works, since the definition of
-// glb_params_type is in a completely different place
 typedef struct glb_projection_type *glb_projection;
 typedef struct glb_params_type  *glb_params;
 typedef struct glb_experiment *glb_exp;
-typedef float(*pt2Func)(float, float);  // JK - What is this good for ???
 
 /* User-defined chi^2 function */
 typedef double (*glb_chi_function)(int exp, int rule, int n_params,
@@ -136,16 +129,13 @@ void glbInit(char *name);
 
 
 /* Loading of AEDL files */
-glb_exp glbAllocExp();               // JK - Why is this in globes.h?
+
 void glbClearExperimentList();
 void glbDefineAEDLVariable(const char *name, double value);
 void glbDefineAEDLList(const char *name, double *list, size_t length);
 void glbClearAEDLVariables();
 int glbInitExperiment(char *inf, glb_exp *in, int *counter);
-void glbSetExperiment(glb_exp in);   // JK - Why does this have to be in globes.h ?
-int glbDefaultExp(glb_exp ins);      //               "
-void glbInitExp(glb_exp ins);        //               "
-void glbFreeExp(glb_exp ins);        //               "
+
 
 int glbNameToValue(int exp, const char* context, const char *name);
 const char *glbValueToName(int exp,const char* context, int value);
@@ -301,19 +291,12 @@ void glbShiftEnergyScale(double g, double *rates_in, double *rates_out,         
                          int n_bins, double emin, double emax);
 
 
-/* Modules and user-defined priors */
-int glbProbeModule(const char *module_name, int verbosity);                        //new
-glb_dlhandle glbOpenModule(const char *module_name);                               //new
-int glbCloseModule(glb_dlhandle stale);                                            //new
-void *glbSymModule(glb_dlhandle module,const char *symbol_name);                   //new
-
 #ifndef SWIG
 int glbRegisterPriorFunction(double (*prior)(const glb_params, void *user_data),   //new
                              int (*starting)(const glb_params, void *user_data),
                              int (*error)(const glb_params, void *user_data),
                              void *user_data);
 #endif /* SWIG */
-int glbUsePrior(glb_dlhandle module);                                              //new
 
 
 /* Implementation of non-standard physics */
@@ -365,7 +348,7 @@ int glbSelectMinimizer(int minimizer_ID);
   #define GLB_DM_SOL  GLB_DM_21   /* Redefined to avoid confusion of dm31 and dm32 */
   #define GLB_DM_ATM  GLB_DM_31 
 
-//  #define GLB_OSCP (glbGetNumOfOscParams())  // FIXME JK - Is this OK?
+ #define GLB_OSCP (glbGetNumOfOscParams())
     
   /* Replaced by glbChiTheta13 */
   double glbChiTheta(const glb_params in, glb_params out, int exp);
@@ -395,7 +378,7 @@ int glbSelectMinimizer(int minimizer_ID);
   void glbResetRateStack();                   /* Obsolete */
   
   int glbSetFilterState(int on_off);          /* No longer implemented */
-  int glbGetFilterState();                    // FIXME
+  int glbGetFilterState();                   
   int glbSetFilter(double filter);
   double glbGetFilter();
 

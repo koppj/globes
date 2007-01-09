@@ -45,11 +45,7 @@ local_CFLAGS = -g -O4
 
 INCFLAGS:=$(shell $(globesconf) --include)
 local_LDFLAGS:=$(shell $(globesconf) --libs)
-preopen_modules:=$(shell $(globesconf) --dlpreopen)
 local_LTLDFLAGS:=$(shell $(globesconf) --ltlibs)
-ifdef preopen_modules
-predefs = -DGLB_STATIC
-endif
 
 
 
@@ -57,15 +53,13 @@ BIN = example-tour example-static example1 example2 example3 example4 example5 e
 OBJ = example-tour.o example-tour-s.o example1.o example2.o example3.o example4.o \
       example5.o example6.o myio.o
 
+all: $(BIN)
+
 example-tour: example-tour.o
 	gcc example-tour.o -o example-tour $(LDFLAGS) $(local_LDFLAGS)
 
-example-tour-s.o: example-tour.c
-	gcc -c $(predefs) $(CFLAGS) $(local_CFLAGS) example-tour.c -o example-tour-s.o $(INCFLAGS)
-
-example-static: example-tour-s.o
-	../libtool --mode=link g++ example-tour-s.o -o example-static -all-static $(LDFLAGS)\
- $(local_LTLDFLAGS) $(preopen_modules)      
+example-static: example-tour.o
+	gcc example-tour.o -o example-static -static $(LDFLAGS) $(local_LDFLAGS) 
 
 example1: example1.o myio.o
 	gcc example1.o myio.o -o example1  $(LDFLAGS) $(local_LDFLAGS)

@@ -30,9 +30,9 @@
 
 extern int glb_builtin_prior_init();
 extern void glb_builtin_prior_clean();
-extern double glb_builtin_prior_prior(const glb_params in);
-extern int glb_builtin_prior_starting_values(const glb_params in);
-extern int glb_builtin_prior_input_errors(const glb_params in);
+extern double glb_builtin_prior_prior(const glb_params in, void *user_data);
+extern int glb_builtin_prior_starting_values(const glb_params in, void *user_date);
+extern int glb_builtin_prior_input_errors(const glb_params in, void *user_data);
 
 #endif /* !GLB_PRIOR_H */
  

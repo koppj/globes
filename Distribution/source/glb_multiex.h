@@ -30,6 +30,14 @@
 
 extern int glb_current_exp;
 
+glb_exp glbAllocExp();
+
+void glbSetExperiment(glb_exp in);   
+int glbDefaultExp(glb_exp ins);      
+void glbInitExp(glb_exp ins);        
+void glbFreeExp(glb_exp ins);        
+
+
 void glb_set_profile_scaling(double scale,int i);
 
 glb_flux *glb_flux_alloc();

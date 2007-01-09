@@ -32,8 +32,8 @@
 #include "config.h"
 #endif
 
-#include <globes/globes.h>
-
+#include "globes/globes.h"
+#include "glb_prior.h"
 
 /* File-scope static variables to store starting values and input errors */
 static glb_params sv;

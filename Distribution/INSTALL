@@ -11,28 +11,32 @@ Besides the usual things like a working libc you need to have
 	GSL 	The GNU Scientific Library
 			www.gnu.org/software/gsl/
 
-The library `libglobes' should in principle compile with any ANSI C/C++ 
-compiler but the `globes' binary uses the `argp' facility of `glibc' to 
-parse its command line options. However, on platforms where `argp' is lacking
-GLoBES has replacement code, thus it should also work there.
+The library `libglobes' should in principle compile with any C/C++
+compiler but the `globes' binary uses the `argp' facility of `glibc'
+to parse its command line options. However, on platforms where `argp'
+is lacking GLoBES has replacement code, thus it should also work
+there. GLoBES is, however, using the C99 standard in order to handle
+complex numbers, but that is the only feature of C99 used.
 
-All those libraries are also available as rpm's from the various
-distributors of GNU/Linux, see their web sites for downloads. Chances are 
-that gcc and GSL are already part of your installation.  For building GLoBES 
-from source, however, not only working libaries for above packages are 
-needed but also the headers,  especially for GSL. Depending on your
-installation, eg. on RedHat/Fedora, of GSL this may require to additionally 
-install a rpm-package named `gsl-devel'. If GSL has been installed from the 
-tar-ball as provided by gnu.org no problems should occur. Furthmore you need 
-a working `make' to build and install GLoBES.
+GSL is also available as rpm's from the various distributors of
+GNU/Linux, see their web sites for downloads. Chances are that gcc and
+GSL are already part of your installation.  For building GLoBES from
+source, however, not only working libaries for above packages are
+needed but also the headers, especially for GSL. Depending on your
+installation, eg. on RedHat/Fedora, of GSL this may require to
+additionally install a rpm-package named `gsl-devel'. If GSL has been
+installed from the tar-ball as provided by gnu.org no problems should
+occur. Furthmore you need a working `make' to build and install
+GLoBES.
 
 
 Installation Instructions
 =========================
 
-GLoBES follows the standard GNU installation procedure.  To compile GLoBES
-you will need an ANSI C-compiler.  After unpacking the distribution
-the Makefiles can be prepared using the configure command,
+GLoBES follows the standard GNU installation procedure.  To compile
+GLoBES you will need an ANSI C-compiler.  After unpacking the
+distribution the Makefiles can be prepared using the configure
+command,
 
   ./configure
 
@@ -48,17 +52,17 @@ The libraries and modules can be installed using the command,
   make install
 
 The install target also will install a program with name globes to
-/usr/local/bin. 
+/usr/local/bin.
 
 The default install directory prefix is /usr/local.  Consult the
 "Further Information" section below for instructions on installing the
 library in another location or changing other default compilation
 options.
 
-Moreover a config-script called `globes-config' will be installed. This
-script displays all information necessary to link any program with GLoBES.
-For building static libaries and linking against them see the corresponding
-section of this file.
+Moreover a config-script called `globes-config' will be
+installed. This script displays all information necessary to link any
+program with GLoBES.  For building static libaries and linking against
+them see the corresponding section of this file.
  
                     ------------------------------
 
@@ -69,14 +73,15 @@ Basic Installation
    These are generic installation instructions.
 
    The `configure' shell script attempts to guess correct values for
-various system-dependent variables used during compilation.  It uses
-those values to create a `Makefile' in each directory of the package.
-It may also create one or more `.h' files containing system-dependent
-definitions.  Finally, it creates a shell script `config.status' that
-you can run in the future to recreate the current configuration, a file
-`config.cache' that saves the results of its tests to speed up
-reconfiguring, and a file `config.log' containing compiler output
-(useful mainly for debugging `configure').
+various system-dependent variables used during compilation.  It
+uses those values to create a `Makefile' in each directory of the
+package.  It may also create one or more `.h' files containing
+system-dependent definitions.  Finally, it creates a shell script
+`config.status' that you can run in the future to recreate the
+current configuration, a file `config.cache' that saves the results
+of its tests to speed up reconfiguring, and a file `config.log'
+containing compiler output (useful mainly for debugging
+`configure').
 
    If you need to do unusual things to compile the package, please try
 to figure out how `configure' could check whether to do them, and mail
@@ -119,111 +124,105 @@ Installation without root privilege
 ===================================
 
 Install GLoBES to a directory of your choice GLB_DIR. This is done by
-	configure --prefix=GLB_DIR
-and then follow the usual installation guide. The only remaining problem
-is that you have to tell the compiler where to find the header files, and 
-the linker where to find the library. Furthermore you have to make sure 
-that the shared object files are found during execution. Running 'configure'
-also produces a 'Makefile' in the examples subdirectory which can serve as
-a template for the compilation and linking process, since all necessary
-flags are correctly filled in. 
-Another solution is to set the environment variable LD_RUN_PATH
-during linking to GLB_DIR/lib/. Best thing is to add this to your
-shell dot-file (e.g. .bashrc). Then you can use:
-A typical compiler command like
+	configure --prefix=GLB_DIR 
+and then follow the usual
+installation guide. The only remaining problem is that you
+have to tell the compiler where to find the header files, and
+the linker where to find the library. Furthermore you have to
+make sure that the shared object files are found during
+execution. Running 'configure' also produces a 'Makefile' in
+the examples subdirectory which can serve as a template for
+the compilation and linking process, since all necessary flags
+are correctly filled in. Another solution is to set the
+environment variable LD_RUN_PATH during linking to
+GLB_DIR/lib/. Best thing is to add this to your shell dot-file
+(e.g. .bashrc). Then you can use: A typical compiler command
+like
 	gcc -c my_program.c -IGLB_DIR/include/
 
 and a typical linker command like
-	g++ my_program.o -lglobes -lglb -LGLB_DIR/lib/ -o my_executable
+	gcc my_program.o -lglobes -LGLB_DIR/lib/ -o my_executable
 
-More information on this issue can be obtained by having a look into the output
-of make install. 
+More information on this issue can be obtained by having a look into
+the output of make install.
 
-CAVEAT: It is in principle possible to have many installations on one machine,
-especially the situation of having an installation by root and by a user at
-the same time might occur. However it is strictly warned against this 
-possibility since it is *extremely* likely to create some versioning problem
-at some time!
+CAVEAT: It is in principle possible to have many installations on one
+machine, especially the situation of having an installation by root
+and by a user at the same time might occur. However it is strictly
+warned against this possibility since it is *extremely* likely to
+create some versioning problem at some time!
 
 Building and Using static versions of GLoBES
 ============================================
 
-In certain circumstances it may be useful to use a static version of libglobes
-or any of the binaries, e.g. when running on a cluster.
+In certain circumstances it may be useful to use a static version of
+libglobes or any of the binaries, e.g. when running on a cluster.
 
-   The `configure' script accepts the option `--disable-shared', in which
-case only static objects are built, i.e. only a static version of libglobes. 
-In case your system does not support shared libraries the `configure' script 
-recognizes this. If you give no options to `configure', both shared and static 
-versions are built and will be installed. All binaries, however, will use dynamic 
-linking. If you want to build static binaries, use LDFLAGS='-all-static' for building
-them.
+The `configure' script accepts the option `--disable-shared', in
+which case only static objects are built, i.e. only a static
+version of libglobes. In case your system does not support shared
+libraries the `configure' script recognizes this. If you give no
+options to `configure', both shared and static versions are built
+and will be installed. All binaries, however, will use dynamic
+linking. If you want to build static binaries, use
+LDFLAGS='-all-static' for building them.
 
-   Sometimes it is convenient, eg. for debugging purposes, to have a statically
-linked version of a program using GLoBES, which is easiest achieved by just linking
-with `libglobes.a'. If you need a completely statically linked version, please, have
-a look at the Makefile in the `examples' directory.
-	make example-static
-produces a statically linked program that should in principle run on most Linuxes.
-It should be straightforward to adapt this example to your needs.
+Sometimes it is convenient, eg. for debugging purposes, to have a
+statically linked version of a program using GLoBES, which is easiest
+achieved by just linking with `libglobes.a'. If you need a completely
+statically linked version, please, have a look at the Makefile in the
+`examples' directory.
+	make example-static 
+produces a statically linked program that should in principle run on
+most Linuxes.  It should be straightforward to adapt this example to
+your needs.
 
-All these options rely on `libtool' and a working gcc installation. It seems that gcc 3.x
-is broken in subtle way which makes it necessary to add a symbolic link in the gcc library
-directory. The diagnostic for this requirement is that building static programs fails with
-the error message `cannot find -lgcc_s'. In those cases, find `libgcc.a' and add a symbolic 
-link in the same directory where you found it (this requires probably root privileges)
+All these options rely on a working gcc installation. It seems that
+gcc 3.x is broken in subtle way which makes it necessary to add a
+symbolic link in the gcc library directory. The diagnostic for this
+requirement is that building static programs fails with the error
+message `cannot find -lgcc_s'. In those cases, find `libgcc.a' and add
+a symbolic link in the same directory where you found it (this
+requires probably root privileges)
 	ln -s libgcc.a libgcc_s.a
 
-If you can not write to this directory just use the following work around. Add the same link  
-as above to the directory where you installed GLoBES into
+If you can not write to this directory just use the following work
+around. Add the same link as above to the directory where you
+installed GLoBES into
 	cd prefix/lib       
 	ln -s path_to_libgcc.a/libgcc.a libgcc_s.a
 and then change back into the 'examples' directory and type
 	make LDFLAGS=-Lprefix/lib example-static
 and you are done.
 
-If you don't have libtool on your system either, then you just can use the libtool script in
-the GLoBES tar-ball instead. Make sure it is in a place where it is found by 'make'.
-
-LAPACK & BLAS requirements
-==========================
-
-In contrast to former versions, GLoBES does not require LAPACK any more
-since version 2.3.13
-
 GSL requirements
 ================
 
-Sometimes the GNU scientific library is not available or is installed in a non-standard
-location. This situation can arise in an installation without root privileges. In this 
-case one can specify '--with-gsl-prefix=path_to_gsl' as option to the `configure' script.
-If one wants to use a shared version of `libgsl' then one has to make sure that the
-linker find the library at run-time. This can be achieved by setting the environment variable
-LD_LIBRARY_PATH correctly, i.e. (in bash) 
+Sometimes the GNU scientific library is not available or is installed
+in a non-standard location. This situation can arise in an
+installation without root privileges. In this case one can specify
+'--with-gsl-prefix=path_to_gsl' as option to the `configure' script.
+If one wants to use a shared version of `libgsl' then one has to make
+sure that the linker find the library at run-time. This can be
+achieved by setting the environment variable LD_LIBRARY_PATH
+correctly, i.e. (in bash)
 	export LD_LIBRARY_PATH='path_to_gsl'
-You also can use a static version of GSL by either building GLoBES with LDFLAG='-all-static'
-or by configuring GSL with '--disable-shared'. In both cases no further actions like setting
-any environment variables is necessary.
+You also can use a static version of GSL by either building GLoBES
+with LDFLAG='-all-static' or by configuring GSL with
+'--disable-shared'. In both cases no further actions like setting any
+environment variables is necessary.
 
 Distributions
 =============
 
-Fedora Core 3
--------------
-
-FC3 is shipped with a non working version of LAPACK. Thus to
-make GLoBES work on FC3, configure GLoBES with '--enable-lapack-convenience', which
-replaces the defunct LAPACK with GLoBES' own version thereof. You can diagnose a 
-non-working LAPACK by compiling one of the examples in the `examples' directory and 
-trying to run it. It will hang forever in the function `glbSetRates()'. 
-
 RedHat (all versions)
 ---------------------
 
-The standard rpm-based installation of GSL does not provide any header files for GSL, 
-which are however needed to compile GLoBES. You have to install an additional rpm-package
-called 'gsl-devel'. Altnernatively you can install GSL from a tar-ball and use the 
-`--with-gsl-prefix' option to the configure script of GLoBES.
+The standard rpm-based installation of GSL does not provide any header
+files for GSL, which are however needed to compile GLoBES. You have to
+install an additional rpm-package called 'gsl-devel'. Altnernatively
+you can install GSL from a tar-ball and use the `--with-gsl-prefix'
+option to the configure script of GLoBES.
 
 Platforms
 =========
@@ -236,7 +235,7 @@ Windows
 
 Currently GLoBES is only able to work under Cygwin www.cygwin.com.
 Inside Cygwin GLoBES needs to be built with these commands:
-	configure --disable-modules --disable-perl --enable-libf2c-convenience
+	configure
 	make LDFLAGS='-no-undefined'
 
 
@@ -308,6 +307,45 @@ package recognizes.
 find the X include and library files automatically, but if it doesn't,
 you can use the `configure' options `--x-includes=DIR' and
 `--x-libraries=DIR' to specify their locations.
+
+
+Building a perl extension
+-------------------------
+
+This feature is experimental and your mileage my vary!
+
+This feature allows to build a perl binding of GLoBES, i.e. you will
+in the end have a perl module from which you can use GLoBES from wthin
+any perl program.
+
+If(!) everything works as intended, all you have to do is to provide
+'--enable-perl' to 'configure' and type 'make install'. Now have a
+look at 'globes/example.pl' and you should see how that works in
+principle. 
+
+The trick here, is that we use SWIG (http://www.swig.org/) to generate
+a wrapper file for GLoBES. The wrapper file is part of the GLoBES
+tar-ball (globes/globes_perl.c) and hence you should not need SWIG to
+be installed on your system.
+
+All the tricks employed to get perl extension working should in some
+form to be applicable to building other extensions, like python. If
+you want to try that you will need SWIG.
+
+Building RPMs
+-------------
+
+This feature is experimental and your mileage my vary!
+
+Many people find binary RPMs useful, therefore we provide an optional
+feature '--enable-rpm-rules' which should produce all the necessary
+makefile rules for RPM building. To actually build RPMs requires that
+your system is properly setup for that. How you can do that you can
+learn at http://www.rpm.org. You then can use 'make rpm', most likely
+you will need to be root to do that (sudo won't work!).
+
+NOTE to people packagin GLoBES RPMs: Please, use the provided spec
+file and do include the headers!
 
 Specifying the System Type
 ==========================

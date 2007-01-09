@@ -28,7 +28,7 @@
 #include <gsl/gsl_complex_math.h>
 #include <gsl/gsl_matrix.h>
 #include <gsl/gsl_blas.h>
-#include <globes/globes.h>
+#include "globes/globes.h"
 #include "glb_wrapper.h"
 #include "glb_minimize.h"
 #include "glb_probability.h"
@@ -784,7 +784,7 @@ int glb_probability_matrix(double P[3][3], int cp_sign, double E,
   if (filter_sigma > 0.0)                     /* With low-pass filter */
   {
     if (psteps == 1)
-      glb_filtered_probability_matrix_cd(P, E, KM_TO_EV(length[0]), density[0]*GLB_V_FACTOR*GLB_Ne_MANTLE,
+      glb_filtered_probability_matrix_cd(P, E, GLB_KM_TO_EV(length[0]), density[0]*GLB_V_FACTOR*GLB_Ne_MANTLE,
           filter_sigma, cp_sign);
     else
       return -1;
@@ -796,7 +796,7 @@ int glb_probability_matrix(double P[3][3], int cp_sign, double E,
       gsl_matrix_complex_set_identity(S1);                                 /* S1 = 1 */
       for (i=0; i < psteps; i++)
       {
-        status = glb_S_matrix_cd(E, KM_TO_EV(length[i]), density[i]*GLB_V_FACTOR*GLB_Ne_MANTLE, cp_sign);
+        status = glb_S_matrix_cd(E, GLB_KM_TO_EV(length[i]), density[i]*GLB_V_FACTOR*GLB_Ne_MANTLE, cp_sign);
         if (status != 0)
           return status;
         gsl_blas_zgemm(CblasNoTrans, CblasNoTrans, GSL_COMPLEX_ONE, S, S1, /* T0 = S.S1 */
@@ -807,7 +807,7 @@ int glb_probability_matrix(double P[3][3], int cp_sign, double E,
     }
     else
     {
-      status = glb_S_matrix_cd(E, KM_TO_EV(length[0]), density[0]*GLB_V_FACTOR*GLB_Ne_MANTLE, cp_sign);
+      status = glb_S_matrix_cd(E, GLB_KM_TO_EV(length[0]), density[0]*GLB_V_FACTOR*GLB_Ne_MANTLE, cp_sign);
       if (status != 0)
         return status;
     }

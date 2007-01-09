@@ -136,7 +136,7 @@ int my_probability_matrix(double P[3][3], int cp_sign, double E, int psteps,
   L = 0.0;
   for (i=0; i < psteps; i++)
     L += length[i];
-  L = KM_TO_EV(L) * 1.0e9;      /* Convert to GeV^{-1} */
+  L = GLB_KM_TO_EV(L) * 1.0e9;      /* Convert to GeV^{-1} */
 
   /* Compute P_ee */
   s12 = sin(th12);

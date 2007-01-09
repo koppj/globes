@@ -40,6 +40,7 @@ AC_DEFUN([AC_SWIG_PERL], [
 	AC_REQUIRE([AC_PROG_LIBTOOL])dnl
 	build_perl="no"
         # --enable-perl
+	perl_req="no";
         AC_ARG_ENABLE(perl,
                 [  --enable-perl             Enable/Require Perl support], [perl_req="$enableval"])
 

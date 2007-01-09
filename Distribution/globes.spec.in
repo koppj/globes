@@ -86,10 +86,9 @@ fi
 %{prefix}/lib/globes
 %{prefix}/bin/globes
 %{prefix}/bin/globes-config
-%{prefix}/bin/globes-module
 %{prefix}/include/globes
 %{prefix}/share/globes
-
+%{prefix}/share/aclocal/globes.m4
 
 
 %doc {COPYING,ChangeLog,README,AUTHORS,BUGS,NEWS}  
