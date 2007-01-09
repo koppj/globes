@@ -10,7 +10,10 @@
 \index{norm}{GLOBES tour@\GLOBES~tour}
 
 TOUR ITSELF (+EXAMPLE FILE) TO BE UPDATED (VALUES MAY HAVE CHANGED DUE TO AEDL FILE DEFINITION
-CHANGES ETC. MAYBE ONLY COMMENT ABOUT THAT [WW].
+CHANGES ETC. ALSO EXPERIMENT (OLD) NUFACT DOES NOT EXIST ANYMORE. AND: SOME ERROR IN THIS OLD
+NUFACT-FILE [WW].
+
+CHECK: GLBSETPROJECTION REALLY USED WITH GLB\_FIXED FOR DENSITY PARAMS? IS NFSTANDARD USED?
 
 In this first chapter, we show a \GLOBES\ tour illustrating the
 main features of \GLOBES . The complete example  
@@ -77,9 +80,10 @@ glb\_params starting\_values = glbAllocParams();\\
 glb\_params input\_errors = glbAllocParams();\\
 glb\_params minimum = glbAllocParams();
 }
-Assign values to our standard oscillation parameters:
+Assign values to our standard oscillation parameters and the standard matter density scaling factors:
 \gq{
- glbDefineParams(true\_values,theta12,theta13,theta23,deltacp,sdm,ldm);
+ glbDefineParams(true\_values,theta12,theta13,theta23,deltacp,sdm,ldm); \\
+ glbSetDensityParams(true\_values,1.0,GLB\_ALL);
 }
 Compute the simulated data with our standard parameters:
 \gq{
@@ -172,11 +176,12 @@ chi2 with correlations other than with deltacp: 4.32831
 }
 Similarly, we can only take into account the correlation with $\deltacp$.
 For this, we need to define our own (user-defined) projection, where
-only $\deltacp$ is a free parameter:
+only $\deltacp$ (and the matter density) is a free parameter:
 \gq{
  glb\_projection myprojection = glbAllocProjection(); \\
  glbDefineProjection(myprojection,GLB\_FIXED, GLB\_FIXED, GLB\_FIXED, \\
  \hspace*{0.5cm} GLB\_FREE, GLB\_FIXED, GLB\_FIXED); \\
+  glbSetDensityProjectionFlag(myprojection,GLB\_FREE,GLB\_ALL); \\
  glbSetProjection(myprojection); \\
  chi2 = glbChiNP(fit\_values,minimum,GLB\_ALL); \\
  fprintf(stream,"chi2 with correlation only with deltacp: \\
@@ -205,6 +210,7 @@ inverted hierarchy, see page~\pageref{mass_ordering}.} of the sgn-degeneracy:
   glbDefineParams(starting\_values,theta12,theta13,theta23, \\
   \hspace*{0.5cm} deltacp,sdm,-ldm); \\
   glbSetDensityParams(input\_errors,0.05,GLB\_ALL); \\
+  glbSetDensityParams(starting\_errors,1.0,GLB\_ALL); \\
   glbSetCentralValues(starting\_values);\\
   glbSetInputErrors(input\_errors);\\
   chi2=glbChiAll(starting\_values,minimum,GLB\_ALL);\\ 
@@ -273,6 +279,7 @@ In addition, we repeat the procedure for the simulated rates and
 the fit parameter vector:
 \gq{
   glbDefineParams(true\_values,theta12,theta13,theta23,deltacp,sdm,ldm); \\
+  glbSetDensityParams(true\_values,1.0,GLB\_ALL); \\
   glbSetOscillationParameters(true\_values); \\
   glbSetRates();\\
   \\
@@ -355,6 +362,7 @@ experiments.
 glbDefineParams(starting\_values,theta12,theta13,theta23, \\
 \hspace*{0.5cm} deltacp,sdm,-ldm);\\
   glbSetDensityParams(input\_errors,0.05,GLB\_ALL);\\
+  glbSetDensityParams(starting\_values,1.0,GLB\_ALL); \\
   glbSetCentralValues(starting\_values);\\
   glbSetInputErrors(input\_errors);\\
   \\
@@ -484,6 +492,8 @@ int main(int argc, char *argv[]) \\
    \hspace*{0.5cm}  
      glbDefineParams(true\_values,\\
      \hspace*{1.5cm}asin(sqrt(0.8))/2,asin(sqrt(0.001))/2,M\_PI/4,M\_PI/2,7e-5,2e-3); \\
+    \hspace*{0.5cm}
+     glbSetDensityParams(true\_values,1.0,GLB\_ALL); // Matter scaling \\
      
      \hspace*{0.5cm}  
    /* The simulated data are computed */ \\
@@ -770,11 +780,13 @@ densities of all loaded experiments. More precisely, the matter density
 profile of each experiment $i$ is multiplied by a scaling factor
 $\hat{\rho_i}$, \index{norm}{Matter density!scaling factor}
 \index{norm}{Matter density!profile} 
-which is stored in the density information of {\tt glb\_params}. 
-Each of
-these scaling factors has $1.0$ as pre-defined value. Since it
-is in most cases not necessary to change this value, the user does
-not need to take care of it. For a constant matter density, it is simply the ratio of the matter density and the average matter density specified in the experiment definition, \ie , $\hat{\rho_i} \equiv \rho_i/\bar{\rho}_i$. For a matter density profile, it acts as an overall normalization factor: The matter density in each layer is multiplied by this factor. In most cases one wants to take a scaling factor of $1.0$ here, which simply means taking the matter density profile as it is given in the experiment definition. For the treatment of correlations, however,
+which is stored in the density information of {\tt glb\_params}.
+% CHANGED IN GLOBES 3.0: 
+% Each of
+% these scaling factors has $1.0$ as pre-defined value. Since it
+% is in most cases not necessary to change this value, the user does
+% not need to take care of it. 
+For a constant matter density, it is simply the ratio of the matter density and the average matter density specified in the experiment definition, \ie , $\hat{\rho_i} \equiv \rho_i/\bar{\rho}_i$. For a matter density profile, it acts as an overall normalization factor: The matter density in each layer is multiplied by this factor. In most cases one wants to take a scaling factor of $1.0$ here, which simply means taking the matter density profile as it is given in the experiment definition. For the treatment of correlations, however,
 an external precision of the scaling factor might be used to include the
 correlations with the matter density uncertainty.
 Note that the {\tt glb\_params}
@@ -796,7 +808,8 @@ is provided to handle these parameter structures:
 \begin{function}
 \GLBNS{AllocParams}
 {\tt glb\_params glbAllocParams()} allocates the memory space
-needed for a parameter vector and returns a pointer to it.
+needed for a parameter vector and returns a pointer to it. All parameter values are
+initially set to {\tt nan} (not a number).
 \end{function}
 \begin{function}
 \GLBNS{AllocParams}
@@ -964,14 +977,15 @@ The functions in \GLOBES\ for version control are:
 the {\tt version} string of the format ``X.Y.Z'' is exactly the
 used \GLOBES\ version, $1$ if it is older, and $-1$ if it is newer. 
 \end{function}
-\begin{function}
-\GLBNS{TestLibraryVersion}
-{\tt int glbTestLibraryVersion(const char *version)} returns $0$ if
-the {\tt version} string of the format ``X.Y.Z'' is exactly the
-used \GLOBES\ version, $1$ if it is older, and $-1$ if it is newer.
-Note that the library and \GLOBES\ versions are not the same. 
-\end{function}
-WHAT IS THE DIFFERENCE BETWEEN THE LIBRARY AND GLOBES VERSION???? [WW]
+% UNDOCUMENTED FUNCTION, SINCE VERY DIFICULT TO EXPLAIN DIFFERENCE:
+% \begin{function}
+% \GLBNS{TestLibraryVersion}
+% {\tt int glbTestLibraryVersion(const char *version)} returns $0$ if
+% the {\tt version} string of the format ``X.Y.Z'' is exactly the
+% used \GLOBES\ library version, $1$ if it is older, and $-1$ if it is newer.
+% \end{function}
+% Note that the library and \GLOBES\ versions are not the same. 
+
 \begin{function}
 \GLBNS{VersionOfExperiment} 
 {\tt const char* glbVersionOfExperiment(int experiment)} returns
@@ -1019,11 +1033,12 @@ A typical and fast application for \GLB{ChiSys} is the visualization of
 {\tt {\footnotesize
   /* Initialize parameter vector(s) and compute simulated data */ \\
   glbDefineParams(true\_values,theta12,theta13,theta23,deltacp,sdm,ldm); \\
-  glbDefineParams(test\_values,theta12,theta13,theta23,deltacp,sdm,ldm);  \\
+  glbSetDensityParams(true\_values,1.0,GLB\_ALL); \\
+  glbCopyParams(true\_values,test\_values);  \\
   glbSetOscillationParameters(true\_values); glbSetRates(); \\
 \\
   /* Iteration over all values to be computed */ \\
-  double x,y,res; \\   
+%  double x,y,res; \\   
   for(x=-4.0;x<-2.0+0.01;x=x+2.0/50) \\
   for(y=0.0;y<200.0+0.01;y=y+200.0/50) \\
   \{ \\
@@ -1170,15 +1185,19 @@ Ones needs to register the user-defined systematics in the
 source code (typically after {\tt glbInit}) with
 \begin{function}
 \GLBNS{DefineChiFunction}
-{\tt int glbDefineChiFunction(glb\_chi\_function chi\_func, int dim, const char *name)}
+{\tt int glbDefineChiFunction(glb\_chi\_function chi\_func, int dim, const char *name, void* user\_data)}
  tells \GLOBES\ to register the user-defined systematics $\chi^2$ function {\tt chi\_func} 
-identified by the string {\tt name} with {\tt dim} systematics parameters. Returns zero, if successful.
+identified by the string {\tt name} with {\tt dim} systematics parameters. The parameter {\tt user\_data}
+is an arbitrary pointer being transferred to {\tt chi\_func}. It can, for instance, be used to avoid
+global variables. Returns zero, if successful.
 \end{function}
 The user-defined systematics function itself has to have the pre-defined type 
 \begin{function}
 \GLBNS{\_chi\_function}
-{\tt double (*glb\_chi\_function)(int exp, int rule, int dim, double *params, double *errors)}.
-In this function type, {\tt exp} is the experiment number, {\tt rule} is the rule number, {\tt dim} is the number of systematics parameters, {\tt params} is an array of the systematics auxiliary parameters themselves, and {\tt errors} is an array with the systematical errors. Note the the central values for {\tt params} are $0$, which means that $0$ corresponds to the un-modified rates. The array indices are running from $0$ to {\tt dim}-1.
+{\tt double (*glb\_chi\_function)(int exp, int rule, int dim, double *params, double *errors, void* user\_data)}.
+In this function type, {\tt exp} is the experiment number, {\tt rule} is the rule number, {\tt dim} is the number of systematics parameters, {\tt params} is an array of the systematics auxiliary parameters themselves, and {\tt errors} is an array with the systematical errors. The parameter {\tt user\_data} is set as defined with
+{\tt glbDefineChiFunction}.
+Note the the central values for {\tt params} are $0$, which means that $0$ corresponds to the un-modified rates. The array indices are running from $0$ to {\tt dim}-1.
 \end{function}
 Note that this function will be called many times by the \GLOBES\ minimizers.
 Therefore the function should be as efficient as possible. In many cases, it is also recommendable to use different functions for different rules, since the fewer auxiliary parameters in the minimization, the faster the routine will be. In addition, note that complicated systematics with many parameters may introduce complicated (unknown) topologies for the minimization, which means that the minimizers may
@@ -1325,8 +1344,15 @@ passively provided for the common $\chi^2$ function.
 You can find the corresponding files {\tt dchooz-near.glb} and {\tt dchooz-far.glb}, you will need for {\tt example5.c}, in the example directory. 
 %
 We show the implementation of the $\chi^2$ function in the example on page~\pageref{ex:syst},
-where we in addition include an uncorrelated energy calibration error.
-MAYBE: ADDITIONAL PLOT TO SHOW RESULT? [WW]
+where we in addition include an uncorrelated energy calibration error. See \figu{reactor} for the result
+of this example.
+%
+\begin{figure}[t]
+\begin{center}
+\includegraphics[width=10cm]{reactor}
+\end{center}
+\caption{\label{fig:reactor} The result from {\tt example5.c} (figure similar in \Ref~\cite{Huber:2006vr}). The fat curve corresponds to the systematics on page~\pageref{ex:syst}.}
+\end{figure}
 
 Further functions useful in the context of user-defined systematics are:
 \begin{function}
@@ -1647,11 +1673,12 @@ This example demonstrates how to project the fit manifold onto the $\stheta$-axi
   /* Set central values and input errors for all projections */  \\
   glbDefineParams(input\_errors,theta12*0.1,0,0,0,sdm*0.1,0);\\  
   glbSetDensityParams(input\_errors,0.05,GLB\_ALL);\\
-  glbSetCentralValues(true\_values);\\
+  glbSetCentralValues(true\_values);
   glbSetInputErrors(input\_errors);\\
 \\
   /* Define my own two-parameter projection for glbChiNP: Only deltacp is free! */ \\
   glbDefineProjection(th13\_projection,GLB\_FIXED,GLB\_FIXED,GLB\_FIXED,GLB\_FREE,GLB\_FIXED,GLB\_FIXED); \\
+  glbSetDensityProjectionFlag(th13\_projection,GLB\_FREE,GLB\_ALL); \\
   glbSetProjection(th13\_projection); \\ 
 \\
   /* Iteration over all values to be computed */ \\
@@ -1874,12 +1901,13 @@ use {\tt GLB\_ALL} for {\tt exp}. The values in {\tt in} are the guessed fit val
 on the hyperplane (all fixed parameters). The actually determined parameters at the minimum are returned in {\tt out}, where the fixed parameters are still at their input values. If {\tt out} is set to {\tt NULL}, this information will not be returned.
 \end{function}
 As an example, the projection sequence for a minimization over
-$\deltacp$ only looks like this:
+$\deltacp$ only (and the matter density parameters) looks like this:
 \begin{quote}
 {\tt
   glb\_projection th13\_projection = glbAllocProjection(); \\
   glbDefineProjection(th13\_projection,GLB\_FIXED,GLB\_FIXED,GLB\_FIXED,\\
   \hspace*{2cm} GLB\_FREE,GLB\_FIXED,GLB\_FIXED); \\
+  glbSetDensityProjectionFlag(t13\_projection,GLB\_FREE,GLB\_ALL); \\
   glbSetProjection(th13\_projection); \\ 
   res1=glbChiNP(test\_values,NULL,GLB\_ALL); \\
   glbFreeProjection(th13\_projection);
@@ -1902,7 +1930,7 @@ external solar mixing angle input instead of a Gaussian error.
 The user-defined prior function reads as follows and is very similar to the standard prior:
 \begin{quote}
 {\tt {\footnotesize
- double my\_prior(const glb\_params in) \\
+ double my\_prior(const glb\_params in, void* user\_data) \\
 \{ \\
   \hspace*{0.5cm} glb\_params central\_values = glbAllocParams(); \\
   \hspace*{0.5cm} glb\_params input\_errors = glbAllocParams(); \\
@@ -1954,10 +1982,6 @@ instead of $\theta_{12}$.
 \end{quote}
 }
 
-
-THIS CHAPTER MAY NEED SOME MODIFICATIONS, SINCENOT YET FINALLY IMPLEMENTED! [WW]
-
-
 User-defined priors are an advanced concept of \GLOBES\ 3.0 and higher. Therefore,
 this section can be jumped over in a first reading of the manual.
 They allow for arbitrary priors being added to the $\chi^2$ after the systematics
@@ -1972,10 +1996,10 @@ after {\tt glbInit}:
 \begin{function}
 \GLBNS{RegisterPriorFunction}
 {\tt 
-glbRegisterPriorFunction(double (*prior)(const glb\_params), int (*starting)(const glb\_params), int (*error)(const glb\_params))} registers a user-defined prior function {\tt prior}. 
+glbRegisterPriorFunction(double (*prior)(const glb\_params, void *user\_data), int (*central)(const glb\_params, void *user\_data), int (*error)(const glb\_params, void *user\_data),  void *user\_data)} registers a user-defined prior function {\tt prior}. In addition, it is possible to register
+two functions {\tt central} and {\tt error} being called everytime \GLB{SetCentralValues} or \GLB{SetInputErrors} are called with the same argument. For example, the central values and input errors can be stored in
+global variables for a faster access. These pointers can also be {\tt NULL}. The pointer {\tt user\_data} can be optionally used to circumvent the use of global variables. It is set by {\tt glbRegisterPriorFunction} and transferred to the registered functions whenever called.
 \end{function}
-DO WE REALLY NEED THE {\tt starting} AND {\tt error} VARIABLES? WHAT ARE THEY GOOD FOR? 
-DOES THAT MAKE SOMTHING FASTER? [WW]
 
 The prior function has to be any function using one parameter {\tt glb\_params} containing the fit values.
 We show an example for a user-defined prior on page~\pageref{ex:userprior}. This prior
@@ -1983,7 +2007,7 @@ will simply be registered with
 \begin{quote}
 {\tt
  glbInit(argv[0]); \\
- glbRegisterPriorFunction(my\_prior,NULL,NULL);
+ glbRegisterPriorFunction(my\_prior,NULL,NULL,NULL);
 }
 \end{quote}
 and replaces the standard prior of \GLOBES . It behaves exactly as the standard prior, but
@@ -2018,6 +2042,7 @@ and let it run into the minimum.  The following code excerpt  corresponds to fin
 {\footnotesize
   /* Set starting vales to suspected position at opposite sign of ldm */ \\
   \mbox{glbDefineParams(starting\_values,theta12,theta13,theta23,deltacp,sdm,-ldm);} \\
+  glbSetDensityParams(starting\_values,1.0,GLB\_ALL); \\
   \\
   /* Set input errors for external input, where some information on ldm \\
    \hspace*{0.5cm} is imposed in order to avoid falling into the right-sign solution */ \\
@@ -2126,6 +2151,7 @@ with the following function:
 {\tt double glbVacuumProbability(int l, int m, int panti,double E, double L)} returns the neutrino oscillation probability $\nu_l \rightarrow \nu_m$ for the energy {\tt E} and the baseline {\tt L} in vacuum. The parameter
 {\tt panti} is $+1$ for neutrinos and $-1$ for antineutrinos. 
 \end{function}
+Note that for this and the other probability functions $1 \le$ {\tt l}, {\tt m} $\le 3$.
 In addition, the oscillation probabilities in matter can be obtained
 with:
 \begin{function}
@@ -2493,6 +2519,7 @@ introduce a mechanism how one can even change these \AEDL\ parameters
 during running time.
 
 \section{Baseline and matter density profile}
+\label{sec:baselinemd}
 \index{norm}{Baseline!change}
 \index{norm}{Matter density!change profile}
 
@@ -2777,8 +2804,6 @@ As usual, all these functions return $-1$ if they were not successful.
 \label{sec:aedlparams}
 \index{norm}{AEDL@\AEDL!external parameters}
 
-TO BE EXTENDED BY LIST HANDLING (TRANSFER LISTS IN AEDL VARIABLES). STATUS? [WW].
-
 Using external parameters in \AEDL\ files is a very powerful feature
 to change experiment parameters at running time which require that
 the experiment be re-initialized. For example, one can change the
@@ -2827,6 +2852,15 @@ Note that one does not have do re-initialize the oscillation
 parameter vectors every time within the loop as long as the
 number of experiments does not change.
 
+Similar to a simple \AEDL\ variable, one can transfer the value of an
+\AEDL\ list with (\cf, \Sec~\ref{sec:syntax})
+\begin{function}
+\GLBNS{DefineAEDLList}
+{\tt glbDefineAEDLList(const char *name, double *list, size\_t length)} assigns the list {\tt list}
+of length {\tt length} to the \AEDL\ variable {\tt name}.
+\end{function}
+See \Sec~\ref{sec:baselinemd} for how to use such lists.
+%
 In order to clear the external variable stack if one is
 excessively using it, one can use
 \begin{function}
@@ -2904,19 +2938,23 @@ However, the probability engine has to be changed, which one would usually do by
 The key function types are
 \begin{function}
 \GLBNS{\_set\_oscillation\_parameters\_function}
-{\tt int (*glb\_set\_oscillation\_parameters\_function)(glb\_params p)} reads the fundamental oscillation parameters
-obtained from {\tt p} and stores them into global variables accessible to {\tt glb\_probability\_matrix\_function}. In addition, it can be used to pre-compute quantities which are dependent on the oscillation paramaters only for efficiency.
+{\tt int (*glb\_set\_oscillation\_parameters\_function)(glb\_params p, void* user\_data)} reads the fundamental oscillation parameters
+obtained from {\tt p} and stores them into global variables accessible to {\tt glb\_probability\_matrix\_function}.
+ In addition, it can be used to pre-compute quantities which are dependent on the oscillation paramaters only for efficiency. 
+In order to circumvent global variables, an arbitrary pointer can be used by {\tt user\_data} which is set by {\tt glbRegisterProbabilityEngine}.
 \end{function}
 \begin{function}
 \GLBNS{\_get\_oscillation\_parameters\_function}
-{\tt int (*glb\_get\_oscillation\_parameters\_function)(glb\_params p)} returns the fundamental oscillation parameters
+{\tt int (*glb\_get\_oscillation\_parameters\_function)(glb\_params p, void* user\_data)} returns the fundamental oscillation parameters
 in {\tt p} which are obtained from the global variables accessible to {\tt glb\_probability\_matrix\_function}.
+In order to circumvent global variables, an arbitrary pointer can be used by {\tt user\_data} which is set by {\tt glbRegisterProbabilityEngine}.
 \end{function}
 \begin{function}
 \GLBNS{\_probability\_matrix\_function}
 {\tt int (*glb\_probability\_matrix\_function)(double P[3][3], int cp\_sign, double E,
                   int psteps, const double *lengths, const double *densities,
-                  double filter\_sigma)} calculates the neutrino oscillation probability matrix to be returned in {\tt P}. The {\tt cp\_sign} is +1 for neutrinos and -1 for antineutrinos. In addition, the matter density profile to be used is characterized by the number of steps {\tt psteps}, the lengths of the matter density layers in the list {\tt lengths}, and the corresponding densities in the list {\tt densities}. The parameter {\tt filter\_sigma} defines the width of the low-pass filter to be used, or no filter usage if negative.
+                  double filter\_sigma, void* user\_data)} calculates the neutrino oscillation probability matrix to be returned in {\tt P}. The {\tt cp\_sign} is +1 for neutrinos and -1 for antineutrinos. In addition, the matter density profile to be used is characterized by the number of steps {\tt psteps}, the lengths of the matter density layers in the list {\tt lengths}, and the corresponding densities in the list {\tt densities}. The parameter {\tt filter\_sigma} defines the width of the low-pass filter to be used, or no filter usage if negative.
+In order to circumvent global variables, an arbitrary pointer can be used by {\tt user\_data} which is set by {\tt glbRegisterProbabilityEngine}.
 \end{function}
 These three function types correspond to the standard implementation functions \GLB{\_set\_oscillation\_parameters}, \GLB{\_get\_oscillation\_parameters}, and \GLB{\_probability\_matrix} in {\tt glb\_probability.c} of the source code of \GLOBES , where one can find the standard behavior and use it by cut and paste (including the variables and code used by these functions).
 
@@ -2926,9 +2964,10 @@ In order to use non-standard physics in \GLOBES , one needs re-define the three 
 {\tt int glbRegisterProbabilityEngine(int n\_parameters,
                  glb\_probability\_matrix\_function prob\_func, \\
                  glb\_set\_oscillation\_parameters\_function set\_params\_func, \\
-                 glb\_get\_oscillation\_parameters\_function get\_params\_func)} registers a probability
+                 glb\_get\_oscillation\_parameters\_function get\_params\_func, \\
+                 void* user\_data)} registers a probability
 engine for the simulation of non-standard physics with {\tt n\_parameters} oscillation parameters ({\tt n\_parameters} $\ge6$). The three functions {\tt prob\_func}, {\tt set\_params\_func}, and {get\_params\_func} 
-will be used with the function types defined above.         
+will be used with the function types defined above. In order to circumvent global variables, an arbitrary pointer can be used by {\tt user\_data} being set by this function.
 \end{function}
 The number of oscillation parameters can, at any time, be obtained with
 \begin{function}
