@@ -365,6 +365,98 @@ A warning: not all \verb+configure+ scripts look for a site script.
 \index{norm}{Installation|)}
 
 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Flux normalization in \GLOBES }
+\index{norm}{Normalization of fluxes}
+\label{app:flux}
+
+A common issue with \GLOBES\ is confusion about the proper units for
+the input flux files for use in \AEDL\ experiment descriptions. Source of
+the confusion is an undocumented factor 5.2 in \GLOBES\ versions older
+than 3.0 the fluxes are multiplied with (see below). In Version 3.0 and 
+higher, the alternative flux environment {\tt nuflux} is provided, 
+which does not contain this factor. The following material is
+based on the old environment {\tt flux}. For the use of {\tt nuflux},
+replace the factor 5.20034 by unity.
+
+\section*{Historical problem}
+
+One problem for the design of \AEDL\ was initially that meaningful
+units for flux data strongly depend on the given type of experiment,
+but also on relatively arbitrary decisions. For accelerator beams
+based on pion decay, one frequently defines the beam luminosity in
+{\it protons on target (pot)} since this number has a one-to-one
+correspondence with the number of neutrinos produced. Another sensible
+unit could be {\it megawatt on target (MW)}, again this number is directly
+correlated with the number of neutrinos and moreover there is a unique
+relation to {\it pot} for a given accelerator. Of course,
+what matters is the integrated luminosity. In some  cases the
+neutrino flux is given per $10^7\,\mathrm{s}$. However,
+most experiments will run for several years, hence also this number
+has to enter somewhere. For neutrino factories the proper number is
+useful muon decays per unit time, and for reactor experiments it is
+the thermal power of the reactor {\it asf}. This demonstrates that it is
+reasonable to keep the flux definition flexible.
+
+\section*{Implementation in \GLOBES }
+
+In understanding how one still can figure out what the correct units
+are for each case, it is a good starting point to look at what
+\GLOBES\ does with the input files. The cross section in the file is given as
+differential cross section divided by energy $x=\sigma/E$, and the flux file
+gives $f$. The differential number of events per GeV $n$ as computed in
+\GLOBES\ without oscillation and efficiencies is given by
+\begin{eqnarray}
+n &=& 5.20034\times x\times E\times f\times \nonumber \\
+&&\mathtt{@norm}\times\mathtt{@power}\times\mathtt{@stored\_muons}\times\mathtt{@time}\times\mathtt{\$target\_mass}\times(\mathtt{\$baseline})^{-2} \nonumber
+\end{eqnarray}
+Note that $5.20034$ is a undocumented fudge factor!
+
+It is the sole responsibility of the author of the \AEDL\ file and its
+supporting files, to ensure that the result makes sense. In
+principle, it is possible to divide, for example, {\tt @time}  by
+$\pi$ and fix that by redefining the flux file by multiplying
+it with $\pi$. Modifications like that have happened in the past
+and still happen, and many of them are not properly commented.
+ 
+\section*{Writing \AEDL\ files}
+
+The task is to choose the value of  {\tt @norm} such that all the
+variables in the \AEDL\ file have the proper units, \eg , {\tt
+  @time} has proper unit years.
+
+\GLOBES\ assumes that the cross
+section $x$ is given in $10^{-38}\,\mathrm{cm}^2$ and that all fluxes are
+given at a distance of $1\,\mathrm{km}$. In addition, it assumes that
+the number of target nuclei $\tau$ (or protons or whatever applies to the
+given cross section) per unit target mass $m_u$ (which usually is $kt$)
+ are properly accounted for.\footnote{Note that the cross sections which are delivered with
+  \GLOBES\ always are per nucleon.}  Assuming that in the flux file
+the data is given as number of neutrinos per unit area $A$ and
+energy bin of width $\Delta E$ at a distance $L$ from the source, one
+obtains
+\begin{eqnarray}
+\mathtt{@norm}=\frac{1}{5.20034}\left(\frac{\mathrm{GeV}}{\Delta
+      E}\right)
+\left(\frac{\mathrm{cm}^2}{A}\right)\left(\frac{L}{\mathrm{km}}\right)^2\left(\frac{\tau}{m_u}\right)\times10^{-38}\times\left(\frac{\mathcal{L}_u}{\mathcal{L}}\right)
+\end{eqnarray}
+where $\mathcal{L}$ absorbs all factors in the flux file related to
+the integrated luminosity, and $\mathcal{L}_u$ is the unit chosen for
+it.  The concept of integrated luminosity is
+nicely described in the \GLOBES\ manual in \Sec~\ref{sec:source}.
+A little example illustrates this concept:
+The flux is given for $10^{21}\, \mathrm{pot}\,\mathrm{y}^{-1}$ of
+$10\,\mathrm{GeV}$ protons, thus a good choice for the units $\mathcal{L}_u$
+is $\mathrm{MW}\,\mathrm{y}^{-1}$, which means that
+$\mathcal{L}/\mathcal{L}_u$ is given by (assuming a $10^7\,\mathrm{s}$
+year)
+\begin{equation}
+\frac{\mathcal{L}}{\mathcal{L}_u}=\frac{10\,\mathrm{GeV}\,10^{21}\,\mathrm{pot}\,\mathrm{y}}{10^7\,\mathrm{s}}\times(\mathrm{MW}\,\mathrm{y}^{-1})^{-1}=0.160218\ldots
+\end{equation}
+
+
 {\footnotesize
 \input{gpl}
 

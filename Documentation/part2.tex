@@ -46,7 +46,7 @@ neutrino event. The term ``reconstructed'' implies that the well-defined energy 
 \begin{center}
 \includegraphics[width=0.6\textwidth]{mapping}
 \end{center}
-\caption{\label{fig:distro} A detector maps a true parameter value onto
+\mycaption{\label{fig:distro} A detector maps a true parameter value onto
 a distribution of reconstructed parameter values. This is illustrated here for there energy.}
 \end{figure}
 % 
@@ -68,7 +68,7 @@ distribution $f(x)$ a delta distribution $\delta(x-x_0)$.
 \begin{center}
 \includegraphics[width=13cm]{AEDL1}
 \end{center}
-\caption{\label{fig:channel} General concept of a ``channel''.}
+\mycaption{\label{fig:channel} General concept of a ``channel''.}
 \end{figure}
 
 In order to implement a experiment definition including various
@@ -83,14 +83,14 @@ the secondary electron in the detector then allows to reconstruct the neutrino e
 \begin{center}
 \includegraphics[width=8cm]{SignalBackground}
 \end{center}
-\caption{\label{fig:rule} General concept of a ``rule''.}
+\mycaption{\label{fig:rule} General concept of a ``rule''.}
 \end{figure}
 
 \begin{figure}[t]
 \begin{center}
 \includegraphics[width=9cm]{Rules}
 \end{center}
-\caption{\label{fig:experiment} General concept of an ``experiment''.}
+\mycaption{\label{fig:experiment} General concept of an ``experiment''.}
 \end{figure}
 
 The channels are the building blocks for the so-called ``rules''.
@@ -142,7 +142,7 @@ and that this luminosity is available for $8$ years, \ie , a total number
 of $ 4.264\cdot10^{21}$ muons is stored:
 \begin{quote}
 {\tt /* beam */}\\
-{\tt flux(\#mu\_plus)<\\
+{\tt nuflux(\#mu\_plus)<\\
 \tb  @builtin = 1\\
 \tb  @parent\_energy = 50.0\\
 \tb  @stored\_muons = 5.33e+20\\
@@ -296,7 +296,7 @@ with the channel definition part:
 The first part is the type of environment, which is {\tt channel} here. 
 There are the following types of environments in AEDL:
 \begin{quote}
-{\tt flux\\
+{\tt nuflux\\
 cross\\
 channel\\
 energy\\
@@ -475,9 +475,9 @@ from \AEDL\ files:
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Experiment definition with AEDL}
 
-In this chapter, we give a detailed definition of the AEDL features. We also show the underlying mathematical concepts, where applicable. We do not exactly follow the separation of source, oscillation, and detection properties, since most issues more or less involve the detection. Instead,
+In this chapter, we give a detailed definition of the \AEDL\ features. We also show the underlying mathematical concepts, where applicable. We do not exactly follow the separation of source, oscillation, and detection properties, since most issues more or less involve the detection. Instead,
 we illustrate many of the features of the \GLOBES\ simulation successively
-in the logical order of their definition, and demonstrate how they translate into AEDL .
+in the logical order of their definition, and demonstrate how they translate into \AEDL .
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Source properties and integrated luminosity}
@@ -493,13 +493,13 @@ the total integrated luminosity of the experiment. In \GLOBES , the total number
 \mathrm{Fid.~detector~mass}\,\left[\mathrm{kt/t}\right]\times 
 \mathrm{Running~time} \,\left[\mathrm{yr}\right]\times\left\{ \begin{array}{c}
 \mathrm{Source~power}\,\left[\mathrm{MW/GW}\right]\\
-\mathrm{Useful~muon~decays}\,\left[\mathrm{yr}^{-1}\right]
+\mathrm{Useful~parent~decays}\,\left[\mathrm{yr}^{-1}\right]
 \end{array}\right.\,.
 \end{equation}
-Thus, the source power corresponds to either the amount of energy produced per time frame in the target (such as for nuclear reactors or sources based on pion decay), or the useful muon decays per time frame (neutrino factories). In addition, the definition of the source power makes only sense together with the flux normalization, the running time, and fiducial detector mass in order to define the total integrated luminosity. Therefore, one can, in principle, use arbitrary units for these components as long as their product gives the wanted neutrino flux. However, it is
+Thus, the source power corresponds to either the amount of energy produced per time frame in the target (such as for nuclear reactors or sources based on pion decay), or the useful parent particle decays per time frame (neutrino factories, beta beams). In addition, the definition of the source power makes only sense together with the flux normalization, the running time, and the fiducial detector mass in order to define the total integrated luminosity. Therefore, one can, in principle, use arbitrary units for these components as long as their product gives the wanted neutrino flux. However, it is
 recommended to use normalizations such that the source power units are $\mathrm{MW}$ for a proton-based beam, and $\mathrm{GW}_\mathrm{thermal}$ for a reactor experiment. Correspondingly, the detector mass units should be kilotons for a proton-based beam, and tons for a reactor experiment. In any case it is a good
 idea to document the choices made by the user by corresponding comments
-in \AEDL.
+in \AEDL. For more details on the luminosity implementation, see appendix on page~\pageref{app:flux}.
 
 \index{aedl}{target mass@{\tt \$target\_mass}}
 The quantity which can be used to scale the overall integrated luminosity of an experiment, is the fiducial detector mass. For example,
@@ -508,32 +508,61 @@ The quantity which can be used to scale the overall integrated luminosity of an 
 \end{quote}
 defines a $50 \, \mathrm{kt}$ detector for a neutrino factory.
 
-\index{aedl}{{\tt flux}!time@{\tt "@time}}
+\index{aedl}{{\tt nuflux}!time@{\tt "@time}}
 There are two principal ways to initialize a neutrino flux: 
 Either one can use 
 a built-in source, or one can provide a file. In both cases,
-a flux is defined by the environment {\tt flux}, such as
-\index{aedl}{{\tt flux}}
+a flux is defined by the environment {\tt nuflux}, such as
+\index{aedl}{{\tt nuflux}}
 \begin{quote}
-  {\tt flux(\#name)<\\
+  {\tt nuflux(\#name)<\\
 \tb $\ldots$\\
 \tb @time = 8.0 \\
 >}
 \end{quote}
 with a running time of $8$ years. Note that the running time is used within
-the {\tt flux} environment. This feature can be used to load the neutrino and antineutrino fluxes separately, in order to combine them with different
-running times within one experiment. The name of the flux {\tt \#name} will later be refered to in the channel definitions.
+the {\tt nuflux} environment. This feature can be used to load the neutrino and antineutrino fluxes separately, in order to combine them with different
+running times within one experiment. The name of the flux {\tt \#name} will later be referred to in the channel definitions. Note that \GLOBES\ versions older than 3.0 use the still supported {\tt flux} environment, which is different from {\tt nuflux} by an undocumented normalization factor 5.2 for user-defined fluxes. This difference is explained in the appendix on page~\pageref{app:flux}.
+
+\index{aedl}{{\tt flux}}
+
+\begin{table}[t]
+\begin{center}
+\begin{tabular}{|cllc|}
+\hline
+{\tt @builtin} & Description & Parameters & Min. version \\
+\hline
+1 & Neutrino factory $\mu^+$ decay & {\tt @parent\_energy} [GeV], & 2.0 \\
+& & {\tt @stored\_muons} &  \\
+2 & Neutrino factory $\mu^-$ decay & {\tt @parent\_energy} [GeV], & 2.0 \\
+& & {\tt @stored\_muons} &  \\
+3 & Beta beam, inv. beta decay & {\tt @end\_point} [GeV], & 3.0 \\
+& & {\tt @stored\_ions}, &  \\
+& & {\tt @gamma} & \\
+4 & Beta beam, beta decay & {\tt @end\_point} [GeV], & 3.0 \\
+& & {\tt @stored\_ions}, &  \\
+& & {\tt @gamma} & \\
+\hline
+\end{tabular}
+\end{center}
+\mycaption{\label{tab:binfluxes} Built-in fluxes currently supported by \GLOBES . For details on
+the beta beams, see \Ref~\cite{Huber:2005jk}. MR ABOUT BETA BEAMS: DOES THIS REALLY WORK FOR ALL ISOTOPES? IS THE DIFFERENCE BETWEEN 3 AND 4 CORRECTLY DESCRIBED? WHY IS THERE A NORMALIZATION FACTOR 50.9 IN THE FILES?}
+\end{table}
 
 For a built-in neutrino source, one has to specify which
 built-in spectrum has to be used, as well as its parameters. The software
 will then automatically calculate the neutrino spectrum. Note that in this
 case, there is no degree of freedom in the choice of the source units.
-Currently, two built-in fluxes are available: $\mu^+$-decay ({\tt @builtin = 1}) and $\mu^-$-decay ({\tt @builtin = 2}). In these cases, the muon energy (enery of the parent particle) has to be specified together with the number of useful decays  per year. Thus, an example to set up a neutrino factory flux is
-\index{aedl}{{\tt flux}!builtin@{\tt "@builtin}}
-\index{aedl}{{\tt flux}!parent energy@{\tt "@parent\_energy}}
-\index{aedl}{{\tt flux}!stored muons@{\tt "@stored\_muons}}
+The currently available fluxes are described in \Tab~\ref{tab:binfluxes}.
+For example, two built-in neutrino factory fluxes are available: $\mu^+$-decay ({\tt @builtin = 1}) and $\mu^-$-decay ({\tt @builtin = 2}). In these cases, the muon energy (enery of the parent particle) has to be specified together with the number of useful decays  per year. Thus, an example to set up a neutrino factory flux is 
+\index{aedl}{{\tt nuflux}!builtin@{\tt "@builtin}}
+\index{aedl}{{\tt nuflux}!parent energy@{\tt "@parent\_energy}}
+\index{aedl}{{\tt nuflux}!stored muons@{\tt "@stored\_muons}}
+\index{aedl}{{\tt nuflux}!end point@{\tt "@end\_point}}
+\index{aedl}{{\tt nuflux}!stored ions@{\tt "@stored\_ions}}
+\index{aedl}{{\tt nuflux}!gamma@{\tt "@gamma}}
 \begin{quote}
-{\tt flux(\#mu\_plus)<\\
+{\tt nuflux(\#mu\_plus)<\\
 \tb  @builtin = 1\\
 \tb  @parent\_energy = 50.0\\
 \tb  @stored\_muons = 5.33e+20\\
@@ -541,12 +570,12 @@ Currently, two built-in fluxes are available: $\mu^+$-decay ({\tt @builtin = 1})
 >}
 \end{quote}
 %
-\index{aedl}{{\tt flux}!power@{\tt "@power}}
-\index{aedl}{{\tt flux}!norm@{\tt "@norm}}
-\index{aedl}{{\tt flux}!flux file@{\tt "@flux\_file}}
+\index{aedl}{{\tt nuflux}!power@{\tt "@power}}
+\index{aedl}{{\tt nuflux}!norm@{\tt "@norm}}
+\index{aedl}{{\tt nuflux}!flux file@{\tt "@flux\_file}}
 For a user-defined flux, one has to give it the file name:
 \begin{quote}
-{\tt flux(\#user)<}\\
+{\tt nuflux(\#user)<}\\
 {\tt \tb @flux\_file = "user\_file\_1.dat"\\
 \tb @time = 2.0\\
 \tb @power = 4.0\\
@@ -561,6 +590,7 @@ In addition, the fluxes will be rescaled by $1/L^2$, which means that the
 normalization must contain a factor $L_0^2$. Here $L_0$ is the distance from the source for which the flux is given to the actual neutrino production region. At the end, it is left to the user to ensure that the 
 numbers in the flux file give, after the multiplication with {\tt @norm}, 
 the proper numbers of produced neutrinos corresponding to the chosen target power {\tt @power}. Usually this adjustment of {\tt @norm} is performed by comparison with known energy spectra for a specific experiment.
+For more details on the flux definition, see appendix on page~\pageref{app:flux}.
 
 \index{aedl}{{\tt flux}!flux file@{\tt "@flux\_file}}\index{norm}{Flux!file}
 The software assumes that the given flux file has seven columns and
@@ -581,10 +611,10 @@ same,\eg\ with zeros.
 
 The flux files accept one-line comments, which start
 with {\tt \#} and end with the linefeed character `\verb+\n+', they are
-not counted as a line and their content is discarded. This comments
-are useful to provide meta information about the fluxes like units
+not counted as a line and their content is discarded. These comments
+are useful to provide meta information about the fluxes such as units
 or the origin of the information. This is also the default method
-to point the user to the references he/she should to cite when using
+to point the user to the references one should to cite when using
 a particular flux.\index{norm}{Flux!file!comments in}
 \index{norm}{Referencing!flux data}
 
@@ -613,7 +643,7 @@ $2$ & {\tt \$baseline}, {\tt \$densitysteps} & PREM profile with given number of
 $3$ & {\tt \$lengthtab},  {\tt \$densitytab} & Arbitrary profile (table of layer thicknesses, table of densities) \\
 \hline
 \end{tabular}
-\caption{\label{tab:profiletypes} Different matter density profiles which can be used with \GLOBES .}
+\mycaption{\label{tab:profiletypes} Different matter density profiles which can be used with \GLOBES .}
 \end{table}
 
 \index{aedl}{profiletype@{\tt \$profiletype}}
@@ -910,7 +940,7 @@ or indirectly be defined by the user.
 \begin{center}
 \includegraphics[width=15cm]{energies}
 \end{center}
-\caption{\label{fig:energies} The different evaluation levels for the energy smearing in \GLOBES .}
+\mycaption{\label{fig:energies} The different evaluation levels for the energy smearing in \GLOBES .}
 \end{figure}
 
 Before we come to the calculation algorithms, it is useful to understand
@@ -1533,7 +1563,7 @@ Error dimension&$a$&$b$&$c$&$d$&Tilt/Calibration&Remarks\\
 20&?&?&?&?&?&User-defined systematics\\
 \hline
 \end{tabular}
-\caption[Table of error dimensions]{\label{tab:error_dim}
+\mycaption[Table of error dimensions]{\label{tab:error_dim}
 Possible values of the error dimensions variable in \GLOBES\ and their meaning. If a parameter is designated with $+$, it will
 be marginalized over, and therefore the corresponding error needs to 
 have a non-zero value. If the cases with ``total rates'' in the remarks, 

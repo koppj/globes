@@ -48,7 +48,7 @@ Needs \GLB{SetProjection} before! \\[0.2cm]
 \hline
 \end{tabular}
 \end{center}
-\caption{\label{tab:stdfunctions} \index{norm}{Standard functions (table)} The \GLOBES\ standard function to obtain a $\chi^2$-value with systematics only or systematics and correlations. The parameters {\tt rule} and {\tt exp}
+\mycaption{\label{tab:stdfunctions} \index{norm}{Standard functions (table)} The \GLOBES\ standard function to obtain a $\chi^2$-value with systematics only or systematics and correlations. The parameters {\tt rule} and {\tt exp}
 can either be \GLBC{GLB\_ALL} for all initialized experiment or the
 experiment number ($0$ to \GLB{\_num\_of\_exps}-1) for a specific experiment. The format of \GLB{\_params} is discussed in detail in \Chapt~\ref{chapt:gettingstarted}. Note that all functions but {\tt glbChiSys} are using minimizers which have to be initialized with \GLB{SetInputErrors} and \GLB{SetCentralValues} first.}
 \end{table}
@@ -1351,7 +1351,7 @@ of this example.
 \begin{center}
 \includegraphics[width=10cm]{reactor}
 \end{center}
-\caption{\label{fig:reactor} The result from {\tt example5.c} (figure similar in \Ref~\cite{Huber:2006vr}). The fat curve corresponds to the systematics on page~\pageref{ex:syst}.}
+\mycaption{\label{fig:reactor} The result from {\tt example5.c} (figure similar in \Ref~\cite{Huber:2006vr}). The fat curve corresponds to the systematics on page~\pageref{ex:syst}.}
 \end{figure}
 
 Further functions useful in the context of user-defined systematics are:
@@ -1850,7 +1850,7 @@ Function & Purpose & Parameters $\rightarrow$ Result\\
 {\tt glbGetDensity\-ProjectionFlag} \GLBNS{GetDensityProjectionFlag} & Return flag for density parameter {\tt which} in vector {\tt in}.  & {\tt (const glb\_projection in, int which)} $\rightarrow$ {\tt int} flag \\
 \hline
 \end{tabular}
-\caption{\label{tab:defprojection}\index{norm}{Projection!type}
+\mycaption{\label{tab:defprojection}\index{norm}{Projection!type}
 Different functions handling the
 \GLB{\_projection} type. Flags are either \GLBC{GLB\_FIXED} or \GLBC{GLB\_FREE}. The (un-shown) return values of the {\tt Set-} and {\tt Define-} functions point either to the assigned vector if successful, or they are {\tt NULL} if unsuccessful.}
 \end{table}
