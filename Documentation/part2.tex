@@ -1331,7 +1331,8 @@ For a rule, the splitting
 in signal and background is useful for the treatment of systematics, as we will se later. Each rule will lead to a $\Delta \chi^2$-value,
 which means that all $\Delta \chi^2$'s of the different rules will be added
 for the whole experiment. Within each rule, the event rates are added, and
-the systematics is considered to be independent of the other rules.
+the systematics is considered to be independent of the other rules (unless user-defined
+systematics specifies a dependence).
 Thus, it is convenient to combine the above defined channels for different
 oscillation patterns and interaction types into one logical construction,
 which is the rule. For example, a superbeam usually has two rules: One for
@@ -1387,12 +1388,13 @@ of a  Gau\ss ian distributed systematical error, this penalty is
 given by
 \begin{equation}
 \label{eq:penalty}
-p_i=\frac{(\zeta_i-\zeta_i^0)^2}{\sigma_{\zeta_i}^2}\,,
+p_i=\frac{\zeta_i^2}{\sigma_{\zeta_i}^2}\,,
 \end{equation}
-where $\zeta_i^0$ denotes the mean and $\sigma_{\zeta_i}$ the standard 
+where $\sigma_{\zeta_i}$ is the standard 
 deviation of the corresponding nuisance parameter. We further on also refer
-to the mean as the ``central value'', and to the standard deviation as
-the ``error''. The latter corresponds to the actual systematical uncertainty. 
+to the  standard deviation as
+the ``error'', it corresponds to the actual systematical uncertainty.
+Note that the central values of all penalties are zero in \GLOBES\ 3.0 and higher. 
 The resulting $\chi^2$ is then minimized with respect to all nuisance 
 parameters $\zeta_i$, which leads to $\chi^2_\mathrm{pull}$
 \begin{equation}
@@ -1408,7 +1410,7 @@ $\chi^2_\mathrm{pull}$ than to invert the $N\times N$ covariance matrix. For
 the experiments considered here, $N$ is typically $20$ and $k\sim 4$, 
 which means that the pull method is numerically much faster. Moreover,
  it is more flexible and  allows the inclusion of systematical errors 
-also for a  Poissonian $\chi^2$-function.
+also for a Poissonian $\chi^2$-function.
 In \Ref~\cite{Fogli:2002pt}, it has been demonstrated that the pull method 
 and the covariance based approach are equivalent for a Gau\ss ian and 
 linear model. In general,
@@ -1426,7 +1428,7 @@ this systematics treatment defines the grouping into signal or background.
 The implementation of the normalization error
 is straightforward:
 \begin{equation}
-s_i(a):=a\cdot s_i
+s_i(a):=(1+a)\cdot s_i
 \end{equation} 
 with an analogous definition for the background events. Here, $a$ is the ``nuisance'' parameter, which will be minimized over later.
 
@@ -1445,7 +1447,7 @@ energy of the $i$th bin. It is often refered to as a ``tilt'' of the
 spectrum, since it describes a linear distortion 
 of the event rate spectrum. Note that this definition of a tilt makes
 only sense in combination with a large enough normalization error, since
-the tilt also affects the normalization.
+the tilt may also affect the normalization. 
 %
 The second option (method ``C'') is closer to an actual energy
 calibration error, which means that one should test this option whenever
@@ -1493,11 +1495,12 @@ Systematics function &$a$&$b$&$c$&$d$&Tilt/Calibr.& Dim. & Remarks\\
 \hline
 \multicolumn{8}{|l|}{{\bf Standard systematics:}} \\
 {\tt chiSpectrumTilt} &+&+&+&+&T&0&Systematics with tilt\\
-{\tt chiNoSysSpectrum} &-&-&-&-&-&2&No systematics\\
+{\tt chiNoSysSpectrum} &-&-&-&-&-&2&No systematics, but\\
+ & & & & & & & spectral information \\
 {\tt chiTotalRatesTilt} &+&+&+&+&T&4&Total rates\\
 {\tt chiSpectrumOnly} & $\infty$ &-& $\infty$ &-&-&7&Spectrum only\\
 {\tt chiNoSysTotalRates} &-&-&-&-&-&8&Total rates, no syst.\\
-{\tt chiSpectrumCalib} &+&+&+&+&C&9&ystematics with calibr.\\
+{\tt chiSpectrumCalib} &+&+&+&+&C&9&Systematics with calibr.\\
 \hline\multicolumn{8}{|l|}{{\bf User-defined systematics:}} \\
 {\tt chiZero} & - & - & - & - & - & n/a & Passive rule\\
  & & & & & & & ($\chi^2$ returns zero) \\
@@ -1519,7 +1522,7 @@ with the symbol $\infty$). In addition, the corresponding error
 dimension from earlier versions of \GLOBES\ is shown in the column ``Dim.''.
  }
 \end{center}
-\index{aedl}{{\tt rule}!errordim@{\tt "@errordim}} 
+%\index{aedl}{{\tt rule}!errordim@{\tt "@errordim}} 
 \index{norm}{Systematics function} 
 \end{table} 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1531,76 +1534,108 @@ x_i(a,b,c,d)=s_i(a,b)+b_i(c,d) \, ,
 and is thus a function of four parameters. 
 The four parameters $a,b,c,d$ have been introduced in order to describe
 systematical uncertainties and are the nuisance parameters.
-Each of the four parameters has a central value and systematical error.
-The central values for all of
-the four parameters have to be always defined. They are called 
-signal normalization ($a$), signal tilt/calibration ($b$), 
+Each of the four parameters has a corresponding systematical error.
+% The central values for all of
+% the four parameters have to be always defined for built-in systematics. 
+They are called  signal normalization ($a$), signal tilt/calibration ($b$), 
 background  normalization ($c$) and
-background tilt/calibration ($d$). The default values are
-\begin{equation}
-a=1\,,\quad b=0\,,\quad c={\tt not \, \, assigned}\,,\quad d=0\,.
-\end{equation}
-Thus, for the background normalization $c$, the value has to be specified 
-in \emph{either} case. The values for the normalization and the 
+background tilt/calibration ($d$). Their default (central) values are zero.
+% \begin{equation}
+% a=1\,,\quad b=0\,,\quad c={\tt not \, \, assigned}\,,\quad d=0\,.
+% \end{equation}
+% Thus, for the background normalization $c$, the value has to be specified 
+% in \emph{either} case. 
+The errors for the normalization and the 
 values of tilt/calibration are always regarded
-as a pairs, \ie, they are given in the form {\tt normalization : tilt}. The errors are treated in the same way. For example, we have
+as a pairs, \ie, they are given in the form {\tt normalization : tilt}. For example, we have\footnote{The old parameter {\tt @backgroundcenter} should not be used anymore. A background normalization center of 1.0 will be
+interpreted as zero central value. IS THAT CORRECT [WW]?}
 \index{aedl}{{\tt rule}!signal error@{\tt "@signalerror}}
 \index{aedl}{{\tt rule}!background error@{\tt "@backgrounderror}}
-\index{aedl}{{\tt rule}!background center@{\tt "@backgroundcenter}}
+%\index{aedl}{{\tt rule}!background center@{\tt "@backgroundcenter}}
 \begin{quote}
 {\tt
 \tb @signalerror =       0.001  :       0.01\\
-\tb @backgroundcenter =  0.1 :       0.0\\
+%\tb @backgroundcenter =  0.1 :       0.0\\
 \tb @backgrounderror =   0.001 :       0.01
 }
 \end{quote}
-There is no {\tt @signalcenter} in this definition, 
-since by default the central value for the
-signal normalization is $1$ and the central value for the tilt/calibration 
-is $0$.  
-
+% There is no {\tt @signalcenter} in this definition, 
+% since by default the central value for the
+% signal normalization is $1$ and the central value for the tilt/calibration 
+% is $0$.  
+%
 The user has the possibility to choose the set $\{\zeta_i\}$ of nuisance 
 parameters which are minimized over. This choice is specified with the 
-error dimension variable\index{norm}{Error dimension}, and the different 
-possibilities are shown in
-\Tab~\ref{tab:error_dim}. Since the error dimension defines the treatement
-of systematics it is useful to have define a matched pair of error dimensions
-for each rule, where on value describes how the event rate is computed
-for \emph{no} systematics and the other one is with systematics 
-(see also~\Sec~\ref{sec:systematics}).
-The error dimensions for the case of no systematics is set for each rule 
-by the value of {\tt @errordim\_sys\_off}\index{aedl}{{\tt rule}!errordim 
-sys off@{\tt "@errordim\_sys\_off}}, whereas the error dimension
-for systematics on is given by {\tt @errordim\_sys\_on}
-\index{aedl}{{\tt rule}!errordim sys on@{\tt "@errordim\_sys\_on}}. Thus,
- for example,
-the complete error dimension definition could look like  
+systematics functions {\tt sys\_on\_function} and {\tt sys\_off\_function}
+corresponding two systematics modes ``systematics on'' and ``systematics off''.\footnote{In earlier
+versions before \GLOBES\ 3.0 the ``error dimension'' was used. The corresponding
+parameters {\tt errordim\_sys\_on} and {\tt errordim\_sys\_off} are still supported
+but should not be used anymore.}
+\index{aedl}{{\tt rule}!sys on function@{\tt "@sys\_on\_function}}
+\index{aedl}{{\tt rule}!sys off function@{\tt "@sys\_off\_function}}
+\index{norm}{Systematics function}
+The different  possibilities are shown in
+\Tab~\ref{tab:error_dim}. Since the dual systematics modes define the experiment
+behavior for systematics on and off, it is useful to have a matching pair of 
+systematics functions for each rule 
+(see also~\Sec~\ref{sec:systematics}).. The signal and background errors specified
+by {\tt @signalerror} and  {\tt @backgrounderror} will then be used, if applicable.
+For example, one may define 
 \begin{quote}
-{\tt 
-\tb @errordim\_sys\_off = 2\\
-\tb @errordim\_sys\_on = 0
+{\tt
+\tb @signalerror =       0.001  :       0.01\\
+\tb @backgrounderror =   0.001 :       0.01 \\
+\tb @sys\_on\_function = "chiSpectrumTilt"  \\
+\tb @sys\_off\_function = "chiNoSysSpectrum"  
 }
 \end{quote}
-If none of the built-in algorithms listed in \Tab~\ref{tab:error_dim} is
-suitable for a certain setup, the user can override them by setting
-{\tt @errordim\_sys\_on} to 20 and using the \GLB{SetUserChi}
-function to specify a specialized function for the calculation
-of $\chi^2$. This function will then be called by the \GLOBES\ minimizers.
-For details, see \Sec~\ref{sec:userchi}.
 
+For user-defined systematics \index{norm}{User-defined systematics}
+(see, \Sec~\ref{sec:userchi}), one can use arbitrary names
+for the systematics functions which are not pre-defined. In this case,
+one would specify the systematical errors in lists, such as
+\index{aedl}{{\tt rule}!sys on errors@{\tt "@sys\_on\_errors}}
+\index{aedl}{{\tt rule}!sys off errors@{\tt "@sys\_off\_errors}}
+\begin{quote}
+{\tt
+\tb @sys\_on\_function = "chiMySystematics"  \\
+\tb @sys\_on\_errors = \{ 0.2, 0.3, 0.5 \}~// Uses three syst. errors \\
+\tb @sys\_off\_function = "chiNoSysSpectrum"  \\
+\tb @sys\_off\_errors = \{ \}
+}
+\end{quote}
+WHICH SYSTEMATICAL ERRORS WILL A FUNCTION USE IF THERE IS A MIXED DECLARATION,
+SUCH AS WITH SYS\_ON\_ERRORS IN SYS ON AND SIGNALERROR/BACKGROUNDERROR in SYS OFF?
+DOES THAT WORK? [WW]
+Note that here the systematics on and systematics off models can be used 
+as fully functional different systematics modes with different systematical
+errors. The interpretation of the systematical errors in {\tt @sys\_on\_errors} and
+{\tt @sys\_off\_errors} is left to the application software code and the user. 
+In addition, the application software has to register the user-defined systematics $\chi^2$
+function with \GLB{DefineChiFunction} and uniquely identify the name
+given by {\tt @sys\_on\_function} or {\tt @sys\_off\_function} to avoid
+confusing different systematics routines. In addition, it is possible to define
+a rule with passive systematics using {\tt glbChiZero}. Such passive systematics
+is not directly used or called, but the corresponding rate vectors will be calculated
+and provided for indirect access. For example, a reactor experiment with correlated
+systematics between near and far detectors may define the user-defined systematics
+{\tt chiReactor} for the far detector and use {\tt chiZero} for the near detector.
+The routine assigned to the far detector will then perform the $\chi^2$ calculation,
+which, of course, also involves the rates of the near detector. However, defining
+{\tt chiReactor} in both the near and far detectors would result in a double call
+of the $\chi^2$ function, \ie, the program will be a factor two slower and the
+resulting $\chi^2$ will be a factor two too large.
 
-
-Eventually, a rule looks like
+Eventually, a complete rule may look like this:
 \begin{quote}
 {\tt rule(\#rule\_1)<\\
 \tb @signal = 0.5 @ \#channel\_1\\
 \tb @background = 0.001 @ \#channel\_2 :  0.005 @ \#channel\_3\\
 \tb @signalerror =       0.001  :       0.01\\
-\tb @backgroundcenter =  0.1 :       0.0\\
 \tb @backgrounderror =   0.001 :       0.01\\
-\tb @errordim\_sys\_off = 2\\
-\tb @errordim\_sys\_on = 0\\
-\tb @energy\_window = 4.0 : 50.0\\ 
+\tb @sys\_on\_function = "chiSpectrumTilt"  \\
+\tb @sys\_off\_function = "chiNoSysSpectrum"  \\
+\tb @energy\_window = 4.0 : 50.0
 >}
 \end{quote}
 \index{aedl}{{\tt rule}|)}
@@ -1684,6 +1719,8 @@ within the shell session or in the shell profile:
 export GLB\_CENTRAL\_VALUES='0.55,0,0.785,0,0.0008,0.0025'
 }
 \end{quote}
+Note that in the case of additional non-standard parameters, these will just to 
+be included at the end of these lists.
 Furthermore it is possible to switch off oscillations with the {\tt -N} option and to switch them on again with {\tt -O} (the default). The effect of {\tt -N} is the same as to use {\tt NOSC\_} in all oscillation channels.
 Thi feature is useful if one wants to normalize an expriment flux if
 the number of un-oscillated events is given.
@@ -1766,8 +1803,9 @@ Therefore, it is \emph{not} possible to use {\tt -b} together with {\tt -r}, or 
 One can, however, switch off the post-smearing efficiencies ({\tt -f}) 
 and the post-smearing backgrounds ({\tt -g}) for each channel. Since
 the definition of a rule also contains so-called ``coefficients'', it is
-possible to switch them off with {\tt -i}. This options also deactivates
-any setting of {\tt @backgroundcenter}. 
+possible to switch them off with {\tt -i}. 
+% This options also deactivates
+% any setting of {\tt @backgroundcenter}. 
 
 
 \subsection*{Output}
@@ -1829,14 +1867,14 @@ special purpose studies (such as the energy resolution-dependence). If
 the external variables are not explicitely specified, they are
 interpreted by the parser as zeros. Thus, it is impossible to properly
 parse any files with {\tt globes} which contain such undefined variables. 
-Hence, there is the possibility to define \AEDL\ variables by using the define option {\tt -D}. A call such as 
+Hence, there is the possibility to define \AEDL\ variables by using the define option {\tt -D}. The example
 \begin{quote}
 {\tt
-globes -DBASELINE=3000 ...
+globes -DBASELINE=3000 -D\%BLUE=$\backslash$\{8, 15$\backslash$\} ...
 }
 \end{quote}
-would define the \AEDL\ variable {\tt BASELINE} to be $3000$.
-
+defines the \AEDL\ variable {\tt BASELINE} to be $3000$ and the \AEDL\ variable list
+{\tt \%BLUE} to be \{8,15\} (please note the syntax for the brackets!).
 
 %%% Local Variables: 
 %%% mode: latex
