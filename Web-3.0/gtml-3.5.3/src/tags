@@ -1,0 +1,51 @@
+// $Id: tags,v 1.1 2007/01/10 12:52:17 globes Exp $
+//
+// Redefinition of my own *HTML* tag.
+//
+
+definechar é            &eacute;
+definechar ß            &szlig;
+
+definechar <c>          &copy;
+definechar <>           &nbsp;
+
+// I use those nasty tricks to cheat my emacs html-helper-mode, and
+// font-lock-mode. 
+// If some good elisp guy wants to write a GTML mode for emacs, let me know,
+// and I will integrate it into the GTML distribution, and stop doing those
+// *unpretty* things ;-)
+
+definechar <h2>         [[h2]]
+definechar </h2>        [[/h2]]
+
+definechar <h3>         [[h3]]
+definechar </h3>        [[/h3]]
+
+definechar <h4>         [[h4]]
+definechar </h4>        [[/h4]]
+
+definechar <ext>        [[ext]]
+definechar </ext>       [[/ext]]
+
+definechar <car>        [[car]]
+definechar </car>       [[/car]]
+
+definechar <file>       [[file]]
+definechar </file>      [[/file]]
+
+definechar <cmd>        [[cmd]]
+definechar </cmd>       [[/cmd]]
+
+definechar <label>      [[label(
+definechar </label>     )]]
+
+definechar <url>        [[url(
+definechar </url>       )]]
+
+definechar <surl>       [[surl(
+definechar </surl>      )]]
+
+definechar <mail>       [[mail(
+definechar </mail>      )]]
+
+// End of tags

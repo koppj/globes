@@ -1,0 +1,29 @@
+#define TITLE        GLoBES - Simulating long baseline neutrino oscillation experiments
+#define DESCRIPTION  GLoBES - A software tool for the simulation of long baseline neutrino \
+                     oscillation experiments, including full correlations, degeneracies, systematics
+#define KEYWORDS     GLoBES, AEDL, long, baseline, neutrino, oscillation, experiment, simulate, simulating,\
+                     long baseline, neutrino oscillation
+
+
+#include "template_head.gtml"
+
+<h1>GLoBES <br> General Long Baseline Experiment Simulator</h1>
+
+GLoBES is a sophisticated software package for the simulation of long baseline
+neutrino oscillation experiments. Main features are:
+<ul>
+  <li>Full incorporation of correlations and degeneracies in the oscillation parameter space.</li>
+  <li>Advanced routines for the treatment of systematic errors</li>
+  <li>AEDL, the <b>A</b>bstract <b>E</b>xperiment <b>D</b>efinition <b>L</b>anguage
+      provides an easy way to define experimental setups.</li>
+  <li>Predefined setups are available for many experiments: Superbeams, Neutrino factories,
+      Reactors, various detector technologies, ...</li>
+  <li>GLoBES can be used as a standalone tool and as a C library.</li>
+  <li>Extensive documentation and examples is available for download.</li>
+</ul>
+
+<p>
+GLoBES Version 3.0 is available for <a href="download.html">download</a>.
+
+#include "template_foot.gtml"
+

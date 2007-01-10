@@ -1,0 +1,65 @@
+#define TITLE        GLoBES - Documentation and User Manual
+#define DESCRIPTION  GLoBES - Software user manual, AEDL documentation, published paper and poster
+#define KEYWORDS     GLoBES, AEDL, documentation, manual, paper, poster, long, baseline, neutrino,\
+                     oscillation, experiment
+
+
+#include "template_head.gtml"
+
+<h1>GLoBES Documentation</h1>
+
+Documentation for GLoBES:&nbsp;
+<ul>
+  <li>
+    GLoBES user manual version 3.0:
+    (<a href="documentation/globes-manual-3.0.pdf">PDF</a>,&nbsp;
+    <a href="documentation/globes-manual-3.0.ps.gz">zipped Postscript</a>,&nbsp;
+    <a href="documentation/globes-manual-3.0.ps">Postscript</a>)
+  </li>
+  <li>
+    GLoBES publication hep-ph/0407333:
+    (<a href="documentation/paper.pdf">PDF</a>,&nbsp;
+    <a href="documentation/paper.ps.gz">zipped Postscript</a>,&nbsp;
+    <a href="documentation/paper.ps">Postscript</a>)
+  </li>
+  <li>
+    GLoBES publication hep-ph/0601XXX:
+    (<a href="documentation/paper2.pdf">PDF</a>,&nbsp;
+    <a href="documentation/paper2.ps.gz">zipped Postscript</a>,&nbsp;
+    <a href="documentation/paper2.ps">Postscript</a>)
+  </li>
+</ul>
+
+Older versions of the GLoBES manual:
+<ul>
+  <li>
+    GLoBES user manual version 2.0.11:
+    (<a href="documentation/globes-manual-2.0.11.pdf">PDF</a>,&nbsp;
+    <a href="documentation/globes-manual-2.0.11.ps.gz">zipped Postscript</a>,&nbsp;
+    <a href="documentation/globes-manual-2.0.11.ps">Postscript</a>)
+  </li>
+  <li>
+    GLoBES user manual version 2.0:
+    (<a href="documentation/globes-manual-2.0.pdf">PDF</a>,&nbsp;
+    <a href="documentation/globes-manual-2.0.ps.gz">zipped Postscript</a>,&nbsp;
+    <a href="documentation/globes-manual-2.0.ps">Postscript</a>)
+  </li>
+</ul>
+
+GLoBES poster from Neutrino 2004 in Paris
+(<a href="documentation/poster.pdf">PDF</a>,&nbsp;
+ <a href="documentation/poster.ps.gz">zipped Postscript</a>,&nbsp;
+ <a href="documentation/poster.ps">Postscript</a>)
+
+<p>
+<a href="documentation/poster.pdf"><img SRC="images/poster.jpg" ></a>
+
+<p>
+Many more sample applications, technical details, and tutorials can be
+found on the website of the <a href="http://www.mpi-hd.mpg.de/~jkopp/glb07/">Workshop on
+Physics and Applications of GLoBES</a>, which took place in Heidelberg from
+24 - 26 January 2007.
+
+
+#include "template_foot.gtml"
+

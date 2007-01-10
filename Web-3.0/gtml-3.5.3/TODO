@@ -1,0 +1,20 @@
+This file contains the list of features, some of were proposed by users, to be
+added. 
+
+TODO ABSOLUTELY :
+-----------------
+
+* It will be cool to add a verbosity level controlling the level of progress
+  report. 
+
+* It will be cool to warn use of not defined #instructions.
+
+* Maybe I should debianize all the stuff.
+
+TODO EVENTUALLY (I HAVE TO THINK ABOUT OTHER SOLUTIONS BEFORE) :
+----------------------------------------------------------------
+
+* Import netscape bookmarks (folder or files).
+
+End of TODO.
+

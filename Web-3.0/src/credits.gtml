@@ -1,0 +1,42 @@
+#define TITLE        GLoBES - Credits
+#define DESCRIPTION  GLoBES - Credits and Acknowledgements
+#define KEYWORDS     GLoBES, AEDL, Credits, Acknowledgements, Support
+
+
+#include "template_head.gtml"
+
+<h1>Credits</h1>
+
+We would like to thank Martin Freund, who wrote the very first
+version of a three-flavour matter profile treatment many years 
+ago. PH is especially thankful for the invaluable advice of 
+Thomas Fischbacher on many design issues. In addition, we would 
+like to thank Mark Rolinec for his help to translate the experiment 
+descriptions into AEDL, and for creating the illustrations in 
+the documentation. Finally, thanks to all the people who have 
+been pushing this project for many years, to the ones who have 
+been continuing asking for the publication of the software, and 
+the referees of several of our papers for suggestions which lead 
+to improvements in the software.
+
+<p>
+The development of GLoBES is currently supported by:
+<ul>
+  <li>Max-Planck-Institut f&uuml;r Kernphysik, Heidelberg </li>
+  <li>Physics Department of the University of Wisconsin</li>
+  <li>Universit&auml;t W&uuml;rzburg</li>
+</ul>
+
+In the past support was also provided by:
+<ul>
+  <li>Physik Department der Technischen Universit&auml;t M&uuml;nchen</li>
+  <li>Sonderforschungsbereich 375 f&uuml;r Astro-Teilchenphysik 
+      der Deutschen Forschungsgemeinschaft</li>
+  <li>Max-Planck-Institut f&uuml;r Physik, M&uuml;nchen </li>
+  <li>Institute for Advanced Study, Princeton</li>
+  <li>W. M. Keck Foundation</li>
+  <li>Studienstiftung des Deutschen Volkes </li>
+</ul>
+
+#include "template_foot.gtml"
+

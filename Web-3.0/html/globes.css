@@ -1,0 +1,19 @@
+body { font-family:      Arial, Helvetica, sans-serif;
+       font-size:        12pt;
+       background-color: #FFFFFF;
+       color:            #000000
+     }
+.footline { font-size: 70% }
+.red { color: #AA0000 }
+
+A.navigation-thispage:link,
+  A.navigation-thispage:active,
+  A.navigation-thispage:visited
+        { color: #FFFFFF; text-decoration: none; font-weight: bold }
+A.navigation-otherpage:link,
+  A.navigation-otherpage:active,
+  A.navigation-otherpage:visited
+        { color: #000000; text-decoration: none; font-weight: bold }
+        
+H1, H2 { color: #AA0000 }
+

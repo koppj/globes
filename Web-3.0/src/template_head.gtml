@@ -1,0 +1,104 @@
+#define mycolor1  #990000
+#define mycolor2  #993333
+#define mycolor3  #FF3333 
+#define mycolor4  #FF9933 
+#define mycolor5  #FFCC33 
+#define mycolor6  #999933 
+#define mycolor7  #339900
+#define mycolor8  #003300 
+#define mycolor9  #336633 
+#define mycolor10 #668866 
+#define mycolor11 #99AA99 
+#define mycolor12 #CCCCCC 
+#define mycolor13 #EEEEEE 
+
+#define nav_entry(filename,label,rgbcolor)                                  \
+<<__PERL__(                                                                 \
+  if ("<<FILENAME>>" eq "filename")                                         \
+  {                                                                         \
+    return("<td bgcolor=\"rgbcolor\">\n\
+              <a href=\"filename\" class=\"navigation-thispage\">label</a>\n\
+            </td>\n\
+            <td bgcolor=\"rgbcolor\">&nbsp;</td>");\
+  }                                                                         \
+  else                                                                      \
+  {                                                                         \
+    return("<td>\n\
+              <a href=\"filename\" class=\"navigation-otherpage\">label</a>\n\
+            </td>\n\
+            <td bgcolor=\"rgbcolor\">&nbsp;</td>");\
+  }                                                                         \
+)>>
+
+#mtimestamp $dd $Mmm $yyyy, $hh:$mm CET
+       
+        
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+  
+<HEAD>
+  <TITLE><<TITLE>></TITLE>
+  <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8859-1">
+  <META name="robots" content="<<ROBOTS>>">
+  <META name="keywords" content="<<KEYWORDS>>">
+  <META name="description" content="<<DESCRIPTION>>">
+  <link rel="stylesheet" href="globes.css" type="text/css">
+</HEAD>
+
+<BODY>
+  <table border="0" cellspacing="0" cellpadding="0">
+    <tr>
+      <td class="Navigation" valign="top" border="1" rules="all">
+        <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+            <td width="130"><img src="images/globes-logo-small.gif" alt="GLoBES Logo" width="120"></td>
+            <td width="5" bgcolor="<<mycolor1>>">&nbsp;</td>
+          </tr>
+          <tr><td height="10">&nbsp;</td><td bgcolor="<<mycolor1>>">&nbsp;</td></tr>
+          <tr>
+            <<nav_entry(index.html,Home,<<mycolor1>>)>>
+          </tr>
+          <tr>
+            <<nav_entry(features.html,Features,<<mycolor2>>)>>
+          </tr>
+          <tr>
+            <<nav_entry(download.html,Download,<<mycolor3>>)>>
+          </tr>
+          <tr>
+            <<nav_entry(documentation.html,Documentation,<<mycolor4>>)>>
+          </tr>
+          <tr>
+            <<nav_entry(plans.html,Future Plans,<<mycolor5>>)>>
+          </tr>
+          <tr>
+            <<nav_entry(credits.html,Credits,<<mycolor6>>)>>
+          </tr>
+          <tr>
+            <<nav_entry(contact.html,Contact,<<mycolor7>>)>>
+          </tr>
+          <tr>
+            <<nav_entry(impressum.html,Impressum,<<mycolor8>>)>>
+          </tr>
+          <tr>
+            <td>&nbsp;</td> <td bgcolor=<<mycolor9>>>&nbsp;</td>
+          </tr>
+          <tr>
+            <td>&nbsp;</td> <td bgcolor=<<mycolor10>>>&nbsp;</td>
+          </tr>
+          <tr>
+            <td>&nbsp;</td> <td bgcolor=<<mycolor11>>>&nbsp;</td>
+          </tr>
+          <tr>
+            <td>&nbsp;</td> <td bgcolor=<<mycolor12>>>&nbsp;</td>
+          </tr>
+          <tr>
+            <td>&nbsp;</td> <td bgcolor=<<mycolor13>>>&nbsp;</td>
+          </tr>
+        </table>
+      </td>
+      <td width="20">&nbsp;</td> 
+      <td width="700" class="paragraph" valign="top">
+
+<!-- Beginning of Page Contents -->
+

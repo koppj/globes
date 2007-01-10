@@ -1,0 +1,11 @@
+#define TITLE        GLoBES - Simulating long baseline neutrino oscillation experiments
+#define DESCRIPTION  GLoBES - A software tool for the simulation of long baseline neutrino \
+                     oscillation experiments, including full correlations, degeneracies, systematics
+#define KEYWORDS     GLoBES
+
+
+#include "template_head.gtml"
+
+
+#include "template_foot.gtml"
+

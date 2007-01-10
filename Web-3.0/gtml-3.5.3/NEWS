@@ -1,0 +1,126 @@
+
+   #Prev
+   
+                            GTML Revision history
+                                      
+   1.0   8-Jun-1996
+     * First release.
+       
+   1.01   14-Jun-1996
+     * Added #newdefine.
+     * Allow undefined constants.
+       
+   1.02   14-Jul-1996
+     * Support path names in project file.
+       
+   1.03   1-Sep-1996
+     * No quotation marks in #include file name is OK.
+     * Allow ../ to higher levels than starting directory.
+       
+   2.0   24-Nov-1996
+     * Added lots of new features.
+       
+   2.01   30-Nov-1996
+     * Commands can be inside comments.
+     * User-specified substitute delimiters.
+       
+   2.02   10-Feb-1997
+     * Fixed #ifdef nesting. (Alan B. Chamberlin)
+       
+   2.1   23-Jul-1997
+     * Allow subs in #include.
+     * Don't downshift file names. (Suggestions from Mike Sendall).
+       
+   2.2   15-Aug-1997
+     * "allsource" command in project file.
+       
+   2.21   2-Feb-1998
+     * Simplified auto-generated navigation links.
+       
+   2.22   25-Jul-1998
+     * Handles years past 2000.
+       
+   2.3   19-Feb-1999
+     * Enhanced #define (Wim Niemans Ri).
+       
+   3.0   22-Jun-1999
+     * Added mtimestamp.
+     * Added usage of "LANGUAGE".
+     * Added usage of "EXTENSION".
+     * Added filename alias definitions.
+     * Fixed a bug with links and subdir.
+     * Fixed a bug with entities.
+       
+   3.1   1-Jul-1999
+     * Added definitions of all environment variables.
+     * Added substitution at definition time for OUTPUT_DIR, INCLUDE_PATH
+       and EXTENSION.
+       
+   3.2   4-Jul-1999
+     * Added usage of "FAST_GENERATION" to process only files which
+       sources are newer than output.
+       
+   3.3   7-Jul-1999
+     * Fixed a bug with directory creation, thanks to Magog.
+     * Added undefined constants in project file, a PhM request.
+     * Added the -F command line argument, to process only single file,
+       enabling the use of make (On a suggestion from PhM).
+     * Added the GNU -h, --help and --version command line arguments.
+       
+   3.31   7-Jul-1999
+     * Added Norwegian language support.
+       
+   3.32   8-Jul-1999
+     * Fixed a bug with filename aliases.
+     * Added Italian and Swedish support.
+       
+   3.33   9-Jul-1999
+     * Fixed a serious bug with filename aliases (thank's to Jens).
+       
+   3.34   10-Jul-1999
+     * Added Dutch support.
+       
+   3.3.5   13-Jul-1999
+     * Fixed another bug with filename aliases.
+       
+   3.3.6   14-Jul-1999
+     * Added German support.
+       
+   3.5.0   2-Sep-1999
+     * Fixed a lot of bugs, while rewritting the code.
+     * Added makefile generation.
+     * Enhanced timestamp support.
+     * Added customizable sitemap generation.
+     * Modified ouput file extension setting.
+     * Added characters translation.
+     * Added embedded Perl code possibility.
+     * Added embedded shell command output possibility.
+     * Documented output compression.
+     * Updated documentation.
+     * Added some new predefined constants.
+     * Added macro with arguments.
+     * Enhanced conditionals.
+     * Enhanced inclusion in project files.
+     * Enhanced timestamps support.
+       
+   3.5.1   2-Sep-1999
+     * Fixed a bug with PATHNAME creation, and thus included file
+       searching.
+       
+   3.5.2   8-Sep-1999
+     * Fixed a bug with conditional output (if/elsif).
+     * Added irish support.
+     * Remove include file name report.
+     * All documentations has been corrected thanks to Ken Guest.
+       
+   3.5.3   13-Sep-1999
+     * Fixed a bug with compression.
+     * Better $ddth (english) computation.
+     * Exit status changed (0 for warnings and OK, 1 for errors).
+       
+     Sitemap   Credits >>
+   ______________________________________________________________________
+                                      
+                   Last modification: 1999/9/13 at 01:49
+           Copyright © 1996-1999 Gihan Perera  (gihan@pobox.com)
+            Copyright © 1999 Bruno Beaufils  (beaufils@lifl.fr)

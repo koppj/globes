@@ -1,0 +1,24 @@
+// ---------------------------------------------------------------------
+// GTML Project File for the GLoBES website
+// ---------------------------------------------------------------------
+
+// Specify directory for generated html files
+define OUTPUT_DIR  ../html
+
+// Define dummy values for some variables - just tobe on the safe side
+// These should be redefined for each html file
+define TITLE       GLoBES - Simulating Long Baseline Neutrino Oscillation Experiments
+define KEYWORDS    GLoBES
+define ROBOTS      index, follow
+define DESCRIPTION GLoBES - A software tool for the simulation of future long baseline neutrino oscillation experiments
+
+// Define project files that GTML should process
+./index.gtml
+./features.gtml
+./download.gtml
+./documentation.gtml
+./plans.gtml
+./credits.gtml
+./contact.gtml
+./impressum.gtml
+

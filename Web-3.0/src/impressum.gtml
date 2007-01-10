@@ -1,0 +1,48 @@
+#define TITLE        GLoBES - Impressum 
+#define DESCRIPTION  GLoBES - Impressum
+#define KEYWORDS     GLoBES, AEDL, Impressum
+
+
+#include "template_head.gtml"
+
+<h1>GLoBES Impressum</h1>
+
+German law requires us to add the following:
+
+<p>
+<b>Verantwortlich f&uuml;r den Inhalt:</b><br>
+Prof. Dr. M. Lindner<br>
+Max-Planck-Institut f&uuml;r Kernphysik<br>
+Postfach 10 39 80<br>
+69029 Heidelberg<br>
+<br>
+Email: <a href="mailto:lindner@mpi-hd.mpg.de">lindner@mpi-hd.mpg.de</a><br>
+Tel.: (06221) 516-800<br><br>
+
+<p>
+<b>Rechtliche Hinweise zur Haftung / Disclaimer</b><br>
+Das Max-Planck-Institut f&uuml;r Kernphysik ist um Richtigkeit und Aktualit&auml;t
+der auf dieser Internetpr&auml;senz bereitgestellten Informationen bem&uuml;ht.
+Trotzdem k&ouml;nnen Fehler und Unklarheiten nicht vollst&auml;ndig ausgeschlossen&nbsp;
+werden. Es wird deshalb keine Gew&auml;hr f&uuml;r die Aktualit&auml;t,
+Richtigkeit, Vollst&auml;ndigkeit oder Qualit&auml;t der bereitgestellten
+Informationen gegeben. F&uuml;r Sch&auml;den materieller oder immaterieller Art,
+die durch die Nutzung oder Nichtnutzung der dargebotenen Informationen&nbsp;
+bzw. durch die Nutzung fehlerhafter und unvollst&auml;ndiger Informationen
+unmittelbar oder mittelbar verursacht werden, haftet das Institut
+nicht. Gleiches gilt f&uuml;r kostenlos zum Download bereitgehaltene
+Software. Das Institut beh&auml;lt es sich vor, Teile des&nbsp;
+Internetangebots oder das gesamte Angebot ohne gesonderte Ank&uuml;ndigung
+zu ver&auml;ndern, zu erg&auml;nzen, zu l&ouml;schen oder die&nbsp;
+Ver&ouml;ffentlichung zeitweise oder endg&uuml;ltig einzustellen. Die
+Verantwortlichkeit f&uuml;r "fremde Inhalte", die beispielsweise durch
+direkte&nbsp;
+oder indirekte Verkn&uuml;pfungen (sogenannte "Links") zu anderen Anbietern
+bereitgehalten werden, liegt beim jeweiligen Anbieter. Das
+Institut hat auf "fremde Inhalte" keinerlei Einfluss und macht sich
+diese Inhalte auch nicht zu eigen. Das Institut hat keine positive&nbsp;
+Kenntnis &uuml;ber rechtswidrige oder anst&ouml;&szlig;ige Inhalte
+auf den verkn&uuml;pften Seiten fremder Anbieter.
+
+#include "template_foot.gtml"
+

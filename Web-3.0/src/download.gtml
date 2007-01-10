@@ -1,0 +1,224 @@
+#define TITLE       GLoBES - Download of the software
+#define KEYWORDS    GLoBES, AEDL, glb, experiment, definitions, download, long, baseline, neutrino, oscillation, linux, binaries, source
+#define DESCRIPTION Download the GLoBES software and AEDL files for numerous experiments
+
+#include "template_head.gtml"
+
+<h1>GLoBES Download</h1>
+
+<h2>Software Requirements</h2>
+GLoBES is currently available for Linux and Mac OS under the GNU Public License. 
+Building the GLoBES binaries requires that the following tools and libraries
+are installed:
+<ul>
+  <li>make and gcc</li>
+  <li><a href="http://www.gnu.org/software/gsl/">GNU Scientific Library</a></li>
+</ul>
+
+These tools are included in many Linux distributions. Otherwise they can
+easily be downloaded from the provided links. 
+
+
+<br>
+<h2>GLoBES Software Download</h2>
+GLoBES can be downloaded as a single gzip-ed tar ball. The latest up-to-date
+version is here: 
+<ul>
+  <li><a href="download/globes-3.0.tar.gz">globes-3.0.tar.gz</a> &nbsp;(Jan. 23, 2007)</li>
+</ul>
+
+<!--You may also want to check out this statically linked binary
+<a href="download/globes.gz">globes.gz</a>, which should run right of the box
+on most Linux systems. To play with it you also need to download at least one
+of the experiment data tar-balls provided below. Unpack everthing to the same
+directory and just type 'globes X.glb', where X is one of the glb-files you just
+unpacked.-->
+
+<h3>What's new in version 3.0?</h3>
+<ul>
+  <li>Customizable treatment of systematical error</li>
+  <li>User-defined priors to incorporate arbitrary external information
+      on the oscillation parameters</li>
+  <li>An interface for the implementation of non-standard physics</li>
+  <li>Beta-beam fluxes are now built-in</li>
+  <li>New and updated AEDL files</li>
+  <li>Various bug fixes</li> 
+  <li>Improved performance</li>
+</ul>
+
+GLoBES documentation and related material can be found under the menu item 
+<a href="documentation.html">Documentation</a>.
+
+The convention for the version number is as follows:<br>
+- the first digit indicates major software revisions<br>
+- the second digit is for changes when new features are introduced <br>
+- the last digit is for minor bug-fix releases. An up-to-date list of known
+bugs and bug fixes is <a href="bugs.html">here</a>
+
+<p>For compatibility we provide als some previous versions of GLoBES:
+<ul>
+  <li><a href="download/globes-2.0.11.tar.gz">globes-2.0.11.tar.gz</a> &nbsp;(Mar. 14, 2005)</li>
+  <li><a href="download/globes-2.0.1.tar.gz">globes-2.0.1.tar.gz</a> &nbsp;(Aug. 10, 2004)</li>
+  <li><a href="download/globes-2.0.0.tar.gz">globes-2.0.0.tar.gz</a> &nbsp;(Jul. 29, 2004)</li>
+</ul>
+
+
+<br>
+<h2>GLoBES Utilities</h2>
+Here we post some utilities, which might be useful together with GLoBES.
+<p>
+<table frame=all rules=all cellspacing=4 cellpadding=4>
+<tr>
+  <td>
+    <b>Mathematica notebook</b><br>
+    to convert the output of the examples to nice ps-figures
+  </td>
+  <td><a href="download/utilities/DocPlots.nb.gz">DocPlots.nb.gz</a></td>
+</tr>
+</table>
+
+
+<br>
+<h2>GLoBES experiment definitions</h2>
+The most important ingredient of GLoBES are adequate experiment descriptions. 
+The experiments posted here may serve as examples in using AEDL, but they 
+may also serve as starting point for modifications. All files listed here 
+contain in their header the references to their origin.
+The GLoBES Team would be happy to include your glb-files into this
+list. Please mail to <a href="mailto:globes@ph.tum.de?SUBJECT=glb-files">globes@ph.tum.de</a>
+
+<p>
+<table frame=all rules=all cellspacing=4 cellpadding=4>
+  <thead>
+    <tr>
+      <th>Experiment</th>
+      <th>glb-file(s)</th>
+      <th>dat-file(s)</th>
+      <th>combined tar-file</th>
+      <th>Author(s)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Neutrino Factory</td>
+      <td>
+        <a href="download/glb/NuFact1.glb">NuFact1.glb</a> <br>
+        <a href="download/glb/NuFact2.glb">NuFact2.glb</a>
+      </td>
+      <td>
+        <a href="download/glb/XNC.dat">XNC.dat</a><br>
+        <a href="download/glb/XCC.dat">XCC.dat</a>
+      </td>
+      <td>
+        <a href="download/glb/NuFact.tar.gz">NuFact.tar.gz</a>
+      </td>
+      <td>The&nbsp;GLoBES&nbsp;Team</td>
+    </tr>
+    <tr>
+      <td>T2K</td>
+      <td>
+        <a href="download/glb/JHFSKnew.glb">JHFSKnew.glb</a><br>
+        <a href="download/glb/JHFSKantinew.glb">JHFSKantinew.glb</a><br>
+        <a href="download/glb/JHFSKcomb.glb">JHFSKcomb.glb</a><br>
+        <a href="download/glb/JHFHKAll.glb">JHFHKAll.glb</a>
+      </td>
+      <td>
+        <a href="download/glb/JHFplus.dat">JHFplus.dat</a><br>
+        <a href="download/glb/JHFminus.dat">JHFminus.dat</a><br>
+        <a href="download/glb/XQE.dat">XQE.dat</a><br>
+        <a href="download/glb/XNC.dat">XNC.dat</a><br>
+        <a href="download/glb/XCC.dat">XCC.dat</a>
+      </td>
+      <td>
+        <a href="download/glb/T2K.tar.gz">T2K.tar.gz</a>
+      </td>
+      <td>The&nbsp;GLoBES&nbsp;Team</td>
+    </tr>
+    <tr>
+      <td>NOvA</td>
+      <td>
+        <a href="download/glb/NUMI12.glb">NUMI12.glb</a><br>
+        <a href="download/glb/NUMI12anti.glb">NUMI12anti.glb</a><br>
+        <a href="download/glb/NUMI12comb.glb">NUMI12comb.glb</a><br>
+        <a href="download/glb/NUMI9.glb">NUMI9.glb</a><br>
+        <a href="download/glb/NUMI9anti.glb">NUMI9anti.glb</a><br>
+        <a href="download/glb/NUMI9comb.glb">NUMI9comb.glb</a>
+      </td>
+      <td>
+        <a href="download/glb/NUMI9plus.dat">NUMI9plus.dat</a><br>
+        <a href="download/glb/NUMI9minus.dat">NUMI9minus.dat</a><br>
+        <a href="download/glb/NUMI12plus.dat">NUMI12plus.dat</a><br>
+        <a href="download/glb/NUMI12minus.dat">NUMI12minus.dat</a><br>
+        <a href="download/glb/XNC.dat">XNC.dat</a><br>
+        <a href="download/glb/XCC.dat">XCC.dat</a>
+      </td>
+      <td><a href="download/glb/NOvA.tar.gz">NOvA.tar.gz</a></td>
+      <td>The&nbsp;GLoBES&nbsp;Team</td>
+    </tr>
+    <tr>
+      <td>Reactor</td>
+      <td>
+        <a href="download/glb/Reactor1.glb">Reactor1.glb</a><br>
+        <a href="download/glb/Reactor2.glb">Reactor2.glb</a>
+      </td>
+      <td>
+        <a href="download/glb/Reactor.dat">Reactor.dat</a><br>
+        <a href="download/glb/XCCreactor.dat">XCCreactor.dat</a>
+      </td>
+      <td>
+       <a href="download/glb/Reactor.tar.gz">Reactor.tar.gz</a>
+      </td>
+      <td>The&nbsp;GLoBES&nbsp;Team</td>
+    </tr>
+    <tr>
+      <td>MINOS</td>
+      <td>
+        <a href="download/glb/MINOS.glb">MINOS.glb</a>
+      </td>
+      <td>
+        <a href="download/glb/MINOS_Spectra.dat">MINOS_Spectra.dat</a><br>
+        <a href="download/glb/XNC.dat">XNC.dat</a><br>
+        <a href="download/glb/XCC.dat">XCC.dat</a>
+      </td>
+      <td>
+        <a href="download/glb/MINOS.tar.gz">MINOS.tar.gz</a>
+      </td>
+      <td>The&nbsp;GLoBES&nbsp;Team</td>
+    </tr>
+    <tr>
+      <td>ICARUS</td>
+      <td>
+        <a href="download/glb/ICARUS.glb">ICARUS.glb</a>
+      </td>
+      <td>
+        <a href="download/glb/CNGS_Spectra.dat">CNGS_Spectra.dat</a><br>
+        <a href="download/glb/XNC.dat">XNC.dat</a><br>
+        <a href="download/glb/XCC.dat">XCC.dat</a><br>
+        <a href="download/glb/XCC_CNGS.dat">XCC_CNGS.dat</a>
+      </td>
+      <td>
+        <a href="download/glb/ICARUS.tar.gz">ICARUS.tar.gz</a>
+      </td>
+      <td>The&nbsp;GLoBES&nbsp;Team</td>
+    </tr>
+    <tr>
+      <td>OPERA</td>
+      <td>
+        <a href="download/glb/OPERA.glb">OPERA.glb</a>
+      </td>
+      <td>
+        <a href="download/glb/CNGS_Spectra.dat">CNGS_Spectra.dat</a><br>
+        <a href="download/glb/XNC.dat">XNC.dat</a><br>
+        <a href="download/glb/XCC.dat">XCC.dat</a><br>
+        <a href="download/glb/XCC_CNGS.dat">XCC_CNGS.dat</a>
+      </td>
+      <td>
+        <a href="download/glb/OPERA.tar.gz">OPERA.tar.gz</a>
+      </td>
+      <td>The&nbsp;GLoBES&nbsp;Team</td>
+    </tr>
+  </tbody>
+</table>
+
+
+#include "template_foot.gtml"

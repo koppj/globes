@@ -1,0 +1,106 @@
+This file contains the list of know BUGS that have to be fixed, or have been
+fixed. 
+
+Last bug number : #8
+
+======================================================================
+UNFIXED:
+----------------------------------------------------------------------
+
+4 - Found on 1999/07/13 by Bruno <beaufils@lifl.fr>
+-| Expansion of filename aliases for aliases defined with absolute path names
+-| is completely unsupported.
+
+7 - Found on 1999/09/09 by Bob Hamm <node@armour.cx> in 3.5.1
+-| Line number in warning produced by FAST_GENERATION is not the line number
+-| where the source si in the project file.
+
+======================================================================
+FIXED:
+----------------------------------------------------------------------
+
+1 - Found on 1999/07/06 by Magog <magog@swipnet.se> 
+  - Fixed on 1999/07/06.
+-| In project file, order of appearance of commands does matter. This is a
+-| problem for source file appearing before some constants definition.
+This is not a bug, it's a feature. It may be desirable to redefine values of
+constants before including some files, so that order of appearance in project
+file have to be taken into account.
+
+----------------------------------------------------------------------
+
+2 - Found on 1999/07/07 by Bruno <beaufils@lifl.fr> 
+  - Fixed on 1999/07/07 in 3.32
+-| Use of filename aliases as described in the documentation, in project file
+-| does not work.
+This was a bug. I corrected it by changing the DefineFilename to include a
+Define of the alias and its filename, and by making a substitution on all
+file declaration lines in project file.
+
+----------------------------------------------------------------------
+
+3 - Found on 1999/07/12 by Jens Helmers <jenhelme@online.no> 
+  - Fixed on 1999/07/13 in 3.3.5.
+-| Use of filename aliases as described in the documentation, still does not
+-| work for file in root directory (expansion of aliases are wrong).
+This was a bug. I corrected it by changing the way pathToRoot is computed in
+the GetPathToRoot subroutine. This let the bug #4 appear.
+
+----------------------------------------------------------------------
+
+5 - Found on 1999/07/20 by Harald Drangmeister <thiesen_GmbH@t-online.de> 
+  - Fixed on 1999/09/02 in 3.5.0
+-| The way gtml look for include files is a little bit strange, for instance
+-| this following example does not work.
+-| 
+-| ### Projectfile (make.gtp):
+-| define INCLUDE_PATH patterns/
+-| source/source.gtm
+-| ### Sourcefile (source/source.gtm):
+-| ...
+-| #include "header.txt"
+-| ...
+-| ### Header (patterns/header.txt)
+-| ...
+-| header comes here
+-| ...
+-| ### GTML-Output:
+-| --- Project file make.gtp ---
+-| --- source/source.gtm
+-|     *** ERROR - Can't read source/patterns//header.txt ***
+This was a bug. I corrected by modifying the ResolveIncludePath
+subroutine. Very stranges things were done here, because I thought that the
+perl `-r' test was done in the directory last used with an open call. In fact
+the `-r' test is relative to the directory the script was launched from,
+i.e. the root dir of the project. Now the INCLUDE_PATH is used to specify
+absolute, or project root dir relative directories to look for when including files.
+
+6 - Found on 1999/09/06 by PhM <marquet@lifl.fr> in 3.5.1
+  - Fixed on 1999/09/09 in 3.5.2
+-| `if' conditions are always evaluated which let the following project file
+-| to get an error:
+-| ifdef TOTO 
+-| if <<TOTO>> == toto 
+-| define FOO 
+-| else 
+-| endif 
+-| endif
+-| Output is:
+-| === Project file sc.gtp ===
+-|     !!! Warning: lines 2: undefined name `TOTO'.
+-|     *** Error: line 2: unknown comparator toto.       
+This was a bug. The substitution was done too early in the `if/elsif'
+processing, and evaluation of tests was done even if we were in an area which
+has not to be processed.
+
+8 - Found on 1999/09/09 by Frank Boehme <f.boehme@cs.ucc.ie> in 3.5.1
+  - Fixed on 1999/09/13 in 3.5.3
+-| This file produce an empty output html file: 
+-| #define SOMETHING this is just a test
+-| #compress ON
+-| 
+-| <<SOMETHING>>
+This was a bug. At the end of ProcessLines, nothing was done with pushed lines
+in case compression was asked. 
+
+End of BUGS.

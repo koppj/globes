@@ -1,0 +1,26 @@
+#define TITLE        GLoBES - Contact information 
+#define DESCRIPTION  GLoBES - Contact information for commets, suggestions, bug reports, etc.
+#define KEYWORDS     GLoBES, AEDL, mail, email, contact, contact information, Patrick Huber,\
+                     Joachim Kopp, Manfred Lindner, Mark Rolinec, Walter Winter
+
+
+#include "template_head.gtml"
+
+<h1>GLoBES Contact</h1>
+
+<h3>Authors:</h3>
+GLoBES is maintained by
+<ul>
+  <li>Patrick Huber</li>
+  <li>Joachim Kopp</li>
+  <li>Manfred Lindner</li>
+  <li>Mark Rolinec</li>
+  <li>Walter Winter</li>
+</ul>
+
+<h3>Contact:</h3>
+Mail to the GLoBES authors:
+<a href="mailto:globes@mpi-hd.mpg.de?subject=GLoBES-contact">globes@mpi-hd.mpg.de</a>
+
+#include "template_foot.gtml"
+
