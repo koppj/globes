@@ -471,8 +471,8 @@ int glb_free_probability_engine()
   if (S!=NULL)      { gsl_matrix_complex_free(S);   S = NULL; }
   if (lambda!=NULL) { gsl_vector_free(lambda);      lambda = NULL; }
   if (Q!=NULL)      { gsl_matrix_complex_free(Q);   Q = NULL; }
-  if (Q!=NULL)      { gsl_matrix_complex_free(H);   H = NULL; }
-  if (Q!=NULL)      { gsl_matrix_complex_free(U);   U = NULL; }
+  if (H!=NULL)      { gsl_matrix_complex_free(H);   H = NULL; }
+  if (U!=NULL)      { gsl_matrix_complex_free(U);   U = NULL; }
 
   return 0;
 }

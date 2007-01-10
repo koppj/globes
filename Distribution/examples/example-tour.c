@@ -52,7 +52,6 @@ int main(int argc, char *argv[])
   stream=stdout;
   /* Initialize libglobes */
   glbInit(argv[0]);
-  glbSetVerbosityLevel(2);
   
 
   /* Define my standard oscillation parameters */

@@ -497,6 +497,9 @@ documented!
 15/11/2006 WW -- fixed problem in glb_lexer.c (incompatibility with new
        flex version)
 
+
+*********Version 2.3.16
+
 27/11/2006 JK
        - Renamed some of the glbChiXXX functions to avoid confusion.
          The old versions are still available as wrappers in the new file
@@ -636,8 +639,6 @@ documented!
        - Modified @norm in Reactor1.glb and Reactor2.glb from 1.1584e-13
          to 1.1584e-12
 
-*********Version 2.3.16
-
 20/12/2006 JK
        - globes binary uses again the former oscillation parameters
          (not the new ones from hep-ph/0405172v5) for comparability reasons
@@ -738,3 +739,9 @@ documented!
 
 	I updated AUTHORS, TODO, README and INSTALL
 
+        
+*********Version 2.4.1
+
+10/01/2007 JK
+        Fixed memory leaks in glbDefineChiFunction and glb_init_probability_engine
+        

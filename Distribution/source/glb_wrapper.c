@@ -1604,6 +1604,7 @@ void glb_clean_up()
 {
   int i;
  for(i=0;i<32;i++) glbFreeExp(glb_experiment_list[i]);
+ glbCleanSysList();
  glb_clean_parser();
  glb_lexer_cleanup();
  obstack_free(&glb_rate_stack,NULL);

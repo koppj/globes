@@ -134,6 +134,26 @@ char *glbConvertErrorDim(int errordim)
 
 
 /***************************************************************************
+ * Function glbCleanSysList                                                *
+ ***************************************************************************
+ * Removes all chi^2 functions from the list glb_sys_list.                 *
+ ***************************************************************************/
+int glbCleanSysList()
+{
+  glb_systematic *p = glb_sys_list;
+
+  while (glb_sys_list != NULL)
+  {
+    glb_free(glb_sys_list->name);
+    p = glb_sys_list;
+    glb_sys_list = glb_sys_list->next;
+    glb_free(p);
+  }
+  return 0;
+}
+
+
+/***************************************************************************
  * Function glbSetChiFunctionInRule                                        *
  ***************************************************************************
  * This internal helper function is called by glbSetChiFunctionInExperiment*

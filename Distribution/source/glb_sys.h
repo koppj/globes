@@ -29,6 +29,7 @@ extern glb_systematic *glb_sys_list;
 int glbIsChiFunction2011Compatible(const char *name);
 glb_systematic *glbFindChiFunctionByName(const char *name);
 char *glbConvertErrorDim(int errordim);
+int glbCleanSysList();
 
 int glbSetChiFunctionInRule(struct glb_experiment *exp, int rule, int on_off,
                             const char *sys_id, double *errors);
