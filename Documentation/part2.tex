@@ -652,8 +652,8 @@ $3$ & {\tt \$lengthtab},  {\tt \$densitytab} & Arbitrary profile (table of layer
 \index{aedl}{densitytab@{\tt \$densitytab}}
 
 Furthermore, the matter density profile along the baseline
-has to be specified. The simplest matter density profile is a constant matter density profile with the average matter density from the PREM~\cite{Stacey} onion shell model of the earth\index{norm}{PREM| \see{Matter density}}
-\index{norm}{Matter density!of the earth}:
+has to be specified. The simplest matter density profile is a constant matter density profile with the average matter density from the PREM~\cite{Stacey} onion shell model of the earth:\index{norm}{PREM| \see{Matter density}}
+\index{norm}{Matter density!of the earth}
 \begin{quote}
 {\tt \$profiletype=1 }
 \end{quote}
@@ -869,9 +869,9 @@ Therefore this feature can be used to speed up the rate
 computation considerably, especially in cases where a large set
 of channels exist which are only used for the computation of backgrounds.
 Usually it is an excellent approximation to treat backgrounds as if they
-were not affected by oscillations\footnote{In case, the backgrounds have
-a sizeable dependence on the oscillation parameters they carry information
-on the oscillation parameters and are therefore more like a signal.}.
+were not affected by oscillations\footnote{In the case that the backgrounds have
+a sizeable dependence on the oscillation parameters, they carry information
+on the oscillation parameters, and therefore behave more like a signal.}.
 
 Note that the energy environment will be described in the next section. 
 In addition, one can define pre- and post-smearing effects together
@@ -905,7 +905,7 @@ definition of the post-smearing efficiencies $\epsilon(E')$.
 In general, $\epsilon(E')$ has to be
 determined by means of a Monte Carlo simulation of the experiment. 
 This usually involves a binning of the simulated events in the 
-reconstructed energy $E'$. Therefore, one simplify \eq~(\ref{eq:events_bin}) by
+reconstructed energy $E'$. Therefore, one can simplify \eq~(\ref{eq:events_bin}) by
 \begin{equation}
 \label{eq:post_smearing}
 \int_{E_i-\Delta E_i/2}^{E_i+\Delta E_i/2} dE' \, R^c(E,E') \, \epsilon^c(E')
@@ -960,9 +960,9 @@ For a manual definition of the sampling points, use
 \$sampling\_max =         50.0
 }
 \end{quote}
-for equidistant sampling points. If no values are given for these variables
-they are assumed to be equal to their corresponding counter part at bin level,
-\ie\ \verb+$sampling_points = $bins+, \verb+$sampling_min = $emin+ and
+for equidistant sampling points. If no values are given for these variables,
+they are assumed to be equal to their corresponding counter parts at the bin level,
+\ie , \verb+$sampling_points = $bins+, \verb+$sampling_min = $emin+ and
 \verb+$sampling_max = $emax+.
 
 
@@ -975,14 +975,14 @@ be specified with
 }
 \end{quote}
 The choice of the sampling point configuration strongly depends on the 
-experiment and required accuracy. Ideally the integrand 
-of~\eq~\ref{eq:simple_int} is zero outside the sampling range, if this cannot
-be achieved it is usually sufficient that the sampling range is by about
-three times the energy resolution\footnote{evaluated at {\tt \$emin} and
-{\tt \$emax} respectively} larger than the bin range. 
-The spacing of the sampling points should be somewhat smaller (a factor 
-$\simeq 2$ usually is more than ebough) than the 
-finest details of the integrand.
+experiment and required accuracy. Ideally, the integrand 
+of~\eq~\ref{eq:simple_int} is zero outside the sampling range. If this cannot
+be achieved, it is usually sufficient that the sampling range is by about
+three times the energy resolution (evaluated at {\tt \$emin} and
+{\tt \$emax}, respectively) larger than the bin range. 
+The spacing of the sampling points should be somewhat smaller than the 
+finest details of the integrand (a factor 
+$\simeq 2$ usually is more than enough).
 
 
 
@@ -1068,7 +1068,7 @@ and their default value is $1$, whereas backgrounds are additive and their defau
 This experiment uses $10$ sampling points and $5$ bins.
 
 In the following subsections we will define the energy resolution function.
-All energy resolution functions are defined within an {\tt energy} environment and can be refered to by {\tt \#name}.
+All energy resolution functions are defined within an {\tt energy} environment and can be refered to by {\tt \#name}:
 \begin{quote}
   {\tt energy(\#name)<\\
 \tb $\ldots$\\
@@ -1175,8 +1175,9 @@ has a neutrino threshold of $1.8\,\mathrm{MeV}$ and that a neutrino
 at threshold already produces $\simeq 1\,\mathrm{MeV}$ visible energy in
 the detector (for more details see \eg~\cite{Huber:2003pm}). 
 
-In the actual implementation of the algorithm,  the sum in \eq~(\ref{eq:algo_one}) is only computed for the $E_j$'s where $K(E_j)$ 
-is above a certain threshold, which is by default $10^{-7}$. 
+In the actual implementation of the algorithm,  the sum in \eq~(\ref{eq:algo_one}) is only evaluated
+ for the $E_j$'s with $K(E_j)$ 
+above a certain threshold, which is, by default, $10^{-7}$. 
 This threshold is defined at the compiling time. 
 
 Eventually,  a complete energy resolution definition of this 
@@ -1427,13 +1428,14 @@ is straightforward:
 \begin{equation}
 s_i(a):=a\cdot s_i
 \end{equation} 
-with an analogous definition for the background events. Here, $a$ is the``nuisance'' parameter, which will be minimized over later.
+with an analogous definition for the background events. Here, $a$ is the ``nuisance'' parameter, which will be minimized over later.
 
 For the parameterization of an energy calibration error, two possibilities
 are implemented. The first one (method ``T'') is somewhat simpler, 
 whereas the second one (method ``C'')
 is more accurate, but it requires a careful choice of parameters. 
-The first option (method ``T'') is
+The first option (method ``T'') is (JK: IS THAT CORRECT? AND ALSO THE NEXT EQUATION? (THERE HAVE BEEN
+SOME CHANGES) [WW])
 \begin{equation}
 s_i(a,b) \equiv s_i(a)+b\cdot s_i\, E'_i/(E'_\mathrm{max}-E'_\mathrm{min}),
 \end{equation}
@@ -1480,6 +1482,47 @@ with each rule to an energy window\index{norm}{Energy!window}:
 The default energy window is given between the minimal and maximal reconstructed energy. To be on the save side, reduce analysis window
 compared to the bin range on each side by about three times the
 energy calibration error.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{table}[t!]
+\begin{center}
+\begin{tabular}[h]{|lccccccl|}
+\hline
+Systematics function &$a$&$b$&$c$&$d$&Tilt/Calibr.& Dim. & Remarks\\
+\hline
+\hline
+\multicolumn{8}{|l|}{{\bf Standard systematics:}} \\
+{\tt chiSpectrumTilt} &+&+&+&+&T&0&Systematics with tilt\\
+{\tt chiNoSysSpectrum} &-&-&-&-&-&2&No systematics\\
+{\tt chiTotalRatesTilt} &+&+&+&+&T&4&Total rates\\
+{\tt chiSpectrumOnly} & $\infty$ &-& $\infty$ &-&-&7&Spectrum only\\
+{\tt chiNoSysTotalRates} &-&-&-&-&-&8&Total rates, no syst.\\
+{\tt chiSpectrumCalib} &+&+&+&+&C&9&ystematics with calibr.\\
+\hline\multicolumn{8}{|l|}{{\bf User-defined systematics:}} \\
+{\tt chiZero} & - & - & - & - & - & n/a & Passive rule\\
+ & & & & & & & ($\chi^2$ returns zero) \\
+Any other name & \multicolumn{5}{c}{User-defined behavior} & n/a & User-defined syst. \\
+\hline
+\end{tabular}
+\mycaption[Table of error dimensions]{\label{tab:error_dim}
+Possible systematics $\chi^2$ functions  in \GLOBES\ and their meaning. 
+If a parameter is designated with $+$, it will
+be marginalized over, and therefore the corresponding error needs to 
+have a non-zero value. If the cases with ``total rates'' in the remarks, 
+the summation over the bins is performed \emph{before} computing 
+the $\chi^2$, \ie, no spectral information is used. 
+The function {\tt chiSpectrumOnly} leaves the 
+normalization free ($\sigma_a=\sigma_c=\infty$), and therefore 
+only the spectral information is used. As a consequence,
+the settings for the normalization error will be ignored (designated 
+with the symbol $\infty$). In addition, the corresponding error
+dimension from earlier versions of \GLOBES\ is shown in the column ``Dim.''.
+ }
+\end{center}
+\index{aedl}{{\tt rule}!errordim@{\tt "@errordim}} 
+\index{norm}{Systematics function} 
+\end{table} 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 Eventually, the total event rate $x_i$ in a bin $i$ is given by
 \begin{equation}
@@ -1545,42 +1588,6 @@ function to specify a specialized function for the calculation
 of $\chi^2$. This function will then be called by the \GLOBES\ minimizers.
 For details, see \Sec~\ref{sec:userchi}.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{center}
-\begin{table}[t!]
-\begin{center}
-\begin{tabular}[h]{|c|cccc|c|l|}
-\hline
-Error dimension&$a$&$b$&$c$&$d$&Tilt/Calibration&Remarks\\
-\hline
-\hline
-0&+&+&+&+&T&Systematics with tilt\\
-2&-&-&-&-&-&No systematics\\
-4&+&+&+&+&T&Total rates\\
-7& $\infty$ &-& $\infty$ &-&-&Spectrum only\\
-8&-&-&-&-&-&Total rates, no systematics\\
-9&+&+&+&+&C&Systematics with calibration\\
-20&?&?&?&?&?&User-defined systematics\\
-\hline
-\end{tabular}
-\mycaption[Table of error dimensions]{\label{tab:error_dim}
-Possible values of the error dimensions variable in \GLOBES\ and their meaning. If a parameter is designated with $+$, it will
-be marginalized over, and therefore the corresponding error needs to 
-have a non-zero value. If the cases with ``total rates'' in the remarks, 
-the summation over the bins is performed \emph{before} computing 
-the $\chi^2$, \ie, no spectral information is used. 
-The error dimension~7 ``spectrum only'' leaves the 
-normalization free ($\sigma_a=\sigma_c=\infty$), and therefore 
-only the spectral information is used. As a consequence,
-the settings for the normalization error will be ignored (designated 
-with the symbol $\infty$).
- 
- }
-\end{center}
-\index{aedl}{{\tt rule}!errordim@{\tt "@errordim}} 
-\end{table} 
-\end{center}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 Eventually, a rule looks like
@@ -1597,20 +1604,23 @@ Eventually, a rule looks like
 >}
 \end{quote}
 \index{aedl}{{\tt rule}|)}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Version control in \AEDL\ files}
-\label{sec:aedl_versioning}
-\index{norm}{Version control}
 
-In order to avoid problems which come from different
-versions of \GLOBES\ and \AEDL\ files, it is possible to use in each 
-\AEDL\ file a version number. For example, it may correspond to the  minimum version number of the \GLOBES\ package with which it works. Set the
-{\tt \$version}\index{aedl}{version@{\tt \$version}} by
-\begin{quote}
-{\tt \$version="1.8.1"}
-\end{quote}
-This information can be accessed by the versioning functions as described in~\Sec~\ref{sec:versioning}.
-\index{norm}{AEDL@\AEDL|)}
+% THIS PART HAS GAINED IMPORTANCE AND THEREFORE BEEN EXPLAINED ALREADY IN THE LAST CHAPTER!
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \section{Version control in \AEDL\ files}
+% \label{sec:aedl_versioning}
+% \index{norm}{Version control}
+% 
+% In order to avoid problems which come from different
+% versions of \GLOBES\ and \AEDL\ files, it is possible to use in each 
+% \AEDL\ file a version number. For example, it may correspond to the  minimum version number of the \GLOBES\ package with which it works. Set the
+% {\tt \$version}\index{aedl}{version@{\tt \$version}} by
+% \begin{quote}
+% {\tt \$version="1.8.1"}
+% \end{quote}
+% This information can be accessed by the versioning functions as described in~\Sec~\ref{sec:versioning}.
+% \index{norm}{AEDL@\AEDL|)}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
