@@ -139,6 +139,8 @@ int main(int argc, char *argv[])
   fprintf(stream,"chi2 with correlation only with deltacp: %g \n\n",chi2);
   glbFreeProjection(myprojection);   
  
+ 
+
   /* Now: compare with statistics chi2 only */
   glbSwitchSystematics(GLB_ALL,GLB_ALL,GLB_OFF);   
   chi2 = glbChiSys(fit_values,GLB_ALL,GLB_ALL);

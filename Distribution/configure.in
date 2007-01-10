@@ -1,5 +1,5 @@
 dnl GLoBES -- General LOng Baseline Experiment Simulator
-dnl (C) 2002 - 2005,  The GLoBES Team
+dnl (C) 2002 - 2007,  The GLoBES Team
 dnl
 dnl GLoBES is mainly intended for academic purposes. Proper
 dnl credit must be given if you use GLoBES or parts of it. Please
@@ -29,7 +29,7 @@ dnl middle digit: increment when features have been introduced/removed
 dnl first digit: major improvements/rewrites
 dnl In contrast to the result of autoupdate I had to swap the
 dnl the AC_INIT and AC_CONFIG_SRCDIR
-AC_INIT([GLoBES],[2.4.1],[globes@mpi-hd.mpg.de],[globes])
+AC_INIT([GLoBES],[2.4.2],[globes@mpi-hd.mpg.de],[globes])
 AC_CONFIG_SRCDIR([source/glb_wrapper.c])
 
 dnl Tellin autoconf we are going to use automake
@@ -44,7 +44,7 @@ dnl code changed: c:r+1:a
 dnl API changed: c+1:0:a
 dnl -> API extended: c:0:a+1
 dnl -> API shrunken: c:0:0
-GLBLIBVERSION="8:10:0"
+GLBLIBVERSION="8:11:0"
 
 dnl From here no editing !
 AC_SUBST(GLBLIBVERSION)

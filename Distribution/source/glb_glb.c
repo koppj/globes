@@ -60,8 +60,8 @@ void glbInit(char *name)
   glbRegisterProbabilityEngine(-1, NULL, NULL, NULL, NULL);
   glbRegisterProbabilityEngine(6, &glb_probability_matrix,
 			       &glb_set_oscillation_parameters,
-                                   &glb_get_oscillation_parameters,
-			        NULL);
+			       &glb_get_oscillation_parameters,
+			       NULL);
 
   /* Select default minimizer */
   glbSelectMinimizer(GLB_MIN_DEFAULT);

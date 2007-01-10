@@ -34,11 +34,51 @@ static void glb_minimizer_error(char error_text[])
   glb_warning(error_text);  
 }
 
+/* This here is code which works fine, but somehow valgrind complains
+ * about leaking memory. Therefore we use the version just below this
+ *  comment, which works fine and makes valgrind happy
+
+ double *glb_alloc_vec(int nl,int nh)
+ {
+ double *v;
+ v=(double *)glb_malloc((unsigned) (nh-nl+1)*sizeof(double));
+ return v-nl;
+ }
+ 
+ double **glb_alloc_mat(int nrl,int nrh, int ncl,int nch)
+ {
+ int i;
+ double **m;
+ 
+ m=(double **) glb_malloc((unsigned) (nrh-nrl+1)*sizeof(double*));
+ m -= nrl;
+ for(i=nrl;i<=nrh;i++) 
+ {
+ m[i]=(double *) glb_malloc((unsigned) 
+ (nch-ncl+1)*sizeof(double));
+ m[i] -= ncl;
+ }
+ return m;
+ }
+ 
+ void glb_free_vec(double *v,int nl,int nh)
+ {
+ glb_free((char*) (v+nl));
+ }
+ 
+ void glb_free_mat(double **m,int nrl,int nrh,int ncl,int nch)
+ {
+ int i;
+ for(i=nrh;i>=nrl;i--) glb_free((char*) (m[i]+ncl));
+ glb_free((char*) (m+nrl));
+ }
+ */
+
 double *glb_alloc_vec(int nl,int nh)
 {
 	double *v;
-	v=(double *)glb_malloc((unsigned) (nh-nl+1)*sizeof(double));
-	return v-nl;
+	v=(double *)glb_malloc((unsigned) (nh+1)*sizeof(double));
+	return v;
 }
 
 double **glb_alloc_mat(int nrl,int nrh, int ncl,int nch)
@@ -46,30 +86,29 @@ double **glb_alloc_mat(int nrl,int nrh, int ncl,int nch)
 	int i;
 	double **m;
 
-	m=(double **) glb_malloc((unsigned) (nrh-nrl+1)*sizeof(double*));
-	m -= nrl;
-	for(i=nrl;i<=nrh;i++) 
+	m=(double **) glb_malloc((unsigned) (nrh+1)*sizeof(double*));
+	//m -= nrl;
+	for(i=0;i<=nrh;i++) 
 	  {
 		m[i]=(double *) glb_malloc((unsigned) 
-					   (nch-ncl+1)*sizeof(double));
-		m[i] -= ncl;
+					   (nch+1)*sizeof(double));
+		//m[i] -= ncl;
 	  }
 	return m;
 }
 
 void glb_free_vec(double *v,int nl,int nh)
 {
-	glb_free((char*) (v+nl));
+	glb_free((char*) (v));
 }
 
 void glb_free_mat(double **m,int nrl,int nrh,int ncl,int nch)
 {
 	int i;
-	for(i=nrh;i>=nrl;i--) glb_free((char*) (m[i]+ncl));
-	glb_free((char*) (m+nrl));
+	for(i=nrh;i>=0;i--) glb_free((char*) (m[i]));
+	
+	glb_free((char*) (m));
 }
-
-
 
 
 #define TOL 2.0e-4

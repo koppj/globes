@@ -745,3 +745,20 @@ documented!
 10/01/2007 JK
         Fixed memory leaks in glbDefineChiFunction and glb_init_probability_engine
         
+
+*********Version 2.4.2
+10/01/2007 PH
+	Fixed a possible memory leak in glb_min_sup.c In reality this
+	may have been one of the rare cases where valgrind was
+	confused by our pointer arithmetic. On the other hand, I wrote
+	a test program epmloying the same tricks and this one valgrind
+	got right. Hence, I decided to 'fix' the problem, as result
+	the minimizer routines need a tiny bit (really only a few
+	bytes) more memory. I checked that the output of
+	'example-tour' stays the same, the only thing which changes is
+	the number of iterations, which goes up by a few.
+
+	'example-tour' and 'globes' now have a clean bill concerning
+	memory management. There are a few bytes left from parsing the
+	command line options in 'globes', but that should be of no
+	practical concern whatsoever.
