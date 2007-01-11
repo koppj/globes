@@ -1080,7 +1080,7 @@ double *glbGetBinSizeListPtr(int exp)
     return NULL;
   }
 
-  return glb_experiment_list[exp]->binsize;
+  return glb_experiment_list[exp]->smear_data[0]->binsize;
 }
 
 /***************************************************************************
@@ -1097,7 +1097,7 @@ double *glbGetBinCentersListPtr(int exp)
     return NULL;
   }
 
-  return glb_experiment_list[exp]->bincenter;
+  return glb_experiment_list[exp]->smear_data[0]->bincenter;
 }
 
 /***************************************************************************
@@ -1114,7 +1114,7 @@ double *glbGetSamplingStepsizeListPtr(int exp)
     return NULL;
   }
 
-  return glb_experiment_list[exp]->simbinsize;
+  return glb_experiment_list[exp]->smear_data[0]->simbinsize;
 }
 
 /***************************************************************************
@@ -1130,7 +1130,7 @@ double *glbGetSamplingPointsListPtr(int exp)
     return NULL;
   }
 
-  return glb_experiment_list[exp]->simbincenter;
+  return glb_experiment_list[exp]->smear_data[0]->simbincenter;
 }
 
 int glbGetLengthOfRule(int exp, int rule, int signal)

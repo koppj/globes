@@ -801,7 +801,6 @@ double glbChiSpectrumTilt(int exp, int rule, int n_params, double *x, double *er
             + glb_prior(bg_norm, bg_norm_center, errors[2])
             + glb_prior(bg_tilt, bg_tilt_center, errors[3]);
 
-  getchar();
   return chi2;
 }
 

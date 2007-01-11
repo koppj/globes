@@ -778,3 +778,10 @@ documented!
         Renamed AEDL function simbincenter to samplingbincenter and modified
         list.glb accordingly.
         
+*********Version 2.4.5
+11/01/2007 JK
+        - Modified treatment of functions introduced in v2.4.3 in such a way
+          that code doubling is avoided (removed lists of bin centers in
+          glb_experiment again, since they are already present in glb_smear)
+        - Cleaned up my debugging comments in globes.h and glb_probability.c
+        

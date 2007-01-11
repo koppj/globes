@@ -626,15 +626,6 @@ int glb_S_matrix_cd(double E, double L, double V, int cp_sign)
       return status;
   }
 
-/*  printf("%g\t%g\t%g\n", lambda[0], lambda[1], lambda[2]); 
-  for (int i=0; i < GLB_NU_FLAVOURS; i++)
-  {
-    for (int j=0; j < GLB_NU_FLAVOURS; j++)
-      printf("%g + %g i     ", GSL_REAL(Q[i][j]), GSL_IMAG(Q[i][j]));
-    printf("\n");
-  }
-  getchar();*/
-  
   /* Calculate S-Matrix in mass basis in matter ... */
   double phase;
   gsl_matrix_complex_set_zero(S);
@@ -817,15 +808,6 @@ int glb_probability_matrix(double P[3][3], int cp_sign, double E,
       for (j=0; j < GLB_NU_FLAVOURS; j++)
         P[j][i] = SQR_ABS(_S[i][j]);
   }
-
-/*  printf("Probabilities:\n");
-  for (int i=0; i < GLB_NU_FLAVOURS; i++)
-  {
-    for (int j=0; j < GLB_NU_FLAVOURS; j++)
-      printf("%g    ", P[i][j]);
-    printf("\n");
-  }
-  getchar();*/
 
   return 0;
 }

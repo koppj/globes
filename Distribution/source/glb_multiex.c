@@ -296,9 +296,7 @@ void glbInitExp(glb_exp ins)
   for(i=0;i<32;i++) in->xsecs[i]=NULL;
 
   in->binsize=NULL;
-  in->bincenter=NULL;
   in->simbinsize=NULL;
-  in->simbincenter=NULL;
   for(i=0;i<32;i++) in->sys_on[i]=NULL;
   for(i=0;i<32;i++) in->sys_off[i]=NULL;
   for(i=0;i<32;i++) in->sys_on_strings[i]=NULL;
@@ -393,9 +391,7 @@ void glbFreeExp(glb_exp ins)
 
   for(i=0;i<6;i++) my_free(in->listofchannels[i]);
   my_free(in->binsize);
-  my_free(in->bincenter);
   my_free(in->simbinsize);
-  my_free(in->simbincenter);
 
  
   for(i=0;i<in->numofrules;i++)
@@ -765,28 +761,6 @@ int glbDefaultExp(glb_exp ins)
       if(in->simbins<in->numofbins){glb_exp_error(in, "Less sampling points than bins");
                                     status=-1;} 
                                     
-  /* Compute bin widths and central energies */
-  in->bincenter = glb_malloc(sizeof(in->bincenter[0]) * in->numofbins);
-  in->simbincenter = glb_malloc(sizeof(in->simbincenter[0]) * in->simbins);
-  if(in->binsize==NULL)
-  {
-    in->binsize = glb_malloc(sizeof(in->binsize[0]) * in->numofbins);
-    for (i=0; i < in->numofbins; i++)
-      in->binsize[i] = (in->emax - in->emin) / in->numofbins;
-  }
-  if(in->simbinsize==NULL)
-  {
-    in->simbinsize = glb_malloc(sizeof(in->simbinsize[0]) * in->simbins);
-    for (i=0; i < in->simbins; i++)
-      in->simbinsize[i] = (in->simbeam - in->simtresh) / in->simbins;
-  }
-  in->bincenter[0] = in->emin + 0.5 * in->binsize[0];
-  for (i=1; i < in->numofbins; i++)
-    in->bincenter[i] = in->bincenter[i-1] + 0.5*(in->binsize[i-1]+in->binsize[i]);
-  in->simbincenter[0] = in->simtresh + 0.5 * in->simbinsize[0];
-  for (i=1; i < in->simbins; i++)
-    in->simbincenter[i] = in->simbincenter[i-1] + 0.5*(in->simbinsize[i-1]+in->simbinsize[i]);
-      
 //---------------------------------------------------------
 
      *in=MInitMemory0(*in);
@@ -901,22 +875,12 @@ int glbDefaultExp(glb_exp ins)
       /* Calculate bin ranges corresponding to the energy window,
        * trying to reproduce the behaviour of the old glb_window_function */
       k = 0;
-      while (in->bincenter[k] <= in->energy_window[i][0])
+      while (in->smear_data[0]->bincenter[k] <= in->energy_window[i][0])
         k++;
       in->energy_window_bins[i][0] = k;
-      while (in->bincenter[k] < in->energy_window[i][1] && k < in->numofbins)
+      while (in->smear_data[0]->bincenter[k] < in->energy_window[i][1] && k < in->numofbins)
         k++;
       in->energy_window_bins[i][1] = k-1;
-
-/*FIXME Remove      in->energy_window_bins[i][0] = (int) ( 0.5 + in->numofbins
-             * (in->energy_window[i][0] - in->emin) / (in->emax - in->emin) );
-      if (in->energy_window_bins[i][0] > in->numofbins)
-        in->energy_window_bins[i][0] = in->numofbins;
-      
-      in->energy_window_bins[i][1] = (int) ( -0.5 + in->numofbins
-             * (in->energy_window[i][1] - in->emin) / (in->emax - in->emin) );
-      if (in->energy_window_bins[i][0] < 0)
-        in->energy_window_bins[i][0] = 0;*/
     }
   for(i=0;i<in->numofrules;i++)
     {
