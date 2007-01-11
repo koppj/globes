@@ -401,46 +401,52 @@ It is recommended that you use the same style for your own input files, since, i
 
 \chapter*{What is new in \GLOBES ?}
 
-TO BE UPDATED [WW].
-
 Here we briefly summarize the main changes of the new GLoBES version. For details, please
 refer to the respective parts of the manual. Please note that any new \GLOBES\ version is
-compatible with older versions, \ie, old application software and AEDL files should also run with the new version. EXCEPTION: VERSION NUMBER IN AEDL REQUIRES? [WW] However, some function names and features will
+compatible with older versions, \ie, old application software and \AEDL\ files should, with minor
+modifications, run with the new version as well.  However, some function names and features will
 evolve during time, which means that outdated features may not be documented anymore.
 
 \section*{Version 3.0}
 \index{norm}{Version 3.0}
 
-Here comes a summary of the most important changes in this version for older users of GLoBES.
+Here comes a summary of the most important changes in this version for users of earlier
+versions of \GLOBES .
 
 \subsection*{New features}
 
 \begin{itemize}
  \item
-  User-defined systematics to simulate experiments with correlated systematics \etc\ (such as
-reactor experiments); see \Sec~?
+  User-defined systematics, which can be used to simulate reactor experiments \etc ; see \Sec~\ref{sec:userchi}
+and~\ref{sec:rules}
  \item
   User-defined priors to include arbitrary external information in the $\chi^2$ before
-marginalization over the oscillation parameters (such as to prevent minimizer from
-running into the wrong octant \etc); see \Sec~?
+marginalization over the oscillation parameters; see \Sec~\ref{sec:userdefined} 
 \item
-  Non-standard physics support; see \Sec~?
+  Non-standard physics support; see \Chapt~\ref{chapt:nsphysics}
 \item
-  Beta beam fluxes available as built-in fluxes; see \Sec~?
+  Beta beam fluxes available as built-in fluxes; see \Sec~\ref{sec:source}
 \item
-  Enhanced support for parallelization, such as Condor; see \Sec~?
+  Enhanced support for parallelization, such as Condor; see, \eg, page~\pageref{sec:condor}
 \item
-  Updated AEDL files, new beta beam files; see \Sec~?
+  Updated AEDL files; see \Tab~\ref{tab:experiments}
 \item
- Faster probability engine
+ New \AEDL\ features, such as the support of lists as variables and an interpolation
+routine; see \Sec~\ref{sec:advaedl}
 \item
-  ...
+ Clean-up of inconsistencies, such as an overall (internal) normalization factor in the flux files;
+see, \eg, page~\pageref{app:flux}
+\item
+  Faster probability engine, easier installation (internal changes)
+\item
+  Experimental feature: Alternative minimizer provided, which is usually faster than
+the standard minimizer; see \Chapt~\ref{chapt:experimental}
 \end{itemize}
 
 \subsection*{Major changes}
 
-Most of the modifications below should not require that old pieces of software be changed. 
-However, the following changes are necessary:
+Most of the modifications should not require that old pieces of software be changed. 
+However, the following changes are relevant:
 \begin{itemize}
 \item
  AEDL requires now that {\tt \$version} be used to define the minimum version number this AEDL
@@ -449,22 +455,39 @@ files with new features be used with old versions of \GLOBES\ which may not reco
 \item
  Some of the earlier AEDL files have been updated, changed names, or have been removed. In addition, new files have been added. Although old AEDL files will run as usual for compatibility, they will not be
 supported by the \GLOBES\ team anymore. You should make sure to keep these files when updating \GLOBES . 
-\item
- ...
 \end{itemize}
-The following changes should not affect older software:
+
+\subsection*{Minor changes}
+
+Here we document the most important changes which should not affect older software:
 \begin{itemize}
 \item
- {\tt glbChi...} functions renamend for consistency
+ Functions and constants renamed for consistency:
+\begin{itemize}
 \item
- {\tt glbChiSetStartingValues} and {\tt glbChiGetStartingValues} renamed into 
-{\tt glbChiSetCentralValues} and {\tt glbChiGetCentralValues}
+ {\tt glbChiTheta} $\rightarrow$ {\tt glbChiTheta13}
 \item
- Systematics concept changed, concept of error dimensions removed
+ {\tt glbChiThetaDelta} $\rightarrow$ {\tt glbChiTheta13Delta}
 \item
- Some functions changed (such as for direct rate access)
+ {\tt glbChiDms} $\rightarrow$ {\tt glbChiDm21}
 \item
- ..
+ {\tt glbChiDm} $\rightarrow$ {\tt glbChiDm31}
+\item
+ {\tt GLB\_DM\_SOL} $\rightarrow$ {\tt GLB\_DM\_21}
+\item
+ {\tt GLB\_DM\_ATM} $\rightarrow$ {\tt GLB\_DM\_31}
+\item
+ {\tt glbSetStartingValues} $\rightarrow$ {\tt glbSetCentralValues}
+\item
+ {\tt glbGetStartingValues} $\rightarrow$ {\tt glbGetCentralValues}
+\item
+ {\tt glbGetProfileData} $\rightarrow$ {\tt glbGetProfileDataInExperiment}
+\end{itemize}
+\item
+ Rate access changed; see \Sec~\ref{sec:event_rates}
+\item
+ Systematics concept changed, concept of error dimensions removed; {\tt @backgroundcenter} removed, central values for all systematics parameters
+now zero; see \Sec~\ref{sec:rules}
 \end{itemize}
 
 \cleardoublepage

@@ -855,7 +855,7 @@ structure {\tt in}.
 In both of these functions, the parameter {\tt which} runs from
 $0$ to $5$ (or the number of oscillation parameters-1), where the parameters in \GLOBES\ always have the order $\theta_{12}$, $\theta_{13}$, $\theta_{23}$, $\deltacp$, $\sdm$, $\ldm$.
 Alternatively to the number, the constants \GLBC{GLB\_THETA\_12}, \GLBC{GLB\_THETA\_13}, \GLBC{GLB\_THETA\_23}, \GLBC{GLB\_DELTA\_CP}, 
-\GLBC{GLB\_DM\_SOL}, or \GLBC{GLB\_DM\_ATM} can be used.
+\GLBC{GLB\_DM\_21}, or \GLBC{GLB\_DM\_31} can be used.
 
 Similarly, the density parameters or number of iterations 
 (returned by the minimizers) can be accessed:
@@ -949,7 +949,7 @@ The reference rate vector is then computed with:
 A complete example for a minimal \GLOBES\ program can be found on
 Page~\pageref{ex:c}.
 
-\section{Version control}
+\section{Version control and debugging}
 \label{sec:versioning}
 \index{norm}{Version control}
 
@@ -995,7 +995,23 @@ The version string is allocated within the experiment structure, which means
 that it cannot be altered and must not be freed by the
 user.
 \end{function}
-
+%
+A useful function to debug \GLOBES\ source code is 
+\begin{function}
+\GLBNS{SetVerbosityLevel}
+{\tt int glbSetVerbosityLevel(int level)} sets the verbosity level
+for \GLOBES\ messages.
+\end{function}
+The following verbosity levels are currently used:
+\begin{description}
+\item[0] Display no messages
+\item[1] (Standard) Display error messages
+\item[2] Display warnings
+\item[3] Display file access history
+\item[4] Display search paths
+\end{description}
+Note that always messages with the chosen verbosity level and lower
+are displayed.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter[Calculating $\chi^2$ with systematics only]{Calculating $\boldsymbol{\chi^2}$ with systematics only}
@@ -2736,8 +2752,8 @@ returns the systematics state in experiment {\tt exp} and rule {\tt rule}.
 In the example on page~\pageref{ex:barcharts}, the application of
 {\tt glbSwitchSystematics} is demonstrated to show the impact of
 systematics, correlations, and degeneracies.
-Note that also the systematics function itself may be changed during running time,
-as described in \Sec~\ref{sec:userchi}.
+Note that also the systematics function itself may be changed during running time
+using \GLB{SetChiFunction}, as it is described in \Sec~\ref{sec:userchi}.
 
 % \index{norm}{Error dimension}
 % The error dimension (for the definition, see \Sec~\ref{sec:rules}) can also be accessed directly with 
@@ -3145,6 +3161,7 @@ example using non-standard physics with the code from the last section on page~\
 
 
 \chapter{Experimental features}
+\label{chapt:experimental}
 
 Here we describe experimental features currently being implemented in \GLOBES . These features have not yet been tested extensively and should be used with care. They may evolve into standard features in the future, or they may not be supported anymore at a certain point. In general, the number of experiment features is small in a new release version, and increases towards a new version number.
 

@@ -191,6 +191,7 @@ and then change back into the \verb+examples+ directory and type\\
 and you are done.
 
 \section*{\GLOBES\ and Condor}
+\label{sec:condor}
 \index{norm}{Condor|(}
 \begin{quote}
   Condor is a specialized workload management system for
@@ -413,7 +414,7 @@ than 3.0 the fluxes are multiplied with (see below). In Version 3.0 and
 higher, the alternative flux environment {\tt nuflux} is provided, 
 which does not contain this factor. The following material is
 based on the old environment {\tt flux}. For the use of {\tt nuflux},
-replace the factor 5.20034 by unity.
+replace the factor 5.2 by unity.
 
 \section*{Historical problem}
 
@@ -443,10 +444,10 @@ differential cross section divided by energy $x=\sigma/E$, and the flux file
 gives $f$. The differential number of events per GeV $n$ as computed in
 \GLOBES\ without oscillation and efficiencies is given by
 \begin{eqnarray}
-n &=& 5.20034\times x\times E\times f\times \nonumber \\
+n &=& 5.2\times x\times E\times f\times \nonumber \\
 &&\mathtt{@norm}\times\mathtt{@power}\times\mathtt{@stored\_muons}\times\mathtt{@time}\times\mathtt{\$target\_mass}\times(\mathtt{\$baseline})^{-2} \nonumber
 \end{eqnarray}
-Note that $5.20034$ is a undocumented fudge factor!
+Note that $5.2$ is a undocumented fudge factor!
 
 It is the sole responsibility of the author of the \AEDL\ file and its
 supporting files, to ensure that the result makes sense. In
@@ -472,7 +473,7 @@ the data is given as number of neutrinos per unit area $A$ and
 energy bin of width $\Delta E$ at a distance $L$ from the source, one
 obtains
 \begin{eqnarray}
-\mathtt{@norm}=\frac{1}{5.20034}\left(\frac{\mathrm{GeV}}{\Delta
+\mathtt{@norm}=\frac{1}{5.2}\left(\frac{\mathrm{GeV}}{\Delta
       E}\right)
 \left(\frac{\mathrm{cm}^2}{A}\right)\left(\frac{L}{\mathrm{km}}\right)^2\left(\frac{\tau}{m_u}\right)\times10^{-38}\times\left(\frac{\mathcal{L}_u}{\mathcal{L}}\right)
 \end{eqnarray}
@@ -487,9 +488,41 @@ is $\mathrm{MW}\,\mathrm{y}^{-1}$, which means that
 $\mathcal{L}/\mathcal{L}_u$ is given by (assuming a $10^7\,\mathrm{s}$
 year)
 \begin{equation}
-\frac{\mathcal{L}}{\mathcal{L}_u}=\frac{10\,\mathrm{GeV}\,10^{21}\,\mathrm{pot}\,\mathrm{y}}{10^7\,\mathrm{s}}\times(\mathrm{MW}\,\mathrm{y}^{-1})^{-1}=0.160218\ldots
+\frac{\mathcal{L}}{\mathcal{L}_u}=\frac{10\,\mathrm{GeV}\,10^{21}\,\mathrm{pot}\,\mathrm{y}}{10^7\,\mathrm{s}}\times(\mathrm{MW}\,\mathrm{y}^{-1})^{-1}=0.16\ldots
 \end{equation}
 
+\section*{Moving from {\tt flux} to {\tt nuflux}}
+
+In order to change the older {\tt flux} environment to the
+new {\tt nuflux} (\GLOBES\ 3.0 and higher), replace all user-defined fluxes, such as
+\begin{quote}
+{\tt flux(\#user)<}\\
+{\tt \tb @flux\_file = "user\_file\_1.dat"\\
+\tb @time = 2.0\\
+\tb @power = 4.0\\
+\tb @norm = 1e+8}\\
+{\tt >}
+\end{quote}
+by
+\begin{quote}
+{\tt FF=5.1989} \\
+\\
+{\tt nuflux(\#user)<}\\
+{\tt \tb @flux\_file = "user\_file\_1.dat"\\
+\tb @time = 2.0\\
+\tb @power = 4.0\\
+\tb @norm = FF*1e+8}\\
+{\tt >}
+\end{quote}
+
+This replacement is not necessary for neutrino factory built-in fluxes,
+and built-in beta beams fluxes where not supported by earlier versions
+of \GLOBES .
+
+IS THAT CORRECT? MR: WHAT HAPPENS TO OLD BETA BEAM FILES [WW]?
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 {\footnotesize
 \input{gpl}

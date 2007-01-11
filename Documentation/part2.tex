@@ -403,6 +403,7 @@ Finally, note that a line feed character \verb+\n+ is necessary at
  the end of the input -- alternatively you can put a comment at the end.
 
 \section{More advanced AEDL features}
+\label{sec:advaedl}
 
 In \GLOBES\ 3.0 and higher, a number of new features can be used. The
 features in this section are slighlty more advanced and can be jumped over at a first reading of
@@ -508,12 +509,12 @@ The quantity which can be used to scale the overall integrated luminosity of an 
 \end{quote}
 defines a $50 \, \mathrm{kt}$ detector for a neutrino factory.
 
-\index{aedl}{{\tt nuflux}!time@{\tt "@time}}
+\index{aedl}{nuflux@{\tt nuflux}!time@{\tt "@time}}
 There are two principal ways to initialize a neutrino flux: 
 Either one can use 
 a built-in source, or one can provide a file. In both cases,
 a flux is defined by the environment {\tt nuflux}, such as
-\index{aedl}{{\tt nuflux}}
+\index{aedl}{nuflux@{\tt nuflux}}
 \begin{quote}
   {\tt nuflux(\#name)<\\
 \tb $\ldots$\\
@@ -524,7 +525,7 @@ with a running time of $8$ years. Note that the running time is used within
 the {\tt nuflux} environment. This feature can be used to load the neutrino and antineutrino fluxes separately, in order to combine them with different
 running times within one experiment. The name of the flux {\tt \#name} will later be referred to in the channel definitions. Note that \GLOBES\ versions older than 3.0 use the still supported {\tt flux} environment, which is different from {\tt nuflux} by an undocumented normalization factor 5.2 for user-defined fluxes. This difference is explained in the appendix on page~\pageref{app:flux}.
 
-\index{aedl}{{\tt flux}}
+\index{aedl}{nuflux@{\tt nuflux}}
 
 \begin{table}[t]
 \begin{center}
@@ -555,12 +556,12 @@ will then automatically calculate the neutrino spectrum. Note that in this
 case, there is no degree of freedom in the choice of the source units.
 The currently available fluxes are described in \Tab~\ref{tab:binfluxes}.
 For example, two built-in neutrino factory fluxes are available: $\mu^+$-decay ({\tt @builtin = 1}) and $\mu^-$-decay ({\tt @builtin = 2}). In these cases, the muon energy (enery of the parent particle) has to be specified together with the number of useful decays  per year. Thus, an example to set up a neutrino factory flux is 
-\index{aedl}{{\tt nuflux}!builtin@{\tt "@builtin}}
-\index{aedl}{{\tt nuflux}!parent energy@{\tt "@parent\_energy}}
-\index{aedl}{{\tt nuflux}!stored muons@{\tt "@stored\_muons}}
-\index{aedl}{{\tt nuflux}!end point@{\tt "@end\_point}}
-\index{aedl}{{\tt nuflux}!stored ions@{\tt "@stored\_ions}}
-\index{aedl}{{\tt nuflux}!gamma@{\tt "@gamma}}
+\index{aedl}{nuflux@{\tt nuflux}!builtin@{\tt "@builtin}}
+\index{aedl}{nuflux@{\tt nuflux}!parent energy@{\tt "@parent\_energy}}
+\index{aedl}{nuflux@{\tt nuflux}!stored muons@{\tt "@stored\_muons}}
+\index{aedl}{nuflux@{\tt nuflux}!end point@{\tt "@end\_point}}
+\index{aedl}{nuflux@{\tt nuflux}!stored ions@{\tt "@stored\_ions}}
+\index{aedl}{nuflux@{\tt nuflux}!gamma@{\tt "@gamma}}
 \begin{quote}
 {\tt nuflux(\#mu\_plus)<\\
 \tb  @builtin = 1\\
@@ -569,10 +570,11 @@ For example, two built-in neutrino factory fluxes are available: $\mu^+$-decay (
 \tb  @time = 8.0\\
 >}
 \end{quote}
+MR: SOME MORE ELABORATION AND AN EXAMPLE FOR THE BETA BEAMS MAY BE APPROPRIATE HERE [WW].
 %
-\index{aedl}{{\tt nuflux}!power@{\tt "@power}}
-\index{aedl}{{\tt nuflux}!norm@{\tt "@norm}}
-\index{aedl}{{\tt nuflux}!flux file@{\tt "@flux\_file}}
+\index{aedl}{nuflux@{\tt nuflux}!power@{\tt "@power}}
+\index{aedl}{nuflux@{\tt nuflux}!norm@{\tt "@norm}}
+\index{aedl}{nuflux@{\tt nuflux}!flux file@{\tt "@flux\_file}}
 For a user-defined flux, one has to give it the file name:
 \begin{quote}
 {\tt nuflux(\#user)<}\\
@@ -592,7 +594,7 @@ numbers in the flux file give, after the multiplication with {\tt @norm},
 the proper numbers of produced neutrinos corresponding to the chosen target power {\tt @power}. Usually this adjustment of {\tt @norm} is performed by comparison with known energy spectra for a specific experiment.
 For more details on the flux definition, see appendix on page~\pageref{app:flux}.
 
-\index{aedl}{{\tt flux}!flux file@{\tt "@flux\_file}}\index{norm}{Flux!file}
+\index{aedl}{nuflux@{\tt nuflux}!flux file@{\tt "@flux\_file}}\index{norm}{Flux!file}
 The software assumes that the given flux file has seven columns and
 501 lines with equidistant energies. The format is:
 \begin{quotation}
@@ -696,8 +698,8 @@ The possible options for matter density profiles are summarized in \Tab~\ref{tab
 Cross sections\index{norm}{Cross section} will later be used as part of the 
 channel definition (see \Sec~\ref{sec:channel}). Similar to the source 
 fluxes, they are provided by the user as a data file:
-\index{aedl}{{\tt cross}}
-\index{aedl}{{\tt cross}!cross file@{\tt  "@cross\_file}}
+\index{aedl}{cross@{\tt cross}}
+\index{aedl}{cross@{\tt cross}!cross file@{\tt  "@cross\_file}}
 \begin{quote}
 {\tt cross(\#name)<}\\
 {\tt \tb @cross\_file ="user\_file\_1.dat"}\\
@@ -713,7 +715,7 @@ Cross sections in \GLOBES\ are given as total cross section divided by energy:
 The software assumes that the cross section files are text files with 
 seven columns and $1001$ lines of the form
 \index{norm}{Cross section!file}
-\index{aedl}{{\tt cross}!cross file@{\tt  "@cross\_file}}
+\index{aedl}{cross@{\tt cross}!cross file@{\tt  "@cross\_file}}
 \begin{quotation}
 $\mathrm{log}_{10} E\quad
 \hat\sigma_{\nu_e}\quad
@@ -742,7 +744,7 @@ a particular cross section.\index{norm}{Cross section!file!comments in}
 \section{Oscillation channels}
 \label{sec:channel}
 
-\index{aedl}{{\tt channel}|(}
+\index{aedl}{channel@{\tt channel}|(}
 Channels\index{norm}{Channel} in \GLOBES\ represent an intermediate level 
 between the pure oscillation physics given by the oscillation probability
 $P_{\alpha\beta}$, and the total event rates composed of signal and 
@@ -841,7 +843,7 @@ the CP-sign of the initial state, the initial flavor, the final flavor,
 the cross sections, and the energy resolution function. In order to refer to
 flux, cross sections, and energy resolution functions, they have to be 
 defined before with their {\tt \#name} in the respective environments. 
-Thus, a simple definition of a channel\index{aedl}{{\tt channel}} is
+Thus, a simple definition of a channel\index{aedl}{channel@{\tt channel}} is
 \begin{quote}
 {\tt channel(\#channel\_1)<\\
 \tb @channel = \#flux : $+$: muon: muon: \#cross: \#energy\\
@@ -850,7 +852,7 @@ Thus, a simple definition of a channel\index{aedl}{{\tt channel}} is
 %
 \index{norm}{Oscillation!switching off}
 It is also possible to define a channel as no-oscillation by using the
-prefix {\tt NOSC\_}\index{aedl}{{\tt channel}!{\tt NOSC\_}} 
+prefix {\tt NOSC\_}\index{aedl}{channel@{\tt channel}!{\tt NOSC\_}} 
 in either the initial  flavour or 
 the final flavour, like this
 \begin{quote}
@@ -877,13 +879,13 @@ Note that the energy environment will be described in the next section.
 In addition, one can define pre- and post-smearing effects together
 with the channels, which will also be introduced together with the
 energy resolution function in the next section.
-\index{aedl}{{\tt channel}|)}
+\index{aedl}{channel@{\tt channel}|)}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Energy resolution function}
 \label{sec:energy}
 
-\index{aedl}{{\tt energy}|(}
+\index{aedl}{energy@{\tt energy}|(}
 \index{norm}{Energy!resolution|(}
 The definition and implementation of the energy resolution function is 
 rather sophisticated in \GLOBES . In particular, the choice of the 
@@ -1031,13 +1033,13 @@ As illustrated in the figure, an interesting feature in combination with the
 channels are pre- and post-smearing effects. Pre-smearing effects are taken into account on the sampling point level, and post-smearing effects on the bin level. Examples for these effects are energy 
 dependent efficiencies and (non-beam) backgrounds. Efficiencies are multiplicative factors, whereas backgrounds are added to the event rates. These components can be introduced before or after the integration in \eq~(\ref{eq:simple_int}) is done. 
 %
-\index{aedl}{{\tt channel}!pre smearing efficiencies@{\tt 
+\index{aedl}{channel@{\tt channel}!pre smearing efficiencies@{\tt 
 "@pre\_smearing\_efficiencies}}
-\index{aedl}{{\tt channel}!pre smearing background@{\tt 
+\index{aedl}{channel@{\tt channel}!pre smearing background@{\tt 
 "@pre\_smearing\_background}}
-\index{aedl}{{\tt channel}!post smearing efficiencies@{\tt 
+\index{aedl}{channel@{\tt channel}!post smearing efficiencies@{\tt 
 "@post\_smearing\_efficiencies}}
-\index{aedl}{{\tt channel}!post smearing background@{\tt 
+\index{aedl}{channel@{\tt channel}!post smearing background@{\tt 
 "@post\_smearing\_background}}
 %
 If they are introduced before, 
@@ -1056,13 +1058,13 @@ and their default value is $1$, whereas backgrounds are additive and their defau
 >}
 \end{quote}
 %
-\index{aedl}{{\tt channel}!pre smearing efficiencies@{\tt 
+\index{aedl}{channel@{\tt channel}!pre smearing efficiencies@{\tt 
 "@pre\_smearing\_efficiencies}}
-\index{aedl}{{\tt channel}!pre smearing background@{\tt 
+\index{aedl}{channel@{\tt channel}!pre smearing background@{\tt 
 "@pre\_smearing\_background}}
-\index{aedl}{{\tt channel}!post smearing efficiencies@{\tt 
+\index{aedl}{channel@{\tt channel}!post smearing efficiencies@{\tt 
 "@post\_smearing\_efficiencies}}
-\index{aedl}{{\tt channel}!post smearing background@{\tt 
+\index{aedl}{channel@{\tt channel}!post smearing background@{\tt 
 "@post\_smearing\_background}}
 %
 This experiment uses $10$ sampling points and $5$ bins.
@@ -1119,7 +1121,7 @@ the true result for decreasing step size. Thus if the number of sampling
 points is large enough this algorithm is very accurate. 
 This algorithm is selected by
 %
-\index{aedl}{{\tt energy}!type@{\tt "@type}}
+\index{aedl}{energy@{\tt energy}!type@{\tt "@type}}
 %
 \begin{quote}
 {\tt \tb @type = 1}
@@ -1139,7 +1141,7 @@ a Gau\ss ian
 R^c(E,E')=\frac{1}{\sigma(E)\,\sqrt{2\pi}}\,e^{-\frac{(E-E')^2}{2\sigma^2(E)}} \, .
 \end{equation} 
 %
-\index{aedl}{{\tt energy}!sigma function@{\tt "@sigma\_function}}
+\index{aedl}{energy@{\tt energy}!sigma function@{\tt "@sigma\_function}}
 %
 There are several energy resolution functions available, where by default
 {\tt \#standard} is used:
@@ -1147,7 +1149,7 @@ There are several energy resolution functions available, where by default
 {\tt \tb @sigma\_function = \#standard} 
 \end{quote}
 %
-\index{aedl}{{\tt energy}!standard@{\tt \#standard}}
+\index{aedl}{energy@{\tt energy}!standard@{\tt \#standard}}
 %
 The energy resolution function {\tt \#standard} is defined by
 \begin{equation}
@@ -1160,7 +1162,7 @@ where the parameters $\alpha, \beta$ and $\gamma$ are provided by the user:
 \end{quote}
 Currently, another possible choice for {\tt @sigma\_function} is {\tt \#inverse\_beta},
 %
-\index{aedl}{{\tt energy}!inverse beta@{\tt \#inverse\_beta}}
+\index{aedl}{energy@{\tt energy}!inverse beta@{\tt \#inverse\_beta}}
 %
 which only uses the parameter $\alpha$. It is defined by
 \begin{equation}
@@ -1236,7 +1238,7 @@ would switch the filter feature on and set the width to $2.0\,\mathrm{GeV}$.
 The setting of {\tt \$filter\_state} is ignored whenever a density profile
 with more than one layer is used. 
 
-\index{aedl}{{\tt energy}!type@{\tt  "@type}}
+\index{aedl}{energy@{\tt energy}!type@{\tt  "@type}}
 With a type 1 ({\tt @type = 1}) energy resolution 
 function, $\sigma_e$ adds on to the energy resolution function 
 of the detector $\sigma_c(E)$ such as
@@ -1292,7 +1294,7 @@ a_{10} & a_{11} & a_{12} & a_{13} & a_{14} &  &  &  &  &  \\
 \end{array}\right) }_{\mathtt{\$sampling\_points}  \, \, \mathrm{columns}} \quad \leftarrow \quad \footnotesize{\mathtt{\$bins} \, \, \mathrm{rows}} \, ,
 \end{equation}
 where the unshown entries are zero. Thus, the values of $K_{ij}$ have to be specified between $k_l^i$ and $k_u^i$ in the form $\{ k_l^i,k_u^i, K_{i \, k_l^i}, K_{i k_l^i+1} , \hdots , K_{i k_u^i} \}$:
-\index{aedl}{{\tt energy}!energy@{\tt "@energy}}
+\index{aedl}{energy@{\tt energy}!energy@{\tt "@energy}}
 \begin{quote}
 {\tt 
 energy(\#name)<\\
@@ -1311,13 +1313,13 @@ lead to sums smaller than unity, such as in the case of truncated Gau\ss ian
 distributions. The sum of entries in each {\em row} is not defined, since the events might be unevently distributed into the energy bins
 according to the energy resolution function.
 
-\index{aedl}{{\tt energy}|)}
+\index{aedl}{energy@{\tt energy}|)}
 \index{norm}{Energy!resolution|)}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Rules and the treatment of systematics}
 \label{sec:rules}
 
-\index{aedl}{{\tt rule}|(}
+\index{aedl}{rule@{\tt rule}|(}
 The set of rules\index{norm}{Rule} for an experiment is the final 
 link between the event rate computation and the statistical analysis. 
 The information in the rules
@@ -1360,8 +1362,8 @@ additional ones. The background normalization factors very often have
 a specific meaning. For example, they may correspond to a fraction
 of mis-identified events (charge or flavor mis-identification).
 %
-\index{aedl}{{\tt rule}!signal@{\tt "@signal}}
-\index{aedl}{{\tt rule}!background@{\tt "@background}}
+\index{aedl}{rule@{\tt rule}!signal@{\tt "@signal}}
+\index{aedl}{rule@{\tt rule}!background@{\tt "@background}}
 %
 These basic building blocks of each rule are, within the rule environment,
 for example defined by
@@ -1475,7 +1477,7 @@ and therefore ensure in this way that only those $s_i$ are used whose index
 $k$ is within the range $0,\ldots, N_\mathrm{bins}-1$ (\cf, \figu{energies}). 
 Thus, it is possible to constrain the analysis energy range 
 with each rule to an energy window\index{norm}{Energy!window}:
-\index{aedl}{{\tt rule}!energy window@{\tt "@energy\_window}}
+\index{aedl}{rule@{\tt rule}!energy window@{\tt "@energy\_window}}
 \begin{quote}
 {\tt 
 \tb @energy\_window = 4.0 : 50.0 
@@ -1549,8 +1551,8 @@ The errors for the normalization and the
 values of tilt/calibration are always regarded
 as a pairs, \ie, they are given in the form {\tt normalization : tilt}. For example, we have\footnote{The old parameter {\tt @backgroundcenter} should not be used anymore. A background normalization center of 1.0 will be
 interpreted as zero central value. IS THAT CORRECT [WW]?}
-\index{aedl}{{\tt rule}!signal error@{\tt "@signalerror}}
-\index{aedl}{{\tt rule}!background error@{\tt "@backgrounderror}}
+\index{aedl}{rule@{\tt rule}!signal error@{\tt "@signalerror}}
+\index{aedl}{rule@{\tt rule}!background error@{\tt "@backgrounderror}}
 %\index{aedl}{{\tt rule}!background center@{\tt "@backgroundcenter}}
 \begin{quote}
 {\tt
@@ -1571,8 +1573,8 @@ corresponding two systematics modes ``systematics on'' and ``systematics off''.\
 versions before \GLOBES\ 3.0 the ``error dimension'' was used. The corresponding
 parameters {\tt errordim\_sys\_on} and {\tt errordim\_sys\_off} are still supported
 but should not be used anymore.}
-\index{aedl}{{\tt rule}!sys on function@{\tt "@sys\_on\_function}}
-\index{aedl}{{\tt rule}!sys off function@{\tt "@sys\_off\_function}}
+\index{aedl}{rule@{\tt rule}!sys on function@{\tt "@sys\_on\_function}}
+\index{aedl}{rule@{\tt rule}!sys off function@{\tt "@sys\_off\_function}}
 \index{norm}{Systematics function}
 The different  possibilities are shown in
 \Tab~\ref{tab:error_dim}. Since the dual systematics modes define the experiment
@@ -1594,8 +1596,8 @@ For user-defined systematics \index{norm}{User-defined systematics}
 (see, \Sec~\ref{sec:userchi}), one can use arbitrary names
 for the systematics functions which are not pre-defined. In this case,
 one would specify the systematical errors in lists, such as
-\index{aedl}{{\tt rule}!sys on errors@{\tt "@sys\_on\_errors}}
-\index{aedl}{{\tt rule}!sys off errors@{\tt "@sys\_off\_errors}}
+\index{aedl}{rule@{\tt rule}!sys on errors@{\tt "@sys\_on\_errors}}
+\index{aedl}{rule@{\tt rule}!sys off errors@{\tt "@sys\_off\_errors}}
 \begin{quote}
 {\tt
 \tb @sys\_on\_function = "chiMySystematics"  \\
@@ -1638,7 +1640,7 @@ Eventually, a complete rule may look like this:
 \tb @energy\_window = 4.0 : 50.0
 >}
 \end{quote}
-\index{aedl}{{\tt rule}|)}
+\index{aedl}{rule@{\tt rule}|)}
 
 % THIS PART HAS GAINED IMPORTANCE AND THEREFORE BEEN EXPLAINED ALREADY IN THE LAST CHAPTER!
 %
