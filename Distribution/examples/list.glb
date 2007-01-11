@@ -107,9 +107,9 @@ cross(#NC)<
 	21.25,23.55,25.85,28.15,30.45,32.75,
 	35.05,37.35,39.65,41.95,44.25,46.55,48.85 }
 
-/* The functions 'bincenter[]' and 'simbincenter[]' respectively return
- * a list with $bins ($sim_points) length which contains the average
- * energy of each bin (simbin). Can only be called once $bins, $emin,
+/* The functions 'bincenter[]' and 'samplingbincenter[]' respectively return
+ * a list with $bins ($sampling_points) length which contains the average
+ * energy of each bin (sampling bin). Can only be called once $bins, $emin,
  * $emax have been specified (resp. $sampling_points, $sampling_min and
  * $sampling_max).
  */

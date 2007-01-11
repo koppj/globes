@@ -3359,14 +3359,14 @@ static glb_List *glb_bincenter(void)
 }
 
 
-static glb_List *glb_simbincenter(void)
+static glb_List *glb_samplingbincenter(void)
 {
   int i;
   glb_List *res=NULL;
   glb_smear *test;
   test=glb_smear_alloc();
   
-  if(buff.simbins<0) {glb_error("Cannot compute simbincenter. Sim-binning not set up properly."); return NULL;}
+  if(buff.simbins<0) {glb_error("Cannot compute samplingbincenter. Sampling-binning not set up properly."); return NULL;}
 
   
   glb_set_up_smear_data(test,&buff);
@@ -3389,7 +3389,7 @@ static glb_List *glb_simbincenter(void)
 static struct glb_init_list list_fncts[] =
   {
     {"bincenter",glb_bincenter},
-    {"simbincenter",glb_simbincenter},
+    {"samplingbincenter",glb_samplingbincenter},
     {NULL, NULL}
   };
 

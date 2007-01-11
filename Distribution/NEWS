@@ -772,4 +772,9 @@ documented!
           and sampling bin central energies.
         Checked that the event rates behave as expected under the influence
         of the tilt, and that example1 still gives correct results.
+
+*********Version 2.4.4
+11/01/2007 JK
+        Renamed AEDL function simbincenter to samplingbincenter and modified
+        list.glb accordingly.
         
