@@ -148,7 +148,7 @@ TUM-HEP-YYY/0X\\
 \setcounter{footnote}{-1}
 
 {\begin{center}
-{\Large\bf New features in the simulation of long baseline experiments with GLoBES 3.0 (working title)}
+{\Large\bf New features in the simulation of neutrino oscillation experiments with GLoBES 3.0}
 \end{center}}
 {\begin{center}
 {\large\bf (General Long Baseline Experiment Simulator)}
@@ -158,14 +158,14 @@ TUM-HEP-YYY/0X\\
 \vspace*{.8cm}
 %\vspace*{.3cm}
 {\begin{center} {\large{\sc
-                P.~Huber\footnotemark[1],~
-                J.~Kopp\footnotemark[2],~
-                M.~Lindner\footnotemark[2],~
-                M.~Rolinec\footnotemark[2],~
-                W.~Winter\footnotemark[3]
+                Patrick~Huber\footnotemark[1],~
+                Joachim~Kopp\footnotemark[2],~
+                Manfred~Lindner\footnotemark[2], \\
+                Mark~Rolinec\footnotemark[3],~
+                Walter~Winter\footnotemark[4]
                 }}
 
-\footnote{All correspondence should be addressed to {\tt globes@ph.tum.de}}
+\footnote{All correspondence should be addressed to {\tt globes@mpi-hd.mpg.de}}
 
 \end{center}}
 \vspace*{0cm}
@@ -179,14 +179,21 @@ TUM-HEP-YYY/0X\\
 \vspace*{1mm}
 
 \footnotemark[2]%
+       Max--Planck--Institut f\"ur Kernphysik,  \\
+       Postfach 10~39~80, D--69029 Heidelberg, Germany 
+
+\vspace*{1mm}
+
+\footnotemark[3]%
        Physik--Department, Technische Universit\"at M\"unchen, \\
        James--Franck--Strasse, 85748 Garching, Germany
 
 \vspace*{1mm}
 
-\footnotemark[3]%
-       School of Natural Sciences, Institute for Advanced Study, \\
-       Einstein Drive, Princeton, NJ 08540, USA
+\footnotemark[4]%
+       Universit\"at W\"urzburg, 
+       Institut f\"ur theoretische Physik und Astrophysik, \\
+       Am Hubland, D-97074 W\"urzburg, Germany
 
 \end{center}}
 
@@ -194,7 +201,13 @@ TUM-HEP-YYY/0X\\
 
 
 \begin{abstract}
-Here comes the abstract.
+We present Version 3.0 of the GLoBES (``General Long Baseline Experiment Simulator'') software, which is
+a simulation tool for short- and long-baseline neutrino oscillation experiments. As new features, \GLOBES\ 3.0 allows the simulation of experiments with multiple detectors by the concept of user-defined systematics.
+In addition, the combination with external information, such as from different experiment classes, is 
+simplified by the concept of user-defined priors. As far as the probability calculation is concerned, \GLOBES\ 
+now provides an interface for the inclusion of non-standard physics without re-compliation of the software. 
+The set of experiment descriptions coming with \GLOBES\ has been updated. For example, built-in fluxes are now
+provided for the simulation of beta beams.
 \end{abstract}
 
 
@@ -210,22 +223,139 @@ Here comes the abstract.
 
 \section{Introduction}
 
-\nocite{Huber:2004ka}
+Neutrino oscillations are now established as the leading flavor
+transition mechanism for neutrinos in a long history of many experiments, see
+\eg , \Ref~\cite{Barger:2003qi}. Future facilities, using accelerator-based
+ neutrino beams or a nuclear reactors as neutrino sources, are proposed
+for precision measurements of the neutrino oscillation parameters. In the
+simulation of these experiments, 
+the presence of multiple solutions which are intrinsic to
+ neutrino oscillation probabilities~\cite{Fogli:1996pv,Burguet-Castell:2001ez,Minakata:2001qm,Barger:2001yr} 
+affect the performance.
+Thus optimization strategies are required which maximally exploit 
+complementarity between experiments. The \GLOBES\ software package~\cite{Huber:2004ka}
+is a  modern experiment  simulation  and analysis tool for
+a highly accurate beam and detector simulation. In addition, it provides powerful 
+means to analyze correlations and degeneracies, especially for the combination
+of several experiments. Compared to a Monte Carlo simulation, which yields a different
+result in each run, it simulates the performance of the {\em average} experiment
+(see \Ref~\cite{Schwetz:2006md} for a discussion of the meaning of ``average'').
+The advantage of such an average prediction is a tremendous performance gain,
+which can be used for systematical parameter space scans. In addition, it 
+simplified the direct comparison of experiments.
 
-\section{User-defined priors and systematics}
+The \GLOBES\ software has, in the past, been used for many studies, some of them
+are referred to in the paper. However, recent developments have indicated that extensions
+and improvements are necessary. In this work, we present the most important new
+features and changes in \GLOBES\ 3.0. For experimentalists, \GLOBES\ now allows
+for the implementation of arbitrary systematics, which can also be used for
+the simulation of multi-detector experiments. In addition, several extensions
+have been included in \AEDL\ (``Abstract Experiment Description Language''), such as
+built-in beta beam fluxes and the possibility to use lists as variables.
+For phenomenologists, user-defined
+priors provide a flexible interface to include external information, such as from
+different experiments. In addition, \GLOBES\ now can be used for the simulation
+of non-standard physics without re-compiling the \GLOBES\ software.
 
-\bi
- \item
-  User-defined priors
- \item
-  User-defined systematics
-\ei
+\section{Concept of \GLOBES }
+
+\GLOBES\ (``General Long Baseline Experiment Simulator'') is a flexible
+software tool to simulate and analyze neutrino oscillation 
+short- and long-baseline experiments using a 
+complete three-flavor description. On the
+one hand, it contains a comprehensive abstract experiment definition
+language (\AEDL ), which allows to describe 
+most classes of long baseline and reactor experiments
+at an abstract level. On the other hand, it provides a C-library to 
+process the experiment information in order to obtain oscillation
+probabilities, rate vectors, and $\Delta \chi^2$-values (\cf, \figu{GLOBES}). 
+In addition, it provides a binary program to test experiment
+definitions very quickly, before they are used by the application software.
+Currently, \GLOBES\ is available for GNU/Linux. 
+
+\begin{figure}[t]
+\begin{center}
+\includegraphics[width=14cm]{GLOBES}
+\end{center}
+\caption{\label{fig:GLOBES} General concept of the \GLOBES\ package.}
+\end{figure}
+
+\GLOBES\ allows to simulate experiments with stationary neutrino point 
+sources, where each experiment is assumed to have only one neutrino source.
+Such experiments are neutrino beam experiments and reactor experiments. 
+Geometrical effects of a continuous source distribution, such as in the sun or the 
+atmosphere, can not be described. In addition, sources with a physically 
+significant time dependencies can not be studied, such as  supernov\ae. 
+However, in \GLOBES\ 3.0 and higher, new flexibility is introduced by the
+concept of user-defined systematics. This new feature allows the cross-definition
+of systematical errors over different experiments. In principle, 
+this mechanism can be used for the combination of several discrete sources
+and one detector, or several detectors and one source, or several sources and
+several detectors. In addition, already implemented
+concepts of \GLOBES\ have been used for indirect simulations of geometrical
+effects. For example, the mapping of the detector location on the neutrino
+energy has been simulated in \Ref~\cite{Rolinec:2006xr} by the use of
+variable bin widths.
+
+On the experiment definition side, either built-in neutrino fluxes
+(\eg, neutrino factory, beta beam) or arbitrary, user-defined fluxes can be used. 
+Similarly,
+arbitrary cross sections, energy dependent efficiencies,
+energy resolution functions as well as the considered oscillation channels, 
+backgrounds, and many other properties can be specified. 
+For the systematics, energy
+normalization and calibration errors can be simulated, or the
+systematics can be completely user-defined. Note that
+energy ranges and windows and bin widths can be
+(almost) arbitrarily chosen, including bins of different
+widths. Together with \GLOBES\ comes a number of
+pre-defined experiments in order to demonstrate the capabilities
+of \GLOBES\ and to provide prototypes for new experiments.
+In addition, they can be used to test new physics ideas with
+complete experiment simulations.
+% Examples for these prototypes are the \MINOS , \ICARUS , and
+% \OPERA\ simulations from \Ref~\cite{Huber:2004ug}, the
+% \JHFSK\ and \NUMI\ superbeam simulations from \Refs~\cite{Huber:2002mx,
+% Huber:2002rs}, the \JHFHK\ superbeam upgrade simulation from
+% \Ref~\cite{Huber:2002mx}, the neutrino factory simulations from
+% \Ref~\cite{Huber:2002mx}, and the reactor experiment simulations from
+% \Ref~\cite{Huber:2003pm}. Other projects using earlier versions
+% of the \GLOBES\ software include \Refs~\cite{Huber:2003ak,Ohlsson:2003ip,Winter:2003ye,Antusch:2004yx}.
+
+With the C-library, one can extract the $\Delta \chi^2$ for all defined 
+oscillation channels for an experiment or any combination of experiments.
+Of course, also low-level information, such as oscillation
+probabilities or event rates, can be obtained. \GLOBES\ includes the
+simulation of neutrino oscillations in matter with arbitrary matter 
+density profiles. In addition, it allows to simulate the matter density
+uncertainty (see, \eg, \Refs~\cite{Huber:2002mx,Ohlsson:2003ip}) and to 
+extract the precision on the matter density (see, \eg, \Refs~\cite{Winter:2005we,Gandhi:2006gu}).
+ As one of the most
+advanced features of \GLOBES , it provides the technology to 
+project the $\Delta \chi^2$, which is a function of all oscillation
+parameters, onto any subspace of parameters by local minimization. 
+This approach allows the inclusion of multi-parameter-correlations,
+where external constraints (\eg, on the solar parameters) can be imposed, too.
+Applications of the projection mechanism include the projections onto 
+the $\stheta$-axis and the $\stheta$-$\deltacp$-plane. In addition, 
+all oscillation parameters can be kept free to precisely localize 
+degenerate solutions.
+
+\section{User-defined systematics and changes in the systematics implementation}
+
+How defined, what good for (physics examples: T2KK, Reactor-paper,).
+Compare to standard systematics (nuisance parameters)
+
+\section{User-defined priors}
+
+How defined, what good for (physics examples: AstroNus, Schwetz priors, atm. neutrinos, octant degeneracy,
+).
 
 \section{Simulation of non-standard physics with GLoBES}
 
-HOWTO
+Eg. Damping, Hamiltonian, MAVANS, Toshi etc.
 
-\section{Simulation of new experiment features}
+\section{Simulation of new experiment features and \AEDL\ changes}
 
 \bi
 \item 
@@ -236,7 +366,9 @@ HOWTO
  New AEDL files in standard GLoBES delivery + changes to existing ones
 \ei
 
-\section{New platform and interpreter support}
+Beta beams paper!
+
+\section{New platform and interpreter support, new ways to improve the performance}
 
 \bi
 \item
@@ -249,7 +381,6 @@ HOWTO
  Changes in installation scheme
 \ei
 
-\section{New ways to improve performance}
 
 \bi
 \item 
@@ -307,107 +438,22 @@ inaccurate, it falls back to the QL method from~\cite{Press:NumRecip}.
 
 \section{Summary and conclusions}
 
-\begin{appendix}
-\section{To do list for new feature release (early spring?); internal}
-
-\subsection*{Programming [PH+JK?]}
-
-\bi
-\item
- Implement user-defined priors+ systematics (done?)
-\item
- Clean up linking scheme: No dynamic linking of modules (physical module
- support) anymore; support static binaries, support Condor etc.;
- problem with append mode (files) [PH]
-\item
- New algoriihm for minimzer [JK]? In this context: Is there any
- efficient algorithm for more than six parameters?
-\item
- Can globes-command (!) take more than six parameters if GLB\_OSCP $>$ 6?
- Adjust, if necessary.
-\item
- Implement Walter's or any modified bugfix for glb\_min\_sup.c
- (we had some negative feedback about that, and for more than
- six parameters ITMAX is far away from being sufficient)
-\ei
-
-\subsection*{Testing [MR+All?]}
-
-\bi
-\item
- Does release-version support Condor and more than six parameters?
-\item 
- Do beta-beam fluxes etc. work?
-\item
- Do examples produce same results as before?
-\item
- Are AEDL files consistent?
-\ei
-
-\subsection*{Documentation [WW with some help?]}
-
-\bi
-\item
- Document all new features and make examples; 
- especially user-defined priors+systematics, Non-standard-Support
-\item
- New examples files for new examples in manual
-\item
- Describe what papers have to be cited
-\ei
-
-\subsection*{Paper [WW/ML?]}
-
-\bi
- \item
-  Write new release paper (this draft)
-\ei
-
-\subsection*{AEDL files [MR?]}
-
-\bi
-\item
- Provide new AEDL files for some/any finished (=published) projects!?
- \bi
-  \item
-   $\beta$-Beams
-  \item
-   New NuFact (from scoping study); our new NuFact; silver channels?
-  \item
-   Double Chooz
-  \item
-   NOvA, BNL beam?
- \ei
-\item
- Cleaned up old AEDL files (e.g., 2.5\% background error NuFact etc.);
- document what changes
-\item
- New AEDL file forum on webpage
-\item
- Clear description in each AEDL file which papers have to be cited
-\ei
-
-\subsection*{Website [ML/JK?]}
-
-\bi
- \item
-  New layout with new release
- \item
-  New FAQ section (e.g., about normalization in AEDL fluxes)
- \item
-  New AEDL file forum
- \item
-  Figure forum, at least from current projects (download)
-\ei
-
-\end{appendix}
 
 \subsection*{Acknowledgments}
 
-We would like to thank ... 
-
-WW would like to
-acknowledge support from the W.~M.~Keck Foundation and NSF grant PHY-0503584.
+For the current version of \GLOBES , we would like to 
+thank Thomas Schwetz, who has been pushing the software to the edge in the 
+past few years. Furthermore, we would like to thank Tommy Ohlsson,
+Toshihiko Ota, and Julian Skrotzki for using and testing unpublished new features of the software.
+%
+The development of \GLOBES\ is currently being supported by the Studienstiftung des Deutschen Volkes [JK] and the
+ Emmy Noether-Program of Deutsche Forschungsgemeinschaft [WW].
+%
+In the past, the following institutions and organizations have supported 
+members of the \GLOBES\ team: Technische Universit\"at M\"unchen,
+Max-Planck-Institut f\"ur Physik, SFB 375 for astro-particle physics
+of Deutsche Forschungsgemeinschaft, Studienstiftung des Deutschen Volkes,
+Institute for Advanced Study, Princeton, W. M. Keck Foundation, and National Science Foundation.
 
 \bibliographystyle{apsrev}
 \bibliography{references}
