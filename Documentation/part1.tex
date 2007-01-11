@@ -2223,6 +2223,26 @@ energy window in terms of bin numbers [{\tt lowbin},{\tt highbin}] corresponding
 \GLBNS{GetNumberOfSamplingPoints}
 {\tt int glbGetNumberOfSamplingPoints(int exp)} returns the number of sampling points for the experiment {\tt exp}.
 \end{function}
+\begin{function}
+\GLBNS{GetBinSizeListPtr}
+{\tt double *glbGetBinSizeListPtr(int exp)} returns a pointer to the array of bin widths
+for the experiment {\tt exp}.
+\end{function}
+\begin{function}
+\GLBNS{GetSamplingStepsizeListPtr}
+{\tt double *glbGetSamplingStepsizeListPtr(int exp)} returns a pointer to the array of
+sampling step sizes for the experiment {\tt exp}.
+\end{function}
+\begin{function}
+\GLBNS{GetBinCentersListPtr}
+{\tt double *glbGetBinCentersListPtr(int exp)} returns a pointer to the array of
+mean bin energies for the experiment {\tt exp}.
+\end{function}
+\begin{function}
+\GLBNS{GetSamplingPointsListPtr}
+{\tt double *glbGetSamplingPointsListPtr(int exp)} returns a pointer to the array of
+sampling points for the experiment {\tt exp}.
+\end{function}
 
 In order to obtain information on the structure of the rules, 
 a number of functions are provided:

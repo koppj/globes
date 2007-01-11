@@ -1441,30 +1441,38 @@ is more accurate, but it requires a careful choice of parameters.
 The first option (method ``T'') is\footnote{Note that this behaviour
 has slightly changed compared to previous \GLOBES\ releases.}
 \begin{equation}
-s_i(a,b) \equiv s_i(a)+b\cdot s_i \cdot i / N_\mathrm{bins}.
+  s_i(a,b) \equiv s_i(a)+b\cdot s_i \, (E'_i - \bar{E'}) / (E'_\mathrm{max}-E'_\mathrm{min}),
 \end{equation}
-It is often refered to as a ``tilt'' of the
+where $E'_\mathrm{min}$ and $E'_\mathrm{max}$ correspond to {\tt \$emin} and
+{\tt \$emax}, $\bar{E'} = \tfrac{1}{2} (E'_\mathrm{max}+E'_\mathrm{min})$ is
+the median of this energy interval, and $E'_i$ is the mean (reconstructed)
+energy of the $i$th bin.
+This method is often refered to as a ``tilt'' of the
 spectrum, since it describes a linear distortion 
-of the event rate spectrum. Note that this definition of a tilt makes
-only sense in combination with a large enough normalization error, since
-the tilt may also affect the normalization. 
+of the event rate spectrum.
+%Note that this definition of a tilt makes
+%only sense in combination with a large enough normalization error, since
+%the tilt may also affect the normalization. 
 %
 The second option (method ``C'') is closer to an actual energy
 calibration error, which means that one should test this option whenever
 one suspects a large impact of this systematical error.
-It is based upon replacing the events in the $i$th bin (mean reconstructed energy $E'_i$)
+It is based upon replacing the events in the $i$th bin
 by the ones at the energy $(1+b)\cdot E'_i$. If the target energy does not exactly hit
 a (discrete) bin energy $E_k$, linear interpolation is used. We use the following approximation:
 \begin{eqnarray}
-s_i(a,b)&=& (1+b)\cdot \left[ \left( s_{k+1}(a)-s_k(a) \right)\cdot (\delta-k) +s_k(a) \right] \,,\\
+s_i(a,b)&=& (1+b)\cdot \left[ \left( s_{k+1}(a)-s_k(a) \right)\cdot (\delta-k) +s_k(a) \right] \,,
+  \label{eq:Ecalib} \\
 \delta&=&b\cdot(i+t_0+ 1/2)+i\,,\nonumber\\
 k&=& \mathrm{div}(\delta,1)\,,\nonumber\\
 t_0&=&E'_\mathrm{min}/\Delta E_0\,.\nonumber
 \end{eqnarray}
-Here, $E'_\mathrm{min} = {\tt \$emin}$,  $\Delta E_0$ is the bin width
-({\tt \$emax}-{\tt \$emin})/{\tt \$bins},
-and ``div'' refers to the integer part of the division. Note that the
-factor $(1+b)$ in the first equation comes from a renormalization of
+Here, $\Delta E_0$ is the bin width ({\tt \$emax}-{\tt \$emin})/{\tt \$bins},
+and ``div'' refers to the integer part of the division. It is important
+to keep in mind that this definition of the energy calibration error 
+makes sense only for constant bin width, so the corresponding $\chi^2$
+functions should not be used in conjunction with the {\tt \$binwidth} directive.
+The factor $(1+b)$ in \eq~\eqref{eq:Ecalib} comes from a renormalization of
 the bin width, since also the bin width is altered by the replacement of
 the energies. Furthermore, special care has to be payed to the limits
  $k<1$ or $k+1>N_\mathrm{bins}$, since there $s_k$ or $s_{k+1}$ may not have been calculated. By default, it is assumed that $s_k$ is
