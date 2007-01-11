@@ -1549,7 +1549,7 @@ background tilt/calibration ($d$). Their default (central) values are zero.
 The errors for the normalization and the 
 values of tilt/calibration are always regarded
 as a pairs, \ie, they are given in the form {\tt normalization : tilt}. For example, we have\footnote{The old parameter {\tt @backgroundcenter} should not be used anymore. A background normalization center of 1.0 will be
-interpreted as zero central value. IS THAT CORRECT [WW]?}
+interpreted as zero central value.}
 \index{aedl}{rule@{\tt rule}!signal error@{\tt "@signalerror}}
 \index{aedl}{rule@{\tt rule}!background error@{\tt "@backgrounderror}}
 %\index{aedl}{{\tt rule}!background center@{\tt "@backgroundcenter}}
@@ -1579,7 +1579,7 @@ The different  possibilities are shown in
 \Tab~\ref{tab:error_dim}. Since the dual systematics modes define the experiment
 behavior for systematics on and off, it is useful to have a matching pair of 
 systematics functions for each rule 
-(see also~\Sec~\ref{sec:systematics}).. The signal and background errors specified
+(see also~\Sec~\ref{sec:systematics}). The signal and background errors specified
 by {\tt @signalerror} and  {\tt @backgrounderror} will then be used, if applicable.
 For example, one may define 
 \begin{quote}
@@ -1605,13 +1605,10 @@ one would specify the systematical errors in lists, such as
 \tb @sys\_off\_errors = \{ \}
 }
 \end{quote}
-WHICH SYSTEMATICAL ERRORS WILL A FUNCTION USE IF THERE IS A MIXED DECLARATION,
-SUCH AS WITH SYS\_ON\_ERRORS IN SYS ON AND SIGNALERROR/BACKGROUNDERROR in SYS OFF?
-DOES THAT WORK? [WW]
 Note that here the systematics on and systematics off models can be used 
 as fully functional different systematics modes with different systematical
 errors. The interpretation of the systematical errors in {\tt @sys\_on\_errors} and
-{\tt @sys\_off\_errors} is left to the application software code and the user. 
+{\tt @sys\_off\_errors} is left to the application software code and the user.
 In addition, the application software has to register the user-defined systematics $\chi^2$
 function with \GLB{DefineChiFunction} and uniquely identify the name
 given by {\tt @sys\_on\_function} or {\tt @sys\_off\_function} to avoid
@@ -1626,6 +1623,10 @@ which, of course, also involves the rates of the near detector. However, definin
 {\tt chiReactor} in both the near and far detectors would result in a double call
 of the $\chi^2$ function, \ie, the program will be a factor two slower and the
 resulting $\chi^2$ will be a factor two too large.
+Note that mixed declarations of {\tt @sys\_on\_errors}, {\tt @sys\_off\_errors}, {\tt @signalerror}, and
+{\tt @backgrounderror} are possible. In this case, {\tt @sys\_on\_errors} and {\tt @sys\_off\_errors}
+have priority. If for one or both of these no systematical errors are defined, {\tt @signalerror} or
+{\tt @backgrounderror} will be used.
 
 Eventually, a complete rule may look like this:
 \begin{quote}

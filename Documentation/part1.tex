@@ -9,11 +9,12 @@
 \label{chapter:tour}
 \index{norm}{GLOBES tour@\GLOBES~tour}
 
-TOUR ITSELF (+EXAMPLE FILE) TO BE UPDATED (VALUES MAY HAVE CHANGED DUE TO AEDL FILE DEFINITION
+FOR WW MYSELF: TOUR ITSELF (+EXAMPLE FILE) TO BE UPDATED (VALUES MAY HAVE CHANGED DUE TO AEDL FILE DEFINITION
 CHANGES ETC. ALSO EXPERIMENT (OLD) NUFACT DOES NOT EXIST ANYMORE. AND: SOME ERROR IN THIS OLD
 NUFACT-FILE [WW].
 
 CHECK: GLBSETPROJECTION REALLY USED WITH GLB\_FIXED FOR DENSITY PARAMS? IS NFSTANDARD USED?
+(QUESTIONS FOR WW MYSELF!)
 
 In this first chapter, we show a \GLOBES\ tour illustrating the
 main features of \GLOBES . The complete example  
@@ -3175,7 +3176,9 @@ One can change the minimization algorithm in \GLOBES\ with
 minimizer.
 \end{function}
 Compared to the standard minimization which is performed for systematics first and then for the
-oscillation parameters, the hybrid minimizer mixes the systematics and oscillation parameter minimizations. This method is much faster, but new (unknown) correlations between systematics parameters and oscillation parameters may emerge. Since one can change the minimizer at any time, it is recommended that one cross check the minimization for a particular experiment.
+oscillation parameters, the hybrid minimizer mixes the systematics and oscillation parameter minimizations. 
+This method is much faster,
+but correlations between systematics parameters and oscillation parameters might lead to a different convergence behaviour in some situations. Thus, when switching to the hybrid minimizer in an application program, one has to reconsider the question whether all degeneracies are found. Since one can change the minimizer at any time, it is recommended that one cross check the minimization for a particular experiment. The danger of modifying the convergence behaviour in existing application programs is another reason why the new, faster minimizer is still declared as experimental and not used by default
 
 %%% Local Variables: 
 %%% mode: latex
