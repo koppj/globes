@@ -518,47 +518,78 @@ int main(int argc, char *argv[]) \\
 \begin{center}
 \begin{tabular}{llp{7.5cm}c}
 \hline
-Experiment & Filename & Short description &  Ref. \\
+Experiment & Filename & Short description &  Ref. \\[0.2cm]
 \hline 
-\multicolumn{4}{l}{\underline{Conventional beams:}} \\
-MINOS & {\tt MINOS.glb} & MINOS exp., 5~yr running time & \cite{Huber:2004ug}\\
-OPERA & {\tt OPERA.glb} & OPERA exp., 5~yr running time & \cite{Huber:2004ug}\\
-ICARUS & {\tt ICARUS.glb} & ICARUS exp., 5~yr running time & \cite{Huber:2004ug}\\[0.1cm]
+\multicolumn{4}{l}{\underline{Superbeam experiments:}} \\[0.2cm]
 
-\multicolumn{4}{l}{\underline{First-generation superbeams:}} \\
-T2K & {\tt JHFSKnew.glb} & J-PARC to Super-K, 5~yr $\nu$-running &  \cite{Huber:2002rs} \\
- & {\tt JHFSKantinew.glb} & J-PARC to Super-K, 5~yr $\bar{\nu}$-running &  \cite{Huber:2002rs} \\
- & {\tt JHFSKcomb.glb} & Same, but 1.25~yr $\nu$- and 3.75~yr $\bar{\nu}$-running &  \cite{Huber:2002rs} \\[0.1cm]
-NO$\nu$A & {\tt NUMI9.glb} & NuMI OA $9 \, \mathrm{km}/712 \, \mathrm{km}$, 5~yr $\nu$-running & \cite{Huber:2002rs} \\
-& {\tt NUMI9anti.glb} & NuMI OA $9 \, \mathrm{km}/712 \, \mathrm{km}$, 5~yr $\bar{\nu}$-running & \cite{Huber:2002rs} \\
-& {\tt NUMI9comb.glb} & NuMI OA $9 \, \mathrm{km}/712 \, \mathrm{km}$, 1.43~yr $\nu$- and 3.57~yr $\bar{\nu}$-running & \cite{Huber:2002rs} \\
-& {\tt NUMI12.glb} & NuMI OA $12 \, \mathrm{km}/712 \, \mathrm{km}$, 5~yr $\nu$-running & \cite{Huber:2002rs} \\
-& {\tt NUMI12anti.glb} & NuMI OA $12 \, \mathrm{km}/712 \, \mathrm{km}$, 5~yr $\bar{\nu}$-running & \cite{Huber:2002rs} \\
-& {\tt NUMI12comb.glb} & NuMI OA $12 \, \mathrm{km}/712 \, \mathrm{km}$, 1.43~yr $\nu$- and 3.57~yr $\bar{\nu}$-running & \cite{Huber:2002rs} \\[0.1cm]
- 
-\multicolumn{4}{l}{\underline{Superbeam upgrade:}} \\
-J-PARC-HK & {\tt JHFHKAll.glb} & J-PARC to Hyper-K, 2~yr $\nu$- and 6~yr $\bar{\nu}$-running &  \cite{Huber:2002mx} \\[0.1cm]
+T2K & {\tt T2K.glb} & J-PARC to Super-K, 2~yr $\nu$- and 6~yr 
+$\bar{\nu}$-running &  \cite{Itow:2001ee,Huber:2002mx} \\[0.2cm]
 
-\multicolumn{4}{l}{\underline{Neutrino factories:}} \\
-\NuFactI\ & {\tt NuFact1.glb} & Initial stage NF, 2$\times$2.5~yr running time (each pol.), $m_{\mathrm{Det}} = 10 \, \mathrm{kt}$,
-$P_{\mathrm{Tg}} \simeq 0.75 \, \mathrm{MW}$ & \cite{Huber:2002mx} \\
-\NuFactII\  & {\tt NuFact2.glb} & Advanced stage NF, 2$\times$4~yr running time (each pol.), $m_{\mathrm{Det}} = 50 \, \mathrm{kt}$,
-$P_{\mathrm{Tg}} \simeq  4 \, \mathrm{MW}$ & \cite{Huber:2002mx} \\[0.1cm]
+T2HK & {\tt T2HK.glb} & J-PARC to Hyper-K, 4~yr $\nu$- and 4~yr 
+$\bar{\nu}$-running (T2K upgrade) &  \cite{Itow:2001ee,Huber:2002mx} \\[0.2cm]
 
-\multicolumn{4}{l}{\underline{Reactor experiments:}} \\
-\ReactorI\ & {\tt Reactor1.glb} & Small reactor exp., $\mathcal{L} = 400 \, \mathrm{t} \, \mathrm{GW} \, \mathrm{yr}$ & \cite{Huber:2003pm} \\
-\ReactorII\ & {\tt Reactor2.glb} & Large reactor exp., $\mathcal{L} = 8\, 000 \, \mathrm{t} \, \mathrm{GW} \, \mathrm{yr}$ & \cite{Huber:2003pm} \\[0.1cm]
+NO$\nu$A & {\tt NOvA.glb} & FermiLab NuMI beamline off-axis, 3~yr $\nu$- and 
+3~yr $\bar{\nu}$-running  & \cite{Ambats:2004js,Yang_2004} \\[0.2cm]
 
-\underline{$\beta$-Beams:} & \multicolumn{3}{l}{In preparation} \\[0.1cm]
+SPL & {\tt SPL.glb} & CERN to Fr\'{e}jus, 2~yr $\nu$- and 8~yr 
+$\bar{\nu}$-running & \cite{Campagne:2006yx,Campagne:2004wt,Mezzetto:2003mm} \\[0.2cm]
+
+\multicolumn{4}{l}{\underline{Reactor experiments:}} \\[0.2cm]
+
+{\sc Reactor-I} & {\tt Reactor1.glb} & Small reactor exp., 
+$\mathcal{L} = 400 \, \mathrm{t} \, \mathrm{GW} \, \mathrm{yr}$
+& \cite{Huber:2003pm} \\[0.2cm]
+
+{\sc Reactor-II} & {\tt Reactor2.glb} & Large reactor exp., 
+$\mathcal{L} = 8\, 000 \, \mathrm{t} \, \mathrm{GW} \, \mathrm{yr}$ 
+& \cite{Huber:2003pm} \\[0.2cm]
+
+Double{\sc Chooz} & {\tt D-Chooz\_near.glb} & DoubleCHOOZ near 
+detector, 5 years data taking & \cite{Huber:2006vr} \\ 
+ & {\tt D-Chooz\_far.glb} & DoubleCHOOZ near detector, 5 years data taking & \\[0.2cm]
+
+\multicolumn{4}{l}{\underline{$\beta$-Beams:}} \\[0.2cm]
+
+low $\gamma$ & {\tt BB\_100.glb} & $\gamma=100$ CERN to Fr\'{e}jus baseline 
+scenario, 4~yr $\nu$- and 4~yr $\bar{\nu}$-running & \cite{Campagne:2006yx} \\[0.2cm]
+
+medium $\gamma$ & {\tt BB\_350.glb} & $\gamma=350$ frogreen field scenario, 4~yr $\nu$- and
+4~yr $\bar{\nu}$-running & \cite{Burguet-Castell:2005pa} \\[0.2cm]
+
+Variable & {\tt BBvar\_WC.glb} & Variable $\beta$-beam, 4~yr $\nu$- and 
+4~yr $\bar{\nu}$-running, {\sf AEDL}-Variables {\tt gammafactor}, 
+{\tt EXP\_FACTOR} and {\tt baselinefactor}, 500~kt WC detector & \cite{Huber:2005jk} \\[0.2cm]
+
+	& {\tt BBvar\_TASD.glb} & like {\tt BBvar\_WC.glb} but with a 50~kt TASD detector  
+& \cite{Huber:2005jk} \\[0.2cm]
+
+\multicolumn{4}{l}{\underline{Neutrino factories:}} \\[0.2cm]
+
+Standard & {\tt NFstandard.glb} & Standard neutrino factory, 
+4~yr $\nu$- and 4~yr $\bar{\nu}$-running & \cite{Huber:2002mx} \\[0.2cm]
+
+Variable  & {\tt NFvar.glb} & Variable neutrino factory, 4~yr 
+$\nu$- and 4~yr $\bar{\nu}$-running, {\sf AEDL}-Variables {\tt emax} and {\tt BASELINE}, disappearance channels
+{\em without} CID & \cite{Huber:2002mx,Huber:2006wb}  \\[0.2cm]
+
+Gold + Silver & {\tt NF\_Goldsilver.glb} & as {\tt NFvar.glb} 
+plus 5~kt ECC detector for Silver Channel
+measurement & \cite{Huber:2002mx,Huber:2006wb,Autiero:2003fu} \\[0.2cm]
+
+Hybrid detector & {\tt NF\_hR\_lT.glb} & like {\tt NFvar.glb} 
+with lower threshold and higher energy resolution & \cite{Huber:2002mx,Huber:2006wb} \\[0.2cm]
+
 \hline
 \end{tabular}
 \end{center}
 \mycaption{\label{tab:experiments} \index{norm}{Experiment files (table)}
 \index{norm}{glb files@{\tt glb}-files} 
-TO BE UPDATED BY MR; POSSIBLY MORE DETAILED DESCRIPTION IN APPENDIX [WW]. Pre-defined experiment prototypes, their filenames (to be used in \GLB{InitExperiment}), their short descriptions, and the references in which they are originally used and discussed (except from minor modifications, such as a
-different implementation of the energy threshold function). Note that
-some of these experiments are outdated in terms of integrated luminosities,
-baseline, fluxes, efficiencies, or other factors. In any case these file are installed along with \GLOBES.}
+Pre-defined experiment prototypes, their filenames (to be used in \GLB{InitExperiment}), 
+their short descriptions, and the references in which they are originally used and 
+discussed (except from minor modifications, such as a different implementation of 
+the energy threshold function). Note that some of these experiments are outdated 
+in terms of integrated luminosities, baseline, fluxes, efficiencies, or other factors. 
+In any case these file are installed along with \GLOBES.}
 \end{table}
 
 \section{Initialization of \GLOBES}

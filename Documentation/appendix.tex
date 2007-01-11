@@ -400,6 +400,659 @@ A warning: not all \verb+configure+ scripts look for a site script.
 \index{norm}{Installation|)}
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Catalogue of {\sf AEDL}-Files}
+\label{app:aedlfiles}
+Along with the \GLOBES\ package comes a catalogue of pre-defined experiment \AEDL\ files for different
+future experiments and different beam and detector technologies. These include the planned superbeam experiments
+and their possible upgrades, different reactor experiment setups, different $\beta$-beam setups, and different 
+neutrino factory setups. A complete list
+of all pre-defined experiment files an be found in \tabl{experiments}. More detailed descriptions of the
+corresponding files, the assumptions, requirements, and references are given in the following. 
+   
+\section*{Superbeam experiments}
+\subsection*{T2K -- {\tt T2K.glb}}
+
+The \TtoK\ experiment can be simulated with the file {\tt T2K.glb}. This file tries to approximate as closely as
+possible the LOI \cite{Itow:2001ee} and the basic version was used within \cite{Huber:2002mx}. These references
+should be cited if the file {\tt T2K.glb} is used for a scientific publication or a talk. For calculations that
+involve {\tt T2K.glb}, the following additional files are required: 
+\bi
+\item {\tt JHFplus.dat} (neutrino flux from J-PARC -- $\nu_\mu$)
+\item {\tt JHFminus.dat} (neutrino flux from J-PARC -- $\bar{\nu}_\mu$)
+\item {\tt XCC.dat} (charged current cross sections)
+\item {\tt XNC.dat} (neutral current cross sections)
+\item {\tt XQE.dat} (quasi elastic cross sections)
+\ei
+The \TtoK\ neutrino beam is produced at J-PARC and directed towards the Super-Kamiokande detector. The target
+power is 0.77~MW and 2~years $\nu$-running and 6~years $\bar{\nu}$-running is assumed. The fiducial mass of the
+Super-Kamiokande Water Cerenkov detector is taken to be $\mathrm{m_{det} = 2.5 \,kt}$ at a baseline of
+L~=~295~km. The appearance measurement involves the total rates data from all CC events and the spectral data
+from the QE sample with a free normalization at an energy resolution of $\mathrm{\sigma_e=0.085\, GeV}$ due to the
+Fermi Motion as is described in more detail in~\cite{Huber:2002mx}. The treatment of systematics is similar to
+\cite{Ishitsuka:2005qi}. The following rules are defined within {\tt T2K.glb}:  
+\begin{center}
+\begin{tabular}{|l|ll|c|c|}
+\hline \hline
+\multicolumn{3}{|l|}{Disappearance (+)} & $\sigma_\mathrm{norm}$ & $\sigma_\mathrm{cal}$ \\ \hline 
+Signal & $0.9 \, \otimes \, (\nu_\mu\rightarrow\nu_\mu)_{\mathrm{QE}}$ & & 0.025 & $10^{-4}$\\
+ & &  & &\\
+Background & $0.0056 \, \otimes \, (\nu_\mu \rightarrow \nu_x)_\mathrm{NC}$ & & 0.2 & $10^{-4}$ \\ \hline \hline 
+\multicolumn{3}{|l|}{Appearance (+) -- Spectrum}  & & \\ \hline
+Signal & $0.505 \, \otimes \, (\nu_\mu \rightarrow \nu_e)_\mathrm{QE}$ & & 10.0 & $10^{-4}$\\
+ & & & & \\
+Background & $0.0056 \, \otimes \, (\nu_\mu \rightarrow \nu_x)_\mathrm{NC}$ & $3.3\cdot 10^{-4} \, \otimes \, (\nu_\mu\rightarrow\nu_\mu)_{\mathrm{CC}}$ & 0.05 & 0.05\\
+Beam background & $0.505 \, \otimes \, (\nu_e\rightarrow \nu_e)_\mathrm{CC}$ & $0.505 \, \otimes \, (\bar{\nu}_e\rightarrow \bar{\nu}_e)_\mathrm{CC}$  & 0.05 & 0.05\\ \hline \hline
+\multicolumn{3}{|l|}{Appearance (+) -- Total Rates}  & & \\ \hline
+Signal & $0.505 \, \otimes \, (\nu_\mu \rightarrow \nu_e)_\mathrm{CC}$ & & 0.05 & $10^{-4}$\\
+ & & & & \\
+Background & $0.0056 \, \otimes \, (\nu_\mu \rightarrow \nu_x)_\mathrm{NC}$ & $3.3\cdot 10^{-4} \, \otimes \, (\nu_\mu\rightarrow\nu_\mu)_{\mathrm{CC}}$ & 0.05 & $10^{-4}$\\
+Beam background & $0.505 \, \otimes \, (\nu_e\rightarrow \nu_e)_\mathrm{CC}$ & $0.505 \, \otimes \, (\bar{\nu}_e\rightarrow \bar{\nu}_e)_\mathrm{CC}$  & 0.05 & $10^{-4}$\\ \hline \hline
+\multicolumn{3}{|l|}{Disappearance (--)} & & \\ \hline 
+Signal & $0.9 \, \otimes \, (\nu_\mu\rightarrow\nu_\mu)_{\mathrm{QE}}$ & & 0.025 & $10^{-4}$\\
+ & &  & &\\
+Background & $0.0056 \, \otimes \, (\nu_\mu \rightarrow \nu_x)_\mathrm{NC}$ & & 0.2 & $10^{-4}$ \\ \hline \hline 
+\multicolumn{3}{|l|}{Appearance (--) -- Spectrum}  & & \\ \hline
+Signal & $0.505 \, \otimes \, (\bar{\nu}_\mu \rightarrow \bar{\nu}_e)_\mathrm{QE}$ & & 10.0 & $10^{-4}$\\
+ & & & & \\
+Background & $0.0056 \, \otimes \, (\bar{\nu}_\mu \rightarrow \bar{\nu}_x)_\mathrm{NC}$ & $3.3\cdot 10^{-4} \, \otimes \, (\bar{\nu}_\mu\rightarrow\bar{\nu}_\mu)_{\mathrm{CC}}$ & 0.05 & 0.05\\
+Beam background & $0.505 \, \otimes \, (\bar{\nu}_e\rightarrow \bar{\nu}_e)_\mathrm{CC}$ & $0.505 \, \otimes \, (\nu_e\rightarrow \nu_e)_\mathrm{CC}$  & 0.05 & 0.05\\ \hline \hline
+\multicolumn{3}{|l|}{Appearance (--) -- Total Rates}  & & \\ \hline
+Signal & $0.505 \, \otimes \, (\bar{\nu}_\mu \rightarrow \bar{\nu}_e)_\mathrm{CC}$ & & 0.05 & $10^{-4}$\\
+ & & & & \\
+Background & $0.0056 \, \otimes \, (\bar{\nu}_\mu \rightarrow \bar{\nu}_x)_\mathrm{NC}$ & $3.3\cdot 10^{-4} \, \otimes \, (\bar{\nu}_\mu\rightarrow\bar{\nu}_\mu)_{\mathrm{CC}}$ & 0.05 & $10^{-4}$\\
+Beam background & $0.505 \, \otimes \, (\bar{\nu}_e\rightarrow \bar{\nu}_e)_\mathrm{CC}$ & $0.505 \, \otimes \, (\nu_e\rightarrow \nu_e)_\mathrm{CC}$  & 0.05 & $10^{-4}$\\ \hline \hline
+\end{tabular}
+\end{center}
+
+\subsection*{T2HK -- {\tt T2HK.glb}}
+
+\TtoHK\ is the superbeam upgrade of the \TtoK\ experiment and can be simulated with the file {\tt T2HK.glb}. 
+The target power is 4~MW and 
+4~years $\nu$-running and 4~years $\bar{\nu}$-running is assumed.
+The fiducial mass of the Water Cerenkov detector is taken to be $\mathrm{m_{det} = 500 \,kt}$ at the same
+baseline as the \TtoK\ experiment. Besides these changes, the file {\tt T2HK.glb} is similar to {\tt T2K.glb}
+and the same additional files are required. 
+The basic version was used within \cite{Huber:2002mx} which should be cited if the file {\tt T2K.glb} is 
+used for a scientific publication or a talk. 
+
+\subsection*{NO$\nu$A -- {\tt NOvA.glb}}
+
+The \NOVA\ experiment can be simulated with the file {\tt NOvA.glb}. The description of the disapperance 
+channels is taken from \cite{Yang_2004} and the description of the appearance channels follows 
+the proposal \cite{Ambats:2004js}. These references
+should be cited if the file {\tt NOvA.glb} is used for a scientific publication or a talk. For calculations that
+involve {\tt NOvA.glb}, the following additional files are required: 
+\bi
+\item {\tt NOvAplus.dat} (NuMI neutrino flux -- $\nu_\mu$)
+\item {\tt NOvAminus.dat} (NuMI neutrino flux -- $\bar{\nu}_\mu$)
+\item {\tt XCC.dat} (charged current cross sections)
+\item {\tt XNC.dat} (neutral current cross sections)
+\ei
+The \NOVA\ experiment uses a neutrino beam from the Fermilab NuMI beamline. The target power is 
+1.2~MV which results in $10^{21}$~pot~$\mathrm{yr^{-1}}$ and 3~years $\nu$-running and 3~years $\bar{\nu}$-running 
+is assumed. The fiducial mass of the Totally Liquid Scintillator Detector (TASD) is taken to be 
+$\mathrm{m_{det} = 25 \,kt}$ at a baseline of L~=~812~km approximately 12~km off-axis to the beamline. The
+energy resolution is $\mathrm{\sigma_e=10 \% \cdot \sqrt{E}}$ for electrons and  $\mathrm{\sigma_e=5 \% \cdot \sqrt{E}}$
+for muons. The following rules are defined within {\tt NOvA.glb}: 
+\begin{center}
+\begin{tabular}{|l|ll|c|c|}
+\hline \hline
+\multicolumn{3}{|l|}{Disappearance (+)} & $\sigma_\mathrm{norm}$ & $\sigma_\mathrm{cal}$ \\ \hline
+Signal & $0.8 \, \otimes \, (\nu_\mu\rightarrow\nu_\mu)_{\mathrm{CC}}$ & & 0.05 & 0.025 \\
+ & & & & \\
+Background & $0.0015 \, \otimes \, (\nu_\mu \rightarrow \nu_x)_\mathrm{NC}$ & & 0.05 & 0.025 \\ \hline \hline 
+\multicolumn{3}{|l|}{Appearance (+)} & & \\ \hline
+Signal & $0.24 \, \otimes \, (\nu_\mu \rightarrow \nu_e)_\mathrm{CC}$ & & 0.05 & 0.025\\
+ & & & & \\
+Background & $0.0015 \, \otimes \, (\nu_\mu \rightarrow \nu_x)_\mathrm{NC}$ & $1.0\cdot 10^{-4} \, \otimes \,
+(\nu_\mu\rightarrow\nu_\mu)_{\mathrm{CC}}$ & 0.05 & 0.025 \\
+Beam background & $0.12 \, \otimes \, (\nu_e\rightarrow \nu_e)_\mathrm{CC}$ & & 0.05 & 0.025 \\ \hline \hline
+\multicolumn{3}{|l|}{Disappearance (--)} &  &  \\ \hline
+Signal & $0.8 \, \otimes \, (\bar{\nu}_\mu\rightarrow\bar{\nu}_\mu)_{\mathrm{CC}}$ & & 0.05 & 0.025 \\
+ & & & & \\
+Background & $0.0015 \, \otimes \, (\bar{\nu}_\mu \rightarrow \bar{\nu}_x)_\mathrm{NC}$ & & 0.05 & 0.025 \\ \hline \hline 
+\multicolumn{3}{|l|}{Appearance (--)} & & \\ \hline
+Signal & $0.37 \, \otimes \, (\bar{\nu}_\mu \rightarrow \bar{\nu}_e)_\mathrm{CC}$ & & 0.05 & 0.025\\
+ & & & & \\
+Background & $0.0037 \, \otimes \, (\bar{\nu}_\mu \rightarrow \bar{\nu}_x)_\mathrm{NC}$ & $1.0\cdot 10^{-4} \, \otimes \,
+(\bar{\nu}_\mu\rightarrow\bar{\nu}_\mu)_{\mathrm{CC}}$ & 0.05 & 0.025 \\
+Beam background & $0.12 \, \otimes \, (\bar{\nu}_e\rightarrow \bar{\nu}_e)_\mathrm{CC}$ & & 0.05 & 0.025 \\ \hline \hline
+\end{tabular}
+\end{center}
+
+\subsection*{SPL - {\tt SPL.glb}}
+
+The \SPL\ experiment can be simulated with the file {\tt SPL.glb}. This file was used in \cite{Campagne:2006yx}
+and follows the experiment description from \cite{Mezzetto:2003mm, Campagne:2004wt}. These references
+should be cited if the file {\tt SPL.glb} is used for a scientific publication or a talk. For calculations that
+involve {\tt SPL.glb}, the following additional files are required: 
+\bi
+\item {\tt SPLplus.dat} (neutrino flux from CERN -- $\nu_\mu$)
+\item {\tt SPLminus.dat} (neutrino flux from CERN -- $\bar{\nu}_\mu$)
+\item {\tt Mig\_WC\_numu.dat} (migration matrix -- $\nu_\mu$)
+\item {\tt Mig\_WC\_numubar.dat} (migration matrix -- $\bar{\nu}_\mu$)
+\item {\tt Mig\_WC\_nue.dat} (migration matrix -- $\nu_e$)
+\item {\tt Mig\_WC\_nuebar.dat} (migration matrix -- $\bar{\nu}_e$)
+\item {\tt XCC\_spl.dat} (charged current cross sections)
+\item {\tt XNC\_spl.dat} (neutral current cross sections)
+\ei
+The \SPL\ experiment uses a neutrino beam from the CERN to Fr\'{e}jus. The target power is 
+4~MV and 2~years $\nu$-running and 8~years $\bar{\nu}$-running 
+is assumed. The fiducial mass of the Water Cerenkov detector is taken to be 
+$\mathrm{m_{det} = 500 \,kt}$ at a baseline of L~=~130~km. The energy resolution is introduced manually by
+four migration matrices (for $\nu_e , \bar{\nu}_e ,\nu_{\mu} ,\bar{\nu}_\mu$) that describe energy smearing mainly
+from Fermi Motion. The following rules are defined within {\tt SPL.glb}: 
+\begin{center}
+\begin{tabular}{|l|ll|c|c|}
+\hline \hline
+\multicolumn{3}{|l|}{Disappearance (+)} & $\sigma_\mathrm{norm}$ & $\sigma_\mathrm{cal}$ \\ \hline 
+Signal & $1.0 \, \otimes \, (\nu_\mu\rightarrow\nu_\mu)_{\mathrm{CC}}$ & (energy dep. efficiency) & 0.02 & $10^{-4}$\\
+ & &  & &\\
+Background & $4.3\cdot 10^{-5} \, \otimes \, (\nu_\mu \rightarrow \nu_\mu)_\mathrm{CC}$ & & 0.02 & $10^{-4}$ \\ \hline \hline 
+\multicolumn{3}{|l|}{Appearance (+)} &  & \\ \hline
+Signal & $0.707 \, \otimes \, (\nu_\mu\rightarrow \nu_e)_\mathrm{CC}$ & & 0.02 & $10^{-4}$\\
+&&&&\\
+Background & $6.5\cdot 10^{-4} \, \otimes \, (\nu_\mu \rightarrow \nu_x)_\mathrm{NC}$ & $5.4\cdot 10^{-4} \, \otimes \, (\nu_\mu \rightarrow \nu_\mu)_\mathrm{CC}$ & 0.02 & $10^{-4}$ \\
+ & $0.7 \, \otimes \, (\bar{\nu}_\mu \rightarrow \bar{\nu}_e )_\mathrm{CC}$ & & 0.02 &  $10^{-4}$ \\
+Beam Background & $0.677 \, \otimes \, (\bar{\nu}_e \rightarrow \bar{\nu}_e )_\mathrm{CC}$ & $0.707 \, \otimes \, (\nu_e \rightarrow \nu_e )_\mathrm{CC}$ & 0.02 & $10^{-4}$ \\ \hline \hline
+\end{tabular}
+\end{center}
+\begin{center}
+\begin{tabular}{|l|ll|c|c|}
+\hline \hline
+\multicolumn{3}{|l|}{Disappearance (--)} & & \\ \hline 
+Signal & $1.0 \, \otimes \, (\bar{\nu}_\mu\rightarrow\bar{\nu}_\mu)_{\mathrm{CC}}$ & (energy dep. efficiency) & 0.02 & $10^{-4}$\\
+ & &  & &\\
+Background & $4.3\cdot 10^{-5} \, \otimes \, (\bar{\nu}_\mu \rightarrow \bar{\nu}_\mu)_\mathrm{CC}$ & & 0.02 & $10^{-4}$ \\ \hline \hline 
+\multicolumn{3}{|l|}{Appearance (--)} &  & \\ \hline
+Signal & $0.677 \, \otimes \, (\bar{\nu}_\mu\rightarrow \bar{\nu}_e)_\mathrm{CC}$ & & 0.02 & $10^{-4}$\\
+&&&&\\
+Background & $0.0025 \, \otimes \, (\bar{\nu}_\mu \rightarrow \bar{\nu}_x)_\mathrm{NC}$ & $5.4\cdot 10^{-4} \, \otimes \, (\bar{\nu}_\mu \rightarrow \bar{\nu}_\mu)_\mathrm{CC}$ & 0.02 & $10^{-4}$ \\
+ & $0.7 \, \otimes \, (\nu_\mu \rightarrow \nu_e )_\mathrm{CC}$ & & 0.02 &  $10^{-4}$ \\
+Beam Background & $0.677 \, \otimes \, (\bar{\nu}_e \rightarrow \bar{\nu}_e )_\mathrm{CC}$ & $0.707 \, \otimes \, (\nu_e \rightarrow \nu_e )_\mathrm{CC}$ & 0.02 & $10^{-4}$ \\ \hline \hline
+\end{tabular}
+\end{center}
+
+\section*{Reactor experiments}
+\subsection*{Small reactor experiment -- {\tt Reactor1.glb}}
+
+The file {\tt Reactor1.glb} allows to simulate a small $\bar{\nu}_e$-disappearance reactor experiment. The basic
+version of this file was used within \cite{Huber:2003pm} which should be cited if the file {\tt Reactor1.glb} is
+used for a scientific publication or a talk. For calculations that involve {\tt Reactor1.glb}, the following
+additional files are required:
+\bi
+\item {\tt Reactor.dat} (neutrino flux from reactor)
+\item {\tt XCCreactor.dat} (charged current cross sections for low energies)
+\ei
+The neutrino source is the core of a nuclear power reactor. The integrated luminosity is assumed to be
+$\mathrm{\mathcal{L} = 400 \,t \, GW\, yr}$, \eg\ a 20~t detector, a reactor with a thermal power of 4~GW
+and a running period of 5 years. As detector technology a liquid scintillator 
+detector is assumed, a far detector at a baseline of L~=~1.7~km and a near detector which is
+assumed to be identical to the far detector (maybe apart from the size) in order to minimize the impact of systematical uncertainties. The normalization error
+used in the file {\tt Reactor1.glb} has to be considered as an effective error, receiving contributions from
+individual uncertainties (see~\cite{Huber:2003pm}). The energy resolution is
+$\mathrm{\sigma_e=5\%\cdot\sqrt{E_{vis}}}$ and the choice for {\tt sigma\_function} is {\tt \#inverse\_beta}. The following rules are defined within {\tt Reactor1.glb}: 
+\begin{center}
+\begin{tabular}{|l|ll|c|c|}
+\hline \hline
+\multicolumn{3}{|l|}{Disappearance} & $\sigma_\mathrm{norm}$ & $\sigma_\mathrm{cal}$ \\ \hline 
+Signal & $1.0 \, \otimes \, (\bar{\nu}_e\rightarrow\bar{\nu}_e)_{\mathrm{CC}}$ & \hspace{5.5cm} & 0.008 & 0.005\\
+ & &  & &\\
+Background & $5.8\cdot 10^{-5} \, \otimes \, (\bar{\nu}_e\rightarrow\bar{\nu}_e)_\mathrm{CC}$ & \hspace{5.5cm} &
+$10^{-6}$ & $10^{-6}$ \\ \hline \hline 
+\end{tabular}
+\end{center}
+
+\subsection*{Large reactor experiment -- {\tt Reactor2.glb}}
+
+The file {\tt Reactor2.glb} allows to simulate a large $\bar{\nu}_e$-disappearance reactor experiment. The basic
+version of this file was used within \cite{Huber:2003pm} which should be cited if the file {\tt Reactor2.glb} is
+used for a scientific publication or a talk. The integrated luminosity is assumed to be
+$\mathrm{\mathcal{L} = 8000 \,t \, GW\, yr}$, \eg\ a 100~t detector, a reactor with a thermal power of 10~GW
+and a running period of 8 years. Besides the higher integrated luminosity, the attributes of {\tt Reactor2.glb}
+are similar to the ones of {\tt Reactor1.glb}.
+
+\subsection*{DoubleCHOOZ -- {\tt Dchooz-near.glb} and {\tt Dchooz-far.glb}}
+
+The files {\tt Dchooz-near.glb} and {\tt Dchooz-far.glb} allow to simulate the \DC\ reactor experiment in France. 
+The basic version of these files were used within \cite{Huber:2006vr} which should be cited if the files 
+{\tt Dchooz-near.glb} and {\tt Dchooz-far.glb} are
+used for a scientific publication or a talk. For calculations that involve {\tt Dchooz-near.glb} and/or {\tt Dchooz-far.glb}, the following
+additional files are required:
+\bi
+\item {\tt Reactor.dat} (neutrino flux from reactor)
+\item {\tt XCCreactor.dat} (charged current cross sections for low energies)
+\ei
+The \DC\ experiment is located at the Chooz reactor complex and the two reactor cores serve as $\bar{\nu}_e$
+neutrino source, so the thermal power is $\mathrm{2\cdot4.2\,GW}$. Two identical liquid scintillator detectors
+with a fiducial mass of $\mathrm{m_{det} = 10.16 \,t}$ are used as near and far detector. The far detector
+is planned to be located in the {\sc Chooz} cavern at a baseline of L~=~1.05~km from the two reactor cores and
+the near detector is assumed to be located at a distance of 0.1~km to the cores. The total running time of the
+experiment is assumed to be 5 years. So, the integrated luminosity at the far detector yields $\mathrm{\mathcal{L} \approx
+427 \,t \, GW\, yr}$.
+Here, the total running time of 5 years is assumed within {\tt Dchooz-near.glb} and {\tt Dchooz-far.glb}, so near
+and far detector are assumed to start the mode of operation simultaneously. For the simulation of \DC\ and
+considering a delayed start of data taking at the near detector the file {\tt Dchooz-near.glb} has to be
+modified. The cancellation of systematical uncertainties is considered by the manual definition of a $\chi^2$
+as described in \cite{Huber:2006vr} with the treatment of user-defined systematics as described in \Sec~\ref{sec:userchi}   
+The energy resolution is
+$\mathrm{\sigma_e=5\%\cdot\sqrt{E_{vis}}}$ and the choice for {\tt sigma\_function} is {\tt \#inverse\_beta}. The following rules are defined within {\tt Dchooz-near.glb} and {\tt Dchooz-far.glb}: 
+\begin{center}
+\begin{tabular}{|l|ll|c|c|c|c|c|}
+\hline \hline
+\multicolumn{3}{|l|}{Disappearance} & $\sigma_\mathrm{flux}$ & $\sigma^N_\mathrm{fid}$ & $\sigma^F_\mathrm{fid}$ &
+$\sigma^N_\mathrm{cal}$ & $\sigma^F_\mathrm{cal}$ \\ \hline 
+Signal & $1.0 \, \otimes \, (\bar{\nu}_e\rightarrow\bar{\nu}_e)_{\mathrm{CC}}$ & & 0.02 & 0.006 & 0.006 & 0.005 &
+0.005 \\
+ & & & & & & & \\
+Background & neglected & (sys. dominates) & -- & -- & -- & -- & -- \\ \hline \hline 
+\end{tabular}
+\end{center}
+
+\section*{Beta beam experiments}
+\subsection*{CERN-Fr\'{e}jus baseline scenario -- {\tt BB\_100.glb}}
+
+The $\gamma=100$ $\beta$-beam baseline scenario from CERN to Fr\'{e}jus can be simulated with the file {\tt
+BB\_100.glb}. The basic version of this file was used within \cite{Campagne:2006yx}. This reference
+should be cited if the file {\tt BB\_100.glb} is used for a scientific publication or a talk. For calculations that
+involve {\tt BB\_100.glb}, the following additional files are required: 
+\bi
+\item {\tt BB100flux\_Ne.dat} ($\beta$-beam neutrino flux -- $^{18}$Ne stored at $\gamma=100$)
+\item {\tt BB100flux\_He.dat} ($\beta$-beam neutrino flux -- $^{6}$He stored at $\gamma=100$)
+\item {\tt BeamBckg\_100.dat} (beam background)
+\item {\tt AtmBckg\_100.dat} (atmospheric background)
+\item {\tt Mig\_WC\_numu.dat} (migration matrix -- $\nu_\mu$)
+\item {\tt Mig\_WC\_numubar.dat} (migration matrix -- $\bar{\nu}_\mu$)
+\item {\tt Mig\_WC\_nue.dat} (migration matrix -- $\nu_e$)
+\item {\tt Mig\_WC\_nuebar.dat} (migration matrix -- $\bar{\nu}_e$)
+\item {\tt XCC\_Nuance.dat} (charged current cross sections)
+\item {\tt XNC\_Nuance.dat} (neutral current cross sections)
+\item {\tt Null.dat} (auxiliary file)
+\ei
+The neutrino beam is produced at CERN and directed towards a a megaton Water Cerenkov detector at Fr\'{e}jus. 
+The neutrinos originate from the decays of accelerated isotopes $^{18}$Ne ($\nu_e$) and $^6$He ($\bar{\nu}_e$).
+The acceleration factor is $\gamma=100$ for both types of isotopes and $2.2\cdot10^{18}$ $^{18}$Ne decays per
+year and $5.8\cdot10^{18}$ $^{6}$He decays per year are assumed. The CERN-Fr\'{e}jus baseline is L~=~130~km, the
+fiducial mass of the detector is $\mathrm{m_{det} = 500 \,kt}$ and 4~years $\nu$-running and 4~years
+$\bar{\nu}$-running are assumed. The energy resolution is introduced manually by
+four migration matrices (for $\nu_e , \bar{\nu}_e ,\nu_{\mu} ,\bar{\nu}_\mu$) that describes energy smearing mainly
+from Fermi Motion. The following rules are defined within {\tt BB\_100.glb}:
+\begin{center}
+\begin{tabular}{|l|ll|c|c|}
+\hline \hline
+\multicolumn{3}{|l|}{Disappearance -- $^{18}$Ne stored} & $\sigma_\mathrm{norm}$ & $\sigma_\mathrm{cal}$ \\ \hline
+Signal & $0.707 \, \otimes \, (\nu_e\rightarrow\nu_e)_{\mathrm{CC}}$ & & 0.02 & $10^{-4}$ \\
+ & & & & \\
+Background & $4.3\cdot 10^{-5} \, \otimes \, (\nu_e \rightarrow \nu_e)_\mathrm{CC}$ & & 0.02 & $10^{-4}$ \\ \hline \hline 
+\multicolumn{3}{|l|}{Appearance -- $^{18}$Ne stored} & & \\ \hline
+Signal & $1.0 \, \otimes \, (\nu_e \rightarrow \nu_\mu)_\mathrm{CC}$ & (energy dep. efficiency) & 0.02 & $10^{-4}$ \\
+ & & & & \\
+Background & $1.0 \, \otimes \, (\nu_e \rightarrow \nu_x)_\mathrm{NC}$ & (from external file) & 0.02 & $10^{-4}$ \\
+Atm. background & & (from external file) & 0.02 & $10^{-4}$ \\ \hline \hline
+\end{tabular}
+\end{center}
+\begin{center}
+\begin{tabular}{|l|ll|c|c|}
+\hline \hline
+\multicolumn{3}{|l|}{Disappearance -- $^6$He stored} & &  \\ \hline
+Signal & $0.677 \, \otimes \, (\bar{\nu}_e\rightarrow\bar{\nu}_e)_{\mathrm{CC}}$ & & 0.02 & $10^{-4}$ \\
+ & & & & \\
+Background & $4.3\cdot 10^{-5} \, \otimes \, (\bar{\nu}_e \rightarrow \nu_e)_\mathrm{CC}$ & & 0.02 & $10^{-4}$ \\ \hline \hline 
+\multicolumn{3}{|l|}{Appearance -- $^6$He stored} & & \\ \hline
+Signal & $1.0 \, \otimes \, (\bar{\nu}_e \rightarrow \bar{\nu}_\mu)_\mathrm{CC}$ & (energy dep. efficiency) & 0.02 & $10^{-4}$ \\
+ & & & & \\
+Background & $1.0 \, \otimes \, (\bar{\nu}_e \rightarrow \bar{\nu}_x)_\mathrm{NC}$ & (from external file) & 0.02 & $10^{-4}$ \\
+Atm. background & & (from external file) & 0.02 & $10^{-4}$ \\ \hline \hline
+\end{tabular}
+\end{center}
+
+\subsection*{Higher gamma scenario -- {\tt BB\_350.glb}}
+
+A $\gamma=350$ medium gamma $\beta$-beam green-field scenario involving a megaton Water Cerenkov detector can be simulated with the file {\tt
+BB\_350.glb}. This file tries to approximate as closely as possible the scenario {\sf Setup III} from
+\cite{Burguet-Castell:2005pa}. This reference
+should be cited if the file {\tt BB\_350.glb} is used for a scientific publication or a talk. For calculations that
+involve {\tt BB\_350.glb}, the following additional files are required: 
+\bi
+\item {\tt BB350flux.dat} ($\beta$-beam neutrino flux -- $\gamma=350$ )
+\item {\tt NeEffMig350.dat} (migration matrix -- $\nu_\mu$)
+\item {\tt NeBckgRej350.dat} (migration matrix -- background)
+\item {\tt NeDisEff350.dat} (migration matrix -- $\nu_e$)
+\item {\tt HeEffMig350.dat} (migration matrix -- $\bar{\nu}_\mu$)
+\item {\tt HeBckgRej350.dat} (migration matrix -- background)
+\item {\tt HeDisEff350.dat} (migration matrix -- $\bar{\nu}_e$)
+\item {\tt XCC.dat} (charged current cross sections)
+\item {\tt XNC.dat} (neutral current cross sections)
+\ei
+The neutrinos originate from the decays of accelerated isotopes $^{18}$Ne ($\nu_e$) and $^6$He ($\bar{\nu}_e$).
+The acceleration factor is $\gamma=350$ for both types of isotopes and $2.2\cdot10^{18}$ $^{18}$Ne decays per
+year and $5.8\cdot10^{18}$ $^{6}$He decays per year are assumed. The baseline is L~=~730~km, the
+fiducial mass of the detector is $\mathrm{m_{det} = 500 \,kt}$ and 4~years $\nu$-running and 4~years
+$\bar{\nu}$-running are assumed. The energy resolution is introduced manually by
+six migration matrices (for $\nu_e , \bar{\nu}_e ,\nu_{\mu} ,\bar{\nu}_\mu$, and the background from NC events
+for $^{18}$Ne and $^6$He) that describes energy smearing. These migration matrices also already include energy
+dependend efficiencies and background rejection factors. They are taken from the appendix of
+\cite{Burguet-Castell:2005pa}. The following rules are defined within {\tt BB\_350.glb}:
+\begin{center}
+\begin{tabular}{|l|ll|c|c|}
+\hline \hline
+\multicolumn{3}{|l|}{Disappearance -- $^{18}$Ne stored} & $\sigma_\mathrm{norm}$ & $\sigma_\mathrm{cal}$ \\ \hline
+Signal & $1.0 \, \otimes \, (\nu_e\rightarrow\nu_e)_{\mathrm{CC}}$ & (migration matrix) & 0.025 & $10^{-4}$ \\
+ & & & & \\
+Background & neglected & (systematic uncertainty dominates) & -- & -- \\ \hline \hline 
+\multicolumn{3}{|l|}{Appearance -- $^{18}$Ne stored} & & \\ \hline
+Signal & $1.0 \, \otimes \, (\nu_e \rightarrow \nu_\mu)_\mathrm{CC}$ & (migration matrix) & 0.025 & $10^{-4}$ \\
+ & & & & \\
+Background & $1.0 \, \otimes \, (\nu_e \rightarrow \nu_x)_\mathrm{NC}$ & (migration matrix) & 0.05 & $10^{-4}$
+\\ \hline \hline
+\multicolumn{3}{|l|}{Disappearance -- $^6$He stored} & &  \\ \hline
+Signal & $1.0 \, \otimes \, (\bar{\nu}_e\rightarrow\bar{\nu}_e)_{\mathrm{CC}}$ & (migration matrix) & 0.025 & $10^{-4}$ \\
+ & & & & \\
+Background & neglected & (systematic uncertainty dominates) & -- & -- \\ \hline \hline 
+\multicolumn{3}{|l|}{Appearance -- $^6$He stored} & & \\ \hline
+Signal & $1.0 \, \otimes \, (\bar{\nu}_e \rightarrow \bar{\nu}_\mu)_\mathrm{CC}$ & (migration matrix)  &
+0.025 & $10^{-4}$ \\
+ & & & & \\
+Background & $1.0 \, \otimes \, (\bar{\nu}_e \rightarrow \bar{\nu}_x)_\mathrm{NC}$ & (migration matrix) & 0.05 & $10^{-4}$ \\ \hline \hline
+\end{tabular}
+\end{center}
+
+\subsection*{Variable beta beam (Water Cerenkov) -- {\tt BBvar\_WC.glb}}
+
+A variable $\beta$-beam scenario involving a megaton Water Cerenkov detector can be simulated with the file 
+{\tt BBvar\_WC.glb}. The basic file was used within \cite{Huber:2005jk}. This reference
+should be cited if the file {\tt BBvar\_WC.glb} is used for a scientific publication or a talk. For calculations that
+involve {\tt BBvar\_WC.glb}, the following additional files are required:
+\bi
+\item {\tt BckgMig\_var.dat} (migration matrix -- background)
+\item {\tt XCC.dat} (charged current cross sections)
+\item {\tt XNC.dat} (neutral current cross sections)
+\item {\tt XQE.dat} (quasi elastic cross sections)
+\ei
+and the values of the following {\sf AEDL}-Variables have to be set:
+\bi
+\item {\tt gammafactor} (acceleration factor $\gamma$)
+\item {\tt EXP\_FACTOR} (parameter of ion decay scaling)
+\item {\tt baselinefactor} (baseline parameter L/$\gamma\,\left[\mathrm{km}\right]$)
+\ei
+The neutrinos originate from the decays of accelerated isotopes $^{18}$Ne ($\nu_e$) and $^6$He ($\bar{\nu}_e$).
+The acceleration factor is $\gamma=${\tt gammafactor} for both types of isotopes and
+$(100/\gamma)^\alpha\cdot2.2\cdot10^{18}$ $^{18}$Ne decays per
+year and $(60/\gamma)^\alpha\cdot5.8\cdot10^{18}$ $^{6}$He decays per year are assumed where $\alpha$~=~{\tt
+EXP\_FACTOR} is a parameter that describes ion decay scaling. As default value {\tt EXP\_FACTOR=0} should be chosen.
+See \cite{Huber:2005jk} for a detailed discussion of this parameter. The baseline is
+L~=~{\tt baselinefactor}$\cdot\gamma$~km, the
+fiducial mass of the detector is $\mathrm{m_{det} = 500 \,kt}$ and 4~years $\nu$-running and 4~years
+$\bar{\nu}$-running are assumed. The appearance measurement involves the total rates data from all CC events and the spectral data
+from the QE sample with a free normalization at an energy resolution of $\mathrm{\sigma_e=0.085GeV}$ due to the
+Fermi Motion identical to the treatment of systematics within the \TtoK\ and \TtoHK\ files. The following rules are defined within {\tt BBvar\_WC.glb}:
+\begin{center}
+\begin{tabular}{|l|ll|c|c|}
+\hline \hline
+\multicolumn{3}{|l|}{Disappearance -- $^{18}$Ne stored} & $\sigma_\mathrm{norm}$ & $\sigma_\mathrm{cal}$ \\ \hline
+Signal & $0.55 \, \otimes \, (\nu_e\rightarrow\nu_e)_{\mathrm{QE}}$ & \hspace{6cm} & 0.025 & $10^{-4}$ \\
+ & & & & \\
+Background & $0.003 \, \otimes \, (\nu_e \rightarrow \nu_x)_\mathrm{NC}$ & & 0.05 & $10^{-4}$ \\ \hline \hline 
+\multicolumn{3}{|l|}{Appearance -- $^{18}$Ne stored -- Spectrum} & & \\ \hline
+Signal & $0.55 \, \otimes \, (\nu_e \rightarrow \nu_\mu)_\mathrm{QE}$ & & 10.0 & $10^{-4}$ \\
+ & & & & \\
+Background & $0.003 \, \otimes \, (\nu_e \rightarrow \nu_x)_\mathrm{NC}$ & & 0.05 & $10^{-4}$
+\\ \hline \hline
+\multicolumn{3}{|l|}{Appearance -- $^{18}$Ne stored -- Total Rates} & & \\ \hline
+Signal & $0.55 \, \otimes \, (\nu_e \rightarrow \nu_\mu)_\mathrm{CC}$ & & 0.025 & $10^{-4}$ \\
+ & & & & \\
+Background & $0.003 \, \otimes \, (\nu_e \rightarrow \nu_x)_\mathrm{NC}$ & & 0.05 & $10^{-4}$
+\\ \hline \hline\multicolumn{3}{|l|}{Disappearance -- $^6$He stored} & &  \\ \hline
+Signal & $0.75 \, \otimes \, (\bar{\nu}_e\rightarrow\bar{\nu}_e)_{\mathrm{QE}}$ & & 0.025 & $10^{-4}$ \\
+ & & & & \\
+Background & $0.0025 \, \otimes \, (\bar{\nu}_e \rightarrow \bar{\nu}_x)_\mathrm{NC}$ & & 0.05 & $10^{-4}$ \\ \hline \hline 
+\multicolumn{3}{|l|}{Appearance -- $^6$He stored -- Spectrum} & & \\ \hline
+Signal & $0.75 \, \otimes \, (\bar{\nu}_e \rightarrow \bar{\nu}_\mu)_\mathrm{QE}$ & &
+10.0 & $10^{-4}$ \\
+ & & & & \\
+Background & $0.0025 \, \otimes \, (\bar{\nu}_e \rightarrow \bar{\nu}_x)_\mathrm{NC}$ & & 0.05 & $10^{-4}$ \\ \hline \hline
+\multicolumn{3}{|l|}{Appearance -- $^6$He stored -- Total Rates} & & \\ \hline
+Signal & $0.75 \, \otimes \, (\bar{\nu}_e \rightarrow \bar{\nu}_\mu)_\mathrm{CC}$ & &
+0.025 & $10^{-4}$ \\
+ & & & & \\
+Background & $0.0025 \, \otimes \, (\bar{\nu}_e \rightarrow \bar{\nu}_x)_\mathrm{NC}$ & & 0.05 & $10^{-4}$ \\ \hline \hline
+\end{tabular}
+\end{center}
+
+\subsection*{Variable beta beam (TASD) -- {\tt BBvar\_TASD.glb}}
+
+A variable $\beta$-beam scenario involving a \NOVA-like TASD detector can be simulated with the file 
+{\tt BBvar\_TASD.glb}. The basic file was used within \cite{Huber:2005jk}. This reference
+should be cited if the file {\tt BBvar\_TASD.glb} is used for a scientific publication or a talk. For calculations that
+involve {\tt BBvar\_TASD.glb}, the following additional files are required:
+\bi
+\item {\tt XCC.dat} (charged current cross sections)
+\item {\tt XNC.dat} (neutral current cross sections)
+\ei
+and the values of the following {\sf AEDL}-Variables have to be set:
+\bi
+\item {\tt gammafactor} (acceleration factor $\gamma$)
+\item {\tt EXP\_FACTOR} (parameter of ion decay scaling)
+\item {\tt baselinefactor} (baseline parameter L/$\gamma\,\left[\mathrm{km}\right]$)
+\ei
+The neutrinos originate from the decays of accelerated isotopes $^{18}$Ne ($\nu_e$) and $^6$He ($\bar{\nu}_e$).
+The acceleration factor is $\gamma=${\tt gammafactor} for both types of isotopes and
+$(100/\gamma)^\alpha\cdot2.2\cdot10^{18}$ $^{18}$Ne decays per
+year and $(60/\gamma)^\alpha\cdot5.8\cdot10^{18}$ $^{6}$He decays per year are assumed where $\alpha$~=~{\tt
+EXP\_FACTOR} is a parameter that describes ion decay scaling. As default value {\tt EXP\_FACTOR=0} should be chosen.
+See \cite{Huber:2005jk} for a detailed discussion of this parameter. The baseline is L~=~{\tt baselinefactor}$\cdot\gamma$~km, the
+fiducial mass of the detector is $\mathrm{m_{det} = 50 \,kt}$ and 4~years $\nu$-running and 4~years
+$\bar{\nu}$-running are assumed. The energy resolution is $\mathrm{\sigma_e=6 \% \cdot \sqrt{E}}$ for electrons and  $\mathrm{\sigma_e=3 \% \cdot \sqrt{E}}$
+for muons.  The following rules are defined within {\tt BBvar\_TASD.glb}:
+\begin{center}
+\begin{tabular}{|l|ll|c|c|}
+\hline \hline
+\multicolumn{3}{|l|}{Disappearance -- $^{18}$Ne stored} & $\sigma_\mathrm{norm}$ & $\sigma_\mathrm{cal}$ \\ \hline
+Signal & $0.2 \, \otimes \, (\nu_e\rightarrow\nu_e)_{\mathrm{CC}}$ & \hspace{6cm} & 0.025 & $10^{-4}$ \\
+ & & & & \\
+Background & $0.001 \, \otimes \, (\nu_e \rightarrow \nu_x)_\mathrm{NC}$ & & 0.05 & $10^{-4}$ \\ \hline \hline 
+\multicolumn{3}{|l|}{Appearance -- $^{18}$Ne stored} & & \\ \hline
+Signal & $0.8 \, \otimes \, (\nu_e \rightarrow \nu_\mu)_\mathrm{CC}$ & & 0.025 & $10^{-4}$ \\
+ & & & & \\
+Background & $0.001 \, \otimes \, (\nu_e \rightarrow \nu_x)_\mathrm{NC}$ & & 0.05 & $10^{-4}$
+\\ \hline \hline
+\multicolumn{3}{|l|}{Disappearance -- $^6$He stored} & &  \\ \hline
+Signal & $0.2 \, \otimes \, (\bar{\nu}_e\rightarrow\bar{\nu}_e)_{\mathrm{CC}}$ & & 0.025 & $10^{-4}$ \\
+ & & & & \\
+Background & $0.001 \, \otimes \, (\bar{\nu}_e \rightarrow \bar{\nu}_x)_\mathrm{NC}$ & & 0.05 & $10^{-4}$  \\ \hline \hline 
+\multicolumn{3}{|l|}{Appearance -- $^6$He stored} & & \\ \hline
+Signal & $0.8 \, \otimes \, (\bar{\nu}_e \rightarrow \bar{\nu}_\mu)_\mathrm{CC}$ & &
+0.025 & $10^{-4}$ \\
+ & & & & \\
+Background & $0.001 \, \otimes \, (\bar{\nu}_e \rightarrow \bar{\nu}_x)_\mathrm{NC}$ & & 0.05 & $10^{-4}$ \\ \hline \hline
+\end{tabular}
+\end{center}
+
+\section*{Neutrino factory experiments}
+\subsection*{Standard neutrino factory -- {\tt NFstandard.glb}}
+
+A standard neutrino factory scenario can be simulated with the file {\tt NFstandard.glb}. The basic version was
+used within \cite{Huber:2002mx} (NuFact-II scenario). This reference should be cited if the file {\tt
+NFstandard.glb} is used for a scientific publication or a talk. For calculations that involve {\tt
+NFstandard.glb}, the following additional files are required:
+\bi
+\item {\tt XCC.dat} (charged current cross sections)
+\item {\tt XNC.dat} (neutral current cross sections)
+\ei
+The neutrino beam is produced by the decay of muons stored in a storage ring at a parent energy of
+$\mathrm{E_\mu = 50\,GeV}$. A number of $1.06\cdot10^{21}$ useful muon decays per year are assumed in each
+polarity (corresponding to $5.3\cdot10^{20}$ useful muon decays per year and polarity for simultaneous operation
+with both polarities) and 4~years $\nu$-running and 4~years $\bar{\nu}$-running is
+assumed. The fiducial mass of the MID detector is taken to be $\mathrm{m_{det} = 50 \,kt}$ at a baseline of
+L~=~3000~km. The energy resolution is $\mathrm{\sigma_e=15\%\cdot E}$. The following rules are defined within
+{\tt NFstandard.glb}:
+\begin{center}
+\begin{tabular}{|l|ll|c|c|}
+\hline \hline
+\multicolumn{3}{|l|}{Disappearance -- $\mu^+$-stored} & $\sigma_\mathrm{norm}$ & $\sigma_\mathrm{cal}$ \\ \hline
+Signal & $0.35 \, \otimes \, (\bar{\nu}_\mu \rightarrow \bar{\nu}_\mu)_\mathrm{CC}$ & & 0.001 & $10^{-4}$ \\
+ & & & & \\
+Background & $1.0\cdot 10^{-5} \, \otimes \, (\bar{\nu}_\mu \rightarrow \bar{\nu}_x)_\mathrm{NC}$ & & 0.2 & $10^{-4}$ \\ \hline \hline
+\multicolumn{3}{|l|}{Appearance -- $\mu^+$-stored} & & \\ \hline
+Signal &  $0.45 \, \otimes \, (\nu_e \rightarrow \nu_\mu)_\mathrm{CC}$ & & 0.001 & $10^{-4}$ \\
+ & & & & \\
+Background &  $5.0\cdot 10^{-6} \, \otimes \, (\bar{\nu}_\mu \rightarrow \bar{\nu}_x)_\mathrm{NC}$ &  $5.0\cdot
+10^{-6} \, \otimes \, (\bar{\nu}_\mu \rightarrow\bar{\nu}_\mu)_\mathrm{CC}$ & 0.2& $10^{-4}$\\ \hline \hline
+\multicolumn{3}{|l|}{Disappearance -- $\mu^-$-stored} & & \\ \hline
+Signal &  $0.45 \, \otimes \, (\nu_\mu \rightarrow \nu_\mu)_\mathrm{CC}$ & & 0.001& $10^{-4}$\\
+ & & & & \\
+Background &  $1.0\cdot 10^{-5} \, \otimes \, (\nu_\mu \rightarrow \nu_x)_\mathrm{NC}$ & & 0.2& $10^{-4}$\\ \hline \hline
+\multicolumn{3}{|l|}{Appearance -- $\mu^-$-stored} & & \\ \hline
+Signal & $0.35 \, \otimes \, (\bar{\nu}_e \rightarrow \bar{\nu}_\mu)_\mathrm{CC}$  & & 0.001& $10^{-4}$\\
+ & & & & \\
+Background &  $5.0\cdot 10^{-6} \, \otimes \, (\nu_\mu \rightarrow \nu_x)_\mathrm{NC}$ & $5.0\cdot 10^{-6} \, \otimes \, (\nu_\mu \rightarrow
+\nu_\mu)_\mathrm{CC}$  & 0.2& $10^{-4}$\\ \hline \hline
+\end{tabular}
+\end{center}
+
+\subsection*{Variable neutrino factory -- {\tt NFvar.glb}}
+
+A variable neutrino factory scenario can be simulated with the file {\tt NFvar.glb}. The basic version was
+used within \cite{Huber:2006wb} and follows the neutrino factory scenarios from \cite{Huber:2002mx}. These
+references should be cited if the file {\tt
+NFvar.glb} is used for a scientific publication or a talk. For calculations that involve {\tt
+NFvar.glb}, the following additional files are required:
+\bi
+\item {\tt ThresholdEnergies.dat} (list of energies)
+\item {\tt CIDthreshold.dat} (list for CID threshold)
+\item {\tt MINOSthreshold.dat} (list for MINOS threshold)
+\item {\tt XCC.dat} (charged current cross sections)
+\item {\tt XNC.dat} (neutral current cross sections)
+\ei
+and the values of the following {\sf AEDL}-Variables have to be set:
+\bi
+\item {\tt emax} (parent energy of the stored muons $\left[\mathrm{km}\right]$)
+\item {\tt BASELINE} (experiment baseline $\left[\mathrm{GeV}\right]$)
+\ei
+The neutrino beam is produced by the decay of muons stored in a storage ring at a parent energy of
+$\mathrm{E_\mu =}$~{\tt emax}. The parent energy of the muons can be set in the range
+$\mathrm{10\,GeV\lesssim E_\mu\lesssim 80\, GeV}$. The baseline of the scenario is L~=~{\tt BASELINE}. 
+Besides these settings the other attributes of {\tt NFvar.glb} are similar to the ones from {\tt
+NFstandard.glb}. Only the treatment of the disappearance channels is different. Whereas the CID threshold is
+also applied in the disappearance channels of {\tt NFstandard.glb} this is not the case for the disapperance
+channel definition within {\tt NFvar.glb} where no CID is applied and a threshold similar to the threshold of
+the MINOS experiment \cite{Ables:1995wq} is applied. The following rules are defined within
+{\tt NFvar.glb}:
+\begin{center}
+\begin{tabular}{|l|ll|c|c|}
+\hline \hline
+\multicolumn{3}{|l|}{Disappearance -- $\mu^+$-stored} & $\sigma_\mathrm{norm}$ & $\sigma_\mathrm{cal}$ \\ \hline
+Signal & $0.9 \, \otimes \, (\bar{\nu}_\mu \rightarrow \bar{\nu}_\mu)_\mathrm{CC}$ & $0.9 \, \otimes \, (\nu_e \rightarrow \nu_\mu)_\mathrm{CC}$& 0.025 & $10^{-4}$ \\
+ & & & & \\
+Background & $1.0\cdot 10^{-5} \, \otimes \, (\bar{\nu}_\mu \rightarrow \bar{\nu}_x)_\mathrm{NC}$ & & 0.2 & $10^{-4}$ \\ \hline \hline
+\multicolumn{3}{|l|}{Appearance -- $\mu^+$-stored} & & \\ \hline
+Signal &  $0.45 \, \otimes \, (\nu_e \rightarrow \nu_\mu)_\mathrm{CC}$ & & 0.025 & $10^{-4}$ \\
+ & & & & \\
+Background &  $5.0\cdot 10^{-6} \, \otimes \, (\bar{\nu}_\mu \rightarrow \bar{\nu}_x)_\mathrm{NC}$ &  $5.0\cdot
+10^{-6} \, \otimes \, (\bar{\nu}_\mu \rightarrow\bar{\nu}_\mu)_\mathrm{CC}$ & 0.2& $10^{-4}$\\ \hline \hline
+\multicolumn{3}{|l|}{Disappearance -- $\mu^-$-stored} & & \\ \hline
+Signal &  $0.9 \, \otimes \, (\nu_\mu \rightarrow \nu_\mu)_\mathrm{CC}$ & $0.9 \, \otimes \, (\bar{\nu}_e
+\rightarrow \bar{\nu}_\mu)_\mathrm{CC}$& 0.025& $10^{-4}$\\
+ & & & & \\
+Background &  $1.0\cdot 10^{-5} \, \otimes \, (\nu_\mu \rightarrow \nu_x)_\mathrm{NC}$ & & 0.2& $10^{-4}$\\ \hline \hline
+\multicolumn{3}{|l|}{Appearance -- $\mu^-$-stored} & & \\ \hline
+Signal & $0.35 \, \otimes \, (\bar{\nu}_e \rightarrow \bar{\nu}_\mu)_\mathrm{CC}$  & & 0.025& $10^{-4}$\\
+ & & & & \\
+Background &  $5.0\cdot 10^{-6} \, \otimes \, (\nu_\mu \rightarrow \nu_x)_\mathrm{NC}$ & $5.0\cdot 10^{-6} \, \otimes \, (\nu_\mu \rightarrow
+\nu_\mu)_\mathrm{CC}$  & 0.2& $10^{-4}$\\ \hline \hline
+\end{tabular}
+\end{center}
+
+\subsection*{Variable neutrino factory with Silver Channel -- {\tt NFvar\_GoldSilver.glb}}
+
+A variable neutrino factory scenario that includes the golden and silver appearance channels can be 
+simulated with the file {\tt NFvar\_GoldSilver.glb}. The basic version was
+used within \cite{Huber:2006wb} and the golden channel follows the neutrino factory scenarios from \cite{Huber:2002mx}
+and the description of the silver channel follows \cite{Autiero:2003fu}. These
+references should be cited if the file {\tt
+NFvar\_GoldSilver.glb} is used for a scientific publication or a talk. For calculations that involve {\tt
+NFvar\_GoldSilver.glb}, the following additional files are required:
+\bi
+\item {\tt ThresholdEnergies.dat} (list of energies)
+\item {\tt CIDthreshold.dat} (list for CID threshold)
+\item {\tt MINOSthreshold.dat} (list for MINOS threshold)
+\item {\tt ECCthreshold.dat} (list for ECC threshold)
+\item {\tt XCC.dat} (charged current cross sections)
+\item {\tt XNC.dat} (neutral current cross sections)
+\ei
+and the values of the following {\sf AEDL}-Variables have to be set:
+\bi
+\item {\tt emax} (parent energy of the stored muons $\left[\mathrm{km}\right]$)
+\item {\tt BASELINE} (experiment baseline $\left[\mathrm{GeV}\right]$)
+\ei
+The beam and golden channel attributes are similar to {\tt NFvar.glb}. The parent energy of the muons can be set
+in the range $\mathrm{10\,GeV\lesssim E_\mu\lesssim 80\, GeV}$. The baseline is set by the {\sf
+AEDL}-Variable {\tt BASELINE}. For the silver channel an additional ECC detector with a fiducial mass
+$\mathrm{m_{ECC} = 5\,kt}$ is assumed to be located at the same baseline as the MID detector. The energy
+resolution of the silver channel is set to $\mathrm{\sigma_e=20\%\cdot E}$. The following additional rule
+compared to {\tt NFvar.glb} is introduced to {\tt NFvar\_GoldSilver.glb}:
+\begin{center}
+\begin{tabular}{|l|ll|c|c|}
+\hline \hline
+\multicolumn{3}{|l|}{$\tau$-Appearance -- $\mu^+$-stored} & $\sigma_\mathrm{norm}$ & $\sigma_\mathrm{cal}$ \\ \hline
+Signal & $0.096 \, \otimes \, (\nu_e \rightarrow \nu_\tau)_\mathrm{CC}$ & & 0.15 & $10^{-4}$ \\
+ & & & & \\
+Background & $3.1\cdot 10^{-8} \, \otimes \, (\nu_e \rightarrow \nu_e)_\mathrm{CC}$ & $2.0\cdot 10^{-8} \,
+\otimes \, (\nu_e \rightarrow \nu_\mu)_\mathrm{CC}$& 0.2 & $10^{-4}$ \\ 
+ & $3.7\cdot 10^{-6} \, \otimes \, (\bar{\nu}_\mu \rightarrow \bar{\nu}_\mu)_\mathrm{CC}$ & $1.0\cdot 10^{-3} \,
+ \otimes \, (\bar{\nu}_\mu \rightarrow \bar{\nu}_\tau)_\mathrm{CC}$& 0.2 & $10^{-4}$ \\ 
+ & $7.0 \cdot 10^{-7} \, \otimes \, (\bar{\nu}_\mu \rightarrow \bar{\nu}_x)_\mathrm{NC}$ & $7.0\cdot 10^{-7} \, \otimes \, (\nu_e \rightarrow \nu_x)_\mathrm{NC}$& 0.2 & $10^{-4}$ \\ \hline \hline
+\end{tabular}
+\end{center}
+
+\subsection*{High Resolution/Low Threshold neutrino factory -- \\{\tt NFvar\_hR\_lT.glb}}
+
+A variable neutrino factory hybrid detector scenario can be simulated with the file {\tt NFvar\_hR\_lT.glb}. The basic version was
+used within \cite{Huber:2006wb} and follows the neutrino factory scenarios from \cite{Huber:2002mx}. These
+references should be cited if the file {\tt NFvar\_hR\_lT.glb} is used for a scientific publication or a talk.
+For calculations that involve {\tt NFvar\_hR\_lT.glb}, the same additional files as for {\tt NFvar.glb} are
+required and the {\sf AEDL}-Variables {\tt emax} and {\tt BASELINE} have to be set. {\tt NFvar\_hR\_lT.glb} 
+implements a lower threshold ($\mathrm{\sim\,1\,GeV}$) at a higher energy resolution
+$\mathrm{\sigma_e=15\%\cdot E + 0.085\, MeV}$ where the constant term represents 
+the effects from Fermi Motion. The background rejection is introduced energy dependent as 
+$10^{-3}/\mathrm{E^2}$ and matches {\tt NFvar.glb} at higher energies. The following rules are defined within {\tt NFvar\_hR\_lT.glb}: 
+\begin{center}
+\begin{tabular}{|l|ll|c|c|}
+\hline \hline
+\multicolumn{3}{|l|}{Disappearance -- $\mu^+$-stored} & $\sigma_\mathrm{norm}$ & $\sigma_\mathrm{cal}$ \\ \hline
+Signal & $0.9 \, \otimes \, (\bar{\nu}_\mu \rightarrow \bar{\nu}_\mu)_\mathrm{CC}$ & $0.9 \, \otimes \, (\nu_e \rightarrow \nu_\mu)_\mathrm{CC}$& 0.025 & $10^{-4}$ \\
+ & & & & \\
+Background & $1.0 \, \otimes \, (\bar{\nu}_\mu \rightarrow \bar{\nu}_x)_\mathrm{NC}$ & & 0.2 & $10^{-4}$ \\ \hline \hline
+\multicolumn{3}{|l|}{Appearance -- $\mu^+$-stored} & & \\ \hline
+Signal &  $0.5 \, \otimes \, (\nu_e \rightarrow \nu_\mu)_\mathrm{CC}$ & & 0.025 & $10^{-4}$ \\
+ & & & & \\
+Background &  $1.0 \, \otimes \, (\bar{\nu}_\mu \rightarrow \bar{\nu}_x)_\mathrm{NC}$ & (energy dep. rejection)
+& 0.2 & $10^{-4}$\\
+ &  $1.0 \, \otimes \, (\bar{\nu}_\mu \rightarrow\bar{\nu}_\mu)_\mathrm{CC}$ & (energy dep. rejection)
+&0.2& $10^{-4}$\\ \hline \hline
+\multicolumn{3}{|l|}{Disappearance -- $\mu^-$-stored} & & \\ \hline
+Signal &  $0.9 \, \otimes \, (\nu_\mu \rightarrow \nu_\mu)_\mathrm{CC}$ & $0.9 \, \otimes \, (\bar{\nu}_e
+\rightarrow \bar{\nu}_\mu)_\mathrm{CC}$& 0.025& $10^{-4}$\\
+ & & & & \\
+Background &  $1.0\cdot 10^{-5} \, \otimes \, (\nu_\mu \rightarrow \nu_x)_\mathrm{NC}$ & & 0.2& $10^{-4}$\\ \hline \hline
+\multicolumn{3}{|l|}{Appearance -- $\mu^-$-stored} & & \\ \hline
+Signal & $0.5 \, \otimes \, (\bar{\nu}_e \rightarrow \bar{\nu}_\mu)_\mathrm{CC}$  & & 0.025& $10^{-4}$\\
+ & & & & \\
+Background &  $1.0 \, \otimes \, (\nu_\mu \rightarrow \nu_x)_\mathrm{NC}$ & (energy dep. rejection)
+& 0.2 & $10^{-4}$\\
+ & $1.0 \, \otimes \, (\nu_\mu \rightarrow
+\nu_\mu)_\mathrm{CC}$  & (energy dep. rejection)
+&0.2& $10^{-4}$\\ \hline \hline
+\end{tabular}
+\end{center}
+
+
+
+
+
+
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
