@@ -35,6 +35,7 @@
 #include "glb_minimize.h"
 #include "glb_types.h"
 #include "glb_multiex.h"
+#include "glb_sys.h"
 #include "glb_version.h"
 #include "glb_error.h"
 #include "glb_smear.h"
@@ -1064,6 +1065,72 @@ int glbGetNumberOfRules(int exp)
   if(exp_range(exp)!=0) return -1;
   i=((struct glb_experiment *) glb_experiment_list[exp])->numofrules; 
   return i;
+}
+
+/***************************************************************************
+ * Function glbGetBinSizeListPtr                                           *
+ ***************************************************************************
+ * Returns a pointer to the array of bin widths in a given experiment.     *
+ ***************************************************************************/
+double *glbGetBinSizeListPtr(int exp)
+{
+  if (exp_range(exp) != 0)
+  {
+    glb_error("glbGetBinSizeListPtr: Parameter \"exp\" is invalid");
+    return NULL;
+  }
+
+  return glb_experiment_list[exp]->binsize;
+}
+
+/***************************************************************************
+ * Function glbGetBinCentersListPtr                                        *
+ ***************************************************************************
+ * Returns a pointer to the array of bin central energies in a given       *
+ * experiment.                                                             *
+ ***************************************************************************/
+double *glbGetBinCentersListPtr(int exp)
+{
+  if (exp_range(exp) != 0)
+  {
+    glb_error("glbGetBinCentersListPtr: Parameter \"exp\" is invalid");
+    return NULL;
+  }
+
+  return glb_experiment_list[exp]->bincenter;
+}
+
+/***************************************************************************
+ * Function glbGetSamplingStepsizeListPtr                                  *
+ ***************************************************************************
+ * Returns a pointer to the array of sampling bin widths in a given        *
+ * experiment.                                                             *
+ ***************************************************************************/
+double *glbGetSamplingStepsizeListPtr(int exp)
+{
+  if (exp_range(exp) != 0)
+  {
+    glb_error("glbGetSamplingStepsizeListPtr: Parameter \"exp\" is invalid");
+    return NULL;
+  }
+
+  return glb_experiment_list[exp]->simbinsize;
+}
+
+/***************************************************************************
+ * Function glbGetSamplingPointsListPtr                                    *
+ ***************************************************************************
+ * Returns a pointer to the array of sampling points.                      *
+ ***************************************************************************/
+double *glbGetSamplingPointsListPtr(int exp)
+{
+  if (exp_range(exp) != 0)
+  {
+    glb_error("glbGetSamplingPointsListPtr: Parameter \"exp\" is invalid");
+    return NULL;
+  }
+
+  return glb_experiment_list[exp]->simbincenter;
 }
 
 int glbGetLengthOfRule(int exp, int rule, int signal)

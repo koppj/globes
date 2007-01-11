@@ -769,24 +769,30 @@ double glbChiSpectrumTilt(int exp, int rule, int n_params, double *x, double *er
   double *true_rates       = glbGetRuleRatePtr(exp, rule);
   double *signal_fit_rates = glbGetSignalFitRatePtr(exp, rule);
   double *bg_fit_rates     = glbGetBGFitRatePtr(exp, rule);
+  double *bin_centers      = glbGetBinCentersListPtr(exp);
   double signal_norm, signal_tilt;
   double bg_norm_center, bg_tilt_center;
   double bg_norm, bg_tilt;
   int ew_low, ew_high;
+  double emin, emax, ecenter;
   double fit_rate, true_rate;
   double chi2 = 0.0;
   int i;
 
+  glbGetEminEmax(exp, &emin, &emax);
+  ecenter = 0.5 * (emax + emin);
   glbGetEnergyWindowBins(exp, rule, &ew_low, &ew_high);
   glbGetBGCenters(exp, rule, &bg_norm_center, &bg_tilt_center);
   signal_norm = 1.0 + x[0];
-  signal_tilt = x[1] / n_bins;
+  signal_tilt = x[1] / (emax - emin);
   bg_norm = bg_norm_center * (1.0 + x[2]);
-  bg_tilt = (bg_tilt_center + x[3]) / n_bins;
+  bg_tilt = x[3] / (emax - emin);
   for (i=ew_low; i <= ew_high; i++)
   {
-    fit_rate = signal_norm*signal_fit_rates[i] + i*signal_tilt*signal_fit_rates[i]
-                + bg_norm*bg_fit_rates[i] + i*bg_tilt*bg_fit_rates[i];
+    fit_rate = signal_norm*signal_fit_rates[i]
+                + signal_tilt*(bin_centers[i]-ecenter)*signal_fit_rates[i]
+                + bg_norm*bg_fit_rates[i]
+                + bg_tilt*(bin_centers[i]-ecenter)*bg_fit_rates[i];
     chi2 += glb_likelihood(true_rates[i], fit_rate);
   }
 
@@ -795,6 +801,7 @@ double glbChiSpectrumTilt(int exp, int rule, int n_params, double *x, double *er
             + glb_prior(bg_norm, bg_norm_center, errors[2])
             + glb_prior(bg_tilt, bg_tilt_center, errors[3]);
 
+  getchar();
   return chi2;
 }
 
@@ -873,28 +880,34 @@ double glbChiTotalRatesTilt(int exp, int rule, int n_params, double *x, double *
   double *true_rates       = glbGetRuleRatePtr(exp, rule);
   double *signal_fit_rates = glbGetSignalFitRatePtr(exp, rule);
   double *bg_fit_rates     = glbGetBGFitRatePtr(exp, rule);
+  double *bin_centers      = glbGetBinCentersListPtr(exp);
   double signal_norm, signal_tilt;
   double bg_norm_center, bg_tilt_center;
   double bg_norm, bg_tilt;
   int ew_low, ew_high;
+  double emin, emax, ecenter;
   double fit_rate, true_rate;
   double total_fit_rate, total_true_rate;
   double chi2 = 0.0;
   int i;
 
+  glbGetEminEmax(exp, &emin, &emax);
+  ecenter = 0.5 * (emax + emin);
   glbGetEnergyWindowBins(exp, rule, &ew_low, &ew_high);
   glbGetBGCenters(exp, rule, &bg_norm_center, &bg_tilt_center);
   signal_norm = 1.0 + x[0];
-  signal_tilt = x[1] / n_bins;
+  signal_tilt = x[1] / (emax - emin);
   bg_norm = bg_norm_center * (1.0 + x[2]);
-  bg_tilt = (bg_tilt_center + x[3]) / n_bins;
+  bg_tilt = x[3] / (emax - emin);
 
   total_fit_rate  = 0.0;
   total_true_rate = 0.0;
   for (i=ew_low; i <= ew_high; i++)
   {
-    fit_rate = signal_norm*signal_fit_rates[i] + i*signal_tilt*signal_fit_rates[i]
-                + bg_norm*bg_fit_rates[i] + i*bg_tilt*bg_fit_rates[i];
+    fit_rate = signal_norm*signal_fit_rates[i]
+                + signal_tilt*(bin_centers[i]-ecenter)*signal_fit_rates[i]
+                + bg_norm*bg_fit_rates[i]
+                + bg_tilt*(bin_centers[i]-ecenter)*bg_fit_rates[i];
     total_fit_rate  += fit_rate;
     total_true_rate += true_rates[i];
   }

@@ -176,15 +176,15 @@ int glbShowRuleRates(FILE *stream, int exp, int rule, int pos,
                      int effi, int bgi, int coeffi, int signal);
 int glbShowChannelRates(FILE *stream, int exp, int channel, int smearing, int effi, int bgi);
 int glbShowChannelProbs(FILE *stream, int exp, int channel, int smearing, int effi, int bgi);//new?
-void glbPrintDelimiter(FILE *stream, int character);  // JK - Why is this in globes.h; should it be documented?
-void *glbSetChannelPrintFunction(void *fp);           //                "
-void glbSetPrintDelimiters(const char *left,const char *middle,  //     "
+void glbPrintDelimiter(FILE *stream, int character);
+void *glbSetChannelPrintFunction(void *fp);
+void glbSetPrintDelimiters(const char *left,const char *middle,
                            const char *right);
 
 
 /* Event rate calculation */
 void glbSetRates();
-void glbSetNewRates();    // JK - Why is this in globes.h?
+void glbSetNewRates();
 
 
 /* chi^2 projections */
@@ -219,7 +219,6 @@ int glbLoadProfileData(const char* filename, size_t *layers, double **length,
                        double **density );
 int glbStaceyProfile(double baseline, size_t layers, double **length,
                      double **density);
-   // JK - Sollte man das politisch korrekt glbPREMProfile oder glbAndersonProfile nennen?
 int glbAverageDensityProfile(double baseline, double **length,
                              double **density);
 int glbGetProfileDataInExperiment(int exp,size_t *layers, double** length,
@@ -250,6 +249,10 @@ int glbGetNumberOfSamplingPoints(int exp);                                      
 int glbGetNumberOfBins(int exp);                                                   //new
 int glbGetNumberOfRules(int exp);
 int glbGetNumberOfChannels(int exp);
+double *glbGetBinSizeListPtr(int exp);                                             //new
+double *glbGetBinCentersListPtr(int exp);                                          //new
+double *glbGetSamplingStepsizeListPtr(int exp);                                    //new
+double *glbGetSamplingPointsListPtr(int exp);                                      //new
 int glbGetLengthOfRule(int exp, int rule, int signal);
 double glbGetNormalizationInRule(int exp, int rule, int signal);
 int glbGetChannelInRule(int exp, int rule, int pos, int signal);
@@ -316,9 +319,6 @@ double *glbGetRuleRatePtr(int exp, int rule);                                   
 double *glbGetSignalRatePtr(int exp, int rule);                                    //new
 double *glbGetBGRatePtr(int exp, int rule);                                        //new
 double *glbGetChannelFitRatePtr(int exp, int channel, int pre_post);               //new
-//double *glbRuleFitRatePtr(int exp, int rule);
-    // JK - new; this will not be implemented since the BG normalization is
-    // usually free and thus only known during chi^2 calculation
 double *glbGetSignalFitRatePtr(int exp, int rule);                                 //new
 double *glbGetBGFitRatePtr(int exp, int rule);                                     //new
 
@@ -393,17 +393,6 @@ int glbSelectMinimizer(int minimizer_ID);
 
   /* Renamed to glbGetNumberOfSamplingPoints */
   int glbGetNumberOfSimBins(int exp);
-  
-//  #ifdef GLB_EXPERIMENTAL
-//  /* These functions are part of the user-defined chi^2 interface and will
-//   * not be documented in this release. I you want to use this feature
-//   * compile libglobes with '-DGLB_EXPERIMENTAL' and define GLB_EXPERIMENTAL
-//   * before you include globes.h into your program.
-//   */
-//    char* glbSetSys(int select, int rule, int experiment);
-//    void glbSetSysErrors(double *val, int rule, int experiment);
-//    void glbSetSysCenter(double *val, int rule, int experiment);
-//  #endif /* GLB_EXPERIMENTAL */
 #endif  /* #ifdef GLB_COMPAT */
 
 

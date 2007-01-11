@@ -176,10 +176,11 @@ struct glb_experiment {
   int num_of_xsecs;
 
  
-  /* This is the binsize array. */
+  /* Bin widths and bin centers */
   double *binsize;
-
+  double *bincenter;
   double *simbinsize; 
+  double *simbincenter;
 
   /** set the way a profile is computed or the baseline is changed */
   int density_profile_type;

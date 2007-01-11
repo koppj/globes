@@ -762,3 +762,14 @@ documented!
 	memory management. There are a few bytes left from parsing the
 	command line options in 'globes', but that should be of no
 	practical concern whatsoever.
+
+*********Version 2.4.3
+11/01/2007 JK
+        - Fixed behaviour of tilt in the presence of variable bin widths
+        - Introduced lists of bin centers in glb_experiment
+        - Introduced API functions which returns pointers to arrays
+          of bin widths, sampling bin widths, bin central energies,
+          and sampling bin central energies.
+        Checked that the event rates behave as expected under the influence
+        of the tilt, and that example1 still gives correct results.
+        
