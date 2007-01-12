@@ -118,8 +118,9 @@
 \newcommand{\NuFactII}{{\sf NuFact-II}}
 
 \newcommand{\GLOBES}{{\sf GLoBES}}
+\newcommand{\GLOBESN}{{\sf GLoBES~3.0}}
 \newcommand{\AEDL}{{\sf AEDL}}
-\newcommand{\EDM}{{\sf EDM}}
+%\newcommand{\EDM}{{\sf EDM}}
 
 \newcommand{\equ}[1]{\eq~(\ref{equ:#1})}
 \newcommand{\figu}[1]{\fig~\ref{fig:#1}}
@@ -149,6 +150,8 @@ TUM-HEP-YYY/0X\\
 
 {\begin{center}
 {\Large\bf New features in the simulation of neutrino oscillation experiments with GLoBES 3.0}
+
+(or: ``GLoBES 3.0 release: From user-defined systematics to the simulation of non-standard physics'')
 \end{center}}
 {\begin{center}
 {\large\bf (General Long Baseline Experiment Simulator)}
@@ -202,7 +205,8 @@ TUM-HEP-YYY/0X\\
 
 \begin{abstract}
 We present Version 3.0 of the GLoBES (``General Long Baseline Experiment Simulator'') software, which is
-a simulation tool for short- and long-baseline neutrino oscillation experiments. As new features, \GLOBES\ 3.0 allows the simulation of experiments with multiple detectors by the concept of user-defined systematics.
+a simulation tool for short- and long-baseline neutrino oscillation experiments. As new features, \GLOBESN\ allows the simulation of experiments with multiple discrete sources and detectors by the 
+concept of user-defined systematics.
 In addition, the combination with external information, such as from different experiment classes, is 
 simplified by the concept of user-defined priors. As far as the probability calculation is concerned, \GLOBES\ 
 now provides an interface for the inclusion of non-standard physics without re-compliation of the software. 
@@ -247,7 +251,7 @@ simplified the direct comparison of experiments.
 The \GLOBES\ software has, in the past, been used for many studies, some of them
 are referred to in the paper. However, recent developments have indicated that extensions
 and improvements are necessary. In this work, we present the most important new
-features and changes in \GLOBES\ 3.0. For experimentalists, \GLOBES\ now allows
+features and changes in \GLOBESN . For experimentalists, \GLOBES\ now allows
 for the implementation of arbitrary systematics, which can also be used for
 the simulation of multi-detector experiments. In addition, several extensions
 have been included in \AEDL\ (``Abstract Experiment Description Language''), such as
@@ -286,7 +290,7 @@ Such experiments are neutrino beam experiments and reactor experiments.
 Geometrical effects of a continuous source distribution, such as in the sun or the 
 atmosphere, can not be described. In addition, sources with a physically 
 significant time dependencies can not be studied, such as  supernov\ae. 
-However, in \GLOBES\ 3.0 and higher, new flexibility is introduced by the
+However, in \GLOBESN\ and higher, new flexibility is introduced by the
 concept of user-defined systematics. This new feature allows the cross-definition
 of systematical errors over different experiments. In principle, 
 this mechanism can be used for the combination of several discrete sources
@@ -313,14 +317,6 @@ pre-defined experiments in order to demonstrate the capabilities
 of \GLOBES\ and to provide prototypes for new experiments.
 In addition, they can be used to test new physics ideas with
 complete experiment simulations.
-% Examples for these prototypes are the \MINOS , \ICARUS , and
-% \OPERA\ simulations from \Ref~\cite{Huber:2004ug}, the
-% \JHFSK\ and \NUMI\ superbeam simulations from \Refs~\cite{Huber:2002mx,
-% Huber:2002rs}, the \JHFHK\ superbeam upgrade simulation from
-% \Ref~\cite{Huber:2002mx}, the neutrino factory simulations from
-% \Ref~\cite{Huber:2002mx}, and the reactor experiment simulations from
-% \Ref~\cite{Huber:2003pm}. Other projects using earlier versions
-% of the \GLOBES\ software include \Refs~\cite{Huber:2003ak,Ohlsson:2003ip,Winter:2003ye,Antusch:2004yx}.
 
 With the C-library, one can extract the $\Delta \chi^2$ for all defined 
 oscillation channels for an experiment or any combination of experiments.
@@ -341,17 +337,103 @@ the $\stheta$-axis and the $\stheta$-$\deltacp$-plane. In addition,
 all oscillation parameters can be kept free to precisely localize 
 degenerate solutions.
 
-\section{User-defined systematics and changes in the systematics implementation}
+\section{Systematics implementation and user-defined systematics}
 
-How defined, what good for (physics examples: T2KK, Reactor-paper,).
-Compare to standard systematics (nuisance parameters)
+\GLOBES\ supports four types of systematical errors as a standard: Signal and background
+normalization errors, as well as signal and background tilt or energy calibration errors.
+The tilt (T) is impemented as a linear distortion of the spectrum around the center,
+and the energy calibration (C) as a distortion (stretching) of the reconstructed energy scale.
+For the implementation of these systematical errors, the  ``pull method'' is used~\cite{Fogli:2002pt}, which introduces  so-called nuisance parameters $\zeta_i$. 
+For example, for the signal and background normalization errors, the rates in
+each bin $i$ are multiplied with
+\begin{equation}
+s_i(\zeta_1) := (1+\zeta_1)\cdot s_i \, , \quad b_i(\zeta_2) : =(1+\zeta_2)\cdot b_i \, ,
+\end{equation} 
+\ie, the rates are scaled by these parameters. The systematics $\chi^2$ is then minimized over
+these parameters:
+\begin{equation}
+\chi^2_\mathrm{pull}(\boldsymbol{\lambda}):=\min_{\{\zeta_i\} } \,\, \left( \,
+\chi^2(\boldsymbol{\lambda},
+\zeta_1, \ldots, \zeta_k)+ \sum_{j=1}^{k} \frac{\zeta_j^2}{\sigma_{\zeta_j}^2}
+\, \right)\,.
+\label{equ:chipull}
+\end{equation}
+Here $\chi^2(\boldsymbol{\lambda}, \zeta_1, \ldots, \zeta_k)$ is the usual Possonian $\chi^2$
+depending on the neutrino oscillation parameters $\boldsymbol{\lambda}$ and the nuisance
+parameters $\zeta_i$ (which, for instance, scale the signal or background rates).
+In addition, Gaussian penalties $\zeta_j^2/\sigma_{\zeta_j}^2$ are added, where 
+$\sigma_{\zeta_j}$ corresponds to the actual systematical error.
+Core part of \equ{chipull} is the definition of $\chi^2$. For example, for a background-free measurement and
+a signal normalization error only, it reads
+\begin{equation}
+  \chi^2 (\boldsymbol{\lambda},a) =  \sum_{i=1}^{\textrm{\# of bins}}2
+     \left( O_{i} - (1 + a) T_{i} +
+       (1 + a) T_{i} \log \frac{(1 + a) T_{i}}{O_{i}}  \right) + \frac{a^2}{\sigma_a^2} 
+\label{equ:chistandard}
+\end{equation}
+(JK/PH: CHECK THIS EQUATION IF THIS IS THE ACTUAL IMPLEMENTATION. HERE THE SYSTEMATICS IS\\
+IMPLEMENTED IN THE SIMULATED RATES. IN ADDITION, CHECK IF THEORETICAL AND EXP. RATES
+ARE CORRECTLY GIVEN. [WW])
 
-\section{User-defined priors}
+Let us assume that we have two detectors, such as for a reactor experiment with a near and
+far detector. Using standard systematics in \GLOBES , one has
+\begin{equation}
+\chi^2_\mathrm{pull}(\boldsymbol{\lambda}) = \min_{a } \,\, \left( \,
+\chi_1^2(\boldsymbol{\lambda},a)+ \frac{a^2}{\sigma_{a}^2} \, \right)
++\min_{ b } \,\, \left( \,
+\chi_2^2(\boldsymbol{\lambda},b)+ \frac{b^2}{\sigma_{b}^2}
+\, \right)\,.
+\label{equ:chipullex}
+\end{equation}
+In this case, the normalization between the two detectors will be uncorrelated.
+
+Using \GLOBESN\ and higher, one can modify the standard $\chi^2$ function in
+\GLOBES\ which corresponds to \equ{chistandard}. In addition, the systematics
+concept of ``error dimensions'' is replaced by a concept directly related to
+this $\chi^2$ function. As an example, consider a reactor experiment with near ($N$)
+and far ($F$) detectors which are described by a reactor flux uncertainty $\sigma_R$
+and two fiducial volume errors of the near $\sigma_N$ and far $\sigma_F$ detectors.
+Then \equ{chistandard} will be replaced by
+\begin{align}
+  \chi^2(\boldsymbol{\lambda},a_N,a_F,a_R) = & \sum_{i=1}^{\textrm{\# of bins}} \sum_{d = N,F} 2
+     \left( O_{d,i} - (1 + a_R + a_d) T_{d,i} + \right. \nonumber \\
+& \left. + (1 + a_R + a_d) T_{d,i} \log \frac{(1 + a_R + a_d) T_{d,i}}{O_{d,i}}  \right) 
+          + \frac{a_R^2}{\sigma_R^2} + \frac{a_N^2}{\sigma_N^2} + \frac{a_F^2}{\sigma_F^2}
+\label{equ:chi2reactor}
+\end{align}
+HOW CAN ONE MAKE THE LEFT BRACKET LARGER? [WW]
+This function can be defined with user-defined systenatics. Similarly, calibration errors, shape
+errors, uncorrelated bin-to-bin errors, \etc , can be introduced. Furthermore, more complicated setups using multiple discrete sources and detectors can be simulated. For details, we refer to the manual~\cite{Manual}.
+In the past, user-defined systematics has (as experimental feature) been used in \Ref~\cite{Huber:2006vr} to
+simulate Double Chooz and in \Ref~\cite{Barger:2006kp} to simulate T2KK. ANYTHING ELSE? [WW]
+
+In summary, \GLOBES\ currently supports the following systematics $\chi^2$ functions:
+\begin{description}
+\item[{\tt chiSpectrumTilt}]
+ Spectral information, signal and background normalization errors and tilts 
+\item[{\tt chiNoSysSpectrum}]
+ No systematical errors, but spectral information
+\item[{\tt chiTotalRatesTilt}]
+ Total rates only, signal and background normalization errors and tilts 
+\item[{\tt chiSpectrumOnly}]
+ Spectrum only, no other systematics 
+\item[{\tt chiNoSysTotalRates}]
+ Total rates only, no systematics
+\item[{\tt chiSpectrumCalib}]
+ Spectral information, signal and background normalization errors and energy calibration errors 
+\item[{\tt chiZero}]
+ Passive systematics (returns $\chi^2=0$, only provides the event rates for the access by other
+rules or experiments)
+\item[{\tt Any other name}]
+ User-defined systematics
+\end{description}
+
+\section{Adding external information with user-defined priors}
 
 How defined, what good for (physics examples: AstroNus, Schwetz priors, atm. neutrinos, octant degeneracy,
 ).
 
-\section{Simulation of non-standard physics with GLoBES}
+\section{Simulation of non-standard physics}
 
 Eg. Damping, Hamiltonian, MAVANS, Toshi etc.
 
@@ -408,12 +490,12 @@ of parameters, and is known to have excellent convergence properties.
 The numerical method that does the minimization is the Powell
 algorithm~\cite{Press:NumRecip}.
 
-In \GLOBES\ 3.0, we provide an alternative method, which does the full minimization
+In \GLOBESN , we provide an alternative method, which does the full minimization
 in one go and is therefore several times faster in most cases. In this algorithm,
 each Powell iteration over oscillation parameters is followed by one iteration
 over systematics parameters. Since there may be some pathological cases where this
 interleaved minimization strategy behaves differently than the old method,
-it is by default not used in \GLOBES\ 3.0. This ensures maximal compatibility
+it is by default not used in \GLOBESN . This ensures maximal compatibility
 with old application programs, but it requires users who wish to benefit from the
 new algorithm to explicitly select it by an API function call.
 
