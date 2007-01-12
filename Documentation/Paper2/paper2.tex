@@ -337,6 +337,11 @@ the $\stheta$-axis and the $\stheta$-$\deltacp$-plane. In addition,
 all oscillation parameters can be kept free to precisely localize 
 degenerate solutions.
 
+\section{Simulation of non-standard physics}
+
+The probability calculation in \GLOBES\ 
+Eg. Damping, Hamiltonian, MAVANS, Toshi etc.
+
 \section{Systematics implementation and user-defined systematics}
 
 \GLOBES\ supports four types of systematical errors as a standard: Signal and background
@@ -430,14 +435,52 @@ rules or experiments)
 
 \section{Adding external information with user-defined priors}
 
-How defined, what good for (physics examples: AstroNus, Schwetz priors, atm. neutrinos, octant degeneracy,
-).
+In order to include correlations and degeneracies, \GLOBES\ provides
+(local) maginalization routines to project the fit manifold onto
+a subspace. For example, if one wants to compute the $\stheta$ precision,
+one scans the $\stheta$ direction and marginalizes for each fixed $\stheta$
+over the other oscillation parameters. This marginalization is performed
+after the systematics $\chi^2_{\mathrm{pull}}$ in \equ{chipull} (or similar) 
+has been determined:
+\begin{equation}
+ \chi^2_{\mathrm{proj}}(\boldsymbol{\lambda_1}) := \min_{\{ \boldsymbol{\lambda_2} \} } \left( \, \chi^2_{\mathrm{pull}} (\boldsymbol{\lambda_1} , \boldsymbol{\lambda_2} ) \, \right) \, .
+\label{equ:margin}
+\end{equation}
+In this case, the parameter space of oscillation parameters 
+$\boldsymbol{\lambda}$ is projected onto the subspace $\boldsymbol{\lambda_1}$.
+If one wants to include external input which only depends on the oscillation
+parameters and not on systematics, one can do this at this level. \GLOBES\ provides
+the pre-defined possibility to include external Gaussian constraints on the 
+oscillation parameters (and the matter density, which is treated as another
+oscillation parameter). For example, an external constraint on $\theta_{12}$
+is added before the marginalition in \equ{margin} by the replacement after the
+systematics minimization
+\begin{equation}
+ \chi^2_{\mathrm{pull}}(\boldsymbol{\lambda}) \rightarrow \chi^2_{\mathrm{pull}}(\boldsymbol{\lambda})  +
+ \frac{(\theta_{12} - \theta_{12}^0)^2}{\sigma_{\theta_{12}}^2}
+\label{equ:priors}
+\end{equation}
+with the central value $\theta_{12}^0$, where the input is added, and
+the $1\sigma$ Gaussian error $\sigma_{\theta_{12}}$. This corresponds to an external
+measurement of the solar mixing angle at the best-fit value $\theta_{12}^0$
+with the error $\sigma_{\theta_{12}}$. 
 
-\section{Simulation of non-standard physics}
+In practice, the external error on $\theta_{12}$ may not be Gaussian or one may
+want to add other external information. Therefore,
+\GLOBESN\ and higher provides the concept of user-defined priors  $f(\boldsymbol{\lambda})$. 
+Instead of \equ{priors}, we then have
+\begin{equation}
+ \chi^2_{\mathrm{pull}}(\boldsymbol{\lambda}) \rightarrow \chi^2_{\mathrm{pull}}(\boldsymbol{\lambda})  + f(\boldsymbol{\lambda}) \, .
+\label{equ:userpriors}
+\end{equation}
+One can easily imagine that this simple concept allows for a high degree of freedom. Examples where
+this feature has been used as an experimental feature are the combination of terrestrial neutrino
+data with the information from neutrino telescopes~\cite{Winter:2006ce} and the combination of long-baseline data with atmospheric neutrino data~\cite{Huber:2005ep,Campagne:2006yx} (CORRECT?).
+Another very interesting option is the use of penalties in degeneracy localization, as suggested by Thomas
+Schwetz. For example, if the minimizer runs into the wrong octant, user-defined priors can be
+used to add a penalty and prevent it from doing so.
 
-Eg. Damping, Hamiltonian, MAVANS, Toshi etc.
-
-\section{Simulation of new experiment features and \AEDL\ changes}
+\section{\AEDL\ changes and new experiment prototypes}
 
 \bi
 \item 
