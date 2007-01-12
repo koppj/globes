@@ -151,7 +151,11 @@ TUM-HEP-YYY/0X\\
 {\begin{center}
 {\Large\bf New features in the simulation of neutrino oscillation experiments with GLoBES 3.0}
 
-(or: ``GLoBES 3.0 release: From user-defined systematics to the simulation of non-standard physics'')
+(Alternative: ``GLoBES 3.0: From the simulation of non-standard physics to user-defined systematics'')
+
+(Alternative: ``GLoBES 3.0: Simulation of non-standard physics and multi-source multi-detector
+setups'')
+
 \end{center}}
 {\begin{center}
 {\large\bf (General Long Baseline Experiment Simulator)}
@@ -281,7 +285,7 @@ Currently, \GLOBES\ is available for GNU/Linux.
 \begin{center}
 \includegraphics[width=14cm]{GLOBES}
 \end{center}
-\caption{\label{fig:GLOBES} General concept of the \GLOBES\ package.}
+\mycaption{\label{fig:GLOBES} General concept of the \GLOBES\ package.}
 \end{figure}
 
 \GLOBES\ allows to simulate experiments with stationary neutrino point 
@@ -384,6 +388,15 @@ with the eigenvalues $m_1^k$, $m_2^k$, and $m_3^k$. The probabilities in \equ{pr
 event rate compution, which is described in greater detail in \Ref~\cite{Huber:2004ka}. In the next section,
 we will demonstrate how systematics is implemented thereafter.
 
+\begin{figure}[t]
+\begin{center}
+\includegraphics[width=8cm]{reactorNSI}
+\end{center}
+\mycaption{\label{fig:reactorNSI} Fit in the $\stheta$-$\sigma_E$-plane for the simulated values
+$\stheta=\sigma_E=0$ (figure similar to \Ref~\cite{Blennow:2005yk}). Here $\sigma_E$ is an additional non-standard parameter describing the wave packet width of the neutrino oscillation wave packet. The figure is computed with
+{\tt example6.c} coming with the \GLOBESN\ distribution (and higher).}
+\end{figure}
+
 \GLOBESN\ allows the modification of this Hamiltonian and the whole probability engine without
 re-compilation of the \GLOBES\ software. This is implemented
 by using pointers for the functions calling the standard probability engine, which can be changed if
@@ -404,9 +417,14 @@ For example, non-standard Hamiltonian effects in the $e$-$\tau$-sector may be in
 \epsilon_{e \tau}^* & 0 & 0 
 \end{array}
 \right)
+\label{equ:nsi}
 \end{equation}
 In this case, there are two more real parameters, such as the absolute value and phase of $\epsilon_{e \tau}$.
 In the literature, the non-standard physics feature in \GLOBES\ as experimental feature has been used for damping effects (such as neutrino decoherence, decay, \etc) in \Ref~\cite{Blennow:2005yk}, Hamiltonian-level effects (such as non-standard matter effects) in \Ref~\cite{Blennow:2005qj}, and mass-varying neutrinos in \Ref~\cite{Schwetz:2005fy} by implementing an environment dependence of neutrino mass.  ANY OTHERS (PH!)?
+We show in \figu{reactorNSI} a result from \Ref~\cite{Blennow:2005yk} provided as {\tt example6.c} in the \GLOBES\
+distribution. Compared to \equ{nsi}, the underlying physics takes place at the probability level, \ie, 
+\equ{probs} (for details, see \Ref~\cite{Blennow:2005yk}). In {\tt example6.c}, an analytical implementation
+of this physics is used for simplicity.
 
 \section{Systematics implementation and user-defined systematics}
 
@@ -463,7 +481,8 @@ In this case, the normalization between the two detectors will be uncorrelated.
 \begin{center}
 \includegraphics[width=9cm]{reactor}
 \end{center}
-\mycaption{\label{fig:reactor} Luminosity scaling of the $\stheta$ sensitivity for different systematical error assumptions (90\% confidence level). The thick curve corresponds to \equ{chi2reactor} for $\sigma_R=\sigma_{\mathrm{corr}}=2.8\%$, $\sigma_N=\sigma_F=\sigma_{\mathrm{uncorr}}=0.6\%$ and an additional calibration error. Figure similar to \Ref~\cite{Huber:2006vr}. MISLEADING: WHY IS THE LUMINOSITY
+\mycaption{\label{fig:reactor} Luminosity scaling of the $\stheta$ sensitivity for different systematical error assumptions (90\% confidence level, figure similar to \Ref~\cite{Huber:2006vr}). The thick curve corresponds to \equ{chi2reactor} for $\sigma_R=\sigma_{\mathrm{corr}}=2.8\%$, $\sigma_N=\sigma_F=\sigma_{\mathrm{uncorr}}=0.6\%$ and an additional calibration error. The figure is computed with {\tt example5.c} provided with the \GLOBES\ software.
+ MISLEADING: WHY IS THE LUMINOSITY
 OF THE ``FAR DETECTOR'' ON THE X-AXIS? SHOULD THIS NOT BE THE SAME AS THE ONE FOR THE NEAR DETECTOR? 
 AT LEAST IF I INTERPRET THE CODE CORRECTLY [WW]}
 \end{figure}
