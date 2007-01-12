@@ -1,5 +1,5 @@
 %!GLoBES
-/* Copyright 2004,2005,2006 The GLoBES Team
+/* Copyright 2004,2005,2006,2007 The GLoBES Team
  *
  * If you modify this file you have to rename it.
  *
@@ -20,7 +20,7 @@
  *
  * This file is intended as example and documentation for the latest features of AEDL.
  *
- * Last modified 20/09/2006
+ * Last modified 12/01/2006
  */
 
 $version="2.3.15"
@@ -107,7 +107,7 @@ cross(#NC)<
 	21.25,23.55,25.85,28.15,30.45,32.75,
 	35.05,37.35,39.65,41.95,44.25,46.55,48.85 }
 
-/* The functions 'bincenter[]' and 'samplingbincenter[]' respectively return
+/* The functions 'bincenter()' and 'samplingbincenter()' respectively return
  * a list with $bins ($sampling_points) length which contains the average
  * energy of each bin (sampling bin). Can only be called once $bins, $emin,
  * $emax have been specified (resp. $sampling_points, $sampling_min and
