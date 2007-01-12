@@ -30,20 +30,11 @@
 #include <math.h>
 #include <string.h>
 
-#ifdef GLB_STATIC
-#include   <ltdl.h>
-#endif /* GLB_STATIC */
-
 #include <globes/globes.h>   /* GLoBES library */
 
 
 int main(int argc, char *argv[])
 {
-
-#ifdef GLB_STATIC
-  LTDL_SET_PRELOADED_SYMBOLS();
-#endif /* GLB_STATIC */
-  
   /* char* MYFILE=""; */ 
   char* MYFILE="gl-tour.dat"; /* if empty, write to screen */
   FILE* stream;
@@ -62,8 +53,8 @@ int main(int argc, char *argv[])
   double sdm = 7e-5;
   double ldm = 2e-3;
  
-  /* Initialize one experiment NuFact.glb */
-  glbInitExperiment("NuFact.glb",&glb_experiment_list[0],&glb_num_of_exps); 
+  /* Initialize one experiment NFstandard.glb */
+  glbInitExperiment("NFstandard.glb",&glb_experiment_list[0],&glb_num_of_exps); 
    
   /* Initialize a number of parameter vector(s) */
   glb_params true_values = glbAllocParams();
@@ -169,10 +160,10 @@ int main(int argc, char *argv[])
 
   fprintf(stream,"\nNOW: TWO-EXPERIMENT SETUP NuFact@3000km+NuFact@7500km\n\n");
   
-  /* Initialize two experiments NuFact.glb */
+  /* Initialize two experiments NFstandard.glb */
   glbClearExperimentList();
-  glbInitExperiment("NuFact.glb",&glb_experiment_list[0],&glb_num_of_exps); 
-  glbInitExperiment("NuFact.glb",&glb_experiment_list[0],&glb_num_of_exps); 
+  glbInitExperiment("NFstandard.glb",&glb_experiment_list[0],&glb_num_of_exps); 
+  glbInitExperiment("NFstandard.glb",&glb_experiment_list[0],&glb_num_of_exps); 
    
   /* Change baseline of second experiment to magic baseline */  
   double* lengths; 

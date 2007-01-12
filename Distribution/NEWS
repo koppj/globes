@@ -789,3 +789,8 @@ documented!
 12/01/2007 MR
         - new AEDL files included to data/ in directory tree
 	- AEDL files in examples/ interchanged and example files adapted
+
+*********Version 2.4.7
+12/01/2007 JK
+        - Update Makefile.am and Makefile.in in data/ directory
+        - examples now use the new AEDL files

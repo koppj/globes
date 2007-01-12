@@ -41,8 +41,8 @@ int main(int argc, char *argv[])
   /* Initialize libglobes */
   glbInit(argv[0]);
 
-  /* Initialize experiment NuFact.glb */
-  glbInitExperiment("NuFact.glb",&glb_experiment_list[0],&glb_num_of_exps); 
+  /* Initialize experiment NFstandard.glb */
+  glbInitExperiment("NFstandard.glb",&glb_experiment_list[0],&glb_num_of_exps); 
  
   /* Intitialize output */
   InitOutput(MYFILE,"Format: Log(10,s22th13)   deltacp   chi^2 \n"); 

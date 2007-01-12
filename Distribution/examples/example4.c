@@ -147,8 +147,8 @@ int main(int argc, char *argv[])
   /* Initialize libglobes */
   glbInit(argv[0]); 
 
-  /* Initialize experiment NuFact.glb */
-  glbInitExperiment("NuFact.glb",&glb_experiment_list[0],&glb_num_of_exps); 
+  /* Initialize experiment NFstandard.glb */
+  glbInitExperiment("NFstandard.glb",&glb_experiment_list[0],&glb_num_of_exps); 
 
   /* Set standard oscillation parameters */
   theta12 = asin(sqrt(0.8))/2;
