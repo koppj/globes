@@ -337,10 +337,76 @@ the $\stheta$-axis and the $\stheta$-$\deltacp$-plane. In addition,
 all oscillation parameters can be kept free to precisely localize 
 degenerate solutions.
 
-\section{Simulation of non-standard physics}
+\section{Oscillation probabilities and the simulation of non-standard physics}
 
-The probability calculation in \GLOBES\ 
-Eg. Damping, Hamiltonian, MAVANS, Toshi etc.
+The probability calculation in \GLOBES\ is based on the diagonalization of the
+Hamiltonian in layers of constant matter density using the standard three flavor
+scenario of neutrino oscillations. In flavor base, we have
+\begin{equation}
+\mathcal{H}(n_e) = \frac{1}{2E} \, U \,
+\left(
+\begin{array}{ccc}
+0 & 0 & 0 \\
+0  & \sdm & 0 \\
+0  & 0 & \ldm \\
+\end{array}
+\right) \,
+U^\dagger + 
+\left(
+\begin{array}{ccc}
+ \pm \sqrt{2} G_F n_e & 0 & 0 \\
+0 & 0 & 0 \\
+0 & 0 & 0 
+\end{array}
+\right)
+\label{equ:ham}
+\end{equation}
+with $U$ the mixing matrix (described by four parameters $\theta_{12}$, $\theta_{13}$, $\theta_{23}$, and $\deltacp$), and $n_e$ the constant electron density
+in that matter density layer. The electron density is related to the matter density $\rho$ by 
+$n_e \simeq 0.5 \, \rho/m_N$ with $m_N$ being the nucleon mass. The sign in the second term depends on if one
+uses neutrinos or antineutrinos. For $k$ matter density layers with densities
+$n^k_e$ and thicknesses $x_i$, the oscillation probability then evaluates to
+\begin{equation}
+P(\nu_\alpha \rightarrow \nu_\beta) = \left| \langle \nu_\beta | \mathcal{E}(n^k_e, x_k) \hdots  \mathcal{E}(n^1_e, x_1) | \nu_\alpha \rangle \right|^2
+\label{equ:probs}
+\end{equation}
+with the evolution operators (CORRECT REFERENCE?)
+\begin{equation}
+  \mathcal{E}(n^k_e, x_k) = \exp \left( -i \mathcal{H}(n^k_e) x_k \right) = \frac{1}{2E} \, \hat{U}(n^k_e) \, \left( \begin{array}{ccc}
+e^{-i \, m_1^k \, x_k} & 0 & 0 \\
+0 &  e^{-i \, m_2^k \, x_k} & 0 \\
+0 & 0 & e^{-i \, m_3^k \, x_k} 
+\end{array}
+\right) \, \hat{U}(n^k_e)^\dagger \, .
+\end{equation}
+Here the Hamiltonian $\mathcal{H}(n^k_e)$ is diagonalized by the unitary mixing matrix in matter $\hat{U}(n^k_e)$
+with the eigenvalues $m_1^k$, $m_2^k$, and $m_3^k$. The probabilities in \equ{probs} are used for the
+event rate compution, which is described in greater detail in \Ref~\cite{Huber:2004ka}. In the next section,
+we will demonstrate how systematics is implemented thereafter.
+
+\GLOBESN\ allows the modification of this Hamiltonian and the whole probability engine without
+re-compilation of the \GLOBES\ software. This is implemented
+by using pointers for the functions calling the standard probability engine, which can be changed if
+a different probability engine is registered. For example, a user may just copy the standard probability
+engine of \GLOBES , and modify it, and register it. An important prerequisite for the ability to handle
+more than the standard six oscillation parameters (plus matter density) $\boldsymbol{\lambda}=(\theta_{12},\theta_{13}, \theta_{23}, \deltacp, \sdm, \ldm, \rho)$, \ie,
+\begin{equation}
+\boldsymbol{\lambda}=(\theta_{12},\theta_{13}, \theta_{23}, \deltacp, \sdm, \ldm, \rho, \eta_1, \hdots, \eta_n)
+\end{equation}
+with $n$ non-standard parameters $\eta_j$. These parameters can be accessed in the usual way, see \Ref~\cite{Manual}.
+For example, non-standard Hamiltonian effects in the $e$-$\tau$-sector may be introduced by modifying \equ{ham} to
+\begin{equation}
+ \mathcal{\hat{H}} = \mathcal{H}(n_e) + 
+\left(
+\begin{array}{ccc}
+0 & 0 & \epsilon_{e \tau} \\
+0 & 0 & 0 \\
+\epsilon_{e \tau}^* & 0 & 0 
+\end{array}
+\right)
+\end{equation}
+In this case, there are two more real parameters, such as the absolute value and phase of $\epsilon_{e \tau}$.
+In the literature, the non-standard physics feature in \GLOBES\ as experimental feature has been used for damping effects (such as neutrino decoherence, decay, \etc) in \Ref~\cite{Blennow:2005yk}, Hamiltonian-level effects (such as non-standard matter effects) in \Ref~\cite{Blennow:2005qj}, and mass-varying neutrinos in \Ref~\cite{Schwetz:2005fy} by implementing an environment dependence of neutrino mass.  ANY OTHERS (PH!)?
 
 \section{Systematics implementation and user-defined systematics}
 
@@ -349,8 +415,9 @@ normalization errors, as well as signal and background tilt or energy calibratio
 The tilt (T) is impemented as a linear distortion of the spectrum around the center,
 and the energy calibration (C) as a distortion (stretching) of the reconstructed energy scale.
 For the implementation of these systematical errors, the  ``pull method'' is used~\cite{Fogli:2002pt}, which introduces  so-called nuisance parameters $\zeta_i$. 
-For example, for the signal and background normalization errors, the rates in
-each bin $i$ are multiplied with
+For example, for the signal and background normalization errors, the respective event rates 
+$s_i$ and $b_i$ in
+each bin $i$ are multiplied with\footnote{For details on the event rate calculation, see \Ref~\cite{Huber:2004ka}.}
 \begin{equation}
 s_i(\zeta_1) := (1+\zeta_1)\cdot s_i \, , \quad b_i(\zeta_2) : =(1+\zeta_2)\cdot b_i \, ,
 \end{equation} 
@@ -392,6 +459,15 @@ far detector. Using standard systematics in \GLOBES , one has
 \end{equation}
 In this case, the normalization between the two detectors will be uncorrelated.
 
+\begin{figure}[t]
+\begin{center}
+\includegraphics[width=9cm]{reactor}
+\end{center}
+\mycaption{\label{fig:reactor} Luminosity scaling of the $\stheta$ sensitivity for different systematical error assumptions (90\% confidence level). The thick curve corresponds to \equ{chi2reactor} for $\sigma_R=\sigma_{\mathrm{corr}}=2.8\%$, $\sigma_N=\sigma_F=\sigma_{\mathrm{uncorr}}=0.6\%$ and an additional calibration error. Figure similar to \Ref~\cite{Huber:2006vr}. MISLEADING: WHY IS THE LUMINOSITY
+OF THE ``FAR DETECTOR'' ON THE X-AXIS? SHOULD THIS NOT BE THE SAME AS THE ONE FOR THE NEAR DETECTOR? 
+AT LEAST IF I INTERPRET THE CODE CORRECTLY [WW]}
+\end{figure}
+
 Using \GLOBESN\ and higher, one can modify the standard $\chi^2$ function in
 \GLOBES\ which corresponds to \equ{chistandard}. In addition, the systematics
 concept of ``error dimensions'' is replaced by a concept directly related to
@@ -407,8 +483,11 @@ Then \equ{chistandard} will be replaced by
 \label{equ:chi2reactor}
 \end{align}
 HOW CAN ONE MAKE THE LEFT BRACKET LARGER? [WW]
-This function can be defined with user-defined systenatics. Similarly, calibration errors, shape
-errors, uncorrelated bin-to-bin errors, \etc , can be introduced. Furthermore, more complicated setups using multiple discrete sources and detectors can be simulated. For details, we refer to the manual~\cite{Manual}.
+This function can be defined with user-defined systematics. Similarly, calibration errors, shape
+errors, uncorrelated bin-to-bin errors, \etc , can be introduced. We show in \figu{reactor} the result of
+such a calculation, where the thick curve corresponds to \equ{chi2reactor} plus an additional 
+energy calibration error.
+Furthermore, more complicated setups using multiple discrete sources and detectors can be simulated. For details, we refer to the manual~\cite{Manual}.
 In the past, user-defined systematics has (as experimental feature) been used in \Ref~\cite{Huber:2006vr} to
 simulate Double Chooz and in \Ref~\cite{Barger:2006kp} to simulate T2KK. ANYTHING ELSE? [WW]
 
@@ -481,6 +560,8 @@ Schwetz. For example, if the minimizer runs into the wrong octant, user-defined 
 used to add a penalty and prevent it from doing so.
 
 \section{\AEDL\ changes and new experiment prototypes}
+
+TABLE FROM MANUAL?
 
 \bi
 \item 
