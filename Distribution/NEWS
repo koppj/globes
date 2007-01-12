@@ -785,3 +785,7 @@ documented!
           glb_experiment again, since they are already present in glb_smear)
         - Cleaned up my debugging comments in globes.h and glb_probability.c
         
+*********Version 2.4.6
+12/01/2007 MR
+        - new AEDL files included to data/ in directory tree
+	- AEDL files in examples/ interchanged and example files adapted
