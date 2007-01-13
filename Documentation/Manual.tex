@@ -310,13 +310,13 @@ probabilities, rate vectors, and $\Delta \chi^2$-values. Currently,
 \GLOBES\ is available for GNU/Linux. Since the source code is included,
 the port to other operating systems is in principle possible. The software
 as well as up-to-date versions of this manual can be found at this URL:
- \verb+http://www.ph.tum.de/~globes+
+ \verb+http://www.mpi-hd.mpg.de/~globes+
 
 \GLOBES\ allows to simulate experiments with stationary neutrino point sources, where each experiment is assumed to have only one neutrino source.
 Such experiments are neutrino beam experiments and reactor experiments. 
 Geometrical effects of a source distribution, such as in the sun or the 
 atmosphere, can not be described. In addition, sources with a physically 
-significant time dependencies  can not be studied, such as  supernov\ae. It 
+significant time dependence, such as supernov\ae, can not be studied. It 
 is, however, possible to simulate beams with bunch structure, since the 
 time dependence of the neutrino source is physically only important to suppress backgrounds. 
 
@@ -345,7 +345,7 @@ advanced features of \GLOBES , it provides the technology to
 project the $\Delta \chi^2$, which is a function of all oscillation
 parameters, onto any subspace of parameters by local minimization. 
 This approach allows the inclusion of multi-parameter-correlations,
-where external input (\eg, from solar parameters) can be imposed, too.
+where external input (\eg, from solar experiments) can be imposed, too.
 Applications of the projection mechanism include the projections onto the $\stheta$-axis and the $\stheta$-$\deltacp$-plane. In addition, all oscillation parameters can be kept free to precisely localize 
 degenerate solutions.
 
@@ -360,13 +360,13 @@ please cite the following references~\cite{globes_paper,globes_paper_two}
 \begin{quote}
 P. Huber, M. Lindner and W. Winter\\
 Simulation of long baseline neutrino oscillation experiments with \GLOBES\\
-Comput. Phys. Commun. 167 (2005) 195, arXiv:\glbxxx.   
+Comput. Phys. Commun. 167 (2005) 195, arXiv:\glbxxx,
 \end{quote}
 
 \begin{quote}
 P. Huber, J. Kopp, M. Lindner, M. Rolinec, and W. Winter\\
 TO BE DEFINED, NEEDS TO BE UPDATED [WW]\\
-arXiv:\glbxxxtwo.   
+arXiv:\glbxxxtwo,
 \end{quote}
 but \emph{not} this manual. This manual itself is not a scientific 
 publication and will not be submitted to a scientific journal. 
@@ -401,7 +401,7 @@ checked, too (for example, cross section or flux files). One can use
 the \verb+-v3+ option to \verb+globes+ to see which files
 are included.
 
-It is recommended that you use the same style for your own input files, since, in case they are distributed, everybody will know how to correctly reference your work.
+It is recommended that you use the same style for your own input files, since then, in case they are distributed, everybody will know how to correctly reference your work.
 
 \chapter*{What is new in \GLOBES ?}
 
@@ -506,7 +506,7 @@ now zero; see \Sec~\ref{sec:rules}
 
 As it is illustrated in \figu{GLOBES}, \GLOBES\ consists 
 of several modules.
-%
+
 \begin{figure}[bht]
 \begin{center}
 \includegraphics[width=16cm]{GLOBES}
@@ -515,7 +515,7 @@ of several modules.
 \end{figure}
 %
 \AEDL (``Abstract Experiment Definition Language'') is a language
-to define experiments in form of ordinary text files. One or more of 
+to define experiments in the form of ordinary text files. One or more of 
 the resulting \AEDL\ files can then be processed together with supporting 
 flux or cross section files by the user interface. The user interface
 is a C-library, which loads one or more \AEDL\ file(s)
@@ -524,7 +524,7 @@ against the application software, and provides the user interface functions
 for the intended experiment simulation. 
 
 The application 
-software is, except from some example files, not part of \GLOBES , since
+software is, except for some example files, not part of \GLOBES , since
 the evaluation of the experiment performance is often a matter of taste
 and definition. In addition, the algorithms depend, especially for
 high-precision instruments, very much on the oscillation parameters.
@@ -543,12 +543,12 @@ interested in the physics potential of different experiment types
 from a theoretical point of view.
 For the first group, \AEDL\ could be the most interesting aspect of
 \GLOBES , where the user interface is only a tool to obtain specific
-parameter sensitivities. In this case, \GLOBES\ could, serve as a
+parameter sensitivities. In this case, \GLOBES\ could serve as a
 unified tool for the comparison and optimization of different experiment
  setups on equal footing, where
 it is the primary objective to simulate the experiments as accurate
 as possible. In addition, changes in experimental parameters, such as
-efficiencies or the energy resolutions, can quickly be tested.
+efficiencies or energy resolutions, can quickly be tested.
 %
 For the second user group, the pre-defined 
 experiment definition files might already be sufficient to test
@@ -577,7 +577,7 @@ In \Part~\ref{part:2} of the manual, \AEDL\ is described. After an
 introductory chapter, all functions are defined in greater detail.
 This part might be more interesting for the experimental users who
 want to modify or create \AEDL\ files. A useful tool in this context
-is the software program \verb+globes+, which returns event rates and other
+is the executable program \verb+globes+, which returns event rates and other
 information for individual \AEDL\ files without further programming. 
 For example, flux normalizations can with this tool be easily adjusted 
 to reproduce the event rates of a specific experiment. It is described
@@ -592,6 +592,12 @@ in the last chapter of \Part~\ref{part:2}.
 % That is the only way in which the examples deviate form ISO C. Moreover
 % the actual numerical values of the results of the examples may be different
 % from the ones in this manual.
+%
+% Comment by JK: A pedantic C89 compile will reject the example files (it would
+% also reject GLoBES itself). With its default settings, gcc is relatively
+% tolerant, so everything works with gcc. I assume that also the Intel
+% compiler would be OK, but maybe Borland, Microsoft, or other compilers would
+% produce problems.
 
 \mainmatter
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

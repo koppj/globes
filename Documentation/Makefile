@@ -44,7 +44,7 @@ Manual.dvi : Manual.tex
 	latex Manual.tex
 
 Manual.pdf : Manual.dvi epspdf
-	pdfmanual
+	./pdfmanual
 
 pdf: Manual.pdf
 
