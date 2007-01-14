@@ -3016,27 +3016,38 @@ However, the probability engine has to be changed, which one would usually do by
 The key function types are
 \begin{function}
 \GLBNS{\_set\_oscillation\_parameters\_function}
-{\tt int (*glb\_set\_oscillation\_parameters\_function)(glb\_params p, void* user\_data)} reads the fundamental oscillation parameters
-obtained from {\tt p} and stores them into global variables accessible to {\tt glb\_probability\_matrix\_function}.
- In addition, it can be used to pre-compute quantities which are dependent on the oscillation paramaters only for efficiency. 
-In order to circumvent global variables, an arbitrary pointer can be used by {\tt user\_data} which is set by {\tt glbRegisterProbabilityEngine}.
+{\tt int (*glb\_set\_oscillation\_parameters\_function)(glb\_params p, void* user\_data)} is
+used to pass the fundamental oscillation parameters {\tt p} to the probability engine.
+The function should store them into variables accessible to {\tt glb\_probability\_matrix\_function}.
+In addition, it can be used to pre-compute quantities which are dependent on the oscillation paramaters for efficiency. 
+In order to circumvent global variables, arbitrary additional parameters can be
+passed to the function in {\tt user\_data}, which is set by {\tt glbRegisterProbabilityEngine}.
 \end{function}
 \begin{function}
 \GLBNS{\_get\_oscillation\_parameters\_function}
-{\tt int (*glb\_get\_oscillation\_parameters\_function)(glb\_params p, void* user\_data)} returns the fundamental oscillation parameters
-in {\tt p} which are obtained from the global variables accessible to {\tt glb\_probability\_matrix\_function}.
-In order to circumvent global variables, an arbitrary pointer can be used by {\tt user\_data} which is set by {\tt glbRegisterProbabilityEngine}.
+{\tt int (*glb\_get\_oscillation\_parameters\_function)(glb\_params p, void* user\_data)}
+reads the fundamental oscillation parameters from the internal variables of the probability
+engine, and writes them into {\tt p}.
+In order to circumvent global variables, arbitrary additional parameters can be
+passed to the function in {\tt user\_data}, which is set by {\tt glbRegisterProbabilityEngine}.
 \end{function}
 \begin{function}
 \GLBNS{\_probability\_matrix\_function}
 {\tt int (*glb\_probability\_matrix\_function)(double P[3][3], int cp\_sign, double E,
                   int psteps, const double *lengths, const double *densities,
-                  double filter\_sigma, void* user\_data)} calculates the neutrino oscillation probability matrix to be returned in {\tt P}. The {\tt cp\_sign} is +1 for neutrinos and -1 for antineutrinos. In addition, the matter density profile to be used is characterized by the number of steps {\tt psteps}, the lengths of the matter density layers in the list {\tt lengths}, and the corresponding densities in the list {\tt densities}. The parameter {\tt filter\_sigma} defines the width of the low-pass filter to be used, or no filter usage if negative.
-In order to circumvent global variables, an arbitrary pointer can be used by {\tt user\_data} which is set by {\tt glbRegisterProbabilityEngine}.
+                  double filter\_sigma, void* user\_data)}
+calculates the neutrino oscillation probability matrix and returns it in {\tt P}.
+The {\tt cp\_sign} is +1 for neutrinos and -1 for antineutrinos. In addition, the matter
+density profile to be used is characterized by the number of steps {\tt psteps}, the
+lengths of the matter density layers in the list {\tt lengths}, and the corresponding
+densities in the list {\tt densities}. The parameter {\tt filter\_sigma} defines
+the width of the low-pass filter to be used, or no filter usage if negative.
+In order to circumvent global variables, arbitrary additional parameters can be
+passed to the function in {\tt user\_data}, which is set by {\tt glbRegisterProbabilityEngine}.
 \end{function}
 These three function types correspond to the standard implementation functions \GLB{\_set\_oscillation\_parameters}, \GLB{\_get\_oscillation\_parameters}, and \GLB{\_probability\_matrix} in {\tt glb\_probability.c} of the source code of \GLOBES , where one can find the standard behavior and use it by cut and paste (including the variables and code used by these functions).
 
-In order to use non-standard physics in \GLOBES , one needs re-define the three above functions and register them after {\tt glbInit} with
+In order to use non-standard physics in \GLOBES , one needs to re-define the three above functions and register them after {\tt glbInit} with
 \begin{function}
 \GLBNS{RegisterProbabilityEngine}
 {\tt int glbRegisterProbabilityEngine(int n\_parameters,
@@ -3044,8 +3055,8 @@ In order to use non-standard physics in \GLOBES , one needs re-define the three 
                  glb\_set\_oscillation\_parameters\_function set\_params\_func, \\
                  glb\_get\_oscillation\_parameters\_function get\_params\_func, \\
                  void* user\_data)} registers a probability
-engine for the simulation of non-standard physics with {\tt n\_parameters} oscillation parameters ({\tt n\_parameters} $\ge6$). The three functions {\tt prob\_func}, {\tt set\_params\_func}, and {get\_params\_func} 
-will be used with the function types defined above. In order to circumvent global variables, an arbitrary pointer can be used by {\tt user\_data} being set by this function.
+engine for the simulation of non-standard physics with {\tt n\_parameters} oscillation parameters ({\tt n\_parameters} $\ge6$). The three functions {\tt prob\_func}, {\tt set\_params\_func}, and {\tt get\_params\_func} 
+will be used with the function types defined above. In order to circumvent global variables, an arbitrary pointer {\tt user\_data} can be defined, that will be passed to the probability engine in each function call.
 \end{function}
 The number of oscillation parameters can, at any time, be obtained with
 \begin{function}
@@ -3059,7 +3070,7 @@ This example is a simplified version of \Sec~4 of
 \Ref~\cite{Blennow:2005yk}.
 It uses an analytical probability calculation for a reactor experiment with a baseline being treated
 in vacuum for simplicity. The non-standard effect is the loss of coherence because of wave packet decoherence
-or any other such effect, \ie, one more oscillation parameter. We need to define two functions to access a set of 
+or any other such effect, \ie, we have one additional oscillation parameter. We need to define two functions to access a set of 
 global oscillation parameters
 \begin{quote}
 {\tt 
@@ -3153,7 +3164,7 @@ a fit region on $\stheta$-$\sigma_E$-space, where $\sigma_E$ is the
 non-standard decoherence parameter (\cf, \Ref~\cite{Blennow:2005yk}):
 \begin{quote}
 {\tt {\footnotesize
-  const GLB\_SIGMA\_E = 6; \\ \\
+  const int GLB\_SIGMA\_E = 6; \\ \\
   /* Fix theta13 and sigma\_E, and marginalize over all other parameters except deltaCP and th23, which do not enter P\_ee */ \\
   glbDefineProjection(myproj, GLB\_FREE, GLB\_FIXED, GLB\_FIXED,
     GLB\_FIXED, \\ \hspace*{0.5cm} GLB\_FREE, GLB\_FREE); \\
@@ -3225,7 +3236,7 @@ example using non-standard physics with the code from the last section on page~\
 \chapter{Experimental features}
 \label{chapt:experimental}
 
-Here we describe experimental features currently being implemented in \GLOBES . These features have not yet been tested extensively and should be used with care. They may evolve into standard features in the future, or they may not be supported anymore at a certain point. In general, the number of experiment features is small in a new release version, and increases towards a new version number.
+Here we describe experimental features currently being implemented in \GLOBES . These features have not yet been tested extensively and should be used with care. They may evolve into standard features in the future, or they may not be supported anymore at a certain point. In general, the number of experimental features is small in a new release version, and increases towards a new version number.
 
 \subsection*{\GLOBES\ 3.0 and higher}
 
