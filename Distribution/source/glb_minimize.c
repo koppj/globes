@@ -914,7 +914,7 @@ static double chi_NP(double x[])
 
  
 static double internal_glbSingleChiNP(const glb_params in, glb_params out, 
-			       int exp)
+                                      int exp)
 {
   double *sp2;
   double **mat2;
@@ -1047,6 +1047,7 @@ static double internal_glbSingleChiNP(const glb_params in, glb_params out,
   switch (glb_current_minimizer)
   {
     case GLB_MIN_POWELL:
+      count = 0;
       glb_invoke_hybrid_minimizer(exp, GLB_ALL, x, &er1);
       if (out != NULL)
       {
@@ -1054,6 +1055,7 @@ static double internal_glbSingleChiNP(const glb_params in, glb_params out,
           glbSetOscParams(out, x[i], i);
         for (i=0; i < glb_num_of_exps; i++)
           glbSetDensityParams(out, x[i+glbGetNumOfOscParams()], i);
+        glbSetIteration(out,count);
       }
       break;
 
@@ -1200,6 +1202,7 @@ static double internal_glbChiNP(const glb_params in, glb_params out)
   switch (glb_current_minimizer)
   {
     case GLB_MIN_POWELL:
+      count = 0;
       glb_invoke_hybrid_minimizer(GLB_ALL, GLB_ALL, x, &er1);
       if (out != NULL)
       {
@@ -1207,6 +1210,7 @@ static double internal_glbChiNP(const glb_params in, glb_params out)
           glbSetOscParams(out, x[i], i);
         for (i=0; i < glb_num_of_exps; i++)
           glbSetDensityParams(out, x[i+glbGetNumOfOscParams()], i);
+        glbSetIteration(out, count);
       }
       break;
 

@@ -794,3 +794,7 @@ documented!
 12/01/2007 JK
         - Update Makefile.am and Makefile.in in data/ directory
         - examples now use the new AEDL files
+        
+*********Version 2.4.8
+14/01/2007 JK
+        - Fixed small bug in hybrid minimizer: Iteration counter was missing
