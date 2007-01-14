@@ -1505,7 +1505,7 @@ the fit manifold is necessary. With this knowledge it is possible
 to obtain an approximate position for each local minimum 
 and thus to start the local minimizer 
 close enough to the investigated minimum.
- Fortunately, this can be done quite straightforward in most cases, since 
+ Fortunately, this can be done quite straightforwardly in most cases, since 
 the structure of the neutrino oscillation formulas does not cause very 
 complicated topologies of the fit manifolds. Especially the simulation of 
 reactor experiments and conventional beams or superbeams is rather simple 
@@ -1525,7 +1525,7 @@ thinks.
 
 Some more words of warning with respect to results obtained by projecting
 the $\chi^2$:
-The results obtained this way are always only a \emph{upper} bound on the
+The results obtained this way are always only an \emph{upper} bound on the
 value of the projected $\chi^2$ function, \ie\ an undiscovered minimum 
 decreases the value of the the projected $\chi^2$ function. If the value
 of the $\chi^2$ function in the missed minimum is larger than the
@@ -1534,12 +1534,12 @@ value.
 Thus, one can only run the danger to obtain a too optimistic solution 
 if one does not find the other local minima appearing 
 below the chosen confidence level. With this approach and proper usage,
- it should not possible to produce a too pessimistic solution. 
+ it should not be possible to produce a too pessimistic solution. 
 However, if one is not careful enough to locate
 all local minima, one can easily produce too optimistic solutions.
 This danger can be summarized as follows:
 \begin{equation}
-\mathrm{Too \, pessimistic \, result} \, < \, \underbrace{\mathrm{Real \, result}}_{\mathrm{Located \, by \, careful \, usage}} \, \le \, \mathrm{GLoBES \, result} \,  < \,  \mathrm{Too \, optimisitic \, result} \nonumber
+\mathrm{Too \, pessimistic \, result} \, < \, \underbrace{\mathrm{Real \, result}}_{\mathrm{Located \, by \, careful \, usage}} \, \le \, \mathrm{\GLOBES \, result} \,  < \,  \mathrm{Too \, optimisitic \, result} \nonumber
 \end{equation}
 
 \index{norm}{External information!priors} 
@@ -1548,24 +1548,23 @@ This danger can be summarized as follows:
 In many cases, the fit manifold is restricted by the knowledge 
 from earlier experiments. For example, the knowledge on the solar 
 parameters will in most cases be supplied by the solar neutrino experiments. 
-If the external precision of a parameter is at the time of the 
-measurement better than the one of the experiment itself, one usually will use
-this external, better knowledge and impose a corresponding constraint
- on this parameter. This external knowledge may reduce the extension of the 
+If, at the time of the measurement, the external precision of a parameter is
+better than the one of the considered experiment itself, one usually will use
+this better, external knowledge and impose a corresponding constraint
+ on this parameter. The external knowledge may reduce the extension of the 
 $n$-dimensional fit manifold in the respective direction. In the most 
 extreme case, keeping all parameters but the measured one fixed 
 in the analysis is equivalent to the assumption that all parameters 
-are determined externally with infinitively high precisions. As this 
-is a quite strong assumption, one should \emph{always} check the 
+are determined externally with infinitively high precision. As this 
+is quite a strong assumption, one should \emph{always} check the 
 consequences of relaxing it and using realistic errors. Only if such
 a test has demonstrated that the impact of the uncertainty on a 
-given fit parameter is negligible, it can be assumed as fixed safely. 
+given fit parameter is negligible, it can safely be assumed as fixed. 
  The inclusion of external input in \GLOBES\ is done by the use of 
 Gau\ss ian {\em priors}: We assume that an external measurement has 
-determined the measured parameter to be at the central value 
-(which we call {\em central value}) with a $1 \sigma$ Gau\ss ian error 
-(which we call {\em input error}). The explicit definition of these 
-priors will be shown in the next section. 
+determined the measured parameter to be at the \emph{central value}
+with a $1 \sigma$ Gau\ss ian error (which we call {\em input error}).
+The explicit definition of these priors will be shown in the next section. 
 
 \section{The treatment of external input}
 \label{sec:externalinput}
@@ -1593,8 +1592,8 @@ prior, and $\sigma_{\hat{\rho}}$ the $1 \sigma$ absolute (half width)
 determined the matter density with a precision (input error) 
 $\sigma_{\hat{\rho}}$ at the central value $\hat{\rho}^0$. Usually, 
 the central value is fixed at the best-fit value, and the input error 
-to the $1 \sigma$ half width of the external measurement. For the matter 
-density, $\hat{\rho}^0$  is usually set to $1.0$ corresponding to
+is chosen as the $1 \sigma$ half width of the external measurement. For the matter 
+density, $\hat{\rho}^0$  is usually set to $1.0$, corresponding to
 the actual matter density profile such as given by the experiment
  definition file, and $\sigma_{\hat{\rho}}$ to the 
 relative matter density uncertainty (\eg, $0.05$ for 5\% uncertainty).
@@ -1671,10 +1670,13 @@ and $5\%$ matter density uncertainties for all experiments looks like this:
 }
 \end{quote}
 In this example, the central values are set to 
-the true (simulated) values. Remember that initially the 
-matter density scaling factors are 
-all $1.0$, which means that they do not need to be adjusted for the
-central values.
+the true (simulated) values.
+
+%JK - NO LONGER TRUE IN GLOBES 3.0
+%Remember that initially the 
+%matter density scaling factors are 
+%all $1.0$, which means that they do not need to be adjusted for the
+%central values.
 
 \index{norm}{Minimizer!priors}
 \index{norm}{External information!priors}
@@ -1778,7 +1780,7 @@ The two lists of data then represent the $\stheta$ precisions with two-parameter
 \mycaption{\label{fig:projex} Left plot: The correlation between $\stheta$ and $\deltacp$ as calculated in the example on page~\pageref{ex:corrth13dcp}, but for 1 d.o.f. only. Right plot: The $\chi^2$-value of the projection onto the $\stheta$-axis as function of $\stheta$. The projection onto the  $\stheta$-axis is obtained by finding the minimum $\chi^2$-value for each fixed value of $\stheta$ in the left-hand plot, \ie, along the gray vertical lines. The thick gray curve marks the position of these minima in the left-hand plot. The arrows mark the obtained fit ranges for $\stheta$ at the $3 \sigma$ confidence level (1 d.o.f.), \ie , the precision of $\stheta$.}
 \end{figure}
 
-The projection onto the $\stheta$- (or $\deltacp$-) axis is performed by fixing $\stheta$ (or $\deltacp$) and minimizing the $\chi^2$-function over all free fit parameters and the matter densities. We illustrate this method at the example of the projection of the two-dimensional manifold in the $\stheta$-$\deltacp$-plane onto the $\stheta$-axis in \figu{projex}. In this figure, the left-hand plot shows the correlation in the $\stheta$-$\deltacp$-plane computed with {\tt glbChiSys}. The right-hand plot illustrates the projection of this two-dimensional manifold onto the $\stheta$ axis by minimizing $\chi^2$ over $\deltacp$. In this simple example, the minimization is done along the vertical gray lines in the left hand plot. The obtained minima are located on the thick gray curve, which means the the right-hand plot represents the $\chi^2$-value along this curve. In fact, one can easily see that one obtains the correct projected $3 \sigma$ errors in this example (\cf, arrows). This figure illustrates the projection of a two-parameter correlation. In general, the full $n$-parameter correlation is treated similarly by the simultaneous (local) minimization over all free fit parameters. 
+The projection onto the $\stheta$- (or $\deltacp$-) axis is performed by fixing $\stheta$ (or $\deltacp$) and minimizing the $\chi^2$-function over all free fit parameters and the matter densities. We illustrate this method by the example of the projection of the two-dimensional manifold in the $\stheta$-$\deltacp$-plane onto the $\stheta$-axis in \figu{projex}. In this figure, the left-hand plot shows the correlation in the $\stheta$-$\deltacp$-plane computed with {\tt glbChiSys}. The right-hand plot illustrates the projection of this two-dimensional manifold onto the $\stheta$ axis by minimizing $\chi^2$ over $\deltacp$. In this simple example, the minimization is done along the vertical gray lines in the left hand plot. The obtained minima are located on the thick gray curve, which means that the right-hand plot represents the $\chi^2$-value along this curve. In fact, one can easily see that one obtains the correct projected $3 \sigma$ errors in this example (\cf, arrows). This figure illustrates the projection of a two-parameter correlation. In general, the full $n$-parameter correlation is treated similarly by the simultaneous (local) minimization over all free fit parameters. 
 
 \index{norm}{Minimizer}
 The following functions are some of the simplest minimizers 
@@ -1826,7 +1828,7 @@ one (for the simulation of one experiment) or all (for the simulation of
 all experiments) are different from $1.0$ if matter density uncertainties
 are present, since each experiment may face other matter density conditions. 
 The minimizers of individual experiments ``know'' which
-experiment they are currently treating, which means that they only returned the
+experiment they are currently treating, which means that they only return the
 matter density scaling factor of the appropriate experiment.
 For example, calculating {\tt glbChiTheta13} for the last experiment
 number, the last density value will be returned.
@@ -1857,8 +1859,8 @@ Since the number of different parameter vectors used by \GLOBES\ may be a bit co
 \item[The fit values] are the values in the first parameter {\tt in} of {\tt glbChiTheta13} (and the other minimization functions) which are {\em fixed} by definition (such as $\theta_{13}$ for {\tt glbChiTheta13}). 
 \item[The starting point/educated guess for the minimizer] are the values in the first parameter {\tt in} of {\tt glbChiTheta13} (and the other minimization functions) which are {\em free} by definition (such as all but $\theta_{13}$ for {\tt glbChiTheta13}). 
 \item[The minimization result] of the marginalization process are the values in the second parameter {\tt out} of {\tt glbChiTheta13} (and the other minimization functions) which are {\em free} by definition (such as all but $\theta_{13}$ for {\tt glbChiTheta13}). The other values in {\tt out} still correspond to the fit values. 
-\item[The position of external priors,] \ie, the best-fit values of external input, is set by \GLB{SetCenralValues}.
-\item[The magnitude of external errors,] \ie, the errors themselves of external input, is set by \GLB{SetInputErrors}.
+\item[The position of external priors,] \ie, the best-fit values of external input, is set by \GLB{SetCentralValues}.
+\item[The magnitude of external errors,] \ie, the errors of external input, is set by \GLB{SetInputErrors}.
 \end{description}
 
 
@@ -1876,7 +1878,7 @@ The corresponding function is
 {\tt double glbChiTheta13Delta(const glb\_params in, glb\_params out, int exp)} returns the projected $\chi^2$ onto the $\theta_{13}$-$\deltacp$-plane for the  experiment {\tt exp}. For the simulation of all initialized experiments,
 use {\tt GLB\_ALL} for {\tt exp}. The values in {\tt in} are the guessed fit values for the minimizer (all parameters other than $\theta_{13}$ and $\deltacp$) and the fixed fit values of $\theta_{13}$ and $\deltacp$. The actually determined parameters at the minimum are returned in {\tt out}, where $\theta_{13}$ and $\deltacp$ are still at their fixed values. If {\tt out} is set to {\tt NULL}, this information will not be returned.
 \end{function}
-This function works analogously to the ones in the last section. They can, for example, be used to obtain a figure similar to \figu{projex}, left.
+This function works analogously to the ones in the last section. It can, for example, be used to obtain a figure similar to \figu{projex}, left.
 The example on page~\pageref{ex:corrproj} illustrates then the difference
 between the projections of the ``eggs'' within the 
 $\stheta$-$\deltacp$-plane onto the $\theta_{13}$-axis. 
@@ -1921,7 +1923,7 @@ oscillation parameter vector {\tt glb\_params}.
 Normally, the user does not need to access this type directly:
 A set of function similar to the ones for {\tt glb\_params} is
 provided. The purpose of {\tt glb\_projection} is to tell \GLOBES\ 
-what parameters are fixed, and what are minimized over. Thus, in
+which parameters are fixed, and which are minimized over. Thus, in
 comparison to {\tt glb\_params}, it does not take values for the
 parameters, but flags \GLBC{GLB\_FIXED} or \GLBC{GLB\_FREE}.
 For example, the projection onto the $\theta_{13}$-axis {\tt glbChiTheta13}
@@ -2039,7 +2041,7 @@ instead of $\theta_{12}$.
 }
 
 User-defined priors are an advanced concept of \GLOBES\ 3.0 and higher. Therefore,
-this section can be jumped over in a first reading of the manual.
+this section can be skipped in a first reading of the manual.
 They allow for arbitrary priors being added to the $\chi^2$ after the systematics
 minimization and before the marginalization over the oscillation parameters (\cf, \equ{priors}).
 Therefore, compared to user-defined systematics, they depend on the oscillation
@@ -2057,9 +2059,10 @@ two functions {\tt central} and {\tt error} being called everytime \GLB{SetCentr
 global variables for a faster access. These pointers can also be {\tt NULL}. The pointer {\tt user\_data} can be optionally used to circumvent the use of global variables. It is set by {\tt glbRegisterPriorFunction} and transferred to the registered functions whenever called.
 \end{function}
 
-The prior function has to be any function using one parameter {\tt glb\_params} containing the fit values.
+The prior function should expect the parameter structre {\tt glb\_params} containing the
+current fit values and the {\tt void}-pointer {\tt user\_data} as arguments.
 We show an example for a user-defined prior on page~\pageref{ex:userprior}. This prior
-will simply be registered with
+is simply registered with
 \begin{quote}
 {\tt
  glbInit(argv[0]); \\
