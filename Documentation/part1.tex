@@ -2740,10 +2740,10 @@ $100$ matter density steps and print them:
 \label{ex:barcharts}
 \index{norm}{Bar plots}
 \index{norm}{Systematics!on/off}
-Here it is demonstrated how one can successively include systematics, correlations, and degeneracies at the example of the $\stheta$-sensitivity limit.
-An important part of this example is how two switch the systematics off,
-\ie, how to obtain the sensitivity limit from statistics only. Since
-this example is very advanced, we only show the respective function of the code:
+Here, we demonstrate how systematics, correlations, and degeneracies
+can be succesively included in the calculation of the $\stheta$-sensitivity limit.
+The following code fragment shows how systematics can be switched off
+in order to compute the sensitivity limit from statistics only:
 \begin{quote}
 {\tt 
 /* Calculate chi2 with statistics only */ \\
@@ -2765,18 +2765,19 @@ double CalcNoSystematics(double theldm,double thex) \\
 
 \vspace*{-0.5cm}
 
-The complete code can be found as {\tt example4.c} with the software,
-which consists of many of the applications from the earlier examples.
-In addition, it uses a little trick: It avoids falling into the wrong
- solution with {\tt glbChiTheta13}
-by using the fit value of $\deltacp$ from the step before as prediction
-of the position of the current calculation.
+The complete code is very advanced and can be found in {\tt example4.c}.
+It includes many concepts from earlier examples, and, in addition,
+it uses a little trick: It avoids falling into the wrong solution with
+{\tt glbChiTheta13} by using the fit value of $\deltacp$ from the step
+before as prediction for the position of the minimum in the current calculation.
 
 The returned lists of data from the example represent $\chi^2$ 
 as function of the fit value of $\stheta$. The intersections of these
 curves with the line $\chi^2 = 9$ give the $\stheta$ sensitivity
-limits at the $3 \sigma$ confidence level, where we do not include the
- $\mathrm{sgn}(\ldm)$- and $(\deltacp,\theta_{13})$-degeneracies in the sensitivity limit with correlations only (green bar):
+limits at the $3 \sigma$ confidence level. Note that, in the following
+plot, the $\mathrm{sgn}(\ldm)$- and $(\deltacp,\theta_{13})$-degeneracies
+are not included in the sensitivity limit with correlations only (green bar),
+but only in the limit with degeneracies (yellow bar):
 \begin{center}
 \colorbox{white}{\includegraphics[width=6.5cm]{barsex}}
 \end{center}
@@ -2882,10 +2883,10 @@ As usual, all these functions return $-1$ if they were not successful.
 \index{norm}{AEDL@\AEDL!external parameters}
 
 Using external parameters in \AEDL\ files is a very powerful feature
-to change experiment parameters at running time which require that
+to change experiment parameters at running time, which requires, however, that
 the experiment be re-initialized. For example, one can change the
 energy resolution function or the number of energy bins. However,
-in some cases there might be complications, such that the number
+in some cases, there might be complications, such that the number
 of pre- or post-smearing efficiencies does not correspond to the number
 of energy bins anymore. Therefore, this feature needs to be 
 used with care.
@@ -2925,7 +2926,7 @@ for(i=5;i<20;i++) \\
 \}
 }
 \end{quote}
-Note that one does not have do re-initialize the oscillation
+Note that one does not have to re-initialize the oscillation
 parameter vectors every time within the loop as long as the
 number of experiments does not change.
 
