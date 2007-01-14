@@ -165,9 +165,9 @@ Iterations: 1693 \\
 Note that s22theta13 is unchanged/kept fixed: 0.0015! 
 }
 Instead of including the full correlation, we can take the
-correlation with every parameter except from $\deltacp$, \ie,
+correlation with every parameter except for $\deltacp$, \ie,
 we keep (in addition to $\theta_{13}$) $\deltacp$ fixed.
-This corresponds to projection onto the $\stheta$-$\deltacp$-plane:
+This corresponds to a projection onto the $\stheta$-$\deltacp$-plane:
 \gq{
  chi2 = glbChiTheta13Delta(fit\_values,minimum,GLB\_ALL); \\
 fprintf(stream,"chi2 with correlations other than with deltacp: \%g $\backslash$n$\backslash$n",chi2); 
@@ -204,7 +204,7 @@ statistics $\chi^2$ only:
 \go{
 chi2 with statistics only: 39.143
 }
-Let us now locate the exact position\footnote{For a exact definition of 
+Let us now locate the exact position\footnote{For an exact definition of 
 inverted hierarchy, see page~\pageref{mass_ordering}.} of the sgn-degeneracy:
 \gq{
   glbDefineParams(input\_errors,theta12*0.1,0,0,0,sdm*0.1,ldm/3); \\
@@ -603,7 +603,7 @@ library \index{norm}{libglobes@{\tt libglobes}}: \index{norm}{Initialization!\GL
 to be called in the beginning of each \GLOBES\ program. It takes the
 name {\tt name} of the program as a string to initialize the error handling
 functions. In many cases, it is sufficient to use the first
-argument from the command line as the program name (such as in example on page~\pageref{ex:c}).
+argument from the command line as the program name (such as in the example on page~\pageref{ex:c}).
 \end{function}
 
 \index{norm}{Experiment!number of}
@@ -611,11 +611,11 @@ In principle, the \GLOBES\ user interface can currently handle up to 32 of diffe
 of existing experiment definition files can, of course, be unlimited. This means that their $\Delta \chi^2$-values are added {\em after} the minimization over the systematics parameters, and {\em before} any minimization over the oscillation parameters. Note that each experiment
 assumes a specific matter density profile, which means
 that it makes sense to simulate different operation modes within one
-experiment definition, and physically different baselines in different
+experiment definition, and physically different baselines, in different
 definitions. For details of the rate computation and
 simulation techniques, we refer at this place to \Part~\ref{part:2}. Though
  the simplest case of simulating one experiment may be most often used, 
- using more than one experiments are useful in many cases. For example, combinations of experiments can be tested for
+ using several experiments is useful in many cases. For example, combinations of experiments can be tested for
 complementarity and competitiveness by equal means within one program.
 In general, many \GLOBES\ functions take the experiment number as
 a parameter, which runs from $0$ to \GLB{\_num\_of\_exps}-1 in the order of their initialization in the program.\footnote{Note that
@@ -793,17 +793,17 @@ as well as some other information, the parameter type \GLB{\_params} is used. In
  this type is often
 transferred to and from \GLOBES\ functions. Therefore, the memory 
 for these vectors has to be reserved (allocated) before they can be used, 
-and it has
-to be returned (freed) afterwards. \GLOBES\ functions usually use the pointers
-of the type {\tt glb\_params} for the input or output to the functions. As
-an input parameter, the pointer has to be created and point towards a valid
+and it has to be returned (freed) afterwards.
+\GLOBES\ functions usually use pointers
+of the type {\tt glb\_params} for the input or output to the functions.
+As an input parameter, the pointer has to be initialized with the address of a valid
 parameter structure, where the oscillation parameters are read from. As
-an output parameter, the pointer has to be created, too, and point towards
+an output parameter, it has to be initialized with the address of
 a structure which the return values will be written to.
 This parameter transfer concept seems to be very sophisticated, but, as we
 will see in the next chapters, it hides a lot of complicated parameter 
 mappings which otherwise need to be done by the user. For example, not
-only the oscillation parameters are stored in the pointer structure, but also information on the matter
+only the oscillation parameters are stored in the \GLB{\_params} structure, but also information on the matter
 densities of all of the initialized experiments. Since \GLOBES\ treats
 the matter density as a free parameter known with some external precision
 to include matter density uncertainties,
@@ -830,7 +830,7 @@ parameter structures be re-initialized, \ie, freed and allocated again.
 
 
 
-Another piece of information will be returned from the minimizers 
+Another piece of information that will be returned from the minimizers 
 (\cf, \Chapt~\ref{chapt:correlations}) and transferred
 into the {\tt glb\_params} structure is the number
 of iterations used for the minimization, which is proportional to the
@@ -950,7 +950,7 @@ parameter values. Therefore, it is often useful to show the results of a
 future measurement as function of the true parameter values for which the 
 reference rate vectors are computed -- at least within the currently allowed 
 ranges. The true parameter values for the vacuum neutrino oscillation 
-parameters have to be set by the function \GLB{SetOscillationParameters} 
+parameters have to be set by the function \GLB{SetOscillationParameters}, 
 and the reference rate vector, \ie\ the data, has to be computed by a call 
 to \GLB{SetRates}.
 This has to be done {\em before} any evaluation 
@@ -1126,15 +1126,16 @@ This equality will not hold for the minimizers in the next sections anymore.
  An example how to use  {\tt glbChiSys} can be found on page~\pageref{ex:corrth13dcp}.  
 
 \index{norm}{Systematics} \index{norm}{Pull method}
-The treatment of systematics in \GLOBES\ is performed by the so-call
+The treatment of systematics in \GLOBES\ is performed by the so-called
 {\em pull method} with the help of auxiliary systematics parameters.
-They are taken completely uncorrelated among different rules, and treated with simple Gau\ss ian statistics. In general, a rule is a set 
-of signal and background event rates coming from different oscillation
-channels, where the event rates of all rule contributions are added.
-For more details of the rule concept, see \Part~\ref{part:2} of this manual,
+They are taken to be completely uncorrelated among different rules,
+and treated with simple Gau\ss ian statistics.
+In general, a rule is a prescription for summing up experimentally indistinguishable
+signal and background events from different oscillation channels.
+For more details on the rule concept, see \Part~\ref{part:2} of this manual,
 and for the treatment of systematics, see \Sec~\ref{sec:rules}.
  
- One example for a systematics parameter the signal normalization error, \ie, an error to the overall normalization of the signal. For illustration, we assume that the signal event rate in the $i$th bin $s_i^0$ of one oscillation channel is altered by the overall normalization auxiliary parameter\index{norm}{Auxiliary parameter} of this channel, \ie , 
+ One example for a systematics parameter is the signal normalization error, \ie, an error on the overall normalization of the signal. For illustration, we assume that the signal event rate in the $i$th bin $s_i^0$ of one oscillation channel is altered by the overall normalization auxiliary parameter\index{norm}{Auxiliary parameter} of this channel, \ie , 
 \be
  s_i = s_i(n_s) = s_i^0 \cdot (1 + n_s),
 \ee
@@ -1226,8 +1227,8 @@ higher. It can be omitted in a first reading of the manuscript.
 
 User-defined systematics is, compared to the built-in systematics, a compound between
 the AEDL definition and some source code defining the behavior. In the simplest case,
-the AEDL file defines user-defined systematics for a specific rule and gives it a 
-name/identifier,  as will as it defines the systematical errors. The source code has then to match this AEDL
+the AEDL file defines user-defined systematics for a specific rule, gives it a 
+name/identifier, and defines the systematical errors. The source code has then to match this AEDL
 definition -- therefore, make sure to use only unique identifiers. 
 Ones needs to register the user-defined systematics in the 
 source code (typically after {\tt glbInit}) with
@@ -1245,10 +1246,15 @@ The user-defined systematics function itself has to have the pre-defined type
 {\tt double (*glb\_chi\_function)(int exp, int rule, int dim, double *params, double *errors, void* user\_data)}.
 In this function type, {\tt exp} is the experiment number, {\tt rule} is the rule number, {\tt dim} is the number of systematics parameters, {\tt params} is an array of the systematics auxiliary parameters themselves, and {\tt errors} is an array with the systematical errors. The parameter {\tt user\_data} is set as defined with
 {\tt glbDefineChiFunction}.
-Note the the central values for {\tt params} are $0$, which means that $0$ corresponds to the un-modified rates. The array indices are running from $0$ to {\tt dim}-1.
+Note the the central values for {\tt params} are $0$, which means that $0$ corresponds to the un-modified rates. The array indices run from $0$ to {\tt dim}-1.
 \end{function}
 Note that this function will be called many times by the \GLOBES\ minimizers.
-Therefore the function should be as efficient as possible. In many cases, it is also recommendable to use different functions for different rules, since the fewer auxiliary parameters in the minimization, the faster the routine will be. In addition, note that complicated systematics with many parameters may introduce complicated (unknown) topologies for the minimization, which means that the minimizers may
+Therefore the function should be as efficient as possible.
+%JK - THIS IS INCORRECT: ONE MINIMIZATION OVER, SAY, 8 PARAMETERS IS FASTER THAN
+%2 MINIMIZATIONS OVER 4 PARAMETERS EACH-
+%In many cases, it is also recommendable to use different functions for different
+%rules, since the fewer auxiliary parameters in the minimization, the faster the routine will be.
+In addition, note that complicated systematics with many parameters may introduce complicated (unknown) topologies for the minimization, which means that the minimizers may
 end up in a local minimum instead of the global minimum. \GLOBES\ provides the function \GLB{SetSysStartingValuesList} to change the starting values of the minimizer in the case of
  convergence problems (see below).
 A typical implementation may look like the following code, where ``{\tt chiDCNorm}'' is the identifier
@@ -1264,7 +1270,7 @@ assigned in the AEDL definition:
    \hspace*{0.5cm} ... /* Some code to calculate the chi2 */ \\
    \\
     \hspace*{0.5cm} /* Here the systematics priors (penalties) are added: */ \\
-    \hspace*{0.5cm} for(i=0;i<dim;i++) chi2 += (x[i]*x[i]/errors[i]/errors[i]);
+    \hspace*{0.5cm} for(i=0;i<dim;i++) chi2 += (x[i]*x[i])/(errors[i]*errors[i]);
     \hspace*{0.5cm} return chi2; \\
   \} \\
    \\
@@ -1277,7 +1283,7 @@ assigned in the AEDL definition:
  \} \\
 }
 \end{quote}
-During running time, it is also possible to change the user-defined systematics of an experiment or
+During running time, it is also possible to change the systematics of an experiment or
 rule (as compared to the systematics assigned in the AEDL file or earlier) with the following function:
 \begin{function}
 \GLBNS{SetChiFunction}
@@ -1286,15 +1292,15 @@ rule (as compared to the systematics assigned in the AEDL file or earlier) with 
 instead of the built-in systematics
 to calculate $\chi^2$ for the experiment {\tt exp} and the rule {\tt rule}. 
 Both of the parameters {\tt exp} and {\tt rule} can take the value \GLBC{GLB\_ALL} to specify that the
-user-defined systematics can be used for each experiment or each rule. The parameter 
-{\tt on\_off} determines if the systematics function should be used for systematics on
-{\tt GLB\_ON} or systematics off {\tt GLB\_OFF}.
-The array {\tt errors} sets the systematical errors in the order they
-are defined in the AEDL file (running from $0$ to the number of systematics parameters-1). 
-Returns zero, if successful.
+given systematics function should be used for each experiment or each rule. The parameter 
+{\tt on\_off} determines if the systematics function should be used when systematical errors
+are switched on ({\tt GLB\_ON}), or when they are switched off ({\tt GLB\_OFF}).
+The array {\tt errors} sets the systematical errors in the order in which they
+are expected by the systematics function (indices run from $0$ to
+the number of systematics parameters-1). The function returns zero, if successful.
 \end{function}
-Note that the new user-defined systematics has to be registered with {\tt glbDefineChiFunction} first. 
-One can also return the systematics function name by 
+Note that new user-defined systematics functions have to be registered with {\tt glbDefineChiFunction} first. 
+One can also request the systematics function name by 
 \begin{function}
 \GLBNS{GetChiFunction}
 {\tt int glbGetChiFunction(int exp, int rule, int on\_off, char *sys\_id)}
@@ -1321,7 +1327,7 @@ A very useful function to include energy calibration errors is
 \begin{function}
 \GLBNS{ShiftEnergyScale}
 {\tt glbShiftEnergyScale(double b, double *rates\_in, double *rates\_out,int bins, double emin, double emax)}
-shifts the energy scale in {\tt rates\_in} by the amount {\tt b} and stores the result in 
+shifts the energy scale in {\tt rates\_in} by the relative amount {\tt b} and stores the result in 
 {\tt rates\_out}. The parameters {\tt emin} and {\tt emax} denote the minimal and maximal energy
 as obtained with \GLB{GetEminEmax}. Requires constant energy bin widths!
 \end{function}
@@ -1343,7 +1349,7 @@ where $O_{N,i}$ and $O_{F,i}$ are the event rates for the $i$-th bin in the near
 far detector, calculated for the assumed ``true'' values of the oscillation parameters.
 $T_{d,i}$ are the event rates for the parameter values that are currently being tested.
 $a_R$, $a_N$ and $a_F$ parametrize the small uncertainties in the reactor flux and the fiducial
-mass of the two detectors. In this example their central values are assumed to be zero,
+mass of the two detectors. In this example, their central values are assumed to be zero,
 while their standard deviations are $\sigma_R$, $\sigma_N$ and $\sigma_F$.
 %
 The first line of \equ{chi2reactor} is the standard $\chi^2$ expression for
@@ -1389,7 +1395,7 @@ In this case, the systematics {\tt chiZero} is used for systematics on, which me
 be no active $\chi^2$ calculation in this rule. With this definition, the user-defined systematics
 will only be called once for the far detector. However, the rates from the near detector will be 
 passively provided for the common $\chi^2$ function.
-You can find the corresponding files {\tt dchooz-near.glb} and {\tt dchooz-far.glb}, you will need for {\tt example5.c}, in the example directory. 
+You can find the corresponding files {\tt dchooz-near.glb} and {\tt dchooz-far.glb} you will need for {\tt example5.c}, in the example directory. 
 %
 We show the implementation of the $\chi^2$ function in the example on page~\pageref{ex:syst},
 where we in addition include an uncorrelated energy calibration error. See \figu{reactor} for the result
@@ -1399,7 +1405,8 @@ of this example.
 \begin{center}
 \includegraphics[width=10cm]{reactor}
 \end{center}
-\mycaption{\label{fig:reactor} The result from {\tt example5.c} (figure similar in \Ref~\cite{Huber:2006vr}). The fat curve corresponds to the systematics on page~\pageref{ex:syst}.}
+\mycaption{\label{fig:reactor} The result from {\tt example5.c} (figure similar to the one
+in \Ref~\cite{Huber:2006vr}). The thick curve corresponds to the systematics on page~\pageref{ex:syst}.}
 \end{figure}
 
 Further functions useful in the context of user-defined systematics are:
@@ -1417,7 +1424,8 @@ returns a pointer to the list of systematical errors as defined in the AEDL file
 rule {\tt rule}. Choose
 systematics on or systematics off by using {\tt GLB\_ON} or {\tt GLB\_OFF} for {\tt on\_off}. 
 \end{function}
-In addition, in some cases the systematics minimization may not converge very fast or not at all, because it end up in a local minimum. In this case, one can change the starting values of the minimizer, \ie, the
+In cases where the systematics minimization does not converge fast enough or ends
+up in a local minimum, one can change the starting values of the minimizer, \ie, the
 starting point from which the local minimizer rolls into the local minimum.
 \begin{function}
 \GLBNS{SetSysStartingValuesList} 
