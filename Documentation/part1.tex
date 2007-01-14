@@ -2094,7 +2094,7 @@ Though the usage of the all-parameter minimizers is quite simple, one should kee
 In many cases, one can find the exact position of the 
 $\mathrm{sgn}(\ldm)$-degeneracy with \GLB{ChiAll}, where one starts 
 the local minimizer at the suspected position 
-and let it run into the minimum.  The following code excerpt  corresponds to finding the degenerate solution for the example on
+and lets it run into the minimum.  The following code excerpt  corresponds to finding the degenerate solution for the example on
   page~\pageref{ex:corrth13dcp}, and it is from {\tt example3.c}: 
 \begin{quote}
 {\tt
@@ -2118,7 +2118,7 @@ and let it run into the minimum.  The following code excerpt  corresponds to fin
 }}
 \end{quote}
 
-Using {\tt ent\_pos} to obtain a section of the degeneracy in the
+Using {\tt deg\_pos} to obtain a section of the degeneracy in the
 $\stheta$-$\deltacp$-plane (\cf, {\tt example3.c}), one can plot it as a contour plot in addition to the original solution (2 d.o.f., gray curves):
 \begin{center}
 \colorbox{white}{\includegraphics[width=7.5cm]{correntex}}
@@ -2148,7 +2148,7 @@ The minimizer then runs off the plane of these parameters into the local minimum
 \label{mass_ordering}
 \index{norm}{Mass hierarchy}
 \paragraph{Note:} Inverting the mass hierarchy is not
-precisely the same than to change from $\Delta m^2_{31}
+precisely the same as changing from $\Delta m^2_{31}
 \rightarrow -\Delta m^2_{31}$.
 In this case the absolute value of $\Delta m^2_{32}$ changes also, which
 introduces a new frequency to the problem. Therefore, if we assume
@@ -2164,7 +2164,7 @@ For the more advanced reader, a number of tricks can be useful for the numerical
 \item[Minimum $\boldsymbol{\chi^2}$ larger than threshold.] If a located degeneracy has a minimum $\chi^2$ larger than the corresponding confidence level threshold for the discussed quantity of interest, the degeneracy can be immediately ignored. This saves a lot of computation time.
 \item[Locating degeneracies in more complicated topologies.] For more complicated topologies, such as for neutrino factories, it is often useful to use multi-step location procedures or analytical knowledge. For example, for a numerical procedure, one may first of all switch off the systematics and keep $\stheta$ or $\deltacp$ fixed, \ie, use {\tt glbChiTheta13}, where $\stheta$ or $\deltacp$ is fixed at the best-fit value. The result can then be used as a starting point for {\tt glbChiAll} for the individual experiments with the systematics switched on again. 
 \item[Forcing the minimizer into the targeted solution.]
-In addition to switching off the systematics, it can be useful to reduce the input errors during some steps of the localization process in order to make the minimizer not to run away too much from the targeted solution.
+In addition to switching off the systematics, it can be useful to reduce the input errors during some steps of the localization process in order to prevent the minimizer from running away too far from the targeted solution.
 The example on page~\pageref{ex:sgndeg} illustrates this with the
 input error for $\ldm$: Since the guessed starting point might be
 quite far away from the real degeneracy, the algorithm may in some cases
@@ -2179,16 +2179,16 @@ minimum as {\tt in} vector, and $\ldm$ kept free.
 \item[Tracking algorithm.] If one scans a large portion of the parameter space with different input values, it is often useful to use the output from the previous minimization as educated guess for the next minimization. This works often very well if the degeneracy can be located in a part of the parameter space and the input parameter values change slowly enough (adiabatic transformation of the fit manifold). 
 \item[Pre-scanning the parameter space.] In some cases, a very fast procedure can be a pre-scan 
 of the relevant parameters using the very fast {\tt glbChiSys}. For example, for the intrinsic degeneracy, the location of the degeneracy in the $(\deltacp,\theta_{13})$ plane can easily and quickly found with {\tt glbChiSys} while keeping the other parameters fixed. Use this location then as a starting point for {\tt glbChiAll}.
-\item[Manual scan of a subspace.] In some cases, the minimizer easily ends up in the wrong/unwanted solution, which is in most cases the already known best-fit solution. For example, for the octant degeneracy location, it is difficult to prevent the minimizer from running into the best-fit octant. In this case, one can scan one parameter (such as $\theta_{23}$) on a grid by choosing only valid values, and use {\tt glbChiNP} to marginalize over the other ones (while keeping \eg\ $\theta_{23}$ fixed). Therefore, the 6-parameter minimization is split into a 1-parameter manual minimization and a 5-parameter simultaneous minimization. Advantage: Runs with all \GLOBES\ versions. Disadvantage: Very slow. 
+\item[Manual scan of a subspace.] In some cases, the minimizer easily ends up in the wrong/unwanted solution, which is in most cases the already known best-fit solution. For example, when locating the octant degeneracy, it is difficult to prevent the minimizer from running into the best-fit octant. In this case, one can scan one parameter (such as $\theta_{23}$) on a grid by choosing only valid values, and use {\tt glbChiNP} to marginalize over the other ones (while keeping \eg\ $\theta_{23}$ fixed). Therefore, the 6-parameter minimization is split into a 1-parameter manual minimization and a 5-parameter simultaneous minimization. Advantage: Runs with all \GLOBES\ versions. Disadvantage: Very slow. 
 \item[Using Schwetz-priors (\GLOBES\ 3.0 and higher).] An elegant and fast method to prevent the minimizer from running into parts of the parameter space is to use user-defined priors and add a penalty as soon as a taboo zone is entered (\cf, \Sec~\ref{sec:userdefined}). This method was initially suggested by Thomas Schwetz.
 \item[Using total rates.] In order to systematically locate all degeneracies (the eight-fold degeneracy), relatively reliable methods use the total appearance neutrino and antineutrino event rates of the experiment to determine educated guesses. The method goes as follows: Plot the curves with equal total rate in the $\sin^2 2 \theta_{13}$-$\delta_{\mathrm{CP}}$-plane for both neutrinos and antineutrinos using the same rates as in the best-fit point. The curves will intersect at the intrinsic degeneracy (if it all). Plot the same curves for the same rates with $\mathrm{sgn}(\Delta m_{31}^2)$ flipped. Again you will find a maximum of two intersection points. Now do the same for $\pi/2 - \theta_{23}$ flipped, and for  $\mathrm{sgn}(\Delta m_{31}^2)$ combined with $\pi/2 - \theta_{23}$ flipped (mixed degeneracy). You will find at most two more intersection points in each case.
 The results should look somewhat like this, where the best-fit point is not marked (the marks correspond to the points where the discrete degeneracies are located according to this specific algorithm):
 \begin{center}
 \includegraphics[width=0.95\textwidth]{ircurves}
 \end{center}
- Altogether, there is a maximum of eight intersection points in the $\sin^2 2 \theta_{13}$-$\delta_{\mathrm{CP}}$-plane, one of which is the best-fit point. These points can be using as starting points of the minimizer to locate the eight-fold degeneracy. Note that similar methods using the $\chi^2$ instead of the total rates have also been successfully used in the past. 
+ Altogether, there is a maximum of eight intersection points in the $\sin^2 2 \theta_{13}$-$\delta_{\mathrm{CP}}$-plane, one of which is the best-fit point. These points can be used as starting points for the minimizer to locate the eight-fold degeneracy. Note that similar methods using the $\chi^2$ instead of the total rates have also been successfully used in the past. 
 \end{description}
-Finally, note that any degenerate solution below the confidence level threshold which cannot be located makes the result appear better than it actually is. Thus, one should be careful with the determination of the degenerate solutions in order to find all of them.
+Finally, note that any degenerate solution below the confidence level threshold, which cannot be located, makes the result appear better than it actually is. Thus, one should be careful with the determination of the degenerate solutions in order to find all of them.
 \index{norm}{Degeneracies|)}
 
 
@@ -2197,7 +2197,7 @@ Finally, note that any degenerate solution below the confidence level threshold 
 \index{norm}{Low-level information}
 
 In this chapter, we discuss possibilities to obtain low-level information
-in \GLOBES , \ie, about oscillation probabilities, rates, and other
+in \GLOBES , \ie, oscillation probabilities, rates, and other
 information lower than on the $\chi^2$-level.
 
 \section{Oscillation probabilities}
@@ -2218,8 +2218,6 @@ with:
 {\tt double glbProfileProbability(int exp, int l, int m, int panti,double E)} returns the neutrino oscillation probability $\nu_l \rightarrow \nu_m$ for the energy {\tt E} in matter, where the matter density profile
 is the one of experiment {\tt exp}. The parameter
 {\tt panti} is $+1$ for neutrinos and $-1$ for antineutrinos.
-The matter density profile including baseline is the one from the last
-evaluated experiment. 
 \end{function}
 For a constant matter density profile, it is sufficient to specify the oscillation channel with
 \begin{function}
@@ -2228,7 +2226,7 @@ For a constant matter density profile, it is sufficient to specify the oscillati
 has the constant density {\tt rho} and the baseline is {\tt L}. The parameter
 {\tt panti} is $+1$ for neutrinos and $-1$ for antineutrinos.
 \end{function}
-If one in addition wants to use the low-pass filter feature in \GLOBES\ (see \Sec~\ref{sec:energy}), can can use
+If one in addition wants to use the low-pass filter feature in \GLOBES\ (see \Sec~\ref{sec:energy}), one can can use
 \begin{function}
 \GLBNS{FilteredConstantDensityProbability}
 {\tt double glbFilteredConstantDensityProbability(int exp, int l, int m, int panti, double E)} returns the neutrino oscillation probability $\nu_l \rightarrow \nu_m$ for the energy {\tt E} in constant matter, where the matter density and baseline, as well as the filter properties are taken from experiment {\tt exp}. The parameter {\tt panti} is $+1$ for neutrinos and $-1$ for antineutrinos.
@@ -2243,19 +2241,19 @@ files. Very basic information is supplied with
 \begin{function}
 \GLBNS{GetEminEmax}
 {\tt int glbGetEminEmax(int experiment, double *emin, double *emax)} returns the
-energy range [{\tt emin},{\tt emax}] covered by the binning as defined in the AEDL file for the experiment
+energy range [{\tt emin}, {\tt emax}] covered by the binning as defined in the AEDL file for the experiment
 {\tt experiment}.
 \end{function}
 \begin{function}
 \GLBNS{GetEnergyWindow}
 {\tt int glbGetEnergyWindow(int exp, int rule, double *low, double *high)} returns the
-energy window [{\tt low},{\tt high}] defined in the AEDL file for the experiment
+energy window [{\tt low}, {\tt high}] defined in the AEDL file for the experiment
 {\tt exp} and rule {\tt rule}.
 \end{function}
 \begin{function}
 \GLBNS{GetEnergyWindowBins}
 {\tt int glbGetEnergyWindowBins(int exp, int rule, int *lowbin, int *highbin)} returns the
-energy window in terms of bin numbers [{\tt lowbin},{\tt highbin}] corresponding to the energy window defined in the AEDL file for the experiment {\tt exp} and rule {\tt rule}.
+energy window in terms of bin numbers [{\tt lowbin}, {\tt highbin}] corresponding to the energy window defined in the AEDL file for the experiment {\tt exp} and rule {\tt rule}.
 \end{function}
 \begin{function}
 \GLBNS{GetNumberOfBins}
@@ -2334,17 +2332,17 @@ channels of experiment {\tt exp}.
 
 
 \index{norm}{AEDL@\AEDL!names}
-Since in \AEDL\ rules, cross section, fluxes etc. carry a `name' by
-which they can be refered to and in C they cary only an integer as
-index it is sometimes difficult to figure out the correct correspondence.
+Since in \AEDL\, rules, cross section, fluxes etc. carry a `name' by
+which they can be refered to, while in C they carry only an integer
+index, it is sometimes difficult to figure out the correct correspondence.
 Therefore the information about this correspondence obtained during
-parsing is stored and can be accessed within C by these two functions.
+parsing is stored and can be accessed within C by the following two functions.
 \begin{function}
 \GLBNS{NameToValue}
 {\tt int glbNameToValue(int exp, const char* context, const char *name)}
 Converts an \AEDL\ name given as argument {\tt name} into the corresponding
 C index. The variable {\tt context} describes wether this name belongs
-to a rule, channel, flux, energy or cross type environment. {\tt exp}
+to a rule, channel, flux, energy, or cross type environment. {\tt exp}
 is the number of the experiment and can not be {\tt GLB\_ALL}. It returns
 either the index in case of success or {\tt -1} in case the name was not
 found. 
@@ -2373,8 +2371,8 @@ requires some knowledge about the experiment definition.
 In fact, many of these functions are very advanced, which means
 that the reader who wants to use them should be familiar with
 \Secs~\ref{sec:channel} and~\Sec~\ref{sec:rules} of the \AEDL\ manual.
-Note that some of the event rate access has changed in \GLOBES\ 3.0,
-because user-defined systematics requires very fast access which was
+Note that parts of the event rate access have changed in \GLOBES\ 3.0,
+because user-defined systematics require very fast access, which was
 not possible with the old method.
 
 A very simple function is for the total rate
@@ -2406,7 +2404,7 @@ information:
 \GLBNS{ShowRuleRates}
 {\tt int glbShowRuleRates(FILE* stream, int exp, int rule, int pos,
 int effi, int bgi, int coeffi, int signal)} prints the binned rule rates as
-list with energy and event rate to the file {\tt stream} (either an
+a list with energy and event rate to the file {\tt stream} (either an
 open file, or {\tt stdout}). A specific experiment {\tt exp} and a 
 specific rule {\tt rule} have to be chosen, as well as the signal
 or background rate {\tt signal} (either \GLBC{GLB\_SIG} or \GLBC{GLB\_BG}).
@@ -2427,7 +2425,7 @@ is $0$ if successful, and $-1$ if unsuccessful.
 {\tt int glbShowChannelRates(FILE *stream,
 int exp, int channel, int smearing, int effi, int bgi)}
 prints the binned channel rates as
-list with energy and event rate to the file {\tt stream} (either an
+a list with energy and event rate to the file {\tt stream} (either an
 open file, or {\tt stdout}). A specific experiment {\tt exp} and a 
 specific channel {\tt channel} have to be chosen.
 The function may return
@@ -2448,41 +2446,41 @@ For rate vectors, \GLOBES\ currently supports rule-based and channel-based event
 \begin{function}
 \GLBNS{GetChannelRatePtr}
 {\tt double *glbGetChannelRatePtr(int exp, int ch, int pre\_post)} returns a 
-pointer on the simulated rate vector of experiment {\tt exp} and channel {\tt ch}. Either
+pointer to the simulated rate vector of experiment {\tt exp} and channel {\tt ch}. Either
 pre-smearing ({\tt pre\_post} is {\tt GLB\_PRE}) or post-smearing ({\tt pre\_post} is {\tt GLB\_POST})
 rates can be accessed.
 \end{function}
 \begin{function}
 \GLBNS{GetRuleRatePtr}
 {\tt double *glbGetRuleRatePtr(int exp, int rule)} returns a 
-pointer on the simulated rate vector of experiment {\tt exp} and rule {\tt rule}.
+pointer to the simulated rate vector of experiment {\tt exp} and rule {\tt rule}.
 \end{function}
 \begin{function}
 \GLBNS{GetSignalRatePtr}
 {\tt double *glbGetSignalRatePtr(int exp, int rule)} returns a 
-pointer on the simulated signal rate vector of experiment {\tt exp} and rule {\tt rule}.
+pointer to the simulated signal rate vector of experiment {\tt exp} and rule {\tt rule}.
 \end{function}
 \begin{function}
 \GLBNS{GetBGRatePtr}
 {\tt double *glbGetBGRatePtr(int exp, int rule)} returns a 
-pointer on the simulated background rate vector of experiment {\tt exp} and rule {\tt rule}.
+pointer to the simulated background rate vector of experiment {\tt exp} and rule {\tt rule}.
 \end{function}
 \begin{function}
 \GLBNS{GetChannelFitRatePtr}
 {\tt double *glbGetChannelFitRatePtr(int exp, int ch, int pre\_post)} returns a 
-pointer on the fit rate vector of experiment {\tt exp} and channel {\tt ch}. Either
+pointer to the fit rate vector of experiment {\tt exp} and channel {\tt ch}. Either
 pre-smearing ({\tt pre\_post} is {\tt GLB\_PRE}) or post-smearing ({\tt pre\_post} is {\tt GLB\_POST})
 rates can be accessed.
 \end{function}
 \begin{function}
 \GLBNS{GetSignalFitRatePtr}
 {\tt double *glbGetSignalFitRatePtr(int exp, int rule)} returns a 
-pointer on the fit signal rate vector of experiment {\tt exp} and rule {\tt rule}.
+pointer to the fit signal rate vector of experiment {\tt exp} and rule {\tt rule}.
 \end{function}
 \begin{function}
 \GLBNS{GetBGFitRatePtr}
 {\tt double *glbGetBGFitRatePtr(int exp, int rule)} returns a 
-pointer on the fit background rate vector of experiment {\tt exp} and rule {\tt rule}.
+pointer to the fit background rate vector of experiment {\tt exp} and rule {\tt rule}.
 \end{function}
 A simple example how to use these functions to print a rate vector is
 \begin{quote}
