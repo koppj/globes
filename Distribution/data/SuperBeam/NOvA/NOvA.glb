@@ -34,13 +34,13 @@ $version="3.0.0"
  #*  eprint    = "Off-Axis-Note-SIM-30"
  #* }
  *
- * This represent the new running plan, assuming 1.2 MW beam power
+ * This represent the new running plan, assuming 1.12 MW beam power
  * (compared to 0.75MW), 3 year nu and 3 year nu-bar with a 25kt
  * detector. See email from M. Messier from Sep 21 2006 to the FNAL
  * long baseline mailing list. Thus we get 30E20 POT nu running and
  * 30E20 POT nu-bar running.
  *
- *  Last Update: 12/01/06 
+ *  Last Update: 15/01/06 
  * 
   */
 
