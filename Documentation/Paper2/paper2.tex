@@ -578,22 +578,115 @@ Another very interesting option is the use of penalties in degeneracy localizati
 Schwetz. For example, if the minimizer runs into the wrong octant, user-defined priors can be
 used to add a penalty and prevent it from doing so.
 
-\section{\AEDL\ changes and new experiment prototypes}
+\section{\AEDL\ changes and experiment prototypes}
 
-TABLE FROM MANUAL?
+\begin{table}[t!]
+{\small
+\begin{center}
+\begin{tabular}{llp{7.0cm}c}
+\hline
+Experiment & Filename & Short description &  \Refs \\
+\hline 
+\multicolumn{4}{l}{\underline{Superbeam experiments:}} \\
+T2K & {\tt T2K.glb} & J-PARC to Super-Kamiokande &  \cite{Itow:2001ee,Huber:2002mx} \\
+T2HK & {\tt T2HK.glb} & J-PARC to Hyper-Kamiokande &  \cite{Itow:2001ee,Huber:2002mx} \\
+NO$\nu$A & {\tt NOvA.glb} & Fermilab NuMI beamline off-axis  & \cite{Ambats:2004js,Yang_2004} \\
+SPL & {\tt SPL.glb} & CERN to Fr\'{e}jus & \cite{Campagne:2006yx,Campagne:2004wt,Mezzetto:2003mm} \\[0.2cm]
+\multicolumn{4}{l}{\underline{Reactor experiments:}} \\
+{\sc Reactor-I} & {\tt Reactor1.glb} & Small reactor exp., 
+$\mathcal{L} = 400 \, \mathrm{t} \, \mathrm{GW} \, \mathrm{yr}$
+& \cite{Huber:2003pm} \\
+{\sc Reactor-II} & {\tt Reactor2.glb} & Large reactor exp., 
+$\mathcal{L} = 8\, 000 \, \mathrm{t} \, \mathrm{GW} \, \mathrm{yr}$ 
+& \cite{Huber:2003pm} \\
+Double{\sc Chooz} & {\tt D-Chooz\_near.glb} & Double Chooz near 
+detector & \cite{Huber:2006vr} \\ 
+ & {\tt D-Chooz\_far.glb} & Double Chooz far detector & \\[0.2cm]
+\multicolumn{4}{l}{\underline{$\beta$-Beams:}} \\
+Low $\gamma$ & {\tt BB\_100.glb} & $\gamma=100$ CERN to Fr\'{e}jus 
+scenario & \cite{Campagne:2006yx} \\
+Medium $\gamma$ & {\tt BB\_350.glb} & $\gamma=350$ green field scenario 
+& \cite{Burguet-Castell:2005pa} \\
+Variable $\gamma$ & {\tt BBvar\_WC.glb} & Variable $\gamma$ beta beam with water Cherenkov detector, $50 \lesssim \gamma \lesssim 500$ & \cite{Huber:2005jk} \\[0.2cm]
+	& {\tt BBvar\_TASD.glb} & Variable $\gamma$ beta beam with totally active scint. detector (TASD), 
+$100 \lesssim \gamma \lesssim 3\, 000$ & \cite{Huber:2005jk} \\[0.4cm]
+\multicolumn{4}{l}{\underline{Neutrino factories:}} \\
+Standard & {\tt NFstandard.glb} & Standard neutrino factory, $50 \, \mathrm{kt}$ magnetized iron calorimeter, 
+$E_\mu = 50 \, \mathrm{GeV}$ & \cite{Huber:2002mx} \\
+Variable $E_\mu$ & {\tt NFvar.glb} & Variable neutrino factory, disapp. channels
+{\em without} CID; $10 \, \mathrm{GeV} \lesssim E_\mu \lesssim 80 \, \mathrm{GeV}$ & \cite{Huber:2002mx,Huber:2006wb}  \\
+Gold + Silver & {\tt NF\_GoldSilver.glb} & As {\tt NFvar.glb} 
+plus 5~kt ECC detector for Silver Channel
+measurement & \cite{Huber:2002mx,Huber:2006wb,Autiero:2003fu} \\
+Hybrid detector & {\tt NF\_hR\_lT.glb} & As {\tt NFvar.glb}, but 
+lower threshold and better energy resolution & \cite{Huber:2002mx,Huber:2006wb} \\
+\hline
+\end{tabular}
+\end{center}
+} % small
+\mycaption{\label{tab:experiments} 
+Pre-defined experiment prototypes coming with \GLOBESN : The columns represent the \AEDL\ filename, 
+a short description, and the references in which they are originally used and 
+discussed (except from minor modifications, such as a different implementation of 
+the energy threshold function). 
+%
+IS THE GAMMA=350 OPTION REALLY GREEN-FIELD? I THOUGHT THAT THIS MAY BE THE MAXIMUM
+ONE COULD GET OUT OF THE SPS WITH ACCELERATOR MODIFICATIONS? [WW]
+}
+\end{table}
 
-\bi
-\item 
- Built-in $\beta$-beam fluxes
-\item
- New AEDL features
-\item
- New AEDL files in standard GLoBES delivery + changes to existing ones
-\ei
+\AEDL\ (Abstract Experiment Definition Language) is a special syntax developed for the description of
+experiments in \GLOBES\ represented by simple text files. Core part of \AEDL\ are the following constructions
+(for details, see \Ref~\cite{Manual}):
+\begin{description}
+\item[Channel] A channel represents an oscillation channel from the source flux, over the initial and final
+flavors and the use of neutrinos or antineutrinos, to the interaction type and cross section. The result
+is an event rate vector.
+\item[Rule] A rule combines one or more signal channels with one or more background channels. The rates
+from these channels are added, and the signal and background are implemented with specific systematics, \ie,
+systematics is connected to the concept of a rule.
+The result of a rule is a systematics $\chi^2$ corresponding to \equ{chipull}.
+\item[Experiment] An experiment is a combination of one or more rules, which may correspond to different
+appearance and disappearance channels, neutrino and antineutrino operations modes, \etc. An experiment has a common detector and baseline, but may use more different fluxes (such as for neutrinos and antineutrinos). Therefore,
+the matter density profile is the same for all rules of an experiment. The result of an experiment
+is again a systematics $\chi^2$, but summed over all rules.
+\item[Experiment combination] An experiment combination consists of different experiments with different detectors, baselines, and (uncorreleted) matter density profiles. The result of an experiment combination
+is again a systematics $\chi^2$, but summed over all experiments.
+\end{description}
+Note that after the $\chi^2$ is summed over all rules or experiments as specified by the user in the application software, \equ{margin} is applied, and the oscillation parameters are marginalized over. 
 
-Beta beams paper!
+In \GLOBESN , this construction of experiments is extended by user-defined systematics, which allows
+the user to break up the strict coupling of systematics with rules. For example, systematics can be
+correlated between different rules or experiments, such as for an reactor experiment with identical
+near and far detectors. In addition, one can introduce user-defined systematical errors.
+For that purpose, the former error dimension concept has been changed and
+extended. For example, one has to give each user-defined systematics a name, and this name has
+to be matched by the application software. 
+%
+Further changes in \AEDL\ are the requirement of a minimum \GLOBES\ version the \AEDL\ is running with,
+and the extension of lists as \AEDL\ variables and an interpolation feature.
 
-\section{New platform and interpreter support, new ways to improve the performance}
+As far as the experiment prototypes are concerned, a list of the ones provided with \GLOBESN\ 
+is given in \Tab~\ref{tab:experiments}. These prototypes can be modified for the definition of
+one's own experiments (experimentalist), or they can be used for the test of new physics concepts
+(phenomenologist/theorist).
+Note that some of these experiments may contain 
+integrated luminosities, baseline, fluxes, efficiencies, or other factors, which the user
+may not agree with and which can be easily adjusted. Some of the \AEDL\ files have been
+changed or updated from eariler versions, such as for T2K and T2HK, or the standard neutrino
+factory. Other files represent the results from recent developments, such as the variable energy
+beta beam or neutrino factory files. They push \AEDL\ to the edge in terms of advanced features,
+such as variable bin widths, use of the new interpolation feature, threshold function implementations, \etc.
+In particular, note that Double Chooz requires user-defined
+systematics, and the beta beams built-in beta beam fluxes. Both of these features are only
+available in \GLOBESN\ and higher. Some of the files require that \AEDL\ variables be pre-set by the
+user, such as the muon energy for the variable energy neutrino factory. These variables are
+described in the corresponding file headers. Old \AEDL\ prototypes should still run, but will not
+be maintained by the \GLOBES\ team anymore.
+
+\section{Internal changes and improved performance}
+
+New platform and interpreter support, new ways to improve the performance
 
 \bi
 \item
