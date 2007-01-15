@@ -1303,10 +1303,11 @@ Note that new user-defined systematics functions have to be registered with {\tt
 One can also request the systematics function name by 
 \begin{function}
 \GLBNS{GetChiFunction}
-{\tt int glbGetChiFunction(int exp, int rule, int on\_off, char *sys\_id)}
+{\tt int glbGetChiFunction(int exp, int rule, int on\_off, char *sys\_id, size\_t max\_len)}
 returns the name of the systematics $\chi^2$ function of a given experiment {\tt exp} and rule {\tt rule} for
-systematics on or off as given by {\tt on\_off}. The user must 
-ensure that the return string {\tt sys\_id} is large enough to hold the name of the function.
+systematics on or off as given by {\tt on\_off}. The name is copied to the string
+{\tt sys\_id}, the maximum length of which is specified by {\tt max\_len}. If
+{\tt max\_len} is too small, or if any other error occurs, the return value is $< 0$.
 \end{function}
 Similarly, a pointer to the systematics function can be returned either by name, or by experiment and rule selection:
 \begin{function}

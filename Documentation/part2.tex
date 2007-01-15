@@ -1708,7 +1708,7 @@ no options are given to {\tt configure}, and {\tt make install} was
 executed with root-privilege, \ie, a standard installation was done.}
 
 As an argument, {\tt globes} takes a {\tt .glb}-file. While parsing it,
-it prints any warnings and errors which have occured during reading the file. Then it uses the experiment description in the file to compute the event rates at a certain point in parameter space. Finally, it displays the result based on the options used to call {\tt globes}. 
+it prints any warnings and errors which occur while reading the file. Then it uses the experiment description in the file to compute the event rates at a certain point in parameter space. Finally, it displays the result based on the options used to call {\tt globes}. 
 The options of {\tt globes} follow the GNU standard. Thus, there
 is a {\tt \verb+--+help} option to display all other options 
 together with short descriptions.
@@ -1746,11 +1746,11 @@ within the shell session or in the shell profile:
 export GLB\_CENTRAL\_VALUES='0.55,0,0.785,0,0.0008,0.0025'
 }
 \end{quote}
-Note that in the case of additional non-standard parameters, these will just to 
+Note that in the case of additional non-standard parameters, these will have to 
 be included at the end of these lists.
 Furthermore it is possible to switch off oscillations with the {\tt -N} option and to switch them on again with {\tt -O} (the default). The effect of {\tt -N} is the same as to use {\tt NOSC\_} in all oscillation channels.
-Thi feature is useful if one wants to normalize an expriment flux if
-the number of un-oscillated events is given.
+This feature is useful if one wants to normalize the flux in an experimental to
+a given number of un-oscillated events.
 
 \index{norm}{globes@{\tt globes}!warnings}
 \index{norm}{globes@{\tt globes}!errors}
@@ -1768,7 +1768,7 @@ of file names.
 \label{sec:globes_test}
 
 In the process of defining a new experiment, the default output of {\tt globes} at rule level is the final step. However, in order to arrive 
-at this level it is often necessary to review the intermediate steps in the event rate calculation. The {\tt globes} utility offers many possibilities to do this based on the rate access functions as described in \Sec~\ref{sec:event_rates}.
+at this level it is often necessary to review the intermediate steps in the event rate calculation. The {\tt globes} utility offers many possibilities to do this based on the rate access functions described in \Sec~\ref{sec:event_rates}.
 
 \index{norm}{globes@{\tt globes}!total rates}
 \index{norm}{globes@{\tt globes}!spectral rates}
@@ -1790,7 +1790,7 @@ As a first step, one may want to check if each channel produces the
 anticipated output. Channel rates are returned if the {\tt -c} option 
 is used.
 This option takes as an optional argument the channel number 
-(starting at zero). If no argument is given all channels are displayed.
+(starting at zero). If no argument is given, all channels are displayed.
 By default, the sum of the event rates in each channel is shown. Each 
 column has as first line the same channel name as in the file. 
 
@@ -1810,7 +1810,7 @@ globes -c -b -g -f FILE
 }
 \end{quote}
 produces the raw event rate corresponding to the convolution of flux, 
-probability, and cross section, which is neglecting all detector effects.
+probability, and cross section, neglecting all detector effects.
 
 \subsection*{Rule level}
 \index{norm}{globes@{\tt globes}!rule rates}
@@ -1819,11 +1819,12 @@ The next logical step after checking the channel rates is to investigate
  the rule rates. The rule rates are returned with the option {\tt -r}.
 This option takes as an optional argument the rule number 
 (starting at zero). If no argument is given, all rules will be displayed.
-By default, the sum of the event rates in each rule is shown, as well
-as for each component within the rule. Each 
-rule is preceeded by a line with the same rule name as in the file. 
+By default, the signal and background rates in each rule are shown
+separately, together with their decomposition into the different
+contributing channels. Each rule is preceeded by a line with the same
+rule name as in the file. 
 
-It is also possible for rules to switch off one detector effect after 
+Also for the rules, it is possible to switch off one detector effect after 
 the other -- with the limitation that rules only make sense
 after the energy resolution function has been applied to each channel.
 Therefore, it is \emph{not} possible to use {\tt -b} together with {\tt -r}, or to switch off any pre-smearing efficiencies or backgrounds. 
@@ -1849,7 +1850,7 @@ names by using simple printing {\tt -S} instead of pretty printing {\tt -P}.
 There are special options for certain special formats: {\tt -m} produces
 Mathematica\footnote{Mathematica is a trademark of Wolfram Inc.} list
 output, which can be directly visualized by {\tt MultipleListPlot}.
-The option {\tt -u} uses the same principal formatting as {\tt -m}, but
+The option {\tt -u} uses in principle the same formatting as {\tt -m}, but
 it allows to specify the left, middle, and right delimiters in constructing
 the list, such as
 \begin{quote}
