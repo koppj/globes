@@ -22,14 +22,14 @@ $version="3.0.0"
  #*     SLACcitation  = "%%CITATION = HEP-PH 0303232;%%"
  #* }
  *
- * Last Update: 12/01/06  
+ * Last Update: 15/01/06  
  *
   */
 
 
 /* ####### Reactor flux ####### */
 
-flux(#Reactor)<
+nuflux(#Reactor)<
 	@flux_file="Reactor.dat"
 	@time = 8	/* years */
 	@power = 10 /* GW thermal */
