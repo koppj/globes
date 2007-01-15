@@ -501,6 +501,8 @@ int main(int argc, char *argv[])
   osc[3] = 0.0;                     /* delta_CP */
   osc[4] = 0.00007;                 /* dm_21    */
   osc[5] = 0.003;                   /* dm_31    */
+  for (i=6; i < glbGetNumOfOscParams(); i++)
+    osc[i] = 0.0;                   /* Non-standard parameters */
 
   /* Here are new parameters from hep-ph/0405172v5 */
 //  osc[0] = 0.57964;                 /* theta_12 */

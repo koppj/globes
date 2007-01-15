@@ -798,3 +798,11 @@ documented!
 *********Version 2.4.8
 14/01/2007 JK
         - Fixed small bug in hybrid minimizer: Iteration counter was missing
+
+*********Version 2.4.9
+14/01/2007 JK
+        - Fixed small bug in globes.c: Non-standard parameters were not
+          initialized
+        - Moved some deprecated functions to the GLB_COMPAT section in globes.h
+
+        

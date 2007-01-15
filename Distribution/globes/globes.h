@@ -254,7 +254,6 @@ double *glbGetBinCentersListPtr(int exp);
 double *glbGetSamplingStepsizeListPtr(int exp);
 double *glbGetSamplingPointsListPtr(int exp);
 int glbGetLengthOfRule(int exp, int rule, int signal);
-double glbGetNormalizationInRule(int exp, int rule, int signal);
 int glbGetChannelInRule(int exp, int rule, int pos, int signal);
 double glbGetCoefficientInRule(int exp, int rule, int pos, int signal);
 int glbGetNumberOfFluxes(int exp);
@@ -271,7 +270,6 @@ int glbSwitchSystematics(int exp, int rule, int on_off);
 int glbSetSignalErrors(int exp, int rule, double norm, double tilt);
 int glbSetSignalStartingValues(int exp, int rule, double norm, double tilt);
 int glbSetBGErrors(int exp, int rule, double norm, double tilt);
-int glbSetBGCenters(int exp, int rule, double norm, double tilt);
 int glbSetBGStartingValues(int exp, int rule, double norm, double tilt);
 int glbSetSysErrorsList(int exp, int rule, int on_off, const double *sys_list);
 int glbSetSysStartingValuesList(int exp, int rule, int on_off, const double *sys_list);
@@ -285,7 +283,6 @@ int glbGetSysOnOffState(int exp, int rule);
 int glbGetSignalErrors(int exp, int rule, double *norm, double *tilt);
 int glbGetSignalStartingValues(int exp, int rule, double *norm, double *tilt);
 int glbGetBGErrors(int exp, int rule, double *norm, double *tilt);
-int glbGetBGCenters(int exp, int rule, double *norm, double *tilt);
 int glbGetBGStartingValues(int exp, int rule, double *norm, double *tilt);
 double *glbGetSysErrorsListPtr(int exp, int rule, int on_off);
 double *glbGetSysStartingValuesListPtr(int exp, int rule, int on_off);
@@ -363,7 +360,7 @@ int glbSelectMinimizer(int minimizer_ID);
   double glbChiThetaDelta(const glb_params in, glb_params out, int exp);
 
 
-  /* Replaced by glbGetUserDataPtr */
+  /* Replaced by glbGetEfficiencyPtr/glbGetBackgroundPtr */
   int glbGetUserData(double **data, size_t *length,
                      int exp, int channel,int smearing, int bgeff);
 
@@ -386,6 +383,11 @@ int glbSelectMinimizer(int minimizer_ID);
   /* Replaced by glbSet/GetChiFunction */
   int glbSetErrorDim(int experiment, int rule, int on_off, int errordim);
   int glbGetErrorDim(int experiment, int rule, int on_off);
+
+  /* No longer supported since @backgroundcenter is deprecated */
+  double glbGetNormalizationInRule(int exp, int rule, int signal);
+  int glbSetBGCenters(int exp, int rule, double norm, double tilt);
+  int glbGetBGCenters(int exp, int rule, double *norm, double *tilt);
 
   /* Renamed to glbSet/GetCentralValues */
   int glbSetStartingValues(const glb_params in);
