@@ -141,7 +141,7 @@ channel(#nu_bar_NC_bckg)<
 
 rule(#Nu_Mu_Appearance)<
 	@signal =	      0.45@#nu_mu_appearance
-	@signalerror =	     0.001  :	    0.0001
+	@signalerror =	     0.025  :	    0.0001
 
 	@background =	     5e-06@#nu_bar_NC_bckg : 5e-06@#nu_mu_bar_disappearance
 	@backgrounderror = 	     0.2  :	    0.0001
@@ -153,7 +153,7 @@ rule(#Nu_Mu_Appearance)<
 
 rule(#Nu_Mu_BAR_Appearance)<
 	@signal =	      0.35@#nu_mu_bar_appearance
-	@signalerror =	     0.001  :	    0.0001
+	@signalerror =	     0.025  :	    0.0001
 
 	@background =	     5e-06@#nu_NC_bckg : 5e-06@#nu_mu_disappearance
 	@backgrounderror = 	     0.2  :	    0.0001
@@ -165,7 +165,7 @@ rule(#Nu_Mu_BAR_Appearance)<
 
 rule(#Nu_Mu_Disappearance)<
 	@signal =	      0.45@#nu_mu_disappearance
-	@signalerror =	     0.001  :	    0.0001
+	@signalerror =	     0.025  :	    0.0001
 
 	@background =	         1e-05@#nu_NC_bckg
 	@backgrounderror = 	     0.2    :	    0.0001
@@ -177,7 +177,7 @@ rule(#Nu_Mu_Disappearance)<
 
 rule(#Nu_Mu_BAR_Disappearance)<
 	@signal =	      0.35@#nu_mu_bar_disappearance
-	@signalerror =	     0.001  :	    0.0001
+	@signalerror =	     0.025  :	    0.0001
 
 	@background =	         1e-05@#nu_bar_NC_bckg
 	@backgrounderror = 	     0.2    :	    0.0001
