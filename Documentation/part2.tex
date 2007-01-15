@@ -479,7 +479,7 @@ from \AEDL\ files:
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Experiment definition with AEDL}
 
-In this chapter, we give a detailed definition of the \AEDL\ features. We also show the underlying mathematical concepts, where applicable. We do not exactly follow the separation of source, oscillation, and detection properties, since most issues more or less involve the detection. Instead,
+In this chapter, we give a detailed description of the \AEDL\ features. We also show the underlying mathematical concepts where applicable. We do not exactly follow the separation of source, oscillation, and detection properties, since most issues more or less involve the detection. Instead,
 we illustrate many of the features of the \GLOBES\ simulation successively
 in the logical order of their definition, and demonstrate how they translate into \AEDL .
 
@@ -487,7 +487,7 @@ in the logical order of their definition, and demonstrate how they translate int
 \section{Source properties and integrated luminosity}
 \label{sec:source}
 
-As we have disussed before, \GLOBES\ can only deal with point sources. Thus,  it is not possible to study effects from the finite size of the neutrino production region, such as in the sun or in reactor experiments with many
+As we have disussed before, \GLOBES\ can only deal with point sources. Thus,  it is not possible to study effects of the finite size of the neutrino production region, such as in the sun or in reactor experiments with many
 neutrino sources (\eg, KamLAND). Therefore, a neutrino source in \GLOBES\ can, in general, be characterized by the flux spectrum for each neutrino flavor, the CP sign (neutrinos or antineutrinos), and the total luminosity
 of the source.
 
@@ -525,8 +525,10 @@ a flux is defined by the environment {\tt nuflux}, such as
 >}
 \end{quote}
 with a running time of $8$ years. Note that the running time is used within
-the {\tt nuflux} environment. This feature can be used to load the neutrino and antineutrino fluxes separately, in order to combine them with different
-running times within one experiment. The name of the flux {\tt \#name} will later be referred to in the channel definitions. Note that \GLOBES\ versions older than 3.0 use the still supported {\tt flux} environment, which is different from {\tt nuflux} by an undocumented normalization factor 5.2 for user-defined fluxes. This difference is explained in the appendix on page~\pageref{app:flux}.
+the {\tt nuflux} environment. This feature can be used to load the neutrino
+and antineutrino fluxes in an accelerator experiment separately, in order
+to combine them with different running times in the respective operation modes.
+The name of the flux {\tt \#name} will later be referred to in the channel definitions. Note that \GLOBES\ versions older than 3.0 use the still supported {\tt flux} environment, which is different from {\tt nuflux} by an undocumented normalization factor 5.2 for user-defined fluxes. This difference is explained in the appendix on page~\pageref{app:flux}.
 
 \index{aedl}{nuflux@{\tt nuflux}}
 
@@ -554,7 +556,7 @@ the beta beams, see \Ref~\cite{Huber:2005jk}. MR ABOUT BETA BEAMS: DOES THIS REA
 \end{table}
 
 For a built-in neutrino source, one has to specify which
-built-in spectrum has to be used, as well as its parameters. The software
+built-in spectrum should be used, as well as its parameters. The software
 will then automatically calculate the neutrino spectrum. Note that in this
 case, there is no degree of freedom in the choice of the source units.
 The currently available fluxes are described in \Tab~\ref{tab:binfluxes}.
@@ -578,7 +580,7 @@ MR: SOME MORE ELABORATION AND AN EXAMPLE FOR THE BETA BEAMS MAY BE APPROPRIATE H
 \index{aedl}{nuflux@{\tt nuflux}!power@{\tt "@power}}
 \index{aedl}{nuflux@{\tt nuflux}!norm@{\tt "@norm}}
 \index{aedl}{nuflux@{\tt nuflux}!flux file@{\tt "@flux\_file}}
-For a user-defined flux, one has to give it the file name:
+For a user-defined flux, one has to specify the file name:
 \begin{quote}
 {\tt nuflux(\#user)<}\\
 {\tt \tb @flux\_file = "user\_file\_1.dat"\\
@@ -595,7 +597,7 @@ In addition, the fluxes will be rescaled by $1/L^2$, which means that the
 normalization must contain a factor $L_0^2$. Here $L_0$ is the distance from the source for which the flux is given to the actual neutrino production region. At the end, it is left to the user to ensure that the 
 numbers in the flux file give, after the multiplication with {\tt @norm}, 
 the proper numbers of produced neutrinos corresponding to the chosen target power {\tt @power}. Usually this adjustment of {\tt @norm} is performed by comparison with known energy spectra for a specific experiment.
-For more details on the flux definition, see appendix on page~\pageref{app:flux}.
+For more details on the flux definition, see page~\pageref{app:flux} in the appendix.
 
 \index{aedl}{nuflux@{\tt nuflux}!flux file@{\tt "@flux\_file}}\index{norm}{Flux!file}
 The software assumes that the given flux file has seven columns and
@@ -610,25 +612,29 @@ $ E\quad
 \Phi_{\bar\nu_\tau}$
 \end{quotation}
 In order to access fluxes at arbitrary energies, linear interpolation 
-is used by the software. In general, it is advisable to provide the flux between {\tt \$sampling\_min} and {\tt \$sampling\_max} (\cf, \Sec~\ref{sec:energy}), since these values are used by the software. However, if the energy leaves the range of values given in the file, zero is returned.
-The the columns for the fluxes for unused flavours have to be filled all the 
-same,\eg\ with zeros. 
+is used by \GLOBES. In general, it is advisable to provide the flux
+between {\tt \$sampling\_min} and {\tt \$sampling\_max} (\cf, \Sec~\ref{sec:energy}),
+since this is the energy range considered in the simulation. However,
+if part of this interval is omitted in the flux file, zero will be
+used there. If some neutrino flavours are not used in the simulation,
+the corresponding columns in the flux file have to be filled nevertheless,
+\eg\ with zeros. 
 
 The flux files accept one-line comments, which start
 with {\tt \#} and end with the linefeed character `\verb+\n+', they are
 not counted as a line and their content is discarded. These comments
 are useful to provide meta information about the fluxes such as units
 or the origin of the information. This is also the default method
-to point the user to the references one should to cite when using
-a particular flux.\index{norm}{Flux!file!comments in}
+to point the user to the references that should be cited when using
+a particular flux file.\index{norm}{Flux!file!comments in}
 \index{norm}{Referencing!flux data}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Baseline and matter density profile}
 
-The baseline and matter density profile determine, besides energy and
-involved flavors, the neutrino oscillation physics at the experiment
-description level. All of the neutrino oscillation parameters are defined at running time.
+Besides the energy and the involved flavors, the neutrino oscillation
+physics depends on the baseline and the matter density profile.
+All neutrino oscillation parameters are defined at running time.
 
 \index{aedl}{baseline@{\tt \$baseline}}
 The baseline\index{norm}{Baseline} is given by
@@ -657,13 +663,13 @@ $3$ & {\tt \$lengthtab},  {\tt \$densitytab} & Arbitrary profile (table of layer
 \index{aedl}{densitytab@{\tt \$densitytab}}
 
 Furthermore, the matter density profile along the baseline
-has to be specified. The simplest matter density profile is a constant matter density profile with the average matter density from the PREM~\cite{Stacey} onion shell model of the earth:\index{norm}{PREM| \see{Matter density}}
+has to be specified. The simplest profile is a constant matter density equal to the average matter density from the PREM~\cite{Stacey} onion shell model of the earth:\index{norm}{PREM| \see{Matter density}}
 \index{norm}{Matter density!of the earth}
 \begin{quote}
 {\tt \$profiletype=1 }
 \end{quote}
 %
-If your using this option please cite reference~\cite{Stacey}\index{norm}{Referencing!matter profile data}.
+If you are using this option please cite reference~\cite{Stacey}\index{norm}{Referencing!matter profile data}.
 
 For a better approximation of the realistic earth matter density profile, one can use an arbitrary number of equidistant steps of the PREM profile:
 \begin{quote}
@@ -731,17 +737,17 @@ $\mathrm{log}_{10} E\quad
 Here the logarithms of the energy values have to be equidistant. For 
 arbitrary energies, linear interpolation is used. If the energy leaves the
 range of values given in the file, $0.0$ will be assumed. In general, it is advisable to provide the cross sections in the range between {\tt \$sampling\_min} and {\tt \$sampling\_max} (\cf, \Sec~\ref{sec:energy}).
-Unused cross sections have to be filled with zeros, and can not
- be just omitted.
+Cross sections for unused neutrino flavours have to be filled with zeros, and
+can not just be omitted.
 
 Like the flux files, the cross section files 
 accept one-line comments, which start
-with {\tt \#} and end with the linefeed character `\verb+\n+', they are
-not counted as a line and their content is discarded. This comments
+with {\tt \#} and end with the linefeed character `\verb+\n+'; they are
+not counted as a line and their content is discarded. These comments
 are useful to provide meta information about the cross sections like units
 or the origin of the information. This is also the default method
-to point the user to the references he/she should to cite when using
-a particular cross section.\index{norm}{Cross section!file!comments in}
+to point the user to the references he/she should cite when using
+a particular cross section file.\index{norm}{Cross section!file!comments in}
 \index{norm}{Referencing!cross section data}
 
 \section{Oscillation channels}
@@ -750,19 +756,20 @@ a particular cross section.\index{norm}{Cross section!file!comments in}
 \index{aedl}{channel@{\tt channel}|(}
 Channels\index{norm}{Channel} in \GLOBES\ represent an intermediate level 
 between the pure oscillation physics given by the oscillation probability
-$P_{\alpha\beta}$, and the total event rates composed of signal and 
+$P_{\alpha\beta}$, and the final event rates composed of signal and 
 background. A channel describes the path from one
 initial neutrino flavor in the source to the event rates in the detector for one specific interaction type (IT) and final flavor.  
 Therefore, a channel contains the description of the 
 initial neutrino flavor, its CP eigenvalue 
-(neutrino or antineutrino)\footnote{Currently \GLOBES\ does not support lepton
+(neutrino or antineutrino)\footnote{Currently, \GLOBES\ does not support lepton
 number violating transitions, \ie\ no transitions from neutrino to 
 antineutrino (or vice versa) are considered.}, 
 the detected neutrino flavor, the interaction cross sections for the chosen interaction type, and the energy resolution function of the detector.
 
-Before we come to the definition of the channel in AEDL, we introduce the general concept for the calculation of event rates. The first step is to
+Before we come to the definition of channels in AEDL, we introduce the general concept for the calculation of event rates. The first step is to
 compute the number of events for each IT in the detector for each 
-initial and final neutrino flavor and energy bin. The second step is to include the detector effects coming from the insufficient knowledge in the event reconstruction. These two steps combined lead to the differential event rate spectrum for each initial and final flavor and IT as seen by the detector, which we call the ``channel''. In this section, we focus on the
+initial and final neutrino flavor and energy bin. The second step is to include the detector effects coming from the insufficient knowledge in the event reconstruction.
+The combination of these two steps leads to the differential event rate spectrum for each initial and final flavor and IT as seen by the detector, which we call the ``channel''. In this section, we focus on the
  first step, \ie , we discuss the definition of the energy resolution function in the next section, since this is a rather comprehensive issue.
 
 The differential event rate for each channel is given by
@@ -771,8 +778,8 @@ The differential event rate for each channel is given by
 \label{eq:master_event}
 \frac{dn_{\beta}^{\text{IT}}}{dE'}=&&N\,\int\limits_0^\infty \int\limits_0^\infty dE\,d\hat{E}\quad
 \underbrace{\Phi_{\alpha} (E)}_{\mathrm{Production}} \times \nonumber\\
-&&\underbrace{\frac{1}{L^2} P_{(\alpha\rightarrow\beta)}(E,L,\rho;\theta_{23},
-\theta_{12},\theta_{13},
+&&\underbrace{\frac{1}{L^2} P_{(\alpha\rightarrow\beta)}(E,L,\rho;\theta_{12},
+\theta_{13},\theta_{23},
 \Delta m^2_{31},\Delta m^2_{21},\deltacp)}_{\mathrm{Propagation}}
 \times \nonumber \\ &&\underbrace{\sigma^{\text{IT}}_f(E)
 k_f^{\text{IT}}(E-\hat{E})}_{\mathrm{Interaction}} \times \nonumber \\
@@ -804,11 +811,13 @@ modeled by the threshold function $T_\beta(\hat{E})$, coming from the the
 limited resolution or the cuts in the analysis, and the energy resolution 
 function $V_\beta(\hat{E}-E')$ of the secondary particle. 
 
-Since it is a lot of effort to solve this double integral numerically,
-we split up the two integrations. First, we evaluate the integral over
-$\hat{E}$, where the only terms containing $\hat{E}$ are
-$k_\beta^{\text{IT}}(E-\hat{E})$,  $ T_\beta(\hat{E})$, and 
-$ V_\beta(\hat{E}-E')$. We define:
+Since it is computationally very expensive to solve this double integral
+numerically, we split up the two integrations. The integral over $\hat{E}$
+depends only on the terms containing $\hat{E}$, i.e., on $k_\beta^{\text{IT}}(E-\hat{E})$,
+$ T_\beta(\hat{E})$, and $V_\beta(\hat{E}-E')$. These terms do not depend
+on the oscillation parameters, so they will not vary during the fit,
+and the $\hat{E}$ integral can be pre-computed in the initialization phase.
+We define:
 \begin{eqnarray}
 \label{eq:e_res} 
 R_\beta^{\text{IT}}(E,E')\,\epsilon_\beta^{\text{IT}}(E')
@@ -819,7 +828,7 @@ R_\beta^{\text{IT}}(E,E')\,\epsilon_\beta^{\text{IT}}(E')
 Thus, $R_\beta^{\text{IT}}(E,E')$ describes the energy response of 
 the detector, \ie , a neutrino with a (true) energy $E$ is reconstructed
 with an energy between $E'$ and $E'+dE'$ with a probability
-$R_\beta^{\text{IT}}(E,E') dE'$. The function $R(E,E')$ is also often called ``energy resolution function''. Actually, its internal representation
+$R_\beta^{\text{IT}}(E,E') dE'$. The function $R(E,E')$ is often called ``energy resolution function''. Actually, its internal representation
 in the software is a smearing matrix\index{norm}{Energy!resolution}\index{norm}{Smear matrix}. The function $\epsilon_\beta^{\text{IT}}(E')$ will later be refered to as ``post-smearing efficiencies'', since it will allow us to define cuts and threshold functions {\em after} the smearing is performed, \ie, as function of $E'$. The detailed definition and initialization of the energy resolution function is described in \Sec~\ref{sec:energy}.
 
 Eventually, we can write down the number of events per bin $i$ \index{norm}{Bin} and channel $c$ as
@@ -844,9 +853,9 @@ Note that the events are binned according to their \emph{reconstructed} energy.
 A simple channel definition in \GLOBES\ consists of the flux,
 the CP-sign of the initial state, the initial flavor, the final flavor,
 the cross sections, and the energy resolution function. In order to refer to
-flux, cross sections, and energy resolution functions, they have to be 
-defined before with their {\tt \#name} in the respective environments. 
-Thus, a simple definition of a channel\index{aedl}{channel@{\tt channel}} is
+the fluxes, cross sections, and energy resolution functions, they have to be 
+defined first with their {\tt \#name} in the respective environments. 
+A simple definition of a channel\index{aedl}{channel@{\tt channel}} is
 \begin{quote}
 {\tt channel(\#channel\_1)<\\
 \tb @channel = \#flux : $+$: muon: muon: \#cross: \#energy\\
@@ -873,7 +882,7 @@ and do not have to be recomputed in the subsequent fit (which calls the undocume
 Therefore this feature can be used to speed up the rate 
 computation considerably, especially in cases where a large set
 of channels exist which are only used for the computation of backgrounds.
-Usually it is an excellent approximation to treat backgrounds as if they
+Usually, it is an excellent approximation to treat backgrounds as if they
 were not affected by oscillations\footnote{In the case that the backgrounds have
 a sizeable dependence on the oscillation parameters, they carry information
 on the oscillation parameters, and therefore behave more like a signal.}.
@@ -897,17 +906,18 @@ proper parameters depends on the experiment and the frequencies of the
 speed of the calculation.
 
 In this section, we first discuss the principles of the energy smearing, where it is assumed that the reader is familiar with \Sec~\ref{sec:channel}. Then we introduce an automatic energy smearing algorithm, which is fairly simple to understand and applicable to most beam-based experiments. 
-In most cases, the reader may want to continue to the next section after reading these two subsections. In the third subsection, we describe a more elaborate (and slower) smearing algorithm, which can be used together with rather fast neutrino oscillations compared to the bin size, such as for
-(solar) reactor experiments to avoid aliasing effects. Eventually, we show how one can use a manual smearing matrix instead of using one of the implemented algorithms.
+In most cases, the reader may want to proceed to the next section after reading these two subsections. In the third subsection, we describe a more elaborate (and slower) smearing algorithm, which is useful to avoid aliasing effects if the neutrino oscillations are rather fast compared to the bin size, as is the case for
+(solar) reactor experiments. Eventually, we show how one can use a manual smearing matrix instead of using one of the implemented algorithms.
 
 \subsection{Introduction and principles}
 
-The energy resolution function $R^c(E,E')$ has been already introduced in 
+The energy resolution function $R^c(E,E')$ and the post-smearing
+efficiencies $\epsilon(E')$ have already been introduced in 
 \Sec~\ref{sec:channel}, where a definition
 has been given in \eq~(\ref{eq:e_res}). Instead of using
  \eq~(\ref{eq:e_res}) directly, we apply a slightly different
 definition of the post-smearing efficiencies $\epsilon(E')$. 
-In general, $\epsilon(E')$ has to be
+In general, they have to be
 determined by means of a Monte Carlo simulation of the experiment. 
 This usually involves a binning of the simulated events in the 
 reconstructed energy $E'$. Therefore, one can simplify \eq~(\ref{eq:events_bin}) by
@@ -966,7 +976,7 @@ For a manual definition of the sampling points, use
 }
 \end{quote}
 for equidistant sampling points. If no values are given for these variables,
-they are assumed to be equal to their corresponding counter parts at the bin level,
+they are assumed to be equal to their corresponding counterparts at the bin level,
 \ie , \verb+$sampling_points = $bins+, \verb+$sampling_min = $emin+ and
 \verb+$sampling_max = $emax+.
 
@@ -993,7 +1003,7 @@ $\simeq 2$ usually is more than enough).
 
 \item[Bin level] This level is determined by the experiment and its analysis. 
 Note that energy
-bin sizes much smaller than the energy resolution will not improve the results. The energy bin range and the number of energy bins do always have to be specified. For the case of large values of the integrand in \eq~(\ref{eq:simple_int}) at the energy range limits, it is recommended to exceed the analysis energy window by about three times the energy calibration error in order 
+bin sizes much smaller than the energy resolution will not improve the results. The energy bin range and the number of energy bins always have to be specified. For the case of large values of the integrand in \eq~(\ref{eq:simple_int}) at the energy range limits, it is recommended to exceed the analysis energy window by about three times the energy calibration error in order 
 to avoid cutoff effects.
 
 In order to define a range between $E_\mathrm{min}$
@@ -1032,23 +1042,23 @@ details, see next chapter.
 
 In general, the energy smearing happens between the sampling point and bin levels, which means that the energy smearing matrix will have {\tt \$sampling\_points} columns and {\tt \$bins} rows. 
 
-As illustrated in the figure, an interesting feature in combination with the
+As illustrated in \figu{energies}, an interesting feature in combination with the
 channels are pre- and post-smearing effects. Pre-smearing effects are taken into account on the sampling point level, and post-smearing effects on the bin level. Examples for these effects are energy 
 dependent efficiencies and (non-beam) backgrounds. Efficiencies are multiplicative factors, whereas backgrounds are added to the event rates. These components can be introduced before or after the integration in \eq~(\ref{eq:simple_int}) is done. 
 %
 \index{aedl}{channel@{\tt channel}!pre smearing efficiencies@{\tt 
-"@pre\_smearing\_efficiencies}}
+"@pre\_smearing\_efficiencies}}%
 \index{aedl}{channel@{\tt channel}!pre smearing background@{\tt 
-"@pre\_smearing\_background}}
+"@pre\_smearing\_background}}%
 \index{aedl}{channel@{\tt channel}!post smearing efficiencies@{\tt 
-"@post\_smearing\_efficiencies}}
+"@post\_smearing\_efficiencies}}%
 \index{aedl}{channel@{\tt channel}!post smearing background@{\tt 
-"@post\_smearing\_background}}
+"@post\_smearing\_background}}%
 %
 If they are introduced before, 
 we call them
 {\tt @pre\_smearing\_efficiencies} or {\tt @pre\_smearing\_background}. 
-If they are introduced after, we call them {\tt @post\_smearing\_efficiencies} or {\tt @post\_smearing\_background}.
+If they are introduced afterwards, we call them {\tt @post\_smearing\_efficiencies} or {\tt @post\_smearing\_background}.
 Note that pre-smearing components are always a function of the incident neutrino energy $E$. Thus, there have to be as  many elements as there are sampling points. 
 Examples for pre-smearing quantities are non-beam backgrounds, such as from geophysical neutrinos. The post-smearing components are always a function of the reconstructed neutrino energy $E'$, such as the post-smearing efficiencies $\epsilon_\beta^{\text{IT}}(E')$ in \eq~(\ref{eq:e_res}). Examples for post-smearing efficiencies are cuts and detection threshold functions. All post-smearing components have to have as 
 many elements as there are energy bins. Efficiencies are multiplicative 
@@ -1072,7 +1082,7 @@ and their default value is $1$, whereas backgrounds are additive and their defau
 %
 This experiment uses $10$ sampling points and $5$ bins.
 
-In the following subsections we will define the energy resolution function.
+In the following subsections we will explain the energy resolution function.
 All energy resolution functions are defined within an {\tt energy} environment and can be refered to by {\tt \#name}:
 \begin{quote}
   {\tt energy(\#name)<\\
@@ -1118,11 +1128,11 @@ constant, \ie, they hardly change within each bin. This
 assumption seems to be very restrictive, which is however not quite correct.
 First of all, if one analyzes simulated data (which are simulated with the same algorithm), the errors
 will cancel between the simulated and fitted data. Second, and more important,
-this algorithm is just a very basic integration routine\footnote{It is planed 
-for to have something like a Gau\ss-Kronrod scheme as an alternative here.} and converges to
-the true result for decreasing step size. Thus if the number of sampling
-points is large enough this algorithm is very accurate. 
-This algorithm is selected by
+this algorithm is just a very basic integration routine\footnote{It is planned 
+for the future to implement something like a Gau\ss-Kronrod scheme as an
+alternative here.} and converges to the true result for decreasing step size.
+Thus if the number of sampling points is large enough this algorithm is very
+accurate. Bin-based energy smearing is selected by
 %
 \index{aedl}{energy@{\tt energy}!type@{\tt "@type}}
 %
@@ -1183,10 +1193,10 @@ the detector (for more details see \eg~\cite{Huber:2003pm}).
 In the actual implementation of the algorithm,  the sum in \eq~(\ref{eq:algo_one}) is only evaluated
  for the $E_j$'s with $K(E_j)$ 
 above a certain threshold, which is, by default, $10^{-7}$. 
-This threshold is defined at the compiling time. 
+This threshold is defined at compilation time. 
 
-Eventually,  a complete energy resolution definition of this 
-algorithm is, for example,
+Eventually,  a complete energy resolution definition with bin-based
+automatic energy smearing is, for example,
 \begin{quote}
 {\tt energy(\#name)<\\
 \tb @type = 1\\
@@ -1198,11 +1208,11 @@ algorithm is, for example,
 
 \subsection{Low-pass filter}
 
-In order to ensure that fast oscillating probabilities do not lead to 
+In order to ensure that very fast oscillations do not lead to 
 aliasing,\index{norm}{Aliasing}
 it is possible to impose a low-pass filter already during the calculation
-of the probabilities itself. This filter is implemented has a highly
-experimental feature called ``filter''\index{norm}{Filter}. 
+of the probabilities itself. This highly
+experimental feature will be called ``filter''\index{norm}{Filter} in the following. 
 The calculation of oscillation
 probabilities is, in principle, a computation of phase differences. Restricting the maximum admissible size of those phase differences effectively filters
 the high frequency component of the oscillation probability. This idea is
@@ -1217,14 +1227,14 @@ e^{ -\Phi_{ij}^2/\sigma_f(E)^2 }\,,
 where $\Phi_{ij}:=\Delta m_{ij}^2 L/2E$ is the usual phase difference and
 the last term is a Gau\ss ian filter with width $\sigma_f(E)$. Choosing
 $\sigma_f(E):=\sigma_f^0 \cdot E$ ensures that this filter behaves 
-approximately such as an energy resolution function with constant width 
+approximately as an energy resolution function with constant width 
 $\sigma_e=\sqrt{2}/\sigma_f^0$, \ie\
 \begin{equation}
 \label{eq:filter_b}
 \int d\tilde E\quad P(\tilde E) \frac{1}{\sigma_e\,\sqrt{2\pi}}\,
 e^{-\frac{(E-\tilde E)^2}{2\sigma^2_e}}\,.
 \end{equation}
-The relationship between \eqs~\ref{eq:filter_a} and~\ref{eq:filter_b}
+The relationship between \eqs~\eqref{eq:filter_a} and~\eqref{eq:filter_b}
 is not obvious and connected to the properties of $P_{\alpha\beta}$: 
 see \Refs~\cite{Kiers:1996zj,Giunti:2003ax}. This feature works \emph{only} 
 for vacuum and constant densities and is controlled
@@ -1243,14 +1253,14 @@ with more than one layer is used.
 
 \index{aedl}{energy@{\tt energy}!type@{\tt  "@type}}
 With a type 1 ({\tt @type = 1}) energy resolution 
-function, $\sigma_e$ adds on to the energy resolution function 
-of the detector $\sigma_c(E)$ such as
+function, $\sigma_e$ contributes to the energy resolution function 
+of the detector $\sigma_c(E)$ according to
 \begin{equation}
 \sigma_{\mathrm{eff}}(E)^2\simeq \sigma_e^2 + \sigma_c(E)^2\,.
 \end{equation} 
 Sometimes this behavior is unwanted, and therefore one can try to 
 'subtract' the filtering from the energy resolution function by splitting 
-the energy resolution function $\sigma(E)_{\mathrm{eff}}$ in
+the energy resolution function $\sigma(E)_{\mathrm{eff}}$ into
 two parts by
 \begin{equation}
 \sigma_{\mathrm{eff}}(E)^2=\underbrace{\sigma_c(E)^2-\sigma_e^2}_
@@ -1271,18 +1281,18 @@ This scheme is used by choosing as type for the energy resolution
 
 \subsection{Manual energy smearing}
 
-In some cases, one may use the output of a detector Monte Carlo simulation
+In some cases, one may want to use the output of a detector Monte Carlo simulation
 directly. Then one can use ''manual'' energy smearing instead  of the
 automatic energy smearing algorithms. 
 
-The energy smearing matrix $K_{ij}$ has {\tt \$bins} rows and {\tt \$sampling\_points} columns, which are numbered from $0$ to {\tt \$bins}$-1$ or {\tt \$sampling\_points}$-1$. It is equivalent to the 
+The energy smearing matrix $K_{ij}$ has {\tt \$bins} rows and {\tt \$sampling\_points} columns, which are numbered from $0$ to {\tt \$bins}$-1$ resp.\ {\tt \$sampling\_points}$-1$. It is equivalent to the 
 bin- and sampling-point-based kernel in \eq~(\ref{eq:kernel}):
 \begin{equation}
 K_{ij} = K_i^c(E) |_{E=E_j},
 \label{equ:ematrix}
 \end{equation}
 where $E_j$ is the energy of the $j$th sampling point. In general, many of the entries in this matrix are zero, which means that it is convenient to evaluate the integrand in \eq~(\ref{eq:simple_int}) only at positions where
-$K_{ij}$ is non-zero. The corresponding ``sampling range'' range of non-zero matrix entries  in $K_{ij}$ for the $i$th energy bin is defined to run from
+$K_{ij}$ is non-zero. The corresponding ``sampling range'' of non-zero matrix entries  in $K_{ij}$ for the $i$th energy bin is defined to run from
 column $k_l^i$ (``lower index'') to column $k_u^i$ (``upper index'').
 An example for a smearing matrix is
 \begin{equation}
@@ -1333,12 +1343,12 @@ background events are composed out of the channels, and the second part
 specifies which systematical errors are considered, as well as their values.
 %
 For a rule, the splitting
-in signal and background is useful for the treatment of systematics, as we will se later. Each rule will lead to a $\Delta \chi^2$-value,
+into signal and background is useful for the treatment of systematics, as we will se later. Each rule will lead to a $\Delta \chi^2$-value,
 which means that all $\Delta \chi^2$'s of the different rules will be added
 for the whole experiment. Within each rule, the event rates are added, and
 the systematics is considered to be independent of the other rules (unless user-defined
 systematics specifies a dependence).
-Thus, it is convenient to combine the above defined channels for different
+Thus, it is convenient to combine the previously defined channels for different
 oscillation patterns and interaction types into one logical construction,
 which is the rule. For example, a superbeam usually has two rules: One for
 the $\nu_e$-appearance rates, and one for the $\nu_\mu$-disappearance rates.
@@ -1346,7 +1356,7 @@ the $\nu_e$-appearance rates, and one for the $\nu_\mu$-disappearance rates.
  the $\nu_e$-contamination of the beam will lead to a number of contributing signal and background event channels.
 
 For each rule, the signal event rate $s_i$ in the $i$th bin can be composed 
-out of one or more channels by 
+out of one or more channels according to 
 \begin{equation}
 s_i=\alpha_{c_{s1}}\cdot n_i^{c_{s1}}\,+\,\alpha_{c_{s2}}\cdot n_i^{c_{s2}}\,+\,\ldots
 \end{equation}
@@ -1356,7 +1366,7 @@ In addition, note that in most cases, it makes sense to have only one
 signal channel and to assign all sorts of perturbations to the background. 
 %
 Similarly, the background event rate $b_i$ in the $i$th bin can be composed
-out of one or more channels
+out of one or more channels:
 \begin{equation}
 b_i=\beta_{c_{b1}}\cdot n_i^{c_{b1}}\,+\,\beta_{c_{b2}}\cdot n_i^{c_{b2}}\,+\,\ldots \, ,
 \end{equation}
@@ -1384,10 +1394,10 @@ For the pull method, $k$ systematical errors are included by introducing
 $k$ additional variables $\zeta_k$, which are the 
 so-called ``nuisance parameters''. 
 The nuisance parameters describe the dependence 
-of the event rates on the various sources of systematical errors, 
-such as an error on the total 
+of the event rates on the various sources of systematical errors. 
+For example, an error on the total 
 normalization is included by multiplying the expected number of events in 
-each bin by a factor $(1+\zeta_1)$. The variation of $\zeta_1$ is in the fit 
+each bin by a factor $(1+\zeta_1)$. The variation of $\zeta_1$ in the fit is
 constrained by adding a penalty $p_1$ to the $\chi^2$-function. In case 
 of a  Gau\ss ian distributed systematical error, this penalty is 
 given by
@@ -1396,9 +1406,9 @@ given by
 p_i=\frac{\zeta_i^2}{\sigma_{\zeta_i}^2}\,,
 \end{equation}
 where $\sigma_{\zeta_i}$ is the standard 
-deviation of the corresponding nuisance parameter. We further on also refer
-to the  standard deviation as
-the ``error'', it corresponds to the actual systematical uncertainty.
+deviation of the corresponding nuisance parameter. In the following,
+we will refer to the  standard deviation as
+the ``error'', since it corresponds to the actual systematical uncertainty.
 Note that the central values of all penalties are zero in \GLOBES\ 3.0 and higher. 
 The resulting $\chi^2$ is then minimized with respect to all nuisance 
 parameters $\zeta_i$, which leads to $\chi^2_\mathrm{pull}$
@@ -1421,14 +1431,14 @@ and the covariance based approach are equivalent for a Gau\ss ian and
 linear model. In general,
 there is a separate $(\chi^2_\mathrm{pull})^r$ for each rule $r$, 
 \ie , pair of signal and background spectra, with a separate set of 
-nuisance parameters $\zeta_i^\alpha$. Thus, $\chi^2_\mathrm{pull}$
+nuisance parameters $\zeta_i^r$. Thus, $\chi^2_\mathrm{pull}$
 is the sum of all individual  $(\chi^2_\mathrm{pull})^r$'s.
-By the minimization, the dependence on the $k$ nuisance parameters has been eliminated  from $\chi^2_\mathrm{pull}$. 
+By the minimization, the dependence on the $k$ nuisance parameters is eliminated  from $\chi^2_\mathrm{pull}$. 
 
-Now we can introduce the different systematical errors. 
+Now, we can introduce the different systematical errors. 
 The two most important and
 most easily parameterized systematical errors are the normalization 
-and an energy calibration errors. These errors are assumed to be independent between the signal events and the background events, which means that
+and energy calibration errors. These errors are assumed to be independent between the signal events and the background events, which means that
 this systematics treatment defines the grouping into signal or background.
 The implementation of the normalization error
 is straightforward:
@@ -1473,19 +1483,19 @@ t_0&=&E'_\mathrm{min}/\Delta E_0\,.\nonumber
 Here, $\Delta E_0$ is the bin width ({\tt \$emax}-{\tt \$emin})/{\tt \$bins},
 and ``div'' refers to the integer part of the division. It is important
 to keep in mind that this definition of the energy calibration error 
-makes sense only for constant bin width, so the corresponding $\chi^2$
+makes sense only for constant bin widths, so the corresponding $\chi^2$
 functions should not be used in conjunction with the {\tt \$binwidth} directive.
 The factor $(1+b)$ in \eq~\eqref{eq:Ecalib} comes from a renormalization of
 the bin width, since also the bin width is altered by the replacement of
-the energies. Furthermore, special care has to be payed to the limits
+the energies. Furthermore, special attention has to be given to the limits
  $k<1$ or $k+1>N_\mathrm{bins}$, since there $s_k$ or $s_{k+1}$ may not have been calculated. By default, it is assumed that $s_k$ is
 zero in those cases. However, if the event rates are still large at
-the limits, errors will be introduced leading to a wrong
+the limits, this will introduce errors, leading to a wrong
 estimate of the impact of the calibration error. In this case,
 one should truncate the analysis range by a few bins at the boundaries
-and therefore ensure in this way that only those $s_i$ are used whose index
-$k$ is within the range $0,\ldots, N_\mathrm{bins}-1$ (\cf, \figu{energies}). 
-Thus, it is possible to constrain the analysis energy range 
+and thus ensure that only those $s_i$, whose index
+$k$ is within the range $0,\ldots, N_\mathrm{bins}-1$ (\cf, \figu{energies}), are used.
+Therefore, it is possible to constrain the analysis energy range 
 with each rule to an energy window\index{norm}{Energy!window}:
 \index{aedl}{rule@{\tt rule}!energy window@{\tt "@energy\_window}}
 \begin{quote}
@@ -1493,9 +1503,10 @@ with each rule to an energy window\index{norm}{Energy!window}:
 \tb @energy\_window = 4.0 : 50.0 
 }
 \end{quote}
-The default energy window is given between the minimal and maximal reconstructed energy. To be on the save side, reduce analysis window
-compared to the bin range on each side by about three times the
-energy calibration error.
+The default energy window is given by the minimal and maximal reconstructed
+energies {\tt \$emin} and {\tt \$emax}. To be on the safe side, one should
+reduce the analysis window compared to the bin range on each side by about
+three times the energy calibration error.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{table}[t!]
@@ -1523,7 +1534,7 @@ Any other name & \multicolumn{5}{c}{User-defined behavior} & n/a & User-defined 
 Possible systematics $\chi^2$ functions  in \GLOBES\ and their meaning. 
 If a parameter is designated with $+$, it will
 be marginalized over, and therefore the corresponding error needs to 
-have a non-zero value. If the cases with ``total rates'' in the remarks, 
+have a non-zero value. In the cases with ``total rates'' in the remarks, 
 the summation over the bins is performed \emph{before} computing 
 the $\chi^2$, \ie, no spectral information is used. 
 The function {\tt chiSpectrumOnly} leaves the 
@@ -1551,7 +1562,9 @@ Each of the four parameters has a corresponding systematical error.
 % the four parameters have to be always defined for built-in systematics. 
 They are called  signal normalization ($a$), signal tilt/calibration ($b$), 
 background  normalization ($c$) and
-background tilt/calibration ($d$). Their default (central) values are zero.
+background tilt/calibration ($d$). Their default (central) values are
+zero.\footnote{The old parameter {\tt @backgroundcenter} should not be used anymore.
+A background normalization center of 1.0 will be interpreted as zero central value.}
 % \begin{equation}
 % a=1\,,\quad b=0\,,\quad c={\tt not \, \, assigned}\,,\quad d=0\,.
 % \end{equation}
@@ -1559,8 +1572,8 @@ background tilt/calibration ($d$). Their default (central) values are zero.
 % in \emph{either} case. 
 The errors for the normalization and the 
 values of tilt/calibration are always regarded
-as a pairs, \ie, they are given in the form {\tt normalization : tilt}. For example, we have\footnote{The old parameter {\tt @backgroundcenter} should not be used anymore. A background normalization center of 1.0 will be
-interpreted as zero central value.}
+as pairs, \ie, they are given in the form {\tt normalization :\ tilt}.
+For example, we have
 \index{aedl}{rule@{\tt rule}!signal error@{\tt "@signalerror}}
 \index{aedl}{rule@{\tt rule}!background error@{\tt "@backgrounderror}}
 %\index{aedl}{{\tt rule}!background center@{\tt "@backgroundcenter}}
@@ -1587,8 +1600,8 @@ but should not be used anymore.}
 \index{aedl}{rule@{\tt rule}!sys off function@{\tt "@sys\_off\_function}}
 \index{norm}{Systematics function}
 The different  possibilities are shown in
-\Tab~\ref{tab:error_dim}. Since the dual systematics modes define the experiment
-behavior for systematics on and off, it is useful to have a matching pair of 
+\Tab~\ref{tab:error_dim}. Since the dual systematics modes define the behavior
+of the experiment for systematics on and off, it is useful to have a matching pair of 
 systematics functions for each rule 
 (see also~\Sec~\ref{sec:systematics}). The signal and background errors specified
 by {\tt @signalerror} and  {\tt @backgrounderror} will then be used, if applicable.
@@ -1616,39 +1629,40 @@ one would specify the systematical errors in lists, such as
 \tb @sys\_off\_errors = \{ \}
 }
 \end{quote}
-Note that here the systematics on and systematics off models can be used 
-as fully functional different systematics modes with different systematical
+Note that here, the systematics on and systematics off models can be used 
+as two different, fully functional systematics modes with different systematical
 errors. The interpretation of the systematical errors in {\tt @sys\_on\_errors} and
 {\tt @sys\_off\_errors} is left to the application software code and the user.
 In addition, the application software has to register the user-defined systematics $\chi^2$
 function with \GLB{DefineChiFunction} and uniquely identify the name
 given by {\tt @sys\_on\_function} or {\tt @sys\_off\_function} to avoid
 confusing different systematics routines. In addition, it is possible to define
-a rule with passive systematics using {\tt glbChiZero}. Such passive systematics
-is not directly used or called, but the corresponding rate vectors will be calculated
-and provided for indirect access. For example, a reactor experiment with correlated
+a rule with passive systematics using {\tt glbChiZero}. In this case, the
+contribution to $\chi^2$ from this rule will always be set to zero, but
+the corresponding rate vectors will be calculated and provided for indirect access
+by other systematics functions. For example, a reactor experiment with correlated
 systematics between near and far detectors may define the user-defined systematics
 {\tt chiReactor} for the far detector and use {\tt chiZero} for the near detector.
 The routine assigned to the far detector will then perform the $\chi^2$ calculation,
 which, of course, also involves the rates of the near detector. However, defining
 {\tt chiReactor} in both the near and far detectors would result in a double call
-of the $\chi^2$ function, \ie, the program will be a factor two slower and the
-resulting $\chi^2$ will be a factor two too large.
+of the $\chi^2$ function, \ie, the resulting $\chi^2$ would be too large by a factor two
+and the program would be slower by a factor of two.
 Note that mixed declarations of {\tt @sys\_on\_errors}, {\tt @sys\_off\_errors}, {\tt @signalerror}, and
 {\tt @backgrounderror} are possible. In this case, {\tt @sys\_on\_errors} and {\tt @sys\_off\_errors}
-have priority. If for one or both of these no systematical errors are defined, {\tt @signalerror} or
+have priority. If one or both of these are not present, {\tt @signalerror} or
 {\tt @backgrounderror} will be used.
 
 Eventually, a complete rule may look like this:
 \begin{quote}
 {\tt rule(\#rule\_1)<\\
 \tb @signal = 0.5 @ \#channel\_1\\
-\tb @background = 0.001 @ \#channel\_2 :  0.005 @ \#channel\_3\\
-\tb @signalerror =       0.001  :       0.01\\
-\tb @backgrounderror =   0.001 :       0.01\\
+\tb @background = 0.001 @ \#channel\_2 :\ 0.005 @ \#channel\_3\\
+\tb @signalerror =       0.001  :\ 0.01\\
+\tb @backgrounderror =   0.001 :\ 0.01\\
 \tb @sys\_on\_function = "chiSpectrumTilt"  \\
 \tb @sys\_off\_function = "chiNoSysSpectrum"  \\
-\tb @energy\_window = 4.0 : 50.0
+\tb @energy\_window = 4.0 :\ 50.0 \\
 >}
 \end{quote}
 \index{aedl}{rule@{\tt rule}|)}
