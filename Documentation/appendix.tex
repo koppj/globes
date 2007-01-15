@@ -20,18 +20,18 @@ Besides the usual things like a working libc you need to have
 The library \verb+libglobes+ should in principle compile with any C/C++
 compiler but the \verb+globes+ binary uses the \verb+argp+ facility of \verb+glibc+
 to parse its command line options. However, on platforms where \verb+argp+
-is lacking \GLOBES\ has replacement code, thus it should also work
+is lacking, \GLOBES\ has replacement code, thus it should also work
 there. \GLOBES\ is, however, using the C99 standard in order to handle
 complex numbers, but that is the only feature of C99 used.
 
-GSL is also available as rpm+s from the various distributors of
+GSL is also available as rpm's from the various distributors of
 GNU/Linux, see their web sites for downloads. Chances are that gcc and
 GSL are already part of your installation.  For building \GLOBES\ from
-source, however, not only working libraries for above packages are
-needed but also the headers, especially for GSL. Depending on your
-installation, eg. on RedHat/Fedora, of GSL this may require to
+source, however, not only working libraries for the above packages are
+needed, but also the headers, especially for GSL. For some installations
+of GSL, eg. on RedHat/Fedora, this may require to
 additionally install a rpm-package named \verb+gsl-devel+. If GSL has been
-installed from the tar-ball as provided by gnu.org no problems should
+installed from the tar-ball as provided by gnu.org, no problems should
 occur. Furthermore you need a working \verb+make+ to build and install
 \GLOBES.
 
@@ -41,7 +41,7 @@ occur. Furthermore you need a working \verb+make+ to build and install
 
 \GLOBES\ follows the standard GNU installation procedure.  To compile
 \GLOBES\ you will need an ANSI C-compiler.  After unpacking the
-distribution the Makefiles can be prepared using the configure
+distribution, the Makefiles can be prepared using the configure
 command,\\
 \verb+  ./configure+\\
 You can then build the library by typing,\\
@@ -151,19 +151,19 @@ create some versioning problem at some time!
 
 
 Under certain circumstances it may be useful to use a static version of
-libglobes or any of the binaries, e.g. when running on a cluster.
+libglobes or any of the binaries, e.g.\ when running on a cluster.
 
 The \verb+configure+ script accepts the option \verb+--disable-shared+, in
-which case only static objects are built, i.e. only a static
+which case only static objects are built, i.e.\ only a static
 version of libglobes. In case your system does not support shared
 libraries the \verb+configure+ script recognizes this. If you give no
 options to \verb+configure+, both shared and static versions are built
 and will be installed. All binaries, however, will use dynamic
 linking. If you want to build static binaries, use
-LDFLAGS=+-all-static+ for building them.
+\verb+LDFLAGS='-all-static'+ for building them.
 
 Sometimes it is convenient, eg. for debugging purposes, to have a
-statically linked version of a program using \GLOBES\, which is easiest
+statically linked version of a program using \GLOBES, which is easiest
 achieved by just linking with \verb+libglobes.a+. If you need a completely
 statically linked version, please, have a look at the Makefile in the
 \verb+examples+ directory.\\
@@ -173,7 +173,7 @@ most Linuxes.  It should be straightforward to adapt this example to
 your needs.
 
 All these options rely on a working \verb+gcc+ installation. It seems that
-\verb+gcc 3.x+ is broken in subtle way which makes it necessary to add a
+\verb+gcc 3.x+ is broken in a subtle way which makes it necessary to add a
 symbolic link in the gcc library directory. The diagnostic for this
 requirement is that building static programs fails with the error
 message \verb+cannot find -lgcc_s+. In those cases, find \verb+libgcc.a+ and add
@@ -216,17 +216,17 @@ this, it is necessary to re-link the application with the
 Condor-library (this assumes that Condor is installed)\\ 
 \verb+  condor_compile gcc your_object_files -static `globes-config --libs`+\\
 It may be necessary to prefix the call of \verb+globes-config+ with
-the path to it, in case that location is not in \verb+$PATH+.
+the path to it, in case that this location is not in \verb+$PATH+.
 \index{norm}{Condor|)}
 
 \section*{GSL requirements}
 
-Sometimes the GNU scientific library is not available or is installed
+Sometimes, the GNU scientific library is not available or is installed
 in a non-standard location. This situation can arise in an
-installation without root privileges. In this case one can specify
+installation without root privileges. In this case, one can specify
 \verb+--with-gsl-prefix=path_to_gsl+ as option to the \verb+configure+ script.
 If one wants to use a shared version of \verb+libgsl+ then one has to make
-sure that the linker find the library at run-time. This can be
+sure that the linker can find the library at run-time. This can be
 achieved by setting the environment variable \verb+LD_LIBRARY_PATH+
 correctly, i.e. (in bash)\\
 \verb+  export LD_LIBRARY_PATH='path_to_gsl'+\\
@@ -241,7 +241,7 @@ environment variables is necessary.
 \subsection*{RedHat (all versions)}
 
 The standard rpm-based installation of GSL does not provide any header
-files for GSL, which are however needed to compile \GLOBES\. You have to
+files for GSL, which are however needed to compile \GLOBES. You have to
 install an additional rpm-package called \verb+gsl-devel+. Alternatively
 you can install GSL from a tar-ball and use the \verb+--with-gsl-prefix+
 option to the configure script of \GLOBES.
@@ -292,7 +292,7 @@ architecture.
 \section*{Installation Names}
 
 
-   By default, \verb+make install+ will install the package+s files in
+   By default, \verb+make install+ will install the package's files in
 \verb+/usr/local/bin+, \verb+/usr/local/man+, etc.  You can specify an
 installation prefix other than \verb+/usr/local+ by giving \verb+configure+ the
 option \verb+--prefix=PATH+.
@@ -300,7 +300,7 @@ option \verb+--prefix=PATH+.
    You can specify separate installation prefixes for
 architecture-specific files and architecture-independent files.  If you
 give \verb+configure+ the option \verb+--exec-prefix=PATH+, the package will use
-PATH as the prefix for installing programs and libraries.
+\verb+PATH+ as the prefix for installing programs and libraries.
 Documentation and other data files will still use the regular prefix.
 
    In addition, if you use an unusual directory layout you can give
@@ -316,8 +316,8 @@ option \verb+--program-prefix=PREFIX+ or \verb+--program-suffix=SUFFIX+.
 
 
    Some packages pay attention to \verb+--enable-FEATURE+ options to
-\verb+configure+, where FEATURE indicates an optional part of the package.
-They may also pay attention to \verb+--with-PACKAGE+ options, where PACKAGE
+\verb+configure+, where \verb+FEATURE+ indicates an optional part of the package.
+They may also pay attention to \verb+--with-PACKAGE+ options, where \verb+PACKAGE+
 is something like \verb+gnu-as+ or \verb+x+ (for the X Window System).  The
 \verb+README+ should mention any \verb+--enable-+ and \verb+--with-+ options that the
 package recognizes.
@@ -331,7 +331,7 @@ you can use the \verb+configure+ options \verb+--x-includes=DIR+ and
 \subsection*{Building a perl extension}
 
 
-This feature is experimental and your mileage my vary!
+This feature is experimental and your mileage may vary!
 
 This feature allows to build a perl binding of \GLOBES\, i.e. you will
 in the end have a perl module from which you can use \GLOBES\ from within
@@ -342,7 +342,7 @@ If(!) everything works as intended, all you have to do is to provide
 look at \verb+globes/example.pl+ and you should see how that works in
 principle. 
 
-The trick here, is that we use SWIG (\verb+www.swig.org+) to generate
+The trick here is, that we use SWIG (\verb+www.swig.org+) to generate
 a wrapper file for \GLOBES. The wrapper file is part of the \GLOBES\
 tar-ball (\verb+globes/globes_perl.c+) and hence you should not need SWIG to
 be installed on your system.
@@ -354,13 +354,13 @@ you want to try that you will need SWIG.
 \subsection*{Building RPMs}
 
 
-This feature is experimental and your mileage my vary!
+This feature is experimental and your mileage may vary!
 
 Many people find binary RPMs useful, therefore we provide an optional
 feature \verb+--enable-rpm-rules+ which should produce all the necessary
-makefile rules for RPM building. To actually build RPMs requires that
-your system is properly setup for that. How you can do that you can
-learn at \verb+http://www.rpm.org+. You then can use \verb+make rpm+, most likely
+Makefile rules for RPM building. To actually build RPMs requires that
+your system is properly setup for that. You can learn how to do that
+at \verb+http://www.rpm.org+. You then can use \verb+make rpm+, most likely
 you will need to be root to do that (\verb+sudo+ won't work!).
 
 {\bf NOTE} to people packaging \GLOBES\ RPMs: Please, use the provided spec
@@ -373,7 +373,7 @@ file and do include the headers!
 automatically, but needs to determine by the type of host the package
 will run on.  Usually \verb+configure+ can figure that out, but if it prints
 a message saying it can not guess the host type, give it the
-\verb+--host=TYPE+ option.  TYPE can either be a short name for the system
+\verb+--host=TYPE+ option. \verb+TYPE+ can either be a short name for the system
 type, such as \verb+sun4+, or a canonical name with three fields\\
 \verb+  CPU-COMPANY-SYSTEM+
 
@@ -1062,8 +1062,8 @@ Background &  $1.0 \, \otimes \, (\nu_\mu \rightarrow \nu_x)_\mathrm{NC}$ & (ene
 
 A common issue with \GLOBES\ is confusion about the proper units for
 the input flux files for use in \AEDL\ experiment descriptions. Source of
-the confusion is an undocumented factor 5.2 in \GLOBES\ versions older
-than 3.0 the fluxes are multiplied with (see below). In Version 3.0 and 
+the confusion is an undocumented factor 5.2 with which the fluxes
+are multiplied in \GLOBES\ versions older than 3.0 (see below). In Version 3.0 and 
 higher, the alternative flux environment {\tt nuflux} is provided, 
 which does not contain this factor. The following material is
 based on the old environment {\tt flux}. For the use of {\tt nuflux},
@@ -1169,7 +1169,7 @@ by
 \end{quote}
 
 This replacement is not necessary for neutrino factory built-in fluxes,
-and built-in beta beams fluxes where not supported by earlier versions
+and built-in beta beam fluxes were not supported by earlier versions
 of \GLOBES .
 
 
