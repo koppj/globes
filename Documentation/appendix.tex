@@ -490,7 +490,7 @@ involve {\tt NOvA.glb}, the following additional files are required:
 \item {\tt XNC.dat} (neutral current cross sections)
 \ei
 The \NOVA\ experiment uses a neutrino beam from the Fermilab NuMI beamline. The target power is 
-1.2~MV which results in $10^{21}$~pot~$\mathrm{yr^{-1}}$ and 3~years $\nu$-running and 3~years $\bar{\nu}$-running 
+1.12~MV which results in $10^{21}$~pot~$\mathrm{yr^{-1}}$ and 3~years $\nu$-running and 3~years $\bar{\nu}$-running 
 is assumed. The fiducial mass of the Totally Liquid Scintillator Detector (TASD) is taken to be 
 $\mathrm{m_{det} = 25 \,kt}$ at a baseline of L~=~812~km approximately 12~km off-axis to the beamline. The
 energy resolution is $\mathrm{\sigma_e=10 \% \cdot \sqrt{E}}$ for electrons and  $\mathrm{\sigma_e=5 \% \cdot \sqrt{E}}$
@@ -613,12 +613,12 @@ $\mathrm{\mathcal{L} = 8000 \,t \, GW\, yr}$, \eg\ a 100~t detector, a reactor w
 and a running period of 8 years. Besides the higher integrated luminosity, the attributes of {\tt Reactor2.glb}
 are similar to the ones of {\tt Reactor1.glb}.
 
-\subsection*{DoubleCHOOZ -- {\tt Dchooz-near.glb} and {\tt Dchooz-far.glb}}
+\subsection*{DoubleCHOOZ -- {\tt D-Chooz\_near.glb} and {\tt D-Chooz\_far.glb}}
 
-The files {\tt Dchooz-near.glb} and {\tt Dchooz-far.glb} allow to simulate the \DC\ reactor experiment in France. 
+The files {\tt D-Chooz\_near.glb} and {\tt D-Chooz\_far.glb} allow to simulate the \DC\ reactor experiment in France. 
 The basic version of these files were used within \cite{Huber:2006vr} which should be cited if the files 
-{\tt Dchooz-near.glb} and {\tt Dchooz-far.glb} are
-used for a scientific publication or a talk. For calculations that involve {\tt Dchooz-near.glb} and/or {\tt Dchooz-far.glb}, the following
+{\tt D-Chooz\_near.glb} and {\tt D-Chooz\_far.glb} are
+used for a scientific publication or a talk. For calculations that involve {\tt D-Chooz\_near.glb} and/or {\tt D-Chooz\_far.glb}, the following
 additional files are required:
 \bi
 \item {\tt Reactor.dat} (neutrino flux from reactor)
@@ -631,13 +631,13 @@ is planned to be located in the {\sc Chooz} cavern at a baseline of L~=~1.05~km 
 the near detector is assumed to be located at a distance of 0.1~km to the cores. The total running time of the
 experiment is assumed to be 5 years. So, the integrated luminosity at the far detector yields $\mathrm{\mathcal{L} \approx
 427 \,t \, GW\, yr}$.
-Here, the total running time of 5 years is assumed within {\tt Dchooz-near.glb} and {\tt Dchooz-far.glb}, so near
+Here, the total running time of 5 years is assumed within {\tt D-Chooz\_near.glb} and {\tt D-Chooz\_far.glb}, so near
 and far detector are assumed to start the mode of operation simultaneously. For the simulation of \DC\ and
-considering a delayed start of data taking at the near detector the file {\tt Dchooz-near.glb} has to be
+considering a delayed start of data taking at the near detector the file {\tt D-Chooz\_near.glb} has to be
 modified. The cancellation of systematical uncertainties is considered by the manual definition of a $\chi^2$
 as described in \cite{Huber:2006vr} with the treatment of user-defined systematics as described in \Sec~\ref{sec:userchi}   
 The energy resolution is
-$\mathrm{\sigma_e=5\%\cdot\sqrt{E_{vis}}}$ and the choice for {\tt sigma\_function} is {\tt \#inverse\_beta}. The following rules are defined within {\tt Dchooz-near.glb} and {\tt Dchooz-far.glb}: 
+$\mathrm{\sigma_e=5\%\cdot\sqrt{E_{vis}}}$ and the choice for {\tt sigma\_function} is {\tt \#inverse\_beta}. The following rules are defined within {\tt D-Chooz\_near.glb} and {\tt D-Chooz\_far.glb}: 
 \begin{center}
 \begin{tabular}{|l|ll|c|c|c|c|c|}
 \hline \hline
@@ -964,10 +964,10 @@ Background &  $5.0\cdot 10^{-6} \, \otimes \, (\nu_\mu \rightarrow \nu_x)_\mathr
 \end{tabular}
 \end{center}
 
-\subsection*{Variable neutrino factory with Silver Channel -- {\tt NFvar\_GoldSilver.glb}}
+\subsection*{Variable neutrino factory with Silver Channel -- {\tt NF\_GoldSilver.glb}}
 
 A variable neutrino factory scenario that includes the golden and silver appearance channels can be 
-simulated with the file {\tt NFvar\_GoldSilver.glb}. The basic version was
+simulated with the file {\tt NF\_GoldSilver.glb}. The basic version was
 used within \cite{Huber:2006wb} and the golden channel follows the neutrino factory scenarios from \cite{Huber:2002mx}
 and the description of the silver channel follows \cite{Autiero:2003fu}. These
 references should be cited if the file {\tt
@@ -991,7 +991,7 @@ in the range $\mathrm{10\,GeV\lesssim E_\mu\lesssim 80\, GeV}$. The baseline is 
 AEDL}-Variable {\tt BASELINE}. For the silver channel an additional ECC detector with a fiducial mass
 $\mathrm{m_{ECC} = 5\,kt}$ is assumed to be located at the same baseline as the MID detector. The energy
 resolution of the silver channel is set to $\mathrm{\sigma_e=20\%\cdot E}$. The following additional rule
-compared to {\tt NFvar.glb} is introduced to {\tt NFvar\_GoldSilver.glb}:
+compared to {\tt NFvar.glb} is introduced to {\tt NF\_GoldSilver.glb}:
 \begin{center}
 \begin{tabular}{|l|ll|c|c|}
 \hline \hline
@@ -1006,17 +1006,17 @@ Background & $3.1\cdot 10^{-8} \, \otimes \, (\nu_e \rightarrow \nu_e)_\mathrm{C
 \end{tabular}
 \end{center}
 
-\subsection*{High Resolution/Low Threshold neutrino factory -- \\{\tt NFvar\_hR\_lT.glb}}
+\subsection*{High Resolution/Low Threshold neutrino factory -- \\{\tt NF\_hR\_lT.glb}}
 
-A variable neutrino factory hybrid detector scenario can be simulated with the file {\tt NFvar\_hR\_lT.glb}. The basic version was
+A variable neutrino factory hybrid detector scenario can be simulated with the file {\tt NF\_hR\_lT.glb}. The basic version was
 used within \cite{Huber:2006wb} and follows the neutrino factory scenarios from \cite{Huber:2002mx}. These
-references should be cited if the file {\tt NFvar\_hR\_lT.glb} is used for a scientific publication or a talk.
-For calculations that involve {\tt NFvar\_hR\_lT.glb}, the same additional files as for {\tt NFvar.glb} are
-required and the {\sf AEDL}-Variables {\tt emax} and {\tt BASELINE} have to be set. {\tt NFvar\_hR\_lT.glb} 
+references should be cited if the file {\tt NF\_hR\_lT.glb} is used for a scientific publication or a talk.
+For calculations that involve {\tt NF\_hR\_lT.glb}, the same additional files as for {\tt NFvar.glb} are
+required and the {\sf AEDL}-Variables {\tt emax} and {\tt BASELINE} have to be set. {\tt NF\_hR\_lT.glb} 
 implements a lower threshold ($\mathrm{\sim\,1\,GeV}$) at a higher energy resolution
 $\mathrm{\sigma_e=15\%\cdot E + 0.085\, MeV}$ where the constant term represents 
 the effects from Fermi Motion. The background rejection is introduced energy dependent as 
-$10^{-3}/\mathrm{E^2}$ and matches {\tt NFvar.glb} at higher energies. The following rules are defined within {\tt NFvar\_hR\_lT.glb}: 
+$10^{-3}/\mathrm{E^2}$ and matches {\tt NFvar.glb} at higher energies. The following rules are defined within {\tt NF\_hR\_lT.glb}: 
 \begin{center}
 \begin{tabular}{|l|ll|c|c|}
 \hline \hline
