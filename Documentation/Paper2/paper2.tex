@@ -213,7 +213,7 @@ a simulation tool for short- and long-baseline neutrino oscillation experiments.
 concept of user-defined systematics.
 In addition, the combination with external information, such as from different experiment classes, is 
 simplified by the concept of user-defined priors. As far as the probability calculation is concerned, \GLOBES\ 
-now provides an interface for the inclusion of non-standard physics without re-compliation of the software. 
+now provides an interface for the inclusion of non-standard physics without re-compilation of the software. 
 The set of experiment descriptions coming with \GLOBES\ has been updated. For example, built-in fluxes are now
 provided for the simulation of beta beams.
 \end{abstract}
@@ -385,7 +385,7 @@ e^{-i \, m_1^k \, x_k} & 0 & 0 \\
 \end{equation}
 Here the Hamiltonian $\mathcal{H}(n^k_e)$ is diagonalized by the unitary mixing matrix in matter $\hat{U}(n^k_e)$
 with the eigenvalues $m_1^k$, $m_2^k$, and $m_3^k$. The probabilities in \equ{probs} are used for the
-event rate compution, which is described in greater detail in \Ref~\cite{Huber:2004ka}. In the next section,
+event rate computation, which is described in greater detail in \Ref~\cite{Huber:2004ka}. In the next section,
 we will demonstrate how systematics is implemented thereafter.
 
 \begin{figure}[t]
@@ -399,9 +399,9 @@ $\stheta=\sigma_E=0$ (figure similar to \Ref~\cite{Blennow:2005yk}). Here $\sigm
 
 \GLOBESN\ allows the modification of this Hamiltonian and the whole probability engine without
 re-compilation of the \GLOBES\ software. This is implemented
-by using pointers for the functions calling the standard probability engine, which can be changed if
+by using pointers to the functions of the standard probability engine, which can be changed if
 a different probability engine is registered. For example, a user may just copy the standard probability
-engine of \GLOBES , and modify it, and register it. An important prerequisite for the ability to handle
+engine of \GLOBES , modify it, and register it. An important prerequisite for the ability to handle
 more than the standard six oscillation parameters (plus matter density) $\boldsymbol{\lambda}=(\theta_{12},\theta_{13}, \theta_{23}, \deltacp, \sdm, \ldm, \rho)$, \ie,
 \begin{equation}
 \boldsymbol{\lambda}=(\theta_{12},\theta_{13}, \theta_{23}, \deltacp, \sdm, \ldm, \rho, \eta_1, \hdots, \eta_n)
@@ -430,7 +430,7 @@ of this physics is used for simplicity.
 
 \GLOBES\ supports four types of systematical errors as a standard: Signal and background
 normalization errors, as well as signal and background tilt or energy calibration errors.
-The tilt (T) is impemented as a linear distortion of the spectrum around the center,
+The tilt (T) is implemented as a linear distortion of the spectrum around the center,
 and the energy calibration (C) as a distortion (stretching) of the reconstructed energy scale.
 For the implementation of these systematical errors, the  ``pull method'' is used~\cite{Fogli:2002pt}, which introduces  so-called nuisance parameters $\zeta_i$. 
 For example, for the signal and background normalization errors, the respective event rates 
@@ -534,7 +534,7 @@ rules or experiments)
 \section{Adding external information with user-defined priors}
 
 In order to include correlations and degeneracies, \GLOBES\ provides
-(local) maginalization routines to project the fit manifold onto
+(local) marginalization routines to project the fit manifold onto
 a subspace. For example, if one wants to compute the $\stheta$ precision,
 one scans the $\stheta$ direction and marginalizes for each fixed $\stheta$
 over the other oscillation parameters. This marginalization is performed
@@ -551,8 +551,7 @@ parameters and not on systematics, one can do this at this level. \GLOBES\ provi
 the pre-defined possibility to include external Gaussian constraints on the 
 oscillation parameters (and the matter density, which is treated as another
 oscillation parameter). For example, an external constraint on $\theta_{12}$
-is added before the marginalition in \equ{margin} by the replacement after the
-systematics minimization
+is added before the marginalization in \equ{margin} by the replacement
 \begin{equation}
  \chi^2_{\mathrm{pull}}(\boldsymbol{\lambda}) \rightarrow \chi^2_{\mathrm{pull}}(\boldsymbol{\lambda})  +
  \frac{(\theta_{12} - \theta_{12}^0)^2}{\sigma_{\theta_{12}}^2}
@@ -650,21 +649,21 @@ The result of a rule is a systematics $\chi^2$ corresponding to \equ{chipull}.
 appearance and disappearance channels, neutrino and antineutrino operations modes, \etc. An experiment has a common detector and baseline, but may use more different fluxes (such as for neutrinos and antineutrinos). Therefore,
 the matter density profile is the same for all rules of an experiment. The result of an experiment
 is again a systematics $\chi^2$, but summed over all rules.
-\item[Experiment combination] An experiment combination consists of different experiments with different detectors, baselines, and (uncorreleted) matter density profiles. The result of an experiment combination
+\item[Experiment combination] An experiment combination consists of different experiments with different detectors, baselines, and (uncorrelated) matter density profiles. The result of an experiment combination
 is again a systematics $\chi^2$, but summed over all experiments.
 \end{description}
 Note that after the $\chi^2$ is summed over all rules or experiments as specified by the user in the application software, \equ{margin} is applied, and the oscillation parameters are marginalized over. 
 
 In \GLOBESN , this construction of experiments is extended by user-defined systematics, which allows
-the user to break up the strict coupling of systematics with rules. For example, systematics can be
+the user to break up the strict coupling between systematics and rules. For example, systematics can be
 correlated between different rules or experiments, such as for an reactor experiment with identical
 near and far detectors. In addition, one can introduce user-defined systematical errors.
 For that purpose, the former error dimension concept has been changed and
 extended. For example, one has to give each user-defined systematics a name, and this name has
 to be matched by the application software. 
 %
-Further changes in \AEDL\ are the requirement of a minimum \GLOBES\ version the \AEDL\ is running with,
-and the extension of lists as \AEDL\ variables and an interpolation feature.
+Further changes in \AEDL\ are the requirement to specify the minimum \GLOBES\ version the \AEDL\ is running with,
+and the extensions by lists as \AEDL\ variables and by an interpolation feature.
 
 As far as the experiment prototypes are concerned, a list of the ones provided with \GLOBESN\ 
 is given in \Tab~\ref{tab:experiments}. These prototypes can be modified for the definition of
@@ -673,12 +672,12 @@ one's own experiments (experimentalist), or they can be used for the test of new
 Note that some of these experiments may contain 
 integrated luminosities, baseline, fluxes, efficiencies, or other factors, which the user
 may not agree with and which can be easily adjusted. Some of the \AEDL\ files have been
-changed or updated from eariler versions, such as for T2K and T2HK, or the standard neutrino
+changed or updated from earlier versions, such as for T2K and T2HK, or the standard neutrino
 factory. Other files represent the results from recent developments, such as the variable energy
 beta beam or neutrino factory files. They push \AEDL\ to the edge in terms of advanced features,
 such as variable bin widths, use of the new interpolation feature, threshold function implementations, \etc.
 In particular, note that Double Chooz requires user-defined
-systematics, and the beta beams built-in beta beam fluxes. Both of these features are only
+systematics, and the beta beams require built-in beta beam fluxes. Both of these features are only
 available in \GLOBESN\ and higher. Some of the files require that \AEDL\ variables be pre-set by the
 user, such as the muon energy for the variable energy neutrino factory. These variables are
 described in the corresponding file headers. Old \AEDL\ prototypes should still run, but will not
@@ -686,28 +685,6 @@ be maintained by the \GLOBES\ team anymore.
 
 \section{Internal changes and improved performance}
 
-New platform and interpreter support, new ways to improve the performance
-
-\bi
-\item
- PERL?
-\item 
- Windows?
-\item
- Better RedHat support
-\item
- Changes in installation scheme
-\ei
-
-
-\bi
-\item 
- GLoBES on clusters, Condor; parallized code; static links
-\item 
- 64 bit support
-\item 
- New minimization algorithm!?
-\ei
 
 Sophisticated \GLOBES\ simulations with several experiments and complicated
 parameter correlations can take several days to finish even on modern computers.
@@ -724,10 +701,10 @@ procedure is to perform a full minimization in systematics space after each
 step in oscillation space. This avoids interference of the two categories
 of parameters, and is known to have excellent convergence properties.
 The numerical method that does the minimization is the Powell
-algorithm~\cite{Press:NumRecip}.
+algorithm HERE ORIGINAL POWELL REFERENCE [WW].
 
 In \GLOBESN , we provide an alternative method, which does the full minimization
-in one go and is therefore several times faster in most cases. In this algorithm,
+in one go, and is therefore several times faster in most cases. In this algorithm,
 each Powell iteration over oscillation parameters is followed by one iteration
 over systematics parameters. Since there may be some pathological cases where this
 interleaved minimization strategy behaves differently than the old method,
@@ -741,7 +718,7 @@ for one specific set of parameters. In particular, the computation of
 oscillation probabilities, which has to be done every time the oscillation
 parameters have changed, should be as efficient as possible. The most expensive
 step here is the diagonalization of the hermitian $3\times3$ neutrino Hamilton
-operator in matter. The LAPACK rotuines~\cite{Anderson:LAPACK}, which were
+operator in matter. The LAPACK routines~\cite{Anderson:LAPACK}, which were
 used to solve this eigenproblem in previous versions of \GLOBES, turned out
 not to be the optimal choice because they are mainly optimized for very large
 matrices~\cite{Kopp:2006wp}. In the case of the small and usually well-conditioned
@@ -749,13 +726,52 @@ matrices appearing in \GLOBES, they spend too much time evaluating their paramet
 list and planning the optimal diagonalization strategy. Therefore, \GLOBES\ now
 relies an algorithm which has been designed specifically for the diagonalization
 of hermitian $3\times3$ matrices. It is essentially the extremely fast analytical
-algorithm discussed in~\cite{Kopp:2006wp}, but for the rare cases where this may become
-inaccurate, it falls back to the QL method from~\cite{Press:NumRecip}.
+algorithm discussed in \Ref~\cite{Kopp:2006wp}, but for the rare cases where this may become
+inaccurate, it falls back to the QL (WRITE OUT!)
+method from~\cite{Press:NumRecip} REPLACE BY ORIGINAL REFERENCE!.
 
+As far as the installation of \GLOBES\ on different systems is concerned, \GLOBES\
+has been improved in the past, such as to handle different Linux distributions.
+In addition, for high-throughput computing, \GLOBES\ has been used or tested
+on 64 Bit systems, Condor clusters, and parallel clusters. An important prerequisite
+for the parallelization is the option to build static binaries, which is now
+illustrated in the examples. With these improvements, the performance of \GLOBES\
+has been pushed to the edge. \Ref~\cite{Huber:2006wb} is probably the currently
+most demanding product of \GLOBES , for which most of these features
+have been developed.
 
+PH, JK: IS THERE ANYTHING ELSE YOU WANT TO SAY? ABOUT NEW PLATFORMS,
+PERL, WINDOWS, PERFORMANCE, 64BIT, INSTALLATION?
 
 \section{Summary and conclusions}
 
+We have presented \GLOBESN , which is a simulation software for 
+future terrestrial neutrino oscillation facilities. \GLOBES\ is now no further
+restricted to one source-one detector configurations, but it can simulate
+the systematics of arbitrary combinations of discrete sets of sources and
+detectors. In addition, user-defined systematical errors can be introduced.
+The new concept of user-defined priors allows the inclusion of external
+information at a different level. For example, constraints from atmospheric
+neutrino experiments or neutrino telescopes can be taken into account. In addition,
+they provide a powerful handle on complicated degeneracy localization.
+On the probability level, \GLOBES\ now supports the simulation of non-standard
+physics beyond three-flavor neutrino oscillations without a re-compilation of
+the software. A very important prerequisite for this feature is the ability
+of \GLOBESN\ to carry more than six oscillation parameters. New experiment
+prototypes make extensive use these new features, as well as they are illustrated by
+examples in the manual. One prominent example is the Double Chooz experiment,
+which requires user-defined systematics to simulate correlated errors between
+the near and far detectors.
+
+In conclusion, \GLOBESN\ provides a number of new improvements, such as by
+ including more flexibility. At the end, the developers of a software can never
+exactly foresee what the users are up for, and therefore flexible concepts
+allow for more space in problem realizations. In this version of \GLOBES ,
+three new such flexible concepts have been introduced: User-defined systematics,
+user-defined priors, and user-defined oscillation probabilities. These approaches
+will make an easy adjustment of the software possible for both experimentalists and theorists.
+Finally, note that the past has shown that it is often more than one possibility 
+how a specific problem can be implemented in \GLOBES .
 
 \subsection*{Acknowledgments}
 
