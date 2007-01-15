@@ -1,0 +1,87 @@
+#define TITLE       GLoBES - Pre-defined AEDL-Files
+#define KEYWORDS    GLoBES, AEDL, glb, experiment, definitions, download, long, baseline, neutrino, oscillation 
+#define DESCRIPTION Details about pre-defined AEDL Files for GLoBES
+
+#include "template_head.gtml"
+
+<h1>GLoBES - Pre-defined AEDL-Files</h1>
+
+<h2>NO&nu;A</h2>
+
+The NO&nu;A superbeam experiment can be simulated with 
+the file <a href="NOvA.glb">NOvA.glb</a>. Please check the header of the files for references 
+of their origin. Please do not forget to cite these references if the file <a
+href="NOvA.glb">NOvA.glb</a> is used for a scientific publication or a talk. Check the appendix of
+the GLoBES manual for more details of the experiment description. 
+
+<h3>Author(s)</h3>
+
+The GLoBES Team
+
+<h3>Download</h3>
+
+<center>
+<table frame=all rules=all cellspacing=4 cellpadding=4>
+<colgroup>
+<col width="170">
+<col width="170">
+<col width="170">
+<col width="170">
+</colgroup>
+<thead>
+<tr> 
+<td>AEDL file(s)</td>
+<td>required data file(s)</td>
+<td>combined tar file
+<td>AEDL-Variables</td>
+</tr>
+</thead>
+<tfoot>
+</tfoot>
+<tr>
+<td><a href="NOvA.glb">NOvA.glb</a></td>
+<td>
+<table>
+<tr><td><a href="NOvAplus.dat">NOvAplus.dat</a></td></tr>
+<tr><td><a href="NOvAminus.dat">NOvAminus.dat</a></td></tr>
+<tr><td><a href="XCC.dat">XCC.dat</a></td></tr>
+<tr><td><a href="XNC.dat">XNC.dat</a></td></tr>
+</table>
+</td>
+<td><a href="NOvA.tar.gz">NOvA.tar.gz</a></td>
+<td>none</td>
+</tr>
+</table>
+</center>
+<a href="">  </a>
+
+<h3>Experiment Attributes</h3>
+
+<center>
+<table frame=all rules=all cellspacing=4 cellpadding=4>
+<colgroup>
+<col width="180">
+<col width="180">
+</colgroup>
+<tr>
+<td>Target power</td><td>1.12 MW</td>
+</tr>
+<tr>
+<td>Data taking</td><td>3 years &nu; + 3 years <span style="text-decoration: overline"> &nu;</span></td>
+</tr>
+<tr>
+<td>Baseline</td><td>812 km</td>
+</tr>
+<tr>
+<td>Detector technology</td><td>Totally Active Liquid Scintillator</td>
+</tr>
+<tr>
+<td>Detector mass</td><td>25 kt</td>
+</tr>
+</table>
+
+<p>
+
+#include "template_foot.gtml"
+
+

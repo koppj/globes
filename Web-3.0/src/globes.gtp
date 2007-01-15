@@ -5,7 +5,7 @@
 // Specify directory for generated html files
 define OUTPUT_DIR  ../html
 
-// Define dummy values for some variables - just tobe on the safe side
+// Define dummy values for some variables - just to be on the safe side
 // These should be redefined for each html file
 define TITLE       GLoBES - Simulating Long Baseline Neutrino Oscillation Experiments
 define KEYWORDS    GLoBES
@@ -13,6 +13,8 @@ define ROBOTS      index, follow
 define DESCRIPTION GLoBES - A software tool for the simulation of future long baseline neutrino oscillation experiments
 
 // Define project files that GTML should process
+define CSS_PATH    .
+define IMG_PATH    ./images
 ./index.gtml
 ./features.gtml
 ./download.gtml
@@ -21,4 +23,22 @@ define DESCRIPTION GLoBES - A software tool for the simulation of future long ba
 ./credits.gtml
 ./contact.gtml
 ./impressum.gtml
+
+define CSS_PATH    ..
+define IMG_PATH    ../images
+./glb/BB350.gtml
+./glb/BBvarTASD.gtml
+./glb/BBvarWC.gtml
+./glb/DoubleCHOOZ.gtml
+./glb/NFgoldsilver.gtml
+./glb/NFhRlT.gtml
+./glb/NFstandard.gtml
+./glb/NFvar.gtml
+./glb/NOvA.gtml
+./glb/Reactor1.gtml
+./glb/Reactor2.gtml
+./glb/SPL.gtml
+./glb/T2HK.gtml
+./glb/T2K.gtml
+./glb/BB100.gtml
 

@@ -1,0 +1,96 @@
+#define TITLE       GLoBES - Pre-defined AEDL-Files
+#define KEYWORDS    GLoBES, AEDL, glb, experiment, definitions, download, long, baseline, neutrino, oscillation 
+#define DESCRIPTION Details about pre-defined AEDL Files for GLoBES
+
+#include "template_head.gtml"
+
+<h1>GLoBES - Pre-defined AEDL-Files</h1>
+
+<h2>Medium Gamma &beta;-Beam</h2>
+
+A medium gamma green-field &beta;-beam scenario can be simulated with 
+the file <a href="BB_350.glb">BB_350.glb</a>. Please check the header of the files for references 
+of their origin. Please do not forget to cite these references if the file <a
+href="BB_350.glb">BB_350.glb</a> is used for a scientific publication or a talk. Check the appendix of
+the GLoBES manual for more details of the experiment description. 
+
+<h3>Author(s)</h3>
+
+The GLoBES Team, following <b>Setup III</b> from Burguet-Castell et al., <b>Nucl.Phys.B725:306-326,2005</b>
+
+<h3>Download</h3>
+
+<center>
+<table frame=all rules=all cellspacing=4 cellpadding=4>
+<colgroup>
+<col width="170">
+<col width="170">
+<col width="170">
+<col width="170">
+</colgroup>
+<thead>
+<tr> 
+<td>AEDL file(s)</td>
+<td>required data file(s)</td>
+<td>combined tar file
+<td>AEDL-Variables</td>
+</tr>
+</thead>
+<tfoot>
+</tfoot>
+<tr>
+<td><a href="BB_350.glb">BB_350.glb</a></td>
+<td>
+<table>
+<tr><td><a href="BB350flux.dat">BB350flux.dat</a></td></tr>
+<tr><td><a href="NeEffMig350.dat">NeEffMig350.dat</a></td></tr>
+<tr><td><a href="NeBckgRej350.dat">NeBckgRej350.dat</a></td></tr>
+<tr><td><a href="NeDisEff350.dat">NeDisEff350.dat</a></td></tr>
+<tr><td><a href="HeEffMig350.dat">HeEffMig350.dat</a></td></tr>
+<tr><td><a href="HeBckgRej350.dat">HeBckgRej350.dat</a></td></tr>
+<tr><td><a href="HeDisEff350.dat">HeDisEff350.dat</a></td></tr>
+<tr><td><a href="XCC.dat">XCC.dat</a></td></tr>
+<tr><td><a href="XNC.dat">XNC.dat</a></td></tr>
+</table>
+</td>
+<td><a href="BB_350.tar.gz">BB_350.tar.gz</a></td>
+<td>none</td>
+</tr>
+</table>
+</center>
+<a href="">  </a>
+
+<h3>Experiment Attributes</h3>
+
+<center>
+<table frame=all rules=all cellspacing=4 cellpadding=4>
+<colgroup>
+<col width="180">
+<col width="180">
+</colgroup>
+<tr>
+<td>Gamma factor</td><td>350</td>
+</tr>
+<tr>
+<td>Isotope decays (<SUP>18</SUP>Ne)</td><td>2.2&times;10<SUP>18</SUP> per year</td>
+</tr>
+<tr>
+<td>Isotope decays (<SUP>6</SUP>He)</td><td>5.8&times;10<SUP>18</SUP> per year</td>
+</tr><tr>
+<td>Data taking</td><td>4 years &nu; + 4 years <span style="text-decoration: overline"> &nu;</span></td>
+</tr>
+<tr>
+<td>Baseline</td><td>730 km</td>
+</tr>
+<tr>
+<td>Detector technology</td><td>Water Cerenkov</td>
+</tr>
+<tr>
+<td>Detector mass</td><td>500 kt</td>
+</tr>
+</table>
+
+<p>
+
+#include "template_foot.gtml"
+

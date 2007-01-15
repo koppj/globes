@@ -79,146 +79,140 @@ Here we post some utilities, which might be useful together with GLoBES.
 
 
 <br>
-<h2>GLoBES experiment definitions</h2>
+<h2>GLoBES - Pre-Defined Experiment Files</h2>
 The most important ingredient of GLoBES are adequate experiment descriptions. 
 The experiments posted here may serve as examples in using AEDL, but they 
-may also serve as starting point for modifications. All files listed here 
+may also serve as starting point for modifications. All pre-defined AEDL files  
 contain in their header the references to their origin.
 The GLoBES Team would be happy to include your glb-files into this
-list. Please mail to <a href="mailto:globes@ph.tum.de?SUBJECT=glb-files">globes@ph.tum.de</a>
+list. Please mail to
+<a href="mailto:globes@mpi-hd.mpg.de?SUBJECT=glb-files">globes@mpi-hd.mpg.de</a>
+
+<p>
+<table>
+<tr><td>
+<table frame=all rules=all cellspacing=4 cellpadding=4>
+<colgroup>
+<col width="180">
+<col width="350">
+<col width="130">
+</colgroup>
+<tr>
+<td colspan=3 align=center> <font size=+2 >Superbeam Experiments</font></td>
+</tr>
+<tr>
+<td><b>T2K</b></td>
+<td> J-PARC to Super-K, 2 years &nu;-running and 6 years <span style="text-decoration: overline"> &nu;</span>-running</td>
+<td><a href="glb/T2K.html">Description and Download</a></td>
+</tr>
+<tr>
+<td><b>T2HK</b></td>
+<td>J-PARC to Hyper-K, 4 years &nu;-running and 4 years <span style="text-decoration: overline"> &nu;</span>-running</td>
+<td><a href="glb/T2HK.html">Description and Download</a></td>
+</tr>
+<tr>
+<td><b>NO&nu;A</b></td>
+<td> FermiLab NuMI beamline off-axis, 3 years &nu;-running and 3 years <span style="text-decoration: overline"> &nu;</span>-running</td>
+<td><a href="glb/NOvA.html">Description and Download</a></td>
+</tr>
+<tr>
+<td><b>SPL</b></td>
+<td>CERN to Fr&eacute;jus, 2 years &nu;-running and 8 years <span style="text-decoration: overline"> &nu;</span>-running</td>
+<td><a href="glb/SPL.html">Description and Download</a></td>
+</tr>
+</table>
+</table>
 
 <p>
 <table frame=all rules=all cellspacing=4 cellpadding=4>
-  <thead>
-    <tr>
-      <th>Experiment</th>
-      <th>glb-file(s)</th>
-      <th>dat-file(s)</th>
-      <th>combined tar-file</th>
-      <th>Author(s)</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>Neutrino Factory</td>
-      <td>
-        <a href="download/glb/NuFact1.glb">NuFact1.glb</a> <br>
-        <a href="download/glb/NuFact2.glb">NuFact2.glb</a>
-      </td>
-      <td>
-        <a href="download/glb/XNC.dat">XNC.dat</a><br>
-        <a href="download/glb/XCC.dat">XCC.dat</a>
-      </td>
-      <td>
-        <a href="download/glb/NuFact.tar.gz">NuFact.tar.gz</a>
-      </td>
-      <td>The&nbsp;GLoBES&nbsp;Team</td>
-    </tr>
-    <tr>
-      <td>T2K</td>
-      <td>
-        <a href="download/glb/JHFSKnew.glb">JHFSKnew.glb</a><br>
-        <a href="download/glb/JHFSKantinew.glb">JHFSKantinew.glb</a><br>
-        <a href="download/glb/JHFSKcomb.glb">JHFSKcomb.glb</a><br>
-        <a href="download/glb/JHFHKAll.glb">JHFHKAll.glb</a>
-      </td>
-      <td>
-        <a href="download/glb/JHFplus.dat">JHFplus.dat</a><br>
-        <a href="download/glb/JHFminus.dat">JHFminus.dat</a><br>
-        <a href="download/glb/XQE.dat">XQE.dat</a><br>
-        <a href="download/glb/XNC.dat">XNC.dat</a><br>
-        <a href="download/glb/XCC.dat">XCC.dat</a>
-      </td>
-      <td>
-        <a href="download/glb/T2K.tar.gz">T2K.tar.gz</a>
-      </td>
-      <td>The&nbsp;GLoBES&nbsp;Team</td>
-    </tr>
-    <tr>
-      <td>NOvA</td>
-      <td>
-        <a href="download/glb/NUMI12.glb">NUMI12.glb</a><br>
-        <a href="download/glb/NUMI12anti.glb">NUMI12anti.glb</a><br>
-        <a href="download/glb/NUMI12comb.glb">NUMI12comb.glb</a><br>
-        <a href="download/glb/NUMI9.glb">NUMI9.glb</a><br>
-        <a href="download/glb/NUMI9anti.glb">NUMI9anti.glb</a><br>
-        <a href="download/glb/NUMI9comb.glb">NUMI9comb.glb</a>
-      </td>
-      <td>
-        <a href="download/glb/NUMI9plus.dat">NUMI9plus.dat</a><br>
-        <a href="download/glb/NUMI9minus.dat">NUMI9minus.dat</a><br>
-        <a href="download/glb/NUMI12plus.dat">NUMI12plus.dat</a><br>
-        <a href="download/glb/NUMI12minus.dat">NUMI12minus.dat</a><br>
-        <a href="download/glb/XNC.dat">XNC.dat</a><br>
-        <a href="download/glb/XCC.dat">XCC.dat</a>
-      </td>
-      <td><a href="download/glb/NOvA.tar.gz">NOvA.tar.gz</a></td>
-      <td>The&nbsp;GLoBES&nbsp;Team</td>
-    </tr>
-    <tr>
-      <td>Reactor</td>
-      <td>
-        <a href="download/glb/Reactor1.glb">Reactor1.glb</a><br>
-        <a href="download/glb/Reactor2.glb">Reactor2.glb</a>
-      </td>
-      <td>
-        <a href="download/glb/Reactor.dat">Reactor.dat</a><br>
-        <a href="download/glb/XCCreactor.dat">XCCreactor.dat</a>
-      </td>
-      <td>
-       <a href="download/glb/Reactor.tar.gz">Reactor.tar.gz</a>
-      </td>
-      <td>The&nbsp;GLoBES&nbsp;Team</td>
-    </tr>
-    <tr>
-      <td>MINOS</td>
-      <td>
-        <a href="download/glb/MINOS.glb">MINOS.glb</a>
-      </td>
-      <td>
-        <a href="download/glb/MINOS_Spectra.dat">MINOS_Spectra.dat</a><br>
-        <a href="download/glb/XNC.dat">XNC.dat</a><br>
-        <a href="download/glb/XCC.dat">XCC.dat</a>
-      </td>
-      <td>
-        <a href="download/glb/MINOS.tar.gz">MINOS.tar.gz</a>
-      </td>
-      <td>The&nbsp;GLoBES&nbsp;Team</td>
-    </tr>
-    <tr>
-      <td>ICARUS</td>
-      <td>
-        <a href="download/glb/ICARUS.glb">ICARUS.glb</a>
-      </td>
-      <td>
-        <a href="download/glb/CNGS_Spectra.dat">CNGS_Spectra.dat</a><br>
-        <a href="download/glb/XNC.dat">XNC.dat</a><br>
-        <a href="download/glb/XCC.dat">XCC.dat</a><br>
-        <a href="download/glb/XCC_CNGS.dat">XCC_CNGS.dat</a>
-      </td>
-      <td>
-        <a href="download/glb/ICARUS.tar.gz">ICARUS.tar.gz</a>
-      </td>
-      <td>The&nbsp;GLoBES&nbsp;Team</td>
-    </tr>
-    <tr>
-      <td>OPERA</td>
-      <td>
-        <a href="download/glb/OPERA.glb">OPERA.glb</a>
-      </td>
-      <td>
-        <a href="download/glb/CNGS_Spectra.dat">CNGS_Spectra.dat</a><br>
-        <a href="download/glb/XNC.dat">XNC.dat</a><br>
-        <a href="download/glb/XCC.dat">XCC.dat</a><br>
-        <a href="download/glb/XCC_CNGS.dat">XCC_CNGS.dat</a>
-      </td>
-      <td>
-        <a href="download/glb/OPERA.tar.gz">OPERA.tar.gz</a>
-      </td>
-      <td>The&nbsp;GLoBES&nbsp;Team</td>
-    </tr>
-  </tbody>
+<colgroup>
+<col width="180">
+<col width="350">
+<col width="130">
+</colgroup>
+<tr>
+<td colspan=3 align=center> <font size=+2 >Reactor experiments</font></td>
+</tr>
+<tr>
+<td><b>Reactor-I</b></td>
+<td>Small reactor experiment, <b>L</b> = 400 t GW yr </td>
+<td><a href="glb/Reactor1.html">Description and Download</td>
+</tr>
+<tr>
+<td><b>Reactor-II</b></td>
+<td>Large reactor experiment, <b>L</b> = 8000 t GW yr</td>
+<td><a href="glb/Reactor2.html">Description and Download</a></td>
+</tr>
+<tr>
+<td><b>DoubleCHOOZ</b></td>
+<td>DoubleCHOOZ, 5 years data taking, near and far detector</td>
+<td><a href="glb/DoubleCHOOZ.html">Description and Download</a></td>
+</tr>
 </table>
-
+<br>
+<table frame=all rules=all cellspacing=4 cellpadding=4>
+<colgroup>
+<col width="180">
+<col width="350">
+<col width="130">
+</colgroup>
+<tr>
+<td colspan=3 align=center> <font size=+2 >&beta;-Beams</font></td>
+</tr>
+<tr>
+<td><b>low gamma</b></td>
+<td>gamma = 100, CERN to Fr&eacute;jus baseline scenario, 4 years &nu;-running and 4 years <span style="text-decoration: overline"> &nu;</span>-running</td>
+<td><a href="glb/BB100.html">Description and Download</a></td>
+</tr>
+<tr>
+<td><b>medium gamma</b></td>
+<td>gamma = 350, L = 730km green field scenario, 4 years &nu;-running and 4 years <span style="text-decoration: overline"> &nu;</span>-running</td>
+<td><a href="glb/BB350.html">Description and Download</a></td>
+</tr>
+<tr>
+<td><b>Variable (WC)</b></td>
+<td>Variable beta-beam, 500 kt Water Cerenkov detector, 4 years &nu;-running and 4 years <span style="text-decoration: overline"> &nu;</span>-running</td>
+<td><a href="glb/BBvarWC.html">Description and Download</a></td>
+</tr>
+<tr>
+<td><b>Variable (TASD)</b></td>
+<td>Variable beta-beam, 50 kt TASD detector, 4 years &nu;-running and 4 years <span style="text-decoration: overline"> &nu;</span>-running</td>
+<td><a href="glb/BBvarTASD.html">Description and Download</a></td>
+</tr>
+</table>
+<br>
+<table frame=all rules=all cellspacing=4 cellpadding=4>
+<colgroup>
+<col width="180">
+<col width="350">
+<col width="130">
+</colgroup>
+<tr>
+<td colspan=3 align=center> <font size=+2 >Neutrino factories</font></td>
+</tr>
+<tr>
+<td><b>Standard</b></td>
+<td>Standard neutrino factory, 4 years &nu;-running and 4 years <span style="text-decoration: overline"> &nu;</span>-running</td>
+<td><a href="glb/NFstandard.html">Description and Download</a></td>
+</tr>
+<tr>
+<td><b>Variable</b></td>
+<td>Variable neutrino factory, 4 years &nu;-running and 4 years <span style="text-decoration: overline"> &nu;</span>-running, disappearance channels without CID</td>
+<td><a href="glb/NFvar.html">Description and Download</a></td>
+</tr>
+<tr>
+<td><b>Gold + Silver</b></td>
+<td>variable neutrino factory, golden and silver channel measurement, 4 years &nu;-running and 4 years <span style="text-decoration: overline"> &nu;</span>-running, disappearance channels without CID</td>
+<td><a href="glb/NFgoldsilver.html">Description and Download</a></td>
+</tr>
+<tr>
+<td><b>Hybrid detector</b></td>
+<td>Variable neutrino factory with lower threshold and higher energy resolution</td>
+<td><a href="glb/NFhRlT.html">Description and Download</a></td>
+</tr>  
+</table>
+</td>
+</tr>
+</table>
 
 #include "template_foot.gtml"

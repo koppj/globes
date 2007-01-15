@@ -1,0 +1,101 @@
+#define TITLE       GLoBES - Pre-defined AEDL-Files
+#define KEYWORDS    GLoBES, AEDL, glb, experiment, definitions, download, long, baseline, neutrino, oscillation 
+#define DESCRIPTION Details about pre-defined AEDL Files for GLoBES
+
+#include "template_head.gtml"
+
+<h1>GLoBES - Pre-defined AEDL-Files</h1>
+
+<h2>DoubleCHOOZ</h2>
+
+The DoubleCHOOZ reactor experiment can be simulated with 
+the files <a href="D-Chooz_near.glb">D-Chooz_near.glb</a> and <a
+href="D-Chooz_far.glb">D-Chooz_far.glb</a>. Please check the header of the files for references 
+of their origin. Please do not forget to cite these references if the files <a href="D-Chooz_near.glb">D-Chooz_near.glb</a> and <a
+href="D-Chooz_far.glb">D-Chooz_far.glb</a> are used for a scientific publication or a talk. Check the appendix of
+the GLoBES manual for more details of the experiment description. 
+
+<h3>Author(s)</h3>
+
+The GLoBES Team
+
+<h3>Download</h3>
+
+<center>
+<table frame=all rules=all cellspacing=4 cellpadding=4>
+<colgroup>
+<col width="170">
+<col width="170">
+<col width="170">
+<col width="170">
+</colgroup>
+<thead>
+<tr> 
+<td>AEDL file(s)</td>
+<td>required data file(s)</td>
+<td>combined tar file
+<td>AEDL-Variables</td>
+</tr>
+</thead>
+<tfoot>
+</tfoot>
+<tr>
+<td>
+<table>
+<tr><td><a href="D-Chooz_near.glb">D-Chooz_near.glb</a></td></tr>
+<tr><td><a href="D-Chooz_far.glb">D-Chooz_far.glb</a></td></tr>
+</table>
+</td>
+<td>
+<table>
+<tr><td><a href="Reactor.dat">Reactor.dat</a></td></tr>
+<tr><td><a href="XCCreactor.dat">XCCreactor.dat</a></td></tr>
+</table>
+</td>
+<td><a href="D-Chooz.tar.gz">D-Chooz.tar.gz</a></td>
+<td>none</td>
+</tr>
+</table>
+</center>
+<a href="">  </a>
+
+<h3>Experiment Attributes</h3>
+
+<center>
+<table frame=all rules=all cellspacing=4 cellpadding=4>
+<colgroup>
+<col width="180">
+<col width="180">
+</colgroup>
+<tr>
+<td>Thermal power</td><td>2&times;4.2 GW</td>
+</tr>
+<tr>
+<td>Data taking</td><td>5 years <span style="text-decoration: overline"> &nu;</span></td>
+</tr>
+<tr>
+<td>Baseline</td><td>
+<table>
+<tr><td>0.1 km (near)</td></tr>
+<tr><td>1.05 km (far)</td></tr>
+</table>
+</td>
+</tr>
+<tr>
+<td>Detector technology</td><td>Liquid Scintillator</td>
+</tr>
+<tr>
+<td>Detector mass</td><td>
+<table>
+<tr><td>10.16 t (near)</td></tr>
+<tr><td>10.16 t (far)</td></tr>
+</table>
+</td>
+</tr>
+</table>
+
+<p>
+
+#include "template_foot.gtml"
+
+

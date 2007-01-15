@@ -52,7 +52,7 @@ GLoBES poster from Neutrino 2004 in Paris
  <a href="documentation/poster.ps">Postscript</a>)
 
 <p>
-<a href="documentation/poster.pdf"><img SRC="images/poster.jpg" ></a>
+<a href="documentation/poster.pdf"><img SRC="<<IMG_PATH>>/poster.jpg" ></a>
 
 <p>
 Many more sample applications, technical details, and tutorials can be

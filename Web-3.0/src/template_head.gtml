@@ -43,7 +43,7 @@
   <META name="robots" content="<<ROBOTS>>">
   <META name="keywords" content="<<KEYWORDS>>">
   <META name="description" content="<<DESCRIPTION>>">
-  <link rel="stylesheet" href="globes.css" type="text/css">
+  <link rel="stylesheet" href="<<CSS_PATH>>/globes.css" type="text/css">
 </HEAD>
 
 <BODY>
@@ -52,7 +52,7 @@
       <td class="Navigation" valign="top" border="1" rules="all">
         <table border="0" cellspacing="0" cellpadding="0">
           <tr>
-            <td width="130"><img src="images/globes-logo-small.gif" alt="GLoBES Logo" width="120"></td>
+            <td width="130"><img src="<<IMG_PATH>>/globes-logo-small.gif" alt="GLoBES Logo" width="120"></td>
             <td width="5" bgcolor="<<mycolor1>>">&nbsp;</td>
           </tr>
           <tr><td height="10">&nbsp;</td><td bgcolor="<<mycolor1>>">&nbsp;</td></tr>
