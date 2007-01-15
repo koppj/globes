@@ -1122,7 +1122,12 @@ int glbGetChiFunction(int exp, int rule, int on_off, char *sys_id, size_t max_le
       if (on_off == GLB_ON)
       {
         if (glb_experiment_list[exp]->sys_on_strings[rule] != NULL)
+        {
           strncpy(sys_id, glb_experiment_list[exp]->sys_on_strings[rule], max_len-1);
+          sys_id[max_len-1] = '\0';
+          if (strlen(sys_id) < strlen(glb_experiment_list[exp]->sys_on_strings[rule]))
+            { glb_error("glbGetChiFunction: Target buffer is too small."); return -1; }
+        }
         else
           { glb_error("glbGetChiFunction: No chi^2 function defined for this rule");
             return -1; }
@@ -1130,7 +1135,12 @@ int glbGetChiFunction(int exp, int rule, int on_off, char *sys_id, size_t max_le
       else if (on_off == GLB_OFF)
       {
         if (glb_experiment_list[exp]->sys_off_strings[rule] != NULL)
+        {
           strncpy(sys_id, glb_experiment_list[exp]->sys_off_strings[rule], max_len-1);
+          sys_id[max_len-1] = '\0';
+          if (strlen(sys_id) < strlen(glb_experiment_list[exp]->sys_off_strings[rule]))
+            { glb_error("glbGetChiFunction: Target buffer is too small."); return -1; }
+        }
         else
           { glb_error("glbGetChiFunction: No chi^2 function defined for this rule");
             return -1; }
@@ -1147,7 +1157,6 @@ int glbGetChiFunction(int exp, int rule, int on_off, char *sys_id, size_t max_le
   else
     { glb_error("glbGetChiFunction: Invalid experiment number"); return -1; }
 
-  sys_id[max_len-1] = '\0';
   return 0;
 }
 
