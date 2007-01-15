@@ -276,7 +276,7 @@ int glbSetSysStartingValuesList(int exp, int rule, int on_off, const double *sys
 
 int glbGetSysDim(const char *name);
 int glbGetSysDimInExperiment(int exp, int rule, int on_off);
-int glbGetChiFunction(int exp, int rule, int on_off, char *sys_id);
+int glbGetChiFunction(int exp, int rule, int on_off, char *sys_id, size_t max_len);
 glb_chi_function glbGetChiFunctionPtr(const char *name);
 glb_chi_function glbGetChiFunctionPtrInExperiment(int exp, int rule, int on_off);
 int glbGetSysOnOffState(int exp, int rule);

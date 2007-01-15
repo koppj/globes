@@ -1110,11 +1110,10 @@ int glbSetChiFunction(int exp, int rule, int on_off, const char *sys_id, double 
 /***************************************************************************
  * Function glbGetChiFunction                                              *
  ***************************************************************************
- * Returns the name of the chi^2 function of a given experiment and rule.  *
- * The user must ensure that the string sys_id is large enough to hold the *
- * name of the chi^2 function.                                             *
+ * Copies the name of the chi^2 function of a given experiment and rule    *
+ * into the string sys_id. The length of sys_id is given in max_len.       *
  ***************************************************************************/
-int glbGetChiFunction(int exp, int rule, int on_off, char *sys_id)
+int glbGetChiFunction(int exp, int rule, int on_off, char *sys_id, size_t max_len)
 {
   if (exp >= 0  &&  exp < glb_num_of_exps)
   {
@@ -1123,7 +1122,7 @@ int glbGetChiFunction(int exp, int rule, int on_off, char *sys_id)
       if (on_off == GLB_ON)
       {
         if (glb_experiment_list[exp]->sys_on_strings[rule] != NULL)
-          strcpy(sys_id, glb_experiment_list[exp]->sys_on_strings[rule]);
+          strncpy(sys_id, glb_experiment_list[exp]->sys_on_strings[rule], max_len-1);
         else
           { glb_error("glbGetChiFunction: No chi^2 function defined for this rule");
             return -1; }
@@ -1131,7 +1130,7 @@ int glbGetChiFunction(int exp, int rule, int on_off, char *sys_id)
       else if (on_off == GLB_OFF)
       {
         if (glb_experiment_list[exp]->sys_off_strings[rule] != NULL)
-          strcpy(sys_id, glb_experiment_list[exp]->sys_off_strings[rule]);
+          strncpy(sys_id, glb_experiment_list[exp]->sys_off_strings[rule], max_len-1);
         else
           { glb_error("glbGetChiFunction: No chi^2 function defined for this rule");
             return -1; }
@@ -1148,6 +1147,7 @@ int glbGetChiFunction(int exp, int rule, int on_off, char *sys_id)
   else
     { glb_error("glbGetChiFunction: Invalid experiment number"); return -1; }
 
+  sys_id[max_len-1] = '\0';
   return 0;
 }
 
@@ -1238,7 +1238,7 @@ int glbGetErrorDim(int exp, int rule, int on_off)
   char sys_id[100];
   int i;
   
-  if (glbGetChiFunction(exp, rule, on_off, sys_id) != 0)
+  if (glbGetChiFunction(exp, rule, on_off, sys_id, 100) != 0)
   {
     glb_error("glbGetErrorDim: Invalid parameters");
     return -1;
