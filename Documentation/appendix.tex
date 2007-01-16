@@ -2,13 +2,13 @@
 % Appendix
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{appendix}
-
+%\begin{appendix}
+\appendix
 \chapter{\GLOBES\ installation}
 \label{app:installation}
 \index{norm}{Installation|(}
 
-\section*{Prerequisites for installation of \GLOBES}
+\section{Prerequisites for installation of \GLOBES}
 
 Besides the usual things like a working libc you need to have
  \begin{itemize}
@@ -36,7 +36,7 @@ occur. Furthermore you need a working \verb+make+ to build and install
 \GLOBES.
 
 
-\section*{Installation Instructions}
+\section{Installation Instructions}
 
 
 \GLOBES\ follows the standard GNU installation procedure.  To compile
@@ -407,14 +407,14 @@ Along with the \GLOBES\ package comes a catalogue of pre-defined experiment \AED
 future experiments and different beam and detector technologies. These include the planned superbeam experiments
 and their possible upgrades, different reactor experiment setups, different $\beta$-beam setups, and different 
 neutrino factory setups. A complete list
-of all pre-defined experiment files an be found in \tabl{experiments}. More detailed descriptions of the
+of all pre-defined experiment files can be found in \tabl{experiments}. More detailed descriptions of the
 corresponding files, the assumptions, requirements, and references are given in the following. 
    
 \section*{Superbeam experiments}
 \subsection*{T2K -- {\tt T2K.glb}}
 
 The \TtoK\ experiment can be simulated with the file {\tt T2K.glb}. This file tries to approximate as closely as
-possible the LOI \cite{Itow:2001ee} and the basic version was used within \cite{Huber:2002mx}. These references
+possible the LOI \cite{Itow:2001ee}, and the basic version was used within \cite{Huber:2002mx}. These references
 should be cited if the file {\tt T2K.glb} is used for a scientific publication or a talk. For calculations that
 involve {\tt T2K.glb}, the following additional files are required: 
 \bi
@@ -587,7 +587,7 @@ additional files are required:
 \ei
 The neutrino source is the core of a nuclear power reactor. The integrated luminosity is assumed to be
 $\mathrm{\mathcal{L} = 400 \,t \, GW\, yr}$, \eg\ a 20~t detector, a reactor with a thermal power of 4~GW
-and a running period of 5 years. As detector technology a liquid scintillator 
+and a running period of 5 years. As detector technology, a liquid scintillator 
 detector is assumed, a far detector at a baseline of L~=~1.7~km and a near detector which is
 assumed to be identical to the far detector (maybe apart from the size) in order to minimize the impact of systematical uncertainties. The normalization error
 used in the file {\tt Reactor1.glb} has to be considered as an effective error, receiving contributions from
@@ -616,7 +616,7 @@ are similar to the ones of {\tt Reactor1.glb}.
 \subsection*{DoubleCHOOZ -- {\tt D-Chooz\_near.glb} and {\tt D-Chooz\_far.glb}}
 
 The files {\tt D-Chooz\_near.glb} and {\tt D-Chooz\_far.glb} allow to simulate the \DC\ reactor experiment in France. 
-The basic version of these files were used within \cite{Huber:2006vr} which should be cited if the files 
+The basic versions of these files were used within \cite{Huber:2006vr}, which should be cited if the files 
 {\tt D-Chooz\_near.glb} and {\tt D-Chooz\_far.glb} are
 used for a scientific publication or a talk. For calculations that involve {\tt D-Chooz\_near.glb} and/or {\tt D-Chooz\_far.glb}, the following
 additional files are required:
@@ -624,7 +624,7 @@ additional files are required:
 \item {\tt Reactor.dat} (neutrino flux from reactor)
 \item {\tt XCCreactor.dat} (charged current cross sections for low energies)
 \ei
-The \DC\ experiment is located at the Chooz reactor complex and the two reactor cores serve as $\bar{\nu}_e$
+The \DC\ experiment is located at the Chooz reactor complex, and the two reactor cores serve as $\bar{\nu}_e$
 neutrino source, so the thermal power is $\mathrm{2\cdot4.2\,GW}$. Two identical liquid scintillator detectors
 with a fiducial mass of $\mathrm{m_{det} = 10.16 \,t}$ are used as near and far detector. The far detector
 is planned to be located in the {\sc Chooz} cavern at a baseline of L~=~1.05~km from the two reactor cores and
@@ -935,8 +935,8 @@ $\mathrm{E_\mu =}$~{\tt emax}. The parent energy of the muons can be set in the 
 $\mathrm{10\,GeV\lesssim E_\mu\lesssim 80\, GeV}$. The baseline of the scenario is L~=~{\tt BASELINE}. 
 Besides these settings the other attributes of {\tt NFvar.glb} are similar to the ones from {\tt
 NFstandard.glb}. Only the treatment of the disappearance channels is different. Whereas the CID threshold is
-also applied in the disappearance channels of {\tt NFstandard.glb} this is not the case for the disapperance
-channel definition within {\tt NFvar.glb} where no CID is applied and a threshold similar to the threshold of
+also applied in the disappearance channels of {\tt NFstandard.glb}, this is not the case for the disapperance
+channel definition within {\tt NFvar.glb}, where no CID is applied, and a threshold similar to the threshold of
 the MINOS experiment \cite{Ables:1995wq} is applied. The following rules are defined within
 {\tt NFvar.glb}:
 \begin{center}
@@ -988,10 +988,10 @@ and the values of the following {\sf AEDL}-Variables have to be set:
 \ei
 The beam and golden channel attributes are similar to {\tt NFvar.glb}. The parent energy of the muons can be set
 in the range $\mathrm{10\,GeV\lesssim E_\mu\lesssim 80\, GeV}$. The baseline is set by the {\sf
-AEDL}-Variable {\tt BASELINE}. For the silver channel an additional ECC detector with a fiducial mass
+AEDL}-Variable {\tt BASELINE}. For the silver channel, an additional ECC detector with a fiducial mass
 $\mathrm{m_{ECC} = 5\,kt}$ is assumed to be located at the same baseline as the MID detector. The energy
 resolution of the silver channel is set to $\mathrm{\sigma_e=20\%\cdot E}$. The following additional rule
-compared to {\tt NFvar.glb} is introduced to {\tt NF\_GoldSilver.glb}:
+compared to {\tt NFvar.glb} is introduced in {\tt NF\_GoldSilver.glb}:
 \begin{center}
 \begin{tabular}{|l|ll|c|c|}
 \hline \hline
@@ -1014,9 +1014,9 @@ references should be cited if the file {\tt NF\_hR\_lT.glb} is used for a scient
 For calculations that involve {\tt NF\_hR\_lT.glb}, the same additional files as for {\tt NFvar.glb} are
 required and the {\sf AEDL}-Variables {\tt emax} and {\tt BASELINE} have to be set. {\tt NF\_hR\_lT.glb} 
 implements a lower threshold ($\mathrm{\sim\,1\,GeV}$) at a higher energy resolution
-$\mathrm{\sigma_e=15\%\cdot E + 0.085\, MeV}$ where the constant term represents 
-the effects from Fermi Motion. The background rejection is introduced energy dependent as 
-$10^{-3}/\mathrm{E^2}$ and matches {\tt NFvar.glb} at higher energies. The following rules are defined within {\tt NF\_hR\_lT.glb}: 
+$\mathrm{\sigma_e=15\%\cdot E + 0.085\, MeV}$, where the constant term represents 
+the effects from Fermi Motion. The background rejection is energy dependent according to 
+$10^{-3}/\mathrm{E^2}$, and matches {\tt NFvar.glb} at higher energies. The following rules are defined within {\tt NF\_hR\_lT.glb}: 
 \begin{center}
 \begin{tabular}{|l|ll|c|c|}
 \hline \hline
@@ -1183,7 +1183,7 @@ of \GLOBES .
 }
 
 
-\end{appendix}
+%\end{appendix}
 
 %%% Local Variables: 
 %%% mode: latex
