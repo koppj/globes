@@ -234,13 +234,13 @@ provided for the simulation of beta beams.
 Neutrino oscillations are now established as the leading flavor
 transition mechanism for neutrinos in a long history of many experiments, see
 \eg , \Ref~\cite{Barger:2003qi}. Future facilities, using accelerator-based
- neutrino beams or a nuclear reactors as neutrino sources, are proposed
+ neutrino beams or nuclear reactors as neutrino sources, are proposed
 for precision measurements of the neutrino oscillation parameters. In the
 simulation of these experiments, 
 the presence of multiple solutions which are intrinsic to
  neutrino oscillation probabilities~\cite{Fogli:1996pv,Burguet-Castell:2001ez,Minakata:2001qm,Barger:2001yr} 
 affect the performance.
-Thus optimization strategies are required which maximally exploit 
+Thus, optimization strategies are required which maximally exploit 
 complementarity between experiments. The \GLOBES\ software package~\cite{Huber:2004ka}
 is a  modern experiment  simulation  and analysis tool for
 a highly accurate beam and detector simulation. In addition, it provides powerful 
@@ -250,7 +250,7 @@ result in each run, it simulates the performance of the {\em average} experiment
 (see \Ref~\cite{Schwetz:2006md} for a discussion of the meaning of ``average'').
 The advantage of such an average prediction is a tremendous performance gain,
 which can be used for systematical parameter space scans. In addition, it 
-simplified the direct comparison of experiments.
+simplifies the direct comparison of experiments.
 
 The \GLOBES\ software has, in the past, been used for many studies, some of them
 are referred to in the paper. However, recent developments have indicated that extensions
@@ -293,7 +293,7 @@ sources, where each experiment is assumed to have only one neutrino source.
 Such experiments are neutrino beam experiments and reactor experiments. 
 Geometrical effects of a continuous source distribution, such as in the sun or the 
 atmosphere, can not be described. In addition, sources with a physically 
-significant time dependencies can not be studied, such as  supernov\ae. 
+significant time dependence can not be studied, such as  supernov\ae. 
 However, in \GLOBESN\ and higher, new flexibility is introduced by the
 concept of user-defined systematics. This new feature allows the cross-definition
 of systematical errors over different experiments. In principle, 
@@ -345,7 +345,7 @@ degenerate solutions.
 
 The probability calculation in \GLOBES\ is based on the diagonalization of the
 Hamiltonian in layers of constant matter density using the standard three flavor
-scenario of neutrino oscillations. In flavor base, we have
+scenario of neutrino oscillations. In the flavor basis, we have
 \begin{equation}
 \mathcal{H}(n_e) = \frac{1}{2E} \, U \,
 \left(
@@ -365,9 +365,9 @@ U^\dagger +
 \right)
 \label{equ:ham}
 \end{equation}
-with $U$ the mixing matrix (described by four parameters $\theta_{12}$, $\theta_{13}$, $\theta_{23}$, and $\deltacp$), and $n_e$ the constant electron density
-in that matter density layer. The electron density is related to the matter density $\rho$ by 
-$n_e \simeq 0.5 \, \rho/m_N$ with $m_N$ being the nucleon mass. The sign in the second term depends on if one
+with $U$ being the mixing matrix (described by four parameters $\theta_{12}$, $\theta_{13}$, $\theta_{23}$, and $\deltacp$), and $n_e$ the constant electron density
+in the respective matter density layer. The electron density is related to the matter density $\rho$ by 
+$n_e \simeq 0.5 \, \rho/m_N$ with $m_N$ being the nucleon mass. The sign in the second term depends on whether one
 uses neutrinos or antineutrinos. For $k$ matter density layers with densities
 $n^k_e$ and thicknesses $x_i$, the oscillation probability then evaluates to
 \begin{equation}
@@ -399,8 +399,8 @@ $\stheta=\sigma_E=0$ (figure similar to \Ref~\cite{Blennow:2005yk}). Here $\sigm
 
 \GLOBESN\ allows the modification of this Hamiltonian and the whole probability engine without
 re-compilation of the \GLOBES\ software. This is implemented
-by using pointers to the functions of the standard probability engine, which can be changed if
-a different probability engine is registered. For example, a user may just copy the standard probability
+by using pointers to the functions of the standard probability engine, which can be changed by
+registering a different probability engine. For example, a user may just copy the standard probability
 engine of \GLOBES , modify it, and register it. An important prerequisite for the ability to handle
 more than the standard six oscillation parameters (plus matter density) $\boldsymbol{\lambda}=(\theta_{12},\theta_{13}, \theta_{23}, \deltacp, \sdm, \ldm, \rho)$, \ie,
 \begin{equation}
@@ -428,7 +428,7 @@ of this physics is used for simplicity.
 
 \section{Systematics implementation and user-defined systematics}
 
-\GLOBES\ supports four types of systematical errors as a standard: Signal and background
+\GLOBES\ supports four types of systematical errors by default: Signal and background
 normalization errors, as well as signal and background tilt or energy calibration errors.
 The tilt (T) is implemented as a linear distortion of the spectrum around the center,
 and the energy calibration (C) as a distortion (stretching) of the reconstructed energy scale.
@@ -453,7 +453,7 @@ depending on the neutrino oscillation parameters $\boldsymbol{\lambda}$ and the 
 parameters $\zeta_i$ (which, for instance, scale the signal or background rates).
 In addition, Gaussian penalties $\zeta_j^2/\sigma_{\zeta_j}^2$ are added, where 
 $\sigma_{\zeta_j}$ corresponds to the actual systematical error.
-Core part of \equ{chipull} is the definition of $\chi^2$. For example, for a background-free measurement and
+The core part of \equ{chipull} is the definition of $\chi^2$. For example, for a background-free measurement and
 a signal normalization error only, it reads
 \begin{equation}
   \chi^2 (\boldsymbol{\lambda},a) =  \sum_{i=1}^{\textrm{\# of bins}}2
@@ -546,8 +546,8 @@ has been determined:
 \end{equation}
 In this case, the parameter space of oscillation parameters 
 $\boldsymbol{\lambda}$ is projected onto the subspace $\boldsymbol{\lambda_1}$.
-If one wants to include external input which only depends on the oscillation
-parameters and not on systematics, one can do this at this level. \GLOBES\ provides
+If one wants to include external input, which only depends on the oscillation
+parameters and not on systematics, one can do so at this level. \GLOBES\ provides
 the pre-defined possibility to include external Gaussian constraints on the 
 oscillation parameters (and the matter density, which is treated as another
 oscillation parameter). For example, an external constraint on $\theta_{12}$
@@ -625,8 +625,8 @@ lower threshold and better energy resolution & \cite{Huber:2002mx,Huber:2006wb} 
 } % small
 \mycaption{\label{tab:experiments} 
 Pre-defined experiment prototypes coming with \GLOBESN : The columns represent the \AEDL\ filename, 
-a short description, and the references in which they are originally used and 
-discussed (except from minor modifications, such as a different implementation of 
+a short description, and the references in which the files are originally used and 
+discussed (except for minor modifications, such as a different implementation of 
 the energy threshold function). 
 %
 IS THE GAMMA=350 OPTION REALLY GREEN-FIELD? I THOUGHT THAT THIS MAY BE THE MAXIMUM
@@ -635,7 +635,7 @@ ONE COULD GET OUT OF THE SPS WITH ACCELERATOR MODIFICATIONS? [WW]
 \end{table}
 
 \AEDL\ (Abstract Experiment Definition Language) is a special syntax developed for the description of
-experiments in \GLOBES\ represented by simple text files. Core part of \AEDL\ are the following constructions
+experiments in \GLOBES, represented by simple text files. Core part of \AEDL\ are the following constructions
 (for details, see \Ref~\cite{Manual}):
 \begin{description}
 \item[Channel] A channel represents an oscillation channel from the source flux, over the initial and final
@@ -646,7 +646,7 @@ from these channels are added, and the signal and background are implemented wit
 systematics is connected to the concept of a rule.
 The result of a rule is a systematics $\chi^2$ corresponding to \equ{chipull}.
 \item[Experiment] An experiment is a combination of one or more rules, which may correspond to different
-appearance and disappearance channels, neutrino and antineutrino operations modes, \etc. An experiment has a common detector and baseline, but may use more different fluxes (such as for neutrinos and antineutrinos). Therefore,
+appearance and disappearance channels, neutrino and antineutrino operations modes, \etc. An experiment has a common detector and baseline, but may use several different fluxes (such as for neutrinos and antineutrinos). Therefore,
 the matter density profile is the same for all rules of an experiment. The result of an experiment
 is again a systematics $\chi^2$, but summed over all rules.
 \item[Experiment combination] An experiment combination consists of different experiments with different detectors, baselines, and (uncorrelated) matter density profiles. The result of an experiment combination
@@ -656,13 +656,13 @@ Note that after the $\chi^2$ is summed over all rules or experiments as specifie
 
 In \GLOBESN , this construction of experiments is extended by user-defined systematics, which allows
 the user to break up the strict coupling between systematics and rules. For example, systematics can be
-correlated between different rules or experiments, such as for an reactor experiment with identical
+correlated between different rules or experiments, such as for a reactor experiment with identical
 near and far detectors. In addition, one can introduce user-defined systematical errors.
 For that purpose, the former error dimension concept has been changed and
 extended. For example, one has to give each user-defined systematics a name, and this name has
 to be matched by the application software. 
 %
-Further changes in \AEDL\ are the requirement to specify the minimum \GLOBES\ version the \AEDL\ is running with,
+Further changes in \AEDL\ are the requirement to specify the minimum \GLOBES\ version the \AEDL\ file can be used with,
 and the extensions by lists as \AEDL\ variables and by an interpolation feature.
 
 As far as the experiment prototypes are concerned, a list of the ones provided with \GLOBESN\ 
@@ -693,7 +693,7 @@ optimize the performance of the multi-dimensional minimizations, which are at
 the heart of each \GLOBES\ $\chi^2$ analysis.
 
 Firstly, the \GLOBES\ minimizers distinguish between minimization over
-oscillation parameters and minimization over systematics parameters.
+oscillation parameters and minimization over systematics (nuisance) parameters.
 This is necessary because each step in the oscillation parameter space
 requires a time-consuming re-computation of oscillation probabilities,
 while a modification of the systematics parameters does not. The standard
@@ -701,7 +701,7 @@ procedure is to perform a full minimization in systematics space after each
 step in oscillation space. This avoids interference of the two categories
 of parameters, and is known to have excellent convergence properties.
 The numerical method that does the minimization is the Powell
-algorithm HERE ORIGINAL POWELL REFERENCE [WW].
+algorithm~\cite{Fletcher:1963:RCD}.
 
 In \GLOBESN , we provide an alternative method, which does the full minimization
 in one go, and is therefore several times faster in most cases. In this algorithm,
@@ -727,8 +727,7 @@ list and planning the optimal diagonalization strategy. Therefore, \GLOBES\ now
 relies an algorithm which has been designed specifically for the diagonalization
 of hermitian $3\times3$ matrices. It is essentially the extremely fast analytical
 algorithm discussed in \Ref~\cite{Kopp:2006wp}, but for the rare cases where this may become
-inaccurate, it falls back to the QL (WRITE OUT!)
-method from~\cite{Press:NumRecip} REPLACE BY ORIGINAL REFERENCE!.
+inaccurate, it falls back to the QL method~\cite{Fra61,Stoer:NumAnalysis}.
 
 As far as the installation of \GLOBES\ on different systems is concerned, \GLOBES\
 has been improved in the past, such as to handle different Linux distributions.
@@ -758,7 +757,7 @@ On the probability level, \GLOBES\ now supports the simulation of non-standard
 physics beyond three-flavor neutrino oscillations without a re-compilation of
 the software. A very important prerequisite for this feature is the ability
 of \GLOBESN\ to carry more than six oscillation parameters. New experiment
-prototypes make extensive use these new features, as well as they are illustrated by
+prototypes make extensive use of these new features, as well as they are illustrated by
 examples in the manual. One prominent example is the Double Chooz experiment,
 which requires user-defined systematics to simulate correlated errors between
 the near and far detectors.
@@ -770,7 +769,7 @@ allow for more space in problem realizations. In this version of \GLOBES ,
 three new such flexible concepts have been introduced: User-defined systematics,
 user-defined priors, and user-defined oscillation probabilities. These approaches
 will make an easy adjustment of the software possible for both experimentalists and theorists.
-Finally, note that the past has shown that it is often more than one possibility 
+Finally, note that the past has shown that there is often more than one possibility 
 how a specific problem can be implemented in \GLOBES .
 
 \subsection*{Acknowledgments}
@@ -780,8 +779,8 @@ thank Thomas Schwetz, who has been pushing the software to the edge in the
 past few years. Furthermore, we would like to thank Tommy Ohlsson,
 Toshihiko Ota, and Julian Skrotzki for using and testing unpublished new features of the software.
 %
-The development of \GLOBES\ is currently being supported by the Studienstiftung des Deutschen Volkes [JK] and the
- Emmy Noether-Program of Deutsche Forschungsgemeinschaft [WW].
+The development of \GLOBES\ is currently being supported by the
+Emmy Noether-Program of Deutsche Forschungsgemeinschaft [WW].
 %
 In the past, the following institutions and organizations have supported 
 members of the \GLOBES\ team: Technische Universit\"at M\"unchen,
