@@ -2011,7 +2011,7 @@ The user-defined prior function reads as follows and is very similar to the stan
   \hspace*{1cm} if(inputerror>1e-12) 
   \hspace*{1cm} \{ \\
   \hspace*{1.5cm} if(i==GLB\_THETA\_12) /* Prior on $\sin^2 \theta_{12}$ */ \\ 
-\hspace*{2.0cm} pv+=square((square(sin(startvalue))-fitvalue)/inputerror);\\ 
+\hspace*{2.0cm} pv+=square((startvalue-square(sin(fitvalue)))/inputerror);\\ 
   \hspace*{1.5cm} else \\ 
   \hspace*{2.0cm}  pv+=square((startvalue-fitvalue)/inputerror); \\
   \hspace*{1cm} \} \\
