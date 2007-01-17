@@ -410,7 +410,7 @@ neutrino factory setups. A complete list
 of all pre-defined experiment files can be found in \tabl{experiments}. More detailed descriptions of the
 corresponding files, the assumptions, requirements, and references are given in the following. 
    
-\section*{Superbeam experiments}
+\section{Superbeam experiments}
 \subsection*{T2K -- {\tt T2K.glb}}
 
 The \TtoK\ experiment can be simulated with the file {\tt T2K.glb}. This file tries to approximate as closely as
@@ -429,8 +429,16 @@ power is 0.77~MW and 2~years $\nu$-running and 6~years $\bar{\nu}$-running is as
 Super-Kamiokande Water Cerenkov detector is taken to be $\mathrm{m_{det} = 22.5 \,kt}$ at a baseline of
 L~=~295~km. The appearance measurement involves the total rates data from all CC events and the spectral data
 from the QE sample with a free normalization at an energy resolution of $\mathrm{\sigma_e=0.085\, GeV}$ due to the
-Fermi Motion as is described in more detail in~\cite{Huber:2002mx}. The treatment of systematics is similar to
-\cite{Ishitsuka:2005qi}. The following rules are defined within {\tt T2K.glb}:  
+Fermi Motion. The normalization of the QE samples is kept free in order to avoid double counting of events since all QE
+events are also contained in the CC samples. The free normalization is introduced within a rule with the line 
+{\tt \@signalerror = 10.:0.0001}. In case of systematics switched on the systematics functions {\tt chiSpectrumTilt}
+for the QE sample and {\tt chiTotalRatesTilt} for the CC sample are used. However, for systematics switched off, only the
+systematics function for the CC sample is changed to {\tt chiNoSysTotalRates}, but the systematics function for the QE
+sample stays {\tt chiSpectrumTilt}. Note, that otherwise the free normalization would be swiched off and all events from
+the QE sample would be counted twice. A detailed discussion of this QE/CC sample splitting can be found in~\cite{Huber:2002mx}. 
+For the disappearance channels only the QE sample is used since statistics is already quite large and a treatment like for the
+appearance channels would only shlightly modify the results. The quantitative treatment of systematics is similar to \cite{Ishitsuka:2005qi}. The following rules are 
+defined within {\tt T2K.glb}:  
 \begin{center}
 \begin{tabular}{|l|ll|c|c|}
 \hline \hline
@@ -574,7 +582,7 @@ Beam Background & $0.677 \, \otimes \, (\bar{\nu}_e \rightarrow \bar{\nu}_e )_\m
 \end{tabular}
 \end{center}
 
-\section*{Reactor experiments}
+\section{Reactor experiments}
 \subsection*{Small reactor experiment -- {\tt Reactor1.glb}}
 
 The file {\tt Reactor1.glb} allows to simulate a small $\bar{\nu}_e$-disappearance reactor experiment. The basic
@@ -650,7 +658,7 @@ Background & neglected & (sys. dominates) & -- & -- & -- & -- & -- \\ \hline \hl
 \end{tabular}
 \end{center}
 
-\section*{Beta beam experiments}
+\section{Beta beam experiments}
 \subsection*{CERN-Fr\'{e}jus baseline scenario -- {\tt BB\_100.glb}}
 
 The $\gamma=100$ $\beta$-beam baseline scenario from CERN to Fr\'{e}jus can be simulated with the file {\tt
@@ -788,7 +796,9 @@ L~=~{\tt baselinefactor}$\cdot\gamma$~km, the
 fiducial mass of the detector is $\mathrm{m_{det} = 500 \,kt}$ and 4~years $\nu$-running and 4~years
 $\bar{\nu}$-running are assumed. The appearance measurement involves the total rates data from all CC events and the spectral data
 from the QE sample with a free normalization at an energy resolution of $\mathrm{\sigma_e=0.085GeV}$ due to the
-Fermi Motion identical to the treatment of systematics within the \TtoK\ and \TtoHK\ files. The following rules are defined within {\tt BBvar\_WC.glb}:
+Fermi Motion identical to the treatment of systematics within the \TtoK\ and \TtoHK\ files. Note, that here also the systematics
+function for the appearance sample is {\tt chiSpectrumTilt} in case of systematics on {\em and} off to avoid double counting of the
+QE events for systematics switched off. The following rules are defined within {\tt BBvar\_WC.glb}:
 \begin{center}
 \begin{tabular}{|l|ll|c|c|}
 \hline \hline
@@ -871,7 +881,7 @@ Background & $0.001 \, \otimes \, (\bar{\nu}_e \rightarrow \bar{\nu}_x)_\mathrm{
 \end{tabular}
 \end{center}
 
-\section*{Neutrino factory experiments}
+\section{Neutrino factory experiments}
 \subsection*{Standard neutrino factory -- {\tt NFstandard.glb}}
 
 A standard neutrino factory scenario can be simulated with the file {\tt NFstandard.glb}. The basic version was
