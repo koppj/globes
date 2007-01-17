@@ -9,19 +9,15 @@
 \label{chapter:tour}
 \index{norm}{GLOBES tour@\GLOBES~tour}
 
-FOR WW MYSELF: TOUR ITSELF (+EXAMPLE FILE) TO BE UPDATED (VALUES MAY HAVE CHANGED DUE TO AEDL FILE DEFINITION
-CHANGES ETC. ALSO EXPERIMENT (OLD) NUFACT DOES NOT EXIST ANYMORE. AND: SOME ERROR IN THIS OLD
-NUFACT-FILE [WW].
-
-CHECK: GLBSETPROJECTION REALLY USED WITH GLB\_FIXED FOR DENSITY PARAMS? IS NFSTANDARD USED?
-(QUESTIONS FOR WW MYSELF!)
-
 In this first chapter, we show a \GLOBES\ tour illustrating the
 main features of \GLOBES . The complete example  
 can be found as {\tt example-tour.c} in the \verb+example+ subdirectory 
 of your \GLOBES\ distribution.
 The output is written to {\tt stream}, which can be either {\tt stdout},
-or a file. Details about how to use \GLOBES\ with C can found in \Chapt~\ref{chapt:gettingstarted} and the following chapters.
+or a file.\footnote{Note that the output in this section can be slightly
+different from yours depending on the current version of the 
+probability engine, systematics implementation, and \AEDL\ file used.}
+Details about how to use \GLOBES\ with C can found in \Chapt~\ref{chapt:gettingstarted} and the following chapters.
 You can also find a summary of the most important \GLOBES\ $\chi^2$-functions in \tabl{stdfunctions}. Note that this chapter
 can be skipped without loss of relevant information.
 
@@ -77,7 +73,7 @@ Initialize a number of parameter vectors we are going to use later:
 \gq{
 glb\_params true\_values = glbAllocParams();\\
 glb\_params fit\_values = glbAllocParams();\\
-glb\_params starting\_values = glbAllocParams();\\
+glb\_params central\_values = glbAllocParams();\\
 glb\_params input\_errors = glbAllocParams();\\
 glb\_params minimum = glbAllocParams();
 }
@@ -102,8 +98,8 @@ electron neutrino as initial flavor:
  for(i=1;i<4;i++) fprintf(stream,"1->\%i: \%g ",i,\\ \hspace*{4cm} glbProfileProbability(0,1,i,+1,50)); \\
 }
 \go{
-Oscillation probabilities in vacuum: 1->1: 0.999953 1->2: 2.69441e-05 1->3: 1.98019e-05 \\
-Oscillation probabilities in matter: 1->1: 0.999965 1->2: 2.02573e-05 1->3: 1.49021e-05 
+Oscillation probabilities in vacuum: 1->1: 0.999955 1->2: 2.58628e-05 1->3: 1.92142e-05 \\
+Oscillation probabilities in matter: 1->1: 0.999965 1->2: 2.01364e-05 1->3: 1.49644e-05 
 }
 Now assign fit values, where we will test the fit value $\stheta=0.0015$:
 \gq{
@@ -116,7 +112,7 @@ Compute $\chi^2$ with systematics only for all experiments and rules:
   fprintf(stream,"chi2 with systematics only: \%g$\backslash$n$\backslash$n",chi2);
 }
 \go{
-chi2 with systematics only: 22.3984
+chi2 with systematics only: 22.433
 }
 This we would obtain from the first appearance channel only:
 \gq{
@@ -124,7 +120,7 @@ This we would obtain from the first appearance channel only:
  fprintf(stream,"This we would have from the CP-even appearance channel only: \%g$\backslash$n$\backslash$n",chi2);
 }
 \go{
-This we would have from the CP-even appearance channel only: 21.6223
+This we would have from the CP-even appearance channel only: 21.1569
 }
 The sum over all rules again gives:
 \gq{
@@ -134,7 +130,7 @@ The sum over all rules again gives:
 \mbox{fprintf(stream,"The sum over all rules gives again: \%g$\backslash$n$\backslash$n",chi2);}
 }
 \go{
-The sum over all rules gives again: 22.3984
+The sum over all rules gives again: 22.433
 }
 Let's prepare the minimizers for taking into account correlations.
 Set errors for external parameters, too: 10\% for each of the solar parameters, and 5\% for the matter density. 
@@ -157,13 +153,13 @@ This corresponds to a projection onto the $\stheta$-axis:
  \hspace*{0.5cm} \%g! $\backslash$n$\backslash$n",    pow(sin(2*glbGetOscParams(minimum,GLB\_THETA\_13)),2));
 }
 \go{
-chi2 with correlations: 2.1038 \\
+chi2 with correlations: 1.99794 \\
 Position of minimum: theta12,theta13,theta23,delta,sdm,ldm,rho \\
-0.542002 0.0193698 0.747915 1.77688 6.66156e-05 0.00200817 \\
-1.00434 \\
-Iterations: 1693 \\
-Note that s22theta13 is unchanged/kept fixed: 0.0015! 
-}
+0.541226 0.0193698 0.746156 1.74968 6.64399e-05 0.00200514 \\
+1.00341 \\
+Iterations: 1988 \\
+Note that s22theta13 is unchanged/kept fixed: 0.0015!  
+}  
 Instead of including the full correlation, we can take the
 correlation with every parameter except for $\deltacp$, \ie,
 we keep (in addition to $\theta_{13}$) $\deltacp$ fixed.
@@ -173,7 +169,7 @@ This corresponds to a projection onto the $\stheta$-$\deltacp$-plane:
 fprintf(stream,"chi2 with correlations other than with deltacp: \%g $\backslash$n$\backslash$n",chi2); 
 }
 \go{
-chi2 with correlations other than with deltacp: 4.32831 
+chi2 with correlations other than with deltacp: 4.02974  
 }
 Similarly, we can only take into account the correlation with $\deltacp$.
 For this, we need to define our own (user-defined) projection, where
@@ -190,7 +186,7 @@ only $\deltacp$ (and the matter density) is a free parameter:
  glbFreeProjection(myprojection); 
 }  
 \go{
-chi2 with correlation only with deltacp: 2.80651 
+chi2 with correlation only with deltacp: 2.72943
 }
 We can also switch of the systematics and compute the
 statistics $\chi^2$ only:
@@ -202,29 +198,29 @@ statistics $\chi^2$ only:
  \hspace*{0.5cm} \%g$\backslash$n$\backslash$n",chi2);
 }
 \go{
-chi2 with statistics only: 39.143
+chi2 with statistics only: 37.9736
 }
 Let us now locate the exact position\footnote{For an exact definition of 
 inverted hierarchy, see page~\pageref{mass_ordering}.} of the sgn-degeneracy:
 \gq{
   glbDefineParams(input\_errors,theta12*0.1,0,0,0,sdm*0.1,ldm/3); \\
-  glbDefineParams(starting\_values,theta12,theta13,theta23, \\
+  glbDefineParams(central\_values,theta12,theta13,theta23, \\
   \hspace*{0.5cm} deltacp,sdm,-ldm); \\
   glbSetDensityParams(input\_errors,0.05,GLB\_ALL); \\
   glbSetDensityParams(starting\_errors,1.0,GLB\_ALL); \\
-  glbSetCentralValues(starting\_values);\\
+  glbSetCentralValues(central\_values);\\
   glbSetInputErrors(input\_errors);\\
-  chi2=glbChiAll(starting\_values,minimum,GLB\_ALL);\\ 
+  chi2=glbChiAll(central\_values,minimum,GLB\_ALL);\\ 
   fprintf(stream,"chi2 at minimum: \%g $\backslash$n",chi2);\\
   fprintf(stream,"Position of minimum: \\ \hspace*{0.5cm} theta12,theta13,theta23,delta,sdm,ldm,rho$\backslash$n"); \\
   glbPrintParams(stream,minimum); 
 }
 \go{
-chi2 at minimum: 6.20025 \\
+chi2 at minimum: 4.2137 \\
 Position of minimum: theta12,theta13,theta23,delta,sdm,ldm,rho \\
-0.591812 0.0264717 0.72763 1.08709 8.0004e-05 -0.00206094 \\
-0.970685  \\
-Iterations: 1946 \\
+0.585006 0.0275073 0.725679 1.05251 7.80256e-05 -0.00191273  \\
+0.979049  \\
+Iterations: 3184
 }
 After testing these functions with only one experiment, let us now
 go to a two-experiment setup with two different neutrino factory baselines.
@@ -233,7 +229,7 @@ we have to free them first:
 \gq{
  glbFreeParams(true\_values); \\
  glbFreeParams(fit\_values); \\ 
- glbFreeParams(starting\_values);\\
+ glbFreeParams(central\_values);\\
  glbFreeParams(input\_errors);\\
  glbFreeParams(minimum);
 }
@@ -271,10 +267,9 @@ Now we can re-initialize our parameter vectors again:
 \gq{
  true\_values = glbAllocParams();\\
  fit\_values = glbAllocParams(); \\
- starting\_values = glbAllocParams(); \\
+ central\_values = glbAllocParams(); \\
  input\_errors = glbAllocParams(); \\
  minimum = glbAllocParams(); \\
- glb\_params minimum2 = glbAllocParams(); 
 }
 In addition, we repeat the procedure for the simulated rates and
 the fit parameter vector:
@@ -295,7 +290,7 @@ rules:
  \hspace*{0.5cm} \%g$\backslash$n",chi2); 
 }
 \go{
- chi2 with systematics for all exps: 31.0797
+ chi2 with systematics for all exps: 30.5678
 }
 Compute $\chi^2$ for each experiment and compute the sum:
 \gq{
@@ -308,8 +303,8 @@ Compute $\chi^2$ for each experiment and compute the sum:
   \hspace*{0.5cm} \%g$\backslash$n$\backslash$n",chi2+chi2b);
 }
 \go{
-chi2 with systematics for 3000km: 22.3984 \\
-chi2 with systematics for 7500km: 8.68131 \\
+chi2 with systematics for 3000km: 22.433 \\
+chi2 with systematics for 7500km: 8.1348 \\
 The two add again to: 31.0797
 }
 Similarly, compute the $\chi^2$ with correlations for each experiment
@@ -337,82 +332,62 @@ output vectors.
   \hspace*{0.5cm} whereas the total chi2 is \%g !$\backslash$n$\backslash$n",chi2+chi2b,chi2sum); 
 }
 \go{
-chi2 with correlations for 3000km: 2.1038 \\
-0.542002 0.0193698 0.747915 1.77688 6.66156e-05 0.00200817 \\ 
-1.00434 1 \\
-Iterations: 1693 \\
+chi2 with correlations for 3000km: 1.99794 \\
+0.541226 0.0193698 0.746156 1.74968 6.64399e-05 0.00200514 \\ 
+1.00341 1  \\
+Iterations: 1988 \\
 \\
-chi2 with correlations for 7500km: 1.08421 \\
-0.557356 0.0193698 0.771359 4.77751 7.00762e-05 0.00200105 \\
-1 1.01517 \\
-Iterations: 661 \\
+chi2 with correlations for 7500km: 0.803787 \\
+0.556503 0.0193698 0.771812 4.75971 7.00813e-05 0.0020012 \\ 
+1 1.01201 \\
+Iterations: 798 \\
 \\
-chi2 with correlations for combination: 3.90835  \\
-0.544432 0.0193698 0.770175 1.78502 6.61621e-05 0.00200303 \\ 
-1.00431 1.03679 \\
-Iterations: 1636 \\
+chi2 with correlations for combination: 3.68133 \\
+0.543335 0.0193698 0.77004 1.75576 6.59505e-05 0.00199913 \\ 
+1.00333 1.03269 \\
+Iterations: 2187 \\
 \\
-The sum of the two chi2s is 3.18801, whereas the total chi2 is 3.90835!
+The sum of the two chi2s is 2.80173, whereas the total chi2 is 3.68133!
 }
-Now find the $\mathrm{sgn}(\ldm)$-degeneracies for both individual
-experiments and test if they are still there in the combination of the
+Now find the $\mathrm{sgn}(\ldm)$-degeneracy for the neutrino factory
+at the short baseline and test if it is still present in the combination of the
 experiments.
 \gq{
  glbDefineParams(input\_errors,theta12*0.1,theta13,theta23, \\
  \hspace*{0.5cm} deltacp,sdm*0.1,ldm/3); \\
-glbDefineParams(starting\_values,theta12,theta13,theta23, \\
+glbDefineParams(central\_values,theta12,theta13,theta23, \\
 \hspace*{0.5cm} deltacp,sdm,-ldm);\\
   glbSetDensityParams(input\_errors,0.05,GLB\_ALL);\\
-  glbSetDensityParams(starting\_values,1.0,GLB\_ALL); \\
-  glbSetCentralValues(starting\_values);\\
+  glbSetDensityParams(central\_values,1.0,GLB\_ALL); \\
+  glbSetCentralValues(central\_values);\\
   glbSetInputErrors(input\_errors);\\
   \\
-  chi2=glbChiAll(starting\_values,minimum,0); \\ 
+  chi2=glbChiAll(central\_values,minimum,0); \\ 
   fprintf(stream,"chi2 at minimum, L=3000km: \%g $\backslash$n",chi2); \\
   glbPrintParams(stream,minimum);   \\
-  \\
-  chi2b=glbChiAll(starting\_values,minimum2,1);  \\
-  \mbox{fprintf(stream,"$\backslash$nchi2 at minimum, L=7500km: \%g \\ $\backslash$n",chi2b);} \\
-  glbPrintParams(stream,minimum2);  \\
   \\
   chi2=glbChiAll(minimum,minimum,GLB\_ALL); \\
   fprintf(stream,"$\backslash$nchi2 for combination at minimum of Exp. 1:\\ \hspace*{0.5cm} \%g $\backslash$n",chi2); \\
   glbPrintParams(stream,minimum);  \\
-  \\
-  chi2b=glbChiAll(minimum2,minimum2,GLB\_ALL); \\
-  fprintf(stream,"$\backslash$nchi2 for combination at minimum of Exp. 2: \\
-  \hspace*{0.5cm} \%g $\backslash$n",chi2b); \\
-  glbPrintParams(stream,minimum2);  
 }
 \go{
-chi2 at minimum, L=3000km: 6.71794 \\
-0.591497 0.0257396 0.729058 1.11537 7.98867e-05 -0.00206005 \\
-0.970499 1 \\
-Iterations: 2104\\
+chi2 at minimum, L=3000km: 4.82021  \\
+0.584568 0.026488 0.727714 1.09015 7.78747e-05 -0.00191163 \\ 
+0.978867 1 \\
+Iterations: 3298 \\
 \\
-chi2 at minimum, L=7500km: 47.1013 \\
-0.590347 0.0018489 0.768372 0.984827 8.23415e-05 -0.00204588 \\
-1 0.780995 \\
-Iterations: 1270\\
-\\
-chi2 for combination at minimum of Exp. 1: 70.6353 \\
-0.607988 0.0165985 0.767682 1.41422 8.44573e-05 -0.00204853 \\
-0.96147 1.1831 \\
-Iterations: 1549 \\
-\\
-chi2 for combination at minimum of Exp. 2: 70.6357 \\
-0.608454 0.0165823 0.767757 1.41481 8.43864e-05 -0.00204853 \\
-0.961129 1.18304 \\
-Iterations: 1447 
+chi2 for combination at minimum of Exp. 1: 59.4879 \\
+0.599908 0.0172467 0.768342 1.39186 8.198e-05 -0.00189508 \\ 
+0.970733 1.17125 \\
+Iterations: 2327 \\
 }
 Finally, we have to free the parameter vectors again:
 \gq{
  glbFreeParams(true\_values); \\
  glbFreeParams(fit\_values); \\
- glbFreeParams(starting\_values); \\
+ glbFreeParams(central\_values); \\
  glbFreeParams(input\_errors); \\
  glbFreeParams(minimum); \\
- glbFreeParams(minimum2); \\
 }
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{\GLOBES\ basics}
@@ -2101,19 +2076,19 @@ and lets it run into the minimum.  The following code excerpt  corresponds to fi
 {\tt
 {\footnotesize
   /* Set starting vales to suspected position at opposite sign of ldm */ \\
-  \mbox{glbDefineParams(starting\_values,theta12,theta13,theta23,deltacp,sdm,-ldm);} \\
-  glbSetDensityParams(starting\_values,1.0,GLB\_ALL); \\
+  \mbox{glbDefineParams(central\_values,theta12,theta13,theta23,deltacp,sdm,-ldm);} \\
+  glbSetDensityParams(central\_values,1.0,GLB\_ALL); \\
   \\
   /* Set input errors for external input, where some information on ldm \\
    \hspace*{0.5cm} is imposed in order to avoid falling into the right-sign solution */ \\
   glbDefineParams(input\_errors,theta12*0.1,0,0,0,sdm*0.1,ldm/3); \\ 
   glbSetDensityParams(input\_errors,0.05,GLB\_ALL); \\
   \\
-  glbSetCentralValues(starting\_values); \\
+  glbSetCentralValues(central\_values); \\
   glbSetInputErrors(input\_errors); \\
   \\
   /* Localize degenerate solution by minimization over all parameters */ \\
-  double CL=glbChiAll(starting\_values,deg\_pos,GLB\_ALL); \\
+  double CL=glbChiAll(central\_values,deg\_pos,GLB\_ALL); \\
    \\
   \mbox{/* Now: CL is the chi2 of the deg.~solution and deg\_pos the position */} 
 }}

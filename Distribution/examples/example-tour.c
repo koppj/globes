@@ -36,7 +36,7 @@
 int main(int argc, char *argv[])
 {
   /* char* MYFILE=""; */ 
-  char* MYFILE=""; // "gl-tour.dat";    /* if empty, write to screen, otherwise to file name given here */
+  char* MYFILE="gl-tour.dat"; /* if empty, write to screen, otherwise to file name given here */
   FILE* stream;
   if(strlen(MYFILE)>0) stream=fopen(MYFILE, "w");
    else stream = stdout;
@@ -180,7 +180,6 @@ int main(int argc, char *argv[])
   central_values = glbAllocParams();
   input_errors = glbAllocParams();
   minimum = glbAllocParams();
-  glb_params minimum2 = glbAllocParams();
 
   /* Assign standard oscillation parameters */
   glbDefineParams(true_values,theta12,theta13,theta23,deltacp,sdm,ldm);
@@ -226,7 +225,7 @@ int main(int argc, char *argv[])
   glbPrintParams(stream,minimum);  
   fprintf(stream,"\nThe sum of the two chi2s is %g, whereas the total chi2 is %g !\n\n",chi2+chi2b,chi2sum);
   
-  /* Find sgn-degeneracies for both experiments and test if they are still there for comb. */
+  /* Find sgn-degeneracy for 3000km experiments and test if it is still there for comb. */
   glbDefineParams(input_errors,theta12*0.1,theta13,theta23,deltacp,sdm*0.1,ldm/3);
   glbSetDensityParams(input_errors,0.05,GLB_ALL);
   glbDefineParams(central_values,theta12,theta13,theta23,deltacp,sdm,-ldm);
@@ -236,15 +235,9 @@ int main(int argc, char *argv[])
   chi2=glbChiAll(central_values,minimum,0); 
   fprintf(stream,"chi2 at minimum, L=3000km: %g \n",chi2);
   glbPrintParams(stream,minimum);  
-  chi2b=glbChiAll(central_values,minimum2,1); 
-  fprintf(stream,"\nchi2 at minimum, L=7500km: %g \n",chi2b);
-  glbPrintParams(stream,minimum2);  
   chi2=glbChiAll(minimum,minimum,GLB_ALL); 
   fprintf(stream,"\nchi2 for combination at minimum of Exp. 1: %g \n",chi2);
   glbPrintParams(stream,minimum);  
-  chi2b=glbChiAll(minimum2,minimum2,GLB_ALL); 
-  fprintf(stream,"\nchi2 for combination at minimum of Exp. 2: %g \n",chi2b);
-  glbPrintParams(stream,minimum2);  
  
   /* Destroy parameter vector(s) */
   glbFreeParams(true_values);
@@ -252,7 +245,6 @@ int main(int argc, char *argv[])
   glbFreeParams(central_values);
   glbFreeParams(input_errors);
   glbFreeParams(minimum);
-  glbFreeParams(minimum2);
 
   if(strlen(MYFILE)>0) fclose(stream);
 
