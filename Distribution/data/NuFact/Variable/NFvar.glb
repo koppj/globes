@@ -42,7 +42,7 @@ $version="3.0.0"
  #* }
  *
  *
- * Last Update: 21/12/06
+ * Last Update: 17/01/06
  *
   */
 
@@ -154,25 +154,23 @@ cross(#NC)<
 
 /* ####### Energy dependent efficiencies ###### */
 
-%energ = include "ThresholdEnergies.dat"
+%energCID = {0.,4.,20.,100.}
 
 %bc=bincenter()
 
-/* emulate CID threshold; numerical trick to use absolute 
-   value may cause very small event numbers below threshold!
-   this trick works about for emax>10 */
+%CIDthreshold = {0.,0.,1.,1.}
 
-%CIDthreshold = include "CIDthreshold.dat"
-
-%CIDeffs=interpolation(%energ,%CIDthreshold,1,%bc)
+%CIDeffs=interpolation(%energCID,%CIDthreshold,1,%bc)
 
 /* emulate MINOS threshold: since appearance channels are 
    added to disappearance channels, they have to have the 
    same threshold properties in this dataset */
 
-%MINOSthreshold = include "MINOSthreshold.dat"
+%energMINOS = {0.,1.,3.,100.}
 
-%MINOSeffs=interpolation(%energ,%MINOSthreshold,1,%bc)
+%MINOSthreshold = {0.,0.,1.,1.}
+
+%MINOSeffs=interpolation(%energMINOS,%MINOSthreshold,1,%bc)
 
 
 
