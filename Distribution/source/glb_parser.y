@@ -805,7 +805,7 @@ static int set_exp_list(char *name,glb_List *value,int scalar)
 	{
 	  switch((int) token_list[i].scalar) {
 	  case DOUBLE_LIST:
-	    
+
 	    //here we will have to do a lot asking asf.
 	    len=list_length(value); // how long is the list
 	    lbf=(int*) token_list[i].len;
@@ -815,10 +815,10 @@ static int set_exp_list(char *name,glb_List *value,int scalar)
 	  
 	    
 	    dbf = (double**) token_list[i].ptr;
-	    if(*dbf!=NULL)glb_free(*dbf);
+	    if(*dbf!=NULL){glb_free(*dbf);*dbf=NULL;}
 	    list=(double*) glb_malloc(sizeof(double)*len);
 	    *dbf=list; 
-	    
+	  	     
 	    
 	    for(k=0;k<len;k++)
 	       {
@@ -833,7 +833,7 @@ static int set_exp_list(char *name,glb_List *value,int scalar)
 		      fprintf(stderr,"Error: Value for %s out of range\n",
 			      token_list[i].token);
 		      glb_free(list);
-		      list=NULL;
+		      *dbf=NULL;
 		      return 2;
 		    }
 		  
@@ -850,9 +850,9 @@ static int set_exp_list(char *name,glb_List *value,int scalar)
 	    //  lbf[loc_count-1]=len;  // setting the length correctly in exp   
 	  
 	    dbf= (double**) token_list[i].ptr;
-	    if(dbf[loc_count-1]!=NULL)glb_free(dbf[loc_count-1]);
+	    if(dbf[loc_count-1]!=NULL){glb_free(dbf[loc_count-1]);dbf[loc_count-1]=NULL;}
 	    list=(double*) glb_malloc(sizeof(double)*(len+1));
-	  
+	   
 	    dbf[loc_count-1]=list; 
 	    list[len]=-1;
 	    
@@ -870,8 +870,10 @@ static int set_exp_list(char *name,glb_List *value,int scalar)
 		    fprintf(stderr,"Error: In line %d: "
 			    "Value for %s out of range\n",
 			    glb_line_num,token_list[i].token);
-		   glb_free(list);
-		    return 2;
+		    glb_free(list);
+		    dbf[loc_count-1]=NULL;
+		  
+		   return 2;
 		  }
 	      }
 	    if(scalar!=TWICE) list_free(value);
@@ -1463,7 +1465,7 @@ static double line(double x)
 {
   size_t n,i;
   n=floor(x);
-  for(i=0;i<n;i++) fprintf(stdout,"\n",x);
+  for(i=0;i<n;i++) fprintf(stdout,"\n");
   return x;
 }
 
@@ -1813,7 +1815,7 @@ void glbDefineAEDLList(const char *name, double *list, size_t length)
   size_t i;
   glb_symrec *ptr;
   if(name==NULL) return;   
-  if(name[0]!='%'){ fprintf(stderr,"ERROR: AEDL lists have to start with '%'\n");return;}
+  if(name[0]!='%'){ fprintf(stderr,"ERROR: AEDL lists have to start with '\%'\n");return;}
   ptr=glb_getpresym(name);
   if(ptr==0) ptr = glb_putpresym (name, LVAR);
   for(i=0;i<length;i++) {ptr->list=list_cons(ptr->list,list[i]);
@@ -1899,6 +1901,7 @@ int glbInitExperiment(char *inf,glb_exp *in, int *counter)
   context=(char *) strdup("global");
   glb_smear_reset(&ibf);
   glb_option_type_reset(&opt);
+  flt.file_name=NULL;
   glb_flux_reset(&flt);
   input=glb_fopen(inf,"r");
   if(input==NULL) return -2;

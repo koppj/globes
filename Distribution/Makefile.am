@@ -10,7 +10,7 @@ EXTRA_DIST = examples/Makefile.in examples/example1.c	      \
   examples/myio.h \
   examples/NFstandard.glb examples/D-Chooz_far.glb examples/D-Chooz_near.glb \
   examples/Reactor1.glb examples/Reactor.dat examples/XCC.dat examples/XNC.dat \
-  examples/XCCreactor.dat BUGS globes.m4
+  examples/XCCreactor.dat BUGS globes.m4 data/md5-sums
 
 # that is only needed if the testsuite should go into the release
 # testsuite/01-probabilities.c             testsuite/03-chisys.glb   testsuite/06-chibars.c \

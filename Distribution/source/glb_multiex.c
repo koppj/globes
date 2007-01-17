@@ -126,8 +126,8 @@ glb_flux *glb_flux_alloc()
 glb_flux *glb_flux_reset(glb_flux *temp)
 {
   temp->builtin=-1;
-  /* FIXME memory leak */
-  temp->file_name=NULL;
+ 
+  glb_free(temp->file_name);
   temp->time=-1;
   temp->target_power=-1;
   temp->stored_muons=-1;
@@ -383,6 +383,7 @@ void glbFreeExp(glb_exp ins)
   int i,j;
   struct glb_experiment *in;
   in=(struct glb_experiment *) ins;
+  if(ins==NULL) return;
   glb_free_names(in->names);
   glb_free(in->version);
   glb_free(in->filename);
@@ -390,9 +391,11 @@ void glbFreeExp(glb_exp ins)
   for(i=0;i<32;i++)glb_xsec_free(in->xsecs[i]);
 
   for(i=0;i<6;i++) my_free(in->listofchannels[i]);
-  my_free(in->binsize);
-  my_free(in->simbinsize);
 
+  my_free(in->binsize);
+  in->binsize=NULL;
+  my_free(in->simbinsize);
+  in->simbinsize=NULL;
  
   for(i=0;i<in->numofrules;i++)
     {

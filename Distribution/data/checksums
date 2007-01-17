@@ -1,0 +1,9 @@
+#! /bin/sh
+
+files=`find -name '*.???'`
+
+for f in `echo $files`; do
+md5sum $f
+done
+
+

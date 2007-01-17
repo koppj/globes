@@ -99,9 +99,9 @@ int glbLoadProfileData(const char* filename,
 		       size_t *layers, double **length, 
 		       double **density)
 {
-  int i;
+  
   double *l,*d;
-  size_t steps=0;
+  size_t i,steps=0;
   char line[100];
   FILE *fp;
   

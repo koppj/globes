@@ -7,8 +7,8 @@ export TESTS="03-chisys 04-chicorr 05-chideg 06-chibars"
 #export TESTS="01-probabilities 02-probabilities-filtered"
 
 #TESTS="01-probabilities 02-probabilities-filtered"
-export prefix1="/home/lin/jkopp/software/installed/globes-cvs/"
-export prefix2="/home/lin/jkopp/software/installed/globes-debug/"
+export prefix1="/home/phuber/globes-binaries/2.3.1"
+export prefix2="/home/phuber/globes-binaries/release"
 
 # Loop over all tests
 for THIS_TEST in $TESTS; do

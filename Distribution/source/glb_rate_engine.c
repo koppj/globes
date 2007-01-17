@@ -137,8 +137,7 @@ void glb_set_baseline(double l)
 {
   struct glb_experiment *e = glb_experiment_list[glb_current_exp];
   double sum,*ll;
-  size_t s;
-  int i;
+  size_t s,i;
   s = e->psteps;
   ll = e->lengthtab;
   sum=0;

@@ -19,10 +19,10 @@ Group: Science/Research
 Source: %{pkgname}-%{version}.tar.gz
 
 Buildroot: /tmp/%{pkgname}-root
-URL: http://www.ph.tum.de/~globes
+URL: http://www.mpi-hd.mpg.de/lin/globes/
 Prefix: %{prefix}
 BuildArchitectures: @RPM_ARCHS@
-Packager: The GLoBES Team <globes@ph.tum.de>
+Packager: The GLoBES Team <globes@mpi-hd.mpg.de>
 Vendor: The GLoBES Team
 
 

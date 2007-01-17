@@ -533,4 +533,858 @@
 
 	Tested the examples, they work.
 
-	Removed glbSetProfileScaling since it has absolutely no effect.
+	Removed glbSetProfileScaling since it has absolutely no effect.11/08/04
+******** Version 2.1.0 beta
+	Added (minimal) support for user defined priors. The interface is
+
+		int glbRegisterPriorFunction( double (*f)(const glb_params) )
+
+	Thus the user defines a function which returns `double' and takes
+	as argument a `glb_params' pointer with qualifier `const', ie.
+	the function may not change the values stored in this pointer. Example
+	
+		double my_prior(const glb_params in)
+			{
+				some code
+			}
+	
+	To use this prior one would just call
+	
+		glbRegisterPriorFunction(my_prior)
+	
+	If the prior knows the difference between true and fitted values, the
+	true values can be accessed within the prior function by virtue of
+	`glbGetStartingValues'. The user defined prior is co-added with
+	the builtin parabolib priors, if this behaviour is unwanted set
+	the input errors to zero. 
+
+	Nice sideffect: This mechansim can be easily adapted to have a detailed
+	look at the steps the minimizer takes. Just write a prior which
+	prints its input parameters to some file. To make life easier the
+	argument passed to the user defined prior function has the value
+	of `iterations' correctly set to the current value.
+
+##############################################################################
+In the mean time I've done a lot for module support which still has to be
+documented!
+##############################################################################
+
+16/08/04
+	Fixed BUG#5.
+
+19/08/04
+	Added support for building rpm's automatically. Use
+		configure --enable-rpm-rules
+	and then type 
+		make rpm
+	and when done 
+		make rpm-clean
+	It is also possible to use different build-archs (targets) with
+		configure --enable-rpm-rules --with-rpm-targets='i386 i486'
+	The obtained binary rpm should be relocatable and a source rpm is
+	also build.
+
+15/09/04
+	Added a comment on gsl-devel and RedHat/Fedora in the INSTALL file.
+
+	In order to have module support and to keep the ability to have a
+	all-static version of GLoBES I had to restructure the linkage a bit.
+	The problem is that a module for GLoBES usually also will use 
+	functionality of GLoBES, if we kept the scheme as it was, we would
+	obtain following link graph:
+
+				my_program.c
+				     |
+			       +-->--+--<--+ 
+			       |           |
+			my_module.so <-- libglobes.so
+
+	which obviously is cyclic. Moreover if I migrate some core
+	functionality to a module, I would obtain, even worse this:
+
+			       +-----> libglobes.so
+			       |           |
+			core_module.so <---+
+
+	Therefore libglobes is divided into two parts, libglobes
+	and libglb, where libglobes carries the functionality of
+	the former libglobes and libglb links in the modules, yielding:
+
+				libglobes.so
+				      |	
+               			core_module.so
+				      |
+				  libglb.so
+
+	Unfortunately this requires for all non-standard installations,
+	eg. without root-privilege, to use a new linker command, which
+	can be found in the Makefile in the `example' directory. In any
+	case it makes necessary to re-link any application which uses 
+	GLoBES. Sorry for that!
+
+	libglb and all modules are to be found in ${prefix}/lib/globes.
+
+	If an all-static version is required it is neccessary to have
+	libtool installed (only on the machine where the linking is done).
+	How this works in detail will be described elsewhere. The advantage
+	of a all-static program are two-fold: debugging is much easier and
+	it is possible to run the program on machines which are lacking
+	important things, like LAPACK. Just compile and link and all-static
+	version on a machine which has everthing GLoBES needs and then copy
+	the binary and all `.la'-files in  ${prefix}/lib/globes to the other
+	machine and you`re done ;-)
+
+	To complete module support it is of course foreseen to have 
+	user-supplied modules. To this end a documentation of the module
+	API is required, which still is lacking, partly because the API
+	has not finally been defined yet... What already is there, is a
+	helper-script `globes-module' which should make it straightforward
+	to compile and link own modules (which involves building shared 
+	obejcts).
+
+	Finally I have also added `globes-config' which is a config-script
+	in the style of `gsl-config'. This script knows everything about
+	the actual installation of GLoBES and provides information like
+	which linker flags are needed to link with GLoBES or which version
+	of GLoBES currently is installed.
+	
+20/09/04 Now libf2c, BLAS and LAPACK are embedded and can be used in a
+	convenience mode, i.e. they are no longer required to be installed
+	on a system in order to compile GLoBES. If they are installed, the
+	installed versions will be used otherwise the embedded versions are
+	used. One can specifiy the options `--enable-lapack-convenience'
+	and/or 	 `--enable-libf2c-convenience' to configure in order to
+	avoid using any installed versions. This is useful when compiling
+	things for a target installation which is lacking those libraries.
+
+	Improved configury. Now only one configure exists in the top level
+	directory. Especially the lengthy configure step in the libltdl 
+	subdirectory has been removed, the neccessary checks have been moved 
+	to the top level configure. We now use autoheader, which greatly 
+	improves the output of make. The new configury is much faster.
+
+******** Version 2.2.0 
+30/09/04 Added support for SWIG. SWIG itself is simple, but the support
+	for the Perl module turned out to be rather complicated. Still
+	no support for a static perl module. Added a directory `m4' to
+	keep all macros needed by autoconf. 
+
+	As basis I took the AC_SWIG_PERL macro by Brian Shire 
+	<shire@tekrat.com>. This required some hacking to get it work properly
+	with autoconf 2.57. I added a check for the CFLAGS needed by Perl.
+	Furthermore I removed all MSG_ERRORS, since globes should build without
+	any problems even if SWIG/Perl support is broken. Thus SWIG is now 
+	treated like e.g. bison, so if it is not present but e.g. globes.h
+	has changed the missing script is invoked. Compilation of the Perl
+	extension is conditional upon `--enable-perl' (default). If anything
+	the Perl extension needs like shared library building is disabled/
+	broken no extension is built. I found it difficult to figure out where
+	the Perl module should be installed to, thus it ends up in 
+	lib/globes/perl and the config-script knows about this. This should
+	be sufficient for any Perl user. Just add the following to the Perl
+	code 
+	
+	  use lib "perl path as given by `globes-config --extensions=perl'";
+	  use globes;
+	  	...
+
+	After this experience, I doubt wether GLoBES will automagically support
+	many different lanuage extensions. I could imagine distributing the
+	corresponding wrapper files generated by SWIG and leave the gory 
+	details of making a working module out of this to the user...
+
+	Static modules, ie. a complete encapsulated Perl interpreter which
+	understands GLoBES would be great ...
+
+01/10/04 Added a nice perl example in globes. The perl support could still be
+	refined (typemaps etc.). Moved the contents of acinclude.m4 to some
+	files in a new subdirectory `m4'. Perl rules and rpm rules work
+	now silently together.
+
+******** Version 2.2.1
+
+10/11/04 Fixed a problem with the convenience libf2c. Added the inclusion
+	of config.h to wsfe.c and wrtfmt.c. Fixed the includes (f2c.h) for
+	the lapack stuff. The problem is, there might be a working libf2c/
+	libg2c but no f2c.h (RedHat!). Or the there is no libf2c at all and
+	thus no header. Furthemore some typos had to be fixed in the 
+	Makefile.am's. Fixed a problem in the support for libg2c, in lapack.m4
+	there was a misplaced bracket in AC_CHECK_G2C. 
+
+******** Version 2.2.2
+
+25/11/04 ******************** WARNING ********************************
+	works only with configure --prefix=something
+	************************************************************** 
+
+	Added an example which shows how to build a all-static version of an 
+	application using GLoBES. This is actually a bit trickier than one 
+	would usually expect due to the use of *dynamically* loadable modules. 
+	However, libtool and libltdl provide a way out by the use of the so 
+	called `lt_preload' mechanism. It is absolutely necessary to specify
+	the modules which will be needed by the application at link time. 
+	Unfortunately, due to a silliness of libltdl, it is also necessary that
+	the corresponding `*.la' file(s) can be found during execution. They
+	will be looked for at the place where the module itself was found 
+	during linking *and* in the local directory. Thus usually you will want
+	to copy the `*.la' file(s) into the same directory where your 
+	application's binary lives (NB the `*.la' are tiny). 
+	 The actual example is to be found in the `examples' subdirectory of
+	the tar-ball. It is built by issuing `make example-static' (after
+	you have installed this version of GLoBES). Then you should be able
+	to copy the resulting binary `example-static' together with 
+	`glb_prior_module-la' (to be found in ${prefix}/lib/globes) to any
+	computer and execute it there (there are exceptions, it will not work
+	on a non-unix system :-)
+	 If you want to use the Makefile for your own purposes, make sure to
+	add the following line  for each module your additionaly using
+	
+		LTDLOPEN += -dlopen path_to_my_module/my_module.la
+
+	Also have a look at `example-tour.c'. It now contains two blocks of 
+	code, which will be conditionally compiled for all-static applications.
+	This one at the beginning (outside main)
+
+		#ifdef GLB_STATIC
+		#include   <ltdl.h>
+		#endif /* GLB_STATIC */
+
+	and this one inside at the beginning of main
+
+		#ifdef GLB_STATIC
+  			LTDL_SET_PRELOADED_SYMBOLS();
+		#endif /* GLB_STATIC */
+
+	This you will also need in your own applications. The conditional
+	compilation makes it possible to have the same source no matter wether		
+	your going to use an all-static version.
+	
+
+	************************************************************
+	* FIXME -- examples do not work with normal root-install   *
+	************************************************************
+
+07/03/05 Version 2.3.2
+	Fixed a silly bug in glb_multiex.c in the setup of the
+	smearing matrices. It was looped over the number
+	of rules instead of the number of smearing matrices.
+
+08/03/05 Version 2.3.3
+	Fixed the bug in the parser, concerning '$binsize'. Fixed a
+	bug in glb_set_up_smear_data (glb_smear.c),
+	which made it ignore user defined binsizes. 
+
+21/03/05 Version 2.3.4
+	Fixed a sign error in the beta beam fluxes.
+
+19/04/05 libglb now is installed into $(prefix)/lib instead of
+        $(prefix)/lib/globes. The built-in
+	oscillation parameter now are the same as in the 
+	documentation, dm21 was 10 times larger. 
+
+03/06/05 Version 2.3.5
+	Fixed a bug in glb_lexer.l The consequence of this bug was
+	that the include feature in AEDL did not work for files which
+	where not parsed by the first invocation of
+	glbInitExperiment. The reason was that include_stack_ptr was
+	not properly reset at EOF. This fixes BUG#9.
+
+******** Version 2.3.7
+
+27/07/05 At this point we're merging most of the features which were
+	new in 2.0.11 back into the main development branch. What
+	follows is a verbatim copy of the NEWS file of 2.0.11:
+	
+	<-BEGIN-QUOTE->
+
+        This version is the attempt to solve various installation
+        problems and to increase the portability of globes.
+
+        Serious problems have been encountered on various versions of
+        the RedHat/Fedora distribution. Most of those issues can be
+        avoided by using the now embedded libraries needed for the
+        interface to LAPACK. libf2c, BLAS and LAPACK are embedded and
+        can be used in a convenience mode, i.e. they are no longer
+        required to be installed on a system in order to compile
+        GLoBES. If they are installed, the installed versions will be
+        used otherwise the embedded versions are used. One can
+        specifiy the options `--enable-lapack-convenience' and/or
+        `--enable-libf2c-convenience' to configure in order to
+        avoid using any installed versions. This is useful when
+        compiling things for a target installation which is lacking
+        those or where those libraries do not work (e.g. Fedora Core
+        3). Moreover libg2c is now also accepted by configure.
+
+        We now also have a 'globes-config' script which takes a few
+        options and allows to extract e.g the linker flags.
+
+        The test for GSL is now performed with AM_GSL_PATH which
+        allows the user to (optionally) specifiy the path to
+        libgsl. This is especially useful if o ne tries to install
+        globes in presence of a uncooperative sysadmin.
+
+	<-SNIP->	
+
+	Fixed the include files for GSL, thus using
+	'--with-gsl-prefix' now should work seemlessly. Removed the
+	'-static' flag from the linker o ptions for lapack and
+	libf2c. This may slow down compilation but ensures a prop er
+        build on some 64bit platforms. GLoBES should now also build
+        and work on 64bit platforms. There were basically three
+        problems: old version of autotools, the length of integers as
+        used by libf2c and C and some problem with a relocation,
+        which seems to happen on platforms supporting both 32 and
+        64bit applications.
+
+	<-END-QUOTE->	
+
+	Also from the NEWS file of 2.0.11
+
+	<-BEGIN-QUOTE->	
+
+	Added libgnu support to have fallbacks for argp and obstacks,
+	since they seem not to work properly on Mac OS. argp.m4
+	changed such that argp is only taken from gnulib when absent
+        on the system.
+
+	<-END-QUOTE->
+	
+	I tried to solve the problem with multiple definitions (they
+	were the main cause for GLoBES not building on Mac). There I
+	run into a new problem with SWIG. Somehow SWIG needs to have
+	glb_exp glb_experiment_list to be specifically defined, which
+	really looks strange to me. I hope I didn't create any bigger
+	problems. But Perl support anyway is optional.
+
+	BUGS #5-#9 are fixed.
+
+	Merged Walter's code with support for more than 6 oscillation
+	parameters.
+
+	Fixed a little problem in the examples Makefile, should now 
+	work for all types of installation (prefix vs no prefix)
+
+29/07/05 JK
+        Added several functions for user-defined chi^2 calculations
+        (in file user_chi.c)
+
+        Added global variable glb_current_exp that remembers the index
+        of the currently processed experiment. This is necessary
+        for user-defined chi^2.  
+
+01/08/05 Version 2.3.8 -- PH
+	Moved the module support functions (glb_modules.c) into
+	globes/ and thus into libglobes. Makes linking
+	easier. 'configure' now accepts '--disable-modules' in order
+	to turn off module support. This feature may be useful on a
+	variety of platforms. The glb_prior_module in that case is
+	just linked like an ordinary object file. The mechanism I use
+	for this should be extendable to having more than one module
+	(even of the same time) permanently linked. In future any code
+	using modules has to be conditionally compiled, such that is
+	only compiled if GLB_WO_MODULES is *not* defined.
+
+	Corrected a mistake in the Makefile in examples. The static
+	linkage case was wrong, why it worked in the first place I
+	don't know but the error made it break with above changes. Now
+	it works porperly.
+
+03/08/05 PH -- Fixed BUG#13. Now we use realloc, which makes the glbCopyXXX
+	functions pretty featureful and  should fix the memory leak.
+
+	Finally, GLoBES seems to build and run seemlessly under Cygwin/Windows.
+	However, without support for modules.
+
+	In glb_modules.c glb-modules.h is only included if GLB_WO_MODULES is not 
+	defined, thus avoiding a warning about the redefinition of GLB_MOD_NSP. 
+
+
+04/10/05
+******** Version 2.3.9
+	PH -- trying to produce a version which easily (!) can work
+	with condor and on FC.
+
+	Fixed a problem in libf2c/main.c, main was multiply defined. I
+	just made the code which creates this problem conditional. If
+	it turn out you need it define GLB_ORIG_F2C.
+
+	Changed examples/Makefile.in, uses now g++ for linking the
+	static example instead of gcc.
+
+05/10/05 PH -- added an explicit check for the gsl headers.
+
+	Changed the ordering of the libs in globes-config --libs, to match
+	what actually is needed.
+
+10/10/05 PH -- replaced the I/O related stuff in libf2c by a more recent 
+	version from gcc 3.4 in order to fix BUG#15
+
+17/10/05 JK
+        Renamed some of the functions in user_chi.c with more unambiguous
+        names
+
+26/11/05 JK -- Fixed problem in glb_shift_energy_scale (read beyond array boundaries)
+
+
+********Version 2.3.11
+
+10/12/05 PH -- Solved the "FATAL: empty" problem. The code no longer will 
+	abort when ITMAX in 'glb_min_sup.c' is exceeded. It will issue a warning
+	with glb_warning and a now meaningful error message. Warning are not
+	ouput by default but the verbosity level has to be high enough. Thus,
+	if glb_powell fails, the resuting chi^2 will be negative and if 
+	glb_powell2 fails (the usual culprit) the number of iterations, will be 
+	negative. Moreover ITMAX is now 5000.
+
+09/01/06 JK -- Some optimizations:
+       - Declared glb_window_function, errorf, likelihood, glb_list_likelihood, glb_prior
+         as inline
+       - Optimized glb_window_function (do as few comparisons as possible)
+       - Optimized glb_chi_sys_w_bg (use several for loops)
+       - Optimized glb_prior (save intermediate result)
+
+       Bugfix in glb_probability.cc: Initialization of amplitude matrix in
+       glb_probability_matrix was wrong (but seemed to cause no problems because
+       the C++ library automatically initializes objects of class complex)
+
+24/01/06 PH -- Fixed BUG#16
+
+********Version 2.3.12
+
+	PH -- while trying to solve a number of problem with the new
+	SuSE 10.0, I discovered a little flaw in
+	AM_PATH_GSL. Basically I had to add the --rpath stuff to make
+	sure GSL is found at run time even if it sits in a non-standard
+	place. Moreover 'libgfortran' should now be addded to 'LIBS'
+	in those cases where it is necessary. Tests seem to indicate
+	that globes is now SuSE 10.0 proof.
+
+07/02/06 PH -- added a new flag to 'globes' '-w', which gives list of
+	the oscillation probabilities for the central energy of each
+	bin for each channel. It is still experimental.
+
+21/02/06 PH -- added proper treatment of filtered constant density
+	probability to above feature.
+
+06/07/06 JK -- fixed energy_window bug in glb_parser.y
+
+
+********Version 2.3.13
+
+         JK -- Replaced glb_probability.cc completely:
+           - The new oscillation engine is based on an optimized algorithm for
+             the diagonalization of 3x3 matrices.
+           - There is only one function to set the oscillation parameters
+           - There is only one function to obtain oscillation probabilities
+           - These modifications required changes in glb_wrapper.c and glb_minimize.c.
+           - The functions glbSetFilter, glbGetFilter, glbSetFilterState, glbGetFilterState
+             are now deprecated
+
+         Removed all the LAPACK and libf2c stuff.
+
+         Written some test programs (new directory "testsuite"), along
+         with some scripts to automatically compile and run them, and
+         to compare the
+         results. See README file in the tesuite folder for details.
+
+          
+25/07/06 PH -- added globes.m4, which is useful for those who want to
+         use globes in their own projects using autotools
+
+
+*********Version 2.3.14
+
+01/08/06 PH -- added a fix for @energy_window and variable bin
+         width. This is a pretty serious bug since it may be hard to spot.
+
+08/08/06 JK -- corrected a bug in glb_33_zheev: double a[2] --> double a[3]
+         This might have caused segfaults in some situations.
+
+
+27/08/06 PH -- improved globes.m4. It now tries to link globes and
+	checks whether the version as returned by globes-config and the
+	library itself match. It now should be finished.
+
+
+*********Version 2.3.15
+
+15/09/06 PH -- removed module support. This brings a number of changes
+        and I am not sure whether all places have the necessary
+        updates. In any case, the directories 'libldtl' and 'modules'
+        are gone. The linking pattern for libglobes changed, now only
+        '-lglobes' is necessary (i.e. libglb died). Static linking is
+        greatly facilitated, in that case '-lstdc++' has to be
+        added by hand at the end of the linker command line. All other
+        changes should be self-explaining.
+
+20/09/06 PH -- added a number of features to AEDL. They are nicely
+       demonstrated (and documented) in 'examples/list.glb'. AEDL now
+       supports variables for lists and allows to thread functions over
+       lists. This was needed in order to have a half-way decent
+       implementation for interpolating functions. This new feature is
+       really nice, and allows to define efficencies, backgrounds
+       asf. *independently* of the binning. Moreover, I added simple
+       debugging functions to AEDL which allow to print out the values
+       of variables and list. I ran 'valgrind' (found and fixed a
+       minor memory leak). The new parser is clean, no memory leaks
+       (at least with my test case).
+
+15/11/2006 WW -- fixed problem in glb_lexer.c (incompatibility with new
+       flex version)
+
+
+*********Version 2.3.16
+
+27/11/2006 JK
+       - Renamed some of the glbChiXXX functions to avoid confusion.
+         The old versions are still available as wrappers in the new file
+         glb_compat.c
+       - Renamed the constants GLB_DM_SOL -> GLB_DM_21 and
+         GLB_DM_ATM -> GLB_DM_31. Old versions are still available for
+         compatibility.
+       - Modifed constant definitions in globes.h by using enum-constructs
+       - Applied the modification from 15/11/2006 also in glb_lexer.l
+       Verification: Examples still compile, testsuite programs 03/04/05/06
+         produce no errors.
+       - Introduced function glbConstantDensityProbability
+       Verification: Checked that glbConstantDensityProbability gives the
+         same results as glbProfileProbability with the same parameters
+
+28/11/2006 JK
+       - Introduced the following functions
+           glbGetRuleRatePtr
+           glbGetSignalRatePtr
+           glbGetBGRatePtr
+           glbGetSignalFitRatePtr
+           glbGetBGFitRatePtr
+           glbGetEfficiencyPtr
+           glbGetBackgroundPtr
+       - Introduced glbGetChannelRatePtr and glbGetChannelFitRatePtr
+         This required to promote chra/chrb to new arrays chra_0/chrb_0
+         and chra_1/chrb_1 storing the true and fitted rates separately.
+         The (now deprecated) function glbGetChannelRates will
+         always return the _true_ rates (in the past, the behavior of
+         this function was somewhat undefined after calls to glbChiXXX)
+       Verification: Checked that the functions are callable and produce
+         meaningful results.
+
+       - The above modification required some code duplication in
+         the rate engine. I used this chance to rewrite parts of
+         glb_rate_engine.c: The functions BinnedSignalB, CalcAllChannels,
+         and SmearAllChannels have been REMOVED. The respective code
+         is now directly in glb_set_rates and glb_set_new_rates.
+       - The arrays SignalRates and BackgroundRates in struct glb_experiment
+         hold now the "true" signal and background rates. In the past,
+         they were only used for intermediate results.
+       - Removed the following unused arrays form the rate engine
+         (and if necessary also from struct glb_experiment):
+           ratevec
+           ratevecBG
+           signal_prefactors
+           background_prefactors
+       - Removed the following unused functions from the rate engine
+           signal_parts
+           background_parts
+           binned_signal_parts
+           binned_background_parts
+           Returnglb_calc_signal_rates
+           Returnglb_calc_bg_rates
+           SmearRates
+       Verification: tesuite programs 03/04/06 produce no errors, 05
+         yields minor deviations which originate from different
+         compiler optimizations in the last loop of glb_set_rates.
+
+29/11/2006 JK
+       - Made GLB_OSCP a variable and introduced hooks for glb_probability_matrix,
+         glb_set_oscillation_parameters, and glb_get_oscillation_parameters.
+       Verification: Works with the standard probability code.
+         Has still to be verified for > 6 parameters.
+
+       - Modified definition of user-defined chi^2 functions. (exp, rule,
+           and n_params are parameters now)
+       - Work on chi^2/systematics stuff
+       Verification: only minimal deviations in testsuite 03/04/05/06,
+         which are due to varying compiler optimizations
+
+01/12/2006 JK
+       - First part of new systematics implemented:
+           * New AEDL directives sys_on_function/sys_off_function
+           * New functions glbDefineChiFunction/glbSetChiFunction
+           * Converted the (documented) old chi functions
+       - Removed the obsolete internal parts of the old systematics treatment
+       - Removed the now unused array chirate in glb_experiment
+       Verification: Testsuite
+
+07/12/2006 JK
+       - Introduced empty lists {} in AEDL
+       - Introduced new directives @sys_on_errors and @sys_off_errors
+       - Introduced C++-style ('//') comments in AEDL
+       - Removed bgtcenter, bgterror, buffer from struct glb_experiment
+       - Removed all undocumented chi^2 functions
+       - New functions glbGetEnergyWindow() and glbGetEnergyWindowBins()
+       - Re-implemented large parts of the systematics routines:
+           * Errors are kept in arrays of arbitrary length
+           * Old signal/bg error arrays do still exist, and for the
+             old (built-in) chi^2 functions, they are kept consistent
+             with the new error arrays
+           * removed errorf
+           * removed glb_window_function; energy window is now implemented
+             by modified loop boundaries
+           * Introduced new glbGet-functions for energy window
+           * All errors have central value 0 (this can always be achieved
+             by redefinition)
+           * The old bg_center is still valid, but only the built-in
+             chi^2 functions take it into account
+           * Modified all relevant glbSet/glbGet functions
+       - All internal chi^2 functions now use the new interface
+       Verifiation: Testsuite 03/04/05/06 yield only minor deviations, which
+         are expected due to the rearrangement of FP operations in the chi^2
+         functions
+         Various dedicated tests for the Set/Get-Functions etc.
+                    
+12/12/2006 JK
+       - Added example5
+       - Replaced calls to deprecated functions in the old examples
+       - Renamed systematics functions to glbChiXXX (I hope this does not
+         cause confusion with glbChiSys, glbChiTheta13, etc.)
+       - Now clipping energy window to emin/emax to prevent problems when using
+         glbGetEnergyWindowBins().
+       - Updated oscillation parameters (from hep-ph/0405172v5) in globes.c
+       - globes command now supports more than 6 oscillation parameters
+
+13/12/2006 JK
+       - Modified parameters of glbShiftEnergyScale (introduced emin, emax)
+       - New function glbGetEminEmax, required during chi^2 calculations
+       - Removed deprecated arrays rates1T and rates1BGT from glb_experiment
+       - Fixed BUG#11 (non-working "tilt")
+
+14/12/2006 JK
+       - Exchanged eigenvalue routine in glb_probability
+       - Probability engine is now in C99 instead of C++
+       - Removed C++ test from configure.in, added C99 test
+          ==> GLoBES will now be compiled with option -std=gnu99
+              This seems to make the compiler more picky in some respects
+       - Optimized chi^2 functions in example5
+       - Examples now compile with gcc (instead of g++)
+
+19/12/2006 JK
+       - Modifications to example5 (chi^2 is now compoletely based on the
+         appendix of hep-ph/0303232 and thus faster)
+       - New example6 --- Non-Standard-Interactions
+       - Modified @norm in Reactor1.glb and Reactor2.glb from 1.1584e-13
+         to 1.1584e-12
+
+20/12/2006 JK
+       - globes binary uses again the former oscillation parameters
+         (not the new ones from hep-ph/0405172v5) for comparability reasons
+       - struct glb_experiment now has a member filename, containing the name
+         of the AEDL file
+       - More detailed error messages in DefaultExp()
+       - Fixed two buffer overflows in glb_sys.c
+       - GLoBES now complains if a projection is incompletely defined, but
+         uses GLB_FREE as default as before (this was e.g. an error in
+         example2)
+       - Fixed segfault that occured during cleanup of the smearing matrix
+         e.g. if the version string was invalid
+ 
+30/12/2006 JK
+       - Fixed bug in glb_minimize.c: glbChiAll and glbChiTheta13Delta failing
+         to properly reset the projection when they are done
+       - Fixed bug in glb_multiex.c: GLoBES should not issue a warning if
+         density_center and density_error are not set, since there is no
+         possibility to set them in AEDL.
+       - GLoBES now complains if fit values, input errors, or central values are
+         incompletely defined. For the density fit/central values, only a
+         warning is issued, for all other parameters, it's an error. Nevertheless,
+         suitable defaults are used.
+       - Handling of input errors and central values in glb_minimize.c
+         has been greatly simplified.
+       - Implemented "hybrid" minimizer which interleaves minimization over
+         oscillation and systematics parameters, keeping the number of times
+         the event rates are re-computed as low as possible. This feature is
+         switches on by uncommenting the line
+           #define GLB_HYBRID_MINIMIZER
+         in glb_min_sup.h. 
+
+05/01/2007 PH
+       - Implemented 'nuflux' in AEDL which now uses the right
+       normalization, i.e. 1, for user-defined fluxes. This does aways
+       with the spurious factor of 5.1989. If an old file still uses
+       'flux' an error will be issued. The remainin task is now to
+       move all glb-files, which use user-defined fluxes to the new
+       'nuflux' form and to correctly multiply the normalization by
+       the above factor.
+       - In doing that, I discovered an unpleasant bug in glb_lexer.l,
+       which now is fixed. Look into the file if you want to know
+       more.
+
+
+08/01/2007 PH
+      - Adapted the AEDL list syntax as far as possible to the
+      suggestions made by various people. Have a look into
+      examples/list.glb. Most important changes are:
+	! -> %
+	!( , , | ) -> interpolation( , , , )
+	@xxx = copy(%list) -> @xxx := %list (the old syntax still
+	works, since sometimes one may really want to copy a list)
+
+      - Created glbDefineAEDLList(const char *name,double *list,
+      size_t length), which does what you would expect. Make sure to
+      define your "name" with a leading '%' otherwise you will get an
+      error.
+
+08/01/2007 JK
+       - Renamed glbGetNumberOfSimBins --> glbGetNumberOfSamplingPoints
+       - Added function glbSelectMinimizer
+       - Added user_data pointer to all user-defined functions
+
+08/01/2007 PH
+       - $version now mandatory in AEDL files, otherwise glb_fatal
+       will be called.
+
+       - Trying to a newer AEDL file than the release version will
+       produce an error, but the programm will continue.
+
+09/01/2007 PH
+       - Cleaning up globes.h, found a minor inconsistency in
+       glb_prior.h (the user_data stuff was missing). Removed all
+       hints of module functions in globes.h and few of those Joachim
+       has suggested.
+
+
+*********Version 2.4.0
+
+09/01/2007 PH
+	Perl extension are no longer built by default, only by user
+	request with '--enable-perl'.
+
+	Adapted 'globes-config' to a live without modules.
+
+	Changed the Makefile.in in examples to compile all targets by
+	default, not only example-tour in order to facilitate
+	testing. example-static is now compile without libtool, just
+	by using the '-static' flag to gcc.
+
+	Version 2.4.0 starts the pre-release series. The API is now
+	frozen and only bugfixes should happend from now on. In order
+	to facilitate testing, the version numbers should be increased
+	for *any* change like 2.4.x+1.
+
+	I updated the optional rpm building stuff.
+
+	I updated AUTHORS, TODO, README and INSTALL
+
+        
+*********Version 2.4.1
+
+10/01/2007 JK
+        Fixed memory leaks in glbDefineChiFunction and glb_init_probability_engine
+        
+
+*********Version 2.4.2
+10/01/2007 PH
+	Fixed a possible memory leak in glb_min_sup.c In reality this
+	may have been one of the rare cases where valgrind was
+	confused by our pointer arithmetic. On the other hand, I wrote
+	a test program epmloying the same tricks and this one valgrind
+	got right. Hence, I decided to 'fix' the problem, as result
+	the minimizer routines need a tiny bit (really only a few
+	bytes) more memory. I checked that the output of
+	'example-tour' stays the same, the only thing which changes is
+	the number of iterations, which goes up by a few.
+
+	'example-tour' and 'globes' now have a clean bill concerning
+	memory management. There are a few bytes left from parsing the
+	command line options in 'globes', but that should be of no
+	practical concern whatsoever.
+
+
+
+*********Version 2.4.3
+10/01/2007 PH
+	Fixed a small memory leak in glb_parser.y.
+
+
+11/01/2007 JK
+        - Fixed behaviour of tilt in the presence of variable bin widths
+        - Introduced lists of bin centers in glb_experiment
+        - Introduced API functions which returns pointers to arrays
+          of bin widths, sampling bin widths, bin central energies,
+          and sampling bin central energies.
+        Checked that the event rates behave as expected under the influence
+        of the tilt, and that example1 still gives correct results.
+
+*********Version 2.4.4
+11/01/2007 JK
+        Renamed AEDL function simbincenter to samplingbincenter and modified
+        list.glb accordingly.
+        
+*********Version 2.4.5
+11/01/2007 JK
+        - Modified treatment of functions introduced in v2.4.3 in such a way
+          that code doubling is avoided (removed lists of bin centers in
+          glb_experiment again, since they are already present in glb_smear)
+        - Cleaned up my debugging comments in globes.h and glb_probability.c
+        
+*********Version 2.4.6
+12/01/2007 MR
+        - new AEDL files included to data/ in directory tree
+	- AEDL files in examples/ interchanged and example files adapted
+
+*********Version 2.4.7
+12/01/2007 JK
+        - Update Makefile.am and Makefile.in in data/ directory
+        - examples now use the new AEDL files
+        
+*********Version 2.4.8
+14/01/2007 JK
+        - Fixed small bug in hybrid minimizer: Iteration counter was missing
+
+*********Version 2.4.9
+14/01/2007 JK
+        - Fixed small bug in globes.c: Non-standard parameters were not
+          initialized
+        - Moved some deprecated functions to the GLB_COMPAT section in globes.h
+
+*********Version 2.4.10
+15/01/2007 JK
+        - Added parameter max_len to glbGetChiFunction
+
+*********Version 2.4.11
+17/01/2007 JK
+        - Adjusted Makefile for new names of glb-Files in example-directory
+
+        
+*********Version 3.0.0
+17/01/2007 PH
+	- Release Version. Moved NEWS to OLDS. Fixed the bug Joachim mentioned.
+
+	- make distcheck works
+
+	- adjusted globes.spec.in to the new URL and email address
+
+	- make rpm works
+
+	-fixed the following things which turned up using '-W -Wall' as CFLAGS	
+		glb_minimize.c:225: warning: control reaches end of non-void function
+		glb_parser.y:1468: warning: too many arguments for format
+		glb_parser.y:1818: warning: unknown conversion type character 0xa in format
+		glb_wrapper.c:2098: warning: control reaches end of non-void function
+		glb_wrapper.c: In function `glbGetEnergyWindow':
+		glb_wrapper.c:2122: warning: control reaches end of non-void function
+		glb_wrapper.c: In function `glbGetEnergyWindowBins':
+		glb_wrapper.c:2146: warning: control reaches end of non-void function
+
+	- other warnings are mostly about unused variable/parameters
+	and comparisons between signed and unsigned int.
+
+	- for 3.0.1: would be nice clean up all the warnings issued by '-W -Wall'
+
+	- added a script called checksum, which is used to compute md5
+	sums of all glb and dat file in data
+
+	- added md5-sums in data, run 'md5sum -c md5-sums' and you
+	have a very easy check whether any of the input files have
+	changes. md5-sums is part of the distribution.
+
+	

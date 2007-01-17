@@ -1670,7 +1670,8 @@ void
 void glb_clean_up()
 {
   int i;
- for(i=0;i<32;i++) glbFreeExp(glb_experiment_list[i]);
+ 
+  for(i=0;i<32;i++) {glbFreeExp(glb_experiment_list[i]);}
  glbCleanSysList();
  glb_clean_parser();
  glb_lexer_cleanup();
@@ -2094,6 +2095,7 @@ glbGetEminEmax(int experiment, double *emin, double *emax)
   }
   else
     { glb_error("glbGetEminEmax: Invalid experiment number"); return -1; }
+  return 0;
 }
 
 
@@ -2118,6 +2120,8 @@ glbGetEnergyWindow(int experiment, int rule, double *low, double *high)
   }
   else
     { glb_error("glbGetEnergyWindow: Invalid experiment number"); return -1; }
+  return 0;
+
 }
 
 
@@ -2142,6 +2146,7 @@ glbGetEnergyWindowBins(int experiment, int rule, int *low, int *high)
   }
   else
     { glb_error("glbGetEnergyWindow: Invalid experiment number"); return -1; }
+  return 0;
 }
 
 

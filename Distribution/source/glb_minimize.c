@@ -222,6 +222,7 @@ int glb_init_minimizer()
     para_tab[i] = GLB_UNDEFINED;
   for (i=0; i < glbGetNumOfOscParams()+1; i++)
     s_para_tab[i] = GLB_UNDEFINED;
+  return 0;
 }
 
 
