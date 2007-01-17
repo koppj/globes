@@ -809,4 +809,8 @@ documented!
 15/01/2007 JK
         - Added parameter max_len to glbGetChiFunction
 
+*********Version 2.4.11
+17/01/2007 JK
+        - Adjusted Makefile for new names of glb-Files in example-directory
+
         
