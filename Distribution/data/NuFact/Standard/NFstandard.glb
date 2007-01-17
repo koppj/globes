@@ -21,7 +21,7 @@ $version="3.0.0"
  #*     SLACcitation  = "%%CITATION = HEP-PH 0204352;%%"
  #* }
  *
- * Last Update: 15/01/06
+ * Last Update: 17/01/06
  *
  */
  
@@ -93,9 +93,9 @@ cross(#NC)<
 
 /* ####### Energy dependent efficiencies ###### */
 
-%posteffs={0.071875,0.215625,0.359375,0.503125,0.646875,0.790625,0.934375,1.,1.}
+%posteffs={0.,1.,1.}
 
-%energ={5.15, 7.45, 9.75, 12.05, 14.35, 16.65, 18.95, 21.25, 48.85}
+%energ={4.,20.,50.}
 
 %bc=bincenter()
 
