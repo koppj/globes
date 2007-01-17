@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
   
   /* Initialize parameter vector(s) */
   glb_params true_values = glbAllocParams();
-  glb_params starting_values = glbAllocParams();
+  glb_params central_values = glbAllocParams();
   glb_params input_errors = glbAllocParams();
   glb_params deg_pos = glbAllocParams();
 
@@ -68,13 +68,13 @@ int main(int argc, char *argv[])
   glbSetRates();
 
   /* Find sgn-degeneracy */  
-  glbDefineParams(starting_values,theta12,theta13,theta23,deltacp,sdm,-ldm);  
-  glbSetDensityParams(starting_values,1.0,GLB_ALL);
+  glbDefineParams(central_values,theta12,theta13,theta23,deltacp,sdm,-ldm);  
+  glbSetDensityParams(central_values,1.0,GLB_ALL);
   glbDefineParams(input_errors,theta12*0.1,0,0,0,sdm*0.1,ldm/3);  
   glbSetDensityParams(input_errors,0.05,GLB_ALL);
-  glbSetCentralValues(starting_values);
+  glbSetCentralValues(central_values);
   glbSetInputErrors(input_errors);
-  double CL=glbChiAll(starting_values,deg_pos,GLB_ALL);
+  double CL=glbChiAll(central_values,deg_pos,GLB_ALL);
    
   printf("Position of degeneracy: s22th13=%g, deltacp=%g; Confidence level: %g \n",
     glbGetOscParams(deg_pos,GLB_THETA_13),glbGetOscParams(deg_pos,GLB_DELTA_CP),CL);
@@ -100,7 +100,7 @@ int main(int argc, char *argv[])
    
   /* Destroy parameter vector(s) */
   glbFreeParams(true_values);
-  glbFreeParams(starting_values); 
+  glbFreeParams(central_values); 
   glbFreeParams(input_errors); 
   glbFreeParams(deg_pos); 
   

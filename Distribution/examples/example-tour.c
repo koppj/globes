@@ -236,7 +236,7 @@ int main(int argc, char *argv[])
   fprintf(stream,"chi2 at minimum, L=3000km: %g \n",chi2);
   glbPrintParams(stream,minimum);  
   chi2=glbChiAll(minimum,minimum,GLB_ALL); 
-  fprintf(stream,"\nchi2 for combination at minimum of Exp. 1: %g \n",chi2);
+  fprintf(stream,"\nchi2 for combination at minimum of L=3000km: %g \n",chi2);
   glbPrintParams(stream,minimum);  
  
   /* Destroy parameter vector(s) */

@@ -95,7 +95,7 @@ electron neutrino as initial flavor:
  for(i=1;i<4;i++) fprintf(stream,"1->\%i: \%g",i, \\
  \hspace*{4cm} glbVacuumProbability(1,i,+1,50,3000)); \\ 
  fprintf(stream,"$\backslash$nOscillation probabilities in matter: ");\\
- for(i=1;i<4;i++) fprintf(stream,"1->\%i: \%g ",i,\\ \hspace*{4cm} glbProfileProbability(0,1,i,+1,50)); \\
+ for(i=1;i<4;i++) fprintf(stream,"1->\%i: \%g ",i,\\ \hspace*{4cm} glbProfileProbability(0,1,i,+1,50)); 
 }
 \go{
 Oscillation probabilities in vacuum: 1->1: 0.999955 1->2: 2.58628e-05 1->3: 1.92142e-05 \\
@@ -351,7 +351,7 @@ The sum of the two chi2s is 2.80173, whereas the total chi2 is 3.68133!
 }
 Now find the $\mathrm{sgn}(\ldm)$-degeneracy for the neutrino factory
 at the short baseline and test if it is still present in the combination of the
-experiments.
+two baselines:
 \gq{
  glbDefineParams(input\_errors,theta12*0.1,theta13,theta23, \\
  \hspace*{0.5cm} deltacp,sdm*0.1,ldm/3); \\
@@ -367,7 +367,7 @@ glbDefineParams(central\_values,theta12,theta13,theta23, \\
   glbPrintParams(stream,minimum);   \\
   \\
   chi2=glbChiAll(minimum,minimum,GLB\_ALL); \\
-  fprintf(stream,"$\backslash$nchi2 for combination at minimum of Exp. 1:\\ \hspace*{0.5cm} \%g $\backslash$n",chi2); \\
+  fprintf(stream,"$\backslash$nchi2 for combination at minimum of L=3000km:\\ \hspace*{0.5cm} \%g $\backslash$n",chi2); \\
   glbPrintParams(stream,minimum);  \\
 }
 \go{
@@ -376,7 +376,7 @@ chi2 at minimum, L=3000km: 4.82021  \\
 0.978867 1 \\
 Iterations: 3298 \\
 \\
-chi2 for combination at minimum of Exp. 1: 59.4879 \\
+chi2 for combination at minimum of L=3000km: 59.4879 \\
 0.599908 0.0172467 0.768342 1.39186 8.198e-05 -0.00189508 \\ 
 0.970733 1.17125 \\
 Iterations: 2327 \\
@@ -491,6 +491,7 @@ int main(int argc, char *argv[]) \\
 
 \begin{table}[tbp]
 \begin{center}
+{\small
 \begin{tabular}{llp{7.5cm}c}
 \hline
 Experiment & Filename & Short description &  Ref. \\[0.2cm]
@@ -556,6 +557,7 @@ with lower threshold and higher energy resolution & \cite{Huber:2002mx,Huber:200
 
 \hline
 \end{tabular}
+} % small
 \end{center}
 \mycaption{\label{tab:experiments} \index{norm}{Experiment files (table)}
 \index{norm}{glb files@{\tt glb}-files} 
@@ -1080,7 +1082,7 @@ A typical and fast application for \GLB{ChiSys} is the visualization of
 
 The resulting data can then be plotted as a contour plot (2 d.o.f.):
 \begin{center}
-\colorbox{white}{\includegraphics[width=8cm]{correx}}
+\colorbox{white}{\includegraphics[width=7.7cm]{correx}}
 \end{center}
 
 }
@@ -1732,8 +1734,8 @@ This example demonstrates how to project the fit manifold onto the $\stheta$-axi
 \hspace*{0.5cm} res2=glbChiTheta13(test\_values,NULL,GLB\_ALL); \\
   \\
 \hspace*{0.5cm} AddToOutput(x,res1,res2);\\
-  \} \\
-  
+  \} 
+
 }}
 \end{quote}
 The two lists of data then represent the $\stheta$ precisions with two-parameter correlations (gray-shaded) and multi-parameter correlations (arrows):

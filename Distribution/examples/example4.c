@@ -93,18 +93,18 @@ double CalcProjection(double theldm,double thex,glb_params start_vector)
   double thesign=Sign(glbGetOscParams(start_vector,GLB_DM_ATM));
 
   glb_params input_errors = glbAllocParams();
-  glb_params starting_values = glbAllocParams();
+  glb_params central_values = glbAllocParams();
   glb_params minimum = glbAllocParams();
 
   glbDefineParams(input_errors,theta12*0.1,0,0,0,sdm*0.1,theldm/3);  
   glbSetDensityParams(input_errors,0.05,GLB_ALL);
-  /* Set starting values to respective +-dm31^2 to avoid falling into unwanted solution;
+  /* Set central values to respective +-dm31^2 to avoid falling into unwanted solution;
      Note that the error on dm31^2 should not be too small in order to avoid large
      contributions from the priors */  
-  glbDefineParams(starting_values,theta12,theta13,
+  glbDefineParams(central_values,theta12,theta13,
                                    theta23,deltacp,sdm,theldm*thesign);
-  glbSetDensityParams(starting_values,1.0,GLB_ALL);
-  glbSetCentralValues(starting_values);
+  glbSetDensityParams(central_values,1.0,GLB_ALL);
+  glbSetCentralValues(central_values);
   glbSetInputErrors(input_errors);
 
   start_vector=glbSetOscParams(start_vector,thetheta13,GLB_THETA_13);
@@ -115,7 +115,7 @@ double CalcProjection(double theldm,double thex,glb_params start_vector)
   glbSetOscParams(start_vector,glbGetOscParams(minimum,GLB_DELTA_CP),GLB_DELTA_CP);
  
   glbFreeParams(input_errors);
-  glbFreeParams(starting_values);
+  glbFreeParams(central_values);
   glbFreeParams(minimum);
   
   return res; 
@@ -127,18 +127,18 @@ double FindDeg(glb_params deg_pos,double theldm)
   SetOscParams(theldm);
 
   glb_params input_errors = glbAllocParams();
-  glb_params starting_values = glbAllocParams();
+  glb_params central_values = glbAllocParams();
 
-  glbDefineParams(starting_values,theta12,theta13,theta23,deltacp,sdm,-theldm);  
-  glbSetDensityParams(starting_values,1.0,GLB_ALL);
+  glbDefineParams(central_values,theta12,theta13,theta23,deltacp,sdm,-theldm);  
+  glbSetDensityParams(central_values,1.0,GLB_ALL);
   glbDefineParams(input_errors,theta12*0.1,0,0,0,sdm*0.1,theldm/3);  
   glbSetDensityParams(input_errors,0.05,GLB_ALL);
-  glbSetCentralValues(starting_values);
+  glbSetCentralValues(central_values);
   glbSetInputErrors(input_errors);
-  double CL=glbChiAll(starting_values,deg_pos,GLB_ALL); 
+  double CL=glbChiAll(central_values,deg_pos,GLB_ALL); 
 
   glbFreeParams(input_errors);
-  glbFreeParams(starting_values);
+  glbFreeParams(central_values);
   return CL;
 }
 
