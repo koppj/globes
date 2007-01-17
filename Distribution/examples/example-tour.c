@@ -1,5 +1,5 @@
 /* GLoBES -- General LOng Baseline Experiment Simulator
- * (C) 2002 - 2004,  The GLoBES Team
+ * (C) 2002 - 2007,  The GLoBES Team
  *
  * GLoBES is mainly intended for academic purposes. Proper
  * credit must be given if you use GLoBES or parts of it. Please
@@ -36,11 +36,11 @@
 int main(int argc, char *argv[])
 {
   /* char* MYFILE=""; */ 
-  char* MYFILE="gl-tour.dat"; /* if empty, write to screen */
+  char* MYFILE=""; // "gl-tour.dat";    /* if empty, write to screen, otherwise to file name given here */
   FILE* stream;
   if(strlen(MYFILE)>0) stream=fopen(MYFILE, "w");
-  else stream = stdout;
-  stream=stdout;
+   else stream = stdout;
+
   /* Initialize libglobes */
   glbInit(argv[0]);
   
@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
   /* Initialize a number of parameter vector(s) */
   glb_params true_values = glbAllocParams();
   glb_params fit_values = glbAllocParams();
-  glb_params starting_values = glbAllocParams();
+  glb_params central_values = glbAllocParams();
   glb_params input_errors = glbAllocParams();
   glb_params minimum = glbAllocParams();
     
@@ -141,11 +141,11 @@ int main(int argc, char *argv[])
   /* Find position of sgn-degeneracy;  */
   glbDefineParams(input_errors,theta12*0.1,0,0,0,sdm*0.1,ldm/3);
   glbSetDensityParams(input_errors,0.05,GLB_ALL);
-  glbDefineParams(starting_values,theta12,theta13,theta23,deltacp,sdm,-ldm);
-  glbSetDensityParams(starting_values,1.0,GLB_ALL);
-  glbSetCentralValues(starting_values);
+  glbDefineParams(central_values,theta12,theta13,theta23,deltacp,sdm,-ldm);
+  glbSetDensityParams(central_values,1.0,GLB_ALL);
+  glbSetCentralValues(central_values);
   glbSetInputErrors(input_errors);
-  chi2=glbChiAll(starting_values,minimum,GLB_ALL); 
+  chi2=glbChiAll(central_values,minimum,GLB_ALL); 
   fprintf(stream,"chi2 at minimum: %g \n",chi2);
   fprintf(stream,"Position of minimum: theta12,theta13,theta23,delta,sdm,ldm,rho\n");
   glbPrintParams(stream,minimum);  
@@ -154,7 +154,7 @@ int main(int argc, char *argv[])
   /* Destroy parameter vectors, because they depend on no of exps */
   glbFreeParams(true_values);
   glbFreeParams(fit_values); 
-  glbFreeParams(starting_values);
+  glbFreeParams(central_values);
   glbFreeParams(input_errors);
   glbFreeParams(minimum);
 
@@ -177,7 +177,7 @@ int main(int argc, char *argv[])
 	/* Initialize a number of parameter vector(s) again */
   true_values = glbAllocParams();
   fit_values = glbAllocParams();
-  starting_values = glbAllocParams();
+  central_values = glbAllocParams();
   input_errors = glbAllocParams();
   minimum = glbAllocParams();
   glb_params minimum2 = glbAllocParams();
@@ -229,14 +229,14 @@ int main(int argc, char *argv[])
   /* Find sgn-degeneracies for both experiments and test if they are still there for comb. */
   glbDefineParams(input_errors,theta12*0.1,theta13,theta23,deltacp,sdm*0.1,ldm/3);
   glbSetDensityParams(input_errors,0.05,GLB_ALL);
-  glbDefineParams(starting_values,theta12,theta13,theta23,deltacp,sdm,-ldm);
-  glbSetDensityParams(starting_values,1.0,GLB_ALL);
+  glbDefineParams(central_values,theta12,theta13,theta23,deltacp,sdm,-ldm);
+  glbSetDensityParams(central_values,1.0,GLB_ALL);
   glbSetInputErrors(input_errors);
-  glbSetCentralValues(starting_values);
-  chi2=glbChiAll(starting_values,minimum,0); 
+  glbSetCentralValues(central_values);
+  chi2=glbChiAll(central_values,minimum,0); 
   fprintf(stream,"chi2 at minimum, L=3000km: %g \n",chi2);
   glbPrintParams(stream,minimum);  
-  chi2b=glbChiAll(starting_values,minimum2,1); 
+  chi2b=glbChiAll(central_values,minimum2,1); 
   fprintf(stream,"\nchi2 at minimum, L=7500km: %g \n",chi2b);
   glbPrintParams(stream,minimum2);  
   chi2=glbChiAll(minimum,minimum,GLB_ALL); 
@@ -249,7 +249,7 @@ int main(int argc, char *argv[])
   /* Destroy parameter vector(s) */
   glbFreeParams(true_values);
   glbFreeParams(fit_values); 
-  glbFreeParams(starting_values);
+  glbFreeParams(central_values);
   glbFreeParams(input_errors);
   glbFreeParams(minimum);
   glbFreeParams(minimum2);
