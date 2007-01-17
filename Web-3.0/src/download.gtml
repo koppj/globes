@@ -62,22 +62,6 @@ bugs and bug fixes is <a href="bugs.html">here</a>
   <li><a href="download/globes-2.0.0.tar.gz">globes-2.0.0.tar.gz</a> &nbsp;(Jul. 29, 2004)</li>
 </ul>
 
-
-<br>
-<h2>GLoBES Utilities</h2>
-Here we post some utilities, which might be useful together with GLoBES.
-<p>
-<table frame=all rules=all cellspacing=4 cellpadding=4>
-<tr>
-  <td>
-    <b>Mathematica notebook</b><br>
-    to convert the output of the examples to nice ps-figures
-  </td>
-  <td><a href="download/utilities/DocPlots.nb.gz">DocPlots.nb.gz</a></td>
-</tr>
-</table>
-
-
 <br>
 <h2>GLoBES - Pre-Defined Experiment Files</h2>
 The most important ingredient of GLoBES are adequate experiment descriptions. 
