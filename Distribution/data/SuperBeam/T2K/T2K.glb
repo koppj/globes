@@ -58,14 +58,14 @@ nuflux(#JHFplus)<
 	@flux_file="JHFplus.dat"
 	@time = 2	/* years */
 	@power = 0.77 	/* MW (proton intensity) */
-	@norm = 4.21988
+	@norm = 6.93185
 >
 
 nuflux(#JHFminus)<
 	@flux_file="JHFminus.dat"
 	@time = 6	/* years */
 	@power = 0.77 	/* MW (proton intensity) */
-	@norm = 4.21988
+	@norm = 6.93185
 >
 
 

@@ -1396,3 +1396,4 @@ documented!
 	- glb_fluxes.c modified: now contains exact beta beam spectrum
 		-> no normalization factor needed any more
 	- BBvar_WC.glb and BBvar_TASD.glb modified accordingly
+	- T2K.glb now has same @norm as T2HK.glb (matches Table 1, hep-ph/0204352)
