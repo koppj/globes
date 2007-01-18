@@ -1390,3 +1390,4 @@ documented!
 18/01/2007 JK
         - Updated copyright notices in all code files
         - Included (preliminary) title of Paper2 into README
+        - Removed #include <ltdl.h> from globes.c
