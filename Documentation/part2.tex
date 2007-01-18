@@ -552,7 +552,7 @@ The name of the flux {\tt \#name} will later be referred to in the channel defin
 \end{tabular}
 \end{center}
 \mycaption{\label{tab:binfluxes} Built-in fluxes currently supported by \GLOBES . For details on
-the beta beams, see \Ref~\cite{Huber:2005jk}. MR ABOUT BETA BEAMS: DOES THIS REALLY WORK FOR ALL ISOTOPES? IS THE DIFFERENCE BETWEEN 3 AND 4 CORRECTLY DESCRIBED? WHY IS THERE A NORMALIZATION FACTOR 50.9 IN THE FILES?}
+the beta beams, see \Ref~\cite{Huber:2005jk}. }
 \end{table}
 
 For a built-in neutrino source, one has to specify which
@@ -575,11 +575,26 @@ For example, two built-in neutrino factory fluxes are available: $\mu^+$-decay (
 \tb  @time = 8.0\\
 >}
 \end{quote}
-MR: SOME MORE ELABORATION AND AN EXAMPLE FOR THE BETA BEAMS MAY BE APPROPRIATE HERE [WW].
+%
+Furthermore, two beta beam neutrino fluxes are available: inverse beta decay ({\tt @builtin = 3}, \ie\ from the decay of
+$^{18}$Ne-isotopes) and beta decay ({\tt @builtin = 4}, \ie\ from the decay of $^{6}$He-isotopes). For a beta beam file, using
+the beta beam built-in fluxes, the end point energy of the decay ({\tt @end\_point}), the number of decays per year 
+({\tt @stored\_muons}), and the acceleration factor of the ions $\gamma$ ({\tt @gamma}) have to be specified. An example for
+setting up a beta beam neutrino flux from the decay of $^{18}$Ne isotopes is
+\begin{quote}
+{\tt nuflux(\#nu\_e\_flux)<\\
+\tb  @builtin = 3\\
+\tb  @gamma = 130.0\\
+\tb  @end\_point = 0.0034\\
+\tb  @stored\_muons = 2.2e+18\\
+\tb  @time = 4.0\\
+>}
+\end{quote}
 %
 \index{aedl}{nuflux@{\tt nuflux}!power@{\tt "@power}}
 \index{aedl}{nuflux@{\tt nuflux}!norm@{\tt "@norm}}
 \index{aedl}{nuflux@{\tt nuflux}!flux file@{\tt "@flux\_file}}
+%
 For a user-defined flux, one has to specify the file name:
 \begin{quote}
 {\tt nuflux(\#user)<}\\
