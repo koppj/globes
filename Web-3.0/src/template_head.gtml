@@ -68,9 +68,11 @@
           <tr>
             <<nav_entry(documentation.html,Documentation,<<mycolor4>>)>>
           </tr>
+<!--
           <tr>
             <<nav_entry(plans.html,Future Plans,<<mycolor5>>)>>
           </tr>
+-->
           <tr>
             <<nav_entry(credits.html,Credits,<<mycolor6>>)>>
           </tr>

@@ -50,12 +50,14 @@
             </td>
             <td bgcolor="#FF9933 ">&nbsp;</td>
           </tr>
+<!--
           <tr>
             <td>
               <a href="plans.html" class="navigation-otherpage">Future Plans</a>
             </td>
             <td bgcolor="#FFCC33 ">&nbsp;</td>
           </tr>
+-->
           <tr>
             <td>
               <a href="credits.html" class="navigation-otherpage">Credits</a>
@@ -127,7 +129,7 @@ neutrino oscillation experiments.
           calibration errors</li>
       <li>Different systematics modes, such as total rate or spectral analysis</li>
       <li>Arbitrary matter density profiles</li>
-      <li>Arbitrary fluxes and cross sections; built-in neutrino factory fluxes</li>
+      <li>Arbitrary fluxes and cross sections; built-in neutrino factory and beta beam fluxes</li>
       <li>Any number of signal-background-combinations and oscillation channels within
           one experiment</li>
       <li>...</li>
@@ -140,7 +142,7 @@ neutrino oscillation experiments.
       <li>Single and multiple experiment simulation (up to 32 experiments simultaneously)</li>
       <li>Low-level information: event rate vectors, oscillation probabilities etc.</li>
       <li>Simple Chi^2 for individual experiments and experiment combinations</li>
-      <li>Inclusion of systematics in Chi^2</li>
+      <li>Inclusion of arbitrary systematical errors in Chi^2</li>
       <li>Chi^2-Cuts through the n-dimensional fit manifold
         <br>Example for cut through manifold in theta13-deltacp-plane (including systematics):
         <p><img SRC="./images/correx.gif" ALT="Chi^2 cut: correlation between theta13 and deltacp" height=218 width=227>
@@ -167,10 +169,12 @@ neutrino oscillation experiments.
         and degenerate (gray curve) solution:
         <p><img SRC="./images/correntex.gif" ALT="Cut with degenerate solution included" height=218 width=227>
       </li>
-      <li>Inclusion of external input (such as for solar parameters)</li>
+      <li>Inclusion of arbitrary external input on the oscillation parameters through
+          the concept of user-defined priors</li>
       <li>Simulation of matter density uncertainties</li>
       <li>Run-time modification of experiment parameters: baseline, target mass,
           matter density profile etc.</li>
+      <li>Interface for the implementation of non-standard physics</li>
       <li>...</li>
     </ul>
     <p>
@@ -179,11 +183,11 @@ neutrino oscillation experiments.
   <li><b>GLoBES software package</b> features
     <ul>
       <li>User's interface (C library) for Linux</li>
-      <li>User's and AEDL manual (currently over 120 pages)</li>
+      <li>Detailed User's and AEDL manual</li>
       <li>Many examples for immediate compilation</li>
       <li>AEDL prototype files for conventional beams, superbeams, neutrino factories,
-          reactor experiments</li>
-      <li>A program to test and debug AEDL files</li>
+          beta beamd, reactor experiments</li>
+      <li>A standalone program to test and debug AEDL files</li>
       <li>Utilities</li>
     </ul>
     <p>
@@ -200,7 +204,7 @@ neutrino oscillation experiments.
     <tr>
       <td colspan="3" class="footline">
         <center>
-          Last modified: 15 Jan 2007, 23:05 CET
+          Last modified: 18 Jan 2007, 18:26 CET
         </center>
       </td>
     </tr>
