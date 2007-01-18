@@ -215,18 +215,20 @@ static double nufact_flux(glb_flux *data, double en, int polarity, int l, int an
   return ergebnis;
 }
 
-
 static double bb_spectrum(double gamma, double end_point, double enu)
 {
   double part;
   double result,root;
+  double gye,ye;
+  double baseline=1000.;
+  ye=GLB_ELECTRON_MASS/(end_point+GLB_ELECTRON_MASS);
+  gye=(1./60)*(sqrt(1-pow(ye,2))*(2-9*pow(ye,2)-8*pow(ye,4))+15*pow(ye,4)*log10(ye/(1-sqrt(1-pow(ye,2)))));
   part=enu/(2*gamma*(end_point+GLB_ELECTRON_MASS));
   if(part>=1) return 0.0;
   /*  sign is now correct */
-  root=(1-part)*(1-part) - (GLB_ELECTRON_MASS/(end_point+GLB_ELECTRON_MASS))
-    *(GLB_ELECTRON_MASS/(end_point+GLB_ELECTRON_MASS));
+  root=(1-part)*(1-part) - ye*ye;
   if(root<=0) return 0.0;
-  result=enu*enu/gamma*(1-part)*sqrt(root);
+  result=(1./PI/gye/pow(baseline,2))*(gamma*gamma/enu)*pow(part,3)*(1-part)*sqrt(root);
   return result;
 }
 
