@@ -1391,3 +1391,8 @@ documented!
         - Updated copyright notices in all code files
         - Included (preliminary) title of Paper2 into README
         - Removed #include <ltdl.h> from globes.c
+	
+18/01/2007 MR
+	- glb_fluxes.c modified: now contains exact beta beam spectrum
+		-> no normalization factor needed any more
+	- BBvar_WC.glb and BBvar_TASD.glb modified accordingly
