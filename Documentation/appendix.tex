@@ -442,13 +442,13 @@ L~=~295~km. The appearance measurement involves the total rates data from all CC
 from the QE sample with a free normalization at an energy resolution of $\mathrm{\sigma_e=0.085\, GeV}$ due to the
 Fermi Motion. The normalization of the QE samples is kept free in order to avoid double counting of events since all QE
 events are also contained in the CC samples. The free normalization is introduced within a rule with the line 
-{\tt \@signalerror = 10.:0.0001}. In case of systematics switched on the systematics functions {\tt chiSpectrumTilt}
+{\tt @signalerror = 10.:0.0001}. In case of systematics switched on the systematics functions {\tt chiSpectrumTilt}
 for the QE sample and {\tt chiTotalRatesTilt} for the CC sample are used. However, for systematics switched off, only the
 systematics function for the CC sample is changed to {\tt chiNoSysTotalRates}, but the systematics function for the QE
 sample stays {\tt chiSpectrumTilt}. Note, that otherwise the free normalization would be swiched off and all events from
 the QE sample would be counted twice. A detailed discussion of this QE/CC sample splitting can be found in~\cite{Huber:2002mx}. 
-For the disappearance channels only the QE sample is used since statistics is already quite large and a treatment like for the
-appearance channels would only shlightly modify the results. The quantitative treatment of systematics is similar to \cite{Ishitsuka:2005qi}. The following rules are 
+For the disappearance channels only the QE sample is used since statistics is already quite large and a treatment as for the
+appearance channels would only slightly modify the results. The quantitative treatment of systematics is similar to \cite{Ishitsuka:2005qi}. The following rules are 
 defined within {\tt T2K.glb}:  
 \begin{center}
 \begin{tabular}{|l|ll|c|c|}
@@ -565,8 +565,8 @@ The \SPL\ experiment uses a neutrino beam from the CERN to Fr\'{e}jus. The targe
 4~MV and 2~years $\nu$-running and 8~years $\bar{\nu}$-running 
 is assumed. The fiducial mass of the Water Cerenkov detector is taken to be 
 $\mathrm{m_{det} = 500 \,kt}$ at a baseline of L~=~130~km. The energy resolution is introduced manually by
-four migration matrices (for $\nu_e , \bar{\nu}_e ,\nu_{\mu} ,\bar{\nu}_\mu$) that describe energy smearing mainly
-from Fermi Motion. The following rules are defined within {\tt SPL.glb}: 
+four migration matrices (for $\nu_e , \bar{\nu}_e ,\nu_{\mu} ,\bar{\nu}_\mu$) that describe energy smearing 
+due to Fermi Motion. The following rules are defined within {\tt SPL.glb}: 
 \begin{center}
 \begin{tabular}{|l|ll|c|c|}
 \hline \hline
@@ -622,7 +622,7 @@ detector is assumed, a far detector at a baseline of L~=~1.7~km and a near detec
 assumed to be identical to the far detector (maybe apart from the size) in order to minimize the impact of systematical uncertainties. The normalization error
 used in the file {\tt Reactor1.glb} has to be considered as an effective error, receiving contributions from
 individual uncertainties (see~\cite{Huber:2003pm}). The energy resolution is
-$\mathrm{\sigma_e=5\%\cdot\sqrt{E_{vis}}}$ and the choice for {\tt sigma\_function} is {\tt \#inverse\_beta}. The following rules are defined within {\tt Reactor1.glb}: 
+$\mathrm{\sigma_e=5\%\cdot\sqrt{E_{vis}}}$ and the choice for {\tt @sigma\_function} is {\tt \#inverse\_beta}. The following rules are defined within {\tt Reactor1.glb}: 
 \begin{center}
 \begin{tabular}{|l|ll|c|c|}
 \hline \hline
@@ -667,7 +667,7 @@ considering a delayed start of data taking at the near detector the file {\tt D-
 modified. The cancellation of systematical uncertainties is considered by the manual definition of a $\chi^2$
 as described in \cite{Huber:2006vr} with the treatment of user-defined systematics as described in \Sec~\ref{sec:userchi}   
 The energy resolution is
-$\mathrm{\sigma_e=5\%\cdot\sqrt{E_{vis}}}$ and the choice for {\tt sigma\_function} is {\tt \#inverse\_beta}. The following rules are defined within {\tt D-Chooz\_near.glb} and {\tt D-Chooz\_far.glb}: 
+$\mathrm{\sigma_e=5\%\cdot\sqrt{E_{vis}}}$ and the choice for {\tt @sigma\_function} is {\tt \#inverse\_beta}. The following rules are defined within {\tt D-Chooz\_near.glb} and {\tt D-Chooz\_far.glb}: 
 \begin{center}
 \begin{tabular}{|l|ll|c|c|c|c|c|}
 \hline \hline
@@ -717,8 +717,8 @@ The acceleration factor is $\gamma=100$ for both types of isotopes and $2.2\cdot
 year and $5.8\cdot10^{18}$ $^{6}$He decays per year are assumed. The CERN-Fr\'{e}jus baseline is L~=~130~km, the
 fiducial mass of the detector is $\mathrm{m_{det} = 500 \,kt}$ and 4~years $\nu$-running and 4~years
 $\bar{\nu}$-running are assumed. The energy resolution is introduced manually by
-four migration matrices (for $\nu_e , \bar{\nu}_e ,\nu_{\mu} ,\bar{\nu}_\mu$) that describes energy smearing mainly
-from Fermi Motion. The following rules are defined within {\tt BB\_100.glb}:
+four migration matrices (for $\nu_e , \bar{\nu}_e ,\nu_{\mu} ,\bar{\nu}_\mu$) that describe the energy smearing 
+due to Fermi Motion. The following rules are defined within {\tt BB\_100.glb}:
 \begin{center}
 \begin{tabular}{|l|ll|c|c|}
 \hline \hline
@@ -946,7 +946,7 @@ NFstandard.glb}, the following additional files are required:
 \item {\tt XNC.dat} (neutral current cross sections)
 \ei
 The neutrino beam is produced by the decay of muons stored in a storage ring at a parent energy of
-$\mathrm{E_\mu = 50\,GeV}$. A number of $1.06\cdot10^{21}$ useful muon decays per year are assumed in each
+$\mathrm{E_\mu = 50\,GeV}$. A number of $1.06\cdot10^{21}$ useful muon decays per year is assumed in each
 polarity (corresponding to $5.3\cdot10^{20}$ useful muon decays per year and polarity for simultaneous operation
 with both polarities) and 4~years $\nu$-running and 4~years $\bar{\nu}$-running is
 assumed. The fiducial mass of the MID detector is taken to be $\mathrm{m_{det} = 50 \,kt}$ at a baseline of
@@ -989,8 +989,8 @@ NFvar.glb}, the following additional files are required:
 \ei
 and the values of the following {\sf AEDL}-Variables have to be set:
 \bi
-\item {\tt emax} (parent energy of the stored muons $\left[\mathrm{km}\right]$)
-\item {\tt BASELINE} (experiment baseline $\left[\mathrm{GeV}\right]$)
+\item {\tt emax} (parent energy of the stored muons $\left[\mathrm{GeV}\right]$)
+\item {\tt BASELINE} (experiment baseline $\left[\mathrm{km}\right]$)
 \ei
 The neutrino beam is produced by the decay of muons stored in a storage ring at a parent energy of
 $\mathrm{E_\mu =}$~{\tt emax}. The parent energy of the muons can be appropriately set in the range
@@ -1042,8 +1042,8 @@ NFvar\_GoldSilver.glb}, the following additional files are required:
 \ei
 and the values of the following {\sf AEDL}-Variables have to be set:
 \bi
-\item {\tt emax} (parent energy of the stored muons $\left[\mathrm{km}\right]$)
-\item {\tt BASELINE} (experiment baseline $\left[\mathrm{GeV}\right]$)
+\item {\tt emax} (parent energy of the stored muons $\left[\mathrm{GeV}\right]$)
+\item {\tt BASELINE} (experiment baseline $\left[\mathrm{km}\right]$)
 \ei
 The beam and golden channel attributes are similar to {\tt NFvar.glb}. The parent energy of the muons can be appropriately
 set in the range $\mathrm{10\,GeV\lesssim E_\mu\lesssim 80\, GeV}$ (technically it is possible to arrange {\tt emax} for $\mathrm{E_\mu=5\,
