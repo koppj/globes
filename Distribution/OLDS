@@ -1387,4 +1387,6 @@ documented!
 	have a very easy check whether any of the input files have
 	changes. md5-sums is part of the distribution.
 
-	
+18/01/2007 JK
+        - Updated copyright notices in all code files
+        - Included (preliminary) title of Paper2 into README
