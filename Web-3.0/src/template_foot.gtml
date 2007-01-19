@@ -6,7 +6,7 @@
     <tr>
       <td colspan="3" class="footline">
         <center>
-          Last modified: <<MTIMESTAMP>>
+          Last modified: <<TIMESTAMP>>
         </center>
       </td>
     </tr>

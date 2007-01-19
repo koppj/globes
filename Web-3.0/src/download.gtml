@@ -4,23 +4,9 @@
 
 #include "template_head.gtml"
 
-<h1>GLoBES Download</h1>
+<h1>Download</h1>
 
-<h2>Software Requirements</h2>
-GLoBES is currently available for Linux and Mac OS under the GNU Public License. 
-Building the GLoBES binaries requires that the following tools and libraries
-are installed:
-<ul>
-  <li>make and gcc</li>
-  <li><a href="http://www.gnu.org/software/gsl/">GNU Scientific Library</a></li>
-</ul>
-
-These tools are included in many Linux distributions. Otherwise they can
-easily be downloaded from the provided links. 
-
-
-<br>
-<h2>GLoBES Software Download</h2>
+<h2>GLoBES Software</h2>
 GLoBES can be downloaded as a single gzip-ed tar ball. The latest up-to-date
 version is here: 
 <ul>
@@ -46,7 +32,7 @@ unpacked.-->
   <li>Improved performance</li>
 </ul>
 
-<h3>Documentation</h3>
+<h3>Documentation and tutorials</h3>
 GLoBES documentation and related material can be found under the menu item 
 <a href="documentation.html">Documentation</a>.
 
@@ -55,6 +41,17 @@ The convention for the version number is as follows:<br>
 - the second digit is for changes when new features are introduced <br>
 - the last digit is for minor bug-fix releases. An up-to-date list of known
 bugs and bug fixes is <a href="bugs.html">here</a>
+
+<h3>Software Requirements</h3>
+GLoBES is currently available for Linux and Mac OS under the GNU Public License. 
+Building the GLoBES binaries requires that the following tools and libraries
+are installed:
+<ul>
+  <li>make and gcc</li>
+  <li><a href="http://www.gnu.org/software/gsl/">GNU Scientific Library</a></li>
+</ul>
+These tools are included in many Linux distributions. Otherwise they can
+easily be downloaded from the provided links. 
 
 <h3>Terms of Use</h3>
 GLoBES is released under the <a href="http://www.gnu.org/licenses/gpl.html">GNU
