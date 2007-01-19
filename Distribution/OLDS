@@ -1397,3 +1397,9 @@ documented!
 		-> no normalization factor needed any more
 	- BBvar_WC.glb and BBvar_TASD.glb modified accordingly
 	- T2K.glb now has same @norm as T2HK.glb (matches Table 1, hep-ph/0204352)
+
+**********Version 3.0.4
+
+19/01/2007 PH
+	- fixed a bug in the defintions parser of globes.c
+

@@ -66,7 +66,7 @@ static int parse_definition(const char *str)
   size_t c=0,vec=0;
   double *result=NULL;
   double res;
-  char *endp;
+  char *endp=NULL;
   char *wrk,*dummy;
   const char *delim="=";
   double val;
@@ -102,31 +102,31 @@ static int parse_definition(const char *str)
   dummy=glb_malloc((s+1)*sizeof(char));
   wrk=dummy;
   if(rhs[0]=='{' && rhs[s-1]=='}') {strncpy(wrk,&rhs[1],s);vec=1;wrk[s-2]='\0';}
-  else strncpy(wrk,&rhs[0],s);
-
+  else strncpy(wrk,&rhs[0],s+1);
+  
   while(wrk)
     {
-      errno=0;
+        errno=0;
       res=strtod(wrk,&endp);
      
       if(errno) {fprintf(stderr,"globes: ERROR: While parsing input the following"
 			 " error occured\nFATAL: '%s'\n",
                          strerror(errno));exit(1);}
-
-      if(endp&&strcmp(wrk,endp)==0) {break;}
+      c++;
+      result = (double* ) glb_realloc(result, c * sizeof(double));
+      result[c-1]=res;
   
+      if(strlen(endp)==0) {break;} /* stop if there is nothing left */
+ 
       wrk=endp;
       /* Eat up trailing white space */
       while(isspace(wrk[0])) wrk++;
       /* Take care of the separator */
       if(wrk[0]==','||wrk[0]=='\0') wrk++;
-      c++;
-      result = (double* ) glb_realloc(result, c * sizeof(double));
-      result[c-1]=res;
-     
+
     }
 
-
+  
   if(c==1&&vec==0&& lhs[0] != '\%') glbDefineAEDLVariable(lhs,result[0]);
   else if (c>0&&vec==1 && lhs[0] == '%') glbDefineAEDLList(lhs,result,c);
   else {fprintf(stderr,"globes: ERROR: Confusion about vector vs scalar definition.\n");c=0;}
