@@ -2,7 +2,6 @@
 
 # Redirect output to file
 set terminal postscript enhanced eps color
-set output "th13delta.eps"
 
 # Layout
 set contour base             # Draw contours on the base plane
