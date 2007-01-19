@@ -302,7 +302,7 @@ Version from \today\ for \GLOBES\ 3.0
 software package to simulate neutrino oscillation 
 long baseline and reactor experiments. On the
 one hand, it contains a comprehensive abstract experiment definition
-language (AEDL), which allows to describe most classes 
+language (\AEDL), which allows to describe most classes 
 of long baseline experiments
 at an abstract level. On the other hand, it provides a C-library to
 process the experiment information in order to obtain oscillation
@@ -319,6 +319,8 @@ atmosphere, can not be described. In addition, sources with a physically
 significant time dependence, such as supernov\ae, can not be studied. It 
 is, however, possible to simulate beams with bunch structure, since the 
 time dependence of the neutrino source is physically only important to suppress backgrounds. 
+Furthermore, experiments with discrete numbers of sources and detectors can
+be implemented by user-defined systematics in \GLOBES\ 3.0 and higher.
 
 On the experiment definition side, either built-in neutrino fluxes
 (\eg, neutrino factory, $\beta$-Beam) or arbitrary fluxes can be used. Similarly,
@@ -348,6 +350,12 @@ This approach allows the inclusion of multi-parameter-correlations,
 where external input (\eg, from solar experiments) can be imposed, too.
 Applications of the projection mechanism include the projections onto the $\stheta$-axis and the $\stheta$-$\deltacp$-plane. In addition, all oscillation parameters can be kept free to precisely localize 
 degenerate solutions.
+
+In the newest version \GLOBES\ 3.0 flexibility is introduced at all levels. At the probability level,
+the transition probabilities can be modified to introduce new physics. At the systematics level,
+user-defined systematical errors and correlations between sources or detectors can be simulated,
+and at the analysis level, arbitrary  input from external measurements can be added.
+Therefore, \GLOBES\ now provides solutions for new classes of problems.
 
 \chapter*{Terms of usage of \GLOBES}
 
@@ -391,16 +399,15 @@ from and if additional work has to be cited in addition to the
 \GLOBES\ papers~\cite{globes_paper,globes_paper_two}. To assist with this task, we provide  the necessary information for the data coming along together with \GLOBES.
 
 When using the built-in Earth matter density profile, the 
-original source is \Ref~\cite{Stacey}.
+original source is \Refs~\cite{Dziewonski:1981xy,Stacey}.
 
 All files ending with \verb+.dat+ or \verb+.glb+ 
-in the \verb+data+ subdirectory of the \GLOBES\ tar-ball have on top a comment field which clearly indicates which works should be
+in the \verb+data+ subdirectory of the \GLOBES\ tar-ball have on top a comment field which clearly indicates which studies should be
 cited when using a certain file. Make sure that dependencies are correctly
 tracked, \ie , in some cases files included by other files need to be 
 checked, too (for example, cross section or flux files). One can use 
-the \verb+-v3+ option to \verb+globes+ to see which files
-are included.
-
+the \verb+-v3+ option to the \verb+globes+ command to see which files
+are included (\cf, \Chapt~\ref{chap:exp_def}).
 It is recommended that you use the same style for your own input files, since then, in case they are distributed, everybody will know how to correctly reference your work.
 
 \chapter*{What is new in \GLOBES ?}
@@ -421,7 +428,7 @@ versions of \GLOBES .
 
 \begin{itemize}
  \item
-  User-defined systematics, which can be used to simulate reactor experiments \etc ; see \Sec~\ref{sec:userchi}
+  User-defined systematics, which can be used to simulate reactor experiments \etc ; see \Secs~\ref{sec:userchi}
 and~\ref{sec:rules}
  \item
   User-defined priors to include arbitrary external information in the $\chi^2$ before
@@ -433,7 +440,7 @@ marginalization over the oscillation parameters; see \Sec~\ref{sec:userdefined}
 \item
   Enhanced support for parallelization, such as Condor; see, \eg, page~\pageref{sec:condor}
 \item
-  Updated AEDL files; see \Tab~\ref{tab:experiments}
+  Updated \AEDL\ files; see \Tab~\ref{tab:experiments}
 \item
  New \AEDL\ features, such as the support of lists as variables and an interpolation
 routine; see \Sec~\ref{sec:advaedl}
@@ -450,15 +457,25 @@ the standard minimizer; see \Chapt~\ref{chapt:experimental}
 \subsection*{Major changes}
 
 Most of the modifications should not require that old pieces of software be changed. 
-However, the following changes are relevant:
+However, the following changes could be relevant:
 \begin{itemize}
 \item
- AEDL requires now that {\tt \$version} be used to define the minimum version number this AEDL
-file is to be used with. With this requirement one can easily avoid that new AEDL
+ \GLB{SetDensityParams} has to be used with \GLB{DefineParams} and \GLB{SetDensityProjectionFlag} together
+with \GLB{DefineProjection}, because unexpected pre-defined behavior should be avoided.
+\item
+ Functions \GLB{SetFilter}, \GLB{GetFilter}, \GLB{SetFilterState}, and \GLB{GetFilterState} replaced
+by functions {\tt ...InExperiment}.
+\item
+ \AEDL\ requires now that {\tt \$version} be used to define the minimum version number this \AEDL\
+file is to be used with. With this requirement one can easily avoid that new \AEDL\
 files with new features be used with old versions of \GLOBES\ which may not recognize these features.
 \item
- Some of the earlier AEDL files have been updated, changed names, or have been removed. In addition, new files have been added. Although old AEDL files will run as usual for compatibility, they will not be
-supported by the \GLOBES\ team anymore. You should make sure to keep these files when updating \GLOBES . 
+ Some of the earlier \AEDL\ files have been updated, changed names, or have been removed. In addition, new files have been added. Although old \AEDL\ files will run as usual for compatibility, they will not be
+supported by the \GLOBES\ Team anymore. You should make sure to keep these files when updating \GLOBES . 
+\item 
+ The implementation of the tilt (systematics) has slightly changed. The tilt also works for
+variable bin widths. Therefore, you will obtain slightly different results when you run
+the same \AEDL\ between older and newer versions of \GLOBES .
 \end{itemize}
 
 \subsection*{Minor changes}
@@ -586,6 +603,13 @@ For example, flux normalizations can with this tool be easily adjusted
 to reproduce the event rates of a specific experiment. It is described
 in the last chapter of \Part~\ref{part:2}.
 
+In this version of the manual, introductory topics and advanced topics are
+mixed if they belong to the same subject. Therefore, we have marked more
+advanced material by a star~($^*$). This material can be skipped in a first
+reading of the manual. In some cases, it may be even recommendable to do
+so because knowledge of \AEDL\ is required (which is introduced in
+the second part).
+
 % THE FOLLOWING HAS CHANGED: C99, COMPILED WITH GCC; MAYBE ONLY PROBLEMS WITH C89
 %
 % \paragraph{Note:} All examples for application software in C do require
@@ -638,7 +662,8 @@ for many years, to the ones who have been continuing asking for the
 publication of the software, and the referees of several of our
 papers for suggestions which lead to improvements in the software.
 
-This work and the development of \GLOBES\ have over the years been supported by:
+This work and the development of \GLOBES\ have over the years been supported by
+(in chronological order):
 \begin{itemize}
 \item Technische Universit\"at M\"unchen [All authors]
 \item Max-Planck-Institut f\"ur Physik, M\"unchen [PH]
@@ -672,7 +697,7 @@ der Deutschen Forschungsgemeinschaft [All authors]
 
 \printindex{constants}{API constants \& macros}
 
-\printindex{aedl}{AEDL reference}
+\printindex{aedl}{\AEDL\ reference}
 
 \printindex{norm}{Index}
 

@@ -403,6 +403,8 @@ A warning: not all \verb+configure+ scripts look for a site script.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Catalogue of {\sf AEDL}-Files}
 \label{app:aedlfiles}
+%\index{norm}{glb files@{\tt glb}-files} 
+
 Along with the \GLOBES\ package comes a catalogue of pre-defined experiment \AEDL\ files for different
 future experiments and different beam and detector technologies. These include the planned superbeam experiments
 and their possible upgrades, different reactor experiment setups, different $\beta$-beam setups, and different 
@@ -413,16 +415,19 @@ corresponding files, the assumptions, requirements, and references are given in 
 \section{Superbeam Experiments}
 
 \begin{center}
-\begin{tabular}{lllllll} 
+\begin{tabular}{lllllll}
+\hline 
 Experiment & File & Runtime & Power & Baseline & Detector & Mass \\ \hline \hline
-T2K & {\tt T2K.glb} & 2~yr $\nu$/6~yr $\bar{\nu}$ & 0.77~MW & 295~km & WC & 22.5~kt \\ \hline
-T2HK & {\tt T2HK.glb} & 4~yr $\nu$/4~yr $\bar{\nu}$ & 4~MW & 295~km & WC & 500~kt \\ \hline
-NO$\nu$A & {\tt NOvA.glb} & 3~yr $\nu$/3~yr $\bar{\nu}$ & 1.12~MW & 812~km & TASD & 25~kt \\ \hline
+T2K & {\tt T2K.glb} & 2~yr $\nu$/6~yr $\bar{\nu}$ & 0.77~MW & 295~km & WC & 22.5~kt \\ 
+T2HK & {\tt T2HK.glb} & 4~yr $\nu$/4~yr $\bar{\nu}$ & 4~MW & 295~km & WC & 500~kt \\ 
+NO$\nu$A & {\tt NOvA.glb} & 3~yr $\nu$/3~yr $\bar{\nu}$ & 1.12~MW & 812~km & TASD & 25~kt \\
 SPL & {\tt SPL.glb} & 2~yr $\nu$/8~yr $\bar{\nu}$ & 4~MW & 130~km & WC & 500~kt \\ 
+\hline
 \end{tabular}
 \end{center}
 
 \subsection*{T2K -- {\tt T2K.glb}}
+\index{aedl}{T2K.glb@{\tt T2K.glb}}
 
 The \TtoK\ experiment can be simulated with the file {\tt T2K.glb}. This file tries to approximate as closely as
 possible the LOI \cite{Itow:2001ee}, and the basic version was used within \cite{Huber:2002mx}. These references
@@ -445,7 +450,7 @@ events are also contained in the CC samples. The free normalization is introduce
 {\tt @signalerror = 10.:0.0001}. In case of systematics switched on the systematics functions {\tt chiSpectrumTilt}
 for the QE sample and {\tt chiTotalRatesTilt} for the CC sample are used. However, for systematics switched off, only the
 systematics function for the CC sample is changed to {\tt chiNoSysTotalRates}, but the systematics function for the QE
-sample stays {\tt chiSpectrumTilt}. Note, that otherwise the free normalization would be swiched off and all events from
+sample stays {\tt chiSpectrumTilt}. Note, that otherwise the free normalization would be switched off and all events from
 the QE sample would be counted twice. A detailed discussion of this QE/CC sample splitting can be found in~\cite{Huber:2002mx}. 
 For the disappearance channels only the QE sample is used since statistics is already quite large and a treatment as for the
 appearance channels would only slightly modify the results. The quantitative treatment of systematics is similar to \cite{Ishitsuka:2005qi}. The following rules are 
@@ -490,6 +495,7 @@ Beam background & $0.505 \, \otimes \, (\bar{\nu}_e\rightarrow \bar{\nu}_e)_\mat
 \end{center}
 
 \subsection*{T2HK -- {\tt T2HK.glb}}
+\index{aedl}{T2HK.glb@{\tt T2HK.glb}}
 
 \TtoHK\ is the superbeam upgrade of the \TtoK\ experiment and can be simulated with the file {\tt T2HK.glb}. 
 The target power is 4~MW and 
@@ -501,8 +507,9 @@ The basic version was used within \cite{Huber:2002mx} which should be cited if t
 used for a scientific publication or a talk. 
 
 \subsection*{NO$\nu$A -- {\tt NOvA.glb}}
+\index{aedl}{NOvA.glb@{\tt NOvA.glb}}
 
-The \NOVA\ experiment can be simulated with the file {\tt NOvA.glb}. The description of the disapperance 
+The \NOVA\ experiment can be simulated with the file {\tt NOvA.glb}. The description of the disappearance 
 channels is taken from \cite{Yang_2004} and the description of the appearance channels follows 
 the proposal \cite{Ambats:2004js}. These references
 should be cited if the file {\tt NOvA.glb} is used for a scientific publication or a talk. For calculations that
@@ -513,9 +520,9 @@ involve {\tt NOvA.glb}, the following additional files are required:
 \item {\tt XCC.dat} (charged current cross sections)
 \item {\tt XNC.dat} (neutral current cross sections)
 \ei
-The \NOVA\ experiment uses a neutrino beam from the Fermilab NuMI beamline. The target power is 
-1.12~MV which results in $10^{21}$~pot~$\mathrm{yr^{-1}}$ and 3~years $\nu$-running and 3~years $\bar{\nu}$-running 
-is assumed. The fiducial mass of the Totally Liquid Scintillator Detector (TASD) is taken to be 
+The \NOVA\ experiment uses a neutrino beam from the Fermilab NuMI beamline. The source power is $10^{21}$~pot~$\mathrm{yr^{-1}}$, corresponding to a (naively computed) target power of
+1.12~MW. For the running times, 3~years $\nu$-running and 3~years $\bar{\nu}$-running 
+are assumed. The fiducial mass of the Totally Liquid Scintillator Detector (TASD) is taken to be 
 $\mathrm{m_{det} = 25 \,kt}$ at a baseline of L~=~812~km approximately 12~km off-axis to the beamline. The
 energy resolution is $\mathrm{\sigma_e=10 \% \cdot \sqrt{E}}$ for electrons and  $\mathrm{\sigma_e=5 \% \cdot \sqrt{E}}$
 for muons. The following rules are defined within {\tt NOvA.glb}: 
@@ -546,6 +553,7 @@ Beam background & $0.12 \, \otimes \, (\bar{\nu}_e\rightarrow \bar{\nu}_e)_\math
 \end{center}
 
 \subsection*{SPL - {\tt SPL.glb}}
+\index{aedl}{SPL.glb@{\tt SPL.glb}}
 
 The \SPL\ experiment can be simulated with the file {\tt SPL.glb}. This file was used in \cite{Campagne:2006yx}
 and follows the experiment description from \cite{Mezzetto:2003mm, Campagne:2004wt}. These references
@@ -562,7 +570,7 @@ involve {\tt SPL.glb}, the following additional files are required:
 \item {\tt XNC\_spl.dat} (neutral current cross sections)
 \ei
 The \SPL\ experiment uses a neutrino beam from the CERN to Fr\'{e}jus. The target power is 
-4~MV and 2~years $\nu$-running and 8~years $\bar{\nu}$-running 
+4~MW and 2~years $\nu$-running and 8~years $\bar{\nu}$-running 
 is assumed. The fiducial mass of the Water Cerenkov detector is taken to be 
 $\mathrm{m_{det} = 500 \,kt}$ at a baseline of L~=~130~km. The energy resolution is introduced manually by
 four migration matrices (for $\nu_e , \bar{\nu}_e ,\nu_{\mu} ,\bar{\nu}_\mu$) that describe energy smearing 
@@ -597,15 +605,18 @@ Beam Background & $0.677 \, \otimes \, (\bar{\nu}_e \rightarrow \bar{\nu}_e )_\m
 
 \begin{center}
 \begin{tabular}{lllllll} 
+\hline
 Experiment & File & Runtime & th. Power & Baseline & Det. & Mass \\ \hline \hline
-Small & {\tt Reactor1.glb} & 5~yr $\bar{\nu}$ & 4~GW & 1.7~km & LS & 20~t \\ \hline
-Large & {\tt Reactor.glb} & 8~yr $\bar{\nu}$ & 10~GW & 1.7~km & LS & 100~t \\ \hline
-DoubleCHOOZ & {\tt D-Chooz\_near.glb} & 5~yr $\bar{\nu}$ & 2$\times$4.2~GW & 0.1~km & LS & 10.16~t \\ 
+Small & {\tt Reactor1.glb} & 5~yr $\bar{\nu}$ & 4~GW & 1.7~km & LS & 20~t \\ 
+Large & {\tt Reactor.glb} & 8~yr $\bar{\nu}$ & 10~GW & 1.7~km & LS & 100~t \\
+Double Chooz & {\tt D-Chooz\_near.glb} & 5~yr $\bar{\nu}$ & 2$\times$4.2~GW & 0.1~km & LS & 10.16~t \\ 
  & {\tt D-Chooz\_far.glb} & 5~yr $\bar{\nu}$ & 2$\times$4.2~GW & 1.05~km & LS & 10.16~t \\ 
+\hline 
 \end{tabular}
 \end{center}
 
 \subsection*{Small Reactor Experiment -- {\tt Reactor1.glb}}
+\index{aedl}{Reactor1.glb@{\tt Reactor1.glb}}
 
 The file {\tt Reactor1.glb} allows to simulate a small $\bar{\nu}_e$-disappearance reactor experiment. The basic
 version of this file was used within \cite{Huber:2003pm} which should be cited if the file {\tt Reactor1.glb} is
@@ -616,12 +627,14 @@ additional files are required:
 \item {\tt XCCreactor.dat} (charged current cross sections for low energies)
 \ei
 The neutrino source is the core of a nuclear power reactor. The integrated luminosity is assumed to be
-$\mathrm{\mathcal{L} = 400 \,t \, GW\, yr}$, \eg\ a 20~t detector, a reactor with a thermal power of 4~GW
+$\mathrm{\mathcal{L} = 400 \,t \, GW\, yr}$, such as for a 20~t detector, a reactor with a thermal power of 4~GW,
 and a running period of 5 years. As detector technology, a liquid scintillator 
 detector is assumed, a far detector at a baseline of L~=~1.7~km and a near detector which is
-assumed to be identical to the far detector (maybe apart from the size) in order to minimize the impact of systematical uncertainties. The normalization error
+assumed to be identical to the far detector (maybe apart from the size) in order to minimize the impact of systematical uncertainties. The near detector is simulated implicitly by lower effective systematical errors,
+and there are no external backgrounds assumed.
+The normalization error
 used in the file {\tt Reactor1.glb} has to be considered as an effective error, receiving contributions from
-individual uncertainties (see~\cite{Huber:2003pm}). The energy resolution is
+individual uncertainties (see \Ref~\cite{Huber:2003pm}). The energy resolution is
 $\mathrm{\sigma_e=5\%\cdot\sqrt{E_{vis}}}$ and the choice for {\tt @sigma\_function} is {\tt \#inverse\_beta}. The following rules are defined within {\tt Reactor1.glb}: 
 \begin{center}
 \begin{tabular}{|l|ll|c|c|}
@@ -635,6 +648,7 @@ $10^{-6}$ & $10^{-6}$ \\ \hline \hline
 \end{center}
 
 \subsection*{Large Reactor Experiment -- {\tt Reactor2.glb}}
+\index{aedl}{Reactor2.glb@{\tt Reactor2.glb}}
 
 The file {\tt Reactor2.glb} allows to simulate a large $\bar{\nu}_e$-disappearance reactor experiment. The basic
 version of this file was used within \cite{Huber:2003pm} which should be cited if the file {\tt Reactor2.glb} is
@@ -643,9 +657,12 @@ $\mathrm{\mathcal{L} = 8000 \,t \, GW\, yr}$, \eg\ a 100~t detector, a reactor w
 and a running period of 8 years. Besides the higher integrated luminosity, the attributes of {\tt Reactor2.glb}
 are similar to the ones of {\tt Reactor1.glb}.
 
-\subsection*{DoubleCHOOZ -- {\tt D-Chooz\_near.glb} and {\tt D-Chooz\_far.glb}}
+\subsection*{Double Chooz -- {\tt D-Chooz\_near.glb} and {\tt D-Chooz\_far.glb}}
+\index{aedl}{D-Chooznear.glb@{\tt D-Chooz\_near.glb}}
+\index{aedl}{D-Choozfar.glb@{\tt D-Chooz\_far.glb}}
 
-The files {\tt D-Chooz\_near.glb} and {\tt D-Chooz\_far.glb} allow to simulate the \DC\ reactor experiment in France. 
+The files {\tt D-Chooz\_near.glb} and {\tt D-Chooz\_far.glb} allow to simulate the \DC\ reactor experiment in France. They require user-defined systematics and \GLOBES\ 3.0 or higher, where the user-defined
+systematics function can be found in the header of  {\tt D-Chooz\_near.glb} or {\tt example5.c}.
 The basic versions of these files were used within \cite{Huber:2006vr}, which should be cited if the files 
 {\tt D-Chooz\_near.glb} and {\tt D-Chooz\_far.glb} are
 used for a scientific publication or a talk. For calculations that involve {\tt D-Chooz\_near.glb} and/or {\tt D-Chooz\_far.glb}, the following
@@ -684,15 +701,18 @@ Background & neglected & (sys. dominates) & -- & -- & -- & -- & -- \\ \hline \hl
 
 \begin{center}
 \begin{tabular}{lllllll} 
+\hline 
 Experiment & File & Runtime & $\gamma$ & Baseline & Det. & Mass \\ \hline \hline
-Low $\gamma$ & {\tt BB\_100.glb} & 4~yr $\nu$/4~yr $\bar{\nu}$ & 100 & 130~km & WC & 500~kt \\ \hline
-Medium $\gamma$ & {\tt BB\_350.glb} & 4~yr $\nu$/4~yr $\bar{\nu}$ & 350 & 730~km & WC & 500kt \\  \hline
-Variable & {\tt BBvar\_WC.glb} & 4~yr $\nu$/4~yr $\bar{\nu}$ & variable & variable & WC & 500~kt \\  \hline
-Variable & {\tt BBvar\_TASD.glb} & 4~yr $\nu$/4~yr $\bar{\nu}$ & variable & variable & TASD & 50~kt \\ 
+Low $\gamma$ & {\tt BB\_100.glb} & 4~yr $\nu$/4~yr $\bar{\nu}$ & 100 & 130~km & WC & 500~kt \\ 
+Medium $\gamma$ & {\tt BB\_350.glb} & 4~yr $\nu$/4~yr $\bar{\nu}$ & 350 & 730~km & WC & 500kt \\
+Variable $\gamma$ & {\tt BBvar\_WC.glb} & 4~yr $\nu$/4~yr $\bar{\nu}$ & variable & variable & WC & 500~kt \\  
+Variable $\gamma$ & {\tt BBvar\_TASD.glb} & 4~yr $\nu$/4~yr $\bar{\nu}$ & variable & variable & TASD & 50~kt \\ 
+\hline 
 \end{tabular}
 \end{center}
 
 \subsection*{CERN-Fr\'{e}jus Baseline Scenario -- {\tt BB\_100.glb}}
+\index{aedl}{BB100.glb@{\tt BB\_100.glb}}
 
 The $\gamma=100$ $\beta$-beam baseline scenario from CERN to Fr\'{e}jus can be simulated with the file {\tt
 BB\_100.glb}. The basic version of this file was used within \cite{Campagne:2006yx}. This reference
@@ -744,6 +764,7 @@ Atm. background & & (from external file) & 0.02 & $10^{-4}$ \\ \hline \hline
 \end{center}
 
 \subsection*{Higher Gamma Scenario -- {\tt BB\_350.glb}}
+\index{aedl}{BB350.glb@{\tt BB\_350.glb}}
 
 A $\gamma=350$ medium gamma $\beta$-beam scenario involving a megaton Water Cerenkov detector can be simulated with the file {\tt
 BB\_350.glb}. This file tries to approximate as closely as possible the scenario {\sf Setup III} from
@@ -770,7 +791,7 @@ fiducial mass of the detector is $\mathrm{m_{det} = 500 \,kt}$ and 4~years $\nu$
 $\bar{\nu}$-running are assumed. The energy resolution is introduced manually by
 six migration matrices (for $\nu_e , \bar{\nu}_e ,\nu_{\mu} ,\bar{\nu}_\mu$, and the background from NC events
 for $^{18}$Ne and $^6$He) that describes energy smearing. These migration matrices also already include energy
-dependend efficiencies and background rejection factors. They are taken from the appendix of
+dependent efficiencies and background rejection factors. They are taken from the appendix of
 \cite{Burguet-Castell:2005pa}. The following rules are defined within {\tt BB\_350.glb}:
 \begin{center}
 \begin{tabular}{|l|ll|c|c|}
@@ -797,6 +818,7 @@ Background & $1.0 \, \otimes \, (\bar{\nu}_e \rightarrow \bar{\nu}_x)_\mathrm{NC
 \end{center}
 
 \subsection*{Variable Beta Beam (Water Cerenkov) -- {\tt BBvar\_WC.glb}}
+\index{aedl}{BBvarWC.glb@{\tt BBvar\_WC.glb}}
 
 A variable $\beta$-beam scenario involving a megaton Water Cerenkov detector can be simulated with the file 
 {\tt BBvar\_WC.glb}. The basic file was used within \cite{Huber:2005jk}. This reference
@@ -870,6 +892,7 @@ Background & $0.0025 \, \otimes \, (\bar{\nu}_e \rightarrow \bar{\nu}_x)_\mathrm
 \end{center}
 
 \subsection*{Variable Beta Beam (TASD) -- {\tt BBvar\_TASD.glb}}
+\index{aedl}{BBvarTASD.glb@{\tt BBvar\_TASD.glb}}
 
 A variable $\beta$-beam scenario involving a \NOVA-like TASD detector can be simulated with the file 
 {\tt BBvar\_TASD.glb}. The basic file was used within \cite{Huber:2005jk}. This reference
@@ -924,21 +947,27 @@ Background & $0.001 \, \otimes \, (\bar{\nu}_e \rightarrow \bar{\nu}_x)_\mathrm{
 
 \section{Neutrino Factory Experiments}
 
+{\small
 \begin{center}
-\begin{tabular}{lllllll} 
+\begin{tabular}{lllllll}
+\hline 
 Experiment & File & Runtime & $\mathrm{E_\mu}$ & Baseline & Det. & Mass \\ \hline \hline
-Standard & {\tt NFstandard.glb} & \begin{tabular}{l}4~yr $\nu$ \\ 4~yr $\bar{\nu}$\end{tabular} & 50~GeV & 3000~km & \begin{tabular}{l}MID\end{tabular} & \begin{tabular}{l}50~kt\end{tabular} \\ \hline
-Variable & {\tt NFvar.glb} & \begin{tabular}{l}4~yr $\nu$ \\ 4~yr $\bar{\nu}$\end{tabular} & variable & variable & \begin{tabular}{l}MID\end{tabular} & \begin{tabular}{l}50~kt\end{tabular} \\ \hline
-Silver & {\tt NF\_GoldSilver.glb} & \begin{tabular}{l}4~yr $\nu$ \\ 4~yr $\bar{\nu}$\end{tabular} & variable & variable
-&\begin{tabular}{l}MID\\ECC\end{tabular}&\begin{tabular}{l}50~kt\\5~kt\end{tabular}\\ \hline
-Hybrid & {\tt NF\_hR\_lT.glb} & \begin{tabular}{l}4~yr $\nu$ \\ 4~yr $\bar{\nu}$\end{tabular} & variable & variable & \begin{tabular}{l}Hybrid\end{tabular} & \begin{tabular}{l}50~kt\end{tabular} \\ 
+Standard & {\tt NFstandard.glb} & \begin{tabular}{l}4~yr $\nu$ \\ 4~yr $\bar{\nu}$\end{tabular} & 50~GeV & 3000~km & \begin{tabular}{l}MID\end{tabular} & \begin{tabular}{l}50~kt\end{tabular} \\ 
+Variable $E_\mu$ & {\tt NFvar.glb} & \begin{tabular}{l}4~yr $\nu$ \\ 4~yr $\bar{\nu}$\end{tabular} & variable & variable & \begin{tabular}{l}MID\end{tabular} & \begin{tabular}{l}50~kt\end{tabular} \\ 
+Gold+Silver & {\tt NF\_GoldSilver.glb} & \begin{tabular}{l}4~yr $\nu$ \\ 4~yr $\bar{\nu}$\end{tabular} & variable & variable
+&\begin{tabular}{l}MID\\ECC\end{tabular}&\begin{tabular}{l}50~kt\\5~kt\end{tabular}\\
+Hybrid det. & {\tt NF\_hR\_lT.glb} & \begin{tabular}{l}4~yr $\nu$ \\ 4~yr $\bar{\nu}$\end{tabular} & variable & variable & \begin{tabular}{l}Hybrid\end{tabular} & \begin{tabular}{l}50~kt\end{tabular} \\ 
+\hline
 \end{tabular}
 \end{center}
+}
 
 \subsection*{Standard Neutrino Factory -- {\tt NFstandard.glb}}
+\index{aedl}{NFstandard.glb@{\tt NFstandard.glb}}
 
 A standard neutrino factory scenario can be simulated with the file {\tt NFstandard.glb}. The basic version was
-used within \cite{Huber:2002mx} (NuFact-II scenario). This reference should be cited if the file {\tt
+used within \cite{Huber:2002mx} (NuFact-II scenario, but some changes in normalization errors). 
+This reference should be cited if the file {\tt
 NFstandard.glb} is used for a scientific publication or a talk. For calculations that involve {\tt
 NFstandard.glb}, the following additional files are required:
 \bi
@@ -976,7 +1005,8 @@ Background &  $5.0\cdot 10^{-6} \, \otimes \, (\nu_\mu \rightarrow \nu_x)_\mathr
 \end{tabular}
 \end{center}
 
-\subsection*{Variable Feutrino Factory -- {\tt NFvar.glb}}
+\subsection*{Variable $\boldsymbol{E_\mu}$ Neutrino Factory -- {\tt NFvar.glb}}
+\index{aedl}{NFvar.glb@{\tt NFvar.glb}}
 
 A variable neutrino factory scenario can be simulated with the file {\tt NFvar.glb}. The basic version was
 used within \cite{Huber:2006wb} and follows the neutrino factory scenarios from \cite{Huber:2002mx}. These
@@ -989,18 +1019,14 @@ NFvar.glb}, the following additional files are required:
 \ei
 and the values of the following {\sf AEDL}-Variables have to be set:
 \bi
-\item {\tt emax} (parent energy of the stored muons $\left[\mathrm{GeV}\right]$)
-\item {\tt BASELINE} (experiment baseline $\left[\mathrm{km}\right]$)
+\item {\tt emax} (parent energy of the stored muons $\left[\mathrm{km}\right]$)
+\item {\tt BASELINE} (experiment baseline $\left[\mathrm{GeV}\right]$)
 \ei
 The neutrino beam is produced by the decay of muons stored in a storage ring at a parent energy of
 $\mathrm{E_\mu =}$~{\tt emax}. The parent energy of the muons can be appropriately set in the range
-$\mathrm{10\,GeV\lesssim E_\mu\lesssim 80\, GeV}$ (technically it is possible to arrange {\tt emax} for $\mathrm{E_\mu=5\,
-GeV}$). The baseline of the scenario is L~=~{\tt BASELINE} and has to be chosen within the interval $\mathrm{1\,km\lesssim\, L \, \lesssim\, 2\cdot R_{EARTH}}$. 
+$\mathrm{10\,GeV\lesssim E_\mu\lesssim 80\, GeV}$. The baseline of the scenario is L~=~{\tt BASELINE} and has to be chosen within the interval $\mathrm{1\,km\lesssim\, L \, \lesssim\, 2\cdot R_{EARTH}}$. 
 Besides these settings the other attributes of {\tt NFvar.glb} are similar to the ones from {\tt
-NFstandard.glb}. Only the treatment of the disappearance channels is different. Whereas the CID threshold is
-also applied in the disappearance channels of {\tt NFstandard.glb}, this is not the case for the disapperance
-channel definition within {\tt NFvar.glb}, where no CID is applied, and a threshold similar to the threshold of
-the MINOS experiment \cite{Ables:1995wq} is applied. The following rules are defined within
+NFstandard.glb}. Only the treatment of the disappearance channels is different. In the disappearance channels of {\tt NFstandard.glb}, the charge identification is used to reduce the background from the appearance neutrinos. In {\tt NFvar.glb}, however, a threshold similar to the MINOS experiment~\cite{Ables:1995wq} is applied and the appearance and disappearance rates are assumed to be indistinguishable for the disappearance channel. The following rules are defined within
 {\tt NFvar.glb}:
 \begin{center}
 \begin{tabular}{|l|ll|c|c|}
@@ -1028,6 +1054,7 @@ Background &  $5.0\cdot 10^{-6} \, \otimes \, (\nu_\mu \rightarrow \nu_x)_\mathr
 \end{center}
 
 \subsection*{Variable Feutrino Factory with Silver Channel -- \\{\tt NF\_GoldSilver.glb}}
+\index{aedl}{NFGoldSilver.glb@{\tt NF\_GoldSilver.glb}}
 
 A variable neutrino factory scenario that includes the golden and silver appearance channels can be 
 simulated with the file {\tt NF\_GoldSilver.glb}. The basic version was
@@ -1066,6 +1093,7 @@ Background & $3.1\cdot 10^{-8} \, \otimes \, (\nu_e \rightarrow \nu_e)_\mathrm{C
 \end{center}
 
 \subsection*{High Resolution/Low Threshold Neutrino Factory -- \\{\tt NF\_hR\_lT.glb}}
+\index{aedl}{NFhRlT.glb@{\tt NF\_hR\_lT.glb}}
 
 A variable neutrino factory hybrid detector scenario can be simulated with the file {\tt NF\_hR\_lT.glb}. The basic version was
 used within \cite{Huber:2006wb} and follows the neutrino factory scenarios from \cite{Huber:2002mx}. These
@@ -1115,7 +1143,7 @@ Background &  $1.0 \, \otimes \, (\nu_\mu \rightarrow \nu_x)_\mathrm{NC}$ & (ene
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\chapter{Flux normalization in \GLOBES }
+\chapter{Flux normalization in \GLOBES $^*$ }
 \index{norm}{Normalization of fluxes}
 \label{app:flux}
 
@@ -1136,7 +1164,7 @@ but also on relatively arbitrary decisions. For accelerator beams
 based on pion decay, one frequently defines the beam luminosity in
 {\it protons on target (pot)} since this number has a one-to-one
 correspondence with the number of neutrinos produced. Another sensible
-unit could be {\it megawatt on target (MW)}, again this number is directly
+unit could be {\it megawatts on target (MW)}, again this number is directly
 correlated with the number of neutrinos and moreover there is a unique
 relation to {\it pot} for a given accelerator. Of course,
 what matters is the integrated luminosity. In some  cases the
