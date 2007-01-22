@@ -151,10 +151,6 @@ TUM-HEP-656/07\\
 {\begin{center}
 {\Large\bf New features in the simulation of neutrino oscillation experiments with GLoBES 3.0}
 
-(Alternative: ``GLoBES 3.0: From the simulation of non-standard physics to user-defined systematics'')
-
-(Alternative: ``GLoBES 3.0: Simulation of non-standard physics and multi-source multi-detector
-setups'')
 
 \end{center}}
 {\begin{center}
@@ -209,12 +205,12 @@ setups'')
 
 \begin{abstract}
 We present Version 3.0 of the GLoBES (``General Long Baseline Experiment Simulator'') software, which is
-a simulation tool for short- and long-baseline neutrino oscillation experiments. As new features, \GLOBESN\ allows the simulation of experiments with multiple discrete sources and detectors by the 
-concept of user-defined systematics.
+a simulation tool for short- and long-baseline neutrino oscillation experiments. As new features, \GLOBESN\ allows for user-defined systematical errors, which can also be used to simulate experiments with
+multiple discrete sources and detectors.
 In addition, the combination with external information, such as from different experiment classes, is 
-simplified by the concept of user-defined priors. As far as the probability calculation is concerned, \GLOBES\ 
+simplified. As far as the probability calculation is concerned, \GLOBES\ 
 now provides an interface for the inclusion of non-standard physics without re-compilation of the software. 
-The set of experiment descriptions coming with \GLOBES\ has been updated. For example, built-in fluxes are now
+The set of experiment prototypes coming with \GLOBES\ has been updated. For example, built-in fluxes are now
 provided for the simulation of beta beams.
 \end{abstract}
 
@@ -233,7 +229,7 @@ provided for the simulation of beta beams.
 
 Neutrino oscillations are now established as the leading flavor
 transition mechanism for neutrinos in a long history of many experiments, see
-\eg , \Ref~\cite{Barger:2003qi}. Future facilities, using accelerator-based
+\eg\ \Ref~\cite{Barger:2003qi} and references therein. Future facilities, using accelerator-based
  neutrino beams or nuclear reactors as neutrino sources, are proposed
 for precision measurements of the neutrino oscillation parameters. In the
 simulation of these experiments, 
@@ -338,14 +334,14 @@ This approach allows the inclusion of multi-parameter-correlations,
 where external constraints (\eg, on the solar parameters) can be imposed, too.
 Applications of the projection mechanism include the projections onto 
 the $\stheta$-axis and the $\stheta$-$\deltacp$-plane. In addition, 
-all oscillation parameters can be kept free to precisely localize 
+all oscillation parameters can be kept free to numerically localize 
 degenerate solutions.
 
 \section{Oscillation probabilities and the simulation of non-standard physics}
 
 The probability calculation in \GLOBES\ is based on the diagonalization of the
 Hamiltonian in layers of constant matter density using the standard three flavor
-scenario of neutrino oscillations. In the flavor basis, we have
+scenario of neutrino oscillations. In the flavor base, we have
 \begin{equation}
 \mathcal{H}(n_e) = \frac{1}{2E} \, U \,
 \left(
@@ -374,7 +370,7 @@ $n^k_e$ and thicknesses $x_i$, the oscillation probability then evaluates to
 P(\nu_\alpha \rightarrow \nu_\beta) = \left| \langle \nu_\beta | \mathcal{E}(n^k_e, x_k) \hdots  \mathcal{E}(n^1_e, x_1) | \nu_\alpha \rangle \right|^2
 \label{equ:probs}
 \end{equation}
-with the evolution operators (CORRECT REFERENCE?)
+with the evolution operators (see, \eg, \Ref~\cite{Ohlsson:1999um})
 \begin{equation}
   \mathcal{E}(n^k_e, x_k) = \exp \left( -i \mathcal{H}(n^k_e) x_k \right) = \frac{1}{2E} \, \hat{U}(n^k_e) \, \left( \begin{array}{ccc}
 e^{-i \, m_1^k \, x_k} & 0 & 0 \\
@@ -386,14 +382,17 @@ e^{-i \, m_1^k \, x_k} & 0 & 0 \\
 Here the Hamiltonian $\mathcal{H}(n^k_e)$ is diagonalized by the unitary mixing matrix in matter $\hat{U}(n^k_e)$
 with the eigenvalues $m_1^k$, $m_2^k$, and $m_3^k$. The probabilities in \equ{probs} are used for the
 event rate computation, which is described in greater detail in \Ref~\cite{Huber:2004ka}. In the next section,
-we will demonstrate how systematics is implemented thereafter.
+we will demonstrate how systematics is implemented.
 
 \begin{figure}[t]
 \begin{center}
 \includegraphics[width=8cm]{reactorNSI}
 \end{center}
 \mycaption{\label{fig:reactorNSI} Fit in the $\stheta$-$\sigma_E$-plane for the simulated values
-$\stheta=\sigma_E=0$ (figure similar to \Ref~\cite{Blennow:2005yk}). Here $\sigma_E$ is an additional non-standard parameter describing the wave packet width of the neutrino oscillation wave packet. The figure is computed with
+$\stheta=\sigma_E=0$ (figure similar to \Ref~\cite{Blennow:2005yk}). Here $\sigma_E$ is an additional non-standard parameter describing the wave packet width of the neutrino oscillation wave packet. If this parameter is
+kept free (vertical axis), the $\stheta$ sensitivity (horizontal axis) will be affected. Note that
+the standard $\stheta$ sensitivity is given by the curves for $\sigma_E \equiv 0$.
+The figure is computed with
 {\tt example6.c} coming with the \GLOBESN\ distribution (and higher).}
 \end{figure}
 
@@ -401,7 +400,7 @@ $\stheta=\sigma_E=0$ (figure similar to \Ref~\cite{Blennow:2005yk}). Here $\sigm
 re-compilation of the \GLOBES\ software. This is implemented
 by using pointers to the functions of the standard probability engine, which can be changed by
 registering a different probability engine. For example, a user may just copy the standard probability
-engine of \GLOBES , modify it, and register it. An important prerequisite for the ability to handle
+engine of \GLOBES , modify it, and register it. An important prerequisite is the ability to handle
 more than the standard six oscillation parameters (plus matter density) $\boldsymbol{\lambda}=(\theta_{12},\theta_{13}, \theta_{23}, \deltacp, \sdm, \ldm, \rho)$, \ie,
 \begin{equation}
 \boldsymbol{\lambda}=(\theta_{12},\theta_{13}, \theta_{23}, \deltacp, \sdm, \ldm, \rho, \eta_1, \hdots, \eta_n)
@@ -420,10 +419,13 @@ For example, non-standard Hamiltonian effects in the $e$-$\tau$-sector may be in
 \label{equ:nsi}
 \end{equation}
 In this case, there are two more real parameters, such as the absolute value and phase of $\epsilon_{e \tau}$.
-In the literature, the non-standard physics feature in \GLOBES\ as experimental feature has been used for damping effects (such as neutrino decoherence, decay, \etc) in \Ref~\cite{Blennow:2005yk}, Hamiltonian-level effects (such as non-standard matter effects) in \Ref~\cite{Blennow:2005qj}, and mass-varying neutrinos in \Ref~\cite{Schwetz:2005fy} by implementing an environment dependence of neutrino mass.  ANY OTHERS (PH!)?
+In the literature, the non-standard physics feature in \GLOBES\ as experimental feature has been used for damping effects (such as neutrino decoherence, decay, \etc) in \Ref~\cite{Blennow:2005yk}, Hamiltonian-level effects (such as non-standard matter effects) in \Ref~\cite{Blennow:2005qj}, and mass-varying neutrinos in \Ref~\cite{Schwetz:2005fy} by implementing an environment dependence of neutrino mass. 
 We show in \figu{reactorNSI} a result from \Ref~\cite{Blennow:2005yk} provided as {\tt example6.c} in the \GLOBES\
-distribution. Compared to \equ{nsi}, the underlying physics takes place at the probability level, \ie, 
-\equ{probs} (for details, see \Ref~\cite{Blennow:2005yk}). In {\tt example6.c}, an analytical implementation
+distribution. In this case, the non-standard physics is a loss of coherence in neutrino oscillations
+described by an intrinsic width of the mass eigenstate wave packets $\sigma_E$ (in energy space).
+Compared to \equ{nsi}, the underlying physics takes place at the probability level, \ie, 
+\equ{probs}, and it can be easily implemented analytically (for details, see \Ref~\cite{Blennow:2005yk}). 
+In {\tt example6.c}, an analytical implementation
 of this physics is used for simplicity.
 
 \section{Systematics implementation and user-defined systematics}
@@ -461,9 +463,6 @@ a signal normalization error only, it reads
        (1 + a) T_{i} \log \frac{(1 + a) T_{i}}{O_{i}}  \right) + \frac{a^2}{\sigma_a^2} 
 \label{equ:chistandard}
 \end{equation}
-(JK/PH: CHECK THIS EQUATION IF THIS IS THE ACTUAL IMPLEMENTATION. HERE THE SYSTEMATICS IS\\
-IMPLEMENTED IN THE SIMULATED RATES. IN ADDITION, CHECK IF THEORETICAL AND EXP. RATES
-ARE CORRECTLY GIVEN. [WW])
 
 Let us assume that we have two detectors, such as for a reactor experiment with a near and
 far detector. Using standard systematics in \GLOBES , one has
@@ -481,10 +480,7 @@ In this case, the normalization between the two detectors will be uncorrelated.
 \begin{center}
 \includegraphics[width=9cm]{reactor}
 \end{center}
-\mycaption{\label{fig:reactor} Luminosity scaling of the $\stheta$ sensitivity for different systematical error assumptions (90\% confidence level, figure similar to \Ref~\cite{Huber:2006vr}). The thick curve corresponds to \equ{chi2reactor} for $\sigma_R=\sigma_{\mathrm{corr}}=2.8\%$, $\sigma_N=\sigma_F=\sigma_{\mathrm{uncorr}}=0.6\%$ and an additional calibration error. The figure is computed with {\tt example5.c} provided with the \GLOBES\ software.
- MISLEADING: WHY IS THE LUMINOSITY
-OF THE ``FAR DETECTOR'' ON THE X-AXIS? SHOULD THIS NOT BE THE SAME AS THE ONE FOR THE NEAR DETECTOR? 
-AT LEAST IF I INTERPRET THE CODE CORRECTLY [WW]}
+\mycaption{\label{fig:reactor} Luminosity scaling of the $\stheta$ sensitivity for different systematical error assumptions (90\% confidence level, figure similar to \Ref~\cite{Huber:2006vr}). The thick curve corresponds to \equ{chi2reactor} for $\sigma_R=\sigma_{\mathrm{corr}}=2.8\%$, $\sigma_N=\sigma_F=\sigma_{\mathrm{uncorr}}=0.6\%$ and an additional calibration error. The figure is computed with {\tt example5.c} provided with the \GLOBES\ software.}
 \end{figure}
 
 Using \GLOBESN\ and higher, one can modify the standard $\chi^2$ function in
@@ -496,19 +492,21 @@ and two fiducial volume errors of the near $\sigma_N$ and far $\sigma_F$ detecto
 Then \equ{chistandard} will be replaced by
 \begin{align}
   \chi^2(\boldsymbol{\lambda},a_N,a_F,a_R) = & \sum_{i=1}^{\textrm{\# of bins}} \sum_{d = N,F} 2
-     \left( O_{d,i} - (1 + a_R + a_d) T_{d,i} + \right. \nonumber \\
+     \Big( O_{d,i} - (1 + a_R + a_d) T_{d,i} +  \nonumber \\
 & \left. + (1 + a_R + a_d) T_{d,i} \log \frac{(1 + a_R + a_d) T_{d,i}}{O_{d,i}}  \right) 
           + \frac{a_R^2}{\sigma_R^2} + \frac{a_N^2}{\sigma_N^2} + \frac{a_F^2}{\sigma_F^2}
 \label{equ:chi2reactor}
 \end{align}
-HOW CAN ONE MAKE THE LEFT BRACKET LARGER? [WW]
 This function can be defined with user-defined systematics. Similarly, calibration errors, shape
 errors, uncorrelated bin-to-bin errors, \etc , can be introduced. We show in \figu{reactor} the result of
 such a calculation, where the thick curve corresponds to \equ{chi2reactor} plus an additional 
-energy calibration error.
+energy calibration error.\footnote{In fact, \figu{reactor} was computed with Gaussian statistics for
+efficiency reasons, whereas \GLOBES\ internally uses Poissonian statistics as a standard; see \Ref~\cite{Manual}.}
 Furthermore, more complicated setups using multiple discrete sources and detectors can be simulated. For details, we refer to the manual~\cite{Manual}.
 In the past, user-defined systematics has (as experimental feature) been used in \Ref~\cite{Huber:2006vr} to
-simulate Double Chooz and in \Ref~\cite{Barger:2006kp} to simulate T2KK. ANYTHING ELSE? [WW]
+simulate Double Chooz, in \Ref~\cite{Barger:2006kp} to simulate T2KK, and in
+\Ref~\cite{Kopp:2006mw} to simulate various reactor experiment setups and complicated
+ backgrounds from geoneutrinos. 
 
 In summary, \GLOBES\ currently supports the following systematics $\chi^2$ functions:
 \begin{description}
@@ -519,7 +517,7 @@ In summary, \GLOBES\ currently supports the following systematics $\chi^2$ funct
 \item[{\tt chiTotalRatesTilt}]
  Total rates only, signal and background normalization errors and tilts 
 \item[{\tt chiSpectrumOnly}]
- Spectrum only, no other systematics 
+ Spectrum only (free signal normalization), no other systematics 
 \item[{\tt chiNoSysTotalRates}]
  Total rates only, no systematics
 \item[{\tt chiSpectrumCalib}]
@@ -539,7 +537,10 @@ a subspace. For example, if one wants to compute the $\stheta$ precision,
 one scans the $\stheta$ direction and marginalizes for each fixed $\stheta$
 over the other oscillation parameters. This marginalization is performed
 after the systematics $\chi^2_{\mathrm{pull}}$ in \equ{chipull} (or similar) 
-has been determined:
+has been determined:\footnote{The marginalization order systematics - correlations
+is, strictly speaking, not valid anymore for the new hybrid minimizer provided
+with \GLOBESN\ as an experimental feature. However, we keep this description
+for pedagogical reasons.}
 \begin{equation}
  \chi^2_{\mathrm{proj}}(\boldsymbol{\lambda_1}) := \min_{\{ \boldsymbol{\lambda_2} \} } \left( \, \chi^2_{\mathrm{pull}} (\boldsymbol{\lambda_1} , \boldsymbol{\lambda_2} ) \, \right) \, .
 \label{equ:margin}
@@ -572,7 +573,7 @@ Instead of \equ{priors}, we then have
 \end{equation}
 One can easily imagine that this simple concept allows for a high degree of freedom. Examples where
 this feature has been used as an experimental feature are the combination of terrestrial neutrino
-data with the information from neutrino telescopes~\cite{Winter:2006ce} and the combination of long-baseline data with atmospheric neutrino data~\cite{Huber:2005ep,Campagne:2006yx} (CORRECT?).
+data with the information from neutrino telescopes~\cite{Winter:2006ce} and the combination of long-baseline data with atmospheric neutrino data~\cite{Huber:2005ep,Campagne:2006yx}.
 Another very interesting option is the use of penalties in degeneracy localization, as suggested by Thomas
 Schwetz. For example, if the minimizer runs into the wrong octant, user-defined priors can be
 used to add a penalty and prevent it from doing so.
@@ -604,7 +605,7 @@ detector & \cite{Huber:2006vr} \\
 \multicolumn{4}{l}{\underline{Beta beams:}} \\
 Low $\gamma$ & {\tt BB\_100.glb} & $\gamma=100$ CERN to Fr\'{e}jus 
 scenario & \cite{Campagne:2006yx} \\
-Medium $\gamma$ & {\tt BB\_350.glb} & $\gamma=350$ green field scenario 
+Medium $\gamma$ & {\tt BB\_350.glb} & $\gamma=350$ ``refurbished SPS'' scenario (or other accelerator)
 & \cite{Burguet-Castell:2005pa} \\
 Variable $\gamma$ & {\tt BBvar\_WC.glb} & Variable $\gamma$ beta beam with water Cherenkov detector, $50 \lesssim \gamma \lesssim 500$ & \cite{Huber:2005jk} \\[0.2cm]
 	& {\tt BBvar\_TASD.glb} & Variable $\gamma$ beta beam with totally active scint. detector (TASD), 
@@ -628,9 +629,6 @@ Pre-defined experiment prototypes coming with \GLOBESN : The columns represent t
 a short description, and the references in which the files are originally used and 
 discussed (except for minor modifications, such as a different implementation of 
 the energy threshold function). 
-%
-IS THE GAMMA=350 OPTION REALLY GREEN-FIELD? I THOUGHT THAT THIS MAY BE THE MAXIMUM
-ONE COULD GET OUT OF THE SPS WITH ACCELERATOR MODIFICATIONS? [WW]
 }
 \end{table}
 
@@ -739,9 +737,6 @@ has been pushed to the edge. \Ref~\cite{Huber:2006wb} is probably the currently
 most demanding product of \GLOBES , for which most of these features
 have been developed.
 
-PH, JK: IS THERE ANYTHING ELSE YOU WANT TO SAY? ABOUT NEW PLATFORMS,
-PERL, WINDOWS, PERFORMANCE, 64BIT, INSTALLATION?
-
 \section{Summary and conclusions}
 
 We have presented \GLOBESN , which is a simulation software for 
@@ -766,9 +761,10 @@ In conclusion, \GLOBESN\ provides a number of new improvements, such as by
  including more flexibility. At the end, the developers of a software can never
 exactly foresee what the users are up for, and therefore flexible concepts
 allow for more space in problem realizations. In this version of \GLOBES ,
-three new such flexible concepts have been introduced: User-defined systematics,
-user-defined priors, and user-defined oscillation probabilities. These approaches
-will make an easy adjustment of the software possible for both experimentalists and theorists.
+three new such flexible concepts have been introduced: user-defined oscillation 
+probabilities, user-defined systematics, and user-defined priors. These approaches
+will make an easy adjustment of the software possible for both experimentalists and theorists,
+and will allow for flexibility at all levels.
 Finally, note that the past has shown that there is often more than one possibility 
 how a specific problem can be implemented in \GLOBES .
 
