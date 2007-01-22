@@ -17,14 +17,14 @@
   if ("<<FILENAME>>" eq "filename")                                         \
   {                                                                         \
     return("<td bgcolor=\"rgbcolor\">\n\
-              <a href=\"filename\" class=\"navigation-thispage\">label</a>\n\
+              <a href=\"<<HTML_PATH>>/filename\" class=\"navigation-thispage\">label</a>\n\
             </td>\n\
             <td bgcolor=\"rgbcolor\">&nbsp;</td>");\
   }                                                                         \
   else                                                                      \
   {                                                                         \
     return("<td>\n\
-              <a href=\"filename\" class=\"navigation-otherpage\">label</a>\n\
+              <a href=\"<<HTML_PATH>>/filename\" class=\"navigation-otherpage\">label</a>\n\
             </td>\n\
             <td bgcolor=\"rgbcolor\">&nbsp;</td>");\
   }                                                                         \

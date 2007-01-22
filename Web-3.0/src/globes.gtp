@@ -17,6 +17,7 @@ define DESCRIPTION GLoBES - A software tool for the simulation of future long ba
 
 // Define project files that GTML should process
 define CSS_PATH    .
+define HTML_PATH   .
 define IMG_PATH    ./images
 ./index.gtml
 ./features.gtml
@@ -28,6 +29,7 @@ define IMG_PATH    ./images
 ./impressum.gtml
 
 define CSS_PATH    ..
+define HTML_PATH   ..
 define IMG_PATH    ../images
 ./glb/BB350.gtml
 ./glb/BBvarTASD.gtml
