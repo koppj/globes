@@ -1,4 +1,4 @@
-define TITLE       GLoBES - Pre-defined AEDL-Files
+#define TITLE       GLoBES - Pre-defined AEDL-Files
 #define KEYWORDS    GLoBES, AEDL, glb, experiment, definitions, download, long, baseline, neutrino, oscillation 
 #define DESCRIPTION Details about pre-defined AEDL Files for GLoBES
 

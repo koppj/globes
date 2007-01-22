@@ -21,7 +21,7 @@ define IMG_PATH    ./images
 ./index.gtml
 ./features.gtml
 ./download.gtml
-./documentation.gtml
+./experiments.gtml
 ./plans.gtml
 ./credits.gtml
 ./contact.gtml
