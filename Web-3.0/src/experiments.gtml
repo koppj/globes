@@ -14,7 +14,7 @@ list. Please mail to
 <a href="mailto:globes@mpi-hd.mpg.de?SUBJECT=glb-files">globes@mpi-hd.mpg.de</a>
 
 <p>
-<table frame=all rules=all cellspacing=4 cellpadding=4>
+<table frame="all" rules="all" cellspacing="4" cellpadding="4">
   <colgroup>
     <col width="180">
     <col width="350">
@@ -71,7 +71,7 @@ list. Please mail to
   <tr>
     <td><b>Reactor-I</b></td>
     <td>Small reactor experiment, <b>L</b> = 400 t GW yr</td>
-    <td><a href="glb/Reactor1.html">Description and Download</td>
+    <td><a href="glb/Reactor1.html">Description and Download</a></td>
   </tr>
   <tr>
     <td><b>Reactor-II</b></td>
@@ -87,14 +87,14 @@ list. Please mail to
 </p>
 
 <p>
-<table frame=all rules=all cellspacing=4 cellpadding=4>
+<table frame="all" rules="all" cellspacing="4" cellpadding="4">
   <colgroup>
     <col width="180">
     <col width="350">
     <col width="130">
   </colgroup>
   <tr>
-    <td colspan=3 align=center> <font size=+2 >&beta;-Beams</font></td>
+    <td colspan="3" align="center"> <font size="+2">&beta;-Beams</font></td>
   </tr>
   <tr>
     <td><b>low gamma</b></td>
@@ -132,14 +132,14 @@ list. Please mail to
 </p>
 
 <p>
-<table frame=all rules=all cellspacing=4 cellpadding=4>
+<table frame="all" rules="all" cellspacing="4" cellpadding="4">
   <colgroup>
     <col width="180">
     <col width="350">
     <col width="130">
   </colgroup>
   <tr>
-    <td colspan=3 align=center> <font size=+2 >Neutrino factories</font></td>
+    <td colspan="3" align="center"> <font size="+2">Neutrino factories</font></td>
   </tr>
   <tr>
     <td><b>Standard</b></td>
@@ -172,5 +172,6 @@ list. Please mail to
     <td><a href="glb/NFhRlT.html">Description and Download</a></td>
   </tr>  
 </table>
+</p>
 
 #include "template_foot.gtml"
