@@ -1,0 +1,253 @@
+%!GLoBES
+
+$version="3.0.0"
+
+/* ############################################################################
+  *                                                                            *
+  *                                                                            *
+  *   Copyright 2007, The GLoBES Team                                          *
+  *                                                                            *
+  *   This file is a starting draft of a AEDL file for the tutorial            *
+  *                                                                            *
+  *   "Advanced usage of AEDL"                                                 *
+  *                                                                            *
+  *   at the GLoBES Workshop, 24-26 January 2007, Heidelberg                        *
+  *                                                                            *
+  *   This file was prepared by M. Rolinec.                                    *
+  *                                                                            *
+  *   Last update 22/01/07                                                     *
+  *                                                                            *
+  *   WARNING: This file only describes a TOY example. The attributes of       *
+  *            the described experiment are completely fictious. Do not use    *
+  *            this file or any of the data files coming with this file for    *
+  *            scientific purposes.                                            *
+  *                                                                            *
+   ############################################################################ 
+*/
+
+/* HINT: If you are not familiar with describing experiments 
+         in AEDL, you should first visit page 83 of the 
+	 GLoBES manual. There, it is explained how one can
+	 include data, e.g. lists, from external data files
+	 into an AEDL file (not required for flux or cross 
+	 section data files). There is no "cut and paste" required. */ 
+
+
+/* ######################## Beam flux ######################################### */
+
+/* In this section the beam flux of the toy experiment can 
+   be set up. The description how neutrino fluxes can be 
+   implemented from an external data file can be found in 
+   the GLoBES manual on pages 88-90. */
+
+
+nuflux(#plus)<			
+	@flux_file = "TOYplus.dat"		/* loads the flux file */
+	@time =	2.0		/* sets the runtime in units years */
+  	@norm =	1.0e10		/* sets a normalization factor */
+>
+
+nuflux(#minus)<			
+	@flux_file = "TOYminus.dat"		/* loads the flux file */
+	@time =	6.0		/* sets the runtime in units years */
+  	@norm =	1.0e10		/* sets a normalization factor */
+>
+
+
+/* ######################## Detector settings ################################# */
+
+/* Here the fiducial mass of the detector can be adjusted 
+   (see page 88 of the GLoBES manual). */
+
+
+$target_mass = 500.	        	/* kt (fiducial mass) */
+
+
+/* ######################## Energy window ##################################### */
+
+/* Here, the energy window and bin numbers are defined. 
+   The description of how to set the energy window is given 
+   on pages 95-97 in the GLoBES manual. */
+
+
+/* True Energy Level (pre-smearing) */
+
+$sampling_points = 17		/* number of sampling points 
+				   before energy smearing */
+$sampling_min = 0.2		/* GeV */
+$sampling_max = 2.0		/* GeV */
+
+/* Reconstructed Energy Level (post-smearing) */
+
+$bins = 17			/* number of bins */
+$emin = 0.2	        	/* GeV */
+$emax = 2.0	        	/* GeV */
+
+
+/* ######################## Baseline setting ################################## */
+
+/* In this section, the baseline length of the experiment and
+   the matter density is inserted to the AEDL file. There are 
+   three different profile types possible in GLoBES. Please choose
+   the one that seems to be appropriate for the requirements 
+   of the toy experiment that has to be described. Explanations
+   of the three types and the necesarry AEDL syntax are given in 
+   the GLoBES manual on pages 90-91. */ 
+
+
+$profiletype = 3
+$densitytab = {2.95}
+$lengthtab = {350.0}
+
+
+/* ######################## Energy resolution ################################# */
+
+/* In this section, the energy resolution of different channels can 
+   be defined. One can either use manually defined migration matrices
+   or use the automatic energy smearing of the energy resolution 
+   functions provided by GLoBES. The implementation of smearing 
+   matrices is described in the GLoBES manual on pages 101-102 and the 
+   usage of the GLoBES internal resolution functions is explained on
+   pages 98-100 */
+
+
+energy(#ERES)<			
+	@type = 1
+	@sigma_function = #standard
+	@sigma_e = {0.0,0.0,0.085}
+>
+
+energy(#NCres)<			
+	@type = 1
+	@sigma_function = #standard
+	@sigma_e = {0.0,0.0,0.01}
+> 
+
+/* HINT: If one wants to compute the event rates without energy 
+         semaring, one still has to assign a number, so that 
+	 the AEDL file works properly. The value has to be very 
+	 small, so that no actual energy smearing is introduced. */
+
+
+/* ######################## Cross sections #################################### */
+
+/* In this section, the cross section data for different channels is 
+   loaded from external data files. Explanations can be found in the 
+   GLoBES maunal on pages 91-92. */
+
+
+cross(#CC)<
+	@cross_file = "XCC.dat"         
+>
+
+cross(#NC)<
+	@cross_file = "XNC.dat"         
+>
+
+cross(#QE)<
+	@cross_file = "XQE.dat"         
+>
+
+
+/* ##################### Energy dependent efficiencies ######################## */
+
+/* In this section, energy dependent efficiencies can be defined. 
+   There exists now, as a new feature of GLoBES 3.0, an interpolation
+   feature, that allows to give efficiencies independent of number and
+   width of the bins. See pages 84-85 of the GLoBES manual. This feature
+   is not required for Problem 1 and Problem 2. */
+
+%energyvalues = {0.25,0.35,0.45,0.55,0.65,0.75,0.85,0.95,1.05,1.15,1.25,1.35,1.45,1.55,1.65,1.75,1.85,1.95}
+
+%numueffvalues = include "NUMUeff.dat"
+
+%numubareffvalues = include "NUMUBAReff.dat"
+
+%NCrejvalues = include "NC_bckg_rej.dat"
+
+%NCBARrejvalues = include "NCBAR_bckg_rej.dat"
+
+%bc = bincenter()
+
+%sbc = samplingbincenter()
+
+%numueffs = interpolation(%energyvalues,%numueffvalues,1,%sbc)
+
+%numubareffs = interpolation(%energyvalues,%numubareffvalues,1,%sbc)
+
+%NCrejs = interpolation(%energyvalues,%NCrejvalues,1,%bc)
+
+%NCBARrejs = interpolation(%energyvalues,%NCBARrejvalues,1,%bc)
+
+/* ######################### Channel definitions ############################## */
+
+/* In this section the different required channels can be defined. The
+   detailed explanation of all features of the channel definition is
+   given in the GLoBES manual on pages 94 and 98. */
+
+/* WARNING: NAME has to be replaced in all cases to fit the strings
+            given above within this file. Equal strings for NAME 
+	    cannot be assigned. */ 
+
+
+channel(#numu_app)<
+	@channel =	#plus:	+:	electron:	muon:	#QE:	#ERES
+		@pre_smearing_efficiencies = copy(%numueffs)
+>
+
+channel(#numubar_app)<
+	@channel =	#minus:	-:	electron:	muon:	#QE:	#ERES
+		@pre_smearing_efficiencies = copy(%numubareffs)
+>
+
+channel(#nc_bckg)<
+	@channel =	#plus:	+:	NOSC_electron:	NOSC_electron:	#NC:	#NCres
+		 @post_smearing_efficiencies = copy(%NCrejs)
+>
+
+channel(#nc_bar_bckg)<
+	@channel =	#minus:	-:	NOSC_electron:	NOSC_electron:	#NC:	#NCres
+		 @post_smearing_efficiencies = copy(%NCBARrejs)
+>
+
+
+
+/* ########################## Setting the rules ############################### */
+
+/* Finally, defined channels can be gathered as signal and 
+   backgrounds in the so-called rules. Additionally, the systematical
+   uncertainties are introduced and their treatment is defined.
+   The building of the rules is described on pages 102-107 in 
+   the GLoBES manual. */
+ 
+ 
+rule(#NU_MU_Appearance)<
+ 	@signal = 1.0@#numu_app
+	@signalerror =  0.025 : 0.001
+
+	@background = 1.0@#nc_bckg 
+	@backgrounderror = 0.025 : 0.001
+
+	@sys_on_function = "chiSpectrumTilt"
+	@sys_off_function = "chiNoSysSpectrum"
+
+> 
+
+rule(#NU_MU_BAR_Appearance)<
+ 	@signal = 1.0@#numubar_app
+	@signalerror =  0.025 : 0.001
+
+	@background = 1.0@#nc_bar_bckg 
+	@backgrounderror = 0.025 : 0.001
+
+	@sys_on_function = "chiSpectrumTilt"
+	@sys_off_function = "chiNoSysSpectrum"
+
+> 
+
+
+/* ############################################################################
+  *                                                                            *
+  *                               END OF FILE                                  *
+  *				                                               *
+   ############################################################################ */ 
