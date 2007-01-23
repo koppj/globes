@@ -14,14 +14,14 @@ list. Please mail to
 <a href="mailto:globes@mpi-hd.mpg.de?SUBJECT=glb-files">globes@mpi-hd.mpg.de</a>
 
 <p>
-<table frame="all" rules="all" cellspacing="4" cellpadding="4">
+<table frame="border" rules="all" cellspacing="4" cellpadding="4">
   <colgroup>
     <col width="180">
     <col width="350">
     <col width="130">
   </colgroup>
   <tr>
-    <td colspan=3 align=center> <font size=+2 >Superbeam Experiments</font></td>
+    <td colspan="3" align="center"> <font size="+2">Superbeam Experiments</font></td>
   </tr>
   <tr>
     <td><b>T2K</b></td>
@@ -59,14 +59,14 @@ list. Please mail to
 </p>
 
 <p>
-<table frame=all rules=all cellspacing=4 cellpadding=4>
+<table frame="border" rules="all" cellspacing="4" cellpadding="4">
   <colgroup>
     <col width="180">
     <col width="350">
     <col width="130">
   </colgroup>
   <tr>
-    <td colspan=3 align=center> <font size=+2 >Reactor experiments</font></td>
+    <td colspan="3" align="center"> <font size="+2">Reactor experiments</font></td>
   </tr>
   <tr>
     <td><b>Reactor-I</b></td>
@@ -87,7 +87,7 @@ list. Please mail to
 </p>
 
 <p>
-<table frame="all" rules="all" cellspacing="4" cellpadding="4">
+<table frame="border" rules="all" cellspacing="4" cellpadding="4">
   <colgroup>
     <col width="180">
     <col width="350">
@@ -132,7 +132,7 @@ list. Please mail to
 </p>
 
 <p>
-<table frame="all" rules="all" cellspacing="4" cellpadding="4">
+<table frame="border" rules="all" cellspacing="4" cellpadding="4">
   <colgroup>
     <col width="180">
     <col width="350">
