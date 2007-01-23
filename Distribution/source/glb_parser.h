@@ -101,7 +101,7 @@
 
 
 #if ! defined (YYSTYPE) && ! defined (YYSTYPE_IS_DECLARED)
-#line 1021 "glb_parser.y"
+#line 1022 "glb_parser.y"
 typedef union YYSTYPE {
   double  val;  /* For returning numbers.                   */
   double *dpt;  /* for rules */

@@ -1,0 +1,26 @@
+**********Version 3.0.1
+
+18/01/2007 JK
+        - Updated copyright notices in all code files
+        - Included title of new paper in README
+        - Removed #include <ltdl.h> from globes.c
+
+**********Version 3.0.2
+
+18/01/2007 MR
+        - glb_fluxes.c modified: now contains exact beta beam spectrum
+                -> no normalization factor needed any more
+        - BBvar_WC.glb and BBvar_TASD.glb modified accordingly
+        - T2K.glb now has same @norm as T2HK.glb (matches Table 1, hep-ph/0204352)
+
+**********Version 3.0.4
+
+19/01/2007 PH
+        - fixed a bug in the defintions parser of globes.c
+
+**********Version 3.0.5
+
+23/01/2007 JK
+        - Added hep-ph number of new paper to README
+        - Fixed minor problem which occurred for duplicate channel definitions
+

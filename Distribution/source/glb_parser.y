@@ -350,7 +350,8 @@ static int set_channel_data(int x[6],int loc_count)
      int i;
 
      for(i=0;i<6;i++) {
-       buff.listofchannels[i]=
+       if (loc_count >= buff.numofchannels) /* Don't realloc when parsing a re-definition */
+         buff.listofchannels[i]=
 			(int*) glb_realloc(buff.listofchannels[i]
 					,sizeof(int)*loc_count);
 
