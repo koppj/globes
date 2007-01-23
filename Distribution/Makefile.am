@@ -29,7 +29,8 @@ AM_YFLAGS =  -d
 m4datadir = $(datadir)/aclocal
 m4data_DATA = globes.m4
 
-
+distcheck-hook:
+	cd $(distdir)/data && md5sum -c md5-sums
 
 if MAKE_RPMS
 

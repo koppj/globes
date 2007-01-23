@@ -24,3 +24,8 @@
         - Added hep-ph number of new paper to README
         - Fixed minor problem which occurred for duplicate channel definitions
 
+
+**********Version 3.0.6
+
+23/01/2007 PH
+	- Added a distcheck-hook which tests the md5-sums file in data 
