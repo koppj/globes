@@ -9,7 +9,7 @@
 <h2>SPL</h2>
 
 The SPL superbeam experiment can be simulated with 
-the file <a href=SPL.glb">SPL.glb</a>. Please check the header of the files for references 
+the file <a href="SPL.glb">SPL.glb</a>. Please check the header of the files for references 
 of their origin. Please do not forget to cite these references if the file <a
 href="SPL.glb">SPL.glb</a> is used for a scientific publication or a talk. Check the appendix of
 the GLoBES manual for more details of the experiment description. 
@@ -22,12 +22,12 @@ Thomas Schwetz-Mangold, used for Campagne et al., <b>hep-ph/0603172</b>
 
 <center>
 <table frame=all rules=all cellspacing=4 cellpadding=4>
-<colgroup>
+<!--<colgroup>
 <col width="170">
 <col width="170">
 <col width="170">
 <col width="170">
-</colgroup>
+</colgroup>-->
 <thead>
 <tr> 
 <td>AEDL file(s)</td>
@@ -39,20 +39,20 @@ Thomas Schwetz-Mangold, used for Campagne et al., <b>hep-ph/0603172</b>
 <tfoot>
 </tfoot>
 <tr>
-<td><a href="SPL.glb">SPL.glb</a></td>
+<td><a href="SPL.glb">SPL.glb</a> (<a href="SPL.glb.md5">md5</a>)</td>
 <td>
 <table>
-<tr><td><a href="SPLplus.dat">SPLplus.dat</a></td></tr>
-<tr><td><a href="SPLminus.dat">SPLminus.dat</a></td></tr>
-<tr><td><a href="Mig_WC_numu.dat">Mig_WC_numu.dat</a></td></tr>
-<tr><td><a href="Mig_WC_numubar.dat">Mig_WC_numubar.dat</a></td></tr>
-<tr><td><a href="Mig_WC_nue.dat">Mig_WC_nue.dat</a></td></tr>
-<tr><td><a href="Mig_WC_nuebar.dat">Mig_WC_nuebar.dat</a></td></tr>
-<tr><td><a href="XCC_spl.dat">XCC_spl.dat</a></td></tr>
-<tr><td><a href="XNC_spl.dat">XNC_spl.dat</a></td></tr>
+<tr><td><a href="SPLplus.dat">SPLplus.dat</a> (<a href="SPLplus.dat.md5">md5</a>)</td></tr>
+<tr><td><a href="SPLminus.dat">SPLminus.dat</a> (<a href="SPLminus.dat.md5">md5</a>)</td></tr>
+<tr><td><a href="Mig_WC_numu.dat">Mig_WC_numu.dat</a> (<a href="Mig_WC_numu.dat.md5">md5</a>)</td></tr>
+<tr><td><a href="Mig_WC_numubar.dat">Mig_WC_numubar.dat</a> <a href="Mig_WC_numubar.dat.md5">(md5)</a></td></tr>
+<tr><td><a href="Mig_WC_nue.dat">Mig_WC_nue.dat</a> (<a href="Mig_WC_nue.dat.md5">md5</a>)</td></tr>
+<tr><td><a href="Mig_WC_nuebar.dat">Mig_WC_nuebar.dat</a> <a href="Mig_WC_nuebar.dat.md5">(md5)</a></td></tr>
+<tr><td><a href="XCC_spl.dat">XCC_spl.dat</a> (<a href="XCC_spl.dat.md5">md5</a>)</td></tr>
+<tr><td><a href="XNC_spl.dat">XNC_spl.dat</a> (<a href="XNC_spl.dat.md5">md5</a>)</td></tr>
 </table>
 </td>
-<td><a href="SPL.tar.gz">SPL.tar.gz</a></td>
+<td><a href="SPL.tar.gz">SPL.tar.gz</a> (<a href="SPL.tar.gz.md5">md5</a>)</td>
 <td>none</td>
 </tr>
 </table>

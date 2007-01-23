@@ -1,0 +1,9 @@
+#!/bin/bash
+# Calculate MD5 Checksums for glb-Files in web directory
+
+cd ../html/glb
+rm *.md5
+for f in $(find * -name '*.glb' -or -name '*.dat'); do
+  md5sum $f > $f.md5;\
+done
+chmod 600 *.md5

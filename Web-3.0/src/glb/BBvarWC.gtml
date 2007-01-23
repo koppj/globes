@@ -24,12 +24,12 @@ The GLoBES Team
 
 <center>
 <table frame=all rules=all cellspacing=4 cellpadding=4>
-<colgroup>
+<!--<colgroup>
 <col width="170">
 <col width="170">
 <col width="170">
 <col width="170">
-</colgroup>
+</colgroup>-->
 <thead>
 <tr> 
 <td>AEDL file(s)</td>
@@ -41,16 +41,16 @@ The GLoBES Team
 <tfoot>
 </tfoot>
 <tr>
-<td><a href="BBvar_WC.glb">BBvar_WC.glb</a></td>
+<td><a href="BBvar_WC.glb">BBvar_WC.glb</a> (<a href="BBvar_WC.glb.md5">md5</a>)</td>
 <td>
 <table>
-<tr><td><a href="BckgMig_var.dat">BckgMig_var.dat</a></td></tr>
-<tr><td><a href="XCC.dat">XCC.dat</a></td></tr>
-<tr><td><a href="XNC.dat">XNC.dat</a></td></tr>
-<tr><td><a href="XQE.dat">XQE.dat</a></td></tr>
+<tr><td><a href="BckgMig_var.dat">BckgMig_var.dat</a> (<a href="BckgMig_var.dat.md5">md5</a>)</td></tr>
+<tr><td><a href="XCC.dat">XCC.dat</a> (<a href="XCC.dat.md5">md5</a>)</td></tr>
+<tr><td><a href="XNC.dat">XNC.dat</a> (<a href="XNC.dat.md5">md5</a>)</td></tr>
+<tr><td><a href="XQE.dat">XQE.dat</a> (<a href="XQE.dat.md5">md5</a>)</td></tr>
 </table>
 </td>
-<td><a href="BBvar_WC.tar.gz">BBvar_WC.tar.gz</a></td>
+<td><a href="BBvar_WC.tar.gz">BBvar_WC.tar.gz</a> (<a href="BBvar_WC.tar.gz.md5">md5</a>)</td>
 <td>
 <table>
 <tr><td><b>gammafactor</b></td></tr>

@@ -22,13 +22,13 @@ The GLoBES Team
 <h3>Download</h3>
 
 <center>
-<table frame=all rules=all cellspacing=4 cellpadding=4>
-<colgroup>
+<table frame=all rules=all cellspacing=4 cellpadding=4 width="680">
+<!--<colgroup>
 <col width="170">
 <col width="170">
 <col width="170">
 <col width="170">
-</colgroup>
+</colgroup>-->
 <thead>
 <tr> 
 <td>AEDL file(s)</td>
@@ -42,17 +42,17 @@ The GLoBES Team
 <tr>
 <td>
 <table>
-<tr><td><a href="D-Chooz_near.glb">D-Chooz_near.glb</a></td></tr>
-<tr><td><a href="D-Chooz_far.glb">D-Chooz_far.glb</a></td></tr>
+<tr><td><a href="D-Chooz_near.glb">D-Chooz_near.glb</a> (<a href="D-Chooz_near.glb.md5">md5</a>)</td></tr>
+<tr><td><a href="D-Chooz_far.glb">D-Chooz_far.glb</a> (<a href="D-Chooz_far.glb.md5">md5</a>)</td></tr>
 </table>
 </td>
 <td>
 <table>
-<tr><td><a href="Reactor.dat">Reactor.dat</a></td></tr>
-<tr><td><a href="XCCreactor.dat">XCCreactor.dat</a></td></tr>
+<tr><td><a href="Reactor.dat">Reactor.dat</a> (<a href="Reactor.dat.md5">md5</a>)</td></tr>
+<tr><td><a href="XCCreactor.dat">XCCreactor.dat</a> (<a href="XCCreactor.dat.md5">md5</a>)</td></tr>
 </table>
 </td>
-<td><a href="D-Chooz.tar.gz">D-Chooz.tar.gz</a></td>
+<td><a href="D-Chooz.tar.gz">D-Chooz.tar.gz</a> (<a href="D-Chooz.tar.gz.md5">md5</a>)</td>
 <td>none</td>
 </tr>
 </table>

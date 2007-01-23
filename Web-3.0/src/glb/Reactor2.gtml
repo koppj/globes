@@ -22,12 +22,12 @@ The GLoBES Team
 
 <center>
 <table frame=all rules=all cellspacing=4 cellpadding=4>
-<colgroup>
+<!--<colgroup>
 <col width="170">
 <col width="170">
 <col width="170">
 <col width="170">
-</colgroup>
+</colgroup>-->
 <thead>
 <tr> 
 <td>AEDL file(s)</td>
@@ -39,14 +39,14 @@ The GLoBES Team
 <tfoot>
 </tfoot>
 <tr>
-<td><a href="Reactor2.glb">Reactor2.glb</a></td>
+<td><a href="Reactor2.glb">Reactor2.glb</a> (<a href="Reactor2.glb.md5">md5</a>)</td>
 <td>
 <table>
-<tr><td><a href="Reactor.dat">Reactor.dat</a></td></tr>
-<tr><td><a href="XCCreactor.dat">XCCreactor.dat</a></td></tr>
+<tr><td><a href="Reactor.dat">Reactor.dat</a> (<a href="Reactor.dat.md5">md5</a>)</td></tr>
+<tr><td><a href="XCCreactor.dat">XCCreactor.dat</a> (<a href="XCCreactor.dat.md5">md5</a>)</td></tr>
 </table>
 </td>
-<td><a href="Reactor2.tar.gz">Reactor2.tar.gz</a></td>
+<td><a href="Reactor2.tar.gz">Reactor2.tar.gz</a> (<a href="Reactor2.tar.gz.md5">md5</a>)</td>
 <td>none</td>
 </tr>
 </table>

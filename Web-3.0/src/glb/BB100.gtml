@@ -22,12 +22,12 @@ Thomas Schwetz-Mangold, used for Campagne et al., <b>hep-ph/0603172</b>
 
 <center>
 <table frame=all rules=all cellspacing=4 cellpadding=4>
-<colgroup>
+<!--<colgroup>
 <col width="170">
 <col width="170">
 <col width="170">
 <col width="170">
-</colgroup>
+</colgroup>-->
 <thead>
 <tr> 
 <td>AEDL file(s)</td>
@@ -39,21 +39,21 @@ Thomas Schwetz-Mangold, used for Campagne et al., <b>hep-ph/0603172</b>
 <tfoot>
 </tfoot>
 <tr>
-<td><a href="BB_100.glb">BB_100.glb</a></td>
+<td><a href="BB_100.glb">BB_100.glb</a> (<a href="BB_100.glb.md5">md5</a>)</td>
 <td>
 <table>
-<tr><td><a href="BB100flux_Ne.dat">BB100flux_Ne.dat</a></td></tr>
-<tr><td><a href="BB100flux_He.dat">BB100flux_He.dat</a></td></tr>
-<tr><td><a href="Mig_WC_numu.dat">Mig_WC_numu.dat</a></td></tr>
-<tr><td><a href="Mig_WC_numubar.dat">Mig_WC_numubar.dat</a></td></tr>
-<tr><td><a href="Mig_WC_nue.dat">Mig_WC_nue.dat</a></td></tr>
-<tr><td><a href="Mig_WC_nuebar.dat">Mig_WC_nuebar.dat</a></td></tr>
-<tr><td><a href="XCC_Nuance.dat">XCC_Nuance.dat</a></td></tr>
-<tr><td><a href="XNC_Nuance.dat">XNC_Nuance.dat</a></td></tr>
-<tr><td><a href="Null.dat">Null.dat</a></td></tr>
+<tr><td><a href="BB100flux_Ne.dat">BB100flux_Ne.dat</a> (<a href="BB100flux_Ne.dat.md5">md5</a>)</td></tr>
+<tr><td><a href="BB100flux_He.dat">BB100flux_He.dat</a> (<a href="BB100flux_He.dat.md5">md5</a>)</td></tr>
+<tr><td><a href="Mig_WC_numu.dat">Mig_WC_numu.dat</a> (<a href="Mig_WC_numu.dat.md5">md5</a>)</td></tr>
+<tr><td><a href="Mig_WC_numubar.dat">Mig_WC_numubar.dat</a> <a href="Mig_WC_numubar.dat.md5">(md5)</a></td></tr>
+<tr><td><a href="Mig_WC_nue.dat">Mig_WC_nue.dat</a> (<a href="Mig_WC_nue.dat.md5">md5</a>)</td></tr>
+<tr><td><a href="Mig_WC_nuebar.dat">Mig_WC_nuebar.dat</a> <a href="Mig_WC_nuebar.dat.md5">(md5)</a></td></tr>
+<tr><td><a href="XCC_Nuance.dat">XCC_Nuance.dat</a> (<a href="XCC_Nuance.dat.md5">md5</a>)</td></tr>
+<tr><td><a href="XNC_Nuance.dat">XNC_Nuance.dat</a> (<a href="XNC_Nuance.dat.md5">md5</a>)</td></tr>
+<tr><td><a href="Null.dat">Null.dat</a> (<a href="Null.dat.md5">md5</a>)</td></tr>
 </table>
 </td>
-<td><a href="BB_100.tar.gz">BB_100.tar.gz</a></td>
+<td><a href="BB_100.tar.gz">BB_100.tar.gz</a> (<a href="BB_100.tar.gz.md5">md5</a>)</td>
 <td>none</td>
 </tr>
 </table>
