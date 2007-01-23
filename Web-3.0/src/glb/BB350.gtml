@@ -45,10 +45,10 @@ The GLoBES Team, following <b>Setup III</b> from Burguet-Castell et al., <b>Nucl
 <tr><td><a href="BB350flux.dat">BB350flux.dat</a> (<a href="BB350flux.dat.md5">md5</a>)</td></tr>
 <tr><td><a href="NeEffMig350.dat">NeEffMig350.dat</a> (<a href="NeEffMig350.dat.md5">md5</a>)</td></tr>
 <tr><td><a href="NeBckgRej350.dat">NeBckgRej350.dat</a> (<a href="NeBckgRej350.dat.md5">md5</a>)</td></tr>
-<tr><td><a href="NeDisEff350.dat">NeDisEff350.dat</a> (<a href="NeDisEff350.dat.md5">md5</a>)</td></tr>
+<tr><td><a href="NeDisEffMig350.dat">NeDisEffMig350.dat</a> (<a href="NeDisEffMig350.dat.md5">md5</a>)</td></tr>
 <tr><td><a href="HeEffMig350.dat">HeEffMig350.dat</a> (<a href="HeEffMig350.dat.md5">md5</a>)</td></tr>
 <tr><td><a href="HeBckgRej350.dat">HeBckgRej350.dat</a> (<a href="HeBckgRej350.dat.md5">md5</a>)</td></tr>
-<tr><td><a href="HeDisEff350.dat">HeDisEff350.dat</a> (<a href="HeDisEff350.dat.md5">md5</a>)</td></tr>
+<tr><td><a href="HeDisEffMig350.dat">HeDisEffMig350.dat</a> (<a href="HeDisEffMig350.dat.md5">md5</a>)</td></tr>
 <tr><td><a href="XCC.dat">XCC.dat</a> (<a href="XCC.dat.md5">md5</a>)</td></tr>
 <tr><td><a href="XNC.dat">XNC.dat</a> (<a href="XNC.dat.md5">md5</a>)</td></tr>
 </table>
