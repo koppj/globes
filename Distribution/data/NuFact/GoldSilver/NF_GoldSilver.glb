@@ -154,9 +154,6 @@ $filter_value = 	0.090
 
 /* ####### Energy resolution ####### */	 
 
-energy(#ERES)<>
-energy(#smSILVER)<>
-
 energy(#ERES)<	
 	@type = 2  /* deduce filter value from energy resolution */
 	@sigma_e = {0.15,0,0}
