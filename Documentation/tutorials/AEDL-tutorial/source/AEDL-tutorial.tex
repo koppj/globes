@@ -68,11 +68,11 @@ AEDL files that come with GLoBES 3.0 and analyze advanced features in their AEDL
 description. \\
 
 The toy experiment for this tutorial is absolutely fictious, although the attributes 
-of the detector follow roughly the response of a huge Water Cerenkov detector.
+of the detector roughly follow the response of a huge Water Cerenkov detector.
 However, all efficiencies and migration matrices are coming from a fake 
 Monte Carlo simulation and do {\bf not} exactly correspond to the true 
 attributes of a Water Cerenkov detector. So, all files prepared for this tutorial 
-do {\bf not} correspond to a real detector response and all files are just to 
+do {\bf not} correspond to a real detector response and are just to 
 be used for this tutorial.  
 }
 
@@ -88,27 +88,29 @@ Water Cerenkov detector. Now, you want to analyze the future potential of the
 experiment and maybe try to optimize some of the attributes. Your decision is to
 do the analysis with GLoBES. So, first you have to build the experiment description
 in AEDL,~{\it i.e.} write the corresponding {\tt glb}-file. One of your colleagues
-sends the results from a Monte Carlo analysis. 
+sends the results from a Monte Carlo analysis (see Fig.~\ref{fig:mccc}). 
+%
 \begin{figure}[h!]
   \begin{center}
     \includegraphics[width=0.36\textwidth]{CCevents.eps} \hspace{0.5cm}
     \includegraphics[width=0.36\textwidth]{QEevents.eps}
   \end{center}
   \vspace{-0.7 cm}
-  \caption{\small The sample of 20000 charged current $\nu_\mu$ events on the left hand side. The
+  \caption{\small The sample of 20000 charged current $\nu_\mu$ events on the left-hand side. The
   quasi-elastic sample is shown in dark grey while the inelastic part of the sample is
   shown in bright grey. The quasi-elastic part of the sample alone is plotted at the right-hand
   side. It can be seen that this sample allows to recontruct the true neutrino energy at a
   certain level, while this is not possible for the inelastic part of the sample.}
   \label{fig:mccc}
 \end{figure}
-
+%
 It is also important to implement the background from single pion production in 
-neutral current events. Therefore, the colleague sends the Monte Carlo sample of NC events.
-
+neutral current events. Therefore, the colleague sends the Monte Carlo sample of NC events
+(see Fig.~\ref{fig:mcnc}). 
+%
 \begin{figure}[h!]
   \begin{center}
-    \includegraphics[width=0.45\textwidth]{NCevents.eps} 
+    \includegraphics[width=0.36\textwidth]{NCevents.eps} 
   \end{center}
   \vspace{-0.7 cm}
   \caption{\small The sample of 5000 neutral current events. It can be seen that the
@@ -116,13 +118,13 @@ neutral current events. Therefore, the colleague sends the Monte Carlo sample of
   there is missing energy due to the undetected neutrino in the NC event.}
   \label{fig:mcnc}
 \end{figure}
-
-The colleague also sends the energy dependent signal efficiencies of the charged
+%
+Additionally you receive the energy dependent signal efficiencies of the charged
 current $\nu_\mu$/$\bar{\nu}_\mu$ events from the Monte Carlo simulations. These 
-include the Cerenkov threshold for muons. They are given for 18 bins of 
-$\mathrm{\Delta E=0.1\, GeV}$ between 0.2~GeV and 2.0~GeV (The list of these energy dependent
+include the Cerenkov threshold for muons and are given for 18 bins of 
+$\mathrm{\Delta E=0.1\, GeV}$ between 0.2~GeV and 2.0~GeV (the list of these energy dependent
 efficiecies is given in the files {\tt NUMUeff.dat} and {\tt NUMUBAReff.dat}).
-Furthermore, he tells you that the rejection factor for the NC events should be $10^-3$.
+Furthermore, he tells you that the rejection factor for the NC events should be $10^{-3}$.
 This is all the information needed to reconstruct smearing matrices out of the data
 that can be used to describe the experiment in an AEDL file.
 
@@ -136,11 +138,11 @@ manually defined smearing matrices, please consult the GLoBES manual on pages 10
 
 \aufg{2}{Finding the Normalization}
 
-Another colleague of yours provides you with the data of the neutrino beam flux. This is given
+Another colleague of yours provides you with the data of the neutrino beam flux. It is given
 in the files {\tt TOYplus.dat} ($\nu_e$) and {\tt TOYminus.dat} ($\bar{\nu}_e$), already provided 
 in the right syntax for GLoBES. The implementation of neutrino fluxes from a data file is described in the 
 GLoBES manual on pages 89-90.
-
+%
 \begin{figure}[h!]
   \begin{center}
     \includegraphics[width=0.45\textwidth]{FLUX.eps} 
@@ -150,7 +152,7 @@ GLoBES manual on pages 89-90.
   The flux is given in arbitrary units so the right normalization has to be found.}
   \label{fig:flux}
 \end{figure}
-
+%
 Unfortunately, your colleague does not know the units of the flux data anymore, but he 
 tells you that his Monte Carlo simulation showed that in case of no oscillations 
 he would get at total number of 13503.5 $\nu_e$ charged current events and 
@@ -162,7 +164,7 @@ Start from the draft file {\tt TOYdraft.glb} and build an AEDL file that
 uses the flux files and allows to calculate the unoscillated $\nu_e/\bar{\nu}_e$ CC events per kt and
 year. Use 18 bins from 0.2~GeV to 2~GeV (necessary, since the migration matrices are given for this binning). 
 Calculate the event rates with the
-command {\tt globes} from the {\tt /source} directory. Within {\tt TOYdraft.glb}  
+command {\tt globes} from the {\tt /source} directory of GLoBES. Within {\tt TOYdraft.glb}  
 you can find some hints where the corresponding AEDL features are documented in the GLoBES
 manual.
 
@@ -187,12 +189,16 @@ Check your AEDL file with the {\tt globes} command for the following oscillation
 \Delta^2_{21} & = & 7.9\cdot 10^{-5}\, eV^2  \nonumber \\
 \Delta^2_{31} & = & 2.6\cdot 10^{-3}\, eV^2  
 \end{eqnarray}
-This can be done with the command 
+This can either be done with the command 
 \begin{center}
 {\tt ./globes -p'0.5796,0.1609,0.7854,1.5708,7.9e-5,2.6e-3' NAME.glb}
 \end{center}
+or just with {\tt ./globes NAME.glb} within a shell session if the values are defined as the default parameters:
+ \begin{center}
+{\tt export GLB\_CENTRAL\_VALUES='0.5796,0.1609,0.7854,1.5708,7.9e-5,2.6e-3'}
+\end{center}
 
-This is what you should be obtained (signal and background event numbers):\\
+This is what approximately should be obtained (signal and background event numbers):\\
 
 {\tt 
 \hspace*{2cm} --------- \#NU\_MU\_Appearance ---------\\
@@ -218,7 +224,7 @@ results through parameter correlations. Thus, the simulated disappearance data f
 data is missing, so that information on $\sin^22\theta_{13}$ and $\delta_{CP}$ can only be derived from the toy
 experiment data. The effect can be seen in Fig.~\ref{fig:withoutT2K} in the appendix. 
 
-
+\newpage
 \aufg{4}{Experiment Description without Smearing Matrices}
 
 One of your colleagues tells you, that the energy reconstruction of the quasi-elastic
@@ -244,12 +250,13 @@ end up with this output:\\
 \hspace*{2cm}              4911.57 ||      4911.57 \\
 }
 
-The binned event rates again can be derived with the command {\tt ./globes -s NAME.glb}. The screen output 
-that should be obtained is given in the appendix. \\
+The 
+binned event rates again can be derived with the command {\tt ./globes -s NAME.glb}. The screen output 
+that should be obtained is given in the appendix. 
 
 Now we can compare the best-fit solution from the file with migration matrices and the 
 file without migration matrices:
-
+%
 \begin{figure}[h!]
   \begin{center}
     \includegraphics[width=0.48\textwidth]{WithMatrices.eps}   
@@ -274,7 +281,7 @@ completely new migration matrices, this time $16\times16$. But, this would of co
 time consuming. Or one can use the former description and introduce the efficiencies 
 by applying the AEDL feature of list interpolation as described in the GLoBES manual 
 on pages 84-85. The result should of course look extremely similar.
-
+%
 \begin{figure}[h!]
   \begin{center}
     \includegraphics[width=0.5\textwidth]{Bins.eps}   
@@ -289,19 +296,20 @@ on pages 84-85. The result should of course look extremely similar.
 
 \aufg{6}{Usage of Total Rates}
 
-The former files only make use of the quasi-elastic event sample, since there energy
+The former files only make use of the quasi-elastic event sample, there energy
 reconstruction is possible to a certain level. However, this reduces the statistics of the
 experiment, because all inelastic events are omitted.\\
 
-The CC current events can be included to the file and the systematics function
-{\tt chiTotalRatesTilt} within the corresponding rule can be used to only count 
+The CC events can be included to the file and the systematics function
+{\tt chiTotalRatesTilt} within the corresponding rule can be used to only account for 
 total rates. The spectral information still comes from the QE events. However, now double
 counting of events has to be avoided. Therefore the QE events have to be taken into account
-with a free normalization. The explanations about the needed systematics functions can be found
-in the GLoBES manual on pages 105-106. You can also check the {\tt T2K.glb} file. There, this
-description is already implemented. Please discuss the systematics function, that has to be
-used for the QE events in case of no treatment of systematics.\\
+with a free normalization. The explanations about the necessary systematics functions can be found
+in the GLoBES manual on pages 105-106. You can also explore the {\tt T2K.glb} file. There, this
+technique is already implemented. Please discuss the systematics function, that has to be
+used for the QE events in case of no treatment of systematics.
 
+\newpage
 In the end you should end up at:\\
 
 {\tt
@@ -349,11 +357,11 @@ improves the results in a more dramatic way.
 Now, we can have a look at the pre-defined AEDL experiments. The problems of
 Part 1 have made us familiar with the syntax of AEDL. One of the most important
 AEDL features used in the variable AEDL files is the usage of AEDL variables.
-For instance the the file {\tt data/NuFact/Variable/NFvar.glb} is defined with free
-parameters. First, we can have a look at the implementation of the neutrino factory
+For instance the file {\tt data/NuFact/Variable/NFvar.glb} is defined with free
+variables. First, we can have a look at the implementation of the neutrino factory
 flux. In contary to the toy experiment, the fluxes are not loaded from a data file, but
 derived from the built-in flux feature of GLoBES. The parent energy and the baseline of the
-experiment is kept free and can be specified by usage of the AEDL variables {\tt emax} and
+experiment are kept free and can be specified by the usage of the AEDL variables {\tt emax} and
 {\tt BASELINE}.\\
 
 Copy the file {\tt source/globes} to the directory with the {\tt NFvar.glb} file and try the
