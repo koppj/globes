@@ -39,3 +39,7 @@
 
 	- undefined AEDL variables are no longer defaulting to zero
 	but to NaN, which ensures that they create an ERROR
+
+25/01/2007 JK
+        - Corrected correlated flux normalization in D-Chooz_far.glb
+          from 2.0% to 2.8%

@@ -170,7 +170,7 @@ rule(#NU_E_Disappearance)<
         @sys_off_function = "chiNoSysSpectrum"
         @sys_off_errors   = {}
         @sys_on_function  = "chiDCNorm"
-        @sys_on_errors    = { 0.02,    0.006,        0.006,       0.005,     0.005   }
+        @sys_on_errors    = { 0.028,   0.006,        0.006,       0.005,     0.005   }
                          /* { Flux, Fid. mass FD, Fid. mass ND, Energy FD, Energy ND } */
 >
 
