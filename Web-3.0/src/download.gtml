@@ -10,7 +10,7 @@
 GLoBES can be downloaded as a single gzip-ed tar ball. The latest up-to-date
 version is here: 
 <ul>
-  <li><a href="download/globes-3.0.6.tar.gz">globes-3.0.6.tar.gz</a> &nbsp;(Jan. 23, 2007)</li>
+  <li><a href="download/globes-3.0.7.tar.gz">globes-3.0.7.tar.gz</a> &nbsp;(Jan. 25, 2007)</li>
 </ul>
 
 <!--You may also want to check out this statically linked binary
@@ -23,10 +23,10 @@ unpacked.-->
 <h2>Documentation and tutorials</h2>
 <ul>
   <li>
-    <b>GLoBES user manual</b> version 3.0:
-    [<a href="documentation/globes-manual-3.0.pdf">PDF</a>]
-    [<a href="documentation/globes-manual-3.0.ps.gz">zipped Postscript</a>]
-    [<a href="documentation/globes-manual-3.0.ps">Postscript</a>]
+    <b>GLoBES user manual</b> version 3.0.7:
+    [<a href="documentation/globes-manual-3.0.7.pdf">PDF</a>]
+    [<a href="documentation/globes-manual-3.0.7.ps.gz">zipped Postscript</a>]
+    [<a href="documentation/globes-manual-3.0.7.ps">Postscript</a>]
   </li>
   <li>
     <b>GLoBES publication</b> hep-ph/0407333:
