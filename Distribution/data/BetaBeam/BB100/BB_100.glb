@@ -20,13 +20,13 @@ $version="3.0.0"
  #*     SLACcitation  = "%%CITATION = HEP-PH 0603172;%%"
  #* }
  * 
- * The initial file was prepared by T. Schwetz-Mangold. 
+ * The initial file was prepared by Mauro Mezzetto and Thomas Schwetz-Mangold. 
  *
  * Modifications: 
  *  - fiducial detector mass is set to 500kt (MR 20/12/06)
  *  - running time set to 4 years in each polarity
  *
- * Last Update: 12/01/06 
+ * Last Update: 12/01/07 
  *
   */
 
