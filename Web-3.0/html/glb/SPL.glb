@@ -40,12 +40,13 @@ $version="3.0.0"
      SLACcitation  = "%%CITATION = HEP-EX 0302005;%%"
  }
 
- *  This file was adapted by Thomas Schwetz-Mangold on 11/07/2006
+ *  This file was written by Mauro Mezzetto 
+ *  and adapted by Thomas Schwetz-Mangold (11/07/2006)
  *
  * Modifications: 
  *  - fiducial detector mass is set to 500kt (MR 20/12/06)
  *
- * Last Update: 12/01/06 
+ * Last Update: 12/01/07
  *
   */
 
