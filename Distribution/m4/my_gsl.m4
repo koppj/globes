@@ -4,6 +4,7 @@
 
 AC_DEFUN([AM_MY_PATH_GSL],
 [
+AC_REQUIRE([AC_LIB_RPATH])
 AC_ARG_WITH(gsl-prefix,[  --with-gsl-prefix=PFX   Prefix where GSL is installed (optional)],
             gsl_prefix="$withval", gsl_prefix="")
 AC_ARG_WITH(gsl-exec-prefix,[  --with-gsl-exec-prefix=PFX Exec prefix where GSL is installed (optional)],
@@ -33,7 +34,13 @@ AC_ARG_ENABLE(gsltest, [  --disable-gsltest       Do not try to compile and run 
    # run time
     gsl_pref=`$GSL_CONFIG --prefix`	
     gsl_use=`$GSL_CONFIG --libs`
-    GSL_LIBS="-Wl,--rpath -Wl,$gsl_pref/lib $gsl_use"	
+   # this is need to make sure that we honor --disable-rpath which is
+   # needed for building on Mac
+    if test "$enable_rpath" = "no" ; then
+	GSL_LIBS="$gsl_use"
+    else
+	GSL_LIBS="-Wl,--rpath -Wl,$gsl_pref/lib $gsl_use"	
+    fi
     gsl_major_version=`$GSL_CONFIG --version | \
            sed 's/^\([[0-9]]*\).*/\1/'`
     if test "x${gsl_major_version}" = "x" ; then

@@ -30,7 +30,7 @@ dnl first digit: major improvements/rewrites
 dnl In contrast to the result of autoupdate I had to swap the
 dnl the AC_INIT and AC_CONFIG_SRCDIR
 
-AC_INIT([GLoBES],[3.0.6],[globes@mpi-hd.mpg.de],[globes])
+AC_INIT([GLoBES],[3.0.7],[globes@mpi-hd.mpg.de],[globes])
 
 AC_CONFIG_SRCDIR([source/glb_wrapper.c])
 
@@ -108,6 +108,17 @@ LIBS="$GSL_LIBS $LIBS"
 GSLINC="$GSL_CFLAGS"
 AC_SUBST(GSLINC)
 
+# handling rpath for Mac OS in the globes-config script
+ if test "$enable_rpath" = "no" ; then
+	linkerflag=""
+    else
+	linkerflag='-Wl,--rpath -Wl,$libdir'	
+    fi
+
+
+AC_SUBST(linkerflag)
+
+
 dnl check for the headers of GSL (RedHat!)
 TMPCFLAGS=$CFLAGS
 TMPCPPFLAGS=$CPPFLAGS
@@ -145,6 +156,7 @@ AC_CONFIG_FILES([Makefile lib/Makefile \
 
 	
 
+
 AC_OUTPUT
 dnl getting the permissions right
 chmod u+x globes/example.pl
@@ -170,4 +182,6 @@ else
  echo "* Do not forget to add ${prefix}/bin to your path! *"
  echo "***********************${stars}********************"
 fi
+
+
 

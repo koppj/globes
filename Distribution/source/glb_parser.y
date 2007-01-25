@@ -1657,6 +1657,9 @@ free_presymtable()
     pre_sym_table=NULL;
 }
 
+
+
+
 static void
 free_nametable()
 {
@@ -1682,7 +1685,8 @@ glb_putsym (char *sym_name, int sym_type)
   ptr->name = (char *) glb_malloc (strlen (sym_name) + 1);
   strcpy (ptr->name,sym_name);
   ptr->type = sym_type;
-  ptr->value.var = 0; /* set value to 0 even if fctn.  */
+  ptr->value.var = GLB_NAN; /* set value to GLB_NAN, which ensures an
+			       error if an undefined variable is used  */
   ptr->list= NULL;
   ptr->next = (struct glb_symrec *) sym_table;
   sym_table = ptr;
@@ -1870,6 +1874,8 @@ void glbResetEOF()
   flux_count=-1;
   glbInitExp(&buff);
   for(i=0;i<32;i++)   glbInitExp(&buff_list[i]);
+  /* this here would be the place to check for unuses variables, but
+     for that we need an access counter */
   if(name_table!=NULL) free_nametable();
   if(sym_table!=NULL) free_symtable();
 

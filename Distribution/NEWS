@@ -29,3 +29,13 @@
 
 23/01/2007 PH
 	- Added a distcheck-hook which tests the md5-sums file in data 
+
+**********Version 3.0.7
+
+25/01/2007 PH
+	- the configury now handles --disable-rpath correctly, which
+	is what should be used on Mac OS X. Updated to libool 1.5.22
+	and autoconf 2.59.
+
+	- undefined AEDL variables are no longer defaulting to zero
+	but to NaN, which ensures that they create an ERROR

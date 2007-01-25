@@ -216,7 +216,7 @@
 
 /* If using the C implementation of alloca, define if you know the
    direction of stack growth for your system; otherwise it will be
-   automatically deduced at run-time.
+   automatically deduced at runtime.
 	STACK_DIRECTION > 0 => grows toward higher addresses
 	STACK_DIRECTION < 0 => grows toward lower addresses
 	STACK_DIRECTION = 0 => direction of growth unknown */
@@ -258,6 +258,9 @@
 #ifndef __EXTENSIONS__
 # undef __EXTENSIONS__
 #endif
+#ifndef _POSIX_PTHREAD_SEMANTICS
+# undef _POSIX_PTHREAD_SEMANTICS
+#endif
 
 /* Define to empty if `const' does not conform to ANSI C. */
 #undef const
@@ -291,7 +294,7 @@
    supported. Do not define if restrict is supported directly. */
 #undef restrict
 
-/* Define to `unsigned' if <sys/types.h> does not define. */
+/* Define to `unsigned int' if <sys/types.h> does not define. */
 #undef size_t
 
 /* Define to rpl_strnlen if the replacement function should be used. */

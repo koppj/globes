@@ -238,7 +238,16 @@ Inside Cygwin GLoBES needs to be built with these commands:
 	configure
 	make LDFLAGS='-no-undefined'
 
+Mac OS
+------
 
+In order to compile and link globes use
+	configure --disable-rpath
+
+And then everything should work as usual, however, if you install
+GLoBES in a non-standard location you have to set the approriate
+environment variable to ensure that the linker finds the library at
+run-time. Typically this variable is named DYLD_LIBRARY_PATH.
 
 Compilers and Options
 =====================

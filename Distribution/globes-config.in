@@ -36,9 +36,9 @@ if test $perl_ext = "yes"; then
 extension_list="$extension_list perl"
 fi
 
+# linkerflag="-Wl,--rpath -Wl,$libdir"
+linkerflag="@linkerflag@"
 
-
-linkerflag="-Wl,--rpath -Wl,$libdir"
 newlibs="-L$libdir $linkerflag -lglobes @LIBS@" 
 
 lesslibs=${newlibs%"-lglobes"}
