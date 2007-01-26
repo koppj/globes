@@ -1,0 +1,19 @@
+#define TITLE       GLoBES -  Meetings</title>
+#define KEYWORDS    GLoBES, meeting, talks, workshop, AEDL, long, baseline, neutrino, oscillation, experiment, simulate, simulating, long baseline, neutrino oscillation
+#define DESCRIPTION Meetings related to the GLoBES software
+
+#include "template_head.gtml"
+
+<h1>GLoBES Meetings</h1>
+
+<p>
+The first Workshop on Physics and Applications of GLoBES took place in
+Heidelberg, Germany, from 24 - 26 January 2007.
+</p>
+<p>
+<a href="http://www.mpi-hd.mpg.de/~jkopp/glb07/">Go to the workshop homepage</a>
+</p>
+
+
+#include "template_foot.gtml"
+

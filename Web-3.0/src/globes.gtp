@@ -3,7 +3,7 @@
 // ---------------------------------------------------------------------
 
 // Re-generate only modified files
-define FAST_GENERATION
+//define FAST_GENERATION
 
 // Specify directory for generated html files
 define OUTPUT_DIR  ../html
@@ -23,7 +23,7 @@ define IMG_PATH    ./images
 ./features.gtml
 ./download.gtml
 ./experiments.gtml
-./plans.gtml
+./meetings.gtml
 ./credits.gtml
 ./contact.gtml
 ./impressum.gtml
