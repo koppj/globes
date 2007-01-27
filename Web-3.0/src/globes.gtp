@@ -3,7 +3,7 @@
 // ---------------------------------------------------------------------
 
 // Re-generate only modified files
-define FAST_GENERATION
+//define FAST_GENERATION
 
 // Specify directory for generated html files
 define OUTPUT_DIR  ../html
