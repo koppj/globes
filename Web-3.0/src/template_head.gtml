@@ -69,19 +69,19 @@
             <<nav_entry(experiments.html,Experiments,<<mycolor4>>)>>
           </tr>
           <tr>
-            <<nav_entry(meetings.html,Meetings,<<mycolor5>>)>>
+            <<nav_entry(faq.html,FAQ,<<mycolor5>>)>>
           </tr>
           <tr>
-            <<nav_entry(credits.html,Credits,<<mycolor6>>)>>
+            <<nav_entry(meetings.html,Meetings,<<mycolor6>>)>>
           </tr>
           <tr>
-            <<nav_entry(contact.html,Contact,<<mycolor7>>)>>
+            <<nav_entry(credits.html,Credits,<<mycolor7>>)>>
           </tr>
           <tr>
-            <<nav_entry(impressum.html,Impressum,<<mycolor8>>)>>
+            <<nav_entry(contact.html,Contact,<<mycolor8>>)>>
           </tr>
           <tr>
-            <td>&nbsp;</td> <td bgcolor="<<mycolor9>>">&nbsp;</td>
+            <<nav_entry(impressum.html,Impressum,<<mycolor9>>)>>
           </tr>
           <tr>
             <td>&nbsp;</td> <td bgcolor="<<mycolor10>>">&nbsp;</td>

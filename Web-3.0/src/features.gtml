@@ -1,4 +1,4 @@
-#define TITLE       GLoBES -  Features</title>
+#define TITLE       GLoBES -  Features
 #define KEYWORDS    GLoBES, AEDL, long, baseline, neutrino, oscillation, experiment, simulate, simulating, long baseline, neutrino oscillation, features
 #define DESCRIPTION Features of the GLoBES software, the library and the Abstract Experiment Definition Language AEDL
 
