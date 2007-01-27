@@ -1,0 +1,19 @@
+#define TITLE       GLoBES - FAQ
+#define KEYWORDS    GLoBES, FAQ, frequently, asked, questions, AEDL, long, baseline, neutrino, oscillation, experiment, simulate, simulating, long baseline, neutrino oscillation
+#define DESCRIPTION Frequently asked questions about the GLoBES software
+
+#include "template_head.gtml"
+
+<h1>Frequently asked questions</h1>
+
+<p>
+<span class="red">Questions:</span>
+Does GLoBES run under Mac OS?
+</p>
+<p>
+<span class="red">Answer:</span>
+Yes.
+</p>
+
+#include "template_foot.gtml"
+
