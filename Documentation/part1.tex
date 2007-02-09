@@ -1155,12 +1155,14 @@ of the reactor ({\tt x[0]}), the fiducial mass uncertainties of the far
 ({\tt x[3]}) and near ({\tt x[4]}) detectors.  The calculation follows
 \equ{chi2reactor}, but includes the energy calibration.
 
-\begin{quote}{\tt \footnotesize
+\vspace*{-0.3cm}
 
+\begin{quote}{\tt \footnotesize
 double likelihood(double true\_rate, double fit\_rate, double sqr\_sigma) \\
 \{ if (sqr\_sigma > 0) return square(true\_rate - fit\_rate) / sqr\_sigma; else return 0.0; \} 
 
-double chiDCNorm(int exp, int rule, int np, double *x, double *errors) \\
+double chiDCNorm(int exp, int rule, int np, double *x, double *errors, \\
+  \hspace*{0.3cm}  void* user\_data) \\
 \{ \\
   \hspace*{0.3cm} const EXP\_FAR = 0; const EXP\_NEAR = 1; \\
   \hspace*{0.3cm} int n\_bins = glbGetNumberOfBins(EXP\_FAR); \\
@@ -1249,7 +1251,7 @@ assigned in the \AEDL\ definition:
 \begin{quote}
 {\tt
   double chiDCNorm(int exp, int rule, int dim, double *x, \\
-  \hspace*{0.5cm} double *errors) \\
+  \hspace*{0.5cm} double *errors, void* user\_data) \\
   \{ \\
    \hspace*{0.5cm} double chi2 = 0.0; \\
    \hspace*{0.5cm} int i; \\
@@ -1265,7 +1267,7 @@ assigned in the \AEDL\ definition:
  \{ \\ 
   \hspace*{0.5cm} ... \\
   \hspace*{0.5cm} glbInit(agrv[0]); \\
-  \hspace*{0.5cm} glbDefineChiFunction(\&chiDCNorm,5,"chiDCNorm"); \\
+  \hspace*{0.5cm} glbDefineChiFunction(\&chiDCNorm,5,"chiDCNorm",NULL); \\
   \hspace*{0.5cm} ... \\
  \} \\
 }
