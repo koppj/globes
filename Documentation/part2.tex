@@ -1016,7 +1016,9 @@ $\simeq 2$ usually is more than enough).
 \item[Bin level] This level is determined by the experiment and its analysis. 
 Note that energy
 bin sizes much smaller than the energy resolution will not improve the results. The energy bin range and the number of energy bins always have to be specified. For the case of large values of the integrand in \eq~(\ref{eq:simple_int}) at the energy range limits, it is recommended to exceed the analysis energy window by about three times the energy calibration error in order 
-to avoid cutoff effects.
+to avoid cutoff effects. In addition, note that an energy resolution larger than about the
+bin range will distribute events out of this range. Therefore, the normalization
+will be affected.
 
 In order to define a range between $E_\mathrm{min}$
 and $E_\mathrm{max}$ divided by a certain number of equidistant bins,
