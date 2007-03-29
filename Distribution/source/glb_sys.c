@@ -724,10 +724,23 @@ int glbSetSysStartingValuesListInRule(int exp, int rule, int on_off, const doubl
  ***************************************************************************/
 inline double glb_likelihood(double true_rate, double fit_rate)
 {
+  double res; 
+  res = fit_rate - true_rate;
+  if (true_rate > 0)
+  {
+    if (fit_rate <= 0.0) 
+      res = 1e100;
+    else
+      res += true_rate * log(true_rate/fit_rate);
+  }
+  return 2.0 * res;
+  
+/* JK - 29.03.2007
   if(fit_rate > 0)
     return 2*(true_rate - fit_rate) + 2*fit_rate * log(fit_rate/true_rate);
   else
     return 2*(true_rate - fit_rate);
+*/
 }
 
 /* Alternative version of likelihood, using Gauss distribution */

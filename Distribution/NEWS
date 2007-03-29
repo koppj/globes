@@ -43,3 +43,13 @@
 25/01/2007 JK
         - Corrected correlated flux normalization in D-Chooz_far.glb
           from 2.0% to 2.8%
+
+**********Version 3.0.8
+
+29/03/2007 JK
+        - Corrected a bug in the glb_likelihood: In the calculation
+          of the Poisson chi^2, the "true" and fitted rates were
+          exchanged. This has a visible effect only for very small
+          event rates.
+
+          

@@ -1151,6 +1151,7 @@ static double internal_glbChiNP(const glb_params in, glb_params out)
         }
     }
 
+
   /* Check input errors and central values */
   glb_params osc_params = glbAllocParams();
   glb_projection proj = glbAllocProjection();
@@ -1197,8 +1198,7 @@ static double internal_glbChiNP(const glb_params in, glb_params out)
     { glb_error("internal_glbChiNP: Failed to set input errors"); return GLB_NAN; }
   if (glb_user_defined_starting_values(central_values, glb_prior_user_data) != 0)
     { glb_error("internal_glbChiNP: Failed to set central values"); return GLB_NAN; }
-
-
+ 
   /* Minimize over the free oscillation parameters */ 
   switch (glb_current_minimizer)
   {
