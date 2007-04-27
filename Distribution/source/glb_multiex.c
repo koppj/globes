@@ -881,7 +881,7 @@ int glbDefaultExp(glb_exp ins)
       while (in->smear_data[0]->bincenter[k] <= in->energy_window[i][0])
         k++;
       in->energy_window_bins[i][0] = k;
-      while (in->smear_data[0]->bincenter[k] < in->energy_window[i][1] && k < in->numofbins)
+      while (k < in->numofbins && in->smear_data[0]->bincenter[k] < in->energy_window[i][1])
         k++;
       in->energy_window_bins[i][1] = k-1;
     }

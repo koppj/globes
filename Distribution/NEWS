@@ -52,4 +52,8 @@
           exchanged. This has a visible effect only for very small
           event rates.
 
-          
+17/04/2007 JK
+        - Fixed a small bug in glbDefaultExp, leading to a possible read
+          beyond array boundaries of smear_data[0]->bin_center 
+
+
