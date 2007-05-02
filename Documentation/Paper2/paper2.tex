@@ -459,11 +459,13 @@ The core part of \equ{chipull} is the definition of $\chi^2$. For example, for a
 a signal normalization error only, it reads
 \begin{equation}
   \chi^2 (\boldsymbol{\lambda},a) =  \sum_{i=1}^{\textrm{\# of bins}}2
-     \left( O_{i} - (1 + a) T_{i} +
-       (1 + a) T_{i} \log \frac{(1 + a) T_{i}}{O_{i}}  \right) + \frac{a^2}{\sigma_a^2} 
+     \left( (1 + a) T_{i} - O_{i} +
+       O_{i} \log \frac{O_{i}}{(1 + a) T_{i}}  \right) + \frac{a^2}{\sigma_a^2} \, ,
 \label{equ:chistandard}
 \end{equation}
-
+where $O_i$ are the observed rates (corresponding to the data or true values), and $T_i$ are
+the theoretical (fit) rates.
+%
 Let us assume that we have two detectors, such as for a reactor experiment with a near and
 far detector. Using standard systematics in \GLOBES , one has
 \begin{equation}
@@ -492,8 +494,8 @@ and two fiducial volume errors of the near $\sigma_N$ and far $\sigma_F$ detecto
 Then \equ{chistandard} will be replaced by
 \begin{align}
   \chi^2(\boldsymbol{\lambda},a_N,a_F,a_R) = & \sum_{i=1}^{\textrm{\# of bins}} \sum_{d = N,F} 2
-     \Big( O_{d,i} - (1 + a_R + a_d) T_{d,i} +  \nonumber \\
-& \left. + (1 + a_R + a_d) T_{d,i} \log \frac{(1 + a_R + a_d) T_{d,i}}{O_{d,i}}  \right) 
+     \Big( (1 + a_R + a_d) T_{d,i} - O_{d,i} +  \nonumber \\
+& \left. + O_{d,i} \log \frac{O_{d,i}}{(1 + a_R + a_d) T_{d,i}}  \right) 
           + \frac{a_R^2}{\sigma_R^2} + \frac{a_N^2}{\sigma_N^2} + \frac{a_F^2}{\sigma_F^2}
 \label{equ:chi2reactor}
 \end{align}

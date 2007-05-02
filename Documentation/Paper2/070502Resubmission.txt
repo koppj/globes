@@ -1,0 +1,34 @@
+Dear Editor,
+
+we are very pleased about the two very positive referee reports. 
+Hereby we submit the revised version of our manuscript. 
+
+Reviewer (1) argues that Equ. (8) is not consistent with the usual 
+chi2 definition (see Particle Data Group). Though there are no 
+substantial effects in most cases, the referee is correct that in 
+some cases (especially with low event rates) there could be differences. 
+We changed Eqs. (8) and (10) accordingly, as the referee suggests. 
+In addition, we have changed the software starting with version 3.0.8 
+and higher to be consistent with this chi2 definition.
+
+About the editorial comments: 
+
+We have changed the BibTeX bib-style file to h-elsevier.bst. We hope that
+the references are now compatible with your style. If not, please
+send us the appropriate bst-file.
+
+We would like to submit GLoBES version 3.0.8 to the program library. Installation 
+instructions can be found in Appendix A of your manual. Any other questions 
+should be answered by the very first chapter ``What is GLoBES?'' of the manual. 
+Since GLoBES is changing dynamically, we would like to ask you to link the 
+official GLoBES webpage to the program library:
+http://www.mpi-hd.mpg.de/lin/globes/index.html
+We will send these files to the editor Dr. Scott directly.
+
+We hope that our manuscript is now suitable for publication in CPC.
+
+Best regards,
+
+Walter Winter (on behalf of the authors)
+
+
