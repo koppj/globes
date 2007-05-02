@@ -15,7 +15,7 @@ version is here:
 <b>Note</b>: In v3.0.8, we have implemented an important <b>bugfix</b> in the
 &chi;&sup2; calculations. Up to v3.0.7, the meaning of the true and fitted event
 rates was accidentally interchanged. This may have a visible effect only in some
-situations with low event rates, but it should not invalidate existing results.
+situations with low event rates, but it does not invalidate existing results.
 
 <!--You may also want to check out this statically linked binary
 <a href="download/globes.gz">globes.gz</a>, which should run right of the box
