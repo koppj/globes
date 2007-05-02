@@ -12,9 +12,9 @@ version is here:
 <ul>
   <li><a href="download/globes-3.0.8.tar.gz">globes-3.0.8.tar.gz</a> &nbsp;(May. 02, 2007)</li>
 </ul>
-<b>Note</b>: In v3.0.8, we have implemented an important <b>bugfix</b> in the
-&chi;&sup2; calculations. Up to v3.0.7, the meaning of the true and fitted event
-rates was accidentally interchanged. This may have a visible effect only in some
+<b>Note</b>: In v3.0.8, we have fixed a bug in the &chi;&sup2; calculations. Up to
+v3.0.7, the true and fitted event rates were interchanged in the computation
+of the Poissonian &chi;&sup2;. This may have some visible effect only in some
 situations with low event rates, but it does not invalidate existing results.
 
 <!--You may also want to check out this statically linked binary
