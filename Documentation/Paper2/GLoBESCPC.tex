@@ -1,0 +1,183 @@
+
+%% This `backbone' file can be used to write a paper for
+%% Computer Physics Communications using LaTeX.
+%% For authors who want to write a computer program description,
+%% an example Program Summary is included that only has to be
+%% completed and which will give the correct layout in the
+%% preprint and the journal.
+%% The `elsart' style that is used and more information on this style
+%% can be found at the Author Gateway (http://authors.elsevier.com) and follow %% the link to "Guide to publishing with Elsevier".
+\documentclass{elsart}
+
+%% This list environment is used for the references in the
+%% Program Summary
+%%
+\newcounter{bla}
+\newenvironment{refnummer}{%
+\list{[\arabic{bla}]}%
+{\usecounter{bla}%
+ \setlength{\itemindent}{0pt}%
+ \setlength{\topsep}{0pt}%
+ \setlength{\itemsep}{0pt}%
+ \setlength{\labelsep}{2pt}%
+ \setlength{\listparindent}{0pt}%
+ \settowidth{\labelwidth}{[9]}%
+ \setlength{\leftmargin}{\labelwidth}%
+ \addtolength{\leftmargin}{\labelsep}%
+ \setlength{\rightmargin}{0pt}}}
+ {\endlist}
+
+\begin{document}
+\begin{frontmatter}
+
+\title{GLoBES: General Long Baseline Experiment Simulator}
+
+\author[a]{Patrick Huber},
+\author[b]{Joachim Kopp},
+\author[b]{Manfred Lindner},
+\author[c]{Mark Rolinec},
+\author[d]{Walter Winter}
+
+\address[a]{University of Wisconsin, Physics Department, 1150 University Av. Madison, WI 53706, USA}
+\address[b]{Max-Planck-Institut f\"{u}r Kernphysik, Postfach 10 39 80, D-69029 Heidelberg, Germany}
+\address[c]{Technische Universit\"{a}t M\"{u}nchen, Institut f\"{u}r
+Theoretische Physik, Physik-Department, James-Franck-Strasse,
+D-85748 Garching, Germany}
+\address[d]{Universit\"{a}t W\"{u}rzburg, Lehrstuhl f\"{u}r theoretische Physik II, Institut f\"{u}r theoretische Physik und Astrophysik, Am Hubland, D-97074 W\"{u}rzburg, Germany}
+
+\begin{abstract}
+GLoBES (General Long Baseline Experiment Simulator) is a flexible software package to simulate
+neutrino oscillation long baseline and reactor experiments. On the one hand, it contains a
+comprehensive abstract experiment definition language (AEDL), which allows to describe most classes of
+long baseline experiments at an abstract level. On the other hand, it provides a C-library to process
+the experiment information in order to obtain oscillation probabilities, rate vectors, and
+$\Delta_{\chi^{2}}$-values. Currently, GLoBES is available for GNU/Linux. Since the source code is
+included, the port to other operating systems is in principle possible.
+
+GLoBES is an open source code that has previously been described in Computer Physics Communications
+167~(2005)~195 and in this issue, xx (2007) yyy). The source code and a comprehensive User Manual for
+GLoBES v3.0.8 is now available from the CPC Program Library as described in the Program Summary below.
+The home of GLobES is http://www.mpi-hd.mpg.de/$\sim$globes/.
+
+\begin{flushleft}
+
+PACS: 14.60.Pq
+
+\end{flushleft}
+
+\begin{keyword}
+Neutrino oscillations; Long-baseline experiment; GLoBES;
+\end{keyword}
+
+\end{abstract}
+
+
+\end{frontmatter}
+
+% Computer program descriptions should contain the following
+% PROGRAM SUMMARY.
+
+{\bf PROGRAM SUMMARY}
+  %Delete as appropriate.
+
+\begin{small}
+\noindent
+{\em Manuscript Title:} GLoBES: General Long Baseline Experiment Simulator\\
+{\em Authors:} Patrick Huber, Joachim Kopp, Manfred Lindner, Mark Rolinec, Walter Winter\\
+{\em Program Title:} GLoBES version 3.0.8\\
+{\em Journal Reference:}                                      \\
+  %Leave blank, supplied by Elsevier.
+{\em Catalogue identifier:}                                   \\
+  %Leave blank, supplied by Elsevier.
+{\em Licensing provisions:} none                                  \\
+  %enter "none" if CPC non-profit use license is sufficient.
+{\em Programming language:} C                                  \\
+{\em Computer:} GLoBES builds and installs on 32bit and 64bit Linux systems.\\
+  %Computer(s) for which program has been designed.
+{\em Operating system:} 32bit or 64bit Linux                                      \\
+  %Operating system(s) for which program has been designed.
+{\em RAM:} Typically a few MBs                                         \\
+  %RAM in bytes required to execute program with typical data.
+{\em Keywords:} Neutrino oscillations, Long-baseline experiment,
+GLoBES \\
+{\em PACS:} 14.60Pq    \\
+{\em Classification:} 11.1  General, High Energy Physics and Computing, 
+  11.7 Detector Design and Simulation, 11.10 Accelerators and Particle Beams    \\
+  %Classify using CPC Program Library Subject Index, see (
+  % http://cpc.cs.qub.ac.uk/subjectIndex/SUBJECT_index.html)
+  %e.g. 4.4 Feynman diagrams, 5 Computer Algebra.
+{\em External routines/libraries:} GSL - The GNU Scientific Library,
+www.gnu.org/software/gsl/\\
+
+{\em Nature of problem:}\\
+  Neutrino oscillations are now established as the leading flavor
+transition mechanism for neutrinos. In a long history of many experiments, see, e.g., [1], two
+oscillation frequencies have been identified: The fast atmospheric and the slow solar
+oscillations, which are driven by the respective mass squared differences. In addition, there could be
+interference effects between these two oscillations, provided that the coupling given by the small
+mixing angle $\theta_{13}$ is large enough. Such interference effects include, for example, leptonic
+CP violation. In order to test the unknown oscillation parameters, i.e. the mixing angle
+$\theta_{13}$, the leptonic CP phase, and the neutrino mass hierarchy, new long-baseline and reactor
+experiments are proposed. These experiments send an artificial neutrino beam to a detector, or detect
+the neutrinos produced by a nuclear fission reactor. However, the presence of multiple solutions which
+are intrinsic to neutrino oscillation probabilities [2-5] affect these measurements. Thus optimization
+strategies are required which maximally exploit complementarity between experiments. Therefore, a
+modern, complete experiment simulation and analysis tool does not only need to have a highly accurate
+beam and detector simulation, but also powerful means to analyze correlations and degeneracies,
+especially for the combination of several experiments. The GLoBES software package is such a
+tool~[6-7].
+   \\
+{\em Solution method:}\\
+   GLoBES is a flexible software tool to simulate and analyze
+neutrino oscillation long-baseline and reactor experiments using a
+complete three-flavor description. On the one hand, it contains a
+comprehensive abstract experiment definition language (AEDL), which
+makes it possible to describe most classes of long baseline and
+reactor experiments at an abstract level. On the other hand, it
+provides a C-library to process the experiment information in order
+to obtain oscillation probabilities, rate vectors, and
+$\Delta {\chi^{2}}$-values. In addition, it provides a binary
+program to test experiment definitions very quickly, before they are
+used by the application software.
+   \\
+{\em Restrictions:}\\
+  Currently restriced to discrete sets of sources and detectors. For example, the
+simulation of an atmospheric neutrino flux is not supported. 
+  %Describe any restrictions on the complexity of the problem here.
+   \\
+{\em Unusual features:}\\
+   Clear separation between experiment description and the simulation software.
+  %Describe any unusual features of the program/problem here.
+   \\
+{\em Additional comments:}\\
+   To find information on the latest version of the software and user manual, please check the author's
+  web site,  http://www.mpi-hd.mpg.de/$\sim$globes
+   \\
+{\em Running time:}\\
+The examples included in the distribution take only a few minutes to
+complete. More sophisticated problems can take up to several days.
+  %Give an indication of the typical running time here.
+   \\
+{\em References:}
+\begin{refnummer}
+\item V. Barger, D. Marfatia, K. Whisnant, Int. J. Mod. Phys. E 12(2003)569, and references therein,
+hep-ph/0308123.
+\item G.L. Fogli, E. Lisi, Phys. Rev. D 54 (1996) 3667, hepph/
+9604415.
+\item J. Burguet-Castell, M.B. Gavela, J.J. Gomez-Cadenas, P. Hernandez,
+O. Mena, Nucl. Phys. B 608 (2001) 301, hep-ph/ 0103258.
+\item H. Minakata, H. Nunokawa, JHEP 0110 (2001) 001, hep-ph/
+0108085.
+\item V. Barger, D. Marfatia, K. Whisnant, Phys. Rev. D 65 (2002)
+073023, hep-ph/0112119.
+\item P. Huber, M. Lindner and W. Winter, Comput. Phys. Commun. 167 (2005) 195.
+\item Patrick Huber, Joachim Kopp, Manfred Lindner, Mark Rolinec, Walter Winter, Comput. Phys. Commun. xxx (2007) yyy.
+\end{refnummer}
+
+\end{small}
+
+\newpage
+
+
+
+\end{document}
