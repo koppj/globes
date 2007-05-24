@@ -191,6 +191,7 @@ yyterminate();
 }
 else
 {
+glb_fclose(yyin);
 yy_delete_buffer( YY_CURRENT_BUFFER );
 yy_switch_to_buffer(
 		    include_stack[include_stack_ptr] );

@@ -12,3 +12,13 @@ Date: 23.01.07
         grp_end, file glb_parser.y.
 -------------------------------------------------------------------------------
 
+BUG#18 Files opened by include in AEDL are not flclosed
+
+From: Walter Winter
+Date: 22.05.07
+
+	A program repeatedly loading an AEDL file containing 'include'
+	statements will fail with 'Can't open file' error after some
+	time (~1000 includes). 
+-------------------------------------------------------------------------------
+

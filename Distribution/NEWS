@@ -57,3 +57,7 @@
           beyond array boundaries of smear_data[0]->bin_center 
 
 
+**********Version 3.0.9
+
+24/05/2007 PH
+	- Fixed BUG#18
