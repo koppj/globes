@@ -724,6 +724,16 @@ int glbSetSysStartingValuesListInRule(int exp, int rule, int on_off, const doubl
  ***************************************************************************/
 inline double glb_likelihood(double true_rate, double fit_rate)
 {
+  double res;
+  res = fit_rate - true_rate;
+  if (fit_rate <= 0.0)
+    res = 1e100;
+  else if (true_rate > 0)
+    res += true_rate * log(true_rate/fit_rate);
+
+  return 2.0 * res; 
+
+/* JK - 2007-06-29  
   double res; 
   res = fit_rate - true_rate;
   if (true_rate > 0)
@@ -734,6 +744,7 @@ inline double glb_likelihood(double true_rate, double fit_rate)
       res += true_rate * log(true_rate/fit_rate);
   }
   return 2.0 * res;
+*/
   
 /* JK - 29.03.2007
   if(fit_rate > 0)
@@ -2053,12 +2064,23 @@ void glbShiftEnergyScale(double b, double *rates_in, double *rates_out,
     delta = b * (i + t0 + 0.5) + i;
     k     = (int) floor(delta);
 
-    if (k < 0 || k > n_bins - 1)
+    if (k < -1 || k > n_bins - 1)
       rates_out[i] = 0.0;
-    else if (k == n_bins - 1) /* This prevents reading beyond array boundaries */
+    else if (k == -1)         /* Assume out-of-bounds bins to contain 0 events */
+      rates_out[i] = (1 + b) * rates_in[k+1] * (delta - k);
+    else if (k == n_bins - 1)
       rates_out[i] = (1 + b) * (rates_in[k] * (delta - k) + rates_in[k]);
     else
       rates_out[i] = (1 + b) * ((rates_in[k+1] - rates_in[k]) * (delta - k) + rates_in[k]);
+
+/* JK - 2007-06-25 
+    if (k < 0 || k > n_bins - 1)
+      rates_out[i] = 0.0;
+    else if (k == n_bins - 1)
+      rates_out[i] = (1 + b) * (rates_in[k] * (delta - k) + rates_in[k]);
+    else
+      rates_out[i] = (1 + b) * ((rates_in[k+1] - rates_in[k]) * (delta - k) + rates_in[k]);
+*/
   }
 }
 

@@ -61,3 +61,14 @@
 
 24/05/2007 PH
 	- Fixed BUG#18
+
+**********Version 3.0.10
+29/06/2007 JK
+        - Fixed another potential problem in glb_likelihood (chi^2 could
+          become negative for true_rate=0, fit_rate<0)
+        - Fixed problem in glbShiftEnergyScale: for negative shifts, the
+          leftmost bin was always set to 0, instead of some interpolation
+          between 0 and its original value. This is not a big problem, but
+          it leads to glb_likelihood returning 1e200, which can confuse
+          the minimizer if it happens in the very first evaluation of chi^2.
+        - Added DocPlots.nb to the distribution
