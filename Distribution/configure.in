@@ -46,7 +46,7 @@ dnl code changed: c:r+1:a
 dnl API changed: c+1:0:a
 dnl -> API extended: c:0:a+1
 dnl -> API shrunken: c:0:0
-GLBLIBVERSION="8:11:0"
+GLBLIBVERSION="8:12:0"
 
 dnl From here no editing !
 AC_SUBST(GLBLIBVERSION)
