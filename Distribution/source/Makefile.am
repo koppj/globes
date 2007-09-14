@@ -22,4 +22,4 @@ libglobes_la_LDFLAGS += $(top_builddir)/lib/libgnu.la
 
 bin_PROGRAMS = globes
 globes_SOURCES = globes.c 
-globes_LDADD = libglobes.la @LIBS@ -lstdc++ 
+globes_LDADD = libglobes.la @LIBS@

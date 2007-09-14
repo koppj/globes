@@ -72,3 +72,15 @@
           it leads to glb_likelihood returning 1e200, which can confuse
           the minimizer if it happens in the very first evaluation of chi^2.
         - Added DocPlots.nb to the distribution
+
+**********Version 3.0.11
+13/09/2007 JK
+        - Removed libstdc++ from Makefile in source directory
+        - Declared fa, fb, fc and fu as long double in glb_hybrid_bracket
+          to avoid problems with extra floating point digits on x86 CPUs
+          (in the case of flat directions in parameter space, comparisons
+          could yield wrong results if the operands were identical, but
+          one of them was stored in main memory while the other was retained
+          in the floating point registers). See also http://gcc.gnu.org/bugzilla/,
+          entryg No. #323.
+
