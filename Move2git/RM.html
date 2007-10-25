@@ -1,0 +1,475 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+    "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="generator" content="AsciiDoc 7.1.2" />
+<style type="text/css">
+/* Debug borders */
+p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
+/*
+  border: 1px solid red;
+*/
+}
+
+body {
+  margin: 1em 5% 1em 5%;
+}
+
+a {
+  color: blue;
+  text-decoration: underline;
+}
+a:visited {
+  color: fuchsia;
+}
+
+em {
+  font-style: italic;
+}
+
+strong {
+  font-weight: bold;
+}
+
+tt {
+  color: navy;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #527bbd;
+  font-family: sans-serif;
+  margin-top: 1.2em;
+  margin-bottom: 0.5em;
+  line-height: 1.3;
+}
+
+h1 {
+  border-bottom: 2px solid silver;
+}
+h2 {
+  border-bottom: 2px solid silver;
+  padding-top: 0.5em;
+}
+
+div.sectionbody {
+  font-family: serif;
+  margin-left: 0;
+}
+
+hr {
+  border: 1px solid silver;
+}
+
+p {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+pre {
+  padding: 0;
+  margin: 0;
+}
+
+span#author {
+  color: #527bbd;
+  font-family: sans-serif;
+  font-weight: bold;
+  font-size: 1.2em;
+}
+span#email {
+}
+span#revision {
+  font-family: sans-serif;
+}
+
+div#footer {
+  font-family: sans-serif;
+  font-size: small;
+  border-top: 2px solid silver;
+  padding-top: 0.5em;
+  margin-top: 4.0em;
+}
+div#footer-text {
+  float: left;
+  padding-bottom: 0.5em;
+}
+div#footer-badges {
+  float: right;
+  padding-bottom: 0.5em;
+}
+
+div#preamble,
+div.tableblock, div.imageblock, div.exampleblock, div.verseblock,
+div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
+div.admonitionblock {
+  margin-right: 10%;
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
+div.admonitionblock {
+  margin-top: 2.5em;
+  margin-bottom: 2.5em;
+}
+
+div.content { /* Block element content. */
+  padding: 0;
+}
+
+/* Block element titles. */
+div.title, caption.title {
+  font-family: sans-serif;
+  font-weight: bold;
+  text-align: left;
+  margin-top: 1.0em;
+  margin-bottom: 0.5em;
+}
+div.title + * {
+  margin-top: 0;
+}
+
+td div.title:first-child {
+  margin-top: 0.0em;
+}
+div.content div.title:first-child {
+  margin-top: 0.0em;
+}
+div.content + div.title {
+  margin-top: 0.0em;
+}
+
+div.sidebarblock > div.content {
+  background: #ffffee;
+  border: 1px solid silver;
+  padding: 0.5em;
+}
+
+div.listingblock > div.content {
+  border: 1px solid silver;
+  background: #f4f4f4;
+  padding: 0.5em;
+}
+
+div.quoteblock > div.content {
+  padding-left: 2.0em;
+}
+
+div.attribution {
+  text-align: right;
+}
+div.verseblock + div.attribution {
+  text-align: left;
+}
+
+div.admonitionblock .icon {
+  vertical-align: top;
+  font-size: 1.1em;
+  font-weight: bold;
+  text-decoration: underline;
+  color: #527bbd;
+  padding-right: 0.5em;
+}
+div.admonitionblock td.content {
+  padding-left: 0.5em;
+  border-left: 2px solid silver;
+}
+
+div.exampleblock > div.content {
+  border-left: 2px solid silver;
+  padding: 0.5em;
+}
+
+div.verseblock div.content {
+  white-space: pre;
+}
+
+div.imageblock div.content { padding-left: 0; }
+div.imageblock img { border: 1px solid silver; }
+span.image img { border-style: none; }
+
+dl {
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
+}
+dt {
+  margin-top: 0.5em;
+  margin-bottom: 0;
+  font-style: italic;
+}
+dd > *:first-child {
+  margin-top: 0;
+}
+
+ul, ol {
+    list-style-position: outside;
+}
+ol.olist2 {
+  list-style-type: lower-alpha;
+}
+
+div.tableblock > table {
+  border: 3px solid #527bbd;
+}
+thead {
+  font-family: sans-serif;
+  font-weight: bold;
+}
+tfoot {
+  font-weight: bold;
+}
+
+div.hlist {
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
+}
+td.hlist1 {
+  vertical-align: top;
+  font-style: italic;
+  padding-right: 0.8em;
+}
+td.hlist2 {
+  vertical-align: top;
+}
+
+@media print {
+  div#footer-badges { display: none; }
+}
+/* Workarounds for IE6's broken and incomplete CSS2. */
+
+div.sidebar-content {
+  background: #ffffee;
+  border: 1px solid silver;
+  padding: 0.5em;
+}
+div.sidebar-title, div.image-title {
+  font-family: sans-serif;
+  font-weight: bold;
+  margin-top: 0.0em;
+  margin-bottom: 0.5em;
+}
+
+div.listingblock div.content {
+  border: 1px solid silver;
+  background: #f4f4f4;
+  padding: 0.5em;
+}
+
+div.quoteblock-content {
+  padding-left: 2.0em;
+}
+
+div.exampleblock-content {
+  border-left: 2px solid silver;
+  padding-left: 0.5em;
+}
+</style>
+</head>
+<body>
+<div id="header">
+</div>
+<h2>CVS to git move of the central repo</h2>
+<div class="sectionbody">
+<p>This here is take two, I installed the same recent git version on both
+sides of the problem.</p>
+<ul>
+<li>
+<p>
+Install git v1.5.3
+</p>
+</li>
+<li>
+<p>
+Install cvsps (only need for the inital import from CVS)
+</p>
+</li>
+<li>
+<p>
+Create target directory, i.e. place where the new git repository is going to live.
+</p>
+</li>
+</ul>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ export CVS_RSH="ssh"
+$ git cvsimport -v -d globes@lfs3.mpi-hd.mpg.de:/home/lin/globes/cvs Projects/GLOBES</tt></pre>
+</div></div>
+<p>which should not take more than one hour (Heidelberg-&gt;Madison) and
+should be much faster locally.</p>
+<p>NB Size goes from 280MB to 140MB</p>
+<p>In the central repo, I deleted branches</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>Web lin patrick</tt></pre>
+</div></div>
+<p>since they correspond to some old modules, no one is using anymore.</p>
+</div>
+<h2>Organizing releases, branches etc.</h2>
+<div class="sectionbody">
+<p>After doing a bit of research, I can imagine following scheme for
+<tt>GLoBES</tt> release management:</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>                 tag-version-3-0
+                  |
+                  | tag-version-3-0-1
+                  | |
+                  | |           tag-version-3-0-2
+                  | |            |
+  debugging -&gt; o-o-o-----------o-o- &lt;-version-3-0
+              /    ^           ^
+             /     |           |               o-o-o-o-o- &lt;- version-3-2
+            /    bug fix     bug fix          /
+           /       |           |             /
+-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o &lt;-master
+              \               \           /
+               \               \         /
+                \               o-o-o-o-o &lt;-feature-foobar
+                 \
+                  o-o-o-o-o &lt;-feature-foobaz</tt></pre>
+</div></div>
+<p>The idea is that all active development happens on <tt>master</tt>, however
+only changes which actually work (at least in some definition) are
+integrated into <tt>master</tt>. Especially, the API should be more or less
+final on <tt>master</tt>. The version on <tt>master</tt> should always be
+usable. New features and experimental development is done on feature
+branches, like <tt>feature-foobaz</tt>. The development in <tt>feature-foobaz</tt>
+turned out be lead nowhere, hence the branch is not merged. We don't
+delete it, since maybe sometime later we may want to come back to
+it. <tt>feature-foobar</tt>, on the other hand is merged into <tt>master</tt> since
+we want to keep that feature. The branch is deleted afterwards. When
+we decide it's time for a new major version 3.x, we create a
+corresponding branch <tt>version-3.x</tt> and set the version number in
+<tt>configure.in</tt> in the <tt>version-3.x</tt> branch to 3.x and in master to
+3.x+1. There me be a pre-release phase on then <tt>version-3.x</tt> branch,
+the API may be fine tuned etc. After some time we freeze the addition
+of features and API changes and start debugging and testing. Once
+we're ready we tag the branch with <tt>tag-version-3.x</tt> and make the
+release. Bugs will be fixed on <tt>master</tt> and then merged into
+<tt>version-3-x</tt>. At which point we tag and release a minor version 3.x.y+1
+etc. Version branches never are deleted, although we will not merge
+bug fixes in any previous version branches, but always only in the
+most recently released one.</p>
+<h3>Version numbering</h3>
+<p>On any of the version branches it is fairly simple: after release of
+3.x <tt>version-3.x</tt> will have versions 3.x.0, 3.x.1 etc. On <tt>master</tt> we
+have 3.x+1 and will count all changes like 3.x+1.0, 3.x+1.1 etc. The
+next release version then always will be 3.x+2. That implies in the
+current system, that all public releases will haven an even x,
+i.e. 3.0, 3.2, 3.4 &#8230;</p>
+<p>The real issue is are feature branches, how do we count on them?
+Adding forth digit? For instance, assume <tt>feature-foobaz</tt> is branched
+from <tt>master</tt> at version 3.1.0, the its first commit would be version
+3.1.0.0 and then 3.1.0.1. That requires that not two feature branches
+start at the same version, which I think can be arranged.</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>
+        pre-release finalization    release  bugfixes
+         |    |       |       |        |         |
+    2.9.12-&gt;2.9.13-&gt;2.9.14-&gt;2.9.15--&gt;3.0.0---&gt;3.0.1--&gt;   version-3-0
+    /
+   /
+-2.9.12-&gt;3.1.0-&gt;3.1.1-&gt;3.1.2----&gt;3.1.3---------&gt;3.1.4    master
+                         \         \
+                          \       3.1.3.0-&gt;3.1.3.1       feature-foobar
+                           \
+                        3.1.2.0-&gt;3.1.2.1-&gt;3.1.2.2        feature-foobaz</tt></pre>
+</div></div>
+<p>The only thing we can't fit into that scheme are private feature
+branches, on the other hand they are private and hence it's everyone's
+private buissiness to organize that.</p>
+<h3>Tagging</h3>
+<p>We require tagging only for release, so that getting the the state of
+the repo when a certain version was release is easy. Besides, we
+may tag major events, like fixing the chi^2 bug.</p>
+<h3>Implementation</h3>
+<p>Bob wants to colla</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git tag -l
+  last-time-module
+  mass-ordering
+  pre-release
+  release
+  release-3-0-0
+  start
+  version-1-7-7
+  version-1-8
+  version-1-8-2
+  version-2-0-0
+  version-2-0-1
+  version-2-0-1-beta</tt></pre>
+</div></div>
+<p>and decides to create a new branch which starts at release-3-0-0</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git checkout -b version-3-0 release-3-0-0</tt></pre>
+</div></div>
+<p>this also switches to that branch next we`d like to merge all changes
+which happened since the tag release-3-0-0 was created to this branch</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git pull . master</tt></pre>
+</div></div>
+<p>Now we have the following structure</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>         o-o-o-o-o-o-o-o-o-o-o-o version-3-0
+        /                      | merge from master
+-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o master
+       |
+     release-3-0-0</tt></pre>
+</div></div>
+<p>Now, one can add new features to master and do the maintenance and
+bug-fixing for version 3.0 on the version-3-0 branch.</p>
+<p>Next we need to make that public. First we push our new branch</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git push origin version-3-0</tt></pre>
+</div></div>
+<p>Next we need to ensure that this branch gets pulled as well.</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git config branch.version-3-0.remote origin
+$ git config branch.version-3-0.merge refs/heads/version-3-0</tt></pre>
+</div></div>
+<p>These are the same things</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git branch --track version-3-0 origin/version-3-0</tt></pre>
+</div></div>
+<p>would create, but Bob has that branch already.</p>
+</div>
+<h2>Updating the website</h2>
+<div class="sectionbody">
+<p>Clearly the transition to <tt>git</tt> will require to adapt the
+<tt>webupdate-globes</tt> script.</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>#
+# update from cvs
+echo "Updating from CVS ..."
+cvs update -dP
+#</tt></pre>
+</div></div>
+<p>will need to appropriately replaced.</p>
+<p>We extract current tar-ball out of the git central repo and unpack it
+into <tt>web-tmp</tt></p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git-archive --format=tar --remote=path-to-central-repo refs/heads/version-3-0:Web-3.0 &gt; web.tar
+$ tar -xf web.tar</tt></pre>
+</div></div>
+<p>where <tt>version-3-0</tt> has to be replaced with the right branch, i.e if you
+do that for version 3.2, one has to use <tt>version-3-2</tt>.</p>
+<p>The good thing about specifying the branch directly, is that we can
+already update the webpages for release 3.2 without interefering with
+maintenance of the webpages for version 3.0.</p>
+</div>
+<div id="footer">
+<div id="footer-text">
+Last updated 25-Oct-2007 12:17:48 CEST
+</div>
+</div>
+</body>
+</html>

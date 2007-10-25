@@ -1,0 +1,458 @@
+GLoBES transition from CVS to git
+---------------------------------
+Patrick Huber
+
+`git` is a so called distributed source code management system (SCM),
+whereas `CVS` is a centralized SCM. There are nearly religious-like
+view points on the merits and drawback of the distributed versus
+centralized approach. It is, however, clear, that in practice none of
+the approaches is used in a pure fashion. In a centralized world you
+often do have private working copies which never get commited to the
+central server. Sometimes you do send a patch by email instead going
+via the central repo. In a distributed world, some centralization is
+necessary otherwise, N developers would have to do N^2^ updates to
+ensure everyone has the same state of repo. Important about using a
+distributed SCM is that it allows to work in a centralized fashion,
+but it does not force you to. The notion of central repository becomes
+a social one and is no longer a technical one. For `GLoBES` we want to
+keep one central repo in Heidelberg.
+
+With `git` every developer will have a fully equipped local copy of
+the repo. This allows to do very fast, since fully local,
+operations. Especially commits, diffs, branches and log searches
+become very fats and easy operations, which also work while working
+offline. Besides, your commit initially stay private, hence it is
+possible to commit incrementally, one change at a time. This makes log
+messages and the whole history much more useful. It also makes it
+easier to follow the work of other people. Cheap branches allow to
+test new things on a temporary branch. If it works it will get merged
+into the mainline of development, if not the branch will be deleted.
+Eventually the local repo is synchronized with the central repo, but only once your ready and the code is again in a workable state.
+
+`git` does not track files, it tracks the content of files. This a
+fine, but in practice important difference. This allows to move and
+rename files while preserving their history. We had those renames in
+the past and we did disconnect the history of files in that way.
+
+This short document tries to describe the very minimal set of things
+to know about `git` in order to allow for a smooth transition from
+`CVS` to `git`. All the commands in here, I have actually tried out
+with version 1.5.3 of `git` and an actual copy of the `GLoBES` CVS
+repository (imported into `git`).
+
+There is an link:RM.html[accompanying document], which described how
+the actual moving will work. It also describes who the release
+management, version numbering etc. are planed to work after the
+move. Hence anyone involved in making the actual release and/or
+writing code is encouraged to read that as well.
+
+Local git repos for developers
+------------------------------
+
+You get a local copy:
+
+----------------------------------------------------------------
+$ git-clone ssh://phuber@login/~/globes-git-central globes-bob/
+----------------------------------------------------------------
+
+Took about 8 minutes from Wisconsin to CERN and creates about 300MB
+stuff on your hard drive. Everything seems to be in order...
+
+globes-3.0.11 builds out of the box
+
+run locally, i.e. inside `globes-bob`
+
+--------------------------------------
+$ git config user.name "Bob Bar"
+$ git config user.email "bob@bar.com"
+--------------------------------------
+
+This creates in `.git/config`
+
+-----------------------------
+[user]
+	name  = "bob"
+	email = "bob@bar.com"
+-----------------------------
+
+I highly recommend the everyone does that in his/her local copy (of
+course use your real name). In that way, although we only have one
+account, we preserve the correct authorship. That is highly useful for
+tools like `git-blame`.
+
+Typical CVS-like usage
+----------------------
+
+Dictionary
+~~~~~~~~~~
+
+If you just want to pretend that you`re still using CVS
+
+`---------------`------------------------
+cvs update	git pull
+cvs commit 	git commit -a & git push
+cvs add		git add
+cvs rm 		git rm
+cvs checkout 	git clone
+cvs diff	git diff
+cvs log		git log
+cvs tag		git tag
+-----------------------------------------
+
+Added functionality
+~~~~~~~~~~~~~~~~~~~
+
+You will have noticed that the equivalent of `cvs commit` are indeed
+to commands in git. The reason is, that you have a fully equipped local
+repository and hence all git commands (with 3 exceptions) will operate
+on that local copy only. This is great for speed, if you`re offline or
+if you screw up. Since `git commit` operates on your local repo you
+can actually revert a commit. Also commits are fast, that encourages
+to make small commits, i.e.you just commit at once those changes which
+actually belong together. Even if the resulting code in the repo won`t
+compile. That bothers nobody, since it is in your local repo
+only. Then you keep commiting stuff, up to the point where you have
+fully working code again. Now, and only now, you decide to push your
+stuff into the central repo. Thus `git push` is one of the three
+exceptions, once your commits are pushed it is very hard to correct
+them. The other exception is `git pull`, which gets all changes from
+the central repo *and* merges them. If you just want to see the
+changes but nor merge them use `git fetch` and later `git merge`. Thus
+`git fetch` is the 3rd exception.
+
+Pitfalls
+~~~~~~~~
+
+`git add` adds not a file but a current snapshot of the file to the
+repo, hence you should commit immediately afterward, or later changes
+to that file will get lost.
+
+Fixing conflicts
+----------------
+
+Conflict between Bob and Alice
+
+Bob::
++
+------------------
+(edit glb_error.c)
+$ git commit -a
+$ git push
+------------------
+
+Alice::
++
+--------------
+(edit glb_error.c)
+$ git commit -a 
+$ git push 
+--------------
+
+Anyway you may want to `git pull` before you do `git push`!
+
+Alice gets::
++
+-----------------------------------------------------------------------
+...
+CONFLICT (content): Merge conflict in Distribution/source/glb_error.c
+Automatic merge failed; fix conflicts and then commit the result.
+-----------------------------------------------------------------------
+
+and inside glb_error.c we find:
+-------------------------------------------------------------
+void  
+glb_fatal (const char *message)
+{
+  /* A FATAL message always is displayed */
+<<<<<<< HEAD:Distribution/source/glb_error.c
+  error (EXIT_FAILURE, "BOB-2", message,1);
+=======
+  error (EXIT_FAILURE, "Alice-2", message,1);
+>>>>>>> ac3a3ba4ca60432429b5dc8e2fda64f21cc96c94:Distribution/source/glb_error.c
+}
+--------------------------------------------------------------
+
+i.e. that looks like CVS. Now we fix that, and then one has to do 
+
+--------------------
+$ git add glb_error.c 
+--------------------
+
+which add a current snapshot of `glb_error.c` to the things which are
+going to be commited.
+
+---------------
+$ git commit -a 
+---------------
+
+just leave the automatic commit message.  It will tell you a lot
+about merge and blabla, just ignore and finally (maybe later) git push
+
+Alice::
++
+--------
+$ git pull 
+--------
+and all is fine
+
+Local branches
+--------------
+
+---------------
+$ git branch test
+---------------
+
+creates branch test
+
+..........................
+       o- test
+      /
+-o-o-o-o-o-o-o master
+..........................
+
+-----------------
+$ git checkout test
+-----------------
+
+switch to branch test, now your `test` is the active branch, which you
+can check with
+
+----------------
+$ git branch
+  master 
+  test *
+(edit glb_error.c)
+$ git commit -a
+(edit glb_error.c)
+-----------------
+
+and try to switch back to master
+
+---------------------------------------------------------------------------
+$ git checkout master
+  fatal: Entry 'Distribution/source/glb_error.c' not uptodate. Cannot merge.
+---------------------------------------------------------------------------
+
+
+Now let`s commit our changes and make `glb_error.c` uptodate.
+
+--------------------
+$ git commit -a
+$ git checkout master
+--------------------
+
+OK.
+
+Now the structure looks like
+
+       o-o-o test
+      /
+-o-o-o-o-o-o-o master
+
+
+----------------
+$ git pull . test
+----------------
+
+now we have
+
+       o-o-o test
+      /     \
+-o-o-o-o-o-o-o master
+
+will merge test into master.
+
+------------------
+$ git branch -d test
+------------------
+
+deletes the fully merged branch.
+
+after that we 
+
+       o-o-o 
+      /     \
+-o-o-o-o-o-o-o-o-o master
+
+If we wouldn`t have deleted test we`d still could add new things to
+test and merge them later, like this
+
+ test  o-o-o-o-o-o-o
+      /     \
+-o-o-o-o-o-o-o-o-o-o-o- master
+
+and one can continue merging, back and forth.
+
+The idea is that local branches are cheap and hence a great way to try
+things without messing up anything. If all goes wrong delete the
+branch without ever merging it. That may require using the `-D` option
+to `git branch`. On the other hand if your happy with your bugfix,
+cool new feature, whatever, then you just merge your temporary tree
+and delete it. Now you can push your stuff into the central repo.
+
+Remote branch creation and tracking
+-----------------------------------
+
+Sometimes, however we will want new public branches, to e.g. share the
+development of new experimental features or when there is a release,
+since that code should go into its own branch. 
+
+Bob wants to collaborator on the 'write-paper' feature, thus he
+creates a feature branch `feature-write-paper` branching from the
+current `master`.
+
+-----------------------------------------
+$ git checkout -b feature-write-paper master
+-----------------------------------------
+
+this also switches to that branch.
+
+Now we have 
+
+.......................
+         --        feature-write-paper  
+        /                      
+-o-o-o-o-o-o-o-o-  master
+.......................
+       
+
+Next we need to make that public. First we push our new branch
+ 
+----------------------------
+$ git push origin feature-write-paper
+----------------------------
+
+Next we need to ensure that Bob gets all the cool stuff his
+collaborators develop on that branch.
+
+--------------------------------------------------------------
+$ git config branch.feature-write-paper.remote origin
+$ git config branch.feature-write-paper.merge refs/heads/feature-write-paper
+--------------------------------------------------------------
+
+These are the same things 
+
+--------------------------------------------------
+$ git branch --track feature-write-paper origin/feature-write-paper
+--------------------------------------------------
+
+would create, but Bob has that branch already.
+
+Alice::
++
+--------------
+$ git fetch
+$ git branch -r
+--------------
+
+will show the new branch created by Bob. Alice decides to work on that
+branch to implement the 'auto-conclusion' module.
+
+Alice::
++
+--------------------------------------------------
+$ git branch --track feature-write-paper origin/feature-write-paper
+$ git checkout feature-write-paper
+-------------------------------------------------
+
+Alice::
++
+--------------------------------------
+(creates blue.c in Distribution/source)
+$ git add blue.c
+$ git commit blue.c -m "blue.c added"
+$ git push
+--------------------------------------
+
+Bob::
++
+--------
+$ git pull
+--------
+
+and he get's Alice's changed `feature-write-paper` branch.
+
+Branch structure
+~~~~~~~~~~~~~~~~
+
+.................................
+         o-o-o-o-o-o-o-o-o-o-o-o-o feature-write-paper  shared by Bob & Alice
+        /                       \
+       /                         \ merge to master once auto-conclusion works
+      /                           \
+-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o- master
+.................................      
+
+Once the 'auto-conclusion' stuff work we want to merge that into
+`master`
+
+-----------------------
+$ git checkout master 
+$ git pull . feature-write-paper 
+-----------------------
+
+which would try to merge all unmerged changes. Sometimes a more
+careful selection might be necessary, using `git cherrypick`.
+
+Summary
+~~~~~~~
+
+Creating, deleting, switching, merging branches locally is very
+easy. Sharing branches via a central repository seems to work (we`ll
+see how they cope with merges asf.) but it is not totally
+straightforward and basically not documented. It took me a day... I
+guess that reflects how the kernel development works, where the model
+is `Linus pulls`. However, I think for globes we`d like to have this
+centralized model. Especially, since I`d like to be able to share
+development of new features in an early stage to get feedback.
+
+
+CVS emulation -- is broken
+--------------------------
+
+
+Edit the config file in the central repository by adding, which allows
+cvs access via ssh put not pserver
+
+-------------------
+[gitcvs]
+        enabled=0
+
+[gitcvs "ext"]
+        enabled=1
+-------------------
+
+
+- git needs to be installed, for those who want to use CVS access
+
+------------------------------------------------------------------------------
+$ cvs -d ":ext;CVS_SERVER=git-cvsserver:phuber@login/afs/hep.wisc.edu/home/phuber/globes-git-central/.git" co master
+
+------------------------------------------------------------------------------
+
+Two peculiarities of this one:
+ 
+- needs the full path to the git repo 
+
+- secondly one has to checkout master (instead of a real CVS module,
+but after a bit of thinking this makes sens)
+
+Otherwise seems to work fine. (took 6 minutes or so).
+
+All the stuff ended up in a directory named "master" (usual cvs
+behaviour), I rename that to globes-cvs
+
+
+CVS-guy::
++
+-----------------------------------------------------
+(edits glb_error.c)
+$ cvs ci
+  cvs commit: Examining .
+  phuber@login.hep.wisc.edu's password: 
+  Index already exists in git repo
+  cvs commit: saving log message in /tmp/cvs58x89o
+------------------------------------------------------
+
+doesn't work even with new versions...
+
