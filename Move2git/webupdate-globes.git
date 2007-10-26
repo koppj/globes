@@ -40,14 +40,14 @@ chmod -R  go-wx  *
 #chmod go-rwx $(find * -type d -and -wholename '*CVS*')
 #
 # allow x for all other directories
-chmod go+x $(find * -type d -and -not -wholename '*CVS*')
+chmod go+x $(find * -type d)
 # 
 # copy the resulting files to the Web
 #
 echo "Copying files to the web server ..."
 
 #rm -rf $(find $WEBDIR/* -not -name counter.php -and -not -name empty.gif -and -not -wholename *bbccnt*)
-cp -p --parents -t $WEBDIR $(find * -not -type d -and -not -wholename '*CVS*')
+cp -p --parents -t $WEBDIR $(find * -not -type d)
 cd
 #
 # done
