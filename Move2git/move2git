@@ -1,0 +1,83 @@
+#! /bin/sh
+#
+# this script tries to safely move globes from CVS to git
+# (C) Patrick Huber 2007
+
+GIT=/home/phuber/bin/git # path to git
+ROOT=/home/phuber/temp/cvs2git/git-sandbox
+
+########## no editing below necessary ############
+
+cd $ROOT &&
+echo "Disabling CVS access"
+mv cvs cvs-noaccess &&
+
+echo "Back-up of cvs-noacces to cvs-backup.tar.gz"
+tar -czhf cvs-backup.tar.gz cvs-noaccess &&
+
+echo "Cleaning up CVS repo" &&
+cd $ROOT/cvs-noaccess/Projects/GLOBES &&
+echo "remove Synergies" &&
+rm -rf Synergies &&
+echo "remove Development" && 
+rm -rf Development &&
+echo "remove User" &&
+rm -rf User &&
+echo "remove Web" &&
+rm -rf Web &&
+echo "remove ChangeLog,v" && 
+rm -rf ChangeLog,v &&
+
+echo "Import into git" &&
+mkdir $ROOT/git &&
+cd $ROOT/git &&
+$GIT cvsimport -v -d $ROOT/cvs-noaccess Projects/GLOBES &&
+
+echo "deleting useless branches" &&
+$GIT branch -D patrick &&
+
+# In order to set up version branches correctly we'll need a temporary
+# cloned repo do do that. We never want to checkout anything in git
+# itself
+
+echo "Setting up version-3-0 branch"
+cd $ROOT
+
+echo "Creating clone" &&
+$GIT clone -n -l $ROOT/git git-tmp&&
+cd $ROOT/git-tmp
+
+echo "Creating version branch" &&
+$GIT checkout -b version-3-0 release-3-0-0 &&
+
+echo "Merging master into it" &&
+$GIT pull . master &&
+
+echo "and make it part of the central repo" &&
+$GIT push origin version-3-0 &&
+
+echo "leave git-tmp and destroy it" &&
+cd $ROOT &&
+rm -rf git-tmp &&
+
+#------------------------------------------------ 
+
+echo "Adjusting the webupdate script" &&
+mv webupdate-globes webupdate-globes.cvs &&
+chmod a-x webupdate-globes.cvs &&
+mv webupdate-globes.git webupdate-globes &&
+chmod u+x webupdate-globes &&
+
+#-------
+echo "Run webupdate-globes" &&
+./webupdate-globes &&
+
+#-------
+echo "FINIS" 
+echo "Things to do:"
+echo "1) move git to its final location and set up a link to it"
+echo "2) move CVS backup to its final location"
+echo "3) email globes with instruction howto get a clone"
+echo "4) test whether 'webupdate-globes' works as intended"
+
+exit 0

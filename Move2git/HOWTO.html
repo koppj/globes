@@ -276,7 +276,7 @@ view points on the merits and drawback of the distributed versus
 centralized approach. It is, however, clear, that in practice none of
 the approaches is used in a pure fashion. In a centralized world you
 often do have private working copies which never get commited to the
-central server. Sometimes you do send a patch by email instead going
+central server. Sometimes you do send a patch by email instead of going
 via the central repo. In a distributed world, some centralization is
 necessary otherwise, N developers would have to do N<sup>2</sup> updates to
 ensure everyone has the same state of repo. Important about using a
@@ -287,15 +287,16 @@ keep one central repo in Heidelberg.</p>
 <p>With <tt>git</tt> every developer will have a fully equipped local copy of
 the repo. This allows to do very fast, since fully local,
 operations. Especially commits, diffs, branches and log searches
-become very fats and easy operations, which also work while working
-offline. Besides, your commit initially stay private, hence it is
+become very fast and easy operations, which also work while working
+offline. Besides, your commits initially stay private, hence it is
 possible to commit incrementally, one change at a time. This makes log
 messages and the whole history much more useful. It also makes it
 easier to follow the work of other people. Cheap branches allow to
 test new things on a temporary branch. If it works it will get merged
 into the mainline of development, if not the branch will be deleted.
-Eventually the local repo is synchronized with the central repo, but only once your ready and the code is again in a workable state.</p>
-<p><tt>git</tt> does not track files, it tracks the content of files. This a
+Eventually the local repo is synchronized with the central repo, but
+only once your ready and the code is again in a workable state.</p>
+<p><tt>git</tt> does not track files, it tracks the content of files. This is a
 fine, but in practice important difference. This allows to move and
 rename files while preserving their history. We had those renames in
 the past and we did disconnect the history of files in that way.</p>
@@ -304,23 +305,24 @@ to know about <tt>git</tt> in order to allow for a smooth transition from
 <tt>CVS</tt> to <tt>git</tt>. All the commands in here, I have actually tried out
 with version 1.5.3 of <tt>git</tt> and an actual copy of the <tt>GLoBES</tt> CVS
 repository (imported into <tt>git</tt>).</p>
-<p>There is an <a href="RM.html">accompanying document</a>, which described how
-the actual moving will work. It also describes who the release
-management, version numbering etc. are planed to work after the
-move. Hence anyone involved in making the actual release and/or
-writing code is encouraged to read that as well.</p>
+<p>There is a <a href="RM.html">document</a> which
+how the release management, version numbering etc. are planed to work
+after the move. Hence anyone involved in making of the actual release
+and/or writing code is encouraged to read that as well.</p>
+<p>And there is an <a href="MOVE.html">document</a>, which describes how the
+actual moving will work.</p>
 </div>
 <h2>Local git repos for developers</h2>
 <div class="sectionbody">
 <p>You get a local copy:</p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git-clone ssh://phuber@login/~/globes-git-central globes-bob/</tt></pre>
+<pre><tt>$ git-clone phuber@login:globes-git-central globes-bob/</tt></pre>
 </div></div>
 <p>Took about 8 minutes from Wisconsin to CERN and creates about 300MB
-stuff on your hard drive. Everything seems to be in order&#8230;</p>
-<p>globes-3.0.11 builds out of the box</p>
-<p>run locally, i.e. inside <tt>globes-bob</tt></p>
+stuff on your hard drive. Everything seems to be in
+order&#8230; globes-3.0.11 builds out of the box</p>
+<p>Next, run locally, i.e. inside <tt>globes-bob</tt></p>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git config user.name "Bob Bar"
@@ -418,7 +420,7 @@ cellspacing="0" cellpadding="4">
 </div>
 <h3>Added functionality</h3>
 <p>You will have noticed that the equivalent of <tt>cvs commit</tt> are indeed
-to commands in git. The reason is, that you have a fully equipped local
+two commands in git. The reason is, that you have a fully equipped local
 repository and hence all git commands (with 3 exceptions) will operate
 on that local copy only. This is great for speed, if you`re offline or
 if you screw up. Since <tt>git commit</tt> operates on your local repo you
@@ -613,7 +615,7 @@ and delete it. Now you can push your stuff into the central repo.</p>
 <p>Sometimes, however we will want new public branches, to e.g. share the
 development of new experimental features or when there is a release,
 since that code should go into its own branch.</p>
-<p>Bob wants to collaborator on the <em>write-paper</em> feature, thus he
+<p>Bob wants to collaborate on the <em>write-paper</em> feature, thus he
 creates a feature branch <tt>feature-write-paper</tt> branching from the
 current <tt>master</tt>.</p>
 <div class="listingblock">
@@ -783,7 +785,7 @@ $ cvs ci
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 25-Oct-2007 12:15:42 CEST
+Last updated 26-Oct-2007 12:12:38 CEST
 </div>
 </div>
 </body>

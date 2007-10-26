@@ -1,0 +1,55 @@
+#!/bin/bash
+#
+# synchronize local GLOBES WEB pages with WWW 
+#
+# 1) update files from cvs repository
+# 2) Run gtml to generate html pages
+# 3) adjust permisssions
+# 4) copy to WWW folder
+#
+# change to local directory
+
+ROOT=/home/phuber/temp/cvs2git/git-sandbox
+WEBDIR=$ROOT/public_html
+
+cd $ROOT
+rm -rf web-tmp/*
+cd $ROOT/web-tmp/
+
+# update from cvs
+echo "Updating from git ..."
+git-archive --format=tar --remote=$ROOT/git refs/heads/version-3-0:Web-3.0 > web.tar
+tar -xf web.tar
+rm web.tar
+#
+# Run gtml
+echo "Running gtml ..."
+cd src
+../gtml-3.5.3/gtml globes.gtp
+#
+# give everybody read permission ...
+echo "Adjusting permissions ..."
+cd ../html
+chmod -R ugo+r *
+#
+# ... and nobody execute or write permission
+chmod -R  u-x $(find * -not -type d)
+chmod -R  go-wx  *
+#
+# Hide CVS folders
+#chmod go-rwx $(find * -type d -and -wholename '*CVS*')
+#
+# allow x for all other directories
+chmod go+x $(find * -type d -and -not -wholename '*CVS*')
+# 
+# copy the resulting files to the Web
+#
+echo "Copying files to the web server ..."
+
+#rm -rf $(find $WEBDIR/* -not -name counter.php -and -not -name empty.gif -and -not -wholename *bbccnt*)
+cp -p --parents -t $WEBDIR $(find * -not -type d -and -not -wholename '*CVS*')
+cd
+#
+# done
+echo "Done. Don't forget to check the web pages!"
+exit 0

@@ -1,5 +1,5 @@
 
-FILES = RM.txt HOWTO.txt
+FILES = RM.txt HOWTO.txt MOVE.txt
 OBJS = $(FILES:.txt=.html)
 
 

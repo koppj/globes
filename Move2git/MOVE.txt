@@ -1,0 +1,149 @@
+CVS to git move of the central repo
+----------------------------------
+
+TODO
+~~~~
+
+- Install git v1.5.3 - done
+
+- Install cvsps (only needed for the inital import from CVS) - done
+
+- Email globes
+
+- Wait for replies
+
+- Disable CVS access (at least write access)
+
+- Make back-up of repo
+
+- Clean up CVS repo
+
+- Import
+
+- Create version branches
+
+- Adapt the `webupdate` script
+
+- Email globes
+
+
+
+
+Import
+~~~~~~
+
+Create target directory, i.e. place where the new git repository is
+going to live.
+
+----------------------------------------------------------------------
+$ export CVS_RSH="ssh"
+$ git cvsimport -v -d globes@lfs3.mpi-hd.mpg.de:/home/lin/globes/cvs Projects/GLOBES
+----------------------------------------------------------------------
+
+which should not take more than one hour (Heidelberg->Madison) and
+should be much faster locally.
+
+NB Size goes from 280MB to 140MB
+
+In the central repo, I deleted branches
+ 
+ Web lin patrick
+
+since they correspond to some old modules, no one is using anymore.
+
+
+Creating the version-3-0 release branch
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+-----------------------
+$ git tag -l
+  last-time-module
+  mass-ordering
+  pre-release
+  release
+  release-3-0-0
+  start
+  version-1-7-7
+  version-1-8
+  version-1-8-2 
+  version-2-0-0
+  version-2-0-1
+  version-2-0-1-beta
+------------------------
+
+and decides to create a new branch which starts at release-3-0-0 
+
+-----------------------------------------
+$ git checkout -b version-3-0 release-3-0-0
+-----------------------------------------
+
+this also switches to that branch next we`d like to merge all changes
+which happened since the tag release-3-0-0 was created to this branch
+
+-----------------
+$ git pull . master
+-----------------
+
+Now we have the following structure
+
+         o-o-o-o-o-o-o-o-o-o-o-o version-3-0  
+        /                      | merge from master
+-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o master
+       |
+     release-3-0-0
+
+Now, one can add new features to master and do the maintenance and
+bug-fixing for version 3.0 on the version-3-0 branch.
+
+Next we need to make that public. First we push our new branch
+ 
+----------------------------
+$ git push origin version-3-0
+----------------------------
+
+Next we need to ensure that this branch gets pulled as well.
+
+--------------------------------------------------------------
+$ git config branch.version-3-0.remote origin
+$ git config branch.version-3-0.merge refs/heads/version-3-0
+--------------------------------------------------------------
+
+These are the same things 
+
+--------------------------------------------------
+$ git branch --track version-3-0 origin/version-3-0
+--------------------------------------------------
+
+would create, but Bob has that branch already.
+
+
+Updating the website
+~~~~~~~~~~~~~~~~~~~~
+
+Clearly the transition to `git` will require to adapt the
+`webupdate-globes` script.
+
+--------------------------------
+#
+# update from cvs
+echo "Updating from CVS ..."
+cvs update -dP
+#
+--------------------------------
+
+will need to appropriately replaced.
+
+We extract current tar-ball out of the git central repo and unpack it
+into `web-tmp`
+
+----------------------------
+$ git-archive --format=tar --remote=path-to-central-repo refs/heads/version-3-0:Web-3.0 > web.tar
+$ tar -xf web.tar
+----------------------------
+
+where `version-3-0` has to be replaced with the right branch, i.e if you
+do that for version 3.2, one has to use `version-3-2`.
+
+The good thing about specifying the branch directly, is that we can
+already update the webpages for release 3.2 without interefering with
+maintenance of the webpages for version 3.0.

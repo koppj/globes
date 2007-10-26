@@ -267,42 +267,6 @@ div.exampleblock-content {
 <body>
 <div id="header">
 </div>
-<h2>CVS to git move of the central repo</h2>
-<div class="sectionbody">
-<p>This here is take two, I installed the same recent git version on both
-sides of the problem.</p>
-<ul>
-<li>
-<p>
-Install git v1.5.3
-</p>
-</li>
-<li>
-<p>
-Install cvsps (only need for the inital import from CVS)
-</p>
-</li>
-<li>
-<p>
-Create target directory, i.e. place where the new git repository is going to live.
-</p>
-</li>
-</ul>
-<div class="listingblock">
-<div class="content">
-<pre><tt>$ export CVS_RSH="ssh"
-$ git cvsimport -v -d globes@lfs3.mpi-hd.mpg.de:/home/lin/globes/cvs Projects/GLOBES</tt></pre>
-</div></div>
-<p>which should not take more than one hour (Heidelberg-&gt;Madison) and
-should be much faster locally.</p>
-<p>NB Size goes from 280MB to 140MB</p>
-<p>In the central repo, I deleted branches</p>
-<div class="literalblock">
-<div class="content">
-<pre><tt>Web lin patrick</tt></pre>
-</div></div>
-<p>since they correspond to some old modules, no one is using anymore.</p>
-</div>
 <h2>Organizing releases, branches etc.</h2>
 <div class="sectionbody">
 <p>After doing a bit of research, I can imagine following scheme for
@@ -333,7 +297,7 @@ integrated into <tt>master</tt>. Especially, the API should be more or less
 final on <tt>master</tt>. The version on <tt>master</tt> should always be
 usable. New features and experimental development is done on feature
 branches, like <tt>feature-foobaz</tt>. The development in <tt>feature-foobaz</tt>
-turned out be lead nowhere, hence the branch is not merged. We don't
+turned out to lead nowhere, hence the branch is not merged. We don't
 delete it, since maybe sometime later we may want to come back to
 it. <tt>feature-foobar</tt>, on the other hand is merged into <tt>master</tt> since
 we want to keep that feature. The branch is deleted afterwards. When
@@ -346,7 +310,7 @@ of features and API changes and start debugging and testing. Once
 we're ready we tag the branch with <tt>tag-version-3.x</tt> and make the
 release. Bugs will be fixed on <tt>master</tt> and then merged into
 <tt>version-3-x</tt>. At which point we tag and release a minor version 3.x.y+1
-etc. Version branches never are deleted, although we will not merge
+etc. Version branches are never deleted, although we will not merge
 bug fixes in any previous version branches, but always only in the
 most recently released one.</p>
 <h3>Version numbering</h3>
@@ -379,96 +343,13 @@ start at the same version, which I think can be arranged.</p>
 branches, on the other hand they are private and hence it's everyone's
 private buissiness to organize that.</p>
 <h3>Tagging</h3>
-<p>We require tagging only for release, so that getting the the state of
-the repo when a certain version was release is easy. Besides, we
-may tag major events, like fixing the chi^2 bug.</p>
-<h3>Implementation</h3>
-<p>Bob wants to colla</p>
-<div class="listingblock">
-<div class="content">
-<pre><tt>$ git tag -l
-  last-time-module
-  mass-ordering
-  pre-release
-  release
-  release-3-0-0
-  start
-  version-1-7-7
-  version-1-8
-  version-1-8-2
-  version-2-0-0
-  version-2-0-1
-  version-2-0-1-beta</tt></pre>
-</div></div>
-<p>and decides to create a new branch which starts at release-3-0-0</p>
-<div class="listingblock">
-<div class="content">
-<pre><tt>$ git checkout -b version-3-0 release-3-0-0</tt></pre>
-</div></div>
-<p>this also switches to that branch next we`d like to merge all changes
-which happened since the tag release-3-0-0 was created to this branch</p>
-<div class="listingblock">
-<div class="content">
-<pre><tt>$ git pull . master</tt></pre>
-</div></div>
-<p>Now we have the following structure</p>
-<div class="literalblock">
-<div class="content">
-<pre><tt>         o-o-o-o-o-o-o-o-o-o-o-o version-3-0
-        /                      | merge from master
--o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o master
-       |
-     release-3-0-0</tt></pre>
-</div></div>
-<p>Now, one can add new features to master and do the maintenance and
-bug-fixing for version 3.0 on the version-3-0 branch.</p>
-<p>Next we need to make that public. First we push our new branch</p>
-<div class="listingblock">
-<div class="content">
-<pre><tt>$ git push origin version-3-0</tt></pre>
-</div></div>
-<p>Next we need to ensure that this branch gets pulled as well.</p>
-<div class="listingblock">
-<div class="content">
-<pre><tt>$ git config branch.version-3-0.remote origin
-$ git config branch.version-3-0.merge refs/heads/version-3-0</tt></pre>
-</div></div>
-<p>These are the same things</p>
-<div class="listingblock">
-<div class="content">
-<pre><tt>$ git branch --track version-3-0 origin/version-3-0</tt></pre>
-</div></div>
-<p>would create, but Bob has that branch already.</p>
-</div>
-<h2>Updating the website</h2>
-<div class="sectionbody">
-<p>Clearly the transition to <tt>git</tt> will require to adapt the
-<tt>webupdate-globes</tt> script.</p>
-<div class="listingblock">
-<div class="content">
-<pre><tt>#
-# update from cvs
-echo "Updating from CVS ..."
-cvs update -dP
-#</tt></pre>
-</div></div>
-<p>will need to appropriately replaced.</p>
-<p>We extract current tar-ball out of the git central repo and unpack it
-into <tt>web-tmp</tt></p>
-<div class="listingblock">
-<div class="content">
-<pre><tt>$ git-archive --format=tar --remote=path-to-central-repo refs/heads/version-3-0:Web-3.0 &gt; web.tar
-$ tar -xf web.tar</tt></pre>
-</div></div>
-<p>where <tt>version-3-0</tt> has to be replaced with the right branch, i.e if you
-do that for version 3.2, one has to use <tt>version-3-2</tt>.</p>
-<p>The good thing about specifying the branch directly, is that we can
-already update the webpages for release 3.2 without interefering with
-maintenance of the webpages for version 3.0.</p>
+<p>We require tagging only for release, so that getting the state of the
+repo when a certain version was release is easy. Besides, we may tag
+major events, like fixing the chi^2 bug.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 25-Oct-2007 12:17:48 CEST
+Last updated 26-Oct-2007 12:13:48 CEST
 </div>
 </div>
 </body>

@@ -8,7 +8,7 @@ view points on the merits and drawback of the distributed versus
 centralized approach. It is, however, clear, that in practice none of
 the approaches is used in a pure fashion. In a centralized world you
 often do have private working copies which never get commited to the
-central server. Sometimes you do send a patch by email instead going
+central server. Sometimes you do send a patch by email instead of going
 via the central repo. In a distributed world, some centralization is
 necessary otherwise, N developers would have to do N^2^ updates to
 ensure everyone has the same state of repo. Important about using a
@@ -20,16 +20,17 @@ keep one central repo in Heidelberg.
 With `git` every developer will have a fully equipped local copy of
 the repo. This allows to do very fast, since fully local,
 operations. Especially commits, diffs, branches and log searches
-become very fats and easy operations, which also work while working
-offline. Besides, your commit initially stay private, hence it is
+become very fast and easy operations, which also work while working
+offline. Besides, your commits initially stay private, hence it is
 possible to commit incrementally, one change at a time. This makes log
 messages and the whole history much more useful. It also makes it
 easier to follow the work of other people. Cheap branches allow to
 test new things on a temporary branch. If it works it will get merged
 into the mainline of development, if not the branch will be deleted.
-Eventually the local repo is synchronized with the central repo, but only once your ready and the code is again in a workable state.
+Eventually the local repo is synchronized with the central repo, but
+only once your ready and the code is again in a workable state.
 
-`git` does not track files, it tracks the content of files. This a
+`git` does not track files, it tracks the content of files. This is a
 fine, but in practice important difference. This allows to move and
 rename files while preserving their history. We had those renames in
 the past and we did disconnect the history of files in that way.
@@ -40,11 +41,13 @@ to know about `git` in order to allow for a smooth transition from
 with version 1.5.3 of `git` and an actual copy of the `GLoBES` CVS
 repository (imported into `git`).
 
-There is an link:RM.html[accompanying document], which described how
-the actual moving will work. It also describes who the release
-management, version numbering etc. are planed to work after the
-move. Hence anyone involved in making the actual release and/or
-writing code is encouraged to read that as well.
+There is a link:RM.html[document] which
+how the release management, version numbering etc. are planed to work
+after the move. Hence anyone involved in making of the actual release
+and/or writing code is encouraged to read that as well.
+
+And there is an link:MOVE.html[document], which describes how the
+actual moving will work.
 
 Local git repos for developers
 ------------------------------
@@ -52,15 +55,14 @@ Local git repos for developers
 You get a local copy:
 
 ----------------------------------------------------------------
-$ git-clone ssh://phuber@login/~/globes-git-central globes-bob/
+$ git-clone phuber@login:globes-git-central globes-bob/
 ----------------------------------------------------------------
 
 Took about 8 minutes from Wisconsin to CERN and creates about 300MB
-stuff on your hard drive. Everything seems to be in order...
+stuff on your hard drive. Everything seems to be in
+order... globes-3.0.11 builds out of the box
 
-globes-3.0.11 builds out of the box
-
-run locally, i.e. inside `globes-bob`
+Next, run locally, i.e. inside `globes-bob`
 
 --------------------------------------
 $ git config user.name "Bob Bar"
@@ -103,7 +105,7 @@ Added functionality
 ~~~~~~~~~~~~~~~~~~~
 
 You will have noticed that the equivalent of `cvs commit` are indeed
-to commands in git. The reason is, that you have a fully equipped local
+two commands in git. The reason is, that you have a fully equipped local
 repository and hence all git commands (with 3 exceptions) will operate
 on that local copy only. This is great for speed, if you`re offline or
 if you screw up. Since `git commit` operates on your local repo you
@@ -297,7 +299,7 @@ Sometimes, however we will want new public branches, to e.g. share the
 development of new experimental features or when there is a release,
 since that code should go into its own branch. 
 
-Bob wants to collaborator on the 'write-paper' feature, thus he
+Bob wants to collaborate on the 'write-paper' feature, thus he
 creates a feature branch `feature-write-paper` branching from the
 current `master`.
 
