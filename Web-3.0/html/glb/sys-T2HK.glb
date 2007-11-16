@@ -1,0 +1,391 @@
+%!GLoBES
+
+/* This file describes the T2HK setup and uses an effective near
+ * detector.
+ * 
+ * If you modify this file you have to rename it.
+ *
+ * If you are using this file for producing a scientific publication
+ * or a talk please cite the following references and check the supporting
+ * files for a similar comment.
+ *
+ #* @Article{Huber:2007xx,
+ #*    author    = "Huber, P. and Mezzetto, M. and Schwetz, T.",
+ #*    title     = "On the impact of systematical uncertainties 
+ #*	            for the CP violation measurement in superbeam 
+ #*	            experiments}",
+ #*    year      = "2007",
+ #*    eprint    = "0711.xxxx",
+ #* }
+ *
+ * As explained in above reference the value for the signal error in
+ * the appearance channels corresponds to a constraint on the ratio of
+ * nu_e to nu_ mu QE cross sections. 10% is the default value obtained
+ * from allwoing each of the individual cross sections to vary by 10%
+ *
+ * The flux files include the wrong sign nu_m content
+ *
+ * The appearance efficiency is the PID efficiency extracted from full
+ * T2K efficiency
+ *
+ * Migration matrices (MM) for total CC are the weighted sum of QE and
+ * NE MM. All MM are normalised such that they take into account the
+ * 1ring cut therefore full cross sections for QE and non-QE have to
+ * be used
+ *
+ * All the MM were computed by Mauro Mezzetto, 2007
+ * This file is adapted from the T2K file coming with GLoBES 3.0.0
+ * This file was written by Thomas Schwetz, 2007
+ * This file was edited for publication by Patrick Huber, 2007
+ */
+
+$version="3.0.0"
+
+/* ##### Beam flux #####
+ *
+ * Set mass, time and power with these variables, since the are used
+ * later, in order to ensure proper normalization of the NC
+ * backgrounds.
+ */
+
+
+Mass = 500 /* kiloton, fiducial */
+Time_nu = 2 /* years neutrino running at 10^7 seconds per year */ 
+Time_an = 6 /* years anti-neutrino running at 10^7 seconds per year */
+Power = 4 /* Mega Watt */
+
+
+nuflux(#JHFplus)<
+	@flux_file="sys-JHFplus.dat"
+	@time  = Time_nu
+	@power = Power
+	@norm  = 6.93185
+>
+
+nuflux(#JHFminus)<
+	@flux_file="sys-JHFminus.dat"
+	@time  = Time_an
+	@power = Power
+	@norm  = 6.93185
+>
+
+
+/* The variable signal_eff has is set to get the correct
+ * normalization for the appearance signal according to Tab.2 of
+ * hep-ex/0106019.
+ */
+signal_eff = 1.808548
+
+/* ###### Detector settings ###### */
+
+$target_mass = Mass
+
+/* ####### Energy window ####### 
+ * These settings should not be changed, since the MM rely on the
+ * values used here.
+ */
+
+$sampling_points = 50
+$sampling_min = 1.e-4	/* GeV */
+$sampling_max = 2.	/* GeV */
+
+/* NC background is only given from 0.4 to 1.2 GeV only that range can
+ * be used for the analysis
+ */
+
+$bins = 	8
+$emin = 	0.4	/* GeV */
+$emax = 	1.2	/* GeV */
+
+/* ####### Baseline setting ####### */
+
+$profiletype =	 	1 
+$baseline =		295.0	/* km */
+
+/* ####### Technical information ####### */
+
+$filter_state = 0 
+$filter_value = 1000000 
+
+
+/* ####### Energy resolution ####### 
+ * These migration matrices contain the details of the
+ * simulation. They all correspond to those events wich survive the
+ * single ring cut.
+ *
+ * QE is for quasi-elastic
+ * NE is for non-elastic events
+ * CC is charged current
+ */
+
+energy(#MM_nue_QE)<
+	@energy = include "sys-MM_nue_QE.dat"
+>
+energy(#MM_nue_NE)<
+	@energy = include "sys-MM_nue_NE.dat"
+>
+energy(#MM_nue_CC)<
+	@energy = include "sys-MM_nue_CC.dat"
+>
+energy(#MM_num_QE)<
+	@energy = include "sys-MM_num_QE.dat"
+>
+energy(#MM_num_NE)<
+	@energy = include "sys-MM_num_NE.dat"
+>
+energy(#MM_num_CC)<
+	@energy = include "sys-MM_num_CC.dat"
+>
+energy(#MM_ane_QE)<
+	@energy = include "sys-MM_ane_QE.dat"
+>
+energy(#MM_ane_NE)<
+	@energy = include "sys-MM_ane_NE.dat"
+>
+energy(#MM_ane_CC)<
+	@energy = include "sys-MM_ane_CC.dat"
+>
+energy(#MM_anm_QE)<
+	@energy = include "sys-MM_anm_QE.dat"
+>
+energy(#MM_anm_NE)<
+	@energy = include "sys-MM_anm_NE.dat"
+>
+energy(#MM_anm_CC)<
+	@energy = include "sys-MM_anm_CC.dat"
+>
+
+
+/* dummy resolution for NC (not used!) */
+energy(#ERES)<
+	@type = 1
+	@sigma_e = {0.0,0.0,0.085}  /* Fermi motion */
+>
+
+ 
+/* PID efficiencies */
+
+%eff = {0.000, 0.000, 0.000, 0.417, 0.425, 0.430, 0.467, 0.513, 0.505, 0.482, 0.436, 0.434, 0.430, 0.442, 0.438, 0.398, 0.400, 0.419, 0.358, 0.355, 0.350, 0.338, 0.330, 0.299, 0.295, 0.294, 0.290, 0.284, 0.266, 0.254, 0.230, 0.206, 0.213, 0.148, 0.159, 0.151, 0.145, 0.145, 0.137, 0.134, 0.130, 0.128, 0.122, 0.119, 0.110, 0.114, 0.107, 0.104, 0.100, 0.09}
+
+
+/* NC background extracted from hep-ex/0106019, where the backround is
+ * given for 8 bins between 0.4 and 1.2 GeV. 
+ */
+
+%NCbg = {3.6, 2.4, 1.5, 1.4, 0.52, 0.28, 0.33, 0.45}
+
+
+/* Background is given for 22.5 kt x 0.77 MW x 5 yr, scale_NC_nu has to be set
+ * to correct size 
+ */
+
+scale_NC_nu = Mass / 22.5 * Power / 0.77 * Time_nu / 5
+
+
+/* Assume same NC background also for anti-neutrinos normalized such
+ * that they have the same size for running times nu/an = 1/3 
+ */
+
+scale_NC_an = scale_NC_nu * Time_an / Time_nu / 3
+
+
+/* set eff to zero to switch off the standard NC */
+
+%bc   = bincenter()
+%zer  = {0, 0}
+%enz  = {0, 2}
+%zero = interpolation(%enz, %zer, 1, %bc)
+
+/* ####### Cross sections #######
+ * From Nuance v3r503 for water
+ */
+
+cross(#QE)<
+	@cross_file = "sys-XQE.dat"
+>
+cross(#NE)<
+	@cross_file = "sys-XNE.dat"
+>
+cross(#CC)<
+	@cross_file = "sys-XCC.dat"
+>
+
+/* dummy cross section for NC (not used in rule!) */
+cross(#NC)<
+	@cross_file = "sys-XNC.dat"
+>
+
+
+/* ####### Channel definitions ####### */
+
+/*************** NU appearance ***************/
+
+/* 0:  signal QE */
+channel(#nu_e_app_QE)<
+	@channel = 	#JHFplus:	+:	m:	e:	#QE:    #MM_nue_QE
+        @pre_smearing_efficiencies=copy(%eff)
+>
+
+/* 1:  signal NE */
+channel(#nu_e_app_NE)<
+	@channel = 	#JHFplus:	+:	m:	e:	#NE:    #MM_nue_NE
+        @pre_smearing_efficiencies=copy(%eff)
+>
+
+/* 2:  BG NC */
+channel(#NU_NC)<
+	@channel = 	#JHFplus:	+:	NOSC_m:	NOSC_m:	#NC:    #ERES
+        @post_smearing_efficiencies = copy(%zero)
+        @post_smearing_background   = copy(%NCbg)
+>
+
+/* 3:  nu_e beam BG */
+channel(#NU_nu_e_beam)<
+	@channel = 	#JHFplus:	+:	e:	e:	#CC:    #MM_nue_CC
+        @pre_smearing_efficiencies=copy(%eff)
+>
+
+/* 4:  an_e beam BG */
+channel(#NU_an_e_beam)<
+	@channel = 	#JHFplus:	-:	e:	e:	#CC:    #MM_ane_CC
+        @pre_smearing_efficiencies=copy(%eff)
+>
+
+/* 5:  an_m -> an_e BG */
+channel(#NU_an_e_app)<
+	@channel = 	#JHFplus:	-:	m:	e:	#CC:    #MM_ane_CC
+        @pre_smearing_efficiencies=copy(%eff)
+>
+
+/* 6:  misid nu_mu */ 
+channel(#nu_mu_disap_CC)<
+	@channel = 	#JHFplus:	+:	m:	m:	#CC:    #MM_num_CC
+>
+
+
+
+/*************** AN appearance ***************/
+
+/* 7:  signal QE */
+channel(#an_e_app_QE)<
+	@channel = 	#JHFminus:	-:	m:	e:	#QE:    #MM_ane_QE
+        @pre_smearing_efficiencies=copy(%eff)
+>
+
+/* 8:  signal NE */
+channel(#an_e_app_NE)<
+	@channel = 	#JHFminus:	-:	m:	e:	#NE:    #MM_ane_NE
+        @pre_smearing_efficiencies=copy(%eff)
+>
+
+/* 9:  BG NC */
+channel(#AN_NC)<
+	@channel = 	#JHFminus:	-:	NOSC_m:	NOSC_m:	#NC:    #ERES
+        @post_smearing_efficiencies = copy(%zero)
+        @post_smearing_background   = copy(%NCbg)
+>
+
+/* 10:  an_e beam BG */
+channel(#AN_an_e_beam)<
+	@channel = 	#JHFminus:	-:	e:	e:	#CC:    #MM_ane_CC
+        @pre_smearing_efficiencies=copy(%eff)
+>
+
+/* 11:  nu_e beam BG */
+channel(#AN_nu_e_beam)<
+	@channel = 	#JHFminus:	+:	e:	e:	#CC:    #MM_nue_CC
+        @pre_smearing_efficiencies=copy(%eff)
+>
+
+/* 12:  nu_m -> nu_e BG */
+channel(#AN_nu_e_app)<
+	@channel = 	#JHFminus:	+:	m:	e:	#CC:    #MM_nue_CC
+        @pre_smearing_efficiencies=copy(%eff)
+>
+
+/* 13:  misid an_mu */ 
+channel(#an_mu_disap_CC)<
+	@channel = 	#JHFminus:	-:	m:	m:	#CC:    #MM_anm_CC
+>
+
+
+/*************** NU disappearance ***************/
+
+/* 14 */ 
+channel(#nu_mu_disap_QE)<
+	@channel = 	#JHFplus:	+:	m:	m:	#QE:    #MM_num_QE
+>
+
+/* 15 */ 
+channel(#nu_mu_disap_NE)<
+	@channel = 	#JHFplus:	+:	m:	m:	#NE:    #MM_num_NE
+>
+
+
+
+/*************** AN disappearance ***************/
+
+/* 16 */ 
+channel(#an_mu_disap_QE)<
+	@channel = 	#JHFminus:	-:	m:	m:	#QE:    #MM_anm_QE
+>
+
+/* 17 */ 
+channel(#an_mu_disap_NE)<
+	@channel = 	#JHFminus:	-:	m:	m:	#NE:    #MM_anm_NE
+>
+
+
+
+/* ####### Setting the rules ####### */
+
+/* rate of muon miss-identification */
+missID = 0.001
+
+
+/* 0 */
+rule(#NU_Appearance)<
+ 	@signal = signal_eff@#nu_e_app_QE : signal_eff@#nu_e_app_NE 
+	@background =  scale_NC_nu@#NU_NC : signal_eff@#NU_nu_e_beam : signal_eff@#NU_an_e_beam : signal_eff@#NU_an_e_app : missID@#nu_mu_disap_CC 
+
+	@signalerror     = 0.1 : 0.025
+	@backgrounderror = 0.035 : 0.025
+	@sys_on_function = "chiSpectrumTilt"
+	@sys_off_function = "chiNoSysSpectrum" 
+> 
+
+/* 1 */
+rule(#AN_Appearance)<
+ 	@signal = signal_eff@#an_e_app_QE : signal_eff@#an_e_app_NE 
+	@background =  scale_NC_an@#AN_NC : signal_eff@#AN_an_e_beam : signal_eff@#AN_nu_e_beam : signal_eff@#AN_nu_e_app : missID@#an_mu_disap_CC 
+
+	@signalerror     = 0.1 : 0.025
+	@backgrounderror = 0.035 : 0.025
+	@sys_on_function = "chiSpectrumTilt"
+	@sys_off_function = "chiNoSysSpectrum" 
+> 
+
+
+/* 2 */
+rule(#NU_Disapperance)<
+	@signal = 0.9@#nu_mu_disap_QE : 0.9@#nu_mu_disap_NE
+	@background = 0.@#NU_NC
+
+	@signalerror     = 0.02 : 0.025
+	@backgrounderror = 0.05 : 0.025
+	@sys_on_function = "chiSpectrumTilt"
+	@sys_off_function = "chiNoSysSpectrum" 
+>
+
+/* 3 */
+rule(#AN_Disapperance)<
+	@signal = 0.9@#an_mu_disap_QE : 0.9@#an_mu_disap_NE
+	@background = 0.@#AN_NC
+
+	@signalerror     = 0.02 : 0.025
+	@backgrounderror = 0.05 : 0.025
+	@sys_on_function = "chiSpectrumTilt"
+	@sys_off_function = "chiNoSysSpectrum" 
+>
+
+/**********************END**********************/

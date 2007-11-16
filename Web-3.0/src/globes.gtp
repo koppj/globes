@@ -45,6 +45,7 @@ define IMG_PATH    ../images
 ./glb/Reactor2.gtml
 ./glb/SPL.gtml
 ./glb/T2HK.gtml
+./glb/sys-T2HK.gtml
 ./glb/T2K.gtml
 ./glb/BB100.gtml
 
