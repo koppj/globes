@@ -538,8 +538,7 @@ void glb_set_rates()
         glb_calc_signal_rates[i][j] += rule_coeff[i][k] * glb_calc_chra_0[rules[i][k]][j];
     }
 
-    glbGetEnergyWindowBins(glb_current_exp, i, &ew_low, &ew_high);
-    for (j=ew_low; j <= ew_high; j++)
+    for (j=0; j < bins; j++)
     {
       /* Total */
       glb_calc_rates_0[i][j] = glb_calc_signal_rates[i][j]
