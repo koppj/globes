@@ -93,7 +93,7 @@ glb_density_type *glb_alloc_density_type()
   {
     temp->density_params = (double *) glb_malloc(sizeof(double)*glb_num_of_exps);
 
-    fprintf(stderr,"density glb_num_of_exps %d\n",glb_num_of_exps);
+    
     if (temp->density_params != NULL)
     {
       for(i=0; i < glb_num_of_exps; i++)
@@ -345,7 +345,7 @@ glb_projection glbSetDensityProjectionFlag(glb_projection in,
     {
       for(i=0;i<glb_num_of_exps;i++) (in->density)->density_params[i]=flag;
     }
-  else if(0 <= which&&which < (in->osc)->length )
+  else if(0 <= which&&which < (in->density)->length )
     {
       (in->density)->density_params[which]=flag;
     }
