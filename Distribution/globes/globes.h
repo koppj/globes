@@ -78,6 +78,12 @@ enum glb_enum_minimizers
 #define GLB_EV_TO_KM(x)      ((x) * GLB_EV_TO_KM_FACTOR)
 
 
+/* maximum number of experiments */
+
+#define GLB_MAX_EXP 35
+
+
+
 
 /* Data structures */
 /* --------------- */
@@ -113,9 +119,9 @@ extern int glb_single_experiment_number;
  * declare this one to SWIG and the other global 
  * variables not
  */
-glb_exp glb_experiment_list[32];
+glb_exp glb_experiment_list[GLB_MAX_EXP];
 #else
-extern glb_exp glb_experiment_list[32];
+extern glb_exp glb_experiment_list[GLB_MAX_EXP];
 #endif
 extern int glb_rule_number;
 
@@ -335,7 +341,6 @@ double glbFilteredConstantDensityProbability(int exp,int initial_flavour,
 
 /* Selecting a minization algorithm */
 int glbSelectMinimizer(int minimizer_ID);
-
 
 
 

@@ -208,9 +208,9 @@ int glb_init_minimizer()
   central_values = glbAllocParams();
   
   /* Data structures for internal_glbChiNP */
-  fix_params = (double *) glb_malloc((glbGetNumOfOscParams()+32) * sizeof(fix_params[0]));
-  para_tab = (int *) glb_malloc((glbGetNumOfOscParams()+32) * sizeof(para_tab[0]));
-  index_tab = (int *) glb_malloc((glbGetNumOfOscParams()+32) * sizeof(index_tab[0]));
+  fix_params = (double *) glb_malloc((glbGetNumOfOscParams()+GLB_MAX_EXP) * sizeof(fix_params[0]));
+  para_tab = (int *) glb_malloc((glbGetNumOfOscParams()+GLB_MAX_EXP) * sizeof(para_tab[0]));
+  index_tab = (int *) glb_malloc((glbGetNumOfOscParams()+GLB_MAX_EXP) * sizeof(index_tab[0]));
 
   /* Data structures for internal_glbSingleChiNP */
   s_fix_params = (double *) glb_malloc((glbGetNumOfOscParams()+1) * sizeof(s_fix_params[0]));
@@ -218,7 +218,7 @@ int glb_init_minimizer()
   s_index_tab = (int *) glb_malloc((glbGetNumOfOscParams()+1) * sizeof(s_index_tab[0]));
 
   /* Select default projection */
-  for (i=0; i < glbGetNumOfOscParams()+32; i++)
+  for (i=0; i < glbGetNumOfOscParams()+GLB_MAX_EXP; i++)
     para_tab[i] = GLB_UNDEFINED;
   for (i=0; i < glbGetNumOfOscParams()+1; i++)
     s_para_tab[i] = GLB_UNDEFINED;
@@ -521,7 +521,7 @@ static double SingleRuleChi(double x[glbGetNumOfOscParams()+1],int exp, int rule
 double glbChiSys(const glb_params in, int experiment, int rule)
 {
   int i;
-  double res,x[32+glbGetNumOfOscParams()];
+  double res,x[GLB_MAX_EXP+glbGetNumOfOscParams()];
   int old_proj[glbGetNumOfOscParams()+glb_num_of_exps];
 
   if(in==NULL)
@@ -773,7 +773,7 @@ static double MD_chi_NP(double x[])
 {
   glb_params prior_input;
   double erg2;
-  double y[glbGetNumOfOscParams()+32];
+  double y[glbGetNumOfOscParams()+GLB_MAX_EXP];
   int i; 
 //  double nsp[glbGetNumOfOscParams()-6+1];
   prior_input=glbAllocParams();
@@ -922,7 +922,7 @@ static double internal_glbSingleChiNP(const glb_params in, glb_params out,
   double er1;
   glb_projection fnew=NULL,fbuf=NULL; 
 
-  double x[32+glbGetNumOfOscParams()];
+  double x[GLB_MAX_EXP+glbGetNumOfOscParams()];
   int it;
   int i;
   int dim;
@@ -1111,7 +1111,7 @@ static double internal_glbChiNP(const glb_params in, glb_params out)
   double er1;
  
 
-  double x[32+glbGetNumOfOscParams()];
+  double x[GLB_MAX_EXP+glbGetNumOfOscParams()];
   int it;
   int i;
   int dim;
@@ -1278,8 +1278,8 @@ static double glbChi1P(const glb_params in,
 {
   double res;
   int i,*b;
-  int swit[32+glbGetNumOfOscParams()]; 
-  int buff[32+glbGetNumOfOscParams()];
+  int swit[GLB_MAX_EXP+glbGetNumOfOscParams()]; 
+  int buff[GLB_MAX_EXP+glbGetNumOfOscParams()];
   b=CheckProjection();
   for(i=0;i<glbGetNumOfOscParams()+glb_num_of_exps;i++) buff[i]=b[i];
   for(i=0;i<glbGetNumOfOscParams()+glb_num_of_exps;i++) swit[i]=GLB_FREE;
@@ -1350,8 +1350,8 @@ double glbChiTheta13Delta(const glb_params in,glb_params out, int exp)
 {
   double res;
   int i,*b;
-  int swit[32+glbGetNumOfOscParams()]; 
-  int buff[32+glbGetNumOfOscParams()];
+  int swit[GLB_MAX_EXP+glbGetNumOfOscParams()]; 
+  int buff[GLB_MAX_EXP+glbGetNumOfOscParams()];
   b=CheckProjection();
   for(i=0;i<glbGetNumOfOscParams()+glb_num_of_exps;i++) buff[i]=b[i];
   for(i=0;i<glbGetNumOfOscParams()+glb_num_of_exps;i++) swit[i]=GLB_FREE;
@@ -1375,8 +1375,8 @@ double glbChiAll(const glb_params in,glb_params out, int exp)
 {
   double res;
   int i,*b;
-  int swit[32+glbGetNumOfOscParams()]; 
-  int buff[32+glbGetNumOfOscParams()];
+  int swit[GLB_MAX_EXP+glbGetNumOfOscParams()]; 
+  int buff[GLB_MAX_EXP+glbGetNumOfOscParams()];
   b=CheckProjection();
   for(i=0;i<glbGetNumOfOscParams()+glb_num_of_exps;i++) buff[i]=b[i];
   for(i=0;i<glbGetNumOfOscParams()+glb_num_of_exps;i++) swit[i]=GLB_FREE;
