@@ -161,42 +161,60 @@ FILE *glb_fopen(const char *filename, const char *mode)
  
   FILE *t;
   register FILE *value; 
-  for(i=0;i<glb_path_vector_length;i++)
+
+ /* handling an absolute path */
+  if(strlen(filename)>0 && filename[0] == '/') 
     {
-      a=strlen(filename);
-      b=strlen(glb_path_vector[i]);
-      test_name=glb_malloc((a+b+2)*sizeof(char));
-      test_name=strcpy(test_name,glb_path_vector[i]);
-      test_name=strcat(test_name,filename);
-      if(verbosity_level >= 4) fprintf(stderr,"Searched path: %s\n",test_name);
-      t=fopen(test_name,"r");
+      if(verbosity_level >= 4) 
+	fprintf(stderr,"Searched path: %s\n",filename);
+      t=fopen(filename,"r");
       if(t!=NULL) 
 	{
-	  new_name=strdup(test_name);
+	  new_name=strdup(filename); 
 	  fclose(t);
-	  glb_free(test_name);
-	  break;
 	}
-      glb_free(test_name);
-      /* Repeating the exercise with an additional '/' between
-       * path and filename.
-       */
-      a=strlen(filename);
-      b=strlen(glb_path_vector[i]);
-      test_name=glb_malloc((a+b+2)*sizeof(char));
-      test_name=strcpy(test_name,glb_path_vector[i]);
-      test_name=strcat(test_name,"/");
-      test_name=strcat(test_name,filename);
-      t=fopen(test_name,"r");
-      if(t!=NULL) 
-	{
-	  new_name=strdup(test_name); 
-	  glb_free(test_name);
-	  fclose(t);
-	  break;
-	}
-      glb_free(test_name);
     }
+
+  if(new_name==NULL)
+    {
+      for(i=0;i<glb_path_vector_length;i++)
+	{
+	  a=strlen(filename);
+	  b=strlen(glb_path_vector[i]);
+	  test_name=glb_malloc((a+b+2)*sizeof(char));
+	  test_name=strcpy(test_name,glb_path_vector[i]);
+	  test_name=strcat(test_name,filename);
+	  if(verbosity_level >= 4) 
+	    fprintf(stderr,"Searched path: %s\n",test_name);
+	  t=fopen(test_name,"r");
+	  if(t!=NULL) 
+	    {
+	      new_name=strdup(test_name);
+	      fclose(t);
+	      glb_free(test_name);
+	      break;
+	    }
+	  glb_free(test_name);
+	  /* Repeating the exercise with an additional '/' between
+	   * path and filename.
+	   */
+	  a=strlen(filename);
+	  b=strlen(glb_path_vector[i]);
+	  test_name=glb_malloc((a+b+2)*sizeof(char));
+	  test_name=strcpy(test_name,glb_path_vector[i]);
+	  test_name=strcat(test_name,"/");
+	  test_name=strcat(test_name,filename);
+	  t=fopen(test_name,"r");
+	  if(t!=NULL) 
+	    {
+	      new_name=strdup(test_name); 
+	      glb_free(test_name);
+	      fclose(t);
+	      break;
+	    }
+	  glb_free(test_name);
+	}  
+  }
 
   if(new_name==NULL) {glb_error("File not found");return NULL;}
   
