@@ -22,3 +22,14 @@ Date: 22.05.07
 	time (~1000 includes). 
 -------------------------------------------------------------------------------
 
+BUG#19 Filenames which are an absolute path are not resolved by glb_fopen
+
+From: Patrick Huber
+Date: 13.02.2008
+
+	If a filename starts with '/', glb_fopen will nonetheless try
+	to prepend either the working directory from which the program
+	is called or the path given by GLB_PATH. It will not first try
+	the filename itself.
+-------------------------------------------------------------------------------
+

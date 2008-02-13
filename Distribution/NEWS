@@ -85,3 +85,6 @@
  	  point registers). See also http://gcc.gnu.org/bugzilla/,
  	  entry No. #323.
 
+**********Version 3.0.12
+13/02/2008 PH
+	- Fixed BUG#19
