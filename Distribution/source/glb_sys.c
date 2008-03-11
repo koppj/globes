@@ -726,12 +726,28 @@ inline double glb_likelihood(double true_rate, double fit_rate)
 {
   double res;
   res = fit_rate - true_rate;
+  if (true_rate > 0)
+  {
+    if (fit_rate <= 0.0)
+      res = 1e100;
+    else
+      res += true_rate * log(true_rate/fit_rate);
+  }
+  else
+    res = fabs(res);
+
+  return 2.0 * res;
+
+/* JK - 2008-03-11
+  double res;
+  res = fit_rate - true_rate;
   if (fit_rate <= 0.0)
     res = 1e100;
   else if (true_rate > 0)
     res += true_rate * log(true_rate/fit_rate);
 
-  return 2.0 * res; 
+  return 2.0 * res;
+*/
 
 /* JK - 2007-06-29  
   double res; 
