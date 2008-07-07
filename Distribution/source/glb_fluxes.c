@@ -356,7 +356,8 @@ double glb_flux_calc(double en, double baseline,
     }
  
  
- incre = (data->flux_storage[500][0]-data->flux_storage[0][0])/501.0;
+/* JK 2008-07-06 incre = (data->flux_storage[500][0]-data->flux_storage[0][0])/501.0; */
+ incre = (data->flux_storage[500][0]-data->flux_storage[0][0])/500.0;
  lowerind = floor((en-data->flux_storage[0][0])/incre);
  higherind = lowerind + 1;
 
