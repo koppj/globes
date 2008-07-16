@@ -33,3 +33,12 @@ Date: 13.02.2008
 	the filename itself.
 -------------------------------------------------------------------------------
 
+BUG#20 Flux times cross section does not match
+
+From: Christine Lewis
+Date: 04.08.2008
+
+	If one multiplies flux times cross section outside of GLoBES
+	the result deviates by 1% or so from the values obtained with
+	GLoBES.
+-------------------------------------------------------------------------------

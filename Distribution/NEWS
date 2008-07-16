@@ -89,7 +89,11 @@
 13/02/2008 PH
 	- Fixed BUG#19
 
+
 07/07/2008 JK
         - Fixed bug in glb_fluxes.c: Wrong number of flux bins (501
-          instead of 500) had been used in glb_flux_calc.
+          instead of 500) had been used in glb_flux_calc. See BUG#20.
+
+**********Version 3.0.13
+16/07/08 PH
 
