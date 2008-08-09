@@ -42,3 +42,27 @@ Date: 04.08.2008
 	the result deviates by 1% or so from the values obtained with
 	GLoBES.
 -------------------------------------------------------------------------------
+
+BUG#21 GLoBES does not compile on some Macs
+
+From: Anselmo Meregaglia
+Date: 13.05.2008
+
+        On some Macs, compilation fails with the message
+          ld: duplicate symbol _argp_fmtstream_write in .libs/libglobes.lax/
+
+-------------------------------------------------------------------------------
+
+BUG#22 Compilation problem under Fedora Core 9
+
+From: Catalina Espinoza
+Date: 22.07.2008
+
+        On Fedora Core 9, compilation fails with
+          /.libs/libglobes.so: undefined reference to `zhetrd3'
+        and some warnings:
+          glb_probability.h:58: warning: inline function 'zhetrd3' declared
+          but never defined
+
+-------------------------------------------------------------------------------
+

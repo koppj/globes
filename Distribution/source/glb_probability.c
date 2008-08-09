@@ -64,8 +64,11 @@ gsl_matrix_complex *S1=NULL, *T0=NULL; /* Temporary matrix storage              
  ***************************************************************************/
 
 // ----------------------------------------------------------------------------
-inline void zhetrd3(double complex A[3][3], double complex Q[3][3],
-                    double d[3], double e[2])
+//JK 2008-08-09 Temporary workaround for bug #22
+//inline void zhetrd3(double complex A[3][3], double complex Q[3][3],
+//                    double d[3], double e[2])
+void zhetrd3(double complex A[3][3], double complex Q[3][3],
+             double d[3], double e[2])
 // ----------------------------------------------------------------------------
 // Reduces a hermitian 3x3 matrix to real tridiagonal form by applying
 // (unitary) Householder transformations:

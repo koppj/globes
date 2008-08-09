@@ -55,8 +55,8 @@ extern void *glb_probability_user_data;
 
 
 /* Functions */
-inline void zhetrd3(double complex A[3][3], double complex Q[3][3],
-                    double d[3], double e[2]);
+//JK 2008-07-22 inline void zhetrd3(double complex A[3][3], double complex Q[3][3],
+//                    double d[3], double e[2]);
 int zheevc3(double complex A[3][3], double w[3]);
 int zheevq3(double complex A[3][3], double complex Q[3][3], double w[3]);
 int zheevh3(double complex A[3][3], double complex Q[3][3], double w[3]);
