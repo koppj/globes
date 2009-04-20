@@ -193,8 +193,9 @@ exit
 Check the public webpages! If everything is okay, tag your version
 
 -------------
-git tag version-3.0.x
+git tag version-3-0-x
 git push
 -------------
+
 
 Done.
