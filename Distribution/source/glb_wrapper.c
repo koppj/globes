@@ -21,8 +21,6 @@
  */
 
 
-
-
 #include <stdio.h>
 #include <string.h>
 #include <obstack.h>
@@ -48,7 +46,7 @@
 
 /* The global variables */
 int glb_num_of_exps;
-glb_exp glb_experiment_list[32];
+glb_exp glb_experiment_list[GLB_MAX_EXP];
 int glb_rule_number;
 
 
@@ -94,6 +92,8 @@ glb_density_type *glb_alloc_density_type()
   if (temp != NULL)
   {
     temp->density_params = (double *) glb_malloc(sizeof(double)*glb_num_of_exps);
+
+    
     if (temp->density_params != NULL)
     {
       for(i=0; i < glb_num_of_exps; i++)
@@ -345,7 +345,7 @@ glb_projection glbSetDensityProjectionFlag(glb_projection in,
     {
       for(i=0;i<glb_num_of_exps;i++) (in->density)->density_params[i]=flag;
     }
-  else if(0 <= which&&which < (in->osc)->length )
+  else if(0 <= which&&which < (in->density)->length )
     {
       (in->density)->density_params[which]=flag;
     }
@@ -523,8 +523,8 @@ void
 glbClearExperimentList()
 {
   int i;
-  for(i=0;i<32;i++) glbFreeExp(glb_experiment_list[i]);
-  for(i=0;i<32;i++) glb_experiment_list[i]=glbAllocExp();
+  for(i=0;i<GLB_MAX_EXP;i++) glbFreeExp(glb_experiment_list[i]);
+  for(i=0;i<GLB_MAX_EXP;i++) glb_experiment_list[i]=glbAllocExp();
   glb_num_of_exps=0;
   glbResetCounters();
   glb_init_minimizer();   /* Re-initialize minimizer */
@@ -1671,7 +1671,7 @@ void glb_clean_up()
 {
   int i;
  
-  for(i=0;i<32;i++) {glbFreeExp(glb_experiment_list[i]);}
+  for(i=0;i<GLB_MAX_EXP;i++) {glbFreeExp(glb_experiment_list[i]);}
  glbCleanSysList();
  glb_clean_parser();
  glb_lexer_cleanup();
@@ -1700,7 +1700,7 @@ glb_init(char *name)
   glb_prog_name_init(name);
   glb_setup_path();
  
-  for(i=0;i<32;i++) glb_experiment_list[i]=glbAllocExp();
+  for(i=0;i<GLB_MAX_EXP;i++) glb_experiment_list[i]=glbAllocExp();
   glb_num_of_exps=0;
   glb_rule_number=0;
   obstack_init(&glb_rate_stack);

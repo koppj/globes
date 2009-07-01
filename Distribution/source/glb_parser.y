@@ -72,7 +72,7 @@
   static int cross_count=-1;
   static int flux_count=-1;
   static struct glb_experiment buff;
-  static struct glb_experiment buff_list[32];
+  static struct glb_experiment buff_list[GLB_MAX_EXP];
   static glb_smear ibf;
   static glb_option_type opt;
   static glb_flux flt;
@@ -1873,7 +1873,7 @@ void glbResetEOF()
   loc_count=-1;
   flux_count=-1;
   glbInitExp(&buff);
-  for(i=0;i<32;i++)   glbInitExp(&buff_list[i]);
+  for(i=0;i<GLB_MAX_EXP;i++)   glbInitExp(&buff_list[i]);
   /* this here would be the place to check for unuses variables, but
      for that we need an access counter */
   if(name_table!=NULL) free_nametable();
@@ -1932,7 +1932,8 @@ int glbInitExperiment(char *inf,glb_exp *in, int *counter)
   if(k!=0) return -2;
   
   k=0;
-  if(*counter+exp_count>32) glb_fatal("Too many experiments!");
+
+  if(*counter+exp_count>GLB_MAX_EXP) glb_fatal("Too many experiments!");
   for(i=0;i<exp_count;i++)
     {  
       *ins[*counter+i]=buff_list[i];
