@@ -80,7 +80,7 @@ enum glb_enum_minimizers
 
 /* maximum number of experiments */
 
-#define GLB_MAX_EXP 32
+#define GLB_MAX_EXP 64
 
 
 

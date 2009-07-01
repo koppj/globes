@@ -1869,12 +1869,12 @@ SWIGCLASS_STATIC int _wrap_glb_experiment_list_set(pTHX_ SV* sv, MAGIC * SWIGUNU
     glb_exp *inp = 0;
     int res = SWIG_ConvertPtr(sv, SWIG_as_voidptrptr(&inp), SWIGTYPE_p_p_glb_experiment,  0 );
     if (!SWIG_IsOK(res)) {
-      SWIG_exception_fail(SWIG_ArgError(res), "in variable '""glb_experiment_list""' of type '""glb_exp [32]""'");
+      SWIG_exception_fail(SWIG_ArgError(res), "in variable '""glb_experiment_list""' of type '""glb_exp [64]""'");
     } else if (inp) {
       size_t ii = 0;
-      for (; ii < (size_t)32; ++ii) glb_experiment_list[ii] = inp[ii];
+      for (; ii < (size_t)64; ++ii) glb_experiment_list[ii] = inp[ii];
     } else {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in variable '""glb_experiment_list""' of type '""glb_exp [32]""'");
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in variable '""glb_experiment_list""' of type '""glb_exp [64]""'");
     }
   }
 fail:
@@ -9324,7 +9324,7 @@ XS(SWIG_init) {
   } while(0) /*@SWIG@*/;
   /*@SWIG:%set_constant@*/ do {
     SV *sv = get_sv((char*) SWIG_prefix "GLB_MAX_EXP", TRUE | 0x2);
-    sv_setsv(sv, SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(32)));
+    sv_setsv(sv, SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(64)));
     SvREADONLY_on(sv);
   } while(0) /*@SWIG@*/;
   ST(0) = &PL_sv_yes;
