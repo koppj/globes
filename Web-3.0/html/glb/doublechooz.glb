@@ -1,0 +1,189 @@
+%!GLoBES
+
+$version="3.0.0"
+
+/* AEDL file for the Double CHOOZ far detector
+ *
+ * Copyright 2004-2009 The GLoBES Team
+ *
+ * If you modify this file you have to rename it.
+ *
+ * If you are using this file for producing a scientific publication
+ * or a talk please cite the following references and check the supporting
+ * files for a similar comment.
+ * 
+ *
+ * This file was used to produce the results in
+ *
+ #* @Article{Huber:2009xx,
+ #*  author = "Huber, P and Lindner, M and Schwetz, T and Winter, W",
+ #*  title = "",
+ #*  year = "2009",
+ #*  eprint = ""		
+ #* }
+ *
+ * The description of Double Chooz follows
+ *
+ #* @Article{Ardellier:2004ui,
+ #*    author    = "Ardellier, F. and others",
+ #*    title     = "Letter of intent for {Double-CHOOZ}: 
+ #*	A search for the mixing
+ #*                 angle  theta(13)",
+ #*    year      = "2004",
+ #*    eprint    = "hep-ex/0405032",
+ #*    SLACcitation  = "%%CITATION = HEP-EX 0405032;%%"
+ #* }
+ *
+ * The main difference are the updated position of the near detector
+ * and thus longer baselines.  
+ *
+ * 07/07/09 <pahuber@vt.edu>	
+ */
+
+/* ####### Reactor flux ####### */
+
+nuflux(#U235)<
+        @flux_file = "U235.dat"
+        @time      = 3		/* years */
+        @power     = 4.27 	/* GWth */
+        @norm      = 6.0e-12 /* Far detector is more efficient than near detector */
+>
+
+nuflux(#U238)<
+        @flux_file = "U238.dat"
+        @time      = 3		/* years */
+        @power     = 4.27	/* GWth */
+        @norm      = 6.0e-12 /* Far detector is more efficient than near detector */
+>
+
+nuflux(#Pu239)<
+        @flux_file = "Pu239.dat"
+        @time      = 3		/* years */
+        @power     = 4.27 	/* GWth */
+        @norm      = 6.0e-12 /* Far detector is more efficient than near detector */
+>
+
+nuflux(#Pu241)<
+        @flux_file = "Pu241.dat"
+        @time      = 3		/* years */
+        @power     = 4.27 	/* GWth */
+        @norm      = 6.0e-12 /* Far detector is more efficient than near detector */
+>
+
+
+/* ######## Baseline setting ######## */
+
+$profiletype = 3
+$densitytab  = { 1e-6 }
+$lengthtab   = { 1.1146  } /* km */
+
+
+/* ####### Detector settings ####### */
+
+$target_mass = 14.66  /* tons (fiducial mass), adjusted to reproduce event rate */
+
+
+/* ####### Energy window ####### */
+
+$bins        = 62
+$emin        = 0.0018	/* GeV */
+$emax        = 0.008	/* GeV */
+
+
+/* ######## Technical information ######## */
+
+$filter_state = 0 
+$filter_value = 1000000 
+
+
+/* ####### Energy resolution ####### */
+
+energy(#ERES)<
+        @type = 1
+        @sigma_function = #inverse_beta
+        @sigma_e = {0.12,0,0}
+>
+
+
+/* ####### Cross sections ####### */
+
+cross(#Reactor_CC)<
+        @cross_file = "XCCreactor.dat"
+>
+
+
+/* ####### Channel definitions ####### */
+
+channel(#nu_e_disappearance_CC_U235)<
+        @channel   =    #U235:      -  :      e  :      e : #Reactor_CC : #ERES
+>
+
+
+channel(#nu_e_disappearance_CC_U238)<
+        @channel   =    #U238:      -  :      e  :      e : #Reactor_CC : #ERES
+>
+
+
+channel(#nu_e_disappearance_CC_Pu239)<
+        @channel   =    #Pu239:      -  :      e  :      e : #Reactor_CC : #ERES
+>
+
+
+channel(#nu_e_disappearance_CC_Pu241)<
+        @channel   =    #Pu241:      -  :      e  :      e : #Reactor_CC : #ERES
+>
+
+
+
+
+/* ####### Setting the rules ####### */
+
+rule(#NU_E_Disappearance_U235)<
+        @signal     = 0.4@#nu_e_disappearance_CC_U235
+   
+        @background = 0.0@#nu_e_disappearance_CC_U235   /* No background */
+        @energy_window = 0.0015 : 0.01
+
+        @sys_off_function = "chiNoSysSpectrum"
+        @sys_off_errors   = {}
+        @sys_on_function  = "chiZero"
+>
+
+
+
+rule(#NU_E_Disappearance_U238)<
+        @signal     = 0.1@#nu_e_disappearance_CC_U238
+   
+        @background = 0.0@#nu_e_disappearance_CC_U235   /* No background */
+        @energy_window = 0.0015 : 0.01
+
+        @sys_off_function = "chiNoSysSpectrum"
+        @sys_off_errors   = {}
+        @sys_on_function  = "chiZero"
+>
+
+
+
+rule(#NU_E_Disappearance_Pu239)<
+        @signal     = 0.1@#nu_e_disappearance_CC_Pu239
+   
+        @background = 0.0@#nu_e_disappearance_CC_U235   /* No background */
+        @energy_window = 0.0015 : 0.01
+
+        @sys_off_function = "chiNoSysSpectrum"
+        @sys_off_errors   = {}
+        @sys_on_function  = "chiZero"
+>
+
+
+
+rule(#NU_E_Disappearance_Pu241)<
+        @signal     = 0.4@#nu_e_disappearance_CC_Pu241
+   
+        @background = 0.0@#nu_e_disappearance_CC_U235   /* No background */
+        @energy_window = 0.0015 : 0.01
+
+        @sys_off_function = "chiNoSysSpectrum"
+        @sys_off_errors   = {}
+        @sys_on_function  = "chiZero"
+>
