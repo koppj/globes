@@ -1,0 +1,90 @@
+#define TITLE       GLoBES - Pre-defined AEDL-Files
+#define KEYWORDS    GLoBES, AEDL, glb, experiment, definitions, download, long, baseline, neutrino, oscillation 
+#define DESCRIPTION Details about pre-defined AEDL Files for GLoBES
+
+#include "template_head.gtml"
+
+<h1>GLoBES - Pre-defined AEDL-Files</h1>
+
+<h2>T2K as of July 2009</h2>
+
+The T2K superbeam experiment can be simulated with the file <a
+href="0709-t2k.glb">0709-t2k.glb</a>. Please check the header of the
+files for references of their origin. Please do not forget to cite
+these references if the file <a href="0709-t2k.glb">0709-t2k.glb</a> is used
+for a scientific publication or a talk. Check the appendix of the
+GLoBES manual for more details of the experiment description.
+
+<h3>Author(s)</h3>
+
+P. Huber, M. Lindner, T. Schwetz and W. Winter
+
+<h3>Download</h3>
+
+<center>
+<table frame=all rules=all cellspacing=4 cellpadding=4>
+<!--<colgroup>
+<col width="170">
+<col width="170">
+<col width="170">
+<col width="170">
+</colgroup>-->
+<thead>
+<tr> 
+<td>AEDL file(s)</td>
+<td>required data file(s)</td>
+<td>combined tar file
+<td>AEDL-Variables</td>
+</tr>
+</thead>
+<tfoot>
+</tfoot>
+<tr>
+<td><a href="0709-t2k.glb">0709-t2k.glb</a> 
+<a href="0709-t2k-anti.glb">0709-t2k-anti.glb</a> </td>
+<td>
+<table>
+<tr><td><a href="0709-t2k-2.5deg-anti-nu.dat">0709-t2k-2.5deg-anti-nu.dat</a></td></tr>
+<tr><td><a href="0709-t2k-2.5deg-nu.dat">0709-t2k-2.5deg-nu.dat</a></td></tr>
+<tr><td><a href="XQE.dat">XQE.dat</a></td></tr>
+<tr><td><a href="XCC_spl.dat">XCC_spl.dat</a></td></tr>
+</table>
+</td>
+<td><a href="0709-t2k.tar.gz">0709-t2k.tar.gz</a> (<a href="0709-t2k.tar.gz.md5">md5</a>)</td>
+<td>none</td>
+</tr>
+</table>
+</center>
+<a href="">  </a>
+
+<h3>Experiment Attributes</h3>
+
+<center>
+<table frame=all rules=all cellspacing=4 cellpadding=4>
+<colgroup>
+<col width="180">
+<col width="180">
+</colgroup>
+<tr>
+<td>Target power</td><td>0.75 MW</td>
+</tr>
+<tr>
+<td>Data taking</td><td>5 years &nu; </td>
+</tr>
+<tr>
+<td>Baseline</td><td>295 km</td>
+</tr>
+<tr>
+<td>Detector technology</td><td>Water Cherenkov</td>
+</tr>
+<tr>
+<td>Detector mass</td><td>22.5 kt</td>
+</tr>
+</table>
+
+<p>
+
+#include "template_foot.gtml"
+
+
+

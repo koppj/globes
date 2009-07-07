@@ -1,0 +1,239 @@
+%!GLoBES
+
+$version="3.0.0"
+
+/* Copyright 2008, 2009 The GLoBES Team
+ *
+ * If you modify this file you have to rename it.
+ *
+ * This file was used to produce the results in
+ *
+ #* @Article{Huber:2009xx,
+ #*  author = "Huber, P and Lindner, M and Schwetz, T and Winter, W",
+ #*  title = "",
+ #*  year = "2009",
+ #*  eprint = ""		
+ #* }
+ *	
+ * This file is the attempt to describe T2K from publicly accessible
+ * sources as of 2008. The analysis of the nu_e appearance follows the
+ * thesis of M. Fechner. The disappearance analysis is taken from a
+ * talk by I. Kato given at Neutrino 2008. Both analysis use the 2.5 degree
+ * off-axis beam corresponding to 0.75kW of beam power.
+ *
+ * If you are using this file for producing a scientific publication
+ * or a talk please cite the following references and check the supporting
+ * files for a similar comment.
+ *
+ #* @PhdThesis{Fechner2006,
+ #* author = 	 {Fechner, M.},
+ #* title = 	 {D\'etermination des performances attendues sur la recherche 
+ #* de l'oscillation $\nu_\mu\rightarrow\nu_e$ dans l'experi\'ence T2K depuis 
+ #* l'\'etude des donn\'ees recueilles dans l'\'experience K2K},
+ #* school = 	 {Universit\'e Paris VI},
+ #*  year = 	 {2006}
+ #* }
+ *
+ #* @Proceedings{Kato,
+ #*  title = 	 {Neutrino 2008},
+ #*  year = 	 {2008}
+ #* }
+ *
+ * The cross sections have been taken from the files produced for
+ *
+ #* @Article{Campagne:2006yx,
+ #*    author    = "Campagne, J. E. and Maltoni, M. and Mezzetto, M. and
+ #*                 Schwetz, T.",
+ #*    title     = "{Physics potential of the CERN-MEMPHYS neutrino oscillation
+ #*                 project}",
+ #*    journal   = "JHEP",
+ #*    volume    = "04",
+ #*    year      = "2007",
+ #*    pages     = "003",
+ #*    eprint    = "hep-ph/0603172",
+ #*    archivePrefix = "arXiv",
+ #*    SLACcitation  = "%%CITATION = HEP-PH/0603172;%%"
+ #* }
+ *
+ * The efficiencies for fully containing an event in SK for atmospheric
+ * neutrinos has been provided by J. Kopp, which originally are due to
+ * a private communication with T. Kajita. These efficiencies serve
+ * only as proxy for the true efficiencies to contain a muon or an
+ * electron neutrino arriving not isotropically as in the case of
+ * atmospheric neutrinos but from only a specific direction (the beam
+ * direction). The main purpose of these efficiencies is to cut off
+ * the high energy component of the beam. Since the efficiency is
+ * substantially smaller than 1, we have prefactors in the rules which
+ * are larger than 1 in order to reproduce the right event numbers.
+ *
+ * The sensitivity from the appearance channel matches figure 6.17 of
+ * [Fechner2006] and the event rates and spectra for total signal and
+ * total background match figure 6.8 of [Fechner2006]. Systematics is
+ * taken from chapter 6 of [Fechner2006].
+ *
+ * The disappearance channel matches the rates and spectra in the
+ * middle figure in the top row on slide 4 of [Kato] for \Delta
+ * m^2=2.5x10^-3 eV^2 for both signal and non-QE background. The
+ * resulting sensitivity matches well with the corresponding figure on
+ * the same slide, provided contours are assumed to be 1 dof.
+ *
+ * Last updated 07/07/2009 <pahuber@vt.edu>
+ *
+ **********************************************************************
+ * 				WARNING				      *
+ **********************************************************************
+ * You must not change anything in this file pertaining to luminosity *
+ * or binning, since the backgrounds are all implemented by using     *
+ * @post_smearing_background and they will not scale properly with a  * 
+ * change of luminosity or bin width. If you need a different         *
+ * luminosity or bin width you have to manually adjust the            *
+ * backgrounds such that their total rate matches! Also note, that    *
+ * backgrounds will not oscillate at all.                             *
+ **********************************************************************
+ */
+
+
+
+/* ####### Beam flux ####### */
+
+nuflux(#T2Kplus)<
+	@flux_file="0709-t2k-2.5deg-nu.dat"
+	@time = 5	/* years */
+	@norm = 0.334556*1.06
+>
+
+
+/* ####### Detector settings ###### */
+
+$target_mass = 	22.5	/* kt (fiducial mass)*/
+
+/* ####### Energy window ####### */
+
+$bins = 	100
+$emin = 	0.2	/* GeV */
+$emax = 	2	/* GeV */
+
+$sampling_points = 100          
+$sampling_min =                 0.1    /* GeV */
+$sampling_max =                 4.0   /* GeV */
+
+
+
+
+/* ####### Baseline setting ####### */
+
+$profiletype =	 	1 
+$baseline =		295.0	/* km */
+
+
+/* ####### Technical information ####### */
+
+$filter_state = 0 
+$filter_value = 1000000 
+
+
+/* ####### Energy resolution ####### */
+
+energy(#ERES)<
+	@type = 1
+	@sigma_e = {0.0,0.075,0.05}
+>
+
+
+/* ####### Cross sections ####### */
+
+cross(#EL)<
+	@cross_file = "XCC_spl.dat"
+>
+
+
+cross(#MU)<
+	@cross_file = "XQE.dat"
+>
+
+/* ###### Backgrounds and efficiencies ###### */
+
+%energies={0.122416, 0.180616, 0.262373, 0.381137, 0.562341, 0.829696,
+ 1.22416, 1.77828, 2.62373, 3.81137, 5.62341, 8.29696, 12.2416}
+
+%fceffs={0.00269542, 0.00539084, 0.242588, 0.768194, 0.827493, 0.795148, 
+0.665768, 0.509434, 0.380054, 0.269542, 0.172507, 0.0566038, 
+0.0107817}
+
+%bc=samplingbincenter()
+
+%fc=interpolation(%energies,%fceffs,1,%bc)
+
+%nonQEbg={0, 0, 9.91192, 7.16613, 5.51865, 4.42034, 3.63582, 
+3.04744, 2.58981, 2.2237, 1.92416, 1.67454, 1.46333, 1.28229, 
+1.12539, 0.988097, 0.866959, 0.759281, 0.662938, 0.576228}
+
+%nonQEbgen={0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 
+1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0}
+
+%appBG={0, 0.254142, 0.973186, 1.39947, 1.31769, 1.02829, 0.824935, 
+0.644868, 0.490431, 0.369251, 0.282229, 0.226597, 0.159258, 0.111949, 
+0.095775, 0.0633776, 0.0463571, 0.0368429, 0.034065, 0.0502196}
+
+%be=bincenter()
+
+%BG=interpolation(%nonQEbgen,%nonQEbg,2,%be)
+
+%appBG=interpolation(%nonQEbgen,%appBG,2,%be)
+
+
+/* ####### Channel definitions ####### */
+
+channel(#nu_mu_disappearance)<
+	@channel = 	#T2Kplus:	+:	m:	m:	#MU:    #ERES
+	@pre_smearing_efficiencies:=%fc
+>
+
+channel(#nu_mu_disappearance_BG)<
+	@channel = 	#T2Kplus:	+:	NOSC_t:	NOSC_t:	#MU:    #ERES
+	@post_smearing_background:=%BG	
+>
+
+channel(#nu_e_appearance)<
+	@channel = 	#T2Kplus:	+:	m:	e:	#EL:    #ERES
+ 	@pre_smearing_efficiencies:=%fc
+>
+
+channel(#nu_e_appearance_BG)<
+	@channel = 	#T2Kplus:	+:	NOSC_t:	NOSC_t:	#EL:    #ERES
+	@post_smearing_background:=%appBG
+>
+
+
+/* ####### Setting the rules ####### */
+
+
+rule(#NU_E_Appearance)<
+ 	@signal = 0.87@#nu_e_appearance
+	@signalerror = 0.02 : 0.01
+
+	@background =  1@#nu_e_appearance_BG
+	@backgrounderror = 0.05 : 0.05    
+	
+	@sys_on_function = "chiSpectrumCalib"  
+	@sys_off_function = "chiNoSysSpectrum"
+
+	@energy_window = 0.35 : 0.85 
+> 
+
+
+rule(#NU_MU_Disappearance)<
+ 	@signal = 2.13@#nu_mu_disappearance
+	@signalerror = 0.001 : 0.001
+
+	@background = 1.0@#nu_mu_disappearance_BG
+	@backgrounderror = 0.001 : 0.001   
+	
+	@sys_on_function = "chiSpectrumCalib"  
+	@sys_off_function = "chiNoSysSpectrum"
+
+	@energy_window = 0.2 : 2.0
+> 
+
+
+/**********************END**********************/
