@@ -14,9 +14,10 @@ $version="3.0.0"
  *
  #* @Article{Huber:2009xx,
  #*  author = "Huber, P and Lindner, M and Schwetz, T and Winter, W",
- #*  title = "",
+ #*  title = "First hint for CP violation in neutrino oscillations 
+ #*           from upcoming superbeam and reactor experiments",
  #*  year = "2009",
- #*  eprint = ""		
+ #*  eprint = "arXiv:0907.1896"		
  #* }
  *	
  * The description of NoVA (concerning the nu_e appearance signal) follows 
@@ -73,7 +74,7 @@ $version="3.0.0"
  * Besides that, we use 100% of all nu_mu QE events. We use an energy
  * window from 1 to 3 GeV. We use ME beam tune.
  *
- * Last Update: 07/07/09 <pahuber@vt.edu> 
+ * Last Update: 13/07/09 <pahuber@vt.edu> 
  */
 
 

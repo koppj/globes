@@ -10,9 +10,10 @@ $version="3.0.0"
  *
  #* @Article{Huber:2009xx,
  #*  author = "Huber, P and Lindner, M and Schwetz, T and Winter, W",
- #*  title = "",
+ #*  title = "First hint for CP violation in neutrino oscillations 
+ #*           from upcoming superbeam and reactor experiments",
  #*  year = "2009",
- #*  eprint = ""		
+ #*  eprint = "arXiv:0907.1896"		
  #* }
  *
  *********************************************************************
@@ -87,7 +88,7 @@ $version="3.0.0"
  * resulting sensitivity matches well with the corresponding figure on
  * the same slide, provided contours are assumed to be 1 dof.
  *
- * Last updated 20/01/2009 <pahuber@vt.edu>
+ * Last updated 13/07/2009 <pahuber@vt.edu>
  *
  **********************************************************************
  * 				WARNING				      *

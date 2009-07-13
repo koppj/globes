@@ -17,9 +17,10 @@ $version="3.0.0"
  *
  #* @Article{Huber:2009xx,
  #*  author = "Huber, P and Lindner, M and Schwetz, T and Winter, W",
- #*  title = "",
+ #*  title = "First hint for CP violation in neutrino oscillations 
+ #*           from upcoming superbeam and reactor experiments",
  #*  year = "2009",
- #*  eprint = ""		
+ #*  eprint = "arXiv:0907.1896"		
  #* }
  *
  * The description of Double Chooz follows
@@ -37,7 +38,7 @@ $version="3.0.0"
  * The main difference are the updated position of the near detector
  * and thus longer baselines.  
  *
- * 07/07/09 <pahuber@vt.edu>	
+ * 13/07/09 <pahuber@vt.edu>	
  */
 
 /* ####### Reactor flux ####### */
