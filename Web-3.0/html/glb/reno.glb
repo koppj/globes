@@ -32,8 +32,8 @@ nuflux(#U235)<
         @flux_file = "U235.dat"
         @time      = 3		/* years */
         @power     = 2.73  	/* GWth */
-        @norm = 6.0e-12 /* Far detector is more efficient than near
-        detector */ >
+        @norm = 6.0e-12 /* Far detector is more efficient than near detector */
+>
 
 nuflux(#U238)<
         @flux_file = "U238.dat"
