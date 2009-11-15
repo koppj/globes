@@ -122,12 +122,12 @@ glbReset();
 
 
 <INITIAL>{
-rule    {BEGIN(glb_lexer_defr);yylval.name=yytext;return GID;}
-channel {BEGIN(glb_lexer_defc);yylval.name=yytext;return GID;}
-energy  {BEGIN(glb_lexer_defe);yylval.name=yytext;return GID;}
-cross   {BEGIN(glb_lexer_defx);yylval.name=yytext;return GID;}
-flux    {BEGIN(glb_lexer_deff);yylval.name=yytext;return GID;}
-nuflux    {BEGIN(glb_lexer_defnf);yylval.name=yytext;return GID;}
+rule    {BEGIN(glb_lexer_defr);yylval.name=strdup(yytext);return GID;}
+channel {BEGIN(glb_lexer_defc);yylval.name=strdup(yytext);return GID;}
+energy  {BEGIN(glb_lexer_defe);yylval.name=strdup(yytext);return GID;}
+cross   {BEGIN(glb_lexer_defx);yylval.name=strdup(yytext);return GID;}
+flux    {BEGIN(glb_lexer_deff);yylval.name=strdup(yytext);return GID;}
+nuflux    {BEGIN(glb_lexer_defnf);yylval.name=strdup(yytext);return GID;}
 }
 
 include             {cond_buf_i=YY_START;BEGIN(glb_lexer_incl);}
@@ -202,12 +202,11 @@ glb_file_id=file_name_buf[include_stack_ptr];
 
 
 <glb_lexer_rule,glb_lexer_chl,glb_lexer_energy,glb_lexer_cross,glb_lexer_flux,glb_lexer_nuflux>[<]  {
-yylval.name=yytext;
-
+yylval.in=-1;
 return GRPOPEN;}
 
 <glb_lexer_chl>@channel          {
-yylval.name=yytext;
+yylval.name=strdup(yytext);
 
 return CHANNEL;}
 
@@ -224,27 +223,27 @@ NOSC_[tT][auAU]* {yylval.in=13;return FLAVOR;}
 
 
 <glb_lexer_energy>@energy         {
-yylval.name=yytext;
+yylval.name=strdup(yytext);
 
 return ENERGY;}
 
 <glb_lexer_rule>@signal           {
-yylval.name=yytext;
+yylval.name=strdup(yytext);
 
 return SIGNAL;}
 
 <glb_lexer_rule>@background          {
-yylval.name=yytext;
+yylval.name=strdup(yytext);
 
 return BG;}
 
 <glb_lexer_rule>@sys_on_function   {
-yylval.name=yytext;
+yylval.name=strdup(yytext);
 return SYS_ON_FUNCTION;
 }
 
 <glb_lexer_rule>@sys_off_function   {
-yylval.name=yytext;
+yylval.name=strdup(yytext);
 return SYS_OFF_FUNCTION;
 }
 
@@ -257,37 +256,37 @@ return SYS_OFF_FUNCTION;
 <glb_lexer_str>\n {glb_fatal("Lexer error: Unterminated string");exit(1);}
 
 <glb_lexer_str>{FN} {
-yylval.name=yytext;
+yylval.name=strdup(yytext);
 return FNAME;}
 
 $version {
-yylval.name=yytext;
+yylval.name=strdup(yytext);
 return VERS;
 }
 
 <glb_lexer_cross>@cross_file           {
-yylval.name=yytext;
+yylval.name=strdup(yytext);
 return CROSS;}
 
 <glb_lexer_flux>@flux_file          {
-yylval.name=yytext;
+yylval.name=strdup(yytext);
 return FLUXP;}
 
 
 <glb_lexer_flux>@flux_file_m           {
-yylval.name=yytext;
+yylval.name=strdup(yytext);
 return FLUXM;}
 
 
 
 
 <glb_lexer_nuflux>@flux_file          {
-yylval.name=yytext;
+yylval.name=strdup(yytext);
 return NUFLUX;}
 
 
 <glb_lexer_nuflux>@flux_file_m           {
-yylval.name=yytext;
+yylval.name=strdup(yytext);
 return NUFLUX;}
 
 
@@ -390,11 +389,12 @@ return s->type;
 
 <glb_lexer_rule,glb_lexer_chl,glb_lexer_energy,glb_lexer_cross,glb_lexer_flux,glb_lexer_nuflux>[>]        {
 BEGIN(INITIAL);
+yylval.in=-1;
 return GRPCLOSE;}
 
 
 <glb_lexer_chl,glb_lexer_rule,glb_lexer_energy,glb_lexer_cross,glb_lexer_flux,glb_lexer_nuflux>@{ID} {
-yylval.name=yytext;
+yylval.name=strdup(yytext);
 return IDN;
 }
 
@@ -405,7 +405,7 @@ return IDN;
 return NUM;
 }
 
-{IVAL}  {yylval.name=yytext;return IDN;}
+{IVAL}  {yylval.name=strdup(yytext);return IDN;}
 
 {DIGIT}+"."{DIGIT}*        {
 yylval.val=atof(yytext); 

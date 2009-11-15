@@ -1037,9 +1037,12 @@ static int set_exp_energy(char *name, glb_List **value)
 %token <name> IDN CROSS FLUXP FLUXM NUFLUX
 %token <name> SYS_ON_FUNCTION SYS_OFF_FUNCTION
 %token <name> GRP GID FNAME VERS
-%token <in> SIGNAL BG GRPOPEN GRPCLOSE PM FLAVOR
-%token <in> NOGLOBES CHANNEL
-%token <in> RULESEP RULEMULT ENERGY
+%token <name> SIGNAL BG
+%token <name> ENERGY CHANNEL
+%token <in> GRPOPEN GRPCLOSE
+%token <in> PM FLAVOR
+%token <in> NOGLOBES
+%token <in> RULESEP RULEMULT
 %token <nameptr> NAME RDF NDEF
 %type <ptr> seq listcopy
 %type <ptrq> rule brule srule ene
@@ -1098,11 +1101,20 @@ exp:      NUM                { $$ = $1;                         }
 | NAME                { $$ = $1->value;              }
 | VAR                { $$ = $1->value.var;              }
 | VAR '=' exp        { $$ = $3; $1->value.var = $3;     }
-| IDN '=' exp        { if(set_exp($1,$3,0)==1) yyerror("Unknown identifier");
-$$ = $3; }
-| IDN '=' SFNCT        { if(set_fnct($1,$3->sf)==1) yyerror("Unknown identifier");}
-| IDN '=' exp RULESEP exp  { if(set_pair($1,$3,$5,0)==1) yyerror("Unknown identifier");
-$$ = $3; }
+| IDN '=' exp {
+  if(set_exp($1,$3,0)==1) yyerror("Unknown identifier");
+  $$ = $3;
+  if ($1)  { glb_free($1);  $1=NULL; }
+}
+| IDN '=' SFNCT {
+  if(set_fnct($1,$3->sf)==1) yyerror("Unknown identifier");
+  if ($1)  { glb_free($1);  $1=NULL; }
+}
+| IDN '=' exp RULESEP exp {
+  if(set_pair($1,$3,$5,0)==1) yyerror("Unknown identifier");
+  $$ = $3;
+  if ($1)  { glb_free($1);  $1=NULL; }
+}
 | FNCT '(' exp ')'   {
   /* added safety in case the function pointer is NULL, which is
      sometimes useful for special functions */
@@ -1127,6 +1139,7 @@ listcopy: IDN RULESEP '=' LVAR {
   ltemp=thread_list(&glb_list_copy,0,0,$4->list); 
   if(set_exp_list($1,ltemp,3)==1) yyerror("Unknown identifier");
   $$ = ltemp;
+  if ($1)  { glb_free($1);  $1=NULL; }
 }
 
 
@@ -1157,9 +1170,11 @@ seq:    exp  ','        {$$=list_cons(NULL,$1); }
 | '{' exp '}'  {$$=list_cons(NULL,$2); }
 
 
-| IDN '=' seq        { if(set_exp_list($1,$3,3)==1) 
-  yyerror("Unknown identifier");
- $$ = $3; }
+| IDN '=' seq {
+  if(set_exp_list($1,$3,3)==1)  yyerror("Unknown identifier");
+  $$ = $3;
+  if ($1)  { glb_free($1);  $1=NULL; }
+ }
 
 //| FNCT '{' exp '}'   { $$ = ($1->value.lfnctptr)($3); }
 | FNCT '(' seq ')' {$$ = thread_list($1->value.fnctptr,$1->reverse,$1->destroy,$3);}
@@ -1192,12 +1207,15 @@ group: GID '(' NAME ')'
   glb_free(context);
   context =(char *) strdup($1);
   grp_start(context);
+  if ($1)  { glb_free($1);  $1=NULL; }
 }
-  GRPOPEN ingroup  GRPCLOSE { 
-   
-grp_end(context);}
+GRPOPEN ingroup  GRPCLOSE {
+  grp_end(context);
+}
 | GID '(' RDF ')' GRPOPEN ingroup  GRPCLOSE {
-  yyerror("Redefinition of an automatic variable");YYERROR;}  
+    yyerror("Redefinition of an automatic variable"); YYERROR;
+    if ($1)  { glb_free($1);  $1=NULL; }
+}
 ;
 
 ingroup: /* empty */ 
@@ -1213,6 +1231,8 @@ ingroup: /* empty */
 
 version: VERS '=' FNAME {
   buff.version=strdup($3);
+  if ($1)  { glb_free($1);  $1=NULL; }
+  if ($3)  { glb_free($3);  $3=NULL; }
 }
 ;
 
@@ -1220,6 +1240,8 @@ cross: CROSS '=' FNAME {
   //load_cross($3,loc_count-1);
   xsc.file_name=strdup($3);
   $$=$3;
+  if ($1)  { glb_free($1);  $1=NULL; }
+  if ($3)  { glb_free($3);  $3=NULL; }
 }
 ;
 
@@ -1229,6 +1251,8 @@ flux: FLUXP '=' FNAME {
  
   //if(set_exp($1,$3,0)==1) yyerror("Unknown identifier");
   $$=$3;
+  if ($1)  { glb_free($1);  $1=NULL; }
+  if ($3)  { glb_free($3);  $3=NULL; }
 }
 ;
 
@@ -1239,17 +1263,23 @@ nuflux: NUFLUX '=' FNAME {
  
   //if(set_exp($1,$3,0)==1) yyerror("Unknown identifier");
   $$=$3;
+  if ($1)  { glb_free($1);  $1=NULL; }
+  if ($3)  { glb_free($3);  $3=NULL; }
 }
 ;
 
 
 rule: SYS_ON_FUNCTION '=' FNAME {
   buff.sys_on_strings[buff.numofrules-1] = strdup($3);
+  if ($1)  { glb_free($1);  $1=NULL; }
+  if ($3)  { glb_free($3);  $3=NULL; }
 }
 ;
 
 rule: SYS_OFF_FUNCTION '=' FNAME {
   buff.sys_off_strings[buff.numofrules-1] = strdup($3);
+  if ($1)  { glb_free($1);  $1=NULL; }
+  if ($3)  { glb_free($3);  $3=NULL; }
 }
 ;
 
@@ -1265,8 +1295,8 @@ channel: CHANNEL '=' name RULESEP pm RULESEP FLAVOR RULESEP FLAVOR RULESEP
   x[4]=(int) $11->value -1; 
   x[5]=(int) $13->value -1;
 
-
   set_channel_data(x,loc_count);
+  if ($1)  { glb_free($1);  $1=NULL; }
 }
 ;
 
@@ -1288,8 +1318,8 @@ ene: ENERGY '='  seq   {
  
   buf=(glb_List**) glb_malloc(sizeof( glb_List* ) ); 
   buf[0]=$3;
- 
   $$=buf;
+  if ($1)  { glb_free($1);  $1=NULL; }
 }
 | ene RULESEP seq 
 {
@@ -1321,6 +1351,7 @@ brule: BG '=' rulepart {
   buf[0]=list_cons(NULL,$3[0]);
   buf[1]=list_cons(NULL,$3[1]);
   glb_free($3);
+  if ($1)  { glb_free($1);  $1=NULL; }
   $$=buf;
 }
 | brule RULESEP rulepart {
@@ -1340,6 +1371,7 @@ srule: SIGNAL '=' rulepart {
   buf[0]=list_cons(NULL,$3[0]);
   buf[1]=list_cons(NULL,$3[1]);
   glb_free($3);
+  if ($1)  { glb_free($1);  $1=NULL; }
   $$=buf;
 }
 | srule RULESEP rulepart {

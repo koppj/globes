@@ -58,15 +58,15 @@
      VERS = 274,
      SIGNAL = 275,
      BG = 276,
-     GRPOPEN = 277,
-     GRPCLOSE = 278,
-     PM = 279,
-     FLAVOR = 280,
-     NOGLOBES = 281,
-     CHANNEL = 282,
-     RULESEP = 283,
-     RULEMULT = 284,
-     ENERGY = 285,
+     ENERGY = 277,
+     CHANNEL = 278,
+     GRPOPEN = 279,
+     GRPCLOSE = 280,
+     PM = 281,
+     FLAVOR = 282,
+     NOGLOBES = 283,
+     RULESEP = 284,
+     RULEMULT = 285,
      NAME = 286,
      RDF = 287,
      NDEF = 288,
@@ -93,15 +93,15 @@
 #define VERS 274
 #define SIGNAL 275
 #define BG 276
-#define GRPOPEN 277
-#define GRPCLOSE 278
-#define PM 279
-#define FLAVOR 280
-#define NOGLOBES 281
-#define CHANNEL 282
-#define RULESEP 283
-#define RULEMULT 284
-#define ENERGY 285
+#define ENERGY 277
+#define CHANNEL 278
+#define GRPOPEN 279
+#define GRPCLOSE 280
+#define PM 281
+#define FLAVOR 282
+#define NOGLOBES 283
+#define RULESEP 284
+#define RULEMULT 285
 #define NAME 286
 #define RDF 287
 #define NDEF 288
@@ -124,7 +124,7 @@ typedef union YYSTYPE
   int in;
   glb_namerec *nameptr;
 }
-/* Line 1489 of yacc.c.  */
+/* Line 1529 of yacc.c.  */
 #line 129 "glb_parser.h"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
