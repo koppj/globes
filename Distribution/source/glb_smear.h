@@ -57,7 +57,7 @@ glb_smear  *glb_smear_reset(glb_smear *in);
 void glb_compute_smearing_matrix(double ***matrix, 
 			   int **low, int **up, glb_smear *in
 			   ,const struct glb_experiment *head);
-
+void glb_filter_compensate(glb_smear *s, double **matrix, int *lower, int *upper);
 
 
 void glb_set_up_smear_data(glb_smear *test,const struct glb_experiment *head);

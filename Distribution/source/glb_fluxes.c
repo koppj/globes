@@ -330,30 +330,37 @@ double glb_flux_calc(double en, double baseline,
   int lowerind;
   int higherind;
   int part=1;
-  if (l==1 && anti == 1)
-    {
-      part = 1;
-    }
- if (l==2 && anti == 1)
-    {
-      part = 2;
-    }
- if (l==3 && anti == 1)
-    {
-      part = 3;
-    }
- if (l==1 && anti == -1)
-    {
-      part = 4;
-    }
- if (l==2 && anti == -1)
-    {
-      part = 5;
-    }
- if (l==3 && anti == -1)
-    {
-      part = 6;
-    }
+
+  part = l - ((anti-1)*3)/2;
+
+// JK 2009-11-23 This is slow ...
+//  if (l==1 && anti == 1)
+//    {
+//      part = 1;
+//    }
+// if (l==2 && anti == 1)
+//    {
+//      part = 2;
+//    }
+// if (l==3 && anti == 1)
+//    {
+//      part = 3;
+//    }
+// if (l==1 && anti == -1)
+//    {
+//      part = 4;
+//    }
+// if (l==2 && anti == -1)
+//    {
+//      part = 5;
+//    }
+// if (l==3 && anti == -1)
+//    {
+//      part = 6;
+//    }
+//
+//    and the following code should accomplish the same
+  part = l + 3*((1-anti)/2);
  
  
 /* JK 2008-07-06 incre = (data->flux_storage[500][0]-data->flux_storage[0][0])/501.0; */

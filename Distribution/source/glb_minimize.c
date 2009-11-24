@@ -453,7 +453,7 @@ static double Chi(double x[])
     {
       glbSetExperiment(glb_experiment_list[i]);
       glb_set_profile_scaling(x[glbGetNumOfOscParams()+i],i);
-      glb_set_new_rates();
+      glb_set_new_rates(GLB_SLOW_RATES);
     }
   if (setjmp(env)==1)
     {
@@ -482,7 +482,7 @@ static double SingleChi(double x[glbGetNumOfOscParams()+1],int exp)
 
   glbSetExperiment(glb_experiment_list[exp]);
   glb_set_profile_scaling(x[glbGetNumOfOscParams()],exp);
-  glb_set_new_rates();
+  glb_set_new_rates(GLB_SLOW_RATES);
 
   glbSetExperiment(glb_experiment_list[exp]);
   if (setjmp(env)==1) 
@@ -509,7 +509,7 @@ static double SingleRuleChi(double x[glbGetNumOfOscParams()+1],int exp, int rule
 
   glbSetExperiment(glb_experiment_list[exp]);
   glb_set_profile_scaling(x[glbGetNumOfOscParams()],exp);
-  glb_set_new_rates();
+  glb_set_new_rates(GLB_SLOW_RATES);
 
   glbSetExperiment(glb_experiment_list[exp]);
   erg=ChiS0_Rule(rule);
@@ -793,7 +793,7 @@ static double MD_chi_NP(double x[])
     {
       glbSetExperiment(glb_experiment_list[i]);
       glb_set_profile_scaling(y[glbGetNumOfOscParams()+i],i);
-      glb_set_new_rates();
+      glb_set_new_rates(GLB_SLOW_RATES);
     }
 
   erg2=ChiS();
@@ -889,7 +889,7 @@ static double chi_NP(double x[])
 
   glbSetExperiment(glb_experiment_list[glb_single_experiment_number]);
   glb_set_profile_scaling(y[glbGetNumOfOscParams()],glb_single_experiment_number);
-  glb_set_new_rates();
+  glb_set_new_rates(GLB_SLOW_RATES);
     
   
   erg2=ChiS0();
@@ -1493,7 +1493,7 @@ double glb_hybrid_chi_callback(double *x, int new_rates_flag, void *user_data)
         continue;
       glbSetExperiment(glb_experiment_list[i]);
       glb_set_profile_scaling(p->density->density_params[i],i);
-      glb_set_new_rates();
+      glb_set_new_rates(GLB_FAST_RATES);
     }
 
     /* Compute priors */
@@ -1562,7 +1562,8 @@ int glb_invoke_hybrid_minimizer(int exp, int rule, double *x, double *chi2)
   int n_sys, i, j, k;
   int iter;
 
-  /* Determine number of systematics parameters */
+  /* Determine number of systematics parameters, compute invariant factors
+     of event rates to speed up the rate computation later on              */
   n_sys = 0;
   for (i=0; i < glb_num_of_exps; i++)
   {
@@ -1574,6 +1575,9 @@ int glb_invoke_hybrid_minimizer(int exp, int rule, double *x, double *chi2)
         continue;
       n_sys += glbGetSysDimInExperiment(i, j, glbGetSysOnOffState(i, j));
     }
+
+    glbSetExperiment(glb_experiment_list[i]);
+    glb_rate_template();
   }
   
   /* Initialize oscillation parameters */

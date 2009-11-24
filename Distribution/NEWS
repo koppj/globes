@@ -101,3 +101,11 @@
         - Removed "inline" keywords from declaration of zhetrd3
           (tentatively fixes BUG#22)
 
+16/11/2009 JK
+        - Corrected bug in lexer/parser (possible access to memory
+          that flex/bison have already freed)
+
+23/11/2009 JK (only branch wbb-tweaks)
+        - If low-pass filter is active and smearing matrix is explicitly
+          given, the effect of the filter is now compensated
+        - Pre-compute part of rates to speed things up by O(10%)

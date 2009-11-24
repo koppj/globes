@@ -412,7 +412,8 @@ struct glb_experiment {
   * All mallocing has to be done at intialization of a given experiment!
   */
   double *chrb_0[32], *chrb_1[32]; /* True and fitted pre-smearing rates by channel   */
-  double *chra_0[32], *chra_1[32]; /* True and fitted post-smearing rates  by channel */
+  double *chra_0[32], *chra_1[32]; /* True and fitted post-smearing rates by channel */
+  double *chr_template[32];   /* Products of fluxes, cross sections, and prefactors by channel */
   double* SignalRates[32];    /* "True" signal event rates for all rules */
   double* BackgroundRates[32];/* "True" background event rates for all rules */
   double* rates0[32];         /* "True" event rates for all rules */
