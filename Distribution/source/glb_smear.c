@@ -43,6 +43,7 @@
 #include <gsl/gsl_permutation.h>
 #include <gsl/gsl_blas.h>
 #include <gsl/gsl_linalg.h>
+#include <gsl/gsl_sf_gamma.h>
 
 
 
@@ -802,14 +803,30 @@ void glb_filter_compensate(glb_smear *s, double **matrix, int *lower, int *upper
   if (!s || !lower || !upper || !matrix)
     glb_fatal("glb_filter_compensate: NULL pointer argument encountered.");
 
+  double sigma = s->options->corr_fac;
+  int factor = 8;
+  int hires_bins = factor * s->simbins;
+
   gsl_matrix *Sin  = gsl_matrix_alloc(s->numofbins, s->simbins);
   gsl_matrix *Sout = gsl_matrix_alloc(s->numofbins, s->simbins);
-  gsl_matrix *F    = gsl_matrix_alloc(s->simbins, s->simbins);
+  gsl_matrix *R    = gsl_matrix_alloc(s->simbins, hires_bins);
+  gsl_matrix *SR   = gsl_matrix_alloc(s->numofbins, hires_bins);
+  gsl_matrix *V    = gsl_matrix_alloc(s->simbins, s->simbins);
+//  gsl_matrix *F    = gsl_matrix_alloc(s->simbins, s->simbins);
+  gsl_matrix *F    = gsl_matrix_alloc(s->simbins, hires_bins);
+//  gsl_matrix *FT   = gsl_matrix_alloc(s->simbins, s->simbins);
+  gsl_matrix *FT   = gsl_matrix_alloc(hires_bins, s->simbins);
   gsl_matrix *Finv = gsl_matrix_alloc(s->simbins, s->simbins);
   gsl_permutation *p = gsl_permutation_alloc(s->simbins);
+//  gsl_vector *v    = gsl_vector_alloc(s->simbins);
+  gsl_vector *v    = gsl_vector_alloc(hires_bins);
+  gsl_vector *tau  = gsl_vector_alloc(s->simbins);
+  gsl_vector *r    = gsl_vector_alloc(hires_bins);
+  gsl_vector *x    = gsl_vector_alloc(s->simbins);
+  gsl_vector *norm = gsl_vector_alloc(s->simbins);
   int signum;
 
-  if (!Sin || !Sout | !F)
+  if (!Sin || !Sout | !F) //FIXME
     glb_fatal("glb_filter_compensate: Unable to allocate temporary memory for smearing matrix.");
 
   /* Copy existing smearing matrix into a non-sparse data structure */
@@ -826,45 +843,117 @@ void glb_filter_compensate(glb_smear *s, double **matrix, int *lower, int *upper
     }
   }
 
-  /* Generate matrix describing effect of filter ... */
-  double sigma = s->options->corr_fac;
-//  printf(" Filter value: %g\n", sigma);
+//////  /* Assuming the energy resolution function to be Gaussian, compensate
+//////   * for the filter by narrowing the Gaussian */
+//////  for (int j=0; j < s->simbins; j++)
+//////  {
+//////    double norm_in = 0.0, norm_out = 0.0;
+//////    for (int i=0; i < s->numofbins; i++)
+//////    {
+//////      norm_in += gsl_matrix_get(Sin, i, j); /* Remember norm (relevant for boundary bins) */
+//////
+//////      double sigma_prime = sigma*sigma/(sigm0*sigma0*(sigma0*sigma0-sigma*sigma));
+//////      double t = (glb_sbin_center(i,s) - glb_sbin_center(j,s)) / (sqrt(2.0)*sigma_prime);
+////////      t = 0.0;
+//////      if (gsl_matrix_get(Sin, i, j) > TOL/2.0)
+//////        gsl_matrix_set(Sout, i, j, gsl_matrix_get(Sin, i, j) * exp(-t*t));
+//////      else
+//////        gsl_matrix_set(Sout, i, j, 0.0);
+//////      norm_out += gsl_matrix_get(Sout, i, j);
+//////    }
+//////
+//////    for (int i=0; i < s->numofbins; i++)  /* Correct normalization */
+//////      gsl_matrix_set(Sout, i, j, gsl_matrix_get(Sout, i, j) * norm_in/norm_out);
+//////  }
+
+  /* Generate matrix that projects a vector with highres_bins entries onto
+   * a vector with simbins entries */
+  gsl_matrix_set_zero(R);
+  for (int i=0; i < s->simbins; i++)
+    for (int j=0; j < factor; j++)
+      gsl_matrix_set(R, i, factor*i + j, 1.0);
+
+  /* Generate matrix describing effect of filter. For numerical stability, we
+   * use erfc instead of erf if erf would be too close to unity */
   for (int i=0; i < s->simbins; i++)
   {
-    for (int j=0; j < s->simbins; j++)
+//    for (int j=0; j < s->simbins; j++)
+    for (int j=0; j < hires_bins; j++)
     {
-      double p1 = 0.5 * gsl_sf_erf( (glb_upper_sbin_boundary(i,s)-glb_sbin_center(j,s))
-                                 / (sqrt(2.0) * sigma) );
-      double p2 = 0.5 * gsl_sf_erf( (glb_lower_sbin_boundary(i,s)-glb_sbin_center(j,s))
-                                 / (sqrt(2.0) * sigma) );
-      gsl_matrix_set(F, i, j, p1 - p2);
-//      printf("%g  ", p1-p2);
+      double c = glb_lower_sbin_boundary(j/factor,s) +
+         (glb_upper_sbin_boundary(j/factor,s) - glb_lower_sbin_boundary(j/factor,s))
+                     * (j%factor + 0.5) / factor;
+      double x1 = (glb_upper_sbin_boundary(i,s) - c) / (sqrt(2.0)*sigma);
+      double x2 = (glb_lower_sbin_boundary(i,s) - c) / (sqrt(2.0)*sigma);
+//      double x1 = (glb_upper_sbin_boundary(i,s)-glb_sbin_center(j,s))/(sqrt(2.0)*sigma);
+//      double x2 = (glb_lower_sbin_boundary(i,s)-glb_sbin_center(j,s))/(sqrt(2.0)*sigma);
+      double erf1 = gsl_sf_erf(x1);
+      double erf2 = gsl_sf_erf(x2);
+      if (erf1 < 0.5 && erf2 < 0.5)
+        gsl_matrix_set(F, i, j, 0.5 * (erf1 - erf2));
+      else if (erf1 < 0.5 && erf2 >= 0.5)
+        gsl_matrix_set(F, i, j, 0.5 * ((erf1 + gsl_sf_erfc(x2)) - 1.0));
+      else if (erf1 >= 0.5 && erf2 < 0.5)
+        gsl_matrix_set(F, i, j, 0.5 * ((-erf2 - gsl_sf_erfc(x1)) + 1.0));
+      else
+        gsl_matrix_set(F, i, j, 0.5 * (gsl_sf_erfc(x2) - gsl_sf_erfc(x1)));
+
+//      double t = (glb_sbin_center(i,s) - glb_sbin_center(j,s)) / (sqrt(2.0)*sigma);
+//      gsl_matrix_set(F, i, j, 1.0/(sqrt(2.0*M_PI)*sigma)
+//                   * (glb_upper_sbin_boundary(i,s)-glb_lower_sbin_boundary(i,s)) * exp(-t*t));
+
+//      t = (glb_sbin_center(i,s) - glb_sbin_center(j,s));
+//      t = (i - j) * 0.125;
+//      gsl_matrix_set(F, i, j, exp(-t*t));
+////      printf("%g  %g\n", 0.5 * (erf1 - erf2),
+//            gsl_matrix_get(F, i, j));
+//      getchar();
+
+//      if (gsl_matrix_get(F, i, j) < TOL/2.0)
+//        gsl_matrix_set(F, i, j, 0.0);
     }
-//    printf(" ---- %d\n", i);
   }
-
-  gsl_matrix_set_identity(F);
-
-  /* ... and invert it */
-  if (gsl_linalg_LU_decomp(F, p, &signum) != GSL_SUCCESS)
-    glb_fatal("glb_filter_compensate: LU decomposition of filter matrix failed.");
-//  printf("%d   %g\n", s->simbins, gsl_linalg_LU_det(F, signum));
-//  getchar();
-  if (gsl_linalg_LU_invert(F, p, Finv) != GSL_SUCCESS)
-    glb_fatal("glb_filter_compensate: Inversion of filter matrix failed.");
-
-  /* Multiply normal smearing matrix with inverse of filter matrix */
-  gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, Sin, Finv, 0.0, Sout);
 
 //  for (int i=0; i < s->simbins; i++)
 //  {
 //    for (int j=0; j < s->simbins; j++)
-//      printf("%g  ", gsl_matrix_get(Finv, i,j));
-//    printf(" ---- %d\n", i);
+//      printf("%g  ", gsl_matrix_get(F, i,j));
+//      printf("\n");
 //  }
 //  getchar();
 
-//  gsl_matrix_memcpy(Sout, Sin);
+  /* Solve linear system F^T (S R F^-1)^T = (S R)^T to find (S R F^-1) */
+  gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, Sin, R, 0.0, SR);
+//  gsl_matrix_set_identity(F); //FIXME
+  gsl_matrix_transpose_memcpy(FT, F);
+//  gsl_linalg_SV_decomp_jacobi(FT, V, r);
+  gsl_linalg_QR_decomp(FT, tau);
+//  gsl_linalg_LU_decomp(FT, p, &signum);
+  for (int i=0; i < s->numofbins; i++)
+  {
+//    gsl_matrix_get_row(v, Sin, i);
+    gsl_matrix_get_row(v, SR, i);
+
+//    gsl_linalg_SV_solve(FT, V, r, v, x);
+//    gsl_matrix_transpose_memcpy(FT, F);
+//    gsl_linalg_HH_solve(FT, v, x);
+    gsl_linalg_QR_lssolve(FT, tau, v, x, r);
+//    gsl_linalg_LU_solve(FT, p, v, x);
+
+    gsl_matrix_set_row(Sout, i, x);
+  }
+
+//  /* Invert filter matrix */
+//  if (gsl_linalg_LU_decomp(F, p, &signum) != GSL_SUCCESS)
+//    glb_fatal("glb_filter_compensate: LU decomposition of filter matrix failed.");
+//  printf("%d   %g\n", s->simbins, gsl_linalg_LU_det(F, signum));
+//  getchar();
+//  if (gsl_linalg_LU_invert(F, p, Finv) != GSL_SUCCESS)
+//    glb_fatal("glb_filter_compensate: Inversion of filter matrix failed.");
+//
+//  /* Multiply normal smearing matrix with inverse of filter matrix */
+//  gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, Sin, Finv, 0.0, Sout);
+
 
   /* Copy smearing matrix back into GLoBES data structures */
   for (int i=0; i < s->numofbins; i++)
@@ -879,11 +968,11 @@ void glb_filter_compensate(glb_smear *s, double **matrix, int *lower, int *upper
      * responsible for tiny differences observed between the results for
      * no compensation and compensation with F = id. */
     lower[i] = 0;
-    while (lower[i] < s->simbins-1  &&  gsl_matrix_get(Sout, i, lower[i]) < TOL/2.0)
+    while (lower[i] < s->simbins-1  &&  fabs(gsl_matrix_get(Sout, i, lower[i])) < TOL/2.0)
       lower[i]++;
 
     upper[i] = s->simbins - 1;
-    while (upper[i] > lower[i]  &&  gsl_matrix_get(Sout, i, upper[i]) < TOL/2.0)
+    while (upper[i] > lower[i]  &&  fabs(gsl_matrix_get(Sout, i, upper[i])) < TOL/2.0)
       upper[i]--;
 
     if (matrix[i])
@@ -898,14 +987,21 @@ void glb_filter_compensate(glb_smear *s, double **matrix, int *lower, int *upper
 //    getchar();
 
     for (int j=0; j < upper[i]-lower[i]+1; j++)
-    {
       matrix[i][j] = gsl_matrix_get(Sout, i, lower[i]+j);
-    }
   }
 
+  gsl_vector_free(norm);
+  gsl_vector_free(x);
+  gsl_vector_free(r);
+  gsl_vector_free(tau);
+  gsl_vector_free(v);
   gsl_permutation_free(p);
   gsl_matrix_free(Finv);
+  gsl_matrix_free(FT);
   gsl_matrix_free(F);
+  gsl_matrix_free(V);
+  gsl_matrix_free(SR);
+  gsl_matrix_free(R);
   gsl_matrix_free(Sout);
   gsl_matrix_free(Sin);
 }
