@@ -242,6 +242,7 @@ int glbSetSourcePower(int experiment, int flux_ident, double power);
 int glbSetRunningTime(int experiment, int flux_ident, double time);
 int glbSetFilterStateInExperiment(int experiment,int on_off);
 int glbSetFilterInExperiment(int experiment,double filter);
+int glbCompensateFilterInExperiment(int experiment);
 
 double glbGetTargetMass(int experiment);
 double glbGetSourcePower(int experiment, int flux_ident);

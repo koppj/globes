@@ -730,14 +730,6 @@ int glbDefaultExp(glb_exp ins)
     {
       glb_set_up_smear_data(in->smear_data[i],in);
       glb_default_smear(in->smear_data[i],in);
-
-      /* If low-pass filter is active, compensate for it by reducing normal energy smearing */
-      /* JK 2009-11-23 */
-      if (in->filter_state == GLB_ON)
-      {
-        glb_filter_compensate(in->smear_data[i], in->smear[i],
-                              in->lowrange[i], in->uprange[i]);
-      }
     }
 
     /* If not, generate it according to the parameters from the AEDL file */
