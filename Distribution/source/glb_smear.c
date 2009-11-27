@@ -871,8 +871,8 @@ void glb_filter_compensate(glb_smear *s, double **matrix, int *lower, int *upper
 
   /* Solve linear system F^T (S R F^-1)^T = (S R)^T to find (S R F^-1) */
   gsl_matrix_transpose_memcpy(FT, F);
-//  gsl_linalg_SV_decomp(FT, V, sv, x);
-  gsl_linalg_SV_decomp_jacobi(FT, V, sv);
+  gsl_linalg_SV_decomp(FT, V, sv, x);
+//  gsl_linalg_SV_decomp_jacobi(FT, V, sv);
   if (gsl_vector_min(sv) < TOL  ||  gsl_vector_max(sv) / gsl_vector_min(sv) > 1/TOL)
     glb_error("glb_filter_compensate: Unfolding of filter is numerically unstable. "
               "Reduce filter width.");
