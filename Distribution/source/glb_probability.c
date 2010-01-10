@@ -724,14 +724,14 @@ int glb_filtered_probability_matrix_cd(double P[3][3], double E, double L, doubl
   }
 
   // Calculate probability matrix (see GLoBES manual for a discussion of the algorithm)
-  double phase, filter_factor;
+  double phase;
+  double t = -0.5/1.0e-18 * SQR(sigma) / SQR(E);
   gsl_matrix_complex_set_zero(T0);
   for (i=0; i < GLB_NU_FLAVOURS; i++)
     for (j=i+1; j < GLB_NU_FLAVOURS; j++)
     {
       phase         = -L * (_lambda[i] - _lambda[j]);
-      filter_factor = exp(-0.5 * SQR(phase*sigma) / SQR(1.0e-9 * E));
-      _T0[i][j]     = filter_factor * (cos(phase) + I*sin(phase));
+      _T0[i][j]     = cexp(t * SQR(phase) + I * phase);
     }
 
   for (k=0; k < GLB_NU_FLAVOURS; k++)
@@ -740,11 +740,36 @@ int glb_filtered_probability_matrix_cd(double P[3][3], double E, double L, doubl
       P[k][l] = 0.0;
       for (i=0; i < GLB_NU_FLAVOURS; i++)
       {
+        complex t = conj(_Q[k][i]) * _Q[l][i];
         for (j=i+1; j < GLB_NU_FLAVOURS; j++)
-          P[k][l] += 2 * creal(_Q[k][j]*conj(_Q[l][j])*conj(_Q[k][i])*_Q[l][i]*_T0[i][j]);
+          P[k][l] += 2.0 * creal(_Q[k][j] * conj(_Q[l][j]) * t * _T0[i][j]);
         P[k][l] += SQR_ABS(_Q[k][i]) * SQR_ABS(_Q[l][i]);
       }
     }
+
+// JK, 2010-01-10 - above code is a bit faster
+//  // Calculate probability matrix (see GLoBES manual for a discussion of the algorithm)
+//  double phase, filter_factor;
+//  gsl_matrix_complex_set_zero(T0);
+//  for (i=0; i < GLB_NU_FLAVOURS; i++)
+//    for (j=i+1; j < GLB_NU_FLAVOURS; j++)
+//    {
+//      phase         = -L * (_lambda[i] - _lambda[j]);
+//      filter_factor = exp(-0.5 * SQR(phase*sigma) / SQR(1.0e-9 * E));
+//      _T0[i][j]     = filter_factor * (cos(phase) + I*sin(phase));
+//    }
+//
+//  for (k=0; k < GLB_NU_FLAVOURS; k++)
+//    for (l=0; l < GLB_NU_FLAVOURS; l++)
+//    {
+//      P[k][l] = 0.0;
+//      for (i=0; i < GLB_NU_FLAVOURS; i++)
+//      {
+//        for (j=i+1; j < GLB_NU_FLAVOURS; j++)
+//          P[k][l] += 2 * creal(_Q[k][j]*conj(_Q[l][j])*conj(_Q[k][i])*_Q[l][i]*_T0[i][j]);
+//        P[k][l] += SQR_ABS(_Q[k][i]) * SQR_ABS(_Q[l][i]);
+//      }
+//    }
     
   return 0;
 }

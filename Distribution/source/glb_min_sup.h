@@ -23,6 +23,11 @@
 #ifndef GLB_MIN_SUP
 #define GLB_MIN_SUP 1
 
+#define SQR(x)    ((x)*(x))
+#define MIN(a,b)  ((a) < (b) ? (a) : (b))
+#define MAX(a,b)  ((a) > (b) ? (a) : (b))
+#define SIGN(a,b) ((b) > 0.0 ? fabs(a) : -fabs(a))
+
 double *glb_alloc_vec(int nl,int nh);
 double **glb_alloc_mat(int nrl,int nrh, int ncl,int nch);
 void glb_free_vec(double *v,int nl,int nh);

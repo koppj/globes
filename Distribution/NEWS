@@ -109,3 +109,10 @@
         - If low-pass filter is active and smearing matrix is explicitly
           given, the effect of the filter is now compensated
         - Pre-compute part of rates to speed things up by O(10%)
+
+10/01/2009 JK (only branch wbb-tweaks)
+        - Implemented experimental simulated annealing algorithm
+          (is much too slow to be considered seriously)
+        - Modified order of some operations in glb_filtered_probability_matrix_cd
+          to improve speed
+

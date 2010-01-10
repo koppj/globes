@@ -56,6 +56,7 @@
 #include <math.h>
 #include <setjmp.h>
 #include <globes/globes.h>
+#include <gsl/gsl_siman.h>
 
 #include "glb_probability.h"
 #include "glb_fluxes.h"
@@ -1215,6 +1216,19 @@ static double internal_glbChiNP(const glb_params in, glb_params out)
       }
       break;
 
+    case GLB_MIN_SIMAN:
+      count = 0;
+      glb_invoke_siman_minimizer(GLB_ALL, GLB_ALL, x, &er1);
+      if (out != NULL)
+      {
+        for (i=0; i < glbGetNumOfOscParams(); i++)
+          glbSetOscParams(out, x[i], i);
+        for (i=0; i < glb_num_of_exps; i++)
+          glbSetDensityParams(out, x[i+glbGetNumOfOscParams()], i);
+        glbSetIteration(out, count);
+      }
+      break;
+
     case GLB_MIN_NESTED_POWELL:
       dim=n_free;
       mat2=glb_alloc_mat(1,dim,1,dim);
@@ -1441,7 +1455,8 @@ glbGetProjection(glb_projection in)
 int glbSelectMinimizer(int minimizer_ID)
 {
   if (minimizer_ID != GLB_MIN_NESTED_POWELL  &&
-      minimizer_ID != GLB_MIN_POWELL)
+      minimizer_ID != GLB_MIN_POWELL  &&
+      minimizer_ID != GLB_MIN_SIMAN)
   {
     glb_error("glbSelectMinimizer: Invalid minimization algorithm requested");
     return -1;
@@ -1562,8 +1577,8 @@ int glb_invoke_hybrid_minimizer(int exp, int rule, double *x, double *chi2)
   int n_sys, i, j, k;
   int iter;
 
-  /* Determine number of systematics parameters, compute invariant factors
-     of event rates to speed up the rate computation later on              */
+  /* Determine number of systematics parameters, compute constant factors
+     in event rates to speed up the rate computation later on */
   n_sys = 0;
   for (i=0; i < glb_num_of_exps; i++)
   {
@@ -1623,5 +1638,250 @@ int glb_invoke_hybrid_minimizer(int exp, int rule, double *x, double *chi2)
 
   return 0;
 }
+
+
+/***************************************************************************
+ *             S I M U L A T E D   A N N E A L I N G                       *
+ ***************************************************************************/
+
+typedef struct siman_data_struct
+{
+  int n;           /* Dimensionality of parameter space    */
+  double *x;       /* Point in parameter space             */
+  double *ss;      /* `Typical' stepsize in each dimension */
+  void *user_data; /* User data - not used at the moment   */
+} siman_data;
+
+
+/***************************************************************************
+ * Functions glb_siman_copy, glb_siman_copy_constructor, glb_siman_destroy *
+ ***************************************************************************
+ * Memory management for simulated annealing minimizer                     *
+ ***************************************************************************/
+void glb_siman_copy(void *pp1, void *pp2)
+{
+  siman_data *p1 = (siman_data *) pp1;
+  siman_data *p2 = (siman_data *) pp2;
+
+  p2->n         = p1->n;
+  p2->user_data = p1->user_data;
+  memcpy(p2->x, p1->x, sizeof(double) * p1->n);
+  memcpy(p2->ss, p1->ss, sizeof(double) * p1->n);
+}
+
+void *glb_siman_copy_constructor(void *pp)
+{
+  siman_data *p1 = (siman_data *) pp;
+  siman_data *p2 = (siman_data *) glb_malloc(sizeof(*p2));
+  p2->x  = (double *) glb_malloc(sizeof(double) * p1->n);
+  p2->ss = (double *) glb_malloc(sizeof(double) * p1->n);
+  glb_siman_copy(p1, p2);
+  return p2;
+}
+
+void glb_siman_destroy(void *pp)
+{
+  siman_data *p = (siman_data *) pp;
+  if (p->x)   glb_free(p->x);
+  if (p->ss)  glb_free(p->ss);
+  glb_free(p);
+}
+
+
+/***************************************************************************
+ * Function glb_siman_chi                                                  *
+ ***************************************************************************
+ * Callback function for the simulated annealing minimizer. Evaluates      *
+ * chi^2 for the  desired experiment(s) and rule(s).                       *
+ ***************************************************************************
+ * Parameters:                                                             *
+ *   p: Current point in minimization space                                *
+ ***************************************************************************/
+double glb_siman_chi(void *pp)
+{
+  siman_data *p = (siman_data *) pp;
+  return glb_hybrid_chi_callback(p->x, 1, p->user_data);
+}
+
+
+/***************************************************************************
+ * Function glb_siman_step                                                 *
+ ***************************************************************************
+ * Callback function for the simulated annealing. Computes a new random    *
+ * configuration                                                           *
+ ***************************************************************************
+ * Parameters:                                                             *
+ *   r: Pointer to the random number generator                             *
+ *   p: Current point in minimization space                                *
+ *   step_size: Step size                                                  *
+ ***************************************************************************/
+void glb_siman_step(const gsl_rng *r, void *pp, double step_size)
+{
+  siman_data *p = (siman_data *) pp;
+
+//  for (int i=0; i < p->n; i++)
+//    printf("%15.10g ", p->x[i]);
+//  printf(" chi^2=%15.10g\n", glb_siman_chi(p));
+
+  for (int i=0; i < p->n; i++)
+    p->x[i] += (2.0 * gsl_rng_uniform(r) - 1.0) * step_size * p->ss[i];
+
+//  for (int i=0; i < p->n; i++)
+//    printf("%15.10g ", p->x[i]);
+//  printf(" chi^2=%15.10g\n", glb_siman_chi(p));
+}
+
+
+/***************************************************************************
+ * Function glb_siman_metric                                               *
+ ***************************************************************************
+ * Return distance between two points in parameter space for simulated     *
+ * annealing minimizer.                                                    *
+ ***************************************************************************
+ * Parameters:                                                             *
+ *   p1, p2: Two points in parameters pace                                 *
+ ***************************************************************************/
+double glb_siman_metric(void *pp1, void *pp2)
+{
+  siman_data *p1 = (siman_data *) pp1;
+  siman_data *p2 = (siman_data *) pp2;
+  double result = 0.0;
+  for (int i=0; i < p1->n; i++)
+    result += SQR(p1->x[i] - p2->x[i]);
+  return sqrt(result);
+}
+
+
+/***************************************************************************
+ * Function glb_siman_print                                                *
+ ***************************************************************************
+ * Print debugging information about simulated annealing minimizer         *
+ ***************************************************************************
+ * Parameters:                                                             *
+ *   p: Current point in minimization space                                *
+ ***************************************************************************/
+void glb_siman_print(void *pp)
+{
+  siman_data *p = (siman_data *) pp;
+  printf("\nParams: ");
+  for (int i=0; i < p->n; i++)
+    printf("%10.7g ", p->x[i]);
+  printf("\nchi^2 = ", glb_siman_chi(p));
+//  getchar();
+}
+
+
+/***************************************************************************
+ * Function glb_invoke_siman_minimizer                                     *
+ ***************************************************************************
+ * Run GSL simmulated annealing minimizer. Builds the data structures      *
+ * for the minimizer, and returns the position of the minimum.             *
+ ***************************************************************************
+ * Parameters:                                                             *
+ *   exp:  Experiment number for which chi^2 is requested, or GLB_ALL      *
+ *   rule: Rule number for which chi^2 is requested, or GLB_ALL            *
+ *   x:    Input: The starting point. Components should be the oscillation *
+ *         parameters, followed by the density parameters for _all_        *
+ *         experiments, even if exp!=GLB_ALL.                              *
+ *         Output: The position of the minimum                             *
+ *   chi:  Output: The chi^2 value at the minimum                          *
+ ***************************************************************************/
+int glb_invoke_siman_minimizer(int exp, int rule, double *x, double *chi2)
+{
+  int n_sys, i, j, k;
+  siman_data data;
+  data.x = NULL;
+  data.user_data = NULL;
+
+  /* Determine number of systematics parameters, compute constant factors
+     in event rates to speed up the rate computation later on */
+  n_sys = 0;
+  for (i=0; i < glb_num_of_exps; i++)
+  {
+    if (exp!=GLB_ALL && exp!=i)
+      continue;
+    for (j=0; j < glbGetNumberOfRules(i); j++)
+    {
+      if (rule!=GLB_ALL && rule!=j)
+        continue;
+      n_sys += glbGetSysDimInExperiment(i, j, glbGetSysOnOffState(i, j));
+    }
+
+    glbSetExperiment(glb_experiment_list[i]);
+    glb_rate_template();
+  }
+
+  /* Initialize oscillation parameters */
+  data.n  = n_sys + n_free;
+  data.x  = (double *) glb_malloc(sizeof(double) * data.n);
+  data.ss = (double *) glb_malloc(sizeof(double) * data.n);
+  k = 0;                     /* Keeps track of position in starting point vector */
+  for(i=0; i < glbGetNumOfOscParams()+glb_num_of_exps; i++)
+  {
+    fix_params[i] = x[i];
+    if (para_tab[i] == GLB_FREE)
+      data.x[k++] = x[i];
+  }
+
+
+  /* Initialize systematics parameters */
+  for (i=0; i < glb_num_of_exps; i++)
+  {
+    if (exp!=GLB_ALL && exp!=i)
+      continue;
+    for (j=0; j < glbGetNumberOfRules(i); j++)
+    {
+      if (rule!=GLB_ALL && rule!=j)
+        continue;
+      memcpy(&(data.x[k]), glbGetSysStartingValuesListPtr(i, j, glbGetSysOnOffState(i, j)),
+             sizeof(double)*glbGetSysDimInExperiment(i, j, glbGetSysOnOffState(i, j)));
+      k += glbGetSysDimInExperiment(i, j, glbGetSysOnOffState(i, j));
+    }
+  }
+
+  for (i=0; i < data.n; i++)
+  {
+    if (fabs(data.x[i]) > TOLOSC)   /* Choose stepsize */
+      data.ss[i] = 0.1 * fabs(data.x[i]);
+    else
+      data.ss[i] = 0.1;
+  }
+
+  *chi2 = glb_siman_chi(&data);
+
+  gsl_rng *r = gsl_rng_alloc(gsl_rng_taus);
+  gsl_siman_params_t params;
+  params.n_tries       = -1; /* Not used by GSL */
+  params.iters_fixed_T = MAX(10.0, pow(4.0, data.n));
+  params.step_size     = 0.02;
+  params.k             = 1.0;
+  params.t_initial     = 10.0 * (*chi2);
+  params.mu_t          = 1.05;
+  params.t_min         = 1.0e-2;
+  gsl_siman_solve(r, &data,
+                  &glb_siman_chi,
+                  &glb_siman_step,
+                  NULL, /* glb_siman_metric not used by GSL */
+                  NULL,
+//                  &glb_siman_print,
+                  &glb_siman_copy, &glb_siman_copy_constructor, &glb_siman_destroy,
+                  sizeof(siman_data), params);
+  gsl_rng_free(r);
+
+  /* Return position of minimum */
+  k = 0;
+  for (i=0; i < glbGetNumOfOscParams()+glb_num_of_exps; i++)
+  {
+    if (para_tab[i] == GLB_FREE)
+      x[i] = data.x[k++];
+  }
+
+  *chi2 = glb_siman_chi(&data);
+
+  glb_free(data.ss);
+  glb_free(data.x);
+  return 0;
+}
+
 
 

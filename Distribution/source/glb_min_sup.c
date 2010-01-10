@@ -139,7 +139,6 @@ static double one_dim_projection(double x,glb_min_data *in)
 #define ITMAX 100
 #define CGOLD 0.3819660
 #define ZEPS 1.0e-10
-#define SIGN(a,b) ((b) > 0.0 ? fabs(a) : -fabs(a))
 #define SHFT(a,b,c,d) (a)=(b);(b)=(c);(c)=(d);
 
 static double glb_brent_min(double ax,double bx,double cx,
@@ -208,7 +207,6 @@ static double glb_brent_min(double ax,double bx,double cx,
 #undef ITMAX
 #undef CGOLD
 #undef ZEPS
-#undef SIGN
 
 
 
@@ -216,8 +214,6 @@ static double glb_brent_min(double ax,double bx,double cx,
 #define GOLD 1.618034
 #define GLIMIT 100.0
 #define TINY 1.0e-20
-#define MAX(a,b) ((a) > (b) ? (a) : (b))
-#define SIGN(a,b) ((b) > 0.0 ? fabs(a) : -fabs(a))
 #define SHFT(a,b,c,d) (a)=(b);(b)=(c);(c)=(d);
 
 static void bracket(double *ax,double *bx,double *cx,double *fa,double *fb,
@@ -277,8 +273,6 @@ static void bracket(double *ax,double *bx,double *cx,double *fa,double *fb,
 #undef GOLD
 #undef GLIMIT
 #undef TINY
-#undef MAX
-#undef SIGN
 #undef SHFT
 
 
@@ -431,7 +425,6 @@ int glb_powell2(double p[],double **xi,int n,double ftol,
 
 
 #undef ITMAX
-#undef SQR
 #undef TOL
 
 
@@ -439,9 +432,6 @@ int glb_powell2(double p[],double **xi,int n,double ftol,
  *         C O M B I N E D   O S C / S Y S   M I N I M I Z E R             *
  ***************************************************************************/
 
-#define SQR(x)        ((x)*(x))
-#define MAX(a,b)      ((a) > (b) ? (a) : (b))
-#define SIGN(a,b)     ((b) > 0.0 ? fabs(a) : -fabs(a))
 #define SHFT(a,b,c,d) (a)=(b);(b)=(c);(c)=(d);
                                           
 #define ITMAX_BRENT   100.0  /* Max. number of iterations in 1d Brent minimizer */
