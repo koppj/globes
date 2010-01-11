@@ -724,14 +724,15 @@ int glb_filtered_probability_matrix_cd(double P[3][3], double E, double L, doubl
   }
 
   // Calculate probability matrix (see GLoBES manual for a discussion of the algorithm)
-  double phase;
+  double phase, filter_factor;
   double t = -0.5/1.0e-18 * SQR(sigma) / SQR(E);
   gsl_matrix_complex_set_zero(T0);
   for (i=0; i < GLB_NU_FLAVOURS; i++)
     for (j=i+1; j < GLB_NU_FLAVOURS; j++)
     {
       phase         = -L * (_lambda[i] - _lambda[j]);
-      _T0[i][j]     = cexp(t * SQR(phase) + I * phase);
+      filter_factor = exp(t * SQR(phase));
+      _T0[i][j]     = filter_factor * (cos(phase) + I*sin(phase));
     }
 
   for (k=0; k < GLB_NU_FLAVOURS; k++)
