@@ -2079,6 +2079,32 @@ glbGetFilterInExperiment(int experiment)
 }
 
 int
+glbOptimizeSmearingMatrixInExperiment(int experiment)
+{
+  int i;
+  struct glb_experiment *in;
+  /* Testing the experiment number */
+  if(!(((experiment >= 0)&&(experiment < glb_num_of_exps))
+       ||(experiment==GLB_ALL))) {
+    glb_error("Invalid value for experiment number");
+    return -1;}
+
+  for(i=0;i<glb_num_of_exps;i++)
+    {
+      if(experiment!=GLB_ALL) i=experiment;
+      in=(struct glb_experiment *) glb_experiment_list[i];
+
+      for (int j=0; j < in->num_of_sm; j++)
+        glb_optimize_smearing_matrix(in->smear_data[j], in->smear[j],
+                                     in->lowrange[j], in->uprange[j]);
+
+      if(experiment!=GLB_ALL) break;
+    }
+  return 0;
+}
+
+
+int
 glbCompensateFilterInExperiment(int experiment)
 {
   int i;

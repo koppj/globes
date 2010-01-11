@@ -114,5 +114,7 @@
         - Implemented experimental simulated annealing algorithm
           (is much too slow to be considered seriously)
         - Modified order of some operations in glb_filtered_probability_matrix_cd
-          to improve speed
+          and glb_set_new_rates to improve speed a little
+        - Implemented function glbOptimizeSmearingMatrixInExperiment to
+          remove close-to-zero entries from smearing matrices to improve speed
 

@@ -786,6 +786,57 @@ void glb_compute_smearing_matrix(double ***matrix,
 
 
 /***************************************************************************
+ * Function glb_optimize_smearing_matrix                                   *
+ ***************************************************************************
+ * Remove entries that are close to zero from the smearing matrix to       *
+ * speed up smearing and reduce memory usage                               *
+ ***************************************************************************
+ * Parameters:                                                             *
+ *   smear:  glb_smear structure containing metadata about the smearing    *
+ *   matrix: The smearing matrix entries                                   *
+ *   lower:  Array of indices of lowest nonzero entry in each row          *
+ *   upper:  Array of indices of highest nonzero entry in each row         *
+ ***************************************************************************/
+void glb_optimize_smearing_matrix(glb_smear *s, double **matrix, int *lower, int *upper)
+{
+  if (!s || !lower || !upper || !matrix)
+    glb_fatal("glb_optimize_smearing_matrix: NULL pointer argument encountered.");
+
+  for (int i=0; i < s->numofbins; i++)
+  {
+    if (!matrix[i])
+      glb_fatal("glb_optimize_smearing_matrix: Incomplete smearing matrix encountered.");
+
+    int new_lower = lower[i];
+    int new_upper = upper[i];
+    int j=0, k=upper[i]-lower[i];
+    while (new_lower < upper[i]  &&  fabs(matrix[i][j]) < TOL/2.0)
+    {
+      j++;
+      new_lower++;
+    }
+    while (new_upper > new_lower  &&  fabs(matrix[i][k]) < TOL/2.0)
+    {
+      k--;
+      new_upper--;
+    }
+
+    double *new_entry = (double*) malloc(sizeof(double)*(new_upper-new_lower+1));
+    if (!new_entry)
+      glb_fatal("glb_optimize_smearing_matrix: Unable to allocate smearing matrix.");
+
+    for (int m=0; m < new_upper-new_lower+1; m++)
+      new_entry[m] = matrix[i][j++];
+
+    free(matrix[i]);
+    matrix[i] = new_entry;
+    lower[i]  = new_lower;
+    upper[i]  = new_upper;
+  }
+}
+
+
+/***************************************************************************
  * Function glb_compensate_filter                                          *
  ***************************************************************************
  * Modify the smearing matrix in such a way that the effect of the         *

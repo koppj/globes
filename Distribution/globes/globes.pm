@@ -118,6 +118,7 @@ package globes;
 *glbSetFilterStateInExperiment = *globesc::glbSetFilterStateInExperiment;
 *glbSetFilterInExperiment = *globesc::glbSetFilterInExperiment;
 *glbCompensateFilterInExperiment = *globesc::glbCompensateFilterInExperiment;
+*glbOptimizeSmearingMatrixInExperiment = *globesc::glbOptimizeSmearingMatrixInExperiment;
 *glbGetTargetMass = *globesc::glbGetTargetMass;
 *glbGetSourcePower = *globesc::glbGetSourcePower;
 *glbGetRunningTime = *globesc::glbGetRunningTime;

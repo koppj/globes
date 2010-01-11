@@ -625,11 +625,11 @@ void glb_set_new_rates(int fast)
       for(j=0; j < bins; j++)
       {
         glb_calc_chra_1[i][j] = 0.0;
-        for(k=glb_calc_lowrange[s][j]; k < glb_calc_uprange[s][j]+1; k++)
-        {
-          glb_calc_chra_1[i][j] += glb_calc_smearing[s][j][k-glb_calc_lowrange[s][j]]
+        int k_low  = glb_calc_lowrange[s][j];
+        int k_high = glb_calc_uprange[s][j] + 1;
+        for(k=k_low; k < k_high; k++)
+          glb_calc_chra_1[i][j] += glb_calc_smearing[s][j][k-k_low]
                                      * glb_calc_chrb_1[i][k];
-        }
         glb_calc_chra_1[i][j] = glb_calc_chra_1[i][j] * glb_calc_user_post_sm_channel[i][j]
                                     + glb_calc_user_post_sm_background[i][j];
       }
