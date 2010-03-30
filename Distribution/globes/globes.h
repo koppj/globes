@@ -139,6 +139,7 @@ void glbInit(char *name);
 void glbClearExperimentList();
 void glbDefineAEDLVariable(const char *name, double value);
 void glbDefineAEDLList(const char *name, double *list, size_t length);
+double glbGetAEDLVariable(const char *name);
 void glbClearAEDLVariables();
 int glbInitExperiment(char *inf, glb_exp *in, int *counter);
 

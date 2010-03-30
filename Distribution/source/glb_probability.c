@@ -83,7 +83,7 @@ void zhetrd3(double complex A[3][3], double complex Q[3][3],
   double complex u[n], q[n];
   double complex omega, f;
   double K, h, g;
-  
+
   // Initialize Q to the identitity matrix
 #ifndef EVALS_ONLY
   for (int i=0; i < n; i++)
@@ -94,7 +94,7 @@ void zhetrd3(double complex A[3][3], double complex Q[3][3],
   }
 #endif
 
-  // Bring first row and column to the desired form 
+  // Bring first row and column to the desired form
   h = SQR_ABS(A[0][1]) + SQR_ABS(A[0][2]);
   if (creal(A[0][1]) > 0)
     g = -sqrt(h);
@@ -104,7 +104,7 @@ void zhetrd3(double complex A[3][3], double complex Q[3][3],
   f    = g * A[0][1];
   u[1] = conj(A[0][1]) - g;
   u[2] = conj(A[0][2]);
-  
+
   omega = h - f;
   if (creal(omega) > 0.0)
   {
@@ -120,11 +120,11 @@ void zhetrd3(double complex A[3][3], double complex Q[3][3],
 
     for (int i=1; i < n; i++)
       q[i] = q[i] - K * u[i];
-    
+
     d[0] = creal(A[0][0]);
     d[1] = creal(A[1][1]) - 2.0*creal(q[1]*conj(u[1]));
     d[2] = creal(A[2][2]) - 2.0*creal(q[2]*conj(u[2]));
-    
+
     // Store inverse Householder transformation in Q
 #ifndef EVALS_ONLY
     for (int j=1; j < n; j++)
@@ -176,7 +176,7 @@ int zheevc3(double complex A[3][3], double w[3])
 // ----------------------------------------------------------------------------
 {
   double m, c1, c0;
-  
+
   // Determine coefficients of characteristic poynomial. We write
   //       | a   d   f  |
   //  A =  | d*  b   e  |
@@ -202,7 +202,7 @@ int zheevc3(double complex A[3][3], double w[3])
 
   phi = 27.0 * ( 0.25*SQR(c1)*(p - c1) + c0*(q + 27.0/4.0*c0));
   phi = (1.0/3.0) * atan2(sqrt(fabs(phi)), q);
-  
+
   c = sqrt_p*cos(phi);
   s = (1.0/M_SQRT3)*sqrt_p*sin(phi);
 
@@ -246,7 +246,7 @@ int zheevq3(double complex A[3][3], double complex Q[3][3], double w[3])
 
   // Transform A to real tridiagonal form by the Householder method
   zhetrd3(A, Q, w, e);
-  
+
   // Calculate eigensystem of the remaining real symmetric tridiagonal matrix
   // with the QL method
   //
@@ -266,7 +266,7 @@ int zheevq3(double complex A[3][3], double complex Q[3][3], double w[3])
       }
       if (m == l)
         break;
-      
+
       if (nIter++ >= 30)
         return -1;
 
@@ -298,7 +298,7 @@ int zheevq3(double complex A[3][3], double complex Q[3][3], double w[3])
           e[i+1] = g * r;
           s     *= (c = 1.0/r);
         }
-        
+
         g = w[i+1] - p;
         r = (w[i] - g)*s + 2.0*c*b;
         p = s * r;
@@ -313,7 +313,7 @@ int zheevq3(double complex A[3][3], double complex Q[3][3], double w[3])
           Q[k][i+1] = s*Q[k][i] + c*t;
           Q[k][i]   = c*Q[k][i] - s*t;
         }
-#endif 
+#endif
       }
       w[l] -= p;
       e[l]  = g;
@@ -367,7 +367,7 @@ int zheevh3(double complex A[3][3], double complex Q[3][3], double w[3])
 #ifndef EVALS_ONLY
 //  n0 = SQR(creal(A[0][0])) + SQR_ABS(A[0][1]) + SQR_ABS(A[0][2]);
 //  n1 = SQR_ABS(A[0][1]) + SQR(creal(A[1][1])) + SQR_ABS(A[1][2]);
-  
+
   t = fabs(w[0]);
   if ((u=fabs(w[1])) > t)
     t = u;
@@ -405,7 +405,7 @@ int zheevh3(double complex A[3][3], double complex Q[3][3], double w[3])
     for (j=0; j < 3; j++)
       Q[j][0] = Q[j][0] * norm;
   }
-  
+
   // Calculate second eigenvector by the formula
   //   v[1] = conj( (A - w[1]).e1 x (A - w[1]).e2 )
   Q[0][1]  = Q[0][1] + A[0][2]*w[1];
@@ -420,7 +420,7 @@ int zheevh3(double complex A[3][3], double complex Q[3][3], double w[3])
     for (j=0; j < 3; j++)
       Q[j][1] = Q[j][1] * norm;
   }
-  
+
   // Calculate third eigenvector according to
   //   v[2] = conj(v[0] x v[1])
   Q[0][2] = conj(Q[1][0]*Q[2][1] - Q[2][0]*Q[1][1]);
@@ -445,13 +445,13 @@ int zheevh3(double complex A[3][3], double complex Q[3][3], double w[3])
 int glb_init_probability_engine()
 {
   glb_free_probability_engine();
-  
+
   U = gsl_matrix_complex_calloc(GLB_NU_FLAVOURS, GLB_NU_FLAVOURS);
   H = gsl_matrix_complex_calloc(GLB_NU_FLAVOURS, GLB_NU_FLAVOURS);
   Q = gsl_matrix_complex_calloc(GLB_NU_FLAVOURS, GLB_NU_FLAVOURS);
   lambda = gsl_vector_alloc(GLB_NU_FLAVOURS);
   S = gsl_matrix_complex_calloc(GLB_NU_FLAVOURS, GLB_NU_FLAVOURS);
-    
+
   H0_template = gsl_matrix_complex_calloc(GLB_NU_FLAVOURS, GLB_NU_FLAVOURS);
   S1 = gsl_matrix_complex_calloc(GLB_NU_FLAVOURS, GLB_NU_FLAVOURS);
   T0 = gsl_matrix_complex_calloc(GLB_NU_FLAVOURS, GLB_NU_FLAVOURS);
@@ -470,7 +470,7 @@ int glb_free_probability_engine()
   if (T0!=NULL)     { gsl_matrix_complex_free(T0);  T0 = NULL; }
   if (S1!=NULL)     { gsl_matrix_complex_free(S1);  S1 = NULL; }
   if (H0_template!=NULL) { gsl_matrix_complex_free(H0_template);  H0_template = NULL; }
-  
+
   if (S!=NULL)      { gsl_matrix_complex_free(S);   S = NULL; }
   if (lambda!=NULL) { gsl_vector_free(lambda);      lambda = NULL; }
   if (Q!=NULL)      { gsl_matrix_complex_free(Q);   Q = NULL; }
@@ -501,7 +501,7 @@ int glb_set_oscillation_parameters(glb_params p, void *user_data)
   mq[0] = abs(p->osc->osc_params[5]);
   mq[1] = abs(p->osc->osc_params[5]) + p->osc->osc_params[4];
   mq[2] = abs(p->osc->osc_params[5]) + p->osc->osc_params[5];
-   
+
   /* Compute vacuum mixing matrix */
   _U[0][0] = cos(th12)*cos(th13);
   _U[0][1] = sin(th12)*cos(th13);
@@ -514,7 +514,7 @@ int glb_set_oscillation_parameters(glb_params p, void *user_data)
   _U[2][0] =  sin(th12)*sin(th23) - cos(th12)*cos(th23)*sin(th13) * cexp(I*delta);
   _U[2][1] = -cos(th12)*sin(th23) - sin(th12)*cos(th23)*sin(th13) * cexp(I*delta);
   _U[2][2] =  cos(th23)*cos(th13);
- 
+
   /* Calculate energy independent matrix H0 * E */
   gsl_matrix_complex_set_zero(H0_template);
   gsl_matrix_complex_set_zero(H);
@@ -571,7 +571,7 @@ int glb_hamiltonian_cd(double E, double V, int cp_sign)
       for (j=0; j < GLB_NU_FLAVOURS; j++)
         _H[i][j] = conj(_H0_template[i][j] * inv_E); /* delta_CP -> -delta_CP */
   }
- 
+
   _H[0][0] = _H[0][0] + cp_sign*V;
   return 0;
 }
@@ -598,7 +598,7 @@ int glb_S_matrix_cd(double E, double L, double V, int cp_sign)
   double *_lambda = gsl_vector_ptr(lambda,0);
   int status;
   int i, j, k;
-  
+
   if (V < V_THRESHOLD)                             /* Vacuum */
   {
     /* Use vacuum mixing angles and masses */
@@ -619,11 +619,11 @@ int glb_S_matrix_cd(double E, double L, double V, int cp_sign)
   else                                             /* Matter */
   {
     double complex (*_H)[3] = (double complex (*)[3]) gsl_matrix_complex_ptr(H,0,0);
-    
+
     /* Calculate neutrino Hamiltonian */
     if ((status=glb_hamiltonian_cd(E, V, cp_sign)) != 0)
       return status;
-    
+
     /* Calculate eigenvalues of Hamiltonian */
     if ((status=zheevh3(_H, _Q, _lambda)) != 0)
       return status;
@@ -636,8 +636,8 @@ int glb_S_matrix_cd(double E, double L, double V, int cp_sign)
   {
     phase    = -L * _lambda[i];
     _S[i][i] = cos(phase) + I*sin(phase);
-  } 
-  
+  }
+
   /* ... and transform it to the flavour basis */
   gsl_matrix_complex_set_zero(T0);
   double complex *p = &_T0[0][0];
@@ -692,7 +692,7 @@ int glb_filtered_probability_matrix_cd(double P[3][3], double E, double L, doubl
   double *_lambda = gsl_vector_ptr(lambda,0);
   int status;
   int i, j, k, l;
- 
+
   if (V < V_THRESHOLD)                             /* Vacuum */
   {
     /* Use vacuum mixing angles and masses */
@@ -713,11 +713,11 @@ int glb_filtered_probability_matrix_cd(double P[3][3], double E, double L, doubl
   else                                             /* Matter */
   {
     double complex (*_H)[3] = (double complex (*)[3]) gsl_matrix_complex_ptr(H,0,0);
-    
+
     /* Calculate neutrino Hamiltonian */
     if ((status=glb_hamiltonian_cd(E, V, cp_sign)) != 0)
       return status;
-    
+
     /* Calculate eigenvalues of Hamiltonian */
     if ((status=zheevh3(_H, _Q, _lambda)) != 0)
       return status;
@@ -771,7 +771,7 @@ int glb_filtered_probability_matrix_cd(double P[3][3], double E, double L, doubl
 //        P[k][l] += SQR_ABS(_Q[k][i]) * SQR_ABS(_Q[l][i]);
 //      }
 //    }
-    
+
   return 0;
 }
 
@@ -800,7 +800,7 @@ int glb_probability_matrix(double P[3][3], int cp_sign, double E,
 
   /* Convert energy to eV */
   E *= 1.0e9;
-  
+
   if (filter_sigma > 0.0)                     /* With low-pass filter */
   {
     if (psteps == 1)
@@ -822,7 +822,7 @@ int glb_probability_matrix(double P[3][3], int cp_sign, double E,
         gsl_blas_zgemm(CblasNoTrans, CblasNoTrans, GSL_COMPLEX_ONE, S, S1, /* T0 = S.S1 */
                        GSL_COMPLEX_ZERO, T0);
         gsl_matrix_complex_memcpy(S1, T0);                                 /* S1 = T0 */
-      } 
+      }
       gsl_matrix_complex_memcpy(S, S1);                                    /* S = S1 */
     }
     else
@@ -874,7 +874,7 @@ int glbRegisterProbabilityEngine(int n_parameters,
     glb_oscp = 6;
   else
     glb_oscp = n_parameters;
-  
+
   if (prob_func != NULL)
     glb_hook_probability_matrix = prob_func;
   else
@@ -884,7 +884,7 @@ int glbRegisterProbabilityEngine(int n_parameters,
     glb_hook_set_oscillation_parameters = set_params_func;
   else
     glb_hook_set_oscillation_parameters = &glb_set_oscillation_parameters;
-  
+
   if (get_params_func != NULL)
     glb_hook_get_oscillation_parameters = get_params_func;
   else

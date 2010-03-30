@@ -36,18 +36,18 @@
 
 /* Moved from glb_wrapper.c, in order to have the module support stuff
  * only used in this file.
- */ 
-static void final_clean() 
+ */
+static void final_clean()
 {
   glb_builtin_prior_clean();
-  glb_clean_up(); 
-  return; 
+  glb_clean_up();
+  return;
 }
 
 static int test=1234;
 void glbInit(char *name)
 {
-  
+
 
   atexit(final_clean);
   glb_init(name);
@@ -66,12 +66,12 @@ void glbInit(char *name)
   /* Select default minimizer */
   glbSelectMinimizer(GLB_MIN_DEFAULT);
 
-  /* Setup default priors */  
+  /* Setup default priors */
   glbRegisterPriorFunction(glb_builtin_prior_prior,
 			   glb_builtin_prior_starting_values,
 			   glb_builtin_prior_input_errors,
                            &test);
-  
+
   /* Register built-in chi^2 functions */
   /* When making any changes here, don't forget to update the array
    * glb_2011_compatible_chi_functions in glb_sys.c and the functions

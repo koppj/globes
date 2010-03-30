@@ -34,12 +34,12 @@
 #include "glb_error.h"
 
 const char *glb_release_version = VERSION;
-static const char *library_version = GLB_LIBVERSION; 
+static const char *library_version = GLB_LIBVERSION;
 
-static int 
+static int
 break_up_version(char const *version,int *first,int *second, int *third)
 {
-  
+
   char c;
   size_t length,i,k,ct=0,ctb=0;
   char *vec=NULL;
@@ -61,11 +61,11 @@ break_up_version(char const *version,int *first,int *second, int *third)
 	  vec=(char *) glb_realloc(vec,sizeof(char)*(ct+1));
 	  vec[ct-1]=c;
 	  vec[ct]='\0';
-	} 
+	}
       else
 	{
 	  ctb++;
-	  if((ctb>4)||(vec==NULL)) 
+	  if((ctb>4)||(vec==NULL))
 	    {glb_fatal("Invalid version string");exit(1);}
 	  sscanf(vec,"%d",&res[ctb-1]);
 	  ct=0;
@@ -86,12 +86,12 @@ glbTestReleaseVersion(const char *version)
   int major,minor,bug,tmajor,tminor,tbug;
   break_up_version(version,&major,&minor,&bug);
   break_up_version(glb_release_version,&tmajor,&tminor,&tbug);
-  
-  if(major==tmajor) 
+
+  if(major==tmajor)
     {
-      if(minor==tminor) 
+      if(minor==tminor)
 	{
-	  if(bug==tbug) 
+	  if(bug==tbug)
 	    {
 	      s=0;
 	    }
@@ -113,11 +113,11 @@ glbTestLibraryVersion(const char *version)
   int major,minor,bug,tmajor,tminor,tbug;
   break_up_version(version,&major,&bug,&minor);
   break_up_version(library_version,&tmajor,&tbug,&tminor);
-  if(major==tmajor) 
+  if(major==tmajor)
     {
-      if(minor==tminor) 
+      if(minor==tminor)
 	{
-	  if(bug==tbug) 
+	  if(bug==tbug)
 	    {
 	      s=0;
 	    }

@@ -78,7 +78,7 @@ int glb_break_up_path(char *in_path, char ***pathv, size_t *len)
       return 0;
     }
   token=strtok(in_path,delim);
-  if(token!=NULL) 
+  if(token!=NULL)
     {
       vec=(char **) glb_realloc(vec,sizeof(char*)*(length+1));
       vec[length]=strdup(token);
@@ -94,7 +94,7 @@ int glb_break_up_path(char *in_path, char ***pathv, size_t *len)
 	  length++;
 	}
     }
-  
+
   *len=length;
   *pathv=vec;
   return 0;

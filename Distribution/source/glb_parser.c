@@ -152,13 +152,13 @@
 #include "glb_multiex.h"
 #include "glb_types.h"
 #include "glb_error.h"
-#include "glb_lexer.h"  
+#include "glb_lexer.h"
 #include "glb_parser_type.h"
 #include "glb_fluxes.h"
 #include "glb_sys.h"
 #include "glb_minimize.h"
 
-#define TWICE 100  
+#define TWICE 100
 
 #define UNTYPE -1
 #define INT 0
@@ -183,7 +183,7 @@
 
   static int exp_count=1;
   static int energy_len;
-  static int loc_count; 
+  static int loc_count;
   static int energy_count=-1;
   static int cross_count=-1;
   static int flux_count=-1;
@@ -198,47 +198,47 @@
   static char *context;
 
   int yyerror (const char *s);           /* Forward declaration to suppress compiler warning */
-  
+
 
   typedef struct
   {
     char *token; // the string which is used as lhs in the ini-file
-    int scalar; // data type flag 
+    int scalar; // data type flag
     double rl;
     double ru; // allowed range
     void *ptr; // this is a pointer the corresponding part of the exp structure
     void *len; /* this is a pointer which points to the length of the vector
-		*  in a struct glb_experiment. Example: if we parse densitytab, 
+		*  in a struct glb_experiment. Example: if we parse densitytab,
 		*  this things points
-		*  to psteps 
+		*  to psteps
 		*/
-    
+
     char *ctx; /* here the type of the environment is given, e.g. rule
 		* thus the corresponding token is matched onyl within
-		* a rule type environment 
+		* a rule type environment
 		*/
   } glb_parser_decl;
-  
+
 
   static glb_parser_decl token_list[]={
     {"$version",CHAR,0,1E8,&buff.version,NULL,"global"},
     {"$parent_energy",DOUBLE,0,GMAX,&buff.emax,NULL,"global"},
     {"$target_mass",DOUBLE,0,GMAX,&buff.targetmass,NULL,"global"},
 #ifdef GLB_OLD_AEDL
-    {"$simbins" ,COUNTER,0,500,&buff.simbins,NULL,"global"}, 
+    {"$simbins" ,COUNTER,0,500,&buff.simbins,NULL,"global"},
     {"$simtresh" ,DOUBLE,0,GMAX,&buff.simtresh,NULL,"global"},
-    {"$simbeam" ,DOUBLE,0,GMAX,&buff.simbeam,NULL,"global"},  
+    {"$simbeam" ,DOUBLE,0,GMAX,&buff.simbeam,NULL,"global"},
     {"$numofbins",COUNTER,0,500,&buff.numofbins,NULL,"global"},
     {"$simbinsize",DOUBLE_LIST,0,GMAX,&buff.simbinsize,
      &buff.simbins,"global"},
 /* JK - Has been removed
-    {"$errorfunction",INT,0,1,&buff.errorfunction,NULL,"global"}, 
+    {"$errorfunction",INT,0,1,&buff.errorfunction,NULL,"global"},
     {"@treshold_setttings" ,DOUBLE_INDEXED_PAIR,
      0,100,&buff.bgtcenter[0],&loc_count,"rule"},
     {"@treshold_error" ,DOUBLE_INDEXED_PAIR,
      0,100,&buff.bgterror[0],&loc_count,"rule"}, */
 #endif /* GLB_OLD_AEDL */
-    {"$sampling_points" ,COUNTER,0,500,&buff.simbins,NULL,"global"}, 
+    {"$sampling_points" ,COUNTER,0,500,&buff.simbins,NULL,"global"},
     {"$sampling_min" ,DOUBLE,0,GMAX,&buff.simtresh,NULL,"global"},
     {"$sampling_max" ,DOUBLE,0,GMAX,&buff.simbeam,NULL,"global"},
     /* FIXME -- this was not properly recognized due to the fact the first match is performed
@@ -247,18 +247,18 @@
      * 'bins'
      */
     {"$binsize",DOUBLE_LIST,0,GMAX,&buff.binsize,
-     &buff.numofbins,"global"},  
-   
+     &buff.numofbins,"global"},
+
     {"$bins",COUNTER,0,500,&buff.numofbins,NULL,"global"},
-    {"$emin",DOUBLE,0,GMAX,&buff.emin,NULL,"global"}, 
+    {"$emin",DOUBLE,0,GMAX,&buff.emin,NULL,"global"},
     {"$emax",DOUBLE,0,GMAX,&buff.emax,NULL,"global"},
 
     {"$baseline",DOUBLE,0,2*GLB_EARTH_RADIUS,&buff.baseline,NULL,"global"},
     {"$profiletype",INT,1,3,&buff.density_profile_type,NULL,"global"},
- 
+
     {"$sampling_stepsize",DOUBLE_LIST,0,GMAX,&buff.simbinsize,
-     &buff.simbins,"global"}, 
-  
+     &buff.simbins,"global"},
+
    {"$densitytab",DOUBLE_LIST,0,GMAX,&buff.densitytab,&buff.psteps,"global"},
    {"$lengthtab",DOUBLE_LIST,0,2*GLB_EARTH_RADIUS,
     &buff.lengthtab,&buff.psteps,"global"},
@@ -266,7 +266,7 @@
     &buff.lengthofrules[0],"rule"},
    {"rulescoeff",DOUBLE_LIST_INDEXED,0,GMAX,&buff.rulescoeff[0],
     &buff.lengthofrules[0],"rule"},
-   
+
    {"bgrulechannellist",INT_LIST_INDEXED,0,GMAX,&buff.bgrulechannellist[0],
     &buff.lengthofbgrules[0],"rule"},
    {"bgrulescoeff",DOUBLE_LIST_INDEXED,0,GMAX,&buff.bgrulescoeff[0],
@@ -277,17 +277,17 @@
 
     {"@pre_smearing_efficiencies",DOUBLE_LIST_INDEXED,0,GMAX,
      &buff.user_pre_smearing_channel[0],&loc_count,"channel"},
-   
+
     {"@pre_smearing_background",DOUBLE_LIST_INDEXED,0,GMAX,
      &buff.user_pre_smearing_background[0],&loc_count,"channel"},
 
     {"@post_smearing_efficiencies",DOUBLE_LIST_INDEXED,0,GMAX,
      &buff.user_post_smearing_channel[0],&loc_count,"channel"},
-   
+
     {"@post_smearing_background",DOUBLE_LIST_INDEXED,0,GMAX,
      &buff.user_post_smearing_background[0],&loc_count,"channel"},
-    
- 
+
+
    {"@errordim_sys_on",INT,0,20,&errordim_sys_on,NULL,"rule"},
    {"@errordim_sys_off",INT,0,20,&errordim_sys_off,NULL,"rule"},
    {"@sys_on_function",CHAR,0,20,&buff.sys_on_strings[0],&loc_count,"rule"},
@@ -310,13 +310,13 @@
     &buff.sys_on_errors[0],&loc_count,"rule"},
    {"@sys_off_errors",DOUBLE_LIST_INDEXED,0,GMAX,
     &buff.sys_off_errors[0],&loc_count,"rule"},
-   
+
 
    {"@energy_window" ,DOUBLE_INDEXED_PAIR_INV,0,GMAX,&buff.energy_window[0],
     &loc_count,"rule"},
    {"$densitysteps",COUNTER,1,GMAX,&buff.psteps,NULL,"global"},
-  
-  
+
+
 
    {"$filter_state",INT,GLB_OFF,GLB_ON,&buff.filter_state,NULL,"global"},
    {"$filter_value",DOUBLE,0,GMAX,&buff.filter_value,NULL,"global"},
@@ -337,7 +337,7 @@
     {"@gamma",DOUBLE,0,GMAX,&flt.gamma,NULL,"flux"},
     {"@end_point",DOUBLE,0,GMAX,&flt.end_point,NULL,"flux"},
     {"@stored_ions",DOUBLE,0,GMAX,&flt.stored_muons,NULL,"flux"},
- 
+
 
 
     {"nuflux",UNTYPE,0,20,NULL,&buff.num_of_fluxes,"global"},
@@ -352,13 +352,13 @@
     {"@gamma",DOUBLE,0,GMAX,&flt.gamma,NULL,"nuflux"},
     {"@end_point",DOUBLE,0,GMAX,&flt.end_point,NULL,"nuflux"},
     {"@stored_ions",DOUBLE,0,GMAX,&flt.stored_muons,NULL,"nuflux"},
- 
+
 
    {"@type" ,INT,1,2,&ibf.type,&loc_count,"energy"},
    {"@sigma_e" ,DOUBLE_LIST,0,GMAX,&ibf.sigma,&ibf.num_of_params,"energy"},
    {"@sigma_function" ,FUN,0,1000,&ibf.sig_f,NULL,"energy"},
-    
-  
+
+
 
    {NULL,UNTYPE,0,0,NULL,NULL,"global"}
 };
@@ -370,23 +370,23 @@ static void grp_start(char* name)
        {
          /* Reset variables to default values */
          errordim_sys_on  = -1.0;
-         errordim_sys_off = -1.0; 
+         errordim_sys_off = -1.0;
        }
    }
 
- 
+
 static void grp_end(char* name)
    {
-     char tmp_errordim[2];    
-     
+     char tmp_errordim[2];
+
      if(strncmp(name,"energy",6)==0 )
        {
-	 if(buff.num_of_sm-1 >= 0)   
+	 if(buff.num_of_sm-1 >= 0)
 	   {
 	     ibf.options=glb_option_type_alloc();
 	     ibf.options=(glb_option_type *) memmove(ibf.options,&opt,
 					     sizeof(glb_option_type));
-	     
+
 	     if(buff.smear_data[buff.num_of_sm-1]==NULL)
 	       buff.smear_data[buff.num_of_sm-1]=glb_smear_alloc();
 	     buff.smear_data[buff.num_of_sm-1]=
@@ -395,18 +395,18 @@ static void grp_end(char* name)
 	     glb_option_type_reset(&opt);
 	     if(ibf.sigma!=NULL) glb_free(ibf.sigma);
 	     glb_smear_reset(&ibf);
-	     
+
 	   }
 
-       } 
+       }
 
      if(strncmp(name,"flux",4)==0 )
        {
-	
-	 if(buff.num_of_fluxes > 0)   
+
+	 if(buff.num_of_fluxes > 0)
 	   {
 	     glb_error("The 'flux' directive is deprecated.\n"
-		       "The flux normalization may not be what you expect.\n" 
+		       "The flux normalization may not be what you expect.\n"
 		       "Please, consult the manual!");
 	     if(flt.builtin<=0) flt.builtin=GLB_OLD_NORM;
 	     if(buff.fluxes[buff.num_of_fluxes-1]==NULL)
@@ -415,12 +415,12 @@ static void grp_end(char* name)
 	       cpy_glb_flux(buff.fluxes[buff.num_of_fluxes-1],&flt);
 	    glb_flux_reset(&flt);
 	   }
-       }  
+       }
 
 
      if(strncmp(name,"nuflux",6)==0 )
        {
-	 if(buff.num_of_fluxes > 0)   
+	 if(buff.num_of_fluxes > 0)
 	   {
 	     if(buff.fluxes[buff.num_of_fluxes-1]==NULL)
 	       buff.fluxes[buff.num_of_fluxes-1]=glb_flux_alloc();
@@ -428,11 +428,11 @@ static void grp_end(char* name)
 	       cpy_glb_flux(buff.fluxes[buff.num_of_fluxes-1],&flt);
 	    glb_flux_reset(&flt);
 	   }
-       }  
+       }
 
      if(strncmp(name,"cross",5)==0 )
        {
-	 if(buff.num_of_xsecs > 0)   
+	 if(buff.num_of_xsecs > 0)
 	   {
 	     if(buff.xsecs[buff.num_of_xsecs-1]==NULL)
 	       buff.xsecs[buff.num_of_xsecs-1]=glb_xsec_alloc();
@@ -440,7 +440,7 @@ static void grp_end(char* name)
 	       cpy_glb_xsec(buff.xsecs[buff.num_of_xsecs-1],&xsc);
 	     glb_xsec_reset(&xsc);
 	   }
-       }  
+       }
 
 
 
@@ -453,13 +453,13 @@ static void grp_end(char* name)
            buff.sys_on_strings[nr] = glbConvertErrorDim(errordim_sys_on);
          if (buff.sys_off_strings[nr] == NULL  &&  errordim_sys_off >= 0)
            buff.sys_off_strings[nr] = glbConvertErrorDim(errordim_sys_off);
-       } 
+       }
 
      glb_free(context);
      context = (char *) strdup("global");
-     
+
    }
-  
+
 static int set_channel_data(int x[6],int loc_count)
    {
      // I am sorry for this -- it's a kludge
@@ -473,10 +473,10 @@ static int set_channel_data(int x[6],int loc_count)
 
        buff.listofchannels[i][loc_count-1]=x[i];
      }
-     
+
 
      return 0;
-   } 
+   }
 
 
 static int step_counter(char *name)
@@ -489,7 +489,7 @@ static int step_counter(char *name)
       if(strncmp(name,token_list[i].token,
 		 strlen(token_list[i].token))==0 )
 	{
-	 
+
 		     ibf=(int*) token_list[i].len;
 		     if(*ibf==-1) *ibf=1;// first time encounter
 		     else (*ibf)++;
@@ -505,8 +505,8 @@ static int set_fnct(char *name,void *in)
 {
   int i;
   sigfun *dbf;
-  
- 
+
+
   for(i=0;token_list[i].token!=NULL;i++)
     {
       if(strncmp(name,token_list[i].token,
@@ -517,22 +517,22 @@ static int set_fnct(char *name,void *in)
 	     if(token_list[i].scalar==FUN) //double
 	       {
 		 dbf=(sigfun *) token_list[i].ptr;
-		 *dbf=(sigfun) in;	 
+		 *dbf=(sigfun) in;
 	      	 return 0;
 	       }
-	     else       
+	     else
 	       {
 		 fprintf(stderr,"Error: Value for %s out of range\n",
 			 token_list[i].token);
 		 return 2;
 	       }
 	}
-      
-      
-    }   
-  
-  
-  return 1;   
+
+
+    }
+
+
+  return 1;
 }
 
 
@@ -558,7 +558,7 @@ static int set_exp(char *name,double value,int scalar)
 		     *dbf=value;
 		     return 0;
 		   }
-		 else       
+		 else
 		   {
 		     fprintf(stderr,"Error: Value for %s out of range\n",
 			     token_list[i].token);
@@ -573,7 +573,7 @@ static int set_exp(char *name,double value,int scalar)
 		     *ibf=value;
 		     return 0;
 		   }
-		 else       
+		 else
 		   {
 		     fprintf(stderr,"Error: Value for %s out of range\n",
 			     token_list[i].token);
@@ -585,7 +585,7 @@ static int set_exp(char *name,double value,int scalar)
 	       {
 		 if(value >= token_list[i].rl && value <= token_list[i].ru)
 		   {
-		     
+
 		     ibf=(int*) token_list[i].ptr;
 		     if(!((*ibf == -1) || (*ibf == (int) value))) {
 		       glb_warning("Given length does not"
@@ -596,7 +596,7 @@ static int set_exp(char *name,double value,int scalar)
 		     *ibf=value;
 		     return 0;
 		   }
-		 else       
+		 else
 		   {
 		     fprintf(stderr,"Error: Value for %s out of range\n",
 			     token_list[i].token);
@@ -612,14 +612,14 @@ static int set_exp(char *name,double value,int scalar)
 		     xibf[loc_count-1]=(int) value;
 		     return 0;
 		   }
-		 else       
+		 else
 		   {
 		     fprintf(stderr,"Error: Value for %s out of range\n",
 			     token_list[i].token);
 		     return 2;
 		   }
 	       }
-	     
+
 	     if(token_list[i].scalar==DOUBLE_INDEXED) //int
 	       {
 		 if(value >= token_list[i].rl && value <= token_list[i].ru)
@@ -628,7 +628,7 @@ static int set_exp(char *name,double value,int scalar)
 		     dbf[loc_count-1]=(double) value;
 		     return 0;
 		   }
-		 else       
+		 else
 		   {
 		     fprintf(stderr,"Error: Value for %s out of range\n",
 			     token_list[i].token);
@@ -636,11 +636,11 @@ static int set_exp(char *name,double value,int scalar)
 		   }
 	       }
 
-	  
-	   }   
+
+	   }
        }
 
-   return 1;   
+   return 1;
 }
 
 static int set_pair(char *name,double value,double value2,int scalar)
@@ -659,20 +659,20 @@ static int set_pair(char *name,double value,double value2,int scalar)
 	       {
 		 if(value >= token_list[i].rl && value <= token_list[i].ru)
 		   {
-		    
+
 		     dbf=(double*) token_list[i].ptr;
 		     dbf[0]=(double) value;
 		     dbf[1]=(double) value2;
 		     return 0;
 		   }
-		 else       
+		 else
 		   {
 		     fprintf(stderr,"Error: Value for %s out of range\n",
 			     token_list[i].token);
 		     return 2;
 		   }
 	       }
-	     
+
 	     if(token_list[i].scalar==INT_INDEXED_PAIR) //int
 	       {
 		 if(value >= token_list[i].rl && value <= token_list[i].ru)
@@ -682,25 +682,25 @@ static int set_pair(char *name,double value,double value2,int scalar)
 		     ibf[(loc_count-1)+0*32]=(int) value;
 		     return 0;
 		   }
-		 else       
+		 else
 		   {
 		     fprintf(stderr,"Error: Value for %s out of range\n",
 			     token_list[i].token);
 		     return 2;
 		   }
 	       }
-	     
+
 	     if(token_list[i].scalar==DOUBLE_INDEXED_PAIR) //int
 	       {
 		 if(value >= token_list[i].rl && value <= token_list[i].ru)
 		   {
-		    
+
 		     dbf=(double*) token_list[i].ptr;
 		     dbf[(loc_count-1)+0*32]=(double) value;
 		     dbf[(loc_count-1)+1*32]=(double) value2;
 		     return 0;
 		   }
-		 else       
+		 else
 		   {
 		     fprintf(stderr,"Error: Value for %s out of range\n",
 			     token_list[i].token);
@@ -712,47 +712,47 @@ static int set_pair(char *name,double value,double value2,int scalar)
 	       {
 		 if(value >= token_list[i].rl && value <= token_list[i].ru)
 		   {
-		    
+
 		     dbf=(double*) token_list[i].ptr;
 		     dbf[(loc_count-1)*2+0]=(double) value;
 		     dbf[(loc_count-1)*2+1]=(double) value2;
 		     return 0;
 		   }
-		 else       
+		 else
 		   {
 		     fprintf(stderr,"Error: Value for %s out of range\n",
 			     token_list[i].token);
 		     return 2;
 		   }
 	       }
-	   }   
+	   }
        }
 
-   return 1;   
+   return 1;
 }
 
 
 static size_t list_length (glb_List *head)
 {
-  size_t n;  
+  size_t n;
   for (n = 0; head; ++n)
     head = head->next;
-  return n; 
+  return n;
 }
 
 
 static void list_free(glb_List *stale)
 {
  glb_List *ptr;
- glb_List *dummy;  
+ glb_List *dummy;
  ptr=stale;
  while(ptr != (glb_List *) NULL)
-   {	
+   {
      dummy=ptr->next;
      glb_free(ptr);
-     ptr=dummy;  
+     ptr=dummy;
    }
- 
+
 }
 
 
@@ -764,7 +764,7 @@ static double glb_reverse(double x)
 
 static glb_List *list_cons (glb_List *tail, double newdata)
 {
-  glb_List *res = (glb_List*) glb_malloc(sizeof(glb_List)); 
+  glb_List *res = (glb_List*) glb_malloc(sizeof(glb_List));
   res->next=tail;
   res->entry=newdata;
   return res;
@@ -789,7 +789,7 @@ static glb_List *thread_list(func_t f, int reverse, int destroy ,glb_List *tail)
   */
   if(reverse==1)
     {
-      head=tail;  
+      head=tail;
       for (n = 0; head; ++n)
 	{
 	  nv=f(head->entry);
@@ -801,8 +801,8 @@ static glb_List *thread_list(func_t f, int reverse, int destroy ,glb_List *tail)
     {
       double *rlist,x;
       l=list_length(tail);
-      rlist=(double *) malloc(sizeof(double)*l);   
-      head=tail;  
+      rlist=(double *) malloc(sizeof(double)*l);
+      head=tail;
       for (n = 0; head; ++n)
 	{
 	  rlist[n]=head->entry;
@@ -820,11 +820,11 @@ static glb_List *thread_list(func_t f, int reverse, int destroy ,glb_List *tail)
   if(destroy==-1) {list_free(res);res=tail;}
   return res;
 }
-     
+
 
 static void showlist(glb_List *lp)
-{ 
- 
+{
+
   if (lp){
     showlist(lp->next);             // show the tail
     printf("%.10g " , lp->entry);     // show the head
@@ -837,10 +837,10 @@ static double list_take(glb_List *li,int k)
   int i;
   double erg;
   glb_List *bf;
-  bf=li; 
+  bf=li;
   erg=bf->entry;
   for(i=0;i<k;i++)
-    { 
+    {
       bf=bf->next;
       erg=bf->entry;
     }
@@ -862,11 +862,11 @@ static glb_List *glb_interpolation(glb_List *xval,glb_List *yval,int flag,glb_Li
   xl=list_length(xval);
   yl=list_length(yval);
   rl=list_length(where);
- 
+
   if(yl!=xl) {glb_error("Xval and Yval in glb_interpolation are not of the same length"); return NULL;}
 
   xlist=(double*) malloc(sizeof(double)*xl);
-  ylist=(double*) malloc(sizeof(double)*yl);  
+  ylist=(double*) malloc(sizeof(double)*yl);
   rlist=(double*) malloc(sizeof(double)*rl);
 
   gsl_interp_accel *acc = gsl_interp_accel_alloc();
@@ -877,7 +877,7 @@ static glb_List *glb_interpolation(glb_List *xval,glb_List *yval,int flag,glb_Li
     xlist[i]=head->entry;
     head = head->next;
   }
-  
+
   head=yval;
   for (i = yl-1; head; i--){
     ylist[i]=head->entry;
@@ -885,15 +885,15 @@ static glb_List *glb_interpolation(glb_List *xval,glb_List *yval,int flag,glb_Li
   }
 
   gsl_spline_init(spline,xlist,ylist,yl);
-  
+
   head=where;
   for(i=0; head; i++){
-     rlist[i]=gsl_spline_eval(spline,head->entry,acc);   
+     rlist[i]=gsl_spline_eval(spline,head->entry,acc);
     head=head->next;
  }
 
   for(i=rl;i>0;i--) res=list_cons(res,rlist[i-1]);
- 
+
   free(xlist);
   free(ylist);
   free(rlist);
@@ -926,26 +926,26 @@ static int set_exp_list(char *name,glb_List *value,int scalar)
 	    //here we will have to do a lot asking asf.
 	    len=list_length(value); // how long is the list
 	    lbf=(int*) token_list[i].len;
-	    if(*lbf==-1) *lbf=len;  // setting the length correctly in exp   
+	    if(*lbf==-1) *lbf=len;  // setting the length correctly in exp
 	    else if(*lbf!=len) glb_warning("Length mismatch or list"
 					   " length changed");
-	  
-	    
+
+
 	    dbf = (double**) token_list[i].ptr;
 	    if(*dbf!=NULL){glb_free(*dbf);*dbf=NULL;}
 	    list=(double*) glb_malloc(sizeof(double)*len);
-	    *dbf=list; 
-	  	     
-	    
+	    *dbf=list;
+
+
 	    for(k=0;k<len;k++)
 	       {
 		  val=list_take(value,len-k-1);
-		
+
 		  if(val >= token_list[i].rl && val <= token_list[i].ru)
 		    {
-		      list[k]=val;      
+		      list[k]=val;
 		    }
-		  else       
+		  else
 		    {
 		      fprintf(stderr,"Error: Value for %s out of range\n",
 			      token_list[i].token);
@@ -953,43 +953,43 @@ static int set_exp_list(char *name,glb_List *value,int scalar)
 		      *dbf=NULL;
 		      return 2;
 		    }
-		  
+
 	       }
 	    if(scalar!=TWICE)  list_free(value);
 	    return 0;
 	    break;
-	  
-	  case DOUBLE_LIST_INDEXED: 
+
+	  case DOUBLE_LIST_INDEXED:
 	    len=list_length(value); // how long is the list
 	    lbf=(int*) token_list[i].len;
-	    
-	   
-	    //  lbf[loc_count-1]=len;  // setting the length correctly in exp   
-	  
+
+
+	    //  lbf[loc_count-1]=len;  // setting the length correctly in exp
+
 	    dbf= (double**) token_list[i].ptr;
 	    if(dbf[loc_count-1]!=NULL){glb_free(dbf[loc_count-1]);dbf[loc_count-1]=NULL;}
 	    list=(double*) glb_malloc(sizeof(double)*(len+1));
-	   
-	    dbf[loc_count-1]=list; 
+
+	    dbf[loc_count-1]=list;
 	    list[len]=-1;
-	    
+
 	    for(k=0;k<len;k++)
 	      {
 		val=list_take(value,len-k-1);
-		  
+
 		if(val >= token_list[i].rl && val <= token_list[i].ru)
 		  {
 		    list[k]=val;
 
 		  }
-		else       
+		else
 		  {
 		    fprintf(stderr,"Error: In line %d: "
 			    "Value for %s out of range\n",
 			    glb_line_num,token_list[i].token);
 		    glb_free(list);
 		    dbf[loc_count-1]=NULL;
-		  
+
 		   return 2;
 		  }
 	      }
@@ -998,30 +998,30 @@ static int set_exp_list(char *name,glb_List *value,int scalar)
 	    break;
 
 
-	  case INT_LIST_INDEXED: //integer list indexed 
+	  case INT_LIST_INDEXED: //integer list indexed
 	    //with loc_counter
-	    
+
 	    //here we will have to do a lot asking asf.
 	    len=list_length(value); // how long is the list
 	    lbf=(int*) token_list[i].len; //FIXME danger !!!!
-	    lbf[loc_count-1]=len;  // setting the length correctly in exp   
+	    lbf[loc_count-1]=len;  // setting the length correctly in exp
 	    ibf= (int**) token_list[i].ptr;
 	    if(ibf[loc_count-1]!=NULL)glb_free(ibf[loc_count-1]);
 	    ilist=(int*) glb_malloc(sizeof(int)*len);
-	   
-	    ibf[loc_count-1]=ilist; 
-	
-	      
+
+	    ibf[loc_count-1]=ilist;
+
+
 	    for(k=0;k<len;k++)
 	      {
 		val=list_take(value,len-k-1);
-		
+
 		if(val >= token_list[i].rl && val <= token_list[i].ru)
 		  {
 		    ilist[k]=(int) val;
-		  
+
 		  }
-		else       
+		else
 		  {
 		    fprintf(stderr,"Error: Value for %s out of range\n",
 			    token_list[i].token);
@@ -1031,20 +1031,20 @@ static int set_exp_list(char *name,glb_List *value,int scalar)
 	      }
 	    if(scalar!=TWICE) list_free(value);
 	    return 0;
-	    break;	 
+	    break;
 	  default:
 	    return 1;
 	    break;
 	  }
 	}
-    }    
-  return 1;    
+    }
+  return 1;
 }
 
 static int set_exp_energy(char *name, glb_List **value)
 {
   int i,k,l;
-  double ***dbf;  
+  double ***dbf;
   int len;
   double val;
   int v1,v2;
@@ -1057,12 +1057,12 @@ static int set_exp_energy(char *name, glb_List **value)
 		 strlen(token_list[i].ctx))==0 )
 	{
 	  switch((int) token_list[i].scalar) {
-	  
+
 	  case ENERGY_MATRIX:
 	    list=(double**) glb_malloc(sizeof(double* ) * energy_len);
 	    buff.lowrange[loc_count-1]=(int*) glb_malloc(energy_len*sizeof(int));
 	    buff.uprange[loc_count-1]=(int*) glb_malloc(energy_len*sizeof(int));
-      
+
 	    for(l=0;l<energy_len;l++)
 	      {
 		len=(int) list_length(value[l]); // how long is the list
@@ -1070,27 +1070,27 @@ static int set_exp_energy(char *name, glb_List **value)
 				   "number %d: sublist %d is too short!\n"
 				   ,glb_line_num,loc_count,l);return 2;}
 		//lbf=(int*) token_list[i].len;
-	    
-	   
+
+
 		//lbf[loc_count-1]=len;  // setting the length correctly in exp
-	
-		
-		
+
+
+
 		dbf= (double***) token_list[i].ptr;
 		list[l]=(double*) glb_malloc(sizeof(double)*(len-2));
-		dbf[loc_count-1]=list; 
+		dbf[loc_count-1]=list;
 
-		
+
 		v1=(int) list_take(value[l],len-0-1);
 		v2=(int) list_take(value[l],len-1-1);
-	      
+
 		if(v1 >= 0 &&  v2 <= buff.simbins
 		   && v2 >= v1&&v2-v1==len-3 )
 		  {
-		   
-		    buff.lowrange[loc_count-1][l]= v1;	
+
+		    buff.lowrange[loc_count-1][l]= v1;
 		    buff.uprange[loc_count-1][l]= v2;
-		    
+
 		  }
 		else
 		  {
@@ -1102,7 +1102,7 @@ static int set_exp_energy(char *name, glb_List **value)
 		    glb_free(buff.uprange[loc_count-1]);
 		    return 2;
 		  }
-		
+
 	      	for(k=0;k<len-2;k++)
 		  {
 		    val=list_take(value[l],len-(k+2)-1);
@@ -1110,9 +1110,9 @@ static int set_exp_energy(char *name, glb_List **value)
 		    if(val >= token_list[i].rl && val <= token_list[i].ru)
 		      {
 			list[l][k]=val;
-		
+
 		      }
-		    else       
+		    else
 		      {
 			fprintf(stderr,"Error: In line %d: "
 				"Value for %s out of range\n",
@@ -1129,12 +1129,12 @@ static int set_exp_energy(char *name, glb_List **value)
 
 	  }
 	}
-    }    
-  return 1;    
+    }
+  return 1;
 }
 
 
- 
+
 
 /* Enabling traces.  */
 #ifndef YYDEBUG
@@ -1160,7 +1160,7 @@ typedef union YYSTYPE
 {
   double  val;  /* For returning numbers.                   */
   double *dpt;  /* for rules */
-  glb_List *ptr; 
+  glb_List *ptr;
   glb_List **ptrq;
   glb_symrec  *tptr;  /* For returning symbol-table pointers      */
   char *name;
@@ -2354,7 +2354,7 @@ yyparse ()
 #endif
 #endif
 {
-  
+
   int yystate;
   int yyn;
   int yyresult;
@@ -2769,7 +2769,7 @@ yyreduce:
 #line 1137 "glb_parser.y"
     {
   glb_List *ltemp;
-  ltemp=thread_list(&glb_list_copy,0,0,(yyvsp[(4) - (4)].tptr)->list); 
+  ltemp=thread_list(&glb_list_copy,0,0,(yyvsp[(4) - (4)].tptr)->list);
   if(set_exp_list((yyvsp[(1) - (4)].name),ltemp,3)==1) yyerror("Unknown identifier");
   (yyval.ptr) = ltemp;
   if ((yyvsp[(1) - (4)].name))  { glb_free((yyvsp[(1) - (4)].name));  (yyvsp[(1) - (4)].name)=NULL; }
@@ -2792,7 +2792,7 @@ yyreduce:
   glb_List *buf;
   buf=(yyvsp[(1) - (3)].ptr);
   buf=list_cons(buf,(yyvsp[(2) - (3)].val));
-  (yyval.ptr)=buf;   
+  (yyval.ptr)=buf;
 }
     break;
 
@@ -2802,7 +2802,7 @@ yyreduce:
   glb_List *buf;
   buf=(yyvsp[(1) - (4)].ptr);
   buf=list_cons(buf,(yyvsp[(2) - (4)].val));
-  (yyval.ptr)=buf;   
+  (yyval.ptr)=buf;
 }
     break;
 
@@ -2812,7 +2812,7 @@ yyreduce:
   glb_List *buf;
   buf=(yyvsp[(1) - (2)].ptr);
   buf=list_cons(buf,(yyvsp[(2) - (2)].val));
-  (yyval.ptr)=buf;   
+  (yyval.ptr)=buf;
 }
     break;
 
@@ -2872,7 +2872,7 @@ yyreduce:
 
   case 52:
 #line 1190 "glb_parser.y"
-    { 
+    {
 
   double *buf;
   buf=(double*) glb_malloc(sizeof(double)*2);
@@ -2905,7 +2905,7 @@ yyreduce:
 
   case 56:
 #line 1212 "glb_parser.y"
-    { 
+    {
   grp_end(context);
 }
     break;
@@ -2978,7 +2978,7 @@ yyreduce:
     {
   //load_flux($3,loc_count-1,1);
   flt.file_name=strdup((yyvsp[(3) - (3)].name));
- 
+
   //if(set_exp($1,$3,0)==1) yyerror("Unknown identifier");
   (yyval.name)=(yyvsp[(3) - (3)].name);
   if ((yyvsp[(1) - (3)].name))  { glb_free((yyvsp[(1) - (3)].name));  (yyvsp[(1) - (3)].name)=NULL; }
@@ -2991,7 +2991,7 @@ yyreduce:
     {
   //load_flux($3,loc_count-1,1);
   flt.file_name=strdup((yyvsp[(3) - (3)].name));
- 
+
   //if(set_exp($1,$3,0)==1) yyerror("Unknown identifier");
   (yyval.name)=(yyvsp[(3) - (3)].name);
   if ((yyvsp[(1) - (3)].name))  { glb_free((yyvsp[(1) - (3)].name));  (yyvsp[(1) - (3)].name)=NULL; }
@@ -3026,7 +3026,7 @@ yyreduce:
   x[1]=(yyvsp[(5) - (13)].in);
   x[2]=(yyvsp[(7) - (13)].in);
   x[3]=(yyvsp[(9) - (13)].in);
-  x[4]=(int) (yyvsp[(11) - (13)].nameptr)->value -1; 
+  x[4]=(int) (yyvsp[(11) - (13)].nameptr)->value -1;
   x[5]=(int) (yyvsp[(13) - (13)].nameptr)->value -1;
 
   set_channel_data(x,loc_count);
@@ -3064,8 +3064,8 @@ yyreduce:
     {
   glb_List **buf;
   energy_len=1;
- 
-  buf=(glb_List**) glb_malloc(sizeof( glb_List* ) ); 
+
+  buf=(glb_List**) glb_malloc(sizeof( glb_List* ) );
   buf[0]=(yyvsp[(3) - (3)].ptr);
   (yyval.ptrq)=buf;
   if ((yyvsp[(1) - (3)].name))  { glb_free((yyvsp[(1) - (3)].name));  (yyvsp[(1) - (3)].name)=NULL; }
@@ -3078,10 +3078,10 @@ yyreduce:
   glb_List **buf;
   buf=(yyvsp[(1) - (3)].ptrq);
   energy_len++;
-  
+
   buf=(glb_List**) glb_realloc((void**) buf , sizeof( glb_List* ) * energy_len);
- 
-  buf[energy_len-1]=(yyvsp[(3) - (3)].ptr); 
+
+  buf[energy_len-1]=(yyvsp[(3) - (3)].ptr);
   (yyval.ptrq)=buf; }
     break;
 
@@ -3094,7 +3094,7 @@ yyreduce:
 
   buf=(glb_List**) glb_realloc((void**) buf , sizeof( glb_List* ) * energy_len);
 
-  buf[energy_len-1]=(yyvsp[(4) - (4)].ptr); 
+  buf[energy_len-1]=(yyvsp[(4) - (4)].ptr);
   (yyval.ptrq)=buf; }
     break;
 
@@ -3119,15 +3119,15 @@ yyreduce:
   buf[0]=list_cons(buf[0],(yyvsp[(3) - (3)].dpt)[0]);
   buf[1]=list_cons(buf[1],(yyvsp[(3) - (3)].dpt)[1]);
   glb_free((yyvsp[(3) - (3)].dpt));
-  (yyval.ptrq)=buf; 
+  (yyval.ptrq)=buf;
 }
     break;
 
   case 83:
 #line 1367 "glb_parser.y"
     {
-  glb_List **buf;  
- 
+  glb_List **buf;
+
   buf=(glb_List**) glb_malloc(sizeof(glb_List*)*2);
   buf[0]=list_cons(NULL,(yyvsp[(3) - (3)].dpt)[0]);
   buf[1]=list_cons(NULL,(yyvsp[(3) - (3)].dpt)[1]);
@@ -3145,7 +3145,7 @@ yyreduce:
   buf[0]=list_cons(buf[0],(yyvsp[(3) - (3)].dpt)[0]);
   buf[1]=list_cons(buf[1],(yyvsp[(3) - (3)].dpt)[1]);
   glb_free((yyvsp[(3) - (3)].dpt));
-  (yyval.ptrq)=buf; 
+  (yyval.ptrq)=buf;
 }
     break;
 
@@ -3153,15 +3153,15 @@ yyreduce:
 #line 1387 "glb_parser.y"
     {
 
-int flag;  
-  
+int flag;
+
   (yyval.ptrq)=(yyvsp[(1) - (1)].ptrq);
-  
+
   flag=set_exp_list("bgrulescoeff",(yyvsp[(1) - (1)].ptrq)[0],0);
   if(flag==1) yyerror("Unknown identifier");
   flag=set_exp_list("bgrulechannellist",(yyvsp[(1) - (1)].ptrq)[1],0);
   if(flag==1) yyerror("Unknown identifier");
- 
+
   glb_free((yyvsp[(1) - (1)].ptrq));
 }
     break;
@@ -3169,16 +3169,16 @@ int flag;
   case 86:
 #line 1400 "glb_parser.y"
     {
-  int flag;  
+  int flag;
   (yyval.ptrq)=(yyvsp[(1) - (1)].ptrq);
   flag=set_exp_list("rulescoeff",(yyvsp[(1) - (1)].ptrq)[0],0);
   if(flag==1) yyerror("Unknown identifier");
   flag=set_exp_list("rulechannellist",(yyvsp[(1) - (1)].ptrq)[1],0);
-  if(flag==1) yyerror("Unknown identifier"); 
+  if(flag==1) yyerror("Unknown identifier");
 
   glb_free((yyvsp[(1) - (1)].ptrq));
 
- 
+
 }
     break;
 
@@ -3429,7 +3429,7 @@ yyreturn:
 
 
 extern glb_symrec *sym_table;
- 
+
 int
 yyerror (const char *s)  /* Called by yyparse on error */
 {
@@ -3479,7 +3479,7 @@ struct glb_init_sig
   char *fname;
   sigfun sf;
 };
-     
+
 static double echo(double x)
 {
   fprintf(stdout,"%f ",x);
@@ -3530,19 +3530,19 @@ static glb_List *glb_bincenter(void)
   glb_List *res=NULL;
   glb_smear *test;
   test=glb_smear_alloc();
-  
+
   if(buff.numofbins<0) {glb_error("Cannot compute bincenter. Binning not set up properly."); return NULL;}
 
   glb_set_up_smear_data(test,&buff);
 
- 
+
   for(i=0;i<test->numofbins;i++)
-    {    
+    {
       res=list_cons(res,test->bincenter[i]);
     }
- 
+
   glb_smear_free(test);
- 
+
   return res;
 }
 
@@ -3553,21 +3553,21 @@ static glb_List *glb_samplingbincenter(void)
   glb_List *res=NULL;
   glb_smear *test;
   test=glb_smear_alloc();
-  
+
   if(buff.simbins<0) {glb_error("Cannot compute samplingbincenter. Sampling-binning not set up properly."); return NULL;}
 
-  
+
   glb_set_up_smear_data(test,&buff);
 
   for(i=0;i<test->simbins;i++)
     {
-      
+
       res=list_cons(res,test->simbincenter[i]);
     }
- 
+
   glb_smear_free(test);
- 
-  
+
+
   return res;
 }
 
@@ -3603,17 +3603,17 @@ struct glb_init_sig sig_fncts[] =
   };
 
 /* The symbol table: a chain of `struct glb_symrec'.  */
-static glb_namerec *name_table = (glb_namerec *) NULL; 
+static glb_namerec *name_table = (glb_namerec *) NULL;
 /* cannot use static here, since its declared earlier as extern */
 glb_symrec *sym_table = (glb_symrec *) NULL;
-static glb_symrec *pre_sym_table = (glb_symrec *) NULL;
+glb_symrec *pre_sym_table = (glb_symrec *) NULL;
 
 #define BIN_LIST 1
 #define SAMPLING_LIST 2
 #define DENSITY_LIST 3
 
 
-/* Put arithmetic functions in table. 
+/* Put arithmetic functions in table.
  * And all user-defined stuff.
  */
 static void
@@ -3621,7 +3621,7 @@ init_table (void)
 {
   int i;
   glb_symrec *ptr,*p;
-  
+
   glb_namerec *sptr;
   for (i = 0; arith_fncts[i].fname != 0; i++)
     {
@@ -3629,7 +3629,7 @@ init_table (void)
       ptr->value.fnctptr = arith_fncts[i].fnct;
       ptr->destroy=arith_fncts[i].destroy;
       ptr->reverse=arith_fncts[i].reverse;
- 
+
     }
   for (i = 0; list_fncts[i].fname != 0; i++)
     {
@@ -3643,10 +3643,10 @@ init_table (void)
     {
       p=glb_putsym(ptr->name,ptr->type);
       p->value.var=ptr->value.var;
-      if(ptr->list!=NULL) p->list=thread_list(&glb_list_copy,0,0,ptr->list); 
+      if(ptr->list!=NULL) p->list=thread_list(&glb_list_copy,0,0,ptr->list);
     ptr=ptr->next;
     }
-  
+
   for (i = 0; sig_fncts[i].fname != 0; i++)
     {
       sptr = glb_putname (sig_fncts[i].fname,"energy",SFNCT);
@@ -3661,12 +3661,12 @@ free_symtable()
     glb_symrec *dummy;
     ptr=sym_table;
     while(ptr != (glb_symrec *) NULL)
-      {	
+      {
 	glb_free(ptr->name);
 	if(ptr->list!=NULL){ list_free(ptr->list);}
 	dummy=ptr->next;
 	glb_free(ptr);
-	ptr=dummy;  
+	ptr=dummy;
       }
     sym_table=NULL;
 }
@@ -3678,12 +3678,12 @@ free_presymtable()
     glb_symrec *dummy;
     ptr=pre_sym_table;
     while(ptr != (glb_symrec *) NULL)
-      {	
+      {
 	glb_free(ptr->name);
 	if(ptr->list!=NULL){ list_free(ptr->list);}
 	dummy=ptr->next;
 	glb_free(ptr);
-	ptr=dummy;  
+	ptr=dummy;
       }
     pre_sym_table=NULL;
 }
@@ -3694,16 +3694,16 @@ free_presymtable()
 static void
 free_nametable()
 {
-    glb_namerec *ptr;  
+    glb_namerec *ptr;
     glb_namerec *dummy;
     ptr=name_table;
     while(ptr != (glb_namerec *) NULL)
-      {	
+      {
 	glb_free(ptr->name);
 	glb_free(ptr->context);
 	dummy=ptr->next;
 	glb_free(ptr);
-	ptr=dummy;  
+	ptr=dummy;
       }
     name_table=NULL;
 }
@@ -3740,7 +3740,7 @@ static glb_naming *glb_putnames (char *sym_name, char *context, int value,
   ptr->context = (char *) glb_malloc (strlen (context) + 1);
   strcpy (ptr->context,context);
   ptr->value = value; /* set value to -1 for new ones  */
-  
+
   ptr->next = (struct glb_naming *) in;
   //in = ptr;
   return ptr;
@@ -3748,7 +3748,7 @@ static glb_naming *glb_putnames (char *sym_name, char *context, int value,
 
 static glb_naming *copy_names (glb_naming *in)
 {
-  
+
   glb_namerec *ptr;
   for (ptr = name_table; ptr != (glb_namerec *) NULL;
        ptr = (glb_namerec *)ptr->next)
@@ -3780,7 +3780,7 @@ glb_namerec *glb_putname (char *sym_name, char *context, int sym_type)
   strcpy (ptr->context,context);
   ptr->type = sym_type;
   ptr->value = -1; /* set value to -1 for new ones  */
-  
+
   ptr->next = (struct glb_namerec *)name_table;
   name_table = ptr;
   return ptr;
@@ -3825,7 +3825,7 @@ glb_getpresym (const char *sym_name)
 
 
 /* A new an powerful function which allows the user to define variables
- * for substitution in the AEDL files 
+ * for substitution in the AEDL files
  */
 
 
@@ -3838,9 +3838,18 @@ void glbDefineAEDLVariable(const char *name, double value)
   return;
 }
 
+double glbGetAEDLVariable(const char *name)
+{
+  glb_symrec *ptr;
+  ptr=glb_getpresym(name);
+  if (!ptr)
+    return GLB_NAN;
+  return ptr->value.var;
+}
+
 void glbClearAEDLVariables()
 {
-   if(pre_sym_table!=NULL) free_presymtable(); 
+   if(pre_sym_table!=NULL) free_presymtable();
 }
 
 
@@ -3850,13 +3859,13 @@ void glbDefineAEDLList(const char *name, double *list, size_t length)
 {
   size_t i;
   glb_symrec *ptr;
-  if(name==NULL) return;   
+  if(name==NULL) return;
   if(name[0]!='%'){ fprintf(stderr,"ERROR: AEDL lists have to start with '\%'\n");return;}
   ptr=glb_getpresym(name);
   if(ptr==0) ptr = glb_putpresym (name, LVAR);
   for(i=0;i<length;i++) {ptr->list=list_cons(ptr->list,list[i]);
   }
-  
+
   return;
 }
 
@@ -3868,11 +3877,11 @@ void glb_copy_buff()
   /* I am not sure how well this assigment really works */
   buff.names=copy_names(buff.names);
   buff.filename=strdup(glb_file_id);
-  buff_list[exp_count]=buff; 
+  buff_list[exp_count]=buff;
   exp_count++;
 }
 
-void glbReset() 
+void glbReset()
 {
   glb_line_num=0;
   energy_len=1;
@@ -3880,7 +3889,7 @@ void glbReset()
   loc_count=-1;
   flux_count=-1;
   glbInitExp(&buff);
- 
+
   if(name_table!=NULL) free_nametable();
   if(sym_table!=NULL) free_symtable();
   name_table =(glb_namerec *) NULL;
@@ -3889,12 +3898,12 @@ void glbReset()
 }
 
 void glbResetCounters()
-{ 
+{
   flux_count=-1;
   cross_count=-1;
 }
 
-void glbResetEOF() 
+void glbResetEOF()
 {
   int i;
   exp_count=0;
@@ -3915,7 +3924,7 @@ void glbResetEOF()
   init_table ();
   glb_flux_reset(&flt);
   glb_xsec_reset(&xsc);
- 
+
 }
 
 void glb_clean_parser()
@@ -3923,14 +3932,14 @@ void glb_clean_parser()
   if(name_table!=NULL) free_nametable();
   if(sym_table!=NULL) free_symtable();
   if(pre_sym_table!=NULL) free_presymtable();
-  
+
 }
 
 int glbInitExperiment(char *inf,glb_exp *in, int *counter)
 {
   FILE *input;
   int k,i;
-  const char tch[]="%!GLoBES"; 
+  const char tch[]="%!GLoBES";
   char tct[11];
   struct glb_experiment **ins;
   ins=(struct glb_experiment **) in;
@@ -3959,14 +3968,14 @@ int glbInitExperiment(char *inf,glb_exp *in, int *counter)
   glb_fclose(yyin);
   glb_free(context);
   glb_free(glb_file_id);
-  
+
   if(k!=0) return -2;
-  
+
   k=0;
 
   if(*counter+exp_count>GLB_MAX_EXP) glb_fatal("Too many experiments!");
   for(i=0;i<exp_count;i++)
-    {  
+    {
       *ins[*counter+i]=buff_list[i];
       k=+glbDefaultExp(ins[*counter+i]);
     }
@@ -3976,7 +3985,7 @@ int glbInitExperiment(char *inf,glb_exp *in, int *counter)
   glb_init_minimizer();
 
   if(k!=0) return -1;
-  
+
   return 0;
 
 }

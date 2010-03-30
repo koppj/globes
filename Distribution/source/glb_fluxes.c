@@ -43,13 +43,13 @@
 
 #define PI 3.1415
 #define NORM 6.02204*1E-12 //10^-38/u (atomic mass unit)
-#define GLB_ELECTRON_MASS 0.511E-3 
+#define GLB_ELECTRON_MASS 0.511E-3
 
 static double mmu = 0.1056;           // muon mass in GeV
 static double beam_pol = 0;           // beam polaristaion
 static double beam_en = 20;           // beam energy in GeV
 static double beta,rgamma;             // relativistic quantities
-static double stored_muons = 2.0E20;  // stored muons per year 
+static double stored_muons = 2.0E20;  // stored muons per year
 // or protons on target
 // care must be taken with this, it is a different number for each experiment
 static double power;
@@ -185,7 +185,7 @@ static double fastflux_e(double en, double baseline)
 /* This type used for all builtin fluxes
  * The need to take the energy, the polarity (ie. neutrinos/anti-neutrinos
  * and they have to take the flavour argument. The need to return at least
- * zero for any valid input. 
+ * zero for any valid input.
  */
 typedef double (*flux_calc)(glb_flux *data, double en, int polarity, int l, int anti);
 
@@ -254,7 +254,7 @@ static void builtin_flux_setup(glb_flux *data, flux_calc flx, int id,int pl)
   /* the id argument is unused */
   double smb,pb,de,emax;
   int i;
-  
+
   if(data->builtin==1||data->builtin==2) de=data->parent_energy/501.0;
   if(data->builtin==3||data->builtin==4) de=2 * data->gamma * (data->end_point + GLB_ELECTRON_MASS)/501.0;
   smb=stored_muons;
@@ -266,12 +266,12 @@ static void builtin_flux_setup(glb_flux *data, flux_calc flx, int id,int pl)
   for(i=0;i<501;i++)
     {
       data->flux_storage[i][0]=i*de;
-      data->flux_storage[i][1]=flx(data,i*de,pl,1,+1); 
-      data->flux_storage[i][2]=flx(data,i*de,pl,2,+1); 
-      data->flux_storage[i][3]=flx(data,i*de,pl,3,+1); 
-      data->flux_storage[i][4]=flx(data,i*de,pl,1,-1); 
-      data->flux_storage[i][5]=flx(data,i*de,pl,2,-1); 
-      data->flux_storage[i][6]=flx(data,i*de,pl,3,-1); 
+      data->flux_storage[i][1]=flx(data,i*de,pl,1,+1);
+      data->flux_storage[i][2]=flx(data,i*de,pl,2,+1);
+      data->flux_storage[i][3]=flx(data,i*de,pl,3,+1);
+      data->flux_storage[i][4]=flx(data,i*de,pl,1,-1);
+      data->flux_storage[i][5]=flx(data,i*de,pl,2,-1);
+      data->flux_storage[i][6]=flx(data,i*de,pl,3,-1);
     }
   power=pb;
   stored_muons=smb;
@@ -279,7 +279,7 @@ static void builtin_flux_setup(glb_flux *data, flux_calc flx, int id,int pl)
 
 void glb_init_fluxtables(glb_flux *data,int pos)
 {
-  
+
   if(data->builtin==1) builtin_flux_setup(data,&nufact_flux,pos,+1);
   if(data->builtin==2) builtin_flux_setup(data,&nufact_flux,pos,-1);
 
@@ -287,7 +287,7 @@ void glb_init_fluxtables(glb_flux *data,int pos)
   if(data->builtin==4) builtin_flux_setup(data,&bb_flux,pos,-1);
 
   if(data->builtin==0||data->builtin==GLB_OLD_NORM) glb_flux_loader(data,pos,+1);
-  
+
 }
 
 
@@ -303,13 +303,13 @@ static double norm2(int type)
     case 1: erg=NORM*100; //NuFact
       break;
     case 2: erg=NORM*100; //NuFact
-      break;   
-    case 3: erg=NORM*100;//NUMI Beam (9@712) 
       break;
-    case 4: erg=NORM*100; //NUMI Beam (9@712) 
+    case 3: erg=NORM*100;//NUMI Beam (9@712)
+      break;
+    case 4: erg=NORM*100; //NUMI Beam (9@712)
       break;
     case GLB_OLD_NORM: erg=NORM*295*295*9.92033*1E6;
-      /* here we try to eliminate the stupide 5.2 factor 
+      /* here we try to eliminate the stupide 5.2 factor
        *    default: erg=NORM*295*295*9.92033*1E6; */
       break;
     default: erg=1.0 ;
@@ -320,8 +320,8 @@ static double norm2(int type)
 }
 
 
- 
-double glb_flux_calc(double en, double baseline, 
+
+double glb_flux_calc(double en, double baseline,
 	    int type, int l, int anti, const glb_flux *data)
 {
    /* the type argument is unused */
@@ -361,14 +361,14 @@ double glb_flux_calc(double en, double baseline,
 //
 //    and the following code should accomplish the same
   part = l + 3*((1-anti)/2);
- 
- 
+
+
 /* JK 2008-07-06 incre = (data->flux_storage[500][0]-data->flux_storage[0][0])/501.0; */
  incre = (data->flux_storage[500][0]-data->flux_storage[0][0])/500.0;
  lowerind = floor((en-data->flux_storage[0][0])/incre);
  higherind = lowerind + 1;
 
- if (lowerind<0||higherind>500) 
+ if (lowerind<0||higherind>500)
    {
      ergebnis=0.0;
    }
@@ -379,15 +379,15 @@ double glb_flux_calc(double en, double baseline,
 						  /incre)-lowerind)
 	       +data->flux_storage[lowerind][part])
        /baseline/baseline;
-   }     
- ergebnis = ergebnis*norm2(data->builtin) 
+   }
+ ergebnis = ergebnis*norm2(data->builtin)
    * data->time * data->target_power * data->stored_muons * data->norm;
  return ergebnis;
 }
 
- 
 
-/* Here begins the part where the cross-sections are read from 
+
+/* Here begins the part where the cross-sections are read from
  * file and made accessible to the program */
 
 
@@ -400,19 +400,19 @@ void glb_flux_loader(glb_flux *data, int ident, int polarity)
    /* the polarity  argument is unused */
   int i,number,s,ts=0;
   char tok;
- 
+
   FILE *fp = glb_fopen(data->file_name,"r");
   number=ident;
- 
-  
+
+
   data->flux_storage=glb_alloc_flux_storage(501);
       if (fp!=NULL)
-	{ 
+	{
 	  /* peel off all leading comments */
 	  while(1)
 	    {
 	      tok=fgetc(fp);
-	      if(tok=='#') 
+	      if(tok=='#')
 		{
 		  while(fgetc(fp)!='\n');
 		}
@@ -422,11 +422,11 @@ void glb_flux_loader(glb_flux *data, int ident, int polarity)
 		  break;
 		}
 	    }
-	  for (i=0; i<=NFLUX; i++) 
+	  for (i=0; i<=NFLUX; i++)
 	    {
 	      /* get rid of comments inside */
 	      tok=fgetc(fp);
-	      if(tok=='#') 
+	      if(tok=='#')
 		{
 		  while(fgetc(fp)!='\n');
 		  i--;
@@ -438,30 +438,30 @@ void glb_flux_loader(glb_flux *data, int ident, int polarity)
 		  s=fscanf(fp,"%lf %lf %lf %lf %lf %lf %lf \n",
 			   &data->flux_storage[i][0],
 			   &data->flux_storage[i][1],
-			   &data->flux_storage[i][2], 
+			   &data->flux_storage[i][2],
 			   &data->flux_storage[i][3],
 			   &data->flux_storage[i][4],
 			   &data->flux_storage[i][5],
 			   &data->flux_storage[i][6]);
-		  
-		  if(s!=7) 
+
+		  if(s!=7)
 		    fprintf(stderr,"Error: Wrong format in file %s\n",
 			    data->file_name);
 		  else
-		    ts++;		
+		    ts++;
 		}
-	      
+
 	    }
 	  fclose(fp);
 	}
       else
 	{
-	  fprintf(stderr,"Error: Could not open %s\n",data->file_name); 
-	} 
-    
-      
+	  fprintf(stderr,"Error: Could not open %s\n",data->file_name);
+	}
+
+
       if(ts!=501) fprintf(stderr,"Error: Wrong format in file %s\n",
-			  data->file_name);      
+			  data->file_name);
 }
 
 
@@ -478,7 +478,7 @@ void glb_X_section_loader(glb_xsec *data)
     while(1)
       {
 	tok=fgetc(fp);
-	if(tok=='#') 
+	if(tok=='#')
 	  while(fgetc(fp)!='\n');
 	else
 	  {
@@ -486,12 +486,12 @@ void glb_X_section_loader(glb_xsec *data)
 	    break;
 	  }
       }
-    
+
     for (i=0; i<1001; i++)
       {
 	/* get rid of comments inside */
 	tok=fgetc(fp);
-	if(tok=='#') 
+	if(tok=='#')
 	  {
 	    while(fgetc(fp)!='\n');
 	    i--;
@@ -503,13 +503,13 @@ void glb_X_section_loader(glb_xsec *data)
 	    s=fscanf(fp,"%lf %lf %lf %lf %lf %lf %lf \n",
 		     &data->xsec_storage[i][0],
 		     &data->xsec_storage[i][1],
-		     &data->xsec_storage[i][2], 
+		     &data->xsec_storage[i][2],
 		     &data->xsec_storage[i][3],
 		     &data->xsec_storage[i][4],
 		     &data->xsec_storage[i][5],
 		     &data->xsec_storage[i][6]);
-	
-	    if(s!=7) 
+
+	    if(s!=7)
 	      fprintf(stderr,"Error: Wrong format in file %s\n",
 		      data->file_name);
 	    else
@@ -522,10 +522,10 @@ void glb_X_section_loader(glb_xsec *data)
     {
       fprintf(stderr,"Error: Could not open %s\n",data->file_name);
     }
-  
+
   if(ts!=1001) fprintf(stderr,"Error: Wrong format in file %s\n",
 		      data->file_name);
- 
+
 }
 
 double glb_xsec_calc(double enl,int l, int anti, const glb_xsec *data)
@@ -542,10 +542,10 @@ double glb_xsec_calc(double enl,int l, int anti, const glb_xsec *data)
   part = (int) l + 3*(1-anti)/2;
 
   incre = (data->xsec_storage[1000][0]-data->xsec_storage[0][0])/1000.0;
-  lowerind = floor((en-data->xsec_storage[0][0])/incre); 
+  lowerind = floor((en-data->xsec_storage[0][0])/incre);
   higherind = lowerind + 1;
 
-  if (lowerind<0 || higherind>1000) ergebnis=0.0; 
+  if (lowerind<0 || higherind>1000) ergebnis=0.0;
   else
   {
     ergebnis=((data->xsec_storage[higherind][part]-
@@ -559,7 +559,7 @@ double glb_xsec_calc(double enl,int l, int anti, const glb_xsec *data)
 
 void glb_init_xsectables(glb_xsec *data)
 {
-  
+
   if(data->builtin==0) glb_X_section_loader(data);
-  
+
 }

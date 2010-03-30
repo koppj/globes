@@ -50,6 +50,7 @@ package globes;
 *glbClearExperimentList = *globesc::glbClearExperimentList;
 *glbDefineAEDLVariable = *globesc::glbDefineAEDLVariable;
 *glbDefineAEDLList = *globesc::glbDefineAEDLList;
+*glbGetAEDLVariable = *globesc::glbGetAEDLVariable;
 *glbClearAEDLVariables = *globesc::glbClearAEDLVariables;
 *glbInitExperiment = *globesc::glbInitExperiment;
 *glbNameToValue = *globesc::glbNameToValue;

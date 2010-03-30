@@ -62,7 +62,7 @@ void glb_close_module_support()
 /* Set up path to be searched for modules */
 int glb_setup_module_search_path()
 {
- 
+
   int i,s=1;
   char *in_path;
   char *path;
@@ -77,11 +77,11 @@ int glb_setup_module_search_path()
   /* Parse the path -- try this aloud twenty times as fast as you can ;-) */
   s=glb_break_up_path(path,&path_vector,&path_vector_length);
   glb_free(path);
-  
+
   /* Setup the correct directory to find the builtin modules */
   s += lt_dladdsearchdir(GLB_MODULE_DIR);
 
-  /* Adding the elements of path vector to the module search path 
+  /* Adding the elements of path vector to the module search path
    * ommiting the first (which would be the local directory) */
   for(i=1;i<path_vector_length;i++) s += lt_dladdsearchdir(path_vector[i]);
 
@@ -89,14 +89,14 @@ int glb_setup_module_search_path()
   for(i=0;i<path_vector_length;i++)
     glb_free((char *) path_vector[i]);
   glb_free((char **) path_vector);
-  
+
   return s;
 }
 
 #define GLB_MODULE_NOT_FOUND -2
 #define GLB_MODULE_NO_INIT -1
 
-/* Checking wether a module exists and is a GLoBES module 
+/* Checking wether a module exists and is a GLoBES module
  * The idea is to adjust verbosity level to whatever the
  * user needs, if he wants to avoid later error messages
  * he has to explicitely call glb_probe_module before any
@@ -135,13 +135,13 @@ int glbProbeModule(const char *module_name, int verbosity)
       fprintf(stderr,"glb_probe_module: ERROR: in module %s: %s\n",
 	      module_name,error);
       fprintf(stderr,"glb_probe_module: ERROR: %s is not a GLoBES module\n",
-	      module_name); 
+	      module_name);
       lt_dlclose(module);
       if(verbosity>2) {
 	fprintf(stderr,"glb_probe_module: message: unloaded module %s.\n"
 		,module_name);
       }
-      
+
     }
   return GLB_MODULE_NO_INIT;}
   if(verbosity>2) {
@@ -170,18 +170,18 @@ int glbProbeModule(const char *module_name, int verbosity)
       }
       s=-1;
     }
-  
+
 
   /* Closing the module */
   clean=lt_dlsym(module,"glb_module_clean");
   if(clean!=NULL) clean();
   lt_dlclose(module);
-  
+
   if(verbosity>2) {
     fprintf(stderr,"glb_probe_module: message: unloaded module %s.\n"
 	    ,module_name);
   }
-    
+
   return s;
 }
 
@@ -207,7 +207,7 @@ glb_dlhandle glbOpenModule(const char *module_name)
    fprintf(stderr,"\tmodule %s has no working glb_module_init!\n",module_name);
    return NULL;
  }
- 
+
  init();
 
  return (glb_dlhandle) module;
@@ -232,7 +232,7 @@ void *glbSymModule(glb_dlhandle module,const char *symbol_name)
   const char *error;
   void *generic;
   lt_dlhandle mt;
-  mt=(lt_dlhandle) module;  
+  mt=(lt_dlhandle) module;
   generic=lt_dlsym(mt,symbol_name);
   error=lt_dlerror();
   if(error) {
@@ -257,9 +257,9 @@ int glbUsePrior(glb_dlhandle module)
   const char *error;
   int s=0;
 
-  id=lt_dlsym(module,"glb_module_id"); 
+  id=lt_dlsym(module,"glb_module_id");
   magic=*id;
-  
+
   /* Probing wether it is designed as prior module */
   if(magic!=GLB_PRIOR_MODULE_ID) {glb_error("Not a prior module!");
   return -1;}
@@ -271,6 +271,6 @@ int glbUsePrior(glb_dlhandle module)
 
   /* Register the new prior */
   glbRegisterPriorFunction(f,g,h);
-  
+
   return 0;
 }
