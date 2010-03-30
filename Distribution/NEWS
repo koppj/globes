@@ -110,6 +110,10 @@
           given, the effect of the filter is now compensated
         - Pre-compute part of rates to speed things up by O(10%)
 
+27/11/2009 JK
+        - Fixed bug in BB100/BB100_flux_Ne.dat file: Column for \bar{\nu}_e
+          was not zero.
+
 10/01/2010 JK (only branch wbb-tweaks)
         - Implemented experimental simulated annealing algorithm
           (is much too slow to be considered seriously)
@@ -120,8 +124,9 @@
 
 03/02/2010 JK (only branch wbb-tweaks)
         - Introduced function glbGetAEDLVariable
+
+30/03/2010 JK (only branch wbb-tweaks)
         - Fixed bug in Lexer leading to wrong line numbers in error messages
         - Fixed bug in Lexer leading to errors if "//" comments appear
           inside other contexts
-
 
