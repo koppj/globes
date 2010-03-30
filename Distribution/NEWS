@@ -101,11 +101,15 @@
         - Removed "inline" keywords from declaration of zhetrd3
           (tentatively fixes BUG#22)
 
-11/14/2009 JK
+14/11/2009 JK
         - Fixed bug in lexer/parser leading to possible access to
           memory blocks that have already been freed by flex/bison
 
-11/27/2009 JK
+27/11/2009 JK
         - Fixed bug in BB100/BB100_flux_Ne.dat file: Column for \bar{\nu}_e
           was not zero.
+
+30/03/2010 JK
+        - Fixed bug in Lexer leading to wrong line numbers in error messages
+        - Fixed bug in Lexer leading to errors if "//" comments appear
 
