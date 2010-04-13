@@ -130,3 +130,7 @@
         - Fixed bug in Lexer leading to errors if "//" comments appear
           inside other contexts
 
+13 Apr 2010 JK
+        - Fixed bug in glbGetFilterInExperiment -- function returned
+          only integer values
+
