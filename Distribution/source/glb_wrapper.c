@@ -2059,7 +2059,8 @@ glbSetFilterInExperiment(int experiment,double filter)
 double
 glbGetFilterInExperiment(int experiment)
 {
-  int i,out=-1;
+  int i;
+  double out = -1;
   struct glb_experiment *in;
   /* Testing the experiment number */
   if(!(((experiment >= 0)&&(experiment < glb_num_of_exps)))) { 

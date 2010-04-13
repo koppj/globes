@@ -113,3 +113,7 @@
         - Fixed bug in Lexer leading to wrong line numbers in error messages
         - Fixed bug in Lexer leading to errors if "//" comments appear
 
+13 Apr 2010 JK
+        - Fixed bug in glbGetFilterInExperiment -- function returned
+          only integer values
+
