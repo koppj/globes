@@ -22,6 +22,10 @@
 #ifndef GLB_SYS_H
 #define GLB_SYS_H 1
 
+#if HAVE_CONFIG_H   /* config.h should come before any other includes */
+#  include "config.h"
+#endif
+
 #include "glb_types.h"
 
 extern glb_systematic *glb_sys_list;

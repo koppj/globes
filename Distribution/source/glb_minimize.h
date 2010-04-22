@@ -22,6 +22,10 @@
 #ifndef GLB_MMINIMIZE_H
 #define GLB_MMINIMIZE_H 1
 
+#if HAVE_CONFIG_H   /* config.h should come before any other includes */
+#  include "config.h"
+#endif
+
 #include <glb_min_sup.h>
 
 

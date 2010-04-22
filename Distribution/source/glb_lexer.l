@@ -21,8 +21,6 @@
  */
 
 
-
-
 %pointer
 %option noyywrap
 
@@ -65,6 +63,10 @@
 
 
 %{
+#if HAVE_CONFIG_H   /* config.h should come before any other includes */
+#  include "config.h"
+#endif
+
 /* need this for the call to atof() below */
 #include <math.h>
 #include <string.h>

@@ -24,6 +24,10 @@
 
      
 %{
+#if HAVE_CONFIG_H   /* config.h should come before any other includes */
+#  include "config.h"
+#endif
+
 #define YYDEBUG 1
   //    yydebug=1;
 #include <math.h>
