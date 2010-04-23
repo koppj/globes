@@ -27,6 +27,9 @@
 //Gary V. Vaughan.
 
 
+#if HAVE_CONFIG_H   /* config.h should come before any other includes */
+#  include "config.h"
+#endif
 
 #include <stdlib.h>
 #include <string.h>

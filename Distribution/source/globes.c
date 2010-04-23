@@ -19,10 +19,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-
-
-
-
+#if HAVE_CONFIG_H   /* config.h should come before any other includes */
+#  include "config.h"
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -32,21 +31,14 @@
 #include <argp.h>
 #include <ctype.h>
 #include "glb_error.h"
-
-
 #include "globes/globes.h"
-
-#if HAVE_CONFIG_H
-#  include "config.h"
-#endif
-
 
 #ifdef TEST
 #include "glb_modules.h"
 #endif /* TEST */
 
 const char *argp_program_version =
-"globes "VERSION"\n(C) 2002 - 2007 The GLoBES Team\n"
+"globes "VERSION"\n(C) 2002 - 2010 The GLoBES Team\n"
 "This is free software see the source for copying conditions. There is NO\n"
 "warranty; not even for MERCHANTABILITY or"
 " FITNESS FOR A PARTICULAR PURPOSE.";

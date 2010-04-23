@@ -60,16 +60,16 @@
      BG = 276,
      ENERGY = 277,
      CHANNEL = 278,
-     GRPOPEN = 279,
-     GRPCLOSE = 280,
-     PM = 281,
-     FLAVOR = 282,
-     NOGLOBES = 283,
-     RULESEP = 284,
-     RULEMULT = 285,
-     NAME = 286,
-     RDF = 287,
-     NDEF = 288,
+     NDEF = 279,
+     GRPOPEN = 280,
+     GRPCLOSE = 281,
+     PM = 282,
+     FLAVOR = 283,
+     NOGLOBES = 284,
+     RULESEP = 285,
+     RULEMULT = 286,
+     NAME = 287,
+     RDF = 288,
      NEG = 289
    };
 #endif
@@ -95,16 +95,16 @@
 #define BG 276
 #define ENERGY 277
 #define CHANNEL 278
-#define GRPOPEN 279
-#define GRPCLOSE 280
-#define PM 281
-#define FLAVOR 282
-#define NOGLOBES 283
-#define RULESEP 284
-#define RULEMULT 285
-#define NAME 286
-#define RDF 287
-#define NDEF 288
+#define NDEF 279
+#define GRPOPEN 280
+#define GRPCLOSE 281
+#define PM 282
+#define FLAVOR 283
+#define NOGLOBES 284
+#define RULESEP 285
+#define RULEMULT 286
+#define NAME 287
+#define RDF 288
 #define NEG 289
 
 
@@ -116,7 +116,7 @@ typedef union YYSTYPE
 {
   double  val;  /* For returning numbers.                   */
   double *dpt;  /* for rules */
-  glb_List *ptr; 
+  glb_List *ptr;
   glb_List **ptrq;
   glb_symrec  *tptr;  /* For returning symbol-table pointers      */
   char *name;

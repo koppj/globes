@@ -19,6 +19,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
+#if HAVE_CONFIG_H   /* config.h should come before any other includes */
+#  include "config.h"
+#endif
 
 #include <ltdl.h>
 #include <stdio.h>
@@ -26,7 +29,6 @@
 #include <unistd.h>
 #include <globes/globes.h>
 #include <globes/glb-modules.h>
-
 #include "glb_path.h"
 #include "glb_error.h"
 

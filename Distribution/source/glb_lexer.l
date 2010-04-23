@@ -21,8 +21,6 @@
  */
 
 
-
-
 %pointer
 %option noyywrap
 
@@ -65,6 +63,10 @@
 
 
 %{
+#if HAVE_CONFIG_H   /* config.h should come before any other includes */
+#  include "config.h"
+#endif
+
 /* need this for the call to atof() below */
 #include <math.h>
 #include <string.h>
@@ -398,7 +400,7 @@ return s->type;
 
 #{ID}        {glb_namerec *s;
 s = glb_getname (yytext,"rule");
-if (s == 0) return NDEF;
+if (s == 0) { yylval.name=strdup(yytext); return NDEF; }
 yylval.nameptr = s;
 return s->type;
 }
@@ -479,7 +481,7 @@ return s->type;
 .           return (int) yytext[0];
 
 
-\n         /* yylloc.first_line++;*/ glb_line_num++; return '\n';
+\n         /* yylloc.first_line++;*/ glb_line_num++; /*return '\n';*/
 %%
 
 

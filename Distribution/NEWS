@@ -134,3 +134,21 @@
         - Fixed bug in glbGetFilterInExperiment -- function returned
           only integer values
 
+22 Apr 2010 JK
+        - Regenerated all autoconf/automake, libtool, gnulib stuff using
+          the latest versions of these packages:
+            aclocal 1.11.1
+            automake 1.11.1
+            autoconf 2.65
+            autoheader 2.65
+            libtool 2.65
+            gnulib-tool 0.0.3828-6d126
+          The procedure is
+            - Remove m4/ and lib/ directories
+            - Run gnulib-tool --import obstack argp mkstemp
+              (to get copy required modules from GNU library to our build tree)
+            - Get rpm.m4, swig.m4, swig_perl.m4, gsl.m4 macros and copy
+              to m4/
+            - Run aclocal -I m4, autoconf, automake, autoheader
+              (in this order)
+

@@ -20,8 +20,7 @@ dnl along with this program; if not, write to the Free Software
 dnl Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 dnl
 dnl Process this file with autoconf to produce a configure script.
-
-AC_PREREQ(2.57)
+AC_PREREQ(2.59)
 
 dnl Versioning of GLoBES
 dnl last digit: increment whenever code has changed
@@ -29,10 +28,10 @@ dnl middle digit: increment when features have been introduced/removed
 dnl first digit: major improvements/rewrites
 dnl In contrast to the result of autoupdate I had to swap the
 dnl the AC_INIT and AC_CONFIG_SRCDIR
-
-AC_INIT([GLoBES],[3.1.4],[globes@mpi-hd.mpg.de],[globes])
+AC_INIT([GLoBES],[3.1.5],[globes@mpi-hd.mpg.de],[globes])
 
 AC_CONFIG_SRCDIR([source/glb_wrapper.c])
+AC_CONFIG_MACRO_DIR([m4])
 
 dnl Tellin autoconf we are going to use automake
 AM_INIT_AUTOMAKE
@@ -40,6 +39,7 @@ AC_CONFIG_HEADERS([config.h:config-h.in])
 dnl To avoid problems due to clock skew and/or lacking autotools on
 dnl user system
 AM_MAINTAINER_MODE
+AM_SILENT_RULES([yes])  # Less verbose output from make
 
 dnl Versioning of libglobes.so
 dnl code changed: c:r+1:a
@@ -103,7 +103,7 @@ dnl Checks for libraries.
 AC_CHECK_LIB(m,main,[],AC_MSG_ERROR([libm not found]))
 
 dnl check for GSL
-AM_MY_PATH_GSL
+AM_PATH_GSL
 LIBS="$GSL_LIBS $LIBS"
 GSLINC="$GSL_CFLAGS"
 AC_SUBST(GSLINC)
@@ -137,6 +137,12 @@ AC_TYPE_SIZE_T
 
 dnl Checks for library functions.
 AC_CHECK_FUNCS([strdup mkstemp tempnam])
+AC_FUNC_ALLOCA
+LTALLOCA=`echo "$ALLOCA" | sed 's/\.[^.]* /.lo /g;s/\.[^.]*$/.lo/'`
+AC_SUBST(LTALLOCA)
+gl_ARGP
+dnl AM_XGETTEXT_OPTION([--flag=argp_error:2:c-format --flag=argp_failure:4:c-format])
+
 
 dnl Experimental rpm-builing support
 RPM_RELEASE=0
@@ -153,8 +159,6 @@ AC_CONFIG_FILES([Makefile lib/Makefile \
  globes/Makefile globes/example.pl source/Makefile\
  examples/Makefile\
  data/Makefile  globes-config])
-
-	
 
 
 AC_OUTPUT

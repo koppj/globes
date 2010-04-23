@@ -20,8 +20,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-
-
 /* This routines computes the smear matrix in the same way as CalcSmearA
    in GlobesMESbeta.m.
 
@@ -31,6 +29,10 @@
 
 #ifndef GLB_SMEAR_H
 #define GLB_SMEAR_H 1
+
+#if HAVE_CONFIG_H   /* config.h should come before any other includes */
+#  include "config.h"
+#endif
 
 #include "glb_types.h"
 

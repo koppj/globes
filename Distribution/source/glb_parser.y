@@ -19,13 +19,13 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-
-
-
-
 %{
+#if HAVE_CONFIG_H   /* config.h should come before any other includes */
+#  include "config.h"
+#endif
+
 #define YYDEBUG 1
-  //    yydebug=1;
+//int yydebug = 1; /* Uncomment this line to get debug output from the parser */
 #include <math.h>
 #include <ctype.h>
 #include <stdio.h>
@@ -81,7 +81,7 @@
   static int errordim_sys_off=-1;
   static char *context;
 
-  int yyerror (const char *s);           /* Forward declaration to suppress compiler warning */
+  int yyerror (const char *s, ...);           /* Forward declaration to suppress compiler warning */
 
 
   typedef struct
@@ -1039,13 +1039,14 @@ static int set_exp_energy(char *name, glb_List **value)
 %token <name> GRP GID FNAME VERS
 %token <name> SIGNAL BG
 %token <name> ENERGY CHANNEL
+%token <name> NDEF
 %token <in> GRPOPEN GRPCLOSE
 %token <in> PM FLAVOR
 %token <in> NOGLOBES
 %token <in> RULESEP RULEMULT
-%token <nameptr> NAME RDF NDEF
-%type <ptr> seq listcopy
-%type <ptrq> rule brule srule ene
+%token <nameptr> NAME RDF
+%type <ptr> seq list listcopy
+%type <ptrq> rule brule srule energy ene
 %type <dpt> rulepart
 %type <val> exp
 %type <val> group
@@ -1057,7 +1058,7 @@ static int set_exp_energy(char *name, glb_List **value)
 
 %type <name> version
 
-%expect 20
+%expect 2
 %nonassoc ','
 %right '='
 %left RULESEP
@@ -1070,70 +1071,60 @@ static int set_exp_energy(char *name, glb_List **value)
 %left NEG     /* Negation--unary minus */
 %right '^'    /* Exponentiation        */
 
-%% /* Grammar rules and actions follow */
+%%
+/* Grammar rules and actions */
+/* ------------------------- */
 
-input:    /* empty */
-| input line
+/* input: This is where the parser starts */
+input: topleveldirective {}
+| input topleveldirective {}
 | NOGLOBES {YYABORT;}
 | '§' {YYABORT;}
 ;
 
-line:   '\n'
-| outchannel '\n'
-| outrule '\n' { /*showlist($1[0]);showlist($1[1]);*/ }
-| exp '\n'  { /*printf ("\t%.10g\n", $1);*/  }
-| seq '\n'  { /*showlist($1);printf("\n");*/ }
-| group '\n' {}
-| error '\n' {yyerrok;}
-| channel '\n' {}
-| ene ';' '\n' {
- set_exp_energy("@energy",$1);
-}
-| rule '\n' {}
-| cross '\n' {/* printf("%s\n",$1);*/}
-| flux '\n' {/* printf("%s\n",$1);*/}
-| nuflux '\n' {/* printf("%s\n",$1);*/}
+/* topleveldirective: anything that can appear outside any groups */
+topleveldirective: group {}
+| exp {}
+| list {}
 ;
 
-
-
-exp:      NUM                { $$ = $1;                         }
-| NAME                { $$ = $1->value;              }
-| VAR                { $$ = $1->value.var;              }
-| VAR '=' exp        { $$ = $3; $1->value.var = $3;     }
+/* exp: An expression, including assignments, algebraic expressions, etc. */
+exp: NUM             { $$ = $1;                     }
+| NAME               { $$ = $1->value;              }
+| VAR                { $$ = $1->value.var;          }
+| VAR '=' exp        { $$ = $3; $1->value.var = $3; }
 | IDN '=' exp {
-  if(set_exp($1,$3,0)==1) yyerror("Unknown identifier");
+  if(set_exp($1,$3,0)==1) yyerror("Unknown identifier: %s", $1);
   $$ = $3;
   if ($1)  { glb_free($1);  $1=NULL; }
 }
 | IDN '=' SFNCT {
-  if(set_fnct($1,$3->sf)==1) yyerror("Unknown identifier");
+  if(set_fnct($1,$3->sf)==1) yyerror("Unknown identifier: %s", $1);
   if ($1)  { glb_free($1);  $1=NULL; }
 }
 | IDN '=' exp RULESEP exp {
-  if(set_pair($1,$3,$5,0)==1) yyerror("Unknown identifier");
+  if(set_pair($1,$3,$5,0)==1) yyerror("Unknown identifier: %s", $1);
   $$ = $3;
   if ($1)  { glb_free($1);  $1=NULL; }
 }
 | FNCT '(' exp ')'   {
   /* added safety in case the function pointer is NULL, which is
      sometimes useful for special functions */
-  if($1->value.fnctptr==NULL) yyerror("Improper use of special function");
+  if($1->value.fnctptr==NULL) yyerror("Improper use of special function %s", $1->name);
   else $$ = (*($1->value.fnctptr))($3); }
 
-| exp '+' exp        { $$ = $1 + $3;                    }
-| exp '-' exp        { $$ = $1 - $3;                    }
-| exp '*' exp        { $$ = $1 * $3;                    }
-| exp '/' exp        { $$ = $1 / $3;                    }
-| '-' exp  %prec NEG { $$ = -$2;                        }
-| exp '^' exp        { $$ = pow ($1, $3);               }
-| '(' exp ')'        { $$ = $2;                         }
-| version            { $$ = 0;}
-| NDEF               {yyerror("Unknown name");YYERROR;}
+| exp '+' exp        { $$ = $1 + $3;      }
+| exp '-' exp        { $$ = $1 - $3;      }
+| exp '*' exp        { $$ = $1 * $3;      }
+| exp '/' exp        { $$ = $1 / $3;      }
+| '-' exp  %prec NEG { $$ = -$2;          }
+| exp '^' exp        { $$ = pow ($1, $3); }
+| '(' exp ')'        { $$ = $2;           }
+| version            { $$ = 0;            }
+| NDEF               { yyerror("Unknown name: %s", $1); YYERROR; }
 ;
 
-
-
+/* listcopy: A statement that duplicates a list */
 listcopy: IDN RULESEP '=' LVAR {
   glb_List *ltemp;
   ltemp=thread_list(&glb_list_copy,0,0,$4->list);
@@ -1142,53 +1133,35 @@ listcopy: IDN RULESEP '=' LVAR {
   if ($1)  { glb_free($1);  $1=NULL; }
 }
 
-
-
-seq:    exp  ','        {$$=list_cons(NULL,$1); }
-|    exp  ',' '\n'        {$$=list_cons(NULL,$1); }
-|  seq  exp ',' {
-  glb_List *buf;
-  buf=$1;
-  buf=list_cons(buf,$2);
-  $$=buf;
+/* seq: A comma-separated sequence of expressions */
+seq: exp ',' exp {
+   glb_List *buf = list_cons(NULL, $1);
+   buf = list_cons(buf, $3);
+   $$  = buf;
 }
+| seq ',' exp { $$ = list_cons($1, $3); }
+;
 
-|  seq  exp ',' '\n' {
-  glb_List *buf;
-  buf=$1;
-  buf=list_cons(buf,$2);
-  $$=buf;
-}
-|  seq  exp  {
-  glb_List *buf;
-  buf=$1;
-  buf=list_cons(buf,$2);
-  $$=buf;
-}
-| '{' '}'      {$$=NULL;}
+/* list: A list, i.e. a sequence enclosed in { } */
+list: '{' '}'  {$$=NULL;}
 | '{' seq '}'  {$$=$2; }
 | '{' exp '}'  {$$=list_cons(NULL,$2); }
-
-
-| IDN '=' seq {
+| IDN '=' list {
   if(set_exp_list($1,$3,3)==1)  yyerror("Unknown identifier");
   $$ = $3;
   if ($1)  { glb_free($1);  $1=NULL; }
- }
-
-//| FNCT '{' exp '}'   { $$ = ($1->value.lfnctptr)($3); }
+}
 | FNCT '(' seq ')' {$$ = thread_list($1->value.fnctptr,$1->reverse,$1->destroy,$3);}
+| FNCT '(' list ')' {$$ = thread_list($1->value.fnctptr,$1->reverse,$1->destroy,$3);}
 | FNCT '('')' {$$ = (*($1->value.lfnctptr))();}
 | LVAR                { $$ = $1->list;              }
-| LVAR '=' seq        { $$ = $3; $1->list = $3;/* printf("%s ",$1->name);showlist($3);printf("\n");*/ }
-| FNCT '(' seq ',' seq ',' exp  ','seq')'          {$$=glb_interpolation($3,$5,floor($7),$9);}
+| LVAR '=' list       { $$ = $3; $1->list = $3; }
+| FNCT '(' list ',' list ',' exp  ',' list ')'          {$$=glb_interpolation($3,$5,floor($7),$9);}
 | listcopy {}
 ;
 
-
-
+/* rulepart: Building block of signal and background rules */
 rulepart: exp RULEMULT exp {
-
   double *buf;
   buf=(double*) glb_malloc(sizeof(double)*2);
   buf[0]=$1;
@@ -1197,10 +1170,7 @@ rulepart: exp RULEMULT exp {
 }
 ;
 
-expseq: line {}
-|expseq line {}
-;
-
+/* group: An environment containing statements that belong together */
 group: GID '(' NAME ')'
 { if($3->value==-1) {$3->value=step_counter($1); }
   loc_count=$3->value;
@@ -1209,26 +1179,32 @@ group: GID '(' NAME ')'
   grp_start(context);
   if ($1)  { glb_free($1);  $1=NULL; }
 }
-GRPOPEN ingroup  GRPCLOSE {
+GRPOPEN ingroup GRPCLOSE {
   grp_end(context);
 }
 | GID '(' RDF ')' GRPOPEN ingroup  GRPCLOSE {
-    yyerror("Redefinition of an automatic variable"); YYERROR;
+    yyerror("Redefinition of an automatic variable %s", $3->name); YYERROR;
     if ($1)  { glb_free($1);  $1=NULL; }
 }
 ;
 
+/* ingroup: The contents of a group environment */
 ingroup: /* empty */
-| exp {}
+| ingroup ingroup_statement
+;
+
+/* ingroup_statement: A single statement inside a group */
+ingroup_statement: exp {}
+| list {}
 | rule {}
-| expseq {}
+| energy {}
 | channel {}
 | cross {}
 | flux {}
 | nuflux {}
-
 ;
 
+/* version: A version declaration */
 version: VERS '=' FNAME {
   buff.version=strdup($3);
   if ($1)  { glb_free($1);  $1=NULL; }
@@ -1236,6 +1212,7 @@ version: VERS '=' FNAME {
 }
 ;
 
+/* cross: Specification of a cross sections file (to be used inside cross group) */
 cross: CROSS '=' FNAME {
   //load_cross($3,loc_count-1);
   xsc.file_name=strdup($3);
@@ -1245,6 +1222,7 @@ cross: CROSS '=' FNAME {
 }
 ;
 
+/* flux: Specification of flux file (to be used inside flux group) */
 flux: FLUXP '=' FNAME {
   //load_flux($3,loc_count-1,1);
   flt.file_name=strdup($3);
@@ -1256,7 +1234,7 @@ flux: FLUXP '=' FNAME {
 }
 ;
 
-
+/* nuflux: same as flux, but for nuflux group */
 nuflux: NUFLUX '=' FNAME {
   //load_flux($3,loc_count-1,1);
   flt.file_name=strdup($3);
@@ -1268,22 +1246,7 @@ nuflux: NUFLUX '=' FNAME {
 }
 ;
 
-
-rule: SYS_ON_FUNCTION '=' FNAME {
-  buff.sys_on_strings[buff.numofrules-1] = strdup($3);
-  if ($1)  { glb_free($1);  $1=NULL; }
-  if ($3)  { glb_free($3);  $3=NULL; }
-}
-;
-
-rule: SYS_OFF_FUNCTION '=' FNAME {
-  buff.sys_off_strings[buff.numofrules-1] = strdup($3);
-  if ($1)  { glb_free($1);  $1=NULL; }
-  if ($3)  { glb_free($3);  $3=NULL; }
-}
-;
-
-
+/* channel: A channel definition */
 channel: CHANNEL '=' name RULESEP pm RULESEP FLAVOR RULESEP FLAVOR RULESEP
  name RULESEP name {
 
@@ -1300,19 +1263,20 @@ channel: CHANNEL '=' name RULESEP pm RULESEP FLAVOR RULESEP FLAVOR RULESEP
 }
 ;
 
+/* name */
 /* FIXME, maybe we had a bug here */
 name: NAME {$$=$1;}
-|NDEF {yyerror("Unknown name");YYERROR;}
+| NDEF { yyerror("Unknown name: %s", $1); YYERROR; }
 ;
 
-
+/* unary plus/minus */
 pm: PM {$$=$1;}
 | '+' {$$=1;}
 | '-' {$$=-1;}
 ;
 
-
-ene: ENERGY '='  seq   {
+/* ene: Building block of user-defined smearing matrix */
+ene: ENERGY '='  list   {
   glb_List **buf;
   energy_len=1;
 
@@ -1321,7 +1285,7 @@ ene: ENERGY '='  seq   {
   $$=buf;
   if ($1)  { glb_free($1);  $1=NULL; }
 }
-| ene RULESEP seq
+| ene RULESEP list
 {
   glb_List **buf;
   buf=$1;
@@ -1330,21 +1294,16 @@ ene: ENERGY '='  seq   {
   buf=(glb_List**) glb_realloc((void**) buf , sizeof( glb_List* ) * energy_len);
 
   buf[energy_len-1]=$3;
-  $$=buf; }
-| ene RULESEP '\n' seq
-{
-  glb_List **buf;
-  buf=$1;
-  energy_len++;
-
-  buf=(glb_List**) glb_realloc((void**) buf , sizeof( glb_List* ) * energy_len);
-
-  buf[energy_len-1]=$4;
-  $$=buf; }
+  $$=buf;
+}
 ;
 
+/* energy: User-defined smearing matrix */
+energy: ene { set_exp_energy("@energy",$1); }
+| ene ';'   { set_exp_energy("@energy",$1); }
+;
 
-
+/* brule: Background rule */
 brule: BG '=' rulepart {
   glb_List **buf;
   buf=(glb_List**) glb_malloc(sizeof(glb_List*)*2);
@@ -1364,6 +1323,7 @@ brule: BG '=' rulepart {
 }
 ;
 
+/* srule: Signal rule */
 srule: SIGNAL '=' rulepart {
   glb_List **buf;
 
@@ -1384,68 +1344,68 @@ srule: SIGNAL '=' rulepart {
 }
 ;
 
+/* rule: Anything that can appear inside a rule environment */
 rule: brule {
-
-int flag;
-
+  int flag;
   $$=$1;
-
   flag=set_exp_list("bgrulescoeff",$1[0],0);
-  if(flag==1) yyerror("Unknown identifier");
+  if(flag==1) yyerror("Invalid coefficient in @background");
   flag=set_exp_list("bgrulechannellist",$1[1],0);
-  if(flag==1) yyerror("Unknown identifier");
-
+  if(flag==1) yyerror("Invalid channel in @background");
   glb_free($1);
 }
 | srule {
   int flag;
   $$=$1;
   flag=set_exp_list("rulescoeff",$1[0],0);
-  if(flag==1) yyerror("Unknown identifier");
+  if(flag==1) yyerror("Invalid coefficient in @signal");
   flag=set_exp_list("rulechannellist",$1[1],0);
-  if(flag==1) yyerror("Unknown identifier");
-
+  if(flag==1) yyerror("Invalid channel in @signal");
   glb_free($1);
-
-
 }
-;
-
-outrule: NAME {
- if($1->value==-1) {$1->value=step_counter("rule");printf("loc step\n"); }
-  loc_count=$1->value;
-  printf("loc_count %d \n",loc_count);
-  YYERROR;}
-  rule { YYERROR;}
-;
-
-
-outchannel: NAME {
- if($1->value==-1) {$1->value=step_counter("channel");printf("loc step\n"); }
-  loc_count=$1->value;
-  printf("cha loc_count %d \n",loc_count); YYERROR;}
-  channel { YYERROR;}
+| SYS_ON_FUNCTION '=' FNAME {
+  buff.sys_on_strings[buff.numofrules-1] = strdup($3);
+  if ($1)  { glb_free($1);  $1=NULL; }
+  if ($3)  { glb_free($3);  $3=NULL; }
+}
+| SYS_OFF_FUNCTION '=' FNAME {
+  buff.sys_off_strings[buff.numofrules-1] = strdup($3);
+  if ($1)  { glb_free($1);  $1=NULL; }
+  if ($3)  { glb_free($3);  $3=NULL; }
+}
 ;
 
 %%
 
 extern glb_symrec *sym_table;
 
-int
-yyerror (const char *s)  /* Called by yyparse on error */
+
+
+/***************************************************************************
+ * Function yyerror                                                        *
+ ***************************************************************************
+ * Print parser errors including the line number where the error occured   *
+ ***************************************************************************/
+int yyerror (const char *s, ...)  /* Called by yyparse on error */
 {
-  if(yydebug==1) fprintf(stderr,"*****************************************\n");
-  fprintf (stderr,"%s: ERROR: %s in file [%s]: in line %d\n",
-	   glb_prog_name,s,glb_file_id,glb_line_num+1);
-  if(yydebug==1) fprintf(stderr,"*****************************************\n");
+  va_list args;
+  va_start(args, s);
+
+  if(yydebug > 0) fprintf(stderr,"*****************************************\n");
+  fprintf (stderr,"%s:%d: error: ",
+	   glb_file_id, glb_line_num+1);
+  vfprintf(stderr, s, args);
+  fprintf(stderr, "\n");
+  if(yydebug > 0) fprintf(stderr,"*****************************************\n");
+  va_end(args);
   return 0;
 }
 
 int
 yywarn (const char *s)  /* Called by yyparse on warning */
 {
-  fprintf (stderr,"%s: Warning: %s in line %d\n",
-	   glb_prog_name,s,glb_line_num);
+  fprintf (stderr,"%s:%d: warning: %s\n",
+	   glb_file_id, glb_line_num+1, s);
   return 0;
 }
 
