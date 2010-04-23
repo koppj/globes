@@ -67,8 +67,6 @@ int main(int argc, char *argv[])
   /* The simulated data are computed */
   glbSetOscillationParameters(true_values);
   glbSetRates();
-  printf("Total rule rate: %g\n",
-         glbTotalRuleRate(0, 0, GLB_ALL, GLB_EFF, GLB_W_BG, GLB_W_COEFF, GLB_SIG));
 
   /* Iteration over all values to be computed */
   double thetheta13,x,y,res;    
