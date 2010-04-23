@@ -116,7 +116,7 @@ typedef union YYSTYPE
 {
   double  val;  /* For returning numbers.                   */
   double *dpt;  /* for rules */
-  glb_List *ptr; 
+  glb_List *ptr;
   glb_List **ptrq;
   glb_symrec  *tptr;  /* For returning symbol-table pointers      */
   char *name;

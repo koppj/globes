@@ -734,9 +734,9 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = 1.5 gnits
-SUBDIRS =
-noinst_HEADERS =
-noinst_LIBRARIES =
+SUBDIRS = 
+noinst_HEADERS = 
+noinst_LIBRARIES = 
 noinst_LTLIBRARIES = libgnu.la
 EXTRA_DIST = alloca.c alloca.in.h $(top_srcdir)/./arg-nonnull.h \
 	$(top_srcdir)/./c++defs.h basename-lgpl.c dirname-lgpl.c \
@@ -765,7 +765,7 @@ BUILT_SOURCES = $(ALLOCA_H) arg-nonnull.h c++defs.h $(ERRNO_H) \
 	$(FLOAT_H) $(GETOPT_H) $(STDBOOL_H) $(STDDEF_H) $(STDINT_H) \
 	stdio.h stdlib.h string.h strings.h $(SYSEXITS_H) unistd.h \
 	warn-on-use.h wchar.h
-SUFFIXES =
+SUFFIXES = 
 MOSTLYCLEANFILES = core *.stackdump alloca.h alloca.h-t arg-nonnull.h \
 	arg-nonnull.h-t c++defs.h c++defs.h-t errno.h errno.h-t \
 	float.h float.h-t getopt.h getopt.h-t stdbool.h stdbool.h-t \
@@ -773,12 +773,12 @@ MOSTLYCLEANFILES = core *.stackdump alloca.h alloca.h-t arg-nonnull.h \
 	stdlib.h stdlib.h-t string.h string.h-t strings.h strings.h-t \
 	sysexits.h sysexits.h-t unistd.h unistd.h-t warn-on-use.h \
 	warn-on-use.h-t wchar.h wchar.h-t
-MOSTLYCLEANDIRS =
-CLEANFILES =
-DISTCLEANFILES =
-MAINTAINERCLEANFILES =
-AM_CPPFLAGS =
-AM_CFLAGS =
+MOSTLYCLEANDIRS = 
+CLEANFILES = 
+DISTCLEANFILES = 
+MAINTAINERCLEANFILES = 
+AM_CPPFLAGS = 
+AM_CFLAGS = 
 libgnu_la_SOURCES = argp.h argp-ba.c argp-eexst.c argp-fmtstream.c \
 	argp-fmtstream.h argp-fs-xinl.c argp-help.c argp-namefrob.h \
 	argp-parse.c argp-pin.c argp-pv.c argp-pvh.c argp-xinl.c \
@@ -842,7 +842,7 @@ clean-noinstLTLIBRARIES:
 	  echo "rm -f \"$${dir}/so_locations\""; \
 	  rm -f "$${dir}/so_locations"; \
 	done
-libgnu.la: $(libgnu_la_OBJECTS) $(libgnu_la_DEPENDENCIES)
+libgnu.la: $(libgnu_la_OBJECTS) $(libgnu_la_DEPENDENCIES) 
 	$(AM_V_CCLD)$(libgnu_la_LINK)  $(libgnu_la_OBJECTS) $(libgnu_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:

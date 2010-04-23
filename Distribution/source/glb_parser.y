@@ -81,7 +81,7 @@
   static int errordim_sys_off=-1;
   static char *context;
 
-  int yyerror (const char *s);           /* Forward declaration to suppress compiler warning */
+  int yyerror (const char *s, ...);           /* Forward declaration to suppress compiler warning */
 
 
   typedef struct
@@ -1094,39 +1094,34 @@ exp: NUM             { $$ = $1;                     }
 | VAR                { $$ = $1->value.var;          }
 | VAR '=' exp        { $$ = $3; $1->value.var = $3; }
 | IDN '=' exp {
-  if(set_exp($1,$3,0)==1) yyerror("Unknown identifier");
+  if(set_exp($1,$3,0)==1) yyerror("Unknown identifier: %s", $1);
   $$ = $3;
   if ($1)  { glb_free($1);  $1=NULL; }
 }
 | IDN '=' SFNCT {
-  if(set_fnct($1,$3->sf)==1) yyerror("Unknown identifier");
+  if(set_fnct($1,$3->sf)==1) yyerror("Unknown identifier: %s", $1);
   if ($1)  { glb_free($1);  $1=NULL; }
 }
 | IDN '=' exp RULESEP exp {
-  if(set_pair($1,$3,$5,0)==1) yyerror("Unknown identifier");
+  if(set_pair($1,$3,$5,0)==1) yyerror("Unknown identifier: %s", $1);
   $$ = $3;
   if ($1)  { glb_free($1);  $1=NULL; }
 }
 | FNCT '(' exp ')'   {
   /* added safety in case the function pointer is NULL, which is
      sometimes useful for special functions */
-  if($1->value.fnctptr==NULL) yyerror("Improper use of special function");
+  if($1->value.fnctptr==NULL) yyerror("Improper use of special function %s", $1->name);
   else $$ = (*($1->value.fnctptr))($3); }
 
-| exp '+' exp        { $$ = $1 + $3;                    }
-| exp '-' exp        { $$ = $1 - $3;                    }
-| exp '*' exp        { $$ = $1 * $3;                    }
-| exp '/' exp        { $$ = $1 / $3;                    }
-| '-' exp  %prec NEG { $$ = -$2;                        }
-| exp '^' exp        { $$ = pow ($1, $3);               }
-| '(' exp ')'        { $$ = $2;                         }
-| version            { $$ = 0;}
-| NDEF {
-  char s[strlen($1) + 20];
-  sprintf(s, "Unknown name: %s", $1);
-  yyerror(s);
-  YYERROR;
-}
+| exp '+' exp        { $$ = $1 + $3;      }
+| exp '-' exp        { $$ = $1 - $3;      }
+| exp '*' exp        { $$ = $1 * $3;      }
+| exp '/' exp        { $$ = $1 / $3;      }
+| '-' exp  %prec NEG { $$ = -$2;          }
+| exp '^' exp        { $$ = pow ($1, $3); }
+| '(' exp ')'        { $$ = $2;           }
+| version            { $$ = 0;            }
+| NDEF               { yyerror("Unknown name: %s", $1); YYERROR; }
 ;
 
 /* listcopy: A statement that duplicates a list */
@@ -1188,7 +1183,7 @@ GRPOPEN ingroup GRPCLOSE {
   grp_end(context);
 }
 | GID '(' RDF ')' GRPOPEN ingroup  GRPCLOSE {
-    yyerror("Redefinition of an automatic variable"); YYERROR;
+    yyerror("Redefinition of an automatic variable %s", $3->name); YYERROR;
     if ($1)  { glb_free($1);  $1=NULL; }
 }
 ;
@@ -1271,12 +1266,7 @@ channel: CHANNEL '=' name RULESEP pm RULESEP FLAVOR RULESEP FLAVOR RULESEP
 /* name */
 /* FIXME, maybe we had a bug here */
 name: NAME {$$=$1;}
-|NDEF {
-  char s[strlen($1) + 20];
-  sprintf(s, "Unknown name: %s", $1);
-  yyerror(s);
-  YYERROR;
-}
+| NDEF { yyerror("Unknown name: %s", $1); YYERROR; }
 ;
 
 /* unary plus/minus */
@@ -1359,18 +1349,18 @@ rule: brule {
   int flag;
   $$=$1;
   flag=set_exp_list("bgrulescoeff",$1[0],0);
-  if(flag==1) yyerror("Unknown identifier");
+  if(flag==1) yyerror("Invalid coefficient in @background");
   flag=set_exp_list("bgrulechannellist",$1[1],0);
-  if(flag==1) yyerror("Unknown identifier");
+  if(flag==1) yyerror("Invalid channel in @background");
   glb_free($1);
 }
 | srule {
   int flag;
   $$=$1;
   flag=set_exp_list("rulescoeff",$1[0],0);
-  if(flag==1) yyerror("Unknown identifier");
+  if(flag==1) yyerror("Invalid coefficient in @signal");
   flag=set_exp_list("rulechannellist",$1[1],0);
-  if(flag==1) yyerror("Unknown identifier");
+  if(flag==1) yyerror("Invalid channel in @signal");
   glb_free($1);
 }
 | SYS_ON_FUNCTION '=' FNAME {
@@ -1389,21 +1379,33 @@ rule: brule {
 
 extern glb_symrec *sym_table;
 
-int
-yyerror (const char *s)  /* Called by yyparse on error */
+
+
+/***************************************************************************
+ * Function yyerror                                                        *
+ ***************************************************************************
+ * Print parser errors including the line number where the error occured   *
+ ***************************************************************************/
+int yyerror (const char *s, ...)  /* Called by yyparse on error */
 {
-  if(yydebug==1) fprintf(stderr,"*****************************************\n");
-  fprintf (stderr,"%s: ERROR in file [%s], line %d: %s\n",
-	   glb_prog_name, glb_file_id, glb_line_num+1, s);
-  if(yydebug==1) fprintf(stderr,"*****************************************\n");
+  va_list args;
+  va_start(args, s);
+
+  if(yydebug > 0) fprintf(stderr,"*****************************************\n");
+  fprintf (stderr,"%s:%d: error: ",
+	   glb_file_id, glb_line_num+1);
+  vfprintf(stderr, s, args);
+  fprintf(stderr, "\n");
+  if(yydebug > 0) fprintf(stderr,"*****************************************\n");
+  va_end(args);
   return 0;
 }
 
 int
 yywarn (const char *s)  /* Called by yyparse on warning */
 {
-  fprintf (stderr,"%s: Warning: %s in line %d\n",
-	   glb_prog_name,s,glb_line_num);
+  fprintf (stderr,"%s:%d: warning: %s\n",
+	   glb_file_id, glb_line_num+1, s);
   return 0;
 }
 

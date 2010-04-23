@@ -201,7 +201,7 @@
   static int errordim_sys_off=-1;
   static char *context;
 
-  int yyerror (const char *s);           /* Forward declaration to suppress compiler warning */
+  int yyerror (const char *s, ...);           /* Forward declaration to suppress compiler warning */
 
 
   typedef struct
@@ -1138,7 +1138,7 @@ static int set_exp_energy(char *name, glb_List **value)
 }
 
 
-
+ 
 
 /* Enabling traces.  */
 #ifndef YYDEBUG
@@ -1509,8 +1509,8 @@ static const yytype_uint16 yyrline[] =
     1147,  1148,  1149,  1154,  1155,  1156,  1157,  1158,  1159,  1160,
     1164,  1175,  1174,  1185,  1192,  1193,  1197,  1198,  1199,  1200,
     1201,  1202,  1203,  1204,  1208,  1216,  1226,  1238,  1250,  1268,
-    1269,  1279,  1280,  1281,  1285,  1294,  1308,  1309,  1313,  1322,
-    1333,  1343,  1354,  1363,  1372,  1377
+    1269,  1273,  1274,  1275,  1279,  1288,  1302,  1303,  1307,  1316,
+    1327,  1337,  1348,  1357,  1366,  1371
 };
 #endif
 
@@ -2310,7 +2310,7 @@ yyparse ()
 #endif
 #endif
 {
-
+  
   int yystate;
   int yyn;
   int yyresult;
@@ -2612,7 +2612,7 @@ yyreduce:
   case 13:
 #line 1096 "glb_parser.y"
     {
-  if(set_exp((yyvsp[(1) - (3)].name),(yyvsp[(3) - (3)].val),0)==1) yyerror("Unknown identifier");
+  if(set_exp((yyvsp[(1) - (3)].name),(yyvsp[(3) - (3)].val),0)==1) yyerror("Unknown identifier: %s", (yyvsp[(1) - (3)].name));
   (yyval.val) = (yyvsp[(3) - (3)].val);
   if ((yyvsp[(1) - (3)].name))  { glb_free((yyvsp[(1) - (3)].name));  (yyvsp[(1) - (3)].name)=NULL; }
 }
@@ -2621,7 +2621,7 @@ yyreduce:
   case 14:
 #line 1101 "glb_parser.y"
     {
-  if(set_fnct((yyvsp[(1) - (3)].name),(yyvsp[(3) - (3)].nameptr)->sf)==1) yyerror("Unknown identifier");
+  if(set_fnct((yyvsp[(1) - (3)].name),(yyvsp[(3) - (3)].nameptr)->sf)==1) yyerror("Unknown identifier: %s", (yyvsp[(1) - (3)].name));
   if ((yyvsp[(1) - (3)].name))  { glb_free((yyvsp[(1) - (3)].name));  (yyvsp[(1) - (3)].name)=NULL; }
 }
     break;
@@ -2629,7 +2629,7 @@ yyreduce:
   case 15:
 #line 1105 "glb_parser.y"
     {
-  if(set_pair((yyvsp[(1) - (5)].name),(yyvsp[(3) - (5)].val),(yyvsp[(5) - (5)].val),0)==1) yyerror("Unknown identifier");
+  if(set_pair((yyvsp[(1) - (5)].name),(yyvsp[(3) - (5)].val),(yyvsp[(5) - (5)].val),0)==1) yyerror("Unknown identifier: %s", (yyvsp[(1) - (5)].name));
   (yyval.val) = (yyvsp[(3) - (5)].val);
   if ((yyvsp[(1) - (5)].name))  { glb_free((yyvsp[(1) - (5)].name));  (yyvsp[(1) - (5)].name)=NULL; }
 }
@@ -2640,53 +2640,53 @@ yyreduce:
     {
   /* added safety in case the function pointer is NULL, which is
      sometimes useful for special functions */
-  if((yyvsp[(1) - (4)].tptr)->value.fnctptr==NULL) yyerror("Improper use of special function");
+  if((yyvsp[(1) - (4)].tptr)->value.fnctptr==NULL) yyerror("Improper use of special function %s", (yyvsp[(1) - (4)].tptr)->name);
   else (yyval.val) = (*((yyvsp[(1) - (4)].tptr)->value.fnctptr))((yyvsp[(3) - (4)].val)); }
     break;
 
   case 17:
 #line 1116 "glb_parser.y"
-    { (yyval.val) = (yyvsp[(1) - (3)].val) + (yyvsp[(3) - (3)].val);                    }
+    { (yyval.val) = (yyvsp[(1) - (3)].val) + (yyvsp[(3) - (3)].val);      }
     break;
 
   case 18:
 #line 1117 "glb_parser.y"
-    { (yyval.val) = (yyvsp[(1) - (3)].val) - (yyvsp[(3) - (3)].val);                    }
+    { (yyval.val) = (yyvsp[(1) - (3)].val) - (yyvsp[(3) - (3)].val);      }
     break;
 
   case 19:
 #line 1118 "glb_parser.y"
-    { (yyval.val) = (yyvsp[(1) - (3)].val) * (yyvsp[(3) - (3)].val);                    }
+    { (yyval.val) = (yyvsp[(1) - (3)].val) * (yyvsp[(3) - (3)].val);      }
     break;
 
   case 20:
 #line 1119 "glb_parser.y"
-    { (yyval.val) = (yyvsp[(1) - (3)].val) / (yyvsp[(3) - (3)].val);                    }
+    { (yyval.val) = (yyvsp[(1) - (3)].val) / (yyvsp[(3) - (3)].val);      }
     break;
 
   case 21:
 #line 1120 "glb_parser.y"
-    { (yyval.val) = -(yyvsp[(2) - (2)].val);                        }
+    { (yyval.val) = -(yyvsp[(2) - (2)].val);          }
     break;
 
   case 22:
 #line 1121 "glb_parser.y"
-    { (yyval.val) = pow ((yyvsp[(1) - (3)].val), (yyvsp[(3) - (3)].val));               }
+    { (yyval.val) = pow ((yyvsp[(1) - (3)].val), (yyvsp[(3) - (3)].val)); }
     break;
 
   case 23:
 #line 1122 "glb_parser.y"
-    { (yyval.val) = (yyvsp[(2) - (3)].val);                         }
+    { (yyval.val) = (yyvsp[(2) - (3)].val);           }
     break;
 
   case 24:
 #line 1123 "glb_parser.y"
-    { (yyval.val) = 0;}
+    { (yyval.val) = 0;            }
     break;
 
   case 25:
 #line 1124 "glb_parser.y"
-    {yyerror("Unknown name");YYERROR;}
+    { yyerror("Unknown name: %s", (yyvsp[(1) - (1)].name)); YYERROR; }
     break;
 
   case 26:
@@ -2805,7 +2805,7 @@ yyreduce:
   case 43:
 #line 1185 "glb_parser.y"
     {
-    yyerror("Redefinition of an automatic variable"); YYERROR;
+    yyerror("Redefinition of an automatic variable %s", (yyvsp[(3) - (7)].nameptr)->name); YYERROR;
     if ((yyvsp[(1) - (7)].name))  { glb_free((yyvsp[(1) - (7)].name));  (yyvsp[(1) - (7)].name)=NULL; }
 }
     break;
@@ -2920,32 +2920,26 @@ yyreduce:
 
   case 60:
 #line 1269 "glb_parser.y"
-    {
-  char s[strlen((yyvsp[(1) - (1)].name)) + 20];
-  sprintf(s, "Unknown name: %s", (yyvsp[(1) - (1)].name));
-  yyerror(s);
-//  yyerror("Unknown name");
-  YYERROR;
-}
+    { yyerror("Unknown name: %s", (yyvsp[(1) - (1)].name)); YYERROR; }
     break;
 
   case 61:
-#line 1279 "glb_parser.y"
+#line 1273 "glb_parser.y"
     {(yyval.in)=(yyvsp[(1) - (1)].in);}
     break;
 
   case 62:
-#line 1280 "glb_parser.y"
+#line 1274 "glb_parser.y"
     {(yyval.in)=1;}
     break;
 
   case 63:
-#line 1281 "glb_parser.y"
+#line 1275 "glb_parser.y"
     {(yyval.in)=-1;}
     break;
 
   case 64:
-#line 1285 "glb_parser.y"
+#line 1279 "glb_parser.y"
     {
   glb_List **buf;
   energy_len=1;
@@ -2958,7 +2952,7 @@ yyreduce:
     break;
 
   case 65:
-#line 1295 "glb_parser.y"
+#line 1289 "glb_parser.y"
     {
   glb_List **buf;
   buf=(yyvsp[(1) - (3)].ptrq);
@@ -2972,17 +2966,17 @@ yyreduce:
     break;
 
   case 66:
-#line 1308 "glb_parser.y"
+#line 1302 "glb_parser.y"
     { set_exp_energy("@energy",(yyvsp[(1) - (1)].ptrq)); }
     break;
 
   case 67:
-#line 1309 "glb_parser.y"
+#line 1303 "glb_parser.y"
     { set_exp_energy("@energy",(yyvsp[(1) - (2)].ptrq)); }
     break;
 
   case 68:
-#line 1313 "glb_parser.y"
+#line 1307 "glb_parser.y"
     {
   glb_List **buf;
   buf=(glb_List**) glb_malloc(sizeof(glb_List*)*2);
@@ -2995,7 +2989,7 @@ yyreduce:
     break;
 
   case 69:
-#line 1322 "glb_parser.y"
+#line 1316 "glb_parser.y"
     {
   glb_List **buf;
   buf=(yyvsp[(1) - (3)].ptrq);
@@ -3007,7 +3001,7 @@ yyreduce:
     break;
 
   case 70:
-#line 1333 "glb_parser.y"
+#line 1327 "glb_parser.y"
     {
   glb_List **buf;
 
@@ -3021,7 +3015,7 @@ yyreduce:
     break;
 
   case 71:
-#line 1343 "glb_parser.y"
+#line 1337 "glb_parser.y"
     {
   glb_List **buf;
   buf=(yyvsp[(1) - (3)].ptrq);
@@ -3033,33 +3027,33 @@ yyreduce:
     break;
 
   case 72:
-#line 1354 "glb_parser.y"
+#line 1348 "glb_parser.y"
     {
   int flag;
   (yyval.ptrq)=(yyvsp[(1) - (1)].ptrq);
   flag=set_exp_list("bgrulescoeff",(yyvsp[(1) - (1)].ptrq)[0],0);
-  if(flag==1) yyerror("Unknown identifier");
+  if(flag==1) yyerror("Invalid coefficient in @background");
   flag=set_exp_list("bgrulechannellist",(yyvsp[(1) - (1)].ptrq)[1],0);
-  if(flag==1) yyerror("Unknown identifier");
+  if(flag==1) yyerror("Invalid channel in @background");
   glb_free((yyvsp[(1) - (1)].ptrq));
 }
     break;
 
   case 73:
-#line 1363 "glb_parser.y"
+#line 1357 "glb_parser.y"
     {
   int flag;
   (yyval.ptrq)=(yyvsp[(1) - (1)].ptrq);
   flag=set_exp_list("rulescoeff",(yyvsp[(1) - (1)].ptrq)[0],0);
-  if(flag==1) yyerror("Unknown identifier");
+  if(flag==1) yyerror("Invalid coefficient in @signal");
   flag=set_exp_list("rulechannellist",(yyvsp[(1) - (1)].ptrq)[1],0);
-  if(flag==1) yyerror("Unknown identifier");
+  if(flag==1) yyerror("Invalid channel in @signal");
   glb_free((yyvsp[(1) - (1)].ptrq));
 }
     break;
 
   case 74:
-#line 1372 "glb_parser.y"
+#line 1366 "glb_parser.y"
     {
   buff.sys_on_strings[buff.numofrules-1] = strdup((yyvsp[(3) - (3)].name));
   if ((yyvsp[(1) - (3)].name))  { glb_free((yyvsp[(1) - (3)].name));  (yyvsp[(1) - (3)].name)=NULL; }
@@ -3068,7 +3062,7 @@ yyreduce:
     break;
 
   case 75:
-#line 1377 "glb_parser.y"
+#line 1371 "glb_parser.y"
     {
   buff.sys_off_strings[buff.numofrules-1] = strdup((yyvsp[(3) - (3)].name));
   if ((yyvsp[(1) - (3)].name))  { glb_free((yyvsp[(1) - (3)].name));  (yyvsp[(1) - (3)].name)=NULL; }
@@ -3078,7 +3072,7 @@ yyreduce:
 
 
 /* Line 1267 of yacc.c.  */
-#line 3082 "glb_parser.c"
+#line 3076 "glb_parser.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -3292,26 +3286,38 @@ yyreturn:
 }
 
 
-#line 1384 "glb_parser.y"
+#line 1378 "glb_parser.y"
 
 
 extern glb_symrec *sym_table;
 
-int
-yyerror (const char *s)  /* Called by yyparse on error */
+
+
+/***************************************************************************
+ * Function yyerror                                                        *
+ ***************************************************************************
+ * Print parser errors including the line number where the error occured   *
+ ***************************************************************************/
+int yyerror (const char *s, ...)  /* Called by yyparse on error */
 {
-  if(yydebug==1) fprintf(stderr,"*****************************************\n");
-  fprintf (stderr,"%s: ERROR in file [%s], line %d: %s\n",
-	   glb_prog_name, glb_file_id, glb_line_num+1, s);
-  if(yydebug==1) fprintf(stderr,"*****************************************\n");
+  va_list args;
+  va_start(args, s);
+
+  if(yydebug > 0) fprintf(stderr,"*****************************************\n");
+  fprintf (stderr,"%s:%d: error: ",
+	   glb_file_id, glb_line_num+1);
+  vfprintf(stderr, s, args);
+  fprintf(stderr, "\n");
+  if(yydebug > 0) fprintf(stderr,"*****************************************\n");
+  va_end(args);
   return 0;
 }
 
 int
 yywarn (const char *s)  /* Called by yyparse on warning */
 {
-  fprintf (stderr,"%s: Warning: %s in line %d\n",
-	   glb_prog_name,s,glb_line_num);
+  fprintf (stderr,"%s:%d: warning: %s\n",
+	   glb_file_id, glb_line_num+1, s);
   return 0;
 }
 
