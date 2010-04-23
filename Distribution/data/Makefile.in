@@ -668,7 +668,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-glbdatadir = $(datadir)/glb-files
+glbdatadir = $(datadir)/globes
 nobase_glbdata_DATA = \
 BetaBeam/BB100/AtmBckg_100.dat\
 BetaBeam/BB100/BB100flux_He.dat\

@@ -1,4 +1,4 @@
-glbdatadir = $(datadir)/glb-files
+glbdatadir = $(datadir)/globes
 nobase_glbdata_DATA = \
 BetaBeam/BB100/AtmBckg_100.dat\
 BetaBeam/BB100/BB100flux_He.dat\

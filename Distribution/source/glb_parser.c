@@ -87,16 +87,16 @@
      BG = 276,
      ENERGY = 277,
      CHANNEL = 278,
-     GRPOPEN = 279,
-     GRPCLOSE = 280,
-     PM = 281,
-     FLAVOR = 282,
-     NOGLOBES = 283,
-     RULESEP = 284,
-     RULEMULT = 285,
-     NAME = 286,
-     RDF = 287,
-     NDEF = 288,
+     NDEF = 279,
+     GRPOPEN = 280,
+     GRPCLOSE = 281,
+     PM = 282,
+     FLAVOR = 283,
+     NOGLOBES = 284,
+     RULESEP = 285,
+     RULEMULT = 286,
+     NAME = 287,
+     RDF = 288,
      NEG = 289
    };
 #endif
@@ -122,30 +122,30 @@
 #define BG 276
 #define ENERGY 277
 #define CHANNEL 278
-#define GRPOPEN 279
-#define GRPCLOSE 280
-#define PM 281
-#define FLAVOR 282
-#define NOGLOBES 283
-#define RULESEP 284
-#define RULEMULT 285
-#define NAME 286
-#define RDF 287
-#define NDEF 288
+#define NDEF 279
+#define GRPOPEN 280
+#define GRPCLOSE 281
+#define PM 282
+#define FLAVOR 283
+#define NOGLOBES 284
+#define RULESEP 285
+#define RULEMULT 286
+#define NAME 287
+#define RDF 288
 #define NEG 289
 
 
 
 
 /* Copy the first part of user declarations.  */
-#line 26 "glb_parser.y"
+#line 22 "glb_parser.y"
 
 #if HAVE_CONFIG_H   /* config.h should come before any other includes */
 #  include "config.h"
 #endif
 
 #define YYDEBUG 1
-  //    yydebug=1;
+//int yydebug = 1; /* Uncomment this line to get debug output from the parser */
 #include <math.h>
 #include <ctype.h>
 #include <stdio.h>
@@ -156,13 +156,13 @@
 #include "glb_multiex.h"
 #include "glb_types.h"
 #include "glb_error.h"
-#include "glb_lexer.h"  
+#include "glb_lexer.h"
 #include "glb_parser_type.h"
 #include "glb_fluxes.h"
 #include "glb_sys.h"
 #include "glb_minimize.h"
 
-#define TWICE 100  
+#define TWICE 100
 
 #define UNTYPE -1
 #define INT 0
@@ -187,7 +187,7 @@
 
   static int exp_count=1;
   static int energy_len;
-  static int loc_count; 
+  static int loc_count;
   static int energy_count=-1;
   static int cross_count=-1;
   static int flux_count=-1;
@@ -202,47 +202,47 @@
   static char *context;
 
   int yyerror (const char *s);           /* Forward declaration to suppress compiler warning */
-  
+
 
   typedef struct
   {
     char *token; // the string which is used as lhs in the ini-file
-    int scalar; // data type flag 
+    int scalar; // data type flag
     double rl;
     double ru; // allowed range
     void *ptr; // this is a pointer the corresponding part of the exp structure
     void *len; /* this is a pointer which points to the length of the vector
-		*  in a struct glb_experiment. Example: if we parse densitytab, 
+		*  in a struct glb_experiment. Example: if we parse densitytab,
 		*  this things points
-		*  to psteps 
+		*  to psteps
 		*/
-    
+
     char *ctx; /* here the type of the environment is given, e.g. rule
 		* thus the corresponding token is matched onyl within
-		* a rule type environment 
+		* a rule type environment
 		*/
   } glb_parser_decl;
-  
+
 
   static glb_parser_decl token_list[]={
     {"$version",CHAR,0,1E8,&buff.version,NULL,"global"},
     {"$parent_energy",DOUBLE,0,GMAX,&buff.emax,NULL,"global"},
     {"$target_mass",DOUBLE,0,GMAX,&buff.targetmass,NULL,"global"},
 #ifdef GLB_OLD_AEDL
-    {"$simbins" ,COUNTER,0,500,&buff.simbins,NULL,"global"}, 
+    {"$simbins" ,COUNTER,0,500,&buff.simbins,NULL,"global"},
     {"$simtresh" ,DOUBLE,0,GMAX,&buff.simtresh,NULL,"global"},
-    {"$simbeam" ,DOUBLE,0,GMAX,&buff.simbeam,NULL,"global"},  
+    {"$simbeam" ,DOUBLE,0,GMAX,&buff.simbeam,NULL,"global"},
     {"$numofbins",COUNTER,0,500,&buff.numofbins,NULL,"global"},
     {"$simbinsize",DOUBLE_LIST,0,GMAX,&buff.simbinsize,
      &buff.simbins,"global"},
 /* JK - Has been removed
-    {"$errorfunction",INT,0,1,&buff.errorfunction,NULL,"global"}, 
+    {"$errorfunction",INT,0,1,&buff.errorfunction,NULL,"global"},
     {"@treshold_setttings" ,DOUBLE_INDEXED_PAIR,
      0,100,&buff.bgtcenter[0],&loc_count,"rule"},
     {"@treshold_error" ,DOUBLE_INDEXED_PAIR,
      0,100,&buff.bgterror[0],&loc_count,"rule"}, */
 #endif /* GLB_OLD_AEDL */
-    {"$sampling_points" ,COUNTER,0,500,&buff.simbins,NULL,"global"}, 
+    {"$sampling_points" ,COUNTER,0,500,&buff.simbins,NULL,"global"},
     {"$sampling_min" ,DOUBLE,0,GMAX,&buff.simtresh,NULL,"global"},
     {"$sampling_max" ,DOUBLE,0,GMAX,&buff.simbeam,NULL,"global"},
     /* FIXME -- this was not properly recognized due to the fact the first match is performed
@@ -251,18 +251,18 @@
      * 'bins'
      */
     {"$binsize",DOUBLE_LIST,0,GMAX,&buff.binsize,
-     &buff.numofbins,"global"},  
-   
+     &buff.numofbins,"global"},
+
     {"$bins",COUNTER,0,500,&buff.numofbins,NULL,"global"},
-    {"$emin",DOUBLE,0,GMAX,&buff.emin,NULL,"global"}, 
+    {"$emin",DOUBLE,0,GMAX,&buff.emin,NULL,"global"},
     {"$emax",DOUBLE,0,GMAX,&buff.emax,NULL,"global"},
 
     {"$baseline",DOUBLE,0,2*GLB_EARTH_RADIUS,&buff.baseline,NULL,"global"},
     {"$profiletype",INT,1,3,&buff.density_profile_type,NULL,"global"},
- 
+
     {"$sampling_stepsize",DOUBLE_LIST,0,GMAX,&buff.simbinsize,
-     &buff.simbins,"global"}, 
-  
+     &buff.simbins,"global"},
+
    {"$densitytab",DOUBLE_LIST,0,GMAX,&buff.densitytab,&buff.psteps,"global"},
    {"$lengthtab",DOUBLE_LIST,0,2*GLB_EARTH_RADIUS,
     &buff.lengthtab,&buff.psteps,"global"},
@@ -270,7 +270,7 @@
     &buff.lengthofrules[0],"rule"},
    {"rulescoeff",DOUBLE_LIST_INDEXED,0,GMAX,&buff.rulescoeff[0],
     &buff.lengthofrules[0],"rule"},
-   
+
    {"bgrulechannellist",INT_LIST_INDEXED,0,GMAX,&buff.bgrulechannellist[0],
     &buff.lengthofbgrules[0],"rule"},
    {"bgrulescoeff",DOUBLE_LIST_INDEXED,0,GMAX,&buff.bgrulescoeff[0],
@@ -281,17 +281,17 @@
 
     {"@pre_smearing_efficiencies",DOUBLE_LIST_INDEXED,0,GMAX,
      &buff.user_pre_smearing_channel[0],&loc_count,"channel"},
-   
+
     {"@pre_smearing_background",DOUBLE_LIST_INDEXED,0,GMAX,
      &buff.user_pre_smearing_background[0],&loc_count,"channel"},
 
     {"@post_smearing_efficiencies",DOUBLE_LIST_INDEXED,0,GMAX,
      &buff.user_post_smearing_channel[0],&loc_count,"channel"},
-   
+
     {"@post_smearing_background",DOUBLE_LIST_INDEXED,0,GMAX,
      &buff.user_post_smearing_background[0],&loc_count,"channel"},
-    
- 
+
+
    {"@errordim_sys_on",INT,0,20,&errordim_sys_on,NULL,"rule"},
    {"@errordim_sys_off",INT,0,20,&errordim_sys_off,NULL,"rule"},
    {"@sys_on_function",CHAR,0,20,&buff.sys_on_strings[0],&loc_count,"rule"},
@@ -314,13 +314,13 @@
     &buff.sys_on_errors[0],&loc_count,"rule"},
    {"@sys_off_errors",DOUBLE_LIST_INDEXED,0,GMAX,
     &buff.sys_off_errors[0],&loc_count,"rule"},
-   
+
 
    {"@energy_window" ,DOUBLE_INDEXED_PAIR_INV,0,GMAX,&buff.energy_window[0],
     &loc_count,"rule"},
    {"$densitysteps",COUNTER,1,GMAX,&buff.psteps,NULL,"global"},
-  
-  
+
+
 
    {"$filter_state",INT,GLB_OFF,GLB_ON,&buff.filter_state,NULL,"global"},
    {"$filter_value",DOUBLE,0,GMAX,&buff.filter_value,NULL,"global"},
@@ -341,7 +341,7 @@
     {"@gamma",DOUBLE,0,GMAX,&flt.gamma,NULL,"flux"},
     {"@end_point",DOUBLE,0,GMAX,&flt.end_point,NULL,"flux"},
     {"@stored_ions",DOUBLE,0,GMAX,&flt.stored_muons,NULL,"flux"},
- 
+
 
 
     {"nuflux",UNTYPE,0,20,NULL,&buff.num_of_fluxes,"global"},
@@ -356,13 +356,13 @@
     {"@gamma",DOUBLE,0,GMAX,&flt.gamma,NULL,"nuflux"},
     {"@end_point",DOUBLE,0,GMAX,&flt.end_point,NULL,"nuflux"},
     {"@stored_ions",DOUBLE,0,GMAX,&flt.stored_muons,NULL,"nuflux"},
- 
+
 
    {"@type" ,INT,1,2,&ibf.type,&loc_count,"energy"},
    {"@sigma_e" ,DOUBLE_LIST,0,GMAX,&ibf.sigma,&ibf.num_of_params,"energy"},
    {"@sigma_function" ,FUN,0,1000,&ibf.sig_f,NULL,"energy"},
-    
-  
+
+
 
    {NULL,UNTYPE,0,0,NULL,NULL,"global"}
 };
@@ -374,23 +374,23 @@ static void grp_start(char* name)
        {
          /* Reset variables to default values */
          errordim_sys_on  = -1.0;
-         errordim_sys_off = -1.0; 
+         errordim_sys_off = -1.0;
        }
    }
 
- 
+
 static void grp_end(char* name)
    {
-     char tmp_errordim[2];    
-     
+     char tmp_errordim[2];
+
      if(strncmp(name,"energy",6)==0 )
        {
-	 if(buff.num_of_sm-1 >= 0)   
+	 if(buff.num_of_sm-1 >= 0)
 	   {
 	     ibf.options=glb_option_type_alloc();
 	     ibf.options=(glb_option_type *) memmove(ibf.options,&opt,
 					     sizeof(glb_option_type));
-	     
+
 	     if(buff.smear_data[buff.num_of_sm-1]==NULL)
 	       buff.smear_data[buff.num_of_sm-1]=glb_smear_alloc();
 	     buff.smear_data[buff.num_of_sm-1]=
@@ -399,18 +399,18 @@ static void grp_end(char* name)
 	     glb_option_type_reset(&opt);
 	     if(ibf.sigma!=NULL) glb_free(ibf.sigma);
 	     glb_smear_reset(&ibf);
-	     
+
 	   }
 
-       } 
+       }
 
      if(strncmp(name,"flux",4)==0 )
        {
-	
-	 if(buff.num_of_fluxes > 0)   
+
+	 if(buff.num_of_fluxes > 0)
 	   {
 	     glb_error("The 'flux' directive is deprecated.\n"
-		       "The flux normalization may not be what you expect.\n" 
+		       "The flux normalization may not be what you expect.\n"
 		       "Please, consult the manual!");
 	     if(flt.builtin<=0) flt.builtin=GLB_OLD_NORM;
 	     if(buff.fluxes[buff.num_of_fluxes-1]==NULL)
@@ -419,12 +419,12 @@ static void grp_end(char* name)
 	       cpy_glb_flux(buff.fluxes[buff.num_of_fluxes-1],&flt);
 	    glb_flux_reset(&flt);
 	   }
-       }  
+       }
 
 
      if(strncmp(name,"nuflux",6)==0 )
        {
-	 if(buff.num_of_fluxes > 0)   
+	 if(buff.num_of_fluxes > 0)
 	   {
 	     if(buff.fluxes[buff.num_of_fluxes-1]==NULL)
 	       buff.fluxes[buff.num_of_fluxes-1]=glb_flux_alloc();
@@ -432,11 +432,11 @@ static void grp_end(char* name)
 	       cpy_glb_flux(buff.fluxes[buff.num_of_fluxes-1],&flt);
 	    glb_flux_reset(&flt);
 	   }
-       }  
+       }
 
      if(strncmp(name,"cross",5)==0 )
        {
-	 if(buff.num_of_xsecs > 0)   
+	 if(buff.num_of_xsecs > 0)
 	   {
 	     if(buff.xsecs[buff.num_of_xsecs-1]==NULL)
 	       buff.xsecs[buff.num_of_xsecs-1]=glb_xsec_alloc();
@@ -444,7 +444,7 @@ static void grp_end(char* name)
 	       cpy_glb_xsec(buff.xsecs[buff.num_of_xsecs-1],&xsc);
 	     glb_xsec_reset(&xsc);
 	   }
-       }  
+       }
 
 
 
@@ -457,13 +457,13 @@ static void grp_end(char* name)
            buff.sys_on_strings[nr] = glbConvertErrorDim(errordim_sys_on);
          if (buff.sys_off_strings[nr] == NULL  &&  errordim_sys_off >= 0)
            buff.sys_off_strings[nr] = glbConvertErrorDim(errordim_sys_off);
-       } 
+       }
 
      glb_free(context);
      context = (char *) strdup("global");
-     
+
    }
-  
+
 static int set_channel_data(int x[6],int loc_count)
    {
      // I am sorry for this -- it's a kludge
@@ -477,10 +477,10 @@ static int set_channel_data(int x[6],int loc_count)
 
        buff.listofchannels[i][loc_count-1]=x[i];
      }
-     
+
 
      return 0;
-   } 
+   }
 
 
 static int step_counter(char *name)
@@ -493,7 +493,7 @@ static int step_counter(char *name)
       if(strncmp(name,token_list[i].token,
 		 strlen(token_list[i].token))==0 )
 	{
-	 
+
 		     ibf=(int*) token_list[i].len;
 		     if(*ibf==-1) *ibf=1;// first time encounter
 		     else (*ibf)++;
@@ -509,8 +509,8 @@ static int set_fnct(char *name,void *in)
 {
   int i;
   sigfun *dbf;
-  
- 
+
+
   for(i=0;token_list[i].token!=NULL;i++)
     {
       if(strncmp(name,token_list[i].token,
@@ -521,22 +521,22 @@ static int set_fnct(char *name,void *in)
 	     if(token_list[i].scalar==FUN) //double
 	       {
 		 dbf=(sigfun *) token_list[i].ptr;
-		 *dbf=(sigfun) in;	 
+		 *dbf=(sigfun) in;
 	      	 return 0;
 	       }
-	     else       
+	     else
 	       {
 		 fprintf(stderr,"Error: Value for %s out of range\n",
 			 token_list[i].token);
 		 return 2;
 	       }
 	}
-      
-      
-    }   
-  
-  
-  return 1;   
+
+
+    }
+
+
+  return 1;
 }
 
 
@@ -562,7 +562,7 @@ static int set_exp(char *name,double value,int scalar)
 		     *dbf=value;
 		     return 0;
 		   }
-		 else       
+		 else
 		   {
 		     fprintf(stderr,"Error: Value for %s out of range\n",
 			     token_list[i].token);
@@ -577,7 +577,7 @@ static int set_exp(char *name,double value,int scalar)
 		     *ibf=value;
 		     return 0;
 		   }
-		 else       
+		 else
 		   {
 		     fprintf(stderr,"Error: Value for %s out of range\n",
 			     token_list[i].token);
@@ -589,7 +589,7 @@ static int set_exp(char *name,double value,int scalar)
 	       {
 		 if(value >= token_list[i].rl && value <= token_list[i].ru)
 		   {
-		     
+
 		     ibf=(int*) token_list[i].ptr;
 		     if(!((*ibf == -1) || (*ibf == (int) value))) {
 		       glb_warning("Given length does not"
@@ -600,7 +600,7 @@ static int set_exp(char *name,double value,int scalar)
 		     *ibf=value;
 		     return 0;
 		   }
-		 else       
+		 else
 		   {
 		     fprintf(stderr,"Error: Value for %s out of range\n",
 			     token_list[i].token);
@@ -616,14 +616,14 @@ static int set_exp(char *name,double value,int scalar)
 		     xibf[loc_count-1]=(int) value;
 		     return 0;
 		   }
-		 else       
+		 else
 		   {
 		     fprintf(stderr,"Error: Value for %s out of range\n",
 			     token_list[i].token);
 		     return 2;
 		   }
 	       }
-	     
+
 	     if(token_list[i].scalar==DOUBLE_INDEXED) //int
 	       {
 		 if(value >= token_list[i].rl && value <= token_list[i].ru)
@@ -632,7 +632,7 @@ static int set_exp(char *name,double value,int scalar)
 		     dbf[loc_count-1]=(double) value;
 		     return 0;
 		   }
-		 else       
+		 else
 		   {
 		     fprintf(stderr,"Error: Value for %s out of range\n",
 			     token_list[i].token);
@@ -640,11 +640,11 @@ static int set_exp(char *name,double value,int scalar)
 		   }
 	       }
 
-	  
-	   }   
+
+	   }
        }
 
-   return 1;   
+   return 1;
 }
 
 static int set_pair(char *name,double value,double value2,int scalar)
@@ -663,20 +663,20 @@ static int set_pair(char *name,double value,double value2,int scalar)
 	       {
 		 if(value >= token_list[i].rl && value <= token_list[i].ru)
 		   {
-		    
+
 		     dbf=(double*) token_list[i].ptr;
 		     dbf[0]=(double) value;
 		     dbf[1]=(double) value2;
 		     return 0;
 		   }
-		 else       
+		 else
 		   {
 		     fprintf(stderr,"Error: Value for %s out of range\n",
 			     token_list[i].token);
 		     return 2;
 		   }
 	       }
-	     
+
 	     if(token_list[i].scalar==INT_INDEXED_PAIR) //int
 	       {
 		 if(value >= token_list[i].rl && value <= token_list[i].ru)
@@ -686,25 +686,25 @@ static int set_pair(char *name,double value,double value2,int scalar)
 		     ibf[(loc_count-1)+0*32]=(int) value;
 		     return 0;
 		   }
-		 else       
+		 else
 		   {
 		     fprintf(stderr,"Error: Value for %s out of range\n",
 			     token_list[i].token);
 		     return 2;
 		   }
 	       }
-	     
+
 	     if(token_list[i].scalar==DOUBLE_INDEXED_PAIR) //int
 	       {
 		 if(value >= token_list[i].rl && value <= token_list[i].ru)
 		   {
-		    
+
 		     dbf=(double*) token_list[i].ptr;
 		     dbf[(loc_count-1)+0*32]=(double) value;
 		     dbf[(loc_count-1)+1*32]=(double) value2;
 		     return 0;
 		   }
-		 else       
+		 else
 		   {
 		     fprintf(stderr,"Error: Value for %s out of range\n",
 			     token_list[i].token);
@@ -716,47 +716,47 @@ static int set_pair(char *name,double value,double value2,int scalar)
 	       {
 		 if(value >= token_list[i].rl && value <= token_list[i].ru)
 		   {
-		    
+
 		     dbf=(double*) token_list[i].ptr;
 		     dbf[(loc_count-1)*2+0]=(double) value;
 		     dbf[(loc_count-1)*2+1]=(double) value2;
 		     return 0;
 		   }
-		 else       
+		 else
 		   {
 		     fprintf(stderr,"Error: Value for %s out of range\n",
 			     token_list[i].token);
 		     return 2;
 		   }
 	       }
-	   }   
+	   }
        }
 
-   return 1;   
+   return 1;
 }
 
 
 static size_t list_length (glb_List *head)
 {
-  size_t n;  
+  size_t n;
   for (n = 0; head; ++n)
     head = head->next;
-  return n; 
+  return n;
 }
 
 
 static void list_free(glb_List *stale)
 {
  glb_List *ptr;
- glb_List *dummy;  
+ glb_List *dummy;
  ptr=stale;
  while(ptr != (glb_List *) NULL)
-   {	
+   {
      dummy=ptr->next;
      glb_free(ptr);
-     ptr=dummy;  
+     ptr=dummy;
    }
- 
+
 }
 
 
@@ -768,7 +768,7 @@ static double glb_reverse(double x)
 
 static glb_List *list_cons (glb_List *tail, double newdata)
 {
-  glb_List *res = (glb_List*) glb_malloc(sizeof(glb_List)); 
+  glb_List *res = (glb_List*) glb_malloc(sizeof(glb_List));
   res->next=tail;
   res->entry=newdata;
   return res;
@@ -793,7 +793,7 @@ static glb_List *thread_list(func_t f, int reverse, int destroy ,glb_List *tail)
   */
   if(reverse==1)
     {
-      head=tail;  
+      head=tail;
       for (n = 0; head; ++n)
 	{
 	  nv=f(head->entry);
@@ -805,8 +805,8 @@ static glb_List *thread_list(func_t f, int reverse, int destroy ,glb_List *tail)
     {
       double *rlist,x;
       l=list_length(tail);
-      rlist=(double *) malloc(sizeof(double)*l);   
-      head=tail;  
+      rlist=(double *) malloc(sizeof(double)*l);
+      head=tail;
       for (n = 0; head; ++n)
 	{
 	  rlist[n]=head->entry;
@@ -824,11 +824,11 @@ static glb_List *thread_list(func_t f, int reverse, int destroy ,glb_List *tail)
   if(destroy==-1) {list_free(res);res=tail;}
   return res;
 }
-     
+
 
 static void showlist(glb_List *lp)
-{ 
- 
+{
+
   if (lp){
     showlist(lp->next);             // show the tail
     printf("%.10g " , lp->entry);     // show the head
@@ -841,10 +841,10 @@ static double list_take(glb_List *li,int k)
   int i;
   double erg;
   glb_List *bf;
-  bf=li; 
+  bf=li;
   erg=bf->entry;
   for(i=0;i<k;i++)
-    { 
+    {
       bf=bf->next;
       erg=bf->entry;
     }
@@ -866,11 +866,11 @@ static glb_List *glb_interpolation(glb_List *xval,glb_List *yval,int flag,glb_Li
   xl=list_length(xval);
   yl=list_length(yval);
   rl=list_length(where);
- 
+
   if(yl!=xl) {glb_error("Xval and Yval in glb_interpolation are not of the same length"); return NULL;}
 
   xlist=(double*) malloc(sizeof(double)*xl);
-  ylist=(double*) malloc(sizeof(double)*yl);  
+  ylist=(double*) malloc(sizeof(double)*yl);
   rlist=(double*) malloc(sizeof(double)*rl);
 
   gsl_interp_accel *acc = gsl_interp_accel_alloc();
@@ -881,7 +881,7 @@ static glb_List *glb_interpolation(glb_List *xval,glb_List *yval,int flag,glb_Li
     xlist[i]=head->entry;
     head = head->next;
   }
-  
+
   head=yval;
   for (i = yl-1; head; i--){
     ylist[i]=head->entry;
@@ -889,15 +889,15 @@ static glb_List *glb_interpolation(glb_List *xval,glb_List *yval,int flag,glb_Li
   }
 
   gsl_spline_init(spline,xlist,ylist,yl);
-  
+
   head=where;
   for(i=0; head; i++){
-     rlist[i]=gsl_spline_eval(spline,head->entry,acc);   
+     rlist[i]=gsl_spline_eval(spline,head->entry,acc);
     head=head->next;
  }
 
   for(i=rl;i>0;i--) res=list_cons(res,rlist[i-1]);
- 
+
   free(xlist);
   free(ylist);
   free(rlist);
@@ -930,26 +930,26 @@ static int set_exp_list(char *name,glb_List *value,int scalar)
 	    //here we will have to do a lot asking asf.
 	    len=list_length(value); // how long is the list
 	    lbf=(int*) token_list[i].len;
-	    if(*lbf==-1) *lbf=len;  // setting the length correctly in exp   
+	    if(*lbf==-1) *lbf=len;  // setting the length correctly in exp
 	    else if(*lbf!=len) glb_warning("Length mismatch or list"
 					   " length changed");
-	  
-	    
+
+
 	    dbf = (double**) token_list[i].ptr;
 	    if(*dbf!=NULL){glb_free(*dbf);*dbf=NULL;}
 	    list=(double*) glb_malloc(sizeof(double)*len);
-	    *dbf=list; 
-	  	     
-	    
+	    *dbf=list;
+
+
 	    for(k=0;k<len;k++)
 	       {
 		  val=list_take(value,len-k-1);
-		
+
 		  if(val >= token_list[i].rl && val <= token_list[i].ru)
 		    {
-		      list[k]=val;      
+		      list[k]=val;
 		    }
-		  else       
+		  else
 		    {
 		      fprintf(stderr,"Error: Value for %s out of range\n",
 			      token_list[i].token);
@@ -957,43 +957,43 @@ static int set_exp_list(char *name,glb_List *value,int scalar)
 		      *dbf=NULL;
 		      return 2;
 		    }
-		  
+
 	       }
 	    if(scalar!=TWICE)  list_free(value);
 	    return 0;
 	    break;
-	  
-	  case DOUBLE_LIST_INDEXED: 
+
+	  case DOUBLE_LIST_INDEXED:
 	    len=list_length(value); // how long is the list
 	    lbf=(int*) token_list[i].len;
-	    
-	   
-	    //  lbf[loc_count-1]=len;  // setting the length correctly in exp   
-	  
+
+
+	    //  lbf[loc_count-1]=len;  // setting the length correctly in exp
+
 	    dbf= (double**) token_list[i].ptr;
 	    if(dbf[loc_count-1]!=NULL){glb_free(dbf[loc_count-1]);dbf[loc_count-1]=NULL;}
 	    list=(double*) glb_malloc(sizeof(double)*(len+1));
-	   
-	    dbf[loc_count-1]=list; 
+
+	    dbf[loc_count-1]=list;
 	    list[len]=-1;
-	    
+
 	    for(k=0;k<len;k++)
 	      {
 		val=list_take(value,len-k-1);
-		  
+
 		if(val >= token_list[i].rl && val <= token_list[i].ru)
 		  {
 		    list[k]=val;
 
 		  }
-		else       
+		else
 		  {
 		    fprintf(stderr,"Error: In line %d: "
 			    "Value for %s out of range\n",
 			    glb_line_num,token_list[i].token);
 		    glb_free(list);
 		    dbf[loc_count-1]=NULL;
-		  
+
 		   return 2;
 		  }
 	      }
@@ -1002,30 +1002,30 @@ static int set_exp_list(char *name,glb_List *value,int scalar)
 	    break;
 
 
-	  case INT_LIST_INDEXED: //integer list indexed 
+	  case INT_LIST_INDEXED: //integer list indexed
 	    //with loc_counter
-	    
+
 	    //here we will have to do a lot asking asf.
 	    len=list_length(value); // how long is the list
 	    lbf=(int*) token_list[i].len; //FIXME danger !!!!
-	    lbf[loc_count-1]=len;  // setting the length correctly in exp   
+	    lbf[loc_count-1]=len;  // setting the length correctly in exp
 	    ibf= (int**) token_list[i].ptr;
 	    if(ibf[loc_count-1]!=NULL)glb_free(ibf[loc_count-1]);
 	    ilist=(int*) glb_malloc(sizeof(int)*len);
-	   
-	    ibf[loc_count-1]=ilist; 
-	
-	      
+
+	    ibf[loc_count-1]=ilist;
+
+
 	    for(k=0;k<len;k++)
 	      {
 		val=list_take(value,len-k-1);
-		
+
 		if(val >= token_list[i].rl && val <= token_list[i].ru)
 		  {
 		    ilist[k]=(int) val;
-		  
+
 		  }
-		else       
+		else
 		  {
 		    fprintf(stderr,"Error: Value for %s out of range\n",
 			    token_list[i].token);
@@ -1035,20 +1035,20 @@ static int set_exp_list(char *name,glb_List *value,int scalar)
 	      }
 	    if(scalar!=TWICE) list_free(value);
 	    return 0;
-	    break;	 
+	    break;
 	  default:
 	    return 1;
 	    break;
 	  }
 	}
-    }    
-  return 1;    
+    }
+  return 1;
 }
 
 static int set_exp_energy(char *name, glb_List **value)
 {
   int i,k,l;
-  double ***dbf;  
+  double ***dbf;
   int len;
   double val;
   int v1,v2;
@@ -1061,12 +1061,12 @@ static int set_exp_energy(char *name, glb_List **value)
 		 strlen(token_list[i].ctx))==0 )
 	{
 	  switch((int) token_list[i].scalar) {
-	  
+
 	  case ENERGY_MATRIX:
 	    list=(double**) glb_malloc(sizeof(double* ) * energy_len);
 	    buff.lowrange[loc_count-1]=(int*) glb_malloc(energy_len*sizeof(int));
 	    buff.uprange[loc_count-1]=(int*) glb_malloc(energy_len*sizeof(int));
-      
+
 	    for(l=0;l<energy_len;l++)
 	      {
 		len=(int) list_length(value[l]); // how long is the list
@@ -1074,27 +1074,27 @@ static int set_exp_energy(char *name, glb_List **value)
 				   "number %d: sublist %d is too short!\n"
 				   ,glb_line_num,loc_count,l);return 2;}
 		//lbf=(int*) token_list[i].len;
-	    
-	   
+
+
 		//lbf[loc_count-1]=len;  // setting the length correctly in exp
-	
-		
-		
+
+
+
 		dbf= (double***) token_list[i].ptr;
 		list[l]=(double*) glb_malloc(sizeof(double)*(len-2));
-		dbf[loc_count-1]=list; 
+		dbf[loc_count-1]=list;
 
-		
+
 		v1=(int) list_take(value[l],len-0-1);
 		v2=(int) list_take(value[l],len-1-1);
-	      
+
 		if(v1 >= 0 &&  v2 <= buff.simbins
 		   && v2 >= v1&&v2-v1==len-3 )
 		  {
-		   
-		    buff.lowrange[loc_count-1][l]= v1;	
+
+		    buff.lowrange[loc_count-1][l]= v1;
 		    buff.uprange[loc_count-1][l]= v2;
-		    
+
 		  }
 		else
 		  {
@@ -1106,7 +1106,7 @@ static int set_exp_energy(char *name, glb_List **value)
 		    glb_free(buff.uprange[loc_count-1]);
 		    return 2;
 		  }
-		
+
 	      	for(k=0;k<len-2;k++)
 		  {
 		    val=list_take(value[l],len-(k+2)-1);
@@ -1114,9 +1114,9 @@ static int set_exp_energy(char *name, glb_List **value)
 		    if(val >= token_list[i].rl && val <= token_list[i].ru)
 		      {
 			list[l][k]=val;
-		
+
 		      }
-		    else       
+		    else
 		      {
 			fprintf(stderr,"Error: In line %d: "
 				"Value for %s out of range\n",
@@ -1133,12 +1133,12 @@ static int set_exp_energy(char *name, glb_List **value)
 
 	  }
 	}
-    }    
-  return 1;    
+    }
+  return 1;
 }
 
 
- 
+
 
 /* Enabling traces.  */
 #ifndef YYDEBUG
@@ -1160,11 +1160,11 @@ static int set_exp_energy(char *name, glb_List **value)
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 1026 "glb_parser.y"
+#line 1022 "glb_parser.y"
 {
   double  val;  /* For returning numbers.                   */
   double *dpt;  /* for rules */
-  glb_List *ptr; 
+  glb_List *ptr;
   glb_List **ptrq;
   glb_symrec  *tptr;  /* For returning symbol-table pointers      */
   char *name;
@@ -1399,18 +1399,18 @@ union yyalloc
 #endif
 
 /* YYFINAL -- State number of the termination state.  */
-#define YYFINAL  4
+#define YYFINAL  36
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   506
+#define YYLAST   353
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  50
+#define YYNTOKENS  49
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  26
+#define YYNNTS  24
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  90
+#define YYNRULES  75
 /* YYNRULES -- Number of states.  */
-#define YYNSTATES  185
+#define YYNSTATES  162
 
 /* YYTRANSLATE(YYLEX) -- Bison symbol number corresponding to YYLEX.  */
 #define YYUNDEFTOK  2
@@ -1423,11 +1423,11 @@ union yyalloc
 static const yytype_uint8 yytranslate[] =
 {
        0,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-      46,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-      48,    49,    41,    40,    34,    39,     2,    42,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,    47,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+      46,    47,    41,    40,    34,    39,     2,    42,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,    48,
        2,    35,    36,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -1458,67 +1458,59 @@ static const yytype_uint8 yytranslate[] =
    YYRHS.  */
 static const yytype_uint16 yyprhs[] =
 {
-       0,     0,     3,     4,     7,     9,    11,    13,    16,    19,
-      22,    25,    28,    31,    34,    38,    41,    44,    47,    50,
-      52,    54,    56,    60,    64,    68,    74,    79,    83,    87,
-      91,    95,    98,   102,   106,   108,   110,   115,   118,   122,
-     126,   131,   134,   137,   141,   145,   149,   154,   158,   160,
-     164,   175,   177,   181,   183,   186,   187,   196,   204,   205,
-     207,   209,   211,   213,   215,   217,   219,   223,   227,   231,
-     235,   239,   243,   257,   259,   261,   263,   265,   267,   271,
-     275,   280,   284,   288,   292,   296,   298,   300,   301,   305,
-     306
+       0,     0,     3,     5,     8,    10,    12,    14,    16,    18,
+      20,    22,    24,    28,    32,    36,    42,    47,    51,    55,
+      59,    63,    66,    70,    74,    76,    78,    83,    87,    91,
+      94,    98,   102,   106,   111,   116,   120,   122,   126,   137,
+     139,   143,   144,   153,   161,   162,   165,   167,   169,   171,
+     173,   175,   177,   179,   181,   185,   189,   193,   197,   211,
+     213,   215,   217,   219,   221,   225,   229,   231,   234,   238,
+     242,   246,   250,   252,   254,   258
 };
 
 /* YYRHS -- A `-1'-separated list of the rules' RHS.  */
 static const yytype_int8 yyrhs[] =
 {
-      51,     0,    -1,    -1,    51,    52,    -1,    28,    -1,    45,
-      -1,    46,    -1,    74,    46,    -1,    72,    46,    -1,    53,
-      46,    -1,    55,    46,    -1,    58,    46,    -1,     1,    46,
-      -1,    66,    46,    -1,    69,    47,    46,    -1,    65,    46,
-      -1,    62,    46,    -1,    63,    46,    -1,    64,    46,    -1,
-       3,    -1,    31,    -1,     7,    -1,     7,    35,    53,    -1,
-       9,    35,    53,    -1,     9,    35,     4,    -1,     9,    35,
-      53,    29,    53,    -1,     8,    48,    53,    49,    -1,    53,
-      40,    53,    -1,    53,    39,    53,    -1,    53,    41,    53,
-      -1,    53,    42,    53,    -1,    39,    53,    -1,    53,    44,
-      53,    -1,    48,    53,    49,    -1,    61,    -1,    33,    -1,
-       9,    29,    35,     6,    -1,    53,    34,    -1,    53,    34,
-      46,    -1,    55,    53,    34,    -1,    55,    53,    34,    46,
-      -1,    55,    53,    -1,    38,    37,    -1,    38,    55,    37,
-      -1,    38,    53,    37,    -1,     9,    35,    55,    -1,     8,
-      48,    55,    49,    -1,     8,    48,    49,    -1,     6,    -1,
-       6,    35,    55,    -1,     8,    48,    55,    34,    55,    34,
-      53,    34,    55,    49,    -1,    54,    -1,    53,    30,    53,
-      -1,    52,    -1,    57,    52,    -1,    -1,    17,    48,    31,
-      49,    59,    24,    60,    25,    -1,    17,    48,    32,    49,
-      24,    60,    25,    -1,    -1,    53,    -1,    65,    -1,    57,
-      -1,    66,    -1,    62,    -1,    63,    -1,    64,    -1,    19,
-      35,    18,    -1,    10,    35,    18,    -1,    11,    35,    18,
-      -1,    13,    35,    18,    -1,    14,    35,    18,    -1,    15,
-      35,    18,    -1,    23,    35,    67,    29,    68,    29,    27,
-      29,    27,    29,    67,    29,    67,    -1,    31,    -1,    33,
-      -1,    26,    -1,    40,    -1,    39,    -1,    22,    35,    55,
-      -1,    69,    29,    55,    -1,    69,    29,    46,    55,    -1,
-      21,    35,    56,    -1,    70,    29,    56,    -1,    20,    35,
-      56,    -1,    71,    29,    56,    -1,    70,    -1,    71,    -1,
-      -1,    31,    73,    65,    -1,    -1,    31,    75,    66,    -1
+      50,     0,    -1,    51,    -1,    50,    51,    -1,    29,    -1,
+      45,    -1,    57,    -1,    52,    -1,    55,    -1,     3,    -1,
+      32,    -1,     7,    -1,     7,    35,    52,    -1,     9,    35,
+      52,    -1,     9,    35,     4,    -1,     9,    35,    52,    30,
+      52,    -1,     8,    46,    52,    47,    -1,    52,    40,    52,
+      -1,    52,    39,    52,    -1,    52,    41,    52,    -1,    52,
+      42,    52,    -1,    39,    52,    -1,    52,    44,    52,    -1,
+      46,    52,    47,    -1,    61,    -1,    24,    -1,     9,    30,
+      35,     6,    -1,    52,    34,    52,    -1,    54,    34,    52,
+      -1,    38,    37,    -1,    38,    54,    37,    -1,    38,    52,
+      37,    -1,     9,    35,    55,    -1,     8,    46,    54,    47,
+      -1,     8,    46,    55,    47,    -1,     8,    46,    47,    -1,
+       6,    -1,     6,    35,    55,    -1,     8,    46,    55,    34,
+      55,    34,    52,    34,    55,    47,    -1,    53,    -1,    52,
+      31,    52,    -1,    -1,    17,    46,    32,    47,    58,    25,
+      59,    26,    -1,    17,    46,    33,    47,    25,    59,    26,
+      -1,    -1,    59,    60,    -1,    52,    -1,    55,    -1,    72,
+      -1,    69,    -1,    65,    -1,    62,    -1,    63,    -1,    64,
+      -1,    19,    35,    18,    -1,    10,    35,    18,    -1,    11,
+      35,    18,    -1,    13,    35,    18,    -1,    23,    35,    66,
+      30,    67,    30,    28,    30,    28,    30,    66,    30,    66,
+      -1,    32,    -1,    24,    -1,    27,    -1,    40,    -1,    39,
+      -1,    22,    35,    55,    -1,    68,    30,    55,    -1,    68,
+      -1,    68,    48,    -1,    21,    35,    56,    -1,    70,    30,
+      56,    -1,    20,    35,    56,    -1,    71,    30,    56,    -1,
+      70,    -1,    71,    -1,    14,    35,    18,    -1,    15,    35,
+      18,    -1
 };
 
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,  1079,  1079,  1080,  1081,  1082,  1085,  1086,  1087,  1088,
-    1089,  1090,  1091,  1092,  1093,  1096,  1097,  1098,  1099,  1104,
-    1105,  1106,  1107,  1108,  1113,  1117,  1122,  1128,  1129,  1130,
-    1131,  1132,  1133,  1134,  1135,  1136,  1141,  1151,  1152,  1153,
-    1160,  1166,  1172,  1173,  1174,  1177,  1184,  1185,  1186,  1187,
-    1188,  1189,  1194,  1204,  1205,  1209,  1208,  1219,  1225,  1226,
-    1227,  1228,  1229,  1230,  1231,  1232,  1236,  1243,  1252,  1264,
-    1276,  1283,  1291,  1308,  1309,  1313,  1314,  1315,  1319,  1328,
-    1338,  1352,  1361,  1371,  1381,  1391,  1404,  1418,  1418,  1427,
-    1427
+       0,  1079,  1079,  1080,  1081,  1082,  1086,  1087,  1088,  1092,
+    1093,  1094,  1095,  1096,  1101,  1105,  1110,  1116,  1117,  1118,
+    1119,  1120,  1121,  1122,  1123,  1124,  1128,  1137,  1142,  1146,
+    1147,  1148,  1149,  1154,  1155,  1156,  1157,  1158,  1159,  1160,
+    1164,  1175,  1174,  1185,  1192,  1193,  1197,  1198,  1199,  1200,
+    1201,  1202,  1203,  1204,  1208,  1216,  1226,  1238,  1250,  1268,
+    1269,  1279,  1280,  1281,  1285,  1294,  1308,  1309,  1313,  1322,
+    1333,  1343,  1354,  1363,  1372,  1377
 };
 #endif
 
@@ -1530,13 +1522,13 @@ static const char *const yytname[] =
   "$end", "error", "$undefined", "NUM", "SFNCT", "BOGUS", "LVAR", "VAR",
   "FNCT", "IDN", "CROSS", "FLUXP", "FLUXM", "NUFLUX", "SYS_ON_FUNCTION",
   "SYS_OFF_FUNCTION", "GRP", "GID", "FNAME", "VERS", "SIGNAL", "BG",
-  "ENERGY", "CHANNEL", "GRPOPEN", "GRPCLOSE", "PM", "FLAVOR", "NOGLOBES",
-  "RULESEP", "RULEMULT", "NAME", "RDF", "NDEF", "','", "'='", "'>'", "'}'",
-  "'{'", "'-'", "'+'", "'*'", "'/'", "NEG", "'^'", "'\\247'", "'\\n'",
-  "';'", "'('", "')'", "$accept", "input", "line", "exp", "listcopy",
-  "seq", "rulepart", "expseq", "group", "@1", "ingroup", "version",
-  "cross", "flux", "nuflux", "rule", "channel", "name", "pm", "ene",
-  "brule", "srule", "outrule", "@2", "outchannel", "@3", 0
+  "ENERGY", "CHANNEL", "NDEF", "GRPOPEN", "GRPCLOSE", "PM", "FLAVOR",
+  "NOGLOBES", "RULESEP", "RULEMULT", "NAME", "RDF", "','", "'='", "'>'",
+  "'}'", "'{'", "'-'", "'+'", "'*'", "'/'", "NEG", "'^'", "'\\247'", "'('",
+  "')'", "';'", "$accept", "input", "topleveldirective", "exp", "listcopy",
+  "seq", "list", "rulepart", "group", "@1", "ingroup", "ingroup_statement",
+  "version", "cross", "flux", "nuflux", "channel", "name", "pm", "ene",
+  "energy", "brule", "srule", "rule", 0
 };
 #endif
 
@@ -1549,38 +1541,34 @@ static const yytype_uint16 yytoknum[] =
      265,   266,   267,   268,   269,   270,   271,   272,   273,   274,
      275,   276,   277,   278,   279,   280,   281,   282,   283,   284,
      285,   286,   287,   288,    44,    61,    62,   125,   123,    45,
-      43,    42,    47,   289,    94,   167,    10,    59,    40,    41
+      43,    42,    47,   289,    94,   167,    40,    41,    59
 };
 # endif
 
 /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_uint8 yyr1[] =
 {
-       0,    50,    51,    51,    51,    51,    52,    52,    52,    52,
-      52,    52,    52,    52,    52,    52,    52,    52,    52,    53,
-      53,    53,    53,    53,    53,    53,    53,    53,    53,    53,
-      53,    53,    53,    53,    53,    53,    54,    55,    55,    55,
+       0,    49,    50,    50,    50,    50,    51,    51,    51,    52,
+      52,    52,    52,    52,    52,    52,    52,    52,    52,    52,
+      52,    52,    52,    52,    52,    52,    53,    54,    54,    55,
       55,    55,    55,    55,    55,    55,    55,    55,    55,    55,
-      55,    55,    56,    57,    57,    59,    58,    58,    60,    60,
-      60,    60,    60,    60,    60,    60,    61,    62,    63,    64,
-      65,    65,    66,    67,    67,    68,    68,    68,    69,    69,
-      69,    70,    70,    71,    71,    65,    65,    73,    72,    75,
-      74
+      56,    58,    57,    57,    59,    59,    60,    60,    60,    60,
+      60,    60,    60,    60,    61,    62,    63,    64,    65,    66,
+      66,    67,    67,    67,    68,    68,    69,    69,    70,    70,
+      71,    71,    72,    72,    72,    72
 };
 
 /* YYR2[YYN] -- Number of symbols composing right hand side of rule YYN.  */
 static const yytype_uint8 yyr2[] =
 {
-       0,     2,     0,     2,     1,     1,     1,     2,     2,     2,
-       2,     2,     2,     2,     3,     2,     2,     2,     2,     1,
+       0,     2,     1,     2,     1,     1,     1,     1,     1,     1,
        1,     1,     3,     3,     3,     5,     4,     3,     3,     3,
-       3,     2,     3,     3,     1,     1,     4,     2,     3,     3,
-       4,     2,     2,     3,     3,     3,     4,     3,     1,     3,
-      10,     1,     3,     1,     2,     0,     8,     7,     0,     1,
-       1,     1,     1,     1,     1,     1,     3,     3,     3,     3,
-       3,     3,    13,     1,     1,     1,     1,     1,     3,     3,
-       4,     3,     3,     3,     3,     1,     1,     0,     3,     0,
-       3
+       3,     2,     3,     3,     1,     1,     4,     3,     3,     2,
+       3,     3,     3,     4,     4,     3,     1,     3,    10,     1,
+       3,     0,     8,     7,     0,     2,     1,     1,     1,     1,
+       1,     1,     1,     1,     3,     3,     3,     3,    13,     1,
+       1,     1,     1,     1,     3,     3,     1,     2,     3,     3,
+       3,     3,     1,     1,     3,     3
 };
 
 /* YYDEFACT[STATE-NAME] -- Default rule to reduce with in state
@@ -1588,207 +1576,171 @@ static const yytype_uint8 yyr2[] =
    means the default is an error.  */
 static const yytype_uint8 yydefact[] =
 {
-       2,     4,     5,     0,     1,     0,    19,    48,    21,     0,
+       0,     9,    36,    11,     0,     0,     0,     0,    25,     4,
+      10,     0,     0,     5,     0,     0,     2,     7,    39,     8,
+       6,    24,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,    29,     0,     0,    21,     0,     1,     3,     0,     0,
+       0,     0,     0,     0,     0,    37,    12,    35,     0,     0,
+       0,     0,    14,    13,    32,     0,     0,    54,     0,     0,
+       0,    31,     0,    30,    23,    18,    17,    19,    20,    22,
+       0,     0,    16,    33,     0,    34,    26,     0,    41,     0,
+       0,    27,    28,     0,     0,    15,     0,    44,     0,    44,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,    20,    35,     0,     0,     6,     0,     3,     0,
-      51,     0,     0,    34,     0,     0,     0,     0,     0,     0,
-      85,    86,     0,     0,    12,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,    20,    42,     0,     0,     0,     0,    31,
-       0,    37,     0,     0,     0,     0,     0,     9,    10,    41,
-      11,    16,    17,    18,    15,    13,     0,     0,     0,     0,
-       8,     7,     0,    49,    22,    47,     0,     0,     0,    24,
-      23,    45,    67,    68,    69,    70,    71,     0,     0,    66,
-       0,    83,    81,    78,    73,    74,     0,    88,    90,    44,
-      43,     0,     0,    33,    38,    28,    27,    29,    30,    32,
-      39,     0,    79,    14,    82,    84,    26,     0,    46,    36,
-       0,    55,     0,     0,     0,     0,    23,    40,    80,     0,
-      25,     0,     0,    52,    75,    77,    76,     0,     0,     0,
-      53,    59,     0,     0,    63,    64,    65,    60,    62,     0,
-       0,     0,    54,    57,     0,     0,    56,     0,     0,     0,
-      50,     0,     0,     0,    72
+       0,     0,    43,    46,    47,    45,    51,    52,    53,    50,
+      66,    49,    72,    73,    48,     0,    42,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,    67,     0,     0,
+       0,    55,    56,    57,    74,    75,     0,    70,    68,    64,
+      60,    59,     0,    65,    69,    71,    38,     0,     0,    40,
+      61,    63,    62,     0,     0,     0,     0,     0,     0,     0,
+       0,    58
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int16 yydefgoto[] =
 {
-      -1,     3,   160,    79,    30,    31,   111,   162,    32,   151,
-     163,    33,    34,    35,    36,    37,    38,   116,   157,    39,
-      40,    41,    42,    61,    43,    62
+      -1,    15,    16,   136,    18,    49,    19,   137,    20,    86,
+      90,   105,    21,   106,   107,   108,   109,   142,   153,   110,
+     111,   112,   113,   114
 };
 
 /* YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
    STATE-NUM.  */
-#define YYPACT_NINF -141
+#define YYPACT_NINF -142
 static const yytype_int16 yypact[] =
 {
-     -15,  -141,  -141,   167,  -141,   -40,  -141,   -21,    -4,   -12,
-      24,     6,    10,    22,    33,    52,    42,    53,    61,    63,
-      64,    65,    90,  -141,   276,   458,  -141,   458,  -141,   258,
-    -141,   378,    29,  -141,    47,    57,    62,    66,    71,   -18,
-      94,   101,    87,    92,  -141,   365,   458,     1,    96,   313,
-     125,   127,   129,   130,   132,    31,   133,   458,   458,   365,
-      27,   121,   116,  -141,  -141,   289,   399,   106,   122,   114,
-     199,   117,   458,   458,   458,   458,   458,  -141,  -141,    40,
-    -141,  -141,  -141,  -141,  -141,  -141,   331,   118,   458,   458,
-    -141,  -141,   349,   458,   441,  -141,   314,    58,   159,  -141,
-      85,   458,  -141,  -141,  -141,  -141,  -141,   120,   136,  -141,
-     153,  -141,  -141,   458,  -141,  -141,   137,  -141,  -141,  -141,
-    -141,   458,   412,  -141,  -141,   -26,   -26,   114,   114,   114,
-     145,   365,   458,  -141,  -141,  -141,  -141,   365,  -141,  -141,
-     458,  -141,   147,   458,    12,   400,    85,  -141,   458,   445,
-     441,   155,   211,   441,  -141,  -141,  -141,   170,   458,   211,
-    -141,   258,   255,   171,    47,    57,    62,    66,    71,   174,
-     429,   177,  -141,  -141,   175,   365,  -141,   176,   113,   178,
-    -141,    27,   179,    27,  -141
+     210,  -142,   -10,    -4,    -9,    33,    10,    12,  -142,  -142,
+    -142,   272,   307,  -142,   307,    72,  -142,    43,  -142,  -142,
+    -142,  -142,    -2,   307,   106,    38,   254,     1,    56,    30,
+      51,  -142,   196,   -24,    53,   137,  -142,  -142,   307,   307,
+     307,   307,   307,    49,    63,  -142,    43,  -142,    82,    17,
+      18,    94,  -142,   -12,  -142,    52,    54,  -142,   307,   298,
+     307,  -142,   307,  -142,  -142,    13,    13,    53,    53,    53,
+     106,    -2,  -142,  -142,    -2,  -142,  -142,   307,  -142,    77,
+     243,    43,    43,    93,    73,    43,    81,  -142,   307,  -142,
+     148,   225,   182,    84,    85,    96,   101,   104,   105,   107,
+     108,   111,  -142,    43,  -142,  -142,  -142,  -142,  -142,  -142,
+     -28,  -142,    78,    87,  -142,    -2,  -142,   110,   123,   130,
+     131,   132,   307,   307,    -2,   -16,    -2,  -142,   307,   307,
+     113,  -142,  -142,  -142,  -142,  -142,     4,  -142,  -142,  -142,
+    -142,  -142,   134,  -142,  -142,  -142,  -142,   307,   -18,    43,
+    -142,  -142,  -142,   135,   138,   143,   147,   152,   -16,   153,
+     -16,  -142
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int16 yypgoto[] =
 {
-    -141,  -141,    -2,    -3,  -141,   -22,   -41,  -141,  -141,  -141,
-      50,  -141,  -140,  -126,  -124,   -58,   -57,  -105,  -141,  -141,
-    -141,  -141,  -141,  -141,  -141,  -141
+    -142,  -142,   183,     0,  -142,   188,   -21,   -62,  -142,  -142,
+     118,  -142,  -142,  -142,  -142,  -142,  -142,  -141,  -142,  -142,
+    -142,  -142,  -142,  -142
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]].  What to do in state STATE-NUM.  If
    positive, shift that token.  If negative, reduce the rule which
    number is the opposite.  If zero, do what YYDEFACT says.
    If YYTABLE_NINF, syntax error.  */
-#define YYTABLE_NINF -90
-static const yytype_int16 yytable[] =
+#define YYTABLE_NINF -1
+static const yytype_uint8 yytable[] =
 {
-      29,    28,    66,   117,     6,   118,    44,     7,     8,     9,
-      10,    86,   164,     1,    45,    74,    75,   112,    76,   164,
-      17,    65,    69,    93,    70,    97,   165,   101,   166,    87,
-       2,    46,    63,   165,    23,   166,    47,   113,   154,    24,
-      25,    50,    92,    94,    96,    51,   100,   134,   135,    27,
-      95,   155,   156,    48,   110,   110,    92,    52,   114,    49,
-     115,     6,   107,   108,   132,     8,    67,    68,    53,   125,
-     126,   127,   128,   129,   130,    80,   182,    17,   184,    72,
-      73,    74,    75,    92,    76,   110,   110,    54,    56,    63,
-      55,    23,   137,    81,   167,   168,    57,    25,    58,    59,
-      60,   167,   168,    82,   -87,   -87,    27,   138,    83,   148,
-     -87,   -87,    84,   -89,   140,   149,     6,    85,   145,   146,
-       8,    67,    68,    88,    72,    73,    74,    75,    92,    76,
-      89,    98,    17,    90,    92,    14,    15,   150,    91,    21,
-     153,    18,    19,   102,    63,   103,    23,   104,   105,   161,
-     106,   109,    25,   178,   121,   170,   161,   122,    76,    29,
-     172,    27,   180,   124,   133,   139,   144,     4,     5,   141,
-       6,   152,    92,     7,     8,     9,    10,    11,    12,   159,
-      13,    14,    15,   143,    16,   142,    17,    18,    19,    20,
-      21,   147,    72,    73,    74,    75,   173,    76,    22,   169,
-      23,   174,   176,   179,   177,    24,    25,   181,   183,   171,
-       0,     0,     5,    26,     6,    27,     0,     7,     8,     9,
-      10,    11,    12,     0,    13,    14,    15,     0,    16,     0,
-      17,    18,    19,    20,    21,     0,   -58,     0,    72,    73,
-      74,    75,    22,    76,    23,     0,     0,     0,   123,    24,
-      25,     0,     0,     0,     0,     0,     5,    26,     6,    27,
-       0,     7,     8,     9,    10,    11,    12,     0,    13,    14,
-      15,     0,    16,     0,    17,    18,    19,    20,    21,     6,
-     -61,     0,     7,     8,     9,    10,    22,     0,    23,     0,
-       0,     0,    71,    24,    25,    17,     0,    72,    73,    74,
-      75,    26,    76,    27,    77,     0,     0,    63,     0,    23,
-       0,     0,     0,    64,    24,    25,     6,    99,     0,     7,
-       8,     9,    10,    71,    27,     0,   119,     0,    72,    73,
-      74,    75,    17,    76,     6,     0,     0,     7,     8,     9,
-      10,     0,     0,     0,    63,     0,    23,     0,    71,     0,
-      17,    24,    25,    72,    73,    74,    75,     0,    76,     0,
-       0,    27,    63,   136,    23,     0,     0,     0,     6,    24,
-      25,     7,     8,     9,    10,     0,     0,   131,     0,    27,
-       0,     6,     0,    71,    17,     8,    67,    68,    72,    73,
-      74,    75,     0,    76,     0,     0,    63,    17,    23,     0,
-       0,     0,     6,    24,    25,     0,     8,    67,    68,    63,
-       0,    23,     0,    27,     0,     6,    99,    25,    17,     8,
-      67,    68,     0,     0,    78,     0,    27,     0,     0,     0,
-      63,    17,    23,     0,     0,     0,   120,     0,    25,    72,
-      73,    74,    75,    63,    76,    23,     0,    27,     6,   136,
-       0,    25,     8,    67,    68,     0,     0,     0,     0,     0,
-      27,     6,     0,   175,    17,     8,    67,    68,    72,    73,
-      74,    75,     0,    76,     0,     0,    63,    17,    23,   158,
-      72,    73,    74,    75,    25,    76,     0,     0,     0,    63,
-       0,    23,     0,    27,     0,     0,     0,    25,     0,     0,
-       0,     0,     0,     0,     0,     0,    27
+      17,    45,   126,    50,     2,    54,    43,    44,   140,   150,
+      62,    32,    34,    63,    35,    17,   141,   159,    77,   161,
+     127,   151,   152,    46,    48,    22,    53,    38,    39,    40,
+      41,    23,    42,    55,    56,   147,    11,    24,    65,    66,
+      67,    68,    69,    38,    39,    40,    41,    28,    42,    50,
+      54,    62,    74,    84,    40,    41,    27,    42,    80,    53,
+      81,   138,    82,    25,    73,    75,   144,   145,    26,   104,
+      83,   104,    36,    51,    57,     1,    58,    85,     2,     3,
+       4,     5,    38,    39,    40,    41,    59,    42,    91,     6,
+     103,     7,   103,    25,   130,    70,     8,    42,    71,    78,
+      76,    79,    87,   139,    10,   143,    89,    88,   128,     1,
+      11,    12,     2,     3,     4,     5,    60,   129,    14,   117,
+     118,    38,    39,    40,    41,     7,    42,    60,   131,    72,
+       8,   119,    38,    39,    40,    41,   120,    42,    10,   121,
+     122,   132,   123,   124,    11,    12,   125,   149,   133,   134,
+     135,     1,    14,    47,     2,     3,     4,     5,    93,    94,
+     146,    95,    96,    97,   148,   154,   155,     7,    98,    99,
+     100,   101,     8,   156,   102,   157,    38,    39,    40,    41,
+      10,    42,   158,   160,    64,     1,    11,    12,     2,     3,
+       4,     5,    93,    94,    14,    95,    96,    97,    37,    33,
+       0,     7,    98,    99,   100,   101,     8,    92,   116,     0,
+       0,     0,     0,     1,    10,     0,     2,     3,     4,     5,
+      11,    12,     0,     0,     0,     0,     0,     6,    14,     7,
+      60,     0,     0,    61,     8,    38,    39,    40,    41,     9,
+      42,     0,    10,     0,     0,     0,     0,     0,    11,    12,
+       0,     0,     0,     0,     0,    13,    14,     1,    52,   115,
+       2,     3,     4,     5,    38,    39,    40,    41,     0,    42,
+       0,     0,     0,     7,     0,     1,     0,     0,     8,     3,
+      29,    30,    38,    39,    40,    41,    10,    42,     0,     0,
+      72,     7,    11,    12,     0,     0,     8,     0,     0,     0,
+      14,     1,    52,     0,    10,     3,    29,    30,     0,    31,
+       1,    12,     0,     0,     3,    29,    30,     7,    14,     0,
+       0,     0,     8,     0,     0,     0,     7,     0,     0,     0,
+      10,     8,     0,     0,     0,     0,     0,    12,     0,    10,
+       0,     0,     0,     0,    14,     0,    12,     0,     0,     0,
+       0,     0,     0,    14
 };
 
 static const yytype_int16 yycheck[] =
 {
-       3,     3,    24,    61,     3,    62,    46,     6,     7,     8,
-       9,    29,   152,    28,    35,    41,    42,    58,    44,   159,
-      19,    24,    25,    45,    27,    47,   152,    49,   152,    47,
-      45,    35,    31,   159,    33,   159,    48,    59,    26,    38,
-      39,    35,    45,    46,    47,    35,    49,    88,    89,    48,
-      49,    39,    40,    29,    57,    58,    59,    35,    31,    35,
-      33,     3,    31,    32,    86,     7,     8,     9,    35,    72,
-      73,    74,    75,    76,    34,    46,   181,    19,   183,    39,
-      40,    41,    42,    86,    44,    88,    89,    35,    35,    31,
-      48,    33,    34,    46,   152,   152,    35,    39,    35,    35,
-      35,   159,   159,    46,    14,    15,    48,    49,    46,   131,
-      20,    21,    46,    23,    29,   137,     3,    46,   121,   122,
-       7,     8,     9,    29,    39,    40,    41,    42,   131,    44,
-      29,    35,    19,    46,   137,    14,    15,   140,    46,    23,
-     143,    20,    21,    18,    31,    18,    33,    18,    18,   152,
-      18,    18,    39,   175,    48,   158,   159,    35,    44,   162,
-     162,    48,    49,    46,    46,     6,    29,     0,     1,    49,
-       3,    24,   175,     6,     7,     8,     9,    10,    11,    24,
-      13,    14,    15,    30,    17,    49,    19,    20,    21,    22,
-      23,    46,    39,    40,    41,    42,    25,    44,    31,    29,
-      33,    27,    25,    27,    29,    38,    39,    29,    29,   159,
-      -1,    -1,     1,    46,     3,    48,    -1,     6,     7,     8,
-       9,    10,    11,    -1,    13,    14,    15,    -1,    17,    -1,
-      19,    20,    21,    22,    23,    -1,    25,    -1,    39,    40,
-      41,    42,    31,    44,    33,    -1,    -1,    -1,    49,    38,
-      39,    -1,    -1,    -1,    -1,    -1,     1,    46,     3,    48,
-      -1,     6,     7,     8,     9,    10,    11,    -1,    13,    14,
-      15,    -1,    17,    -1,    19,    20,    21,    22,    23,     3,
-      25,    -1,     6,     7,     8,     9,    31,    -1,    33,    -1,
-      -1,    -1,    34,    38,    39,    19,    -1,    39,    40,    41,
-      42,    46,    44,    48,    46,    -1,    -1,    31,    -1,    33,
-      -1,    -1,    -1,    37,    38,    39,     3,     4,    -1,     6,
-       7,     8,     9,    34,    48,    -1,    37,    -1,    39,    40,
-      41,    42,    19,    44,     3,    -1,    -1,     6,     7,     8,
-       9,    -1,    -1,    -1,    31,    -1,    33,    -1,    34,    -1,
-      19,    38,    39,    39,    40,    41,    42,    -1,    44,    -1,
-      -1,    48,    31,    49,    33,    -1,    -1,    -1,     3,    38,
-      39,     6,     7,     8,     9,    -1,    -1,    46,    -1,    48,
-      -1,     3,    -1,    34,    19,     7,     8,     9,    39,    40,
-      41,    42,    -1,    44,    -1,    -1,    31,    19,    33,    -1,
-      -1,    -1,     3,    38,    39,    -1,     7,     8,     9,    31,
-      -1,    33,    -1,    48,    -1,     3,     4,    39,    19,     7,
-       8,     9,    -1,    -1,    46,    -1,    48,    -1,    -1,    -1,
-      31,    19,    33,    -1,    -1,    -1,    37,    -1,    39,    39,
-      40,    41,    42,    31,    44,    33,    -1,    48,     3,    49,
-      -1,    39,     7,     8,     9,    -1,    -1,    -1,    -1,    -1,
-      48,     3,    -1,    34,    19,     7,     8,     9,    39,    40,
-      41,    42,    -1,    44,    -1,    -1,    31,    19,    33,    34,
-      39,    40,    41,    42,    39,    44,    -1,    -1,    -1,    31,
-      -1,    33,    -1,    48,    -1,    -1,    -1,    39,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    48
+       0,    22,    30,    24,     6,    26,     8,     9,    24,    27,
+      34,    11,    12,    37,    14,    15,    32,   158,    30,   160,
+      48,    39,    40,    23,    24,    35,    26,    39,    40,    41,
+      42,    35,    44,    32,    33,    31,    38,    46,    38,    39,
+      40,    41,    42,    39,    40,    41,    42,    35,    44,    70,
+      71,    34,    34,    74,    41,    42,    46,    44,    58,    59,
+      60,   123,    62,    30,    47,    47,   128,   129,    35,    90,
+      70,    92,     0,    35,    18,     3,    46,    77,     6,     7,
+       8,     9,    39,    40,    41,    42,    35,    44,    88,    17,
+      90,    19,    92,    30,   115,    46,    24,    44,    35,    47,
+       6,    47,    25,   124,    32,   126,    25,    34,    30,     3,
+      38,    39,     6,     7,     8,     9,    34,    30,    46,    35,
+      35,    39,    40,    41,    42,    19,    44,    34,    18,    47,
+      24,    35,    39,    40,    41,    42,    35,    44,    32,    35,
+      35,    18,    35,    35,    38,    39,    35,   147,    18,    18,
+      18,     3,    46,    47,     6,     7,     8,     9,    10,    11,
+      47,    13,    14,    15,    30,    30,    28,    19,    20,    21,
+      22,    23,    24,    30,    26,    28,    39,    40,    41,    42,
+      32,    44,    30,    30,    47,     3,    38,    39,     6,     7,
+       8,     9,    10,    11,    46,    13,    14,    15,    15,    11,
+      -1,    19,    20,    21,    22,    23,    24,    89,    26,    -1,
+      -1,    -1,    -1,     3,    32,    -1,     6,     7,     8,     9,
+      38,    39,    -1,    -1,    -1,    -1,    -1,    17,    46,    19,
+      34,    -1,    -1,    37,    24,    39,    40,    41,    42,    29,
+      44,    -1,    32,    -1,    -1,    -1,    -1,    -1,    38,    39,
+      -1,    -1,    -1,    -1,    -1,    45,    46,     3,     4,    34,
+       6,     7,     8,     9,    39,    40,    41,    42,    -1,    44,
+      -1,    -1,    -1,    19,    -1,     3,    -1,    -1,    24,     7,
+       8,     9,    39,    40,    41,    42,    32,    44,    -1,    -1,
+      47,    19,    38,    39,    -1,    -1,    24,    -1,    -1,    -1,
+      46,     3,     4,    -1,    32,     7,     8,     9,    -1,    37,
+       3,    39,    -1,    -1,     7,     8,     9,    19,    46,    -1,
+      -1,    -1,    24,    -1,    -1,    -1,    19,    -1,    -1,    -1,
+      32,    24,    -1,    -1,    -1,    -1,    -1,    39,    -1,    32,
+      -1,    -1,    -1,    -1,    46,    -1,    39,    -1,    -1,    -1,
+      -1,    -1,    -1,    46
 };
 
 /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
    symbol of state STATE-NUM.  */
 static const yytype_uint8 yystos[] =
 {
-       0,    28,    45,    51,     0,     1,     3,     6,     7,     8,
-       9,    10,    11,    13,    14,    15,    17,    19,    20,    21,
-      22,    23,    31,    33,    38,    39,    46,    48,    52,    53,
-      54,    55,    58,    61,    62,    63,    64,    65,    66,    69,
-      70,    71,    72,    74,    46,    35,    35,    48,    29,    35,
-      35,    35,    35,    35,    35,    48,    35,    35,    35,    35,
-      35,    73,    75,    31,    37,    53,    55,     8,     9,    53,
-      53,    34,    39,    40,    41,    42,    44,    46,    46,    53,
-      46,    46,    46,    46,    46,    46,    29,    47,    29,    29,
-      46,    46,    53,    55,    53,    49,    53,    55,    35,     4,
-      53,    55,    18,    18,    18,    18,    18,    31,    32,    18,
-      53,    56,    56,    55,    31,    33,    67,    65,    66,    37,
-      37,    48,    35,    49,    46,    53,    53,    53,    53,    53,
-      34,    46,    55,    46,    56,    56,    49,    34,    49,     6,
-      29,    49,    49,    30,    29,    53,    53,    46,    55,    55,
-      53,    59,    24,    53,    26,    39,    40,    68,    34,    24,
-      52,    53,    57,    60,    62,    63,    64,    65,    66,    29,
-      53,    60,    52,    25,    27,    34,    25,    29,    55,    27,
-      49,    29,    67,    29,    67
+       0,     3,     6,     7,     8,     9,    17,    19,    24,    29,
+      32,    38,    39,    45,    46,    50,    51,    52,    53,    55,
+      57,    61,    35,    35,    46,    30,    35,    46,    35,     8,
+       9,    37,    52,    54,    52,    52,     0,    51,    39,    40,
+      41,    42,    44,     8,     9,    55,    52,    47,    52,    54,
+      55,    35,     4,    52,    55,    32,    33,    18,    46,    35,
+      34,    37,    34,    37,    47,    52,    52,    52,    52,    52,
+      46,    35,    47,    47,    34,    47,     6,    30,    47,    47,
+      52,    52,    52,    52,    55,    52,    58,    25,    34,    25,
+      59,    52,    59,    10,    11,    13,    14,    15,    20,    21,
+      22,    23,    26,    52,    55,    60,    62,    63,    64,    65,
+      68,    69,    70,    71,    72,    34,    26,    35,    35,    35,
+      35,    35,    35,    35,    35,    35,    30,    48,    30,    30,
+      55,    18,    18,    18,    18,    18,    52,    56,    56,    55,
+      24,    32,    66,    55,    56,    56,    47,    31,    30,    52,
+      27,    39,    40,    67,    30,    28,    30,    28,    30,    66,
+      30,    66
 };
 
 #define yyerrok		(yyerrstatus = 0)
@@ -2358,7 +2310,7 @@ yyparse ()
 #endif
 #endif
 {
-  
+
   int yystate;
   int yyn;
   int yyresult;
@@ -2602,7 +2554,17 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
-        case 4:
+        case 2:
+#line 1079 "glb_parser.y"
+    {}
+    break;
+
+  case 3:
+#line 1080 "glb_parser.y"
+    {}
+    break;
+
+  case 4:
 #line 1081 "glb_parser.y"
     {YYABORT;}
     break;
@@ -2612,85 +2574,43 @@ yyreduce:
     {YYABORT;}
     break;
 
-  case 8:
+  case 6:
+#line 1086 "glb_parser.y"
+    {}
+    break;
+
+  case 7:
 #line 1087 "glb_parser.y"
-    { /*showlist($1[0]);showlist($1[1]);*/ }
+    {}
+    break;
+
+  case 8:
+#line 1088 "glb_parser.y"
+    {}
     break;
 
   case 9:
-#line 1088 "glb_parser.y"
-    { /*printf ("\t%.10g\n", $1);*/  }
+#line 1092 "glb_parser.y"
+    { (yyval.val) = (yyvsp[(1) - (1)].val);                     }
     break;
 
   case 10:
-#line 1089 "glb_parser.y"
-    { /*showlist($1);printf("\n");*/ }
-    break;
-
-  case 11:
-#line 1090 "glb_parser.y"
-    {}
-    break;
-
-  case 12:
-#line 1091 "glb_parser.y"
-    {yyerrok;}
-    break;
-
-  case 13:
-#line 1092 "glb_parser.y"
-    {}
-    break;
-
-  case 14:
 #line 1093 "glb_parser.y"
-    {
- set_exp_energy("@energy",(yyvsp[(1) - (3)].ptrq));
-}
-    break;
-
-  case 15:
-#line 1096 "glb_parser.y"
-    {}
-    break;
-
-  case 16:
-#line 1097 "glb_parser.y"
-    {/* printf("%s\n",$1);*/}
-    break;
-
-  case 17:
-#line 1098 "glb_parser.y"
-    {/* printf("%s\n",$1);*/}
-    break;
-
-  case 18:
-#line 1099 "glb_parser.y"
-    {/* printf("%s\n",$1);*/}
-    break;
-
-  case 19:
-#line 1104 "glb_parser.y"
-    { (yyval.val) = (yyvsp[(1) - (1)].val);                         }
-    break;
-
-  case 20:
-#line 1105 "glb_parser.y"
     { (yyval.val) = (yyvsp[(1) - (1)].nameptr)->value;              }
     break;
 
-  case 21:
-#line 1106 "glb_parser.y"
-    { (yyval.val) = (yyvsp[(1) - (1)].tptr)->value.var;              }
+  case 11:
+#line 1094 "glb_parser.y"
+    { (yyval.val) = (yyvsp[(1) - (1)].tptr)->value.var;          }
     break;
 
-  case 22:
-#line 1107 "glb_parser.y"
-    { (yyval.val) = (yyvsp[(3) - (3)].val); (yyvsp[(1) - (3)].tptr)->value.var = (yyvsp[(3) - (3)].val);     }
+  case 12:
+#line 1095 "glb_parser.y"
+    { (yyval.val) = (yyvsp[(3) - (3)].val); (yyvsp[(1) - (3)].tptr)->value.var = (yyvsp[(3) - (3)].val); }
     break;
 
-  case 23:
-#line 1108 "glb_parser.y"
+  case 13:
+#line 1096 "glb_parser.y"
     {
   if(set_exp((yyvsp[(1) - (3)].name),(yyvsp[(3) - (3)].val),0)==1) yyerror("Unknown identifier");
   (yyval.val) = (yyvsp[(3) - (3)].val);
@@ -2698,16 +2618,16 @@ yyreduce:
 }
     break;
 
-  case 24:
-#line 1113 "glb_parser.y"
+  case 14:
+#line 1101 "glb_parser.y"
     {
   if(set_fnct((yyvsp[(1) - (3)].name),(yyvsp[(3) - (3)].nameptr)->sf)==1) yyerror("Unknown identifier");
   if ((yyvsp[(1) - (3)].name))  { glb_free((yyvsp[(1) - (3)].name));  (yyvsp[(1) - (3)].name)=NULL; }
 }
     break;
 
-  case 25:
-#line 1117 "glb_parser.y"
+  case 15:
+#line 1105 "glb_parser.y"
     {
   if(set_pair((yyvsp[(1) - (5)].name),(yyvsp[(3) - (5)].val),(yyvsp[(5) - (5)].val),0)==1) yyerror("Unknown identifier");
   (yyval.val) = (yyvsp[(3) - (5)].val);
@@ -2715,8 +2635,8 @@ yyreduce:
 }
     break;
 
-  case 26:
-#line 1122 "glb_parser.y"
+  case 16:
+#line 1110 "glb_parser.y"
     {
   /* added safety in case the function pointer is NULL, which is
      sometimes useful for special functions */
@@ -2724,160 +2644,138 @@ yyreduce:
   else (yyval.val) = (*((yyvsp[(1) - (4)].tptr)->value.fnctptr))((yyvsp[(3) - (4)].val)); }
     break;
 
-  case 27:
-#line 1128 "glb_parser.y"
+  case 17:
+#line 1116 "glb_parser.y"
     { (yyval.val) = (yyvsp[(1) - (3)].val) + (yyvsp[(3) - (3)].val);                    }
     break;
 
-  case 28:
-#line 1129 "glb_parser.y"
+  case 18:
+#line 1117 "glb_parser.y"
     { (yyval.val) = (yyvsp[(1) - (3)].val) - (yyvsp[(3) - (3)].val);                    }
     break;
 
-  case 29:
-#line 1130 "glb_parser.y"
+  case 19:
+#line 1118 "glb_parser.y"
     { (yyval.val) = (yyvsp[(1) - (3)].val) * (yyvsp[(3) - (3)].val);                    }
     break;
 
-  case 30:
-#line 1131 "glb_parser.y"
+  case 20:
+#line 1119 "glb_parser.y"
     { (yyval.val) = (yyvsp[(1) - (3)].val) / (yyvsp[(3) - (3)].val);                    }
     break;
 
-  case 31:
-#line 1132 "glb_parser.y"
+  case 21:
+#line 1120 "glb_parser.y"
     { (yyval.val) = -(yyvsp[(2) - (2)].val);                        }
     break;
 
-  case 32:
-#line 1133 "glb_parser.y"
+  case 22:
+#line 1121 "glb_parser.y"
     { (yyval.val) = pow ((yyvsp[(1) - (3)].val), (yyvsp[(3) - (3)].val));               }
     break;
 
-  case 33:
-#line 1134 "glb_parser.y"
+  case 23:
+#line 1122 "glb_parser.y"
     { (yyval.val) = (yyvsp[(2) - (3)].val);                         }
     break;
 
-  case 34:
-#line 1135 "glb_parser.y"
+  case 24:
+#line 1123 "glb_parser.y"
     { (yyval.val) = 0;}
     break;
 
-  case 35:
-#line 1136 "glb_parser.y"
+  case 25:
+#line 1124 "glb_parser.y"
     {yyerror("Unknown name");YYERROR;}
     break;
 
-  case 36:
-#line 1141 "glb_parser.y"
+  case 26:
+#line 1128 "glb_parser.y"
     {
   glb_List *ltemp;
-  ltemp=thread_list(&glb_list_copy,0,0,(yyvsp[(4) - (4)].tptr)->list); 
+  ltemp=thread_list(&glb_list_copy,0,0,(yyvsp[(4) - (4)].tptr)->list);
   if(set_exp_list((yyvsp[(1) - (4)].name),ltemp,3)==1) yyerror("Unknown identifier");
   (yyval.ptr) = ltemp;
   if ((yyvsp[(1) - (4)].name))  { glb_free((yyvsp[(1) - (4)].name));  (yyvsp[(1) - (4)].name)=NULL; }
 }
     break;
 
-  case 37:
-#line 1151 "glb_parser.y"
-    {(yyval.ptr)=list_cons(NULL,(yyvsp[(1) - (2)].val)); }
-    break;
-
-  case 38:
-#line 1152 "glb_parser.y"
-    {(yyval.ptr)=list_cons(NULL,(yyvsp[(1) - (3)].val)); }
-    break;
-
-  case 39:
-#line 1153 "glb_parser.y"
+  case 27:
+#line 1137 "glb_parser.y"
     {
-  glb_List *buf;
-  buf=(yyvsp[(1) - (3)].ptr);
-  buf=list_cons(buf,(yyvsp[(2) - (3)].val));
-  (yyval.ptr)=buf;   
+   glb_List *buf = list_cons(NULL, (yyvsp[(1) - (3)].val));
+   buf = list_cons(buf, (yyvsp[(3) - (3)].val));
+   (yyval.ptr)  = buf;
 }
     break;
 
-  case 40:
-#line 1160 "glb_parser.y"
-    {
-  glb_List *buf;
-  buf=(yyvsp[(1) - (4)].ptr);
-  buf=list_cons(buf,(yyvsp[(2) - (4)].val));
-  (yyval.ptr)=buf;   
-}
+  case 28:
+#line 1142 "glb_parser.y"
+    { (yyval.ptr) = list_cons((yyvsp[(1) - (3)].ptr), (yyvsp[(3) - (3)].val)); }
     break;
 
-  case 41:
-#line 1166 "glb_parser.y"
-    {
-  glb_List *buf;
-  buf=(yyvsp[(1) - (2)].ptr);
-  buf=list_cons(buf,(yyvsp[(2) - (2)].val));
-  (yyval.ptr)=buf;   
-}
-    break;
-
-  case 42:
-#line 1172 "glb_parser.y"
+  case 29:
+#line 1146 "glb_parser.y"
     {(yyval.ptr)=NULL;}
     break;
 
-  case 43:
-#line 1173 "glb_parser.y"
+  case 30:
+#line 1147 "glb_parser.y"
     {(yyval.ptr)=(yyvsp[(2) - (3)].ptr); }
     break;
 
-  case 44:
-#line 1174 "glb_parser.y"
+  case 31:
+#line 1148 "glb_parser.y"
     {(yyval.ptr)=list_cons(NULL,(yyvsp[(2) - (3)].val)); }
     break;
 
-  case 45:
-#line 1177 "glb_parser.y"
+  case 32:
+#line 1149 "glb_parser.y"
     {
   if(set_exp_list((yyvsp[(1) - (3)].name),(yyvsp[(3) - (3)].ptr),3)==1)  yyerror("Unknown identifier");
   (yyval.ptr) = (yyvsp[(3) - (3)].ptr);
   if ((yyvsp[(1) - (3)].name))  { glb_free((yyvsp[(1) - (3)].name));  (yyvsp[(1) - (3)].name)=NULL; }
- }
+}
     break;
 
-  case 46:
-#line 1184 "glb_parser.y"
+  case 33:
+#line 1154 "glb_parser.y"
     {(yyval.ptr) = thread_list((yyvsp[(1) - (4)].tptr)->value.fnctptr,(yyvsp[(1) - (4)].tptr)->reverse,(yyvsp[(1) - (4)].tptr)->destroy,(yyvsp[(3) - (4)].ptr));}
     break;
 
-  case 47:
-#line 1185 "glb_parser.y"
+  case 34:
+#line 1155 "glb_parser.y"
+    {(yyval.ptr) = thread_list((yyvsp[(1) - (4)].tptr)->value.fnctptr,(yyvsp[(1) - (4)].tptr)->reverse,(yyvsp[(1) - (4)].tptr)->destroy,(yyvsp[(3) - (4)].ptr));}
+    break;
+
+  case 35:
+#line 1156 "glb_parser.y"
     {(yyval.ptr) = (*((yyvsp[(1) - (3)].tptr)->value.lfnctptr))();}
     break;
 
-  case 48:
-#line 1186 "glb_parser.y"
+  case 36:
+#line 1157 "glb_parser.y"
     { (yyval.ptr) = (yyvsp[(1) - (1)].tptr)->list;              }
     break;
 
-  case 49:
-#line 1187 "glb_parser.y"
-    { (yyval.ptr) = (yyvsp[(3) - (3)].ptr); (yyvsp[(1) - (3)].tptr)->list = (yyvsp[(3) - (3)].ptr);/* printf("%s ",$1->name);showlist($3);printf("\n");*/ }
+  case 37:
+#line 1158 "glb_parser.y"
+    { (yyval.ptr) = (yyvsp[(3) - (3)].ptr); (yyvsp[(1) - (3)].tptr)->list = (yyvsp[(3) - (3)].ptr); }
     break;
 
-  case 50:
-#line 1188 "glb_parser.y"
+  case 38:
+#line 1159 "glb_parser.y"
     {(yyval.ptr)=glb_interpolation((yyvsp[(3) - (10)].ptr),(yyvsp[(5) - (10)].ptr),floor((yyvsp[(7) - (10)].val)),(yyvsp[(9) - (10)].ptr));}
     break;
 
-  case 51:
-#line 1189 "glb_parser.y"
+  case 39:
+#line 1160 "glb_parser.y"
     {}
     break;
 
-  case 52:
-#line 1194 "glb_parser.y"
-    { 
-
+  case 40:
+#line 1164 "glb_parser.y"
+    {
   double *buf;
   buf=(double*) glb_malloc(sizeof(double)*2);
   buf[0]=(yyvsp[(1) - (3)].val);
@@ -2886,18 +2784,8 @@ yyreduce:
 }
     break;
 
-  case 53:
-#line 1204 "glb_parser.y"
-    {}
-    break;
-
-  case 54:
-#line 1205 "glb_parser.y"
-    {}
-    break;
-
-  case 55:
-#line 1209 "glb_parser.y"
+  case 41:
+#line 1175 "glb_parser.y"
     { if((yyvsp[(3) - (4)].nameptr)->value==-1) {(yyvsp[(3) - (4)].nameptr)->value=step_counter((yyvsp[(1) - (4)].name)); }
   loc_count=(yyvsp[(3) - (4)].nameptr)->value;
   glb_free(context);
@@ -2907,58 +2795,63 @@ yyreduce:
 }
     break;
 
-  case 56:
-#line 1216 "glb_parser.y"
+  case 42:
+#line 1182 "glb_parser.y"
     {
   grp_end(context);
 }
     break;
 
-  case 57:
-#line 1219 "glb_parser.y"
+  case 43:
+#line 1185 "glb_parser.y"
     {
     yyerror("Redefinition of an automatic variable"); YYERROR;
     if ((yyvsp[(1) - (7)].name))  { glb_free((yyvsp[(1) - (7)].name));  (yyvsp[(1) - (7)].name)=NULL; }
 }
     break;
 
-  case 59:
-#line 1226 "glb_parser.y"
+  case 46:
+#line 1197 "glb_parser.y"
     {}
     break;
 
-  case 60:
-#line 1227 "glb_parser.y"
+  case 47:
+#line 1198 "glb_parser.y"
     {}
     break;
 
-  case 61:
-#line 1228 "glb_parser.y"
+  case 48:
+#line 1199 "glb_parser.y"
     {}
     break;
 
-  case 62:
-#line 1229 "glb_parser.y"
+  case 49:
+#line 1200 "glb_parser.y"
     {}
     break;
 
-  case 63:
-#line 1230 "glb_parser.y"
+  case 50:
+#line 1201 "glb_parser.y"
     {}
     break;
 
-  case 64:
-#line 1231 "glb_parser.y"
+  case 51:
+#line 1202 "glb_parser.y"
     {}
     break;
 
-  case 65:
-#line 1232 "glb_parser.y"
+  case 52:
+#line 1203 "glb_parser.y"
     {}
     break;
 
-  case 66:
-#line 1236 "glb_parser.y"
+  case 53:
+#line 1204 "glb_parser.y"
+    {}
+    break;
+
+  case 54:
+#line 1208 "glb_parser.y"
     {
   buff.version=strdup((yyvsp[(3) - (3)].name));
   if ((yyvsp[(1) - (3)].name))  { glb_free((yyvsp[(1) - (3)].name));  (yyvsp[(1) - (3)].name)=NULL; }
@@ -2966,8 +2859,8 @@ yyreduce:
 }
     break;
 
-  case 67:
-#line 1243 "glb_parser.y"
+  case 55:
+#line 1216 "glb_parser.y"
     {
   //load_cross($3,loc_count-1);
   xsc.file_name=strdup((yyvsp[(3) - (3)].name));
@@ -2977,12 +2870,12 @@ yyreduce:
 }
     break;
 
-  case 68:
-#line 1252 "glb_parser.y"
+  case 56:
+#line 1226 "glb_parser.y"
     {
   //load_flux($3,loc_count-1,1);
   flt.file_name=strdup((yyvsp[(3) - (3)].name));
- 
+
   //if(set_exp($1,$3,0)==1) yyerror("Unknown identifier");
   (yyval.name)=(yyvsp[(3) - (3)].name);
   if ((yyvsp[(1) - (3)].name))  { glb_free((yyvsp[(1) - (3)].name));  (yyvsp[(1) - (3)].name)=NULL; }
@@ -2990,12 +2883,12 @@ yyreduce:
 }
     break;
 
-  case 69:
-#line 1264 "glb_parser.y"
+  case 57:
+#line 1238 "glb_parser.y"
     {
   //load_flux($3,loc_count-1,1);
   flt.file_name=strdup((yyvsp[(3) - (3)].name));
- 
+
   //if(set_exp($1,$3,0)==1) yyerror("Unknown identifier");
   (yyval.name)=(yyvsp[(3) - (3)].name);
   if ((yyvsp[(1) - (3)].name))  { glb_free((yyvsp[(1) - (3)].name));  (yyvsp[(1) - (3)].name)=NULL; }
@@ -3003,26 +2896,8 @@ yyreduce:
 }
     break;
 
-  case 70:
-#line 1276 "glb_parser.y"
-    {
-  buff.sys_on_strings[buff.numofrules-1] = strdup((yyvsp[(3) - (3)].name));
-  if ((yyvsp[(1) - (3)].name))  { glb_free((yyvsp[(1) - (3)].name));  (yyvsp[(1) - (3)].name)=NULL; }
-  if ((yyvsp[(3) - (3)].name))  { glb_free((yyvsp[(3) - (3)].name));  (yyvsp[(3) - (3)].name)=NULL; }
-}
-    break;
-
-  case 71:
-#line 1283 "glb_parser.y"
-    {
-  buff.sys_off_strings[buff.numofrules-1] = strdup((yyvsp[(3) - (3)].name));
-  if ((yyvsp[(1) - (3)].name))  { glb_free((yyvsp[(1) - (3)].name));  (yyvsp[(1) - (3)].name)=NULL; }
-  if ((yyvsp[(3) - (3)].name))  { glb_free((yyvsp[(3) - (3)].name));  (yyvsp[(3) - (3)].name)=NULL; }
-}
-    break;
-
-  case 72:
-#line 1292 "glb_parser.y"
+  case 58:
+#line 1251 "glb_parser.y"
     {
 
   int x[6];
@@ -3030,7 +2905,7 @@ yyreduce:
   x[1]=(yyvsp[(5) - (13)].in);
   x[2]=(yyvsp[(7) - (13)].in);
   x[3]=(yyvsp[(9) - (13)].in);
-  x[4]=(int) (yyvsp[(11) - (13)].nameptr)->value -1; 
+  x[4]=(int) (yyvsp[(11) - (13)].nameptr)->value -1;
   x[5]=(int) (yyvsp[(13) - (13)].nameptr)->value -1;
 
   set_channel_data(x,loc_count);
@@ -3038,72 +2913,76 @@ yyreduce:
 }
     break;
 
-  case 73:
-#line 1308 "glb_parser.y"
+  case 59:
+#line 1268 "glb_parser.y"
     {(yyval.nameptr)=(yyvsp[(1) - (1)].nameptr);}
     break;
 
-  case 74:
-#line 1309 "glb_parser.y"
-    {yyerror("Unknown name");YYERROR;}
+  case 60:
+#line 1269 "glb_parser.y"
+    {
+  char s[strlen((yyvsp[(1) - (1)].name)) + 20];
+  sprintf(s, "Unknown name: %s", (yyvsp[(1) - (1)].name));
+  yyerror(s);
+//  yyerror("Unknown name");
+  YYERROR;
+}
     break;
 
-  case 75:
-#line 1313 "glb_parser.y"
+  case 61:
+#line 1279 "glb_parser.y"
     {(yyval.in)=(yyvsp[(1) - (1)].in);}
     break;
 
-  case 76:
-#line 1314 "glb_parser.y"
+  case 62:
+#line 1280 "glb_parser.y"
     {(yyval.in)=1;}
     break;
 
-  case 77:
-#line 1315 "glb_parser.y"
+  case 63:
+#line 1281 "glb_parser.y"
     {(yyval.in)=-1;}
     break;
 
-  case 78:
-#line 1319 "glb_parser.y"
+  case 64:
+#line 1285 "glb_parser.y"
     {
   glb_List **buf;
   energy_len=1;
- 
-  buf=(glb_List**) glb_malloc(sizeof( glb_List* ) ); 
+
+  buf=(glb_List**) glb_malloc(sizeof( glb_List* ) );
   buf[0]=(yyvsp[(3) - (3)].ptr);
   (yyval.ptrq)=buf;
   if ((yyvsp[(1) - (3)].name))  { glb_free((yyvsp[(1) - (3)].name));  (yyvsp[(1) - (3)].name)=NULL; }
 }
     break;
 
-  case 79:
-#line 1329 "glb_parser.y"
+  case 65:
+#line 1295 "glb_parser.y"
     {
   glb_List **buf;
   buf=(yyvsp[(1) - (3)].ptrq);
   energy_len++;
-  
-  buf=(glb_List**) glb_realloc((void**) buf , sizeof( glb_List* ) * energy_len);
- 
-  buf[energy_len-1]=(yyvsp[(3) - (3)].ptr); 
-  (yyval.ptrq)=buf; }
-    break;
-
-  case 80:
-#line 1339 "glb_parser.y"
-    {
-  glb_List **buf;
-  buf=(yyvsp[(1) - (4)].ptrq);
-  energy_len++;
 
   buf=(glb_List**) glb_realloc((void**) buf , sizeof( glb_List* ) * energy_len);
 
-  buf[energy_len-1]=(yyvsp[(4) - (4)].ptr); 
-  (yyval.ptrq)=buf; }
+  buf[energy_len-1]=(yyvsp[(3) - (3)].ptr);
+  (yyval.ptrq)=buf;
+}
     break;
 
-  case 81:
-#line 1352 "glb_parser.y"
+  case 66:
+#line 1308 "glb_parser.y"
+    { set_exp_energy("@energy",(yyvsp[(1) - (1)].ptrq)); }
+    break;
+
+  case 67:
+#line 1309 "glb_parser.y"
+    { set_exp_energy("@energy",(yyvsp[(1) - (2)].ptrq)); }
+    break;
+
+  case 68:
+#line 1313 "glb_parser.y"
     {
   glb_List **buf;
   buf=(glb_List**) glb_malloc(sizeof(glb_List*)*2);
@@ -3115,23 +2994,23 @@ yyreduce:
 }
     break;
 
-  case 82:
-#line 1361 "glb_parser.y"
+  case 69:
+#line 1322 "glb_parser.y"
     {
   glb_List **buf;
   buf=(yyvsp[(1) - (3)].ptrq);
   buf[0]=list_cons(buf[0],(yyvsp[(3) - (3)].dpt)[0]);
   buf[1]=list_cons(buf[1],(yyvsp[(3) - (3)].dpt)[1]);
   glb_free((yyvsp[(3) - (3)].dpt));
-  (yyval.ptrq)=buf; 
+  (yyval.ptrq)=buf;
 }
     break;
 
-  case 83:
-#line 1371 "glb_parser.y"
+  case 70:
+#line 1333 "glb_parser.y"
     {
-  glb_List **buf;  
- 
+  glb_List **buf;
+
   buf=(glb_List**) glb_malloc(sizeof(glb_List*)*2);
   buf[0]=list_cons(NULL,(yyvsp[(3) - (3)].dpt)[0]);
   buf[1]=list_cons(NULL,(yyvsp[(3) - (3)].dpt)[1]);
@@ -3141,81 +3020,65 @@ yyreduce:
 }
     break;
 
-  case 84:
-#line 1381 "glb_parser.y"
+  case 71:
+#line 1343 "glb_parser.y"
     {
   glb_List **buf;
   buf=(yyvsp[(1) - (3)].ptrq);
   buf[0]=list_cons(buf[0],(yyvsp[(3) - (3)].dpt)[0]);
   buf[1]=list_cons(buf[1],(yyvsp[(3) - (3)].dpt)[1]);
   glb_free((yyvsp[(3) - (3)].dpt));
-  (yyval.ptrq)=buf; 
+  (yyval.ptrq)=buf;
 }
     break;
 
-  case 85:
-#line 1391 "glb_parser.y"
+  case 72:
+#line 1354 "glb_parser.y"
     {
-
-int flag;  
-  
+  int flag;
   (yyval.ptrq)=(yyvsp[(1) - (1)].ptrq);
-  
   flag=set_exp_list("bgrulescoeff",(yyvsp[(1) - (1)].ptrq)[0],0);
   if(flag==1) yyerror("Unknown identifier");
   flag=set_exp_list("bgrulechannellist",(yyvsp[(1) - (1)].ptrq)[1],0);
   if(flag==1) yyerror("Unknown identifier");
- 
   glb_free((yyvsp[(1) - (1)].ptrq));
 }
     break;
 
-  case 86:
-#line 1404 "glb_parser.y"
+  case 73:
+#line 1363 "glb_parser.y"
     {
-  int flag;  
+  int flag;
   (yyval.ptrq)=(yyvsp[(1) - (1)].ptrq);
   flag=set_exp_list("rulescoeff",(yyvsp[(1) - (1)].ptrq)[0],0);
   if(flag==1) yyerror("Unknown identifier");
   flag=set_exp_list("rulechannellist",(yyvsp[(1) - (1)].ptrq)[1],0);
-  if(flag==1) yyerror("Unknown identifier"); 
-
+  if(flag==1) yyerror("Unknown identifier");
   glb_free((yyvsp[(1) - (1)].ptrq));
-
- 
 }
     break;
 
-  case 87:
-#line 1418 "glb_parser.y"
+  case 74:
+#line 1372 "glb_parser.y"
     {
- if((yyvsp[(1) - (1)].nameptr)->value==-1) {(yyvsp[(1) - (1)].nameptr)->value=step_counter("rule");printf("loc step\n"); }
-  loc_count=(yyvsp[(1) - (1)].nameptr)->value;
-  printf("loc_count %d \n",loc_count);
-  YYERROR;}
+  buff.sys_on_strings[buff.numofrules-1] = strdup((yyvsp[(3) - (3)].name));
+  if ((yyvsp[(1) - (3)].name))  { glb_free((yyvsp[(1) - (3)].name));  (yyvsp[(1) - (3)].name)=NULL; }
+  if ((yyvsp[(3) - (3)].name))  { glb_free((yyvsp[(3) - (3)].name));  (yyvsp[(3) - (3)].name)=NULL; }
+}
     break;
 
-  case 88:
-#line 1423 "glb_parser.y"
-    { YYERROR;}
-    break;
-
-  case 89:
-#line 1427 "glb_parser.y"
+  case 75:
+#line 1377 "glb_parser.y"
     {
- if((yyvsp[(1) - (1)].nameptr)->value==-1) {(yyvsp[(1) - (1)].nameptr)->value=step_counter("channel");printf("loc step\n"); }
-  loc_count=(yyvsp[(1) - (1)].nameptr)->value;
-  printf("cha loc_count %d \n",loc_count); YYERROR;}
-    break;
-
-  case 90:
-#line 1431 "glb_parser.y"
-    { YYERROR;}
+  buff.sys_off_strings[buff.numofrules-1] = strdup((yyvsp[(3) - (3)].name));
+  if ((yyvsp[(1) - (3)].name))  { glb_free((yyvsp[(1) - (3)].name));  (yyvsp[(1) - (3)].name)=NULL; }
+  if ((yyvsp[(3) - (3)].name))  { glb_free((yyvsp[(3) - (3)].name));  (yyvsp[(3) - (3)].name)=NULL; }
+}
     break;
 
 
 /* Line 1267 of yacc.c.  */
-#line 3219 "glb_parser.c"
+#line 3082 "glb_parser.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -3429,17 +3292,17 @@ yyreturn:
 }
 
 
-#line 1434 "glb_parser.y"
+#line 1384 "glb_parser.y"
 
 
 extern glb_symrec *sym_table;
- 
+
 int
 yyerror (const char *s)  /* Called by yyparse on error */
 {
   if(yydebug==1) fprintf(stderr,"*****************************************\n");
-  fprintf (stderr,"%s: ERROR: %s in file [%s]: in line %d\n",
-	   glb_prog_name,s,glb_file_id,glb_line_num+1);
+  fprintf (stderr,"%s: ERROR in file [%s], line %d: %s\n",
+	   glb_prog_name, glb_file_id, glb_line_num+1, s);
   if(yydebug==1) fprintf(stderr,"*****************************************\n");
   return 0;
 }
@@ -3483,7 +3346,7 @@ struct glb_init_sig
   char *fname;
   sigfun sf;
 };
-     
+
 static double echo(double x)
 {
   fprintf(stdout,"%f ",x);
@@ -3534,19 +3397,19 @@ static glb_List *glb_bincenter(void)
   glb_List *res=NULL;
   glb_smear *test;
   test=glb_smear_alloc();
-  
+
   if(buff.numofbins<0) {glb_error("Cannot compute bincenter. Binning not set up properly."); return NULL;}
 
   glb_set_up_smear_data(test,&buff);
 
- 
+
   for(i=0;i<test->numofbins;i++)
-    {    
+    {
       res=list_cons(res,test->bincenter[i]);
     }
- 
+
   glb_smear_free(test);
- 
+
   return res;
 }
 
@@ -3557,21 +3420,21 @@ static glb_List *glb_samplingbincenter(void)
   glb_List *res=NULL;
   glb_smear *test;
   test=glb_smear_alloc();
-  
+
   if(buff.simbins<0) {glb_error("Cannot compute samplingbincenter. Sampling-binning not set up properly."); return NULL;}
 
-  
+
   glb_set_up_smear_data(test,&buff);
 
   for(i=0;i<test->simbins;i++)
     {
-      
+
       res=list_cons(res,test->simbincenter[i]);
     }
- 
+
   glb_smear_free(test);
- 
-  
+
+
   return res;
 }
 
@@ -3607,7 +3470,7 @@ struct glb_init_sig sig_fncts[] =
   };
 
 /* The symbol table: a chain of `struct glb_symrec'.  */
-static glb_namerec *name_table = (glb_namerec *) NULL; 
+static glb_namerec *name_table = (glb_namerec *) NULL;
 /* cannot use static here, since its declared earlier as extern */
 glb_symrec *sym_table = (glb_symrec *) NULL;
 static glb_symrec *pre_sym_table = (glb_symrec *) NULL;
@@ -3617,7 +3480,7 @@ static glb_symrec *pre_sym_table = (glb_symrec *) NULL;
 #define DENSITY_LIST 3
 
 
-/* Put arithmetic functions in table. 
+/* Put arithmetic functions in table.
  * And all user-defined stuff.
  */
 static void
@@ -3625,7 +3488,7 @@ init_table (void)
 {
   int i;
   glb_symrec *ptr,*p;
-  
+
   glb_namerec *sptr;
   for (i = 0; arith_fncts[i].fname != 0; i++)
     {
@@ -3633,7 +3496,7 @@ init_table (void)
       ptr->value.fnctptr = arith_fncts[i].fnct;
       ptr->destroy=arith_fncts[i].destroy;
       ptr->reverse=arith_fncts[i].reverse;
- 
+
     }
   for (i = 0; list_fncts[i].fname != 0; i++)
     {
@@ -3647,10 +3510,10 @@ init_table (void)
     {
       p=glb_putsym(ptr->name,ptr->type);
       p->value.var=ptr->value.var;
-      if(ptr->list!=NULL) p->list=thread_list(&glb_list_copy,0,0,ptr->list); 
+      if(ptr->list!=NULL) p->list=thread_list(&glb_list_copy,0,0,ptr->list);
     ptr=ptr->next;
     }
-  
+
   for (i = 0; sig_fncts[i].fname != 0; i++)
     {
       sptr = glb_putname (sig_fncts[i].fname,"energy",SFNCT);
@@ -3665,12 +3528,12 @@ free_symtable()
     glb_symrec *dummy;
     ptr=sym_table;
     while(ptr != (glb_symrec *) NULL)
-      {	
+      {
 	glb_free(ptr->name);
 	if(ptr->list!=NULL){ list_free(ptr->list);}
 	dummy=ptr->next;
 	glb_free(ptr);
-	ptr=dummy;  
+	ptr=dummy;
       }
     sym_table=NULL;
 }
@@ -3682,12 +3545,12 @@ free_presymtable()
     glb_symrec *dummy;
     ptr=pre_sym_table;
     while(ptr != (glb_symrec *) NULL)
-      {	
+      {
 	glb_free(ptr->name);
 	if(ptr->list!=NULL){ list_free(ptr->list);}
 	dummy=ptr->next;
 	glb_free(ptr);
-	ptr=dummy;  
+	ptr=dummy;
       }
     pre_sym_table=NULL;
 }
@@ -3698,16 +3561,16 @@ free_presymtable()
 static void
 free_nametable()
 {
-    glb_namerec *ptr;  
+    glb_namerec *ptr;
     glb_namerec *dummy;
     ptr=name_table;
     while(ptr != (glb_namerec *) NULL)
-      {	
+      {
 	glb_free(ptr->name);
 	glb_free(ptr->context);
 	dummy=ptr->next;
 	glb_free(ptr);
-	ptr=dummy;  
+	ptr=dummy;
       }
     name_table=NULL;
 }
@@ -3744,7 +3607,7 @@ static glb_naming *glb_putnames (char *sym_name, char *context, int value,
   ptr->context = (char *) glb_malloc (strlen (context) + 1);
   strcpy (ptr->context,context);
   ptr->value = value; /* set value to -1 for new ones  */
-  
+
   ptr->next = (struct glb_naming *) in;
   //in = ptr;
   return ptr;
@@ -3752,7 +3615,7 @@ static glb_naming *glb_putnames (char *sym_name, char *context, int value,
 
 static glb_naming *copy_names (glb_naming *in)
 {
-  
+
   glb_namerec *ptr;
   for (ptr = name_table; ptr != (glb_namerec *) NULL;
        ptr = (glb_namerec *)ptr->next)
@@ -3784,7 +3647,7 @@ glb_namerec *glb_putname (char *sym_name, char *context, int sym_type)
   strcpy (ptr->context,context);
   ptr->type = sym_type;
   ptr->value = -1; /* set value to -1 for new ones  */
-  
+
   ptr->next = (struct glb_namerec *)name_table;
   name_table = ptr;
   return ptr;
@@ -3829,7 +3692,7 @@ glb_getpresym (const char *sym_name)
 
 
 /* A new an powerful function which allows the user to define variables
- * for substitution in the AEDL files 
+ * for substitution in the AEDL files
  */
 
 
@@ -3844,7 +3707,7 @@ void glbDefineAEDLVariable(const char *name, double value)
 
 void glbClearAEDLVariables()
 {
-   if(pre_sym_table!=NULL) free_presymtable(); 
+   if(pre_sym_table!=NULL) free_presymtable();
 }
 
 
@@ -3854,13 +3717,13 @@ void glbDefineAEDLList(const char *name, double *list, size_t length)
 {
   size_t i;
   glb_symrec *ptr;
-  if(name==NULL) return;   
+  if(name==NULL) return;
   if(name[0]!='%'){ fprintf(stderr,"ERROR: AEDL lists have to start with '\%'\n");return;}
   ptr=glb_getpresym(name);
   if(ptr==0) ptr = glb_putpresym (name, LVAR);
   for(i=0;i<length;i++) {ptr->list=list_cons(ptr->list,list[i]);
   }
-  
+
   return;
 }
 
@@ -3872,11 +3735,11 @@ void glb_copy_buff()
   /* I am not sure how well this assigment really works */
   buff.names=copy_names(buff.names);
   buff.filename=strdup(glb_file_id);
-  buff_list[exp_count]=buff; 
+  buff_list[exp_count]=buff;
   exp_count++;
 }
 
-void glbReset() 
+void glbReset()
 {
   glb_line_num=0;
   energy_len=1;
@@ -3884,7 +3747,7 @@ void glbReset()
   loc_count=-1;
   flux_count=-1;
   glbInitExp(&buff);
- 
+
   if(name_table!=NULL) free_nametable();
   if(sym_table!=NULL) free_symtable();
   name_table =(glb_namerec *) NULL;
@@ -3893,12 +3756,12 @@ void glbReset()
 }
 
 void glbResetCounters()
-{ 
+{
   flux_count=-1;
   cross_count=-1;
 }
 
-void glbResetEOF() 
+void glbResetEOF()
 {
   int i;
   exp_count=0;
@@ -3919,7 +3782,7 @@ void glbResetEOF()
   init_table ();
   glb_flux_reset(&flt);
   glb_xsec_reset(&xsc);
- 
+
 }
 
 void glb_clean_parser()
@@ -3927,14 +3790,14 @@ void glb_clean_parser()
   if(name_table!=NULL) free_nametable();
   if(sym_table!=NULL) free_symtable();
   if(pre_sym_table!=NULL) free_presymtable();
-  
+
 }
 
 int glbInitExperiment(char *inf,glb_exp *in, int *counter)
 {
   FILE *input;
   int k,i;
-  const char tch[]="%!GLoBES"; 
+  const char tch[]="%!GLoBES";
   char tct[11];
   struct glb_experiment **ins;
   ins=(struct glb_experiment **) in;
@@ -3963,14 +3826,14 @@ int glbInitExperiment(char *inf,glb_exp *in, int *counter)
   glb_fclose(yyin);
   glb_free(context);
   glb_free(glb_file_id);
-  
+
   if(k!=0) return -2;
-  
+
   k=0;
 
   if(*counter+exp_count>GLB_MAX_EXP) glb_fatal("Too many experiments!");
   for(i=0;i<exp_count;i++)
-    {  
+    {
       *ins[*counter+i]=buff_list[i];
       k=+glbDefaultExp(ins[*counter+i]);
     }
@@ -3980,7 +3843,7 @@ int glbInitExperiment(char *inf,glb_exp *in, int *counter)
   glb_init_minimizer();
 
   if(k!=0) return -1;
-  
+
   return 0;
 
 }
