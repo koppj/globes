@@ -254,6 +254,7 @@ double glbGetFilterInExperiment(int experiment);
 int glbGetEminEmax(int experiment, double *emin, double *emax);
 int glbGetEnergyWindow(int experiment, int rule, double *low, double *high);
 int glbGetEnergyWindowBins(int experiment, int rule, int *low_bin, int *high_bin);
+int glbSetEnergyWindow(int experiment, int rule, double low, double high);
 int glbGetNumberOfSamplingPoints(int exp);
 int glbGetNumberOfBins(int exp);
 int glbGetNumberOfRules(int exp);

@@ -128,6 +128,7 @@ package globes;
 *glbGetEminEmax = *globesc::glbGetEminEmax;
 *glbGetEnergyWindow = *globesc::glbGetEnergyWindow;
 *glbGetEnergyWindowBins = *globesc::glbGetEnergyWindowBins;
+*glbSetEnergyWindow = *globesc::glbSetEnergyWindow;
 *glbGetNumberOfSamplingPoints = *globesc::glbGetNumberOfSamplingPoints;
 *glbGetNumberOfBins = *globesc::glbGetNumberOfBins;
 *glbGetNumberOfRules = *globesc::glbGetNumberOfRules;

@@ -152,3 +152,10 @@
             - Run aclocal -I m4, autoconf, automake, autoheader
               (in this order)
 
+23 Apr 2010 JK
+        - Significant modifications to parser. Now accepts line breaks
+          anywhere.
+
+27 Apr 2010 JK
+        - Implemented new function glbSetEnergyWindow
+

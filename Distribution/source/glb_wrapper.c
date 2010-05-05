@@ -2153,8 +2153,13 @@ glbGetEminEmax(int experiment, double *emin, double *emax)
 }
 
 
-int
-glbGetEnergyWindow(int experiment, int rule, double *low, double *high)
+/***************************************************************************
+ * Function glbGetEnergyWindow                                             *
+ ***************************************************************************
+ * Return lower and upper bounds of the analysis window in the given       *
+ * experiment and rule.                                                    *
+ ***************************************************************************/
+int glbGetEnergyWindow(int experiment, int rule, double *low, double *high)
 {
   struct glb_experiment *in;
 
@@ -2175,12 +2180,16 @@ glbGetEnergyWindow(int experiment, int rule, double *low, double *high)
   else
     { glb_error("glbGetEnergyWindow: Invalid experiment number"); return -1; }
   return 0;
-
 }
 
 
-int
-glbGetEnergyWindowBins(int experiment, int rule, int *low, int *high)
+/***************************************************************************
+ * Function glbGetEnergyWindowBins                                         *
+ ***************************************************************************
+ * Return lowest and highest bin overlapping with the analysis window in   *
+ * the given experiment and rule.                                          *
+ ***************************************************************************/
+int glbGetEnergyWindowBins(int experiment, int rule, int *low, int *high)
 {
   struct glb_experiment *in;
 
@@ -2201,6 +2210,116 @@ glbGetEnergyWindowBins(int experiment, int rule, int *low, int *high)
   else
     { glb_error("glbGetEnergyWindow: Invalid experiment number"); return -1; }
   return 0;
+}
+
+
+/***************************************************************************
+ * Function glbSetEnergyWindowInRule                                       *
+ ***************************************************************************
+ * This helper function is called by glbSetEnergyWindowInExperiment. Its   *
+ * parameters are similar to those of glbSetEnergyWindow, but it does not  *
+ * experiment=GLB_ALL or rule=GLB_ALL                                      *
+ ***************************************************************************/
+int glbSetEnergyWindowInRule(int experiment, int rule, double low, double high)
+{
+  int k;
+  struct glb_experiment *in;
+
+  if (experiment < 0  ||  experiment >= glb_num_of_exps)
+  {
+    glb_error("glbSetEnergyWindowInRule: Invalid experiment number");
+    return -1;
+  }
+  in = (struct glb_experiment *) glb_experiment_list[experiment];
+  if (rule < 0  ||  rule > in->numofrules)
+  {
+    glb_error("glbSetEnergyWindowInRule: Invalid rule number");
+    return -1;
+  }
+
+  if (low > high)
+  {
+    glb_error("glbSetEnergyWindowInRule: Lower boundary above upper boundary");
+    return -1;
+  }
+
+  /* Set new energy window */
+  in->energy_window[rule][0] = low;
+  in->energy_window[rule][1] = high;
+
+  /* Compute bin ranges corresponding to energy window */
+  k = 0;
+  while (in->smear_data[0]->bincenter[k] <= in->energy_window[rule][0])
+    k++;
+  in->energy_window_bins[rule][0] = k;
+  while (k < in->numofbins && in->smear_data[0]->bincenter[k] < in->energy_window[rule][1])
+    k++;
+  in->energy_window_bins[rule][1] = k-1;
+
+  return 0;
+}
+
+
+/***************************************************************************
+ * Function glbSetEnergyWindowInExperiment                                 *
+ ***************************************************************************
+ * This helper function is called by glbSetEnergyWindow. Its parameters    *
+ * similar to those of glbSetEnergyWindow, but it does not accept          *
+ * experiment=GLB_ALL                                                      *
+ ***************************************************************************/
+int glbSetEnergyWindowInExperiment(int experiment, int rule, double low, double high)
+{
+  int i;
+  struct glb_experiment *in;
+
+  if (experiment < 0  ||  experiment >= glb_num_of_exps)
+  {
+    glb_error("glbSetEnergyWindowInExperiment: Invalid experiment number");
+    return -1;
+  }
+
+  in = (struct glb_experiment *) glb_experiment_list[experiment];
+  if(rule == GLB_ALL)
+  {
+    for(i=0; i < in->numofrules; i++)
+      glbSetEnergyWindowInRule(experiment, i, low, high);
+  }
+  else if (rule >= 0  &&  rule < in->numofrules)
+    glbSetEnergyWindowInRule(experiment, rule, low, high);
+  else
+  {
+    glb_error("glbSetEnergyWindowInExperiment: Invalid value for rule number");
+    return -1;
+  }
+  return 0;
+}
+
+/***************************************************************************
+ * Function glbSetEnergyWindow                                             *
+ ***************************************************************************
+ * Modify the energy window in the given experiment and rule (both can be  *
+ * GLB_ALL).                                                               *
+ ***************************************************************************/
+int glbSetEnergyWindow(int experiment, int rule, double low, double high)
+{
+  int i, s=0;
+
+  if (experiment == GLB_ALL)
+  {
+    for(i=0; i < glb_num_of_exps; i++)
+      s += glbSetEnergyWindowInExperiment(i, rule, low, high);
+  }
+  else if (experiment >= 0  &&  experiment < glb_num_of_exps)
+  {
+    s += glbSetEnergyWindowInExperiment(experiment, rule, low, high);
+  }
+  else
+  {
+    glb_error("glbSetEnergyWindow: Invalid value for experiment number");
+    return -1;
+  }
+
+  return s;
 }
 
 
