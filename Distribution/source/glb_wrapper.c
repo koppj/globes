@@ -64,11 +64,11 @@ glb_osc_type *glb_alloc_osc_type()
 {
   glb_osc_type *temp;
   int i;
-  
+
   temp = (glb_osc_type *) glb_malloc(sizeof(glb_osc_type));
   if (temp != NULL)
   {
-    temp->osc_params = (double *) glb_malloc(sizeof(double) * glbGetNumOfOscParams()); 
+    temp->osc_params = (double *) glb_malloc(sizeof(double) * glbGetNumOfOscParams());
     if (temp->osc_params != NULL)
     {
       for (i=0; i < glbGetNumOfOscParams(); i++)
@@ -89,13 +89,13 @@ glb_density_type *glb_alloc_density_type()
 {
   glb_density_type *temp;
   int i;
-  
+
   temp = (glb_density_type *) glb_malloc(sizeof(glb_density_type));
   if (temp != NULL)
   {
     temp->density_params = (double *) glb_malloc(sizeof(double)*glb_num_of_exps);
 
-    
+
     if (temp->density_params != NULL)
     {
       for(i=0; i < glb_num_of_exps; i++)
@@ -147,7 +147,7 @@ int glbGetIteration(const glb_params in)
   return in->iterations;
 }
 
-glb_params glbSetDensityParams(glb_params in, 
+glb_params glbSetDensityParams(glb_params in,
 				 double dens, int which)
 {
   int i;
@@ -159,7 +159,7 @@ glb_params glbSetDensityParams(glb_params in,
     {
       (in->density)->density_params[which]=dens;
     }
-  else 
+  else
     {
       glb_error("glbSetDensityParams: Density list length mismatch");
       return NULL;
@@ -174,7 +174,7 @@ double glbGetDensityParams(const glb_params in, int which)
     {
       out=(in->density)->density_params[which];
     }
-  else 
+  else
     {
       glb_error("glbGetDensityParams: Density list length mismatch");
       return 0;
@@ -187,7 +187,7 @@ glb_params glbSetOscParams(glb_params in,
 {
   if (0 <= which&&which < glbGetNumOfOscParams())
     in->osc->osc_params[which] = osc;
-  else 
+  else
   {
     glb_error("glbSetOscParams: Oscillation list length mismatch");
     return NULL;
@@ -202,7 +202,7 @@ double glbGetOscParams(const glb_params in, int which)
     {
       out=(in->osc)->osc_params[which];
     }
-  else 
+  else
     {
       glb_error("glbGetOscParams: Oscillation list length mismatch");
       return 0;
@@ -210,7 +210,7 @@ double glbGetOscParams(const glb_params in, int which)
   return out;
 }
 
-glb_params 
+glb_params
 glbDefineParams(glb_params in,double theta12, double theta13, double theta23,
 	      double delta, double dms, double dma)
 {
@@ -224,15 +224,15 @@ glbDefineParams(glb_params in,double theta12, double theta13, double theta23,
 }
 
 
-glb_params 
+glb_params
 glbCopyParams(const glb_params source, glb_params dest)
 {
   int i;
-  
+
   if(dest==NULL||source==NULL) return NULL;
   if(source==dest) return dest;
   dest->iterations=source->iterations;
-  
+
   /* BUG #13 -- The use of realloc should solve a memory leak and makes this
      function pretty featureful, since it supports copying parameters
      even if the number of parameters and/or experiments has changed.
@@ -252,25 +252,25 @@ glbCopyParams(const glb_params source, glb_params dest)
 	glb_realloc((dest->density)->density_params,(source->density)->length * sizeof(double));
       (dest->density)->length=(source->density)->length;
     }
-  
-  for(i=0;i<(dest->osc)->length;i++) 
+
+  for(i=0;i<(dest->osc)->length;i++)
     (dest->osc)->osc_params[i]=(source->osc)->osc_params[i];
 
-  for(i=0;i<(dest->density)->length;i++) 
+  for(i=0;i<(dest->density)->length;i++)
     (dest->density)->density_params[i]=(source->density)->density_params[i];
 
   return dest;
-  
+
 }
 
 void glbPrintParams(FILE *stream, const glb_params in)
 {
   size_t k;
-  for(k=0;k<(in->osc)->length;k++) 
-	fprintf(stream,"%g ",(in->osc)->osc_params[k]);   
+  for(k=0;k<(in->osc)->length;k++)
+	fprintf(stream,"%g ",(in->osc)->osc_params[k]);
   fprintf(stream,"\n");
-  for(k=0;k<(in->density)->length;k++) 
-	fprintf(stream,"%g ",(in->density)->density_params[k]);    
+  for(k=0;k<(in->density)->length;k++)
+	fprintf(stream,"%g ",(in->density)->density_params[k]);
   fprintf(stream,"\n");
   fprintf(stream,"Iterations: %d\n",in->iterations);
 }
@@ -284,7 +284,7 @@ glb_osc_proj_type *glb_alloc_osc_proj_type()
   int i;
   glb_osc_proj_type *temp;
   temp=(glb_osc_proj_type *) glb_malloc(sizeof(glb_osc_proj_type));
-  temp->osc_params=(int *) glb_malloc(sizeof(int) *  glbGetNumOfOscParams()); 
+  temp->osc_params=(int *) glb_malloc(sizeof(int) *  glbGetNumOfOscParams());
   temp->length = (size_t) glbGetNumOfOscParams();
   for(i=0;i<glbGetNumOfOscParams();i++) temp->osc_params[i]=GLB_UNDEFINED;
   return temp;
@@ -334,7 +334,7 @@ void glbFreeProjection(glb_projection stale)
 }
 
 
-glb_projection glbSetDensityProjectionFlag(glb_projection in, 
+glb_projection glbSetDensityProjectionFlag(glb_projection in,
 				       int flag, int which)
 {
   int i;
@@ -351,7 +351,7 @@ glb_projection glbSetDensityProjectionFlag(glb_projection in,
     {
       (in->density)->density_params[which]=flag;
     }
-  else 
+  else
     {
       glb_error("Density list length mismatch");
       return NULL;
@@ -366,7 +366,7 @@ int glbGetDensityProjectionFlag(const glb_projection in, int which)
     {
       out=(in->density)->density_params[which];
     }
-  else 
+  else
     {
       glb_error("Density list length mismatch");
       return -1;
@@ -374,7 +374,7 @@ int glbGetDensityProjectionFlag(const glb_projection in, int which)
   return out;
 }
 
-glb_projection glbSetProjectionFlag(glb_projection in, 
+glb_projection glbSetProjectionFlag(glb_projection in,
 				 int flag, int which)
 {
   if((flag!=GLB_FREE)&&(flag!=GLB_FIXED)) {
@@ -386,7 +386,7 @@ glb_projection glbSetProjectionFlag(glb_projection in,
     {
       (in->osc)->osc_params[which]=flag;
     }
-  else 
+  else
     {
       glb_error("Oscillation list length mismatch");
       return NULL;
@@ -401,7 +401,7 @@ int glbGetProjectionFlag(const glb_projection in, int which)
     {
       out=(in->osc)->osc_params[which];
     }
-  else 
+  else
     {
       glb_error("Oscillation list length mismatch");
       return -1;
@@ -410,7 +410,7 @@ int glbGetProjectionFlag(const glb_projection in, int which)
 }
 
 
-glb_projection 
+glb_projection
 glbDefineProjection(glb_projection in,int theta12, int theta13, int theta23,
 	      int delta, int dms, int dma)
 {
@@ -452,10 +452,10 @@ glbCopyProjection(const glb_projection source, glb_projection dest)
       (dest->density)->length=(source->density)->length;
     }
 
-  for(i=0;i<(source->osc)->length;i++) 
+  for(i=0;i<(source->osc)->length;i++)
     (dest->osc)->osc_params[i]=(source->osc)->osc_params[i];
 
-  for(i=0;i<(source->density)->length;i++) 
+  for(i=0;i<(source->density)->length;i++)
     (dest->density)->density_params[i]=(source->density)->density_params[i];
 
   return dest;
@@ -465,22 +465,22 @@ glbCopyProjection(const glb_projection source, glb_projection dest)
 void glbPrintProjection(FILE *stream, const glb_projection in)
 {
   size_t k;
-  for(k=0;k<(in->osc)->length;k++) 
+  for(k=0;k<(in->osc)->length;k++)
     {
-      if((in->osc)->osc_params[k]==GLB_FREE) 
+      if((in->osc)->osc_params[k]==GLB_FREE)
 	fprintf(stream,"free  ");
-      if((in->osc)->osc_params[k]==GLB_FIXED) 
+      if((in->osc)->osc_params[k]==GLB_FIXED)
 	fprintf(stream,"fixed ");
       if(((in->osc)->osc_params[k]!=GLB_FIXED) &&
 	 ((in->osc)->osc_params[k]!=GLB_FREE) )
 	fprintf(stream,"undef ");
     }
   fprintf(stream,"\n");
-  for(k=0;k<(in->density)->length;k++) 
+  for(k=0;k<(in->density)->length;k++)
     {
-      if((in->density)->density_params[k]==GLB_FREE) 
+      if((in->density)->density_params[k]==GLB_FREE)
 	fprintf(stream,"free  ");
-      if((in->density)->density_params[k]==GLB_FIXED) 
+      if((in->density)->density_params[k]==GLB_FIXED)
 	fprintf(stream,"fixed ");
       if(((in->density)->density_params[k]!=GLB_FIXED) &&
 	 ((in->density)->density_params[k]!=GLB_FREE) )
@@ -490,12 +490,12 @@ void glbPrintProjection(FILE *stream, const glb_projection in)
 }
 
 
-/* Wrappers for the old functions dealing with setting the oscillation 
+/* Wrappers for the old functions dealing with setting the oscillation
  * parameters
  */
 
 
-int 
+int
 glbSetOscillationParameters(const glb_params in)
 {
   if (in == NULL)
@@ -505,7 +505,7 @@ glbSetOscillationParameters(const glb_params in)
 }
 
 
-int 
+int
 glbGetOscillationParameters(glb_params in)
 {
   if (in == NULL)
@@ -533,8 +533,8 @@ glbClearExperimentList()
 }
 
 
-/********************************************** 
- * Low-level access to the event rate vectors * 
+/**********************************************
+ * Low-level access to the event rate vectors *
  **********************************************/
 
 /***************************************************************************
@@ -556,7 +556,7 @@ double *glbGetChannelRatePtr(int exp, int channel, int pre_post)
     glb_error("glbGetChannelRatePtr: Parameter \"channel\" is invalid");
     return NULL;
   }
-  
+
   switch (pre_post)
   {
     case GLB_PRE:
@@ -588,7 +588,7 @@ double *glbGetRuleRatePtr(int exp, int rule)
     glb_error("glbGetRuleRatePtr: Parameter \"rule\" is invalid");
     return NULL;
   }
-  
+
   return glb_experiment_list[exp]->rates0[rule];
 }
 
@@ -611,7 +611,7 @@ double *glbGetSignalRatePtr(int exp, int rule)
     glb_error("glbGetSignalRatePtr: Parameter \"rule\" is invalid");
     return NULL;
   }
-  
+
   return glb_experiment_list[exp]->SignalRates[rule];
 }
 
@@ -634,7 +634,7 @@ double *glbGetBGRatePtr(int exp, int rule)
     glb_error("glbGetBGRatePtr: Parameter \"rule\" is invalid");
     return NULL;
   }
-  
+
   return glb_experiment_list[exp]->BackgroundRates[rule];
 }
 
@@ -658,7 +658,7 @@ double *glbGetChannelFitRatePtr(int exp, int channel, int pre_post)
     glb_error("glbGetChannelFitRatePtr: Parameter \"channel\" is invalid");
     return NULL;
   }
-  
+
   switch (pre_post)
   {
     case GLB_PRE:
@@ -691,7 +691,7 @@ double *glbGetSignalFitRatePtr(int exp, int rule)
     glb_error("glbGetSignalFitRatePtr: Parameter \"rule\" is invalid");
     return NULL;
   }
-  
+
   return glb_experiment_list[exp]->rates1[rule];
 }
 
@@ -714,7 +714,7 @@ double *glbGetBGFitRatePtr(int exp, int rule)
     glb_error("glbGetBGFitRatePtr: Parameter \"rule\" is invalid");
     return NULL;
   }
-  
+
   return glb_experiment_list[exp]->rates1BG[rule];
 }
 
@@ -737,7 +737,7 @@ double *glbGetEfficiencyPtr(int exp, int channel, int pre_post)
     glb_error("glbGetEfficiencyPtr: Parameter \"channel\" is invalid");
     return NULL;
   }
-  
+
   switch (pre_post)
   {
     case GLB_PRE:
@@ -770,7 +770,7 @@ double *glbGetBackgroundPtr(int exp, int channel, int pre_post)
     glb_error("glbGetBackgroundPtr: Parameter \"channel\" is invalid");
     return NULL;
   }
-  
+
   switch (pre_post)
   {
     case GLB_PRE:
@@ -793,7 +793,7 @@ glbGetChannelRates(double **data, size_t *length,
   size_t l;
   int i;
   double *temp;
-  if(exp>=glb_num_of_exps) 
+  if(exp>=glb_num_of_exps)
     {
       glb_error("Error in glbGetChannelRates: 4th argument is larger than"
 		" glb_num_of_exps");
@@ -801,7 +801,7 @@ glbGetChannelRates(double **data, size_t *length,
       *length=0;
       return -1;
     }
-  if(channel>= ((struct glb_experiment *) glb_experiment_list[exp])->numofchannels) 
+  if(channel>= ((struct glb_experiment *) glb_experiment_list[exp])->numofchannels)
     {
       glb_error("Error in glbGetChannelRates: 5th argument is larger than"
 		" numofchannels");
@@ -810,7 +810,7 @@ glbGetChannelRates(double **data, size_t *length,
       return -1;
     }
 
-  if(exp<0) 
+  if(exp<0)
     {
       glb_error("Error in glbGetChannelRates: 4th argument must be larger than"
 		" 0");
@@ -818,7 +818,7 @@ glbGetChannelRates(double **data, size_t *length,
       *length=0;
       return -1;
     }
- if(channel<0) 
+ if(channel<0)
     {
       glb_error("Error in glbGetChannelRates: 5th argument must be larger than"
 		" 0");
@@ -838,7 +838,7 @@ glbGetChannelRates(double **data, size_t *length,
 
   if(smearing==GLB_PRE) l=(size_t)
 			  ((struct glb_experiment *) glb_experiment_list[exp])->simbins;
-  else l=(size_t) 
+  else l=(size_t)
 	 ((struct glb_experiment *) glb_experiment_list[exp])->numofbins;
   if(l<=0)
     {
@@ -851,10 +851,10 @@ glbGetChannelRates(double **data, size_t *length,
 
   temp=(double *) obstack_alloc(&glb_rate_stack,(l+1) * sizeof(double));
   if(smearing==GLB_PRE)
-    for(i=0;i<l;i++) 
+    for(i=0;i<l;i++)
       temp[i]= ((struct glb_experiment *) glb_experiment_list[exp])->chrb_0[channel][i];
   else
-    for(i=0;i<l;i++) 
+    for(i=0;i<l;i++)
       temp[i]= ((struct glb_experiment *) glb_experiment_list[exp])->chra_0[channel][i];
 
   temp[l]=-1.0;
@@ -867,13 +867,13 @@ glbGetChannelRates(double **data, size_t *length,
 
 
 int
-glbGetUserData(double **data, size_t *length, 
+glbGetUserData(double **data, size_t *length,
 		   int exp, int channel, int smearing, int bgeff)
 {
   size_t l;
   int i;
   double *temp;
-  if(exp>=glb_num_of_exps) 
+  if(exp>=glb_num_of_exps)
     {
       glb_error("Error in glbGetUserData: 5th argument is larger than"
 		" glb_num_of_exps");
@@ -881,7 +881,7 @@ glbGetUserData(double **data, size_t *length,
       *length=0;
       return -1;
     }
-  if(channel>= ((struct glb_experiment *) glb_experiment_list[exp])->numofchannels) 
+  if(channel>= ((struct glb_experiment *) glb_experiment_list[exp])->numofchannels)
     {
       glb_error("Error in glbGetUserData: 6th argument is larger than"
 		" numofchannels");
@@ -890,7 +890,7 @@ glbGetUserData(double **data, size_t *length,
       return -1;
     }
 
-  if(exp<0) 
+  if(exp<0)
     {
       glb_error("Error in glbGetUserData: 5th argument must be larger than"
 		" 0");
@@ -898,7 +898,7 @@ glbGetUserData(double **data, size_t *length,
       *length=0;
       return -1;
     }
- if(channel<0) 
+ if(channel<0)
     {
       glb_error("Error in glbGetUserData: 6th argument must be larger than"
 		" 0");
@@ -926,7 +926,7 @@ glbGetUserData(double **data, size_t *length,
 
   if(smearing==GLB_PRE) l=(size_t)
 			  ((struct glb_experiment *) glb_experiment_list[exp])->simbins;
-  else l=(size_t) 
+  else l=(size_t)
 	 ((struct glb_experiment *) glb_experiment_list[exp])->numofbins;
   if(l<=0)
     {
@@ -941,27 +941,27 @@ glbGetUserData(double **data, size_t *length,
   if(smearing==GLB_PRE)
     {
       if(bgeff==GLB_EFF)
-	for(i=0;i<l;i++) 
-	  temp[i]= 
-	    ((struct glb_experiment *) 
+	for(i=0;i<l;i++)
+	  temp[i]=
+	    ((struct glb_experiment *)
 	     glb_experiment_list[exp])->user_pre_smearing_channel[channel][i];
       else
-	for(i=0;i<l;i++) 
-	  temp[i]= 
-	    ((struct glb_experiment *) 
+	for(i=0;i<l;i++)
+	  temp[i]=
+	    ((struct glb_experiment *)
 	     glb_experiment_list[exp])->user_pre_smearing_background[channel][i];
-    }  
+    }
   else
-    { 
+    {
       if(bgeff==GLB_EFF)
-	for(i=0;i<l;i++) 
-	  temp[i]= ((struct glb_experiment *) 
+	for(i=0;i<l;i++)
+	  temp[i]= ((struct glb_experiment *)
 		    glb_experiment_list[exp])->user_post_smearing_channel[channel][i];
       else
-	for(i=0;i<l;i++) 
-	  temp[i]= ((struct glb_experiment *) 
+	for(i=0;i<l;i++)
+	  temp[i]= ((struct glb_experiment *)
 		    glb_experiment_list[exp])->user_post_smearing_background[channel][i];
-	
+
     }
   temp[l]=-1.0;
 
@@ -1019,16 +1019,16 @@ static int pos_range(int exp, int rule, int pos, int signal)
 {
   if(rule_range(exp,rule)!=0) return -1;
   if(signal_range(signal)!=0) return -1;
-  if(signal==GLB_SIG) 
+  if(signal==GLB_SIG)
     if((pos>=0)&&
-       (pos<((struct glb_experiment *) 
+       (pos<((struct glb_experiment *)
 	    glb_experiment_list[exp])->lengthofrules[rule])) return 0;
-  
-  if(signal==GLB_BG) 
+
+  if(signal==GLB_BG)
     if((pos>=0)&&
-       (pos<((struct glb_experiment *) 
+       (pos<((struct glb_experiment *)
 	     glb_experiment_list[exp])->lengthofbgrules[rule])) return 0;
-  
+
   glb_error("Position index out of range");
   return -1;
 }
@@ -1065,7 +1065,7 @@ int glbGetNumberOfRules(int exp)
 {
   int i;
   if(exp_range(exp)!=0) return -1;
-  i=((struct glb_experiment *) glb_experiment_list[exp])->numofrules; 
+  i=((struct glb_experiment *) glb_experiment_list[exp])->numofrules;
   return i;
 }
 
@@ -1146,7 +1146,7 @@ int glbGetLengthOfRule(int exp, int rule, int signal)
 
   if(signal==GLB_BG)
     i=((struct glb_experiment *) glb_experiment_list[exp])->lengthofbgrules[rule];
-  
+
   return i;
 }
 
@@ -1154,7 +1154,7 @@ int glbGetChannelInRule(int exp, int rule, int pos, int signal)
 {
   int i=-1;
   if(pos_range( exp,  rule,  pos,  signal)!=0) return -1;
- 
+
   if(signal==GLB_SIG)
     i=((struct glb_experiment *) glb_experiment_list[exp])->rulechannellist[rule][pos];
 
@@ -1162,7 +1162,7 @@ int glbGetChannelInRule(int exp, int rule, int pos, int signal)
     i=((struct glb_experiment *) glb_experiment_list[exp])->bgrulechannellist[rule][pos];
 
   return i;
-} 
+}
 
 double glbGetCoefficientInRule(int exp, int rule, int pos, int signal)
 {
@@ -1176,13 +1176,13 @@ double glbGetCoefficientInRule(int exp, int rule, int pos, int signal)
     res=((struct glb_experiment *) glb_experiment_list[exp])->bgrulescoeff[rule][pos];
 
   return res;
-} 
+}
 
 double glbGetNormalizationInRule(int exp, int rule, int signal)
 {
   double res=-1.0;
   if(signal_range(signal)!=0) return -1.0;
-  if(rule_range(exp,rule)!=0) return -1.0;  
+  if(rule_range(exp,rule)!=0) return -1.0;
 
   if(signal==GLB_SIG)
     res=1.0;
@@ -1191,17 +1191,17 @@ double glbGetNormalizationInRule(int exp, int rule, int signal)
     res=((struct glb_experiment *) glb_experiment_list[exp])->bg_centers[0][rule];
 
   return res;
-} 
+}
 
 
 
-static 
+static
 int channel_bg(const double *ch, const double *bg, double **res, int flag)
 {
   size_t lch,lbg;
   int i;
   double *temp;
-  if((ch==NULL)||(bg==NULL)) 
+  if((ch==NULL)||(bg==NULL))
     {
       glb_error("Rate or background vector may not be NULL");
       return -1;
@@ -1222,25 +1222,25 @@ int channel_bg(const double *ch, const double *bg, double **res, int flag)
       return -1;
     }
   temp=(double *) obstack_alloc(&glb_rate_stack,sizeof(double) * (lch+1));
-  
-  if(flag==GLB_W_BG) 
+
+  if(flag==GLB_W_BG)
     for(i=0;i<lch;i++) temp[i]=ch[i];
-  
+
   if(flag==GLB_WO_BG)
     for(i=0;i<lch;i++) temp[i]=ch[i]-bg[i];
-  
+
   temp[lch]=-1.0;
   *res=temp;
   return 0;
 }
 
-static int 
+static int
 channel_eff(const double *ch, const double *bg, double **res, int flag)
 {
   size_t lch,lbg;
   int i;
   double *temp;
-  if((ch==NULL)||(bg==NULL)) 
+  if((ch==NULL)||(bg==NULL))
     {
       glb_error("Rate or background vector may not be NULL");
       return -1;
@@ -1261,10 +1261,10 @@ channel_eff(const double *ch, const double *bg, double **res, int flag)
       return -1;
     }
   temp=(double *) obstack_alloc(&glb_rate_stack,sizeof(double) * (lch+1));
-  
-  if(flag==GLB_W_EFF) 
+
+  if(flag==GLB_W_EFF)
     for(i=0;i<lch;i++) temp[i]=ch[i];
-  
+
   if(flag==GLB_WO_EFF)
     for(i=0;i<lch;i++) temp[i]=ch[i]/bg[i];
   temp[lch]=-1.0;
@@ -1273,13 +1273,13 @@ channel_eff(const double *ch, const double *bg, double **res, int flag)
 }
 
 
-static int 
+static int
 rule_coeff(const double *ch, double coeff, double **res, int flag)
 {
   size_t lch;
   int i;
   double *temp;
-  if((ch==NULL)) 
+  if((ch==NULL))
     {
       glb_error("Rate or background vector may not be NULL");
       return -1;
@@ -1294,10 +1294,10 @@ rule_coeff(const double *ch, double coeff, double **res, int flag)
       return -1;
     }
   temp=(double *) obstack_alloc(&glb_rate_stack,sizeof(double) * (lch+1));
-  
-  if(flag==GLB_W_COEFF) 
+
+  if(flag==GLB_W_COEFF)
     for(i=0;i<lch;i++) temp[i]=ch[i]*coeff;
-  
+
   if(flag==GLB_WO_COEFF)
     for(i=0;i<lch;i++) temp[i]=ch[i];
   temp[lch]=-1.0;
@@ -1307,7 +1307,7 @@ rule_coeff(const double *ch, double coeff, double **res, int flag)
 
 
 
-static glb_smear 
+static glb_smear
 *get_channel_smear_data(int exp, int channel)
 {
   glb_smear *p;
@@ -1318,10 +1318,10 @@ static glb_smear
   return p;
 }
 
-void (*glb_channel_print_function)(FILE *stream,const double *energy, 
+void (*glb_channel_print_function)(FILE *stream,const double *energy,
 				   double **res, size_t l, size_t c);
 
-int 
+int
 glbShowChannelProbs(FILE *stream,
 			int exp, int channel, int smearing, int effi, int bgi)
 {
@@ -1332,12 +1332,12 @@ glbShowChannelProbs(FILE *stream,
   s=0;
   sum=0.0;
   cc=(size_t) glbGetNumberOfChannels(exp);
-  
+
   filter = glbGetFilterStateInExperiment(exp);
   if(s!=0) return -1;
   if(channel!=GLB_ALL) smt=get_channel_smear_data(exp,channel);
   if(channel==GLB_ALL) smt=get_channel_smear_data(exp,0);
-  s+=glbGetChannelRates(&ch,&l,exp,0,smearing); 
+  s+=glbGetChannelRates(&ch,&l,exp,0,smearing);
   energy=(double *) obstack_alloc(&glb_rate_stack,sizeof(double)*(l+1));
   if(smearing==GLB_PRE)
       for(i=0;i<l;i++) energy[i]=glb_sbin_center(i,smt);
@@ -1350,10 +1350,10 @@ glbShowChannelProbs(FILE *stream,
       res[0]=(double *) obstack_alloc(&glb_rate_stack,sizeof(double)*(l+1));
       res[1]=NULL;
       c=1;
- 
+
       for(i=0;i<l;i++)
 	{
-	  for(m=0;m<6;m++) currentchannel[m]=((struct glb_experiment *) 
+	  for(m=0;m<6;m++) currentchannel[m]=((struct glb_experiment *)
 					      glb_experiment_list[exp])->listofchannels[m][channel];
 	  if(currentchannel[2]>3||currentchannel[3]>3) res[k][i]=1.0;
 	  else
@@ -1370,11 +1370,11 @@ glbShowChannelProbs(FILE *stream,
       c=cc;
       for(k=0;k<cc;k++)
 	{
-	  for(m=0;m<6;m++) currentchannel[m]=((struct glb_experiment *) 
+	  for(m=0;m<6;m++) currentchannel[m]=((struct glb_experiment *)
 					      glb_experiment_list[exp])->listofchannels[m][k];
 	  for(i=0;i<l;i++)
 	    {
-	  
+
 	      if(currentchannel[2]>3||currentchannel[3]>3) res[k][i]=1.0;
 	      else
 		res[k][i] = glbProfileProbability(exp,currentchannel[3],currentchannel[2],
@@ -1382,8 +1382,8 @@ glbShowChannelProbs(FILE *stream,
 	    }
 	}
     }
-  
- 
+
+
 
   glb_channel_print_function(stream,energy,res,l,c);
 
@@ -1393,7 +1393,7 @@ glbShowChannelProbs(FILE *stream,
 
 
 
-int 
+int
 glbShowChannelRates(FILE *stream,
 			int exp, int channel, int smearing, int effi, int bgi)
 {
@@ -1412,7 +1412,7 @@ glbShowChannelRates(FILE *stream,
       s+=glbGetUserData(&eff,&m,exp,channel,smearing,GLB_EFF);
       if(s!=0) return -1;
       if(!((l==k)&&(k==m))) return -1;
- 
+
       s+=channel_bg(ch,bg,&temp,bgi);
       s+=channel_eff(temp,eff,&res[0],effi);
       res[1]=NULL;
@@ -1428,10 +1428,10 @@ glbShowChannelRates(FILE *stream,
 	  s+=glbGetUserData(&eff,&m,exp,i,smearing,GLB_EFF);
 	  if(s!=0) return -1;
 	  if(!((l==k)&&(k==m))) return -1;
-	  
+
 	  s+=channel_bg(ch,bg,&temp,bgi);
 	  s+=channel_eff(temp,eff,&res[i],effi);
-	  
+
 	}
       res[cc]=NULL;
       c=cc;
@@ -1456,10 +1456,10 @@ glbShowChannelRates(FILE *stream,
 
 
 
-int 
+int
 glbShowRuleRates(FILE *stream,
 		 int exp, int rule, int pos,
-		 int effi, int bgi, int coeffi, 
+		 int effi, int bgi, int coeffi,
 		 int signal)
 {
   int i,s,cc,channel;
@@ -1488,14 +1488,14 @@ glbShowRuleRates(FILE *stream,
       c=1;
     }
   else
-    { 
+    {
       res=(double **) obstack_alloc(&glb_rate_stack,sizeof(double *)*(cc+1));
       for(i=0;i<cc;i++)
 	{
 	  channel=glbGetChannelInRule(exp,rule,i,signal);
 	  coeff=glbGetCoefficientInRule(exp,rule,i,signal)*
 	    glbGetNormalizationInRule(exp,rule,signal);
-	 
+
 	  s+=glbGetChannelRates(&ch,&l,exp,channel,GLB_POST);
 	  s+=glbGetUserData(&bg,&k,exp,channel,GLB_POST,GLB_BG);
 	  s+=glbGetUserData(&eff,&m,exp,channel,GLB_POST,GLB_EFF);
@@ -1512,9 +1512,9 @@ glbShowRuleRates(FILE *stream,
 
   if(s!=0) return -1;
   smt=get_channel_smear_data(exp,0);
-  
+
   energy=(double *) obstack_alloc(&glb_rate_stack,sizeof(double)*(l+1));
- 
+
   for(i=0;i<l;i++) energy[i]=glb_bin_center(i,smt);
   energy[l]=-1.0;
 
@@ -1527,10 +1527,10 @@ glbShowRuleRates(FILE *stream,
 
 
 
-double 
+double
 glbTotalRuleRate(
 		 int exp, int rule, int pos,
-		 int effi, int bgi, int coeffi, 
+		 int effi, int bgi, int coeffi,
 		 int signal)
 {
   double out;
@@ -1560,14 +1560,14 @@ glbTotalRuleRate(
       c=1;
     }
   else
-    { 
+    {
       res=(double **) obstack_alloc(&glb_rate_stack,sizeof(double *)*(cc+1));
       for(i=0;i<cc;i++)
 	{
 	  channel=glbGetChannelInRule(exp,rule,i,signal);
 	  coeff=glbGetCoefficientInRule(exp,rule,i,signal)*
 	    glbGetNormalizationInRule(exp,rule,signal);
-	 
+
 	  s+=glbGetChannelRates(&ch,&l,exp,channel,GLB_POST);
 	  s+=glbGetUserData(&bg,&k,exp,channel,GLB_POST,GLB_BG);
 	  s+=glbGetUserData(&eff,&m,exp,channel,GLB_POST,GLB_EFF);
@@ -1633,7 +1633,7 @@ static void glb_builtin_channel_printf(FILE *stream,
   fprintf(stream,"\n");
   fprintf(stream,"%s",printf_left);
   for(i=0;i<l;i++)
-    { 
+    {
       fprintf(stream,"%s",printf_left);
       fprintf(stream,"%6.4g%s",energy[i],printf_middle);
 	for(k=0;k<c;k++)
@@ -1644,14 +1644,14 @@ static void glb_builtin_channel_printf(FILE *stream,
 	fprintf(stream,"%s",printf_right);
 
     }
-   
+
   fprintf(stream,"----------------------");
   for(k=1;k<c;k++)
     {
       fprintf(stream,"----------------");
     }
   fprintf(stream,"\nTotal:\t");
-  
+
   for(k=0;k<c;k++)
     {
       fprintf(stream,"%12.6g%s",sum[k],printf_middle);
@@ -1661,7 +1661,7 @@ static void glb_builtin_channel_printf(FILE *stream,
   glb_free(sum);
 }
 
-void 
+void
 *glbSetChannelPrintFunction(void *fp)
 {
   if(fp==NULL) return glb_channel_print_function;
@@ -1672,7 +1672,7 @@ void
 void glb_clean_up()
 {
   int i;
- 
+
   for(i=0;i<GLB_MAX_EXP;i++) {glbFreeExp(glb_experiment_list[i]);}
  glbCleanSysList();
  glb_clean_parser();
@@ -1693,22 +1693,22 @@ void glb_clean_up()
 
 /* The all important init function */
 
-void 
+void
 glb_init(char *name)
 {
   int i;
-  
- 
+
+
   glb_prog_name_init(name);
   glb_setup_path();
- 
+
   for(i=0;i<GLB_MAX_EXP;i++) glb_experiment_list[i]=glbAllocExp();
   glb_num_of_exps=0;
   glb_rule_number=0;
   obstack_init(&glb_rate_stack);
   glbSetPrintDelimiters("","\t","\n");
   glbSetChannelPrintFunction(glb_builtin_channel_printf);
-  /* this has gone to glbSuperInit 
+  /* this has gone to glbSuperInit
    * glbLoadPrior("prior-template");
    */
 }
@@ -1722,7 +1722,7 @@ glb_init(char *name)
  */
 
 
-int 
+int
 glbSetTargetMass(int experiment,double mass)
 {
   struct glb_experiment *in;
@@ -1735,7 +1735,7 @@ glbSetTargetMass(int experiment,double mass)
 	    {
 	      in=(struct glb_experiment *) glb_experiment_list[i];
 	      in->targetmass = mass;
-	    }  
+	    }
 	}
       else
 	{
@@ -1750,7 +1750,7 @@ glbSetTargetMass(int experiment,double mass)
       in=(struct glb_experiment *) glb_experiment_list[experiment];
       if(mass > 0)
 	{
-	  in->targetmass = mass;  
+	  in->targetmass = mass;
 	}
       else
 	{
@@ -1758,17 +1758,17 @@ glbSetTargetMass(int experiment,double mass)
 	  return -1;
 	}
     }
-  else 
+  else
     {
       glb_error("Invalid value for experiment number");
       return -1;
     }
   return 0;
 
-  
+
 }
 
-double 
+double
 glbGetTargetMass(int experiment)
 {
   struct glb_experiment *in;
@@ -1779,7 +1779,7 @@ glbGetTargetMass(int experiment)
       out=in->targetmass;
       return out;
     }
-  else 
+  else
     {
       glb_error("Invalid value for experiment number");
       return -1.0;
@@ -1791,7 +1791,7 @@ glbGetTargetMass(int experiment)
 const char *glbVersionOfExperiment(int experiment)
 {
   struct glb_experiment *in;
-  if(!(((experiment >= 0)&&(experiment < glb_num_of_exps)))) { 
+  if(!(((experiment >= 0)&&(experiment < glb_num_of_exps)))) {
     glb_error("Invalid value for experiment number");
     return NULL;}
   in=(struct glb_experiment *) glb_experiment_list[experiment];
@@ -1802,41 +1802,41 @@ const char *glbVersionOfExperiment(int experiment)
 /* Flux access routines */
 
 double
-glbFlux(int experiment, int flux_ident, 
+glbFlux(int experiment, int flux_ident,
 	double energy, double distance, int flavour, int anti)
 {
   double out;
   struct glb_experiment *in;
-  if(!(((experiment >= 0)&&(experiment < glb_num_of_exps)))) { 
+  if(!(((experiment >= 0)&&(experiment < glb_num_of_exps)))) {
     glb_error("Invalid value for experiment number");
     return -1;}
   in=(struct glb_experiment *) glb_experiment_list[experiment];
-  if(!(((flux_ident >= 0)&&(flux_ident < in->num_of_fluxes)))) { 
+  if(!(((flux_ident >= 0)&&(flux_ident < in->num_of_fluxes)))) {
     glb_error("Invalid value for flux number");
-    return -1;}  
-
-  
+    return -1;}
 
 
-  out=glb_flux_calc(energy, distance,0,flavour, anti,in->fluxes[flux_ident]); 
+
+
+  out=glb_flux_calc(energy, distance,0,flavour, anti,in->fluxes[flux_ident]);
 
   return out;
 }
 
-double glbXSection(int experiment, int xsec_ident, 
+double glbXSection(int experiment, int xsec_ident,
 	double energy, int flavour, int anti)
 {
   double out;
   struct glb_experiment *in;
-  if(!(((experiment >= 0)&&(experiment < glb_num_of_exps)))) { 
+  if(!(((experiment >= 0)&&(experiment < glb_num_of_exps)))) {
     glb_error("Invalid value for experiment number");
     return -1;}
   in=(struct glb_experiment *) glb_experiment_list[experiment];
-  if(!(((xsec_ident >= 0)&&(xsec_ident < in->num_of_xsecs)))) { 
+  if(!(((xsec_ident >= 0)&&(xsec_ident < in->num_of_xsecs)))) {
     glb_error("Invalid value for X-section number");
-    return -1;}  
+    return -1;}
 
-  out=glb_xsec_calc(energy,flavour, anti,in->xsecs[xsec_ident]); 
+  out=glb_xsec_calc(energy,flavour, anti,in->xsecs[xsec_ident]);
 
   return out;
 }
@@ -1849,33 +1849,33 @@ glbSetSourcePower(int experiment, int flux_ident, double power)
 
   /* Testing the experiment number */
   if(!(((experiment >= 0)&&(experiment < glb_num_of_exps))
-       ||(experiment==GLB_ALL))) { 
+       ||(experiment==GLB_ALL))) {
     glb_error("Invalid value for experiment number");
     return -1;}
   if(power<=0)  {glb_error("Power must be positive");return -1;}
-  
+
   for(i=0;i<glb_num_of_exps;i++)
     {
       if(experiment!=GLB_ALL) i=experiment;
       in=(struct glb_experiment *) glb_experiment_list[i];
       /* Testing theflux number */
       if(!(((flux_ident >= 0)&&(flux_ident < in->num_of_fluxes))
-	   ||(flux_ident==GLB_ALL))) { 
+	   ||(flux_ident==GLB_ALL))) {
 	glb_error("Invalid value for flux number");
-	return -1;}     
+	return -1;}
       for(k=0;k<in->num_of_fluxes;k++)
 	{
 	   if(flux_ident!=GLB_ALL) k=flux_ident;
 	   /* Here should come the assignment */
 	   (in->fluxes[k])->target_power=power;
-	   
+
 	   if(flux_ident!=GLB_ALL) break;
 	}
 
       if(experiment!=GLB_ALL) break;
     }
 
- 
+
   return 0;
 }
 
@@ -1884,55 +1884,55 @@ glbGetSourcePower(int experiment, int flux_ident)
 {
   double out;
   struct glb_experiment *in;
-  if(!(((experiment >= 0)&&(experiment < glb_num_of_exps)))) { 
+  if(!(((experiment >= 0)&&(experiment < glb_num_of_exps)))) {
     glb_error("Invalid value for experiment number");
     return -1;}
   in=(struct glb_experiment *) glb_experiment_list[experiment];
-  if(!(((flux_ident >= 0)&&(flux_ident < in->num_of_fluxes)))) { 
+  if(!(((flux_ident >= 0)&&(flux_ident < in->num_of_fluxes)))) {
     glb_error("Invalid value for flux number");
     return -1;}
-  
+
   out=(in->fluxes[flux_ident])->target_power;
-  
+
   return out;
 }
 
 int
 glbSetRunningTime(int experiment, int flux_ident, double time)
 {
-  
+
  int i,k;
   struct glb_experiment *in;
 
   /* Testing the experiment number */
   if(!(((experiment >= 0)&&(experiment < glb_num_of_exps))
-       ||(experiment==GLB_ALL))) { 
+       ||(experiment==GLB_ALL))) {
     glb_error("Invalid value for experiment number");
     return -1;}
   if(time<=0)  {glb_error("Time must be positive");return -1;}
-  
+
   for(i=0;i<glb_num_of_exps;i++)
     {
       if(experiment!=GLB_ALL) i=experiment;
       in=(struct glb_experiment *) glb_experiment_list[i];
       /* Testing theflux number */
       if(!(((flux_ident >= 0)&&(flux_ident < in->num_of_fluxes))
-	   ||(flux_ident==GLB_ALL))) { 
+	   ||(flux_ident==GLB_ALL))) {
 	glb_error("Invalid value for flux number");
-	return -1;}     
+	return -1;}
       for(k=0;k<in->num_of_fluxes;k++)
 	{
 	   if(flux_ident!=GLB_ALL) k=flux_ident;
 	   /* Here should come the assignment */
 	   (in->fluxes[k])->time=time;
-	   
+
 	   if(flux_ident!=GLB_ALL) break;
 	}
 
       if(experiment!=GLB_ALL) break;
     }
 
- 
+
   return 0;
 }
 
@@ -1941,16 +1941,16 @@ glbGetRunningTime(int experiment, int flux_ident)
 {
   double out;
   struct glb_experiment *in;
-  if(!(((experiment >= 0)&&(experiment < glb_num_of_exps)))) { 
+  if(!(((experiment >= 0)&&(experiment < glb_num_of_exps)))) {
     glb_error("Invalid value for experiment number");
     return -1;}
   in=(struct glb_experiment *) glb_experiment_list[experiment];
-  if(!(((flux_ident >= 0)&&(flux_ident < in->num_of_fluxes)))) { 
+  if(!(((flux_ident >= 0)&&(flux_ident < in->num_of_fluxes)))) {
     glb_error("Invalid value for flux number");
     return -1;}
-  
+
   out=(in->fluxes[flux_ident])->time;
- 
+
   return out;
 }
 
@@ -1978,17 +1978,17 @@ glbSetFilterStateInExperiment(int experiment,int on_off)
   struct glb_experiment *in;
   /* Testing the experiment number */
   if(!(((experiment >= 0)&&(experiment < glb_num_of_exps))
-       ||(experiment==GLB_ALL))) { 
+       ||(experiment==GLB_ALL))) {
     glb_error("Invalid value for experiment number");
     return -1;}
-  if((on_off!=GLB_ON)&&(on_off!=GLB_OFF))  
+  if((on_off!=GLB_ON)&&(on_off!=GLB_OFF))
     {glb_error("on_off must be either GLB_ON or GLB_OFF");return -1;}
-  
+
   for(i=0;i<glb_num_of_exps;i++)
     {
       if(experiment!=GLB_ALL) i=experiment;
       in=(struct glb_experiment *) glb_experiment_list[i];
-      
+
       in->filter_state=on_off;
 
       if(experiment!=GLB_ALL) break;
@@ -2002,15 +2002,15 @@ glbGetFilterStateInExperiment(int experiment)
   int i,out=-1;
   struct glb_experiment *in;
   /* Testing the experiment number */
-  if(!(((experiment >= 0)&&(experiment < glb_num_of_exps)))) { 
+  if(!(((experiment >= 0)&&(experiment < glb_num_of_exps)))) {
     glb_error("Invalid value for experiment number");
     return -1;}
-  
+
   for(i=0;i<glb_num_of_exps;i++)
     {
       if(experiment!=GLB_ALL) i=experiment;
       in=(struct glb_experiment *) glb_experiment_list[i];
-      
+
       out=in->filter_state;
 
       if(experiment!=GLB_ALL) break;
@@ -2040,16 +2040,16 @@ glbSetFilterInExperiment(int experiment,double filter)
   struct glb_experiment *in;
   /* Testing the experiment number */
   if(!(((experiment >= 0)&&(experiment < glb_num_of_exps))
-       ||(experiment==GLB_ALL))) { 
+       ||(experiment==GLB_ALL))) {
     glb_error("Invalid value for experiment number");
     return -1;}
   if(filter<0) {glb_error("Filter must be positive");return -1;}
-  
+
   for(i=0;i<glb_num_of_exps;i++)
     {
       if(experiment!=GLB_ALL) i=experiment;
       in=(struct glb_experiment *) glb_experiment_list[i];
-      
+
       in->filter_value=filter;
 
       if(experiment!=GLB_ALL) break;
@@ -2065,7 +2065,7 @@ glbGetFilterInExperiment(int experiment)
   double out = -1;
   struct glb_experiment *in;
   /* Testing the experiment number */
-  if(!(((experiment >= 0)&&(experiment < glb_num_of_exps)))) { 
+  if(!(((experiment >= 0)&&(experiment < glb_num_of_exps)))) {
     glb_error("Invalid value for experiment number");
     return -1;}
 
@@ -2073,7 +2073,7 @@ glbGetFilterInExperiment(int experiment)
     {
       if(experiment!=GLB_ALL) i=experiment;
       in=(struct glb_experiment *) glb_experiment_list[i];
-      
+
       out=in->filter_value;
 
       if(experiment!=GLB_ALL) break;
@@ -2081,12 +2081,63 @@ glbGetFilterInExperiment(int experiment)
   return out;
 }
 
+int
+glbOptimizeSmearingMatrixInExperiment(int experiment)
+{
+  int i;
+  struct glb_experiment *in;
+  /* Testing the experiment number */
+  if(!(((experiment >= 0)&&(experiment < glb_num_of_exps))
+       ||(experiment==GLB_ALL))) {
+    glb_error("Invalid value for experiment number");
+    return -1;}
+
+  for(i=0;i<glb_num_of_exps;i++)
+    {
+      if(experiment!=GLB_ALL) i=experiment;
+      in=(struct glb_experiment *) glb_experiment_list[i];
+
+      for (int j=0; j < in->num_of_sm; j++)
+        glb_optimize_smearing_matrix(in->smear_data[j], in->smear[j],
+                                     in->lowrange[j], in->uprange[j]);
+
+      if(experiment!=GLB_ALL) break;
+    }
+  return 0;
+}
+
+
+int
+glbCompensateFilterInExperiment(int experiment)
+{
+  int i;
+  struct glb_experiment *in;
+  /* Testing the experiment number */
+  if(!(((experiment >= 0)&&(experiment < glb_num_of_exps))
+       ||(experiment==GLB_ALL))) {
+    glb_error("Invalid value for experiment number");
+    return -1;}
+
+  for(i=0;i<glb_num_of_exps;i++)
+    {
+      if(experiment!=GLB_ALL) i=experiment;
+      in=(struct glb_experiment *) glb_experiment_list[i];
+
+      for (int j=0; j < in->num_of_sm; j++)
+        glb_filter_compensate(in->smear_data[j], in->smear[j],
+                              in->lowrange[j], in->uprange[j]);
+
+      if(experiment!=GLB_ALL) break;
+    }
+  return 0;
+}
+
 
 int
 glbGetEminEmax(int experiment, double *emin, double *emax)
 {
   struct glb_experiment *in;
-  
+
   if (emin == NULL  ||  emax == NULL)
     { glb_error("glbGetEminEmax: Input pointers may not be NULL"); return -1; }
 
@@ -2102,11 +2153,16 @@ glbGetEminEmax(int experiment, double *emin, double *emax)
 }
 
 
-int
-glbGetEnergyWindow(int experiment, int rule, double *low, double *high)
+/***************************************************************************
+ * Function glbGetEnergyWindow                                             *
+ ***************************************************************************
+ * Return lower and upper bounds of the analysis window in the given       *
+ * experiment and rule.                                                    *
+ ***************************************************************************/
+int glbGetEnergyWindow(int experiment, int rule, double *low, double *high)
 {
   struct glb_experiment *in;
-  
+
   if (low == NULL  ||  high == NULL)
     { glb_error("glbGetEnergyWindow: Input pointers may not be NULL"); return -1; }
 
@@ -2124,15 +2180,19 @@ glbGetEnergyWindow(int experiment, int rule, double *low, double *high)
   else
     { glb_error("glbGetEnergyWindow: Invalid experiment number"); return -1; }
   return 0;
-
 }
 
 
-int
-glbGetEnergyWindowBins(int experiment, int rule, int *low, int *high)
+/***************************************************************************
+ * Function glbGetEnergyWindowBins                                         *
+ ***************************************************************************
+ * Return lowest and highest bin overlapping with the analysis window in   *
+ * the given experiment and rule.                                          *
+ ***************************************************************************/
+int glbGetEnergyWindowBins(int experiment, int rule, int *low, int *high)
 {
   struct glb_experiment *in;
-  
+
   if (low == NULL  ||  high == NULL)
     { glb_error("glbGetEnergyWindow: Input pointers may not be NULL"); return -1; }
 
@@ -2153,15 +2213,125 @@ glbGetEnergyWindowBins(int experiment, int rule, int *low, int *high)
 }
 
 
+/***************************************************************************
+ * Function glbSetEnergyWindowInRule                                       *
+ ***************************************************************************
+ * This helper function is called by glbSetEnergyWindowInExperiment. Its   *
+ * parameters are similar to those of glbSetEnergyWindow, but it does not  *
+ * experiment=GLB_ALL or rule=GLB_ALL                                      *
+ ***************************************************************************/
+int glbSetEnergyWindowInRule(int experiment, int rule, double low, double high)
+{
+  int k;
+  struct glb_experiment *in;
+
+  if (experiment < 0  ||  experiment >= glb_num_of_exps)
+  {
+    glb_error("glbSetEnergyWindowInRule: Invalid experiment number");
+    return -1;
+  }
+  in = (struct glb_experiment *) glb_experiment_list[experiment];
+  if (rule < 0  ||  rule > in->numofrules)
+  {
+    glb_error("glbSetEnergyWindowInRule: Invalid rule number");
+    return -1;
+  }
+
+  if (low > high)
+  {
+    glb_error("glbSetEnergyWindowInRule: Lower boundary above upper boundary");
+    return -1;
+  }
+
+  /* Set new energy window */
+  in->energy_window[rule][0] = low;
+  in->energy_window[rule][1] = high;
+
+  /* Compute bin ranges corresponding to energy window */
+  k = 0;
+  while (in->smear_data[0]->bincenter[k] <= in->energy_window[rule][0])
+    k++;
+  in->energy_window_bins[rule][0] = k;
+  while (k < in->numofbins && in->smear_data[0]->bincenter[k] < in->energy_window[rule][1])
+    k++;
+  in->energy_window_bins[rule][1] = k-1;
+
+  return 0;
+}
+
+
+/***************************************************************************
+ * Function glbSetEnergyWindowInExperiment                                 *
+ ***************************************************************************
+ * This helper function is called by glbSetEnergyWindow. Its parameters    *
+ * similar to those of glbSetEnergyWindow, but it does not accept          *
+ * experiment=GLB_ALL                                                      *
+ ***************************************************************************/
+int glbSetEnergyWindowInExperiment(int experiment, int rule, double low, double high)
+{
+  int i;
+  struct glb_experiment *in;
+
+  if (experiment < 0  ||  experiment >= glb_num_of_exps)
+  {
+    glb_error("glbSetEnergyWindowInExperiment: Invalid experiment number");
+    return -1;
+  }
+
+  in = (struct glb_experiment *) glb_experiment_list[experiment];
+  if(rule == GLB_ALL)
+  {
+    for(i=0; i < in->numofrules; i++)
+      glbSetEnergyWindowInRule(experiment, i, low, high);
+  }
+  else if (rule >= 0  &&  rule < in->numofrules)
+    glbSetEnergyWindowInRule(experiment, rule, low, high);
+  else
+  {
+    glb_error("glbSetEnergyWindowInExperiment: Invalid value for rule number");
+    return -1;
+  }
+  return 0;
+}
+
+/***************************************************************************
+ * Function glbSetEnergyWindow                                             *
+ ***************************************************************************
+ * Modify the energy window in the given experiment and rule (both can be  *
+ * GLB_ALL).                                                               *
+ ***************************************************************************/
+int glbSetEnergyWindow(int experiment, int rule, double low, double high)
+{
+  int i, s=0;
+
+  if (experiment == GLB_ALL)
+  {
+    for(i=0; i < glb_num_of_exps; i++)
+      s += glbSetEnergyWindowInExperiment(i, rule, low, high);
+  }
+  else if (experiment >= 0  &&  experiment < glb_num_of_exps)
+  {
+    s += glbSetEnergyWindowInExperiment(experiment, rule, low, high);
+  }
+  else
+  {
+    glb_error("glbSetEnergyWindow: Invalid value for experiment number");
+    return -1;
+  }
+
+  return s;
+}
+
+
 /* Accessing parser meta-information */
 
-int 
+int
 glbNameToValue(int exp,const char* context, const char *name)
 {
   glb_naming *ptr;
   struct glb_experiment *in;
   /* Testing the experiment number */
-  if(!(((exp >= 0)&&(exp < glb_num_of_exps)))) { 
+  if(!(((exp >= 0)&&(exp < glb_num_of_exps)))) {
     glb_error("Invalid value for experiment number");
     return -1;}
   in=(struct glb_experiment *) glb_experiment_list[exp];
@@ -2179,7 +2349,7 @@ const char
   glb_naming *ptr;
   struct glb_experiment *in;
   /* Testing the experiment number */
-  if(!(((exp >= 0)&&(exp < glb_num_of_exps)))) { 
+  if(!(((exp >= 0)&&(exp < glb_num_of_exps)))) {
     glb_error("Invalid value for experiment number");
     return NULL;}
   in=(struct glb_experiment *) glb_experiment_list[exp];
@@ -2215,7 +2385,7 @@ double glbVacuumProbability(int initial_flavour, int final_flavour,
   const double rho = 0.0;
   double P[3][3];
   int status;
- 
+
   if ((status=glb_hook_probability_matrix(P, cp_sign, E, 1, &L, &rho, -1.0,
                                           glb_probability_user_data)) != GLB_SUCCESS)
   {
@@ -2244,7 +2414,7 @@ double glbConstantDensityProbability(int initial_flavour, int final_flavour,
 {
   double P[3][3];
   int status;
- 
+
   if ((status=glb_hook_probability_matrix(P, cp_sign, E, 1, &L, &rho, -1.0,
                                           glb_probability_user_data)) != GLB_SUCCESS)
   {
@@ -2275,7 +2445,7 @@ double glbProfileProbability(int exp,int initial_flavour, int final_flavour,
   struct glb_experiment *e = glb_experiment_list[exp];
   double P[3][3];
   int status;
-  
+
   if (exp < 0  ||  exp >= glb_num_of_exps)
   {
     glb_error("Experiment index out of range");
@@ -2289,7 +2459,7 @@ double glbProfileProbability(int exp,int initial_flavour, int final_flavour,
     glb_error("Calculation of oscillation probabilities failed.");
     return -1.0;
   }
-  
+
   return P[initial_flavour-1][final_flavour-1];
 }
 
@@ -2316,7 +2486,7 @@ double glbFilteredConstantDensityProbability(int exp,int initial_flavour, int fi
   struct glb_experiment *e = glb_experiment_list[exp];
   double P[3][3];
   int status;
-  
+
   if (exp < 0  ||  exp >= glb_num_of_exps)
   {
     glb_error("Experiment index out of range");
@@ -2330,7 +2500,7 @@ double glbFilteredConstantDensityProbability(int exp,int initial_flavour, int fi
     glb_error("Calculation of oscillation probabilities failed.");
     return -1.0;
   }
-  
+
   return P[initial_flavour-1][final_flavour-1];
 }
 
@@ -2341,7 +2511,7 @@ int glbGetNumberOfFluxes(int exp)
 {
   int s;
   /* Testing the experiment number */
-  if(!(((exp >= 0)&&(exp < glb_num_of_exps)))) { 
+  if(!(((exp >= 0)&&(exp < glb_num_of_exps)))) {
     glb_error("Invalid value for experiment number");
     return -1;}
 

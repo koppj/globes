@@ -1567,7 +1567,7 @@ struct glb_init_sig sig_fncts[] =
 static glb_namerec *name_table = (glb_namerec *) NULL;
 /* cannot use static here, since its declared earlier as extern */
 glb_symrec *sym_table = (glb_symrec *) NULL;
-static glb_symrec *pre_sym_table = (glb_symrec *) NULL;
+glb_symrec *pre_sym_table = (glb_symrec *) NULL;
 
 #define BIN_LIST 1
 #define SAMPLING_LIST 2
@@ -1797,6 +1797,15 @@ void glbDefineAEDLVariable(const char *name, double value)
   if(ptr==0) ptr = glb_putpresym (name, VAR);
   ptr->value.var = value;
   return;
+}
+
+double glbGetAEDLVariable(const char *name)
+{
+  glb_symrec *ptr;
+  ptr=glb_getpresym(name);
+  if (!ptr)
+    return GLB_NAN;
+  return ptr->value.var;
 }
 
 void glbClearAEDLVariables()

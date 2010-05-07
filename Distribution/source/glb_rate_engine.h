@@ -28,6 +28,9 @@
 
 #include "glb_types.h"
 
+#define GLB_FAST_RATES 1
+#define GLB_SLOW_RATES 0
+
 extern int glb_num_of_rules;
 extern double glb_glb_sig_norm_error[32];
 extern double glb_sig_tilt_error[32];
@@ -68,6 +71,7 @@ void glb_set_bg_rule(int i, int cn, int *rule, double *coeff);
 
 void glb_set_rates();
 void glb_set_new_rates();
+void glb_rate_template();
 void glb_set_signal_errors(int i,double norm, double tilt);
 void glb_set_bg_errors(int i,double norm, double tilt);
 void glb_set_bg_center(int i,double norm, double tilt);
@@ -138,6 +142,7 @@ extern double *glb_calc_chrb_0[32];
 extern double *glb_calc_chrb_1[32];
 extern double *glb_calc_chra_0[32];
 extern double *glb_calc_chra_1[32];
+extern double *glb_calc_chr_template[32];
 
 extern double *glb_calc_user_pre_sm_channel[32];
 extern double *glb_calc_user_post_sm_channel[32];
