@@ -61,15 +61,99 @@ static int    channel = 1;            // channel
 static int FLUX_STEPS = 500;          // Number of sampling points for builtin fluxes
 
 
-void glb_flux_loader(glb_flux *data, int number, int polarity);
+
+/***************************************************************************
+ *                    H E L P E R   F U N C T I O N S                      *
+ ***************************************************************************/
+
+/***************************************************************************
+ * Function glb_load_n_columns                                             *
+ ***************************************************************************
+ * Load data from file. The expected format is n_columns columns and an    *
+ * arbitray number of rows. The resulting number of rows will be stored in *
+ * n_lines, while for the actual data, arrays will be created (one for     *
+ * each column), i.e. data[] should have length n_columns                  *
+ ***************************************************************************/
+int glb_load_n_columns(const char *file_name, const int n_columns, int *n_lines, double *data[])
+{
+  if (!file_name || !n_lines || !data)
+    return GLBERR_UNINITIALIZED;
+
+  int j;
+  int buf_length = 100;
+
+  /* Allocate buffer */
+  for (j=0; j < n_columns; j++)
+    data[j] = glb_malloc(buf_length*sizeof(data[j][0]));
+
+  FILE *f = glb_fopen(file_name, "r");
+  if (!f)
+  {
+    fprintf(stderr, "glb_load_n_columns: Cannot open file %s.\n", file_name);
+    return GLBERR_FILE_NOT_FOUND;
+  }
+
+  /* Read from file */
+  const int max_line = 1024;
+  char this_line[max_line];
+  *n_lines = 0;
+  while (fgets(this_line, max_line, f))
+  {
+    if (strlen(this_line) > max_line - 2)
+    {
+      fprintf(stderr, "glb_load_n_columns: Line %d too long in file %s.\n",
+              *n_lines+1, file_name);
+      return GLBERR_INVALID_FILE_FORMAT;
+    }
+
+    if (this_line[0] != '#'  &&  this_line[strspn(this_line, " \t")] != '\n')
+    {                               /* Ignore comments and blank lines */
+      if (*n_lines >= buf_length)   /* If necessary, resize x-sec buffer */
+      {
+        buf_length *= 2;
+        for (j=0; j < n_columns; j++)
+          data[j] = glb_realloc(data[j], buf_length*sizeof(data[j][0]));
+      }
+
+      char *p = strtok(this_line, " \t,");
+      for (j=0; j < n_columns; j++)
+      {
+        if (!p)
+        {
+          fprintf(stderr, "glb_load_n_columns: Line %d too short in file %s.\n",
+                  *n_lines+1, file_name);
+          return GLBERR_INVALID_FILE_FORMAT;
+        }
+        if (sscanf(p, "%lf", &data[j][*n_lines]) != 1)
+        {
+          fprintf(stderr, "glb_load_n_columns: Line %d invalid in file %s.\n",
+                  *n_lines+1, file_name);
+          return GLBERR_INVALID_FILE_FORMAT;
+        }
+        p = strtok(NULL, " \t,");
+      }
+
+      if (*n_lines > 1  &&   /* Check if log10(E) support points are equidistant */
+          fabs(data[0][*n_lines] - 2*data[0][*n_lines-1]
+               + data[0][*n_lines-2])/fabs(data[0][*n_lines]) > 1e-10)
+      {
+        fprintf(stderr, "glb_load_n_columns: Error in %s, line %d: log10(E) sampling points "
+                        "should be equidistant.\n", file_name, *n_lines+1);
+        return GLBERR_INVALID_FILE_FORMAT;
+      }
+      (*n_lines)++;
+    }
+  };
+
+  fclose(f);
+  return GLB_SUCCESS;
+}
 
 
-//this loads the fluxes for all non-NuFact beams
-// the files must be of the form
-// Energy[GeV] Flux[?]
-// You should check the normalisation !!!
-// the file has 501 lines
 
+/***************************************************************************
+ *                            F L U X E S                                  *
+ ***************************************************************************/
 
 //this part is by Martin and for the Nufact only
 
@@ -269,6 +353,7 @@ static void builtin_flux_setup(glb_flux *data, flux_calc flx, int pl)
   glb_set_max_energy(data->parent_energy);
   for (j=0; j < GLB_FLUX_COLUMNS; j++)
     data->flux_data[j] = glb_malloc((FLUX_STEPS+1) * sizeof(data->flux_data[j][0]));
+  data->n_lines = FLUX_STEPS + 1;
   for(i=0; i <= FLUX_STEPS; i++)
   {
     data->flux_data[0][i] = i*de;
@@ -283,25 +368,8 @@ static void builtin_flux_setup(glb_flux *data, flux_calc flx, int pl)
   stored_muons=smb;
 }
 
-//FIXME FIXME FIXME
-//void glb_init_fluxtables(glb_flux *data,int pos)
-//{
-//
-//  if(data->builtin==1) builtin_flux_setup(data,&nufact_flux,pos,+1);
-//  if(data->builtin==2) builtin_flux_setup(data,&nufact_flux,pos,-1);
-//
-//  if(data->builtin==3) builtin_flux_setup(data,&bb_flux,pos,+1);
-//  if(data->builtin==4) builtin_flux_setup(data,&bb_flux,pos,-1);
-//
-//  if(data->builtin==0||data->builtin==GLB_OLD_NORM) glb_flux_loader(data,pos,+1);
-//
-//}
-
-
 
 // Here we settle the normalization issue for all beam types
-
-
 static double norm2(int type)
 {
   double erg;
@@ -324,239 +392,6 @@ static double norm2(int type)
       break;
     }
   return erg;
-}
-
-
-
-//double glb_flux_calc(double en, double baseline,
-//	    int type, int l, int anti, const glb_flux *data)
-//{
-//   /* the type argument is unused */
-//  double incre;
-//  double ergebnis;
-//  int lowerind;
-//  int higherind;
-//  int part=1;
-//
-//  part = l - ((anti-1)*3)/2;
-//
-//// JK 2009-11-23 This is slow ...
-////  if (l==1 && anti == 1)
-////    {
-////      part = 1;
-////    }
-//// if (l==2 && anti == 1)
-////    {
-////      part = 2;
-////    }
-//// if (l==3 && anti == 1)
-////    {
-////      part = 3;
-////    }
-//// if (l==1 && anti == -1)
-////    {
-////      part = 4;
-////    }
-//// if (l==2 && anti == -1)
-////    {
-////      part = 5;
-////    }
-//// if (l==3 && anti == -1)
-////    {
-////      part = 6;
-////    }
-////
-////    and the following code should accomplish the same
-//  part = l + 3*((1-anti)/2);
-//
-//  //FIXME FIXME FIXME Adapt to new flux storage
-///* JK 2008-07-06 incre = (data->flux_data[500][0]-data->flux_data[0][0])/501.0; */
-// incre = (data->flux_data[500][0]-data->flux_data[0][0])/500.0;
-// lowerind = floor((en-data->flux_data[0][0])/incre);
-// higherind = lowerind + 1;
-//
-// if (lowerind<0||higherind>500)
-//   {
-//     ergebnis=0.0;
-//   }
-// else
-//   {
-//     ergebnis=((data->flux_data[higherind][part]-
-//		data->flux_data[lowerind][part])*(((en-data->flux_data[0][0])
-//						  /incre)-lowerind)
-//	       +data->flux_data[lowerind][part])
-//       /baseline/baseline;
-//   }
-// ergebnis = ergebnis*norm2(data->builtin)
-//   * data->time * data->target_power * data->stored_muons * data->norm;
-// return ergebnis;
-//}
-//
-//
-//
-///* Here begins the part where the cross-sections are read from
-// * file and made accessible to the program */
-//
-//
-///***********************************************************
-// * Flux-Loader                                             *
-// ***********************************************************/
-//
-//void glb_flux_loader(glb_flux *data, int ident, int polarity)
-//{
-//   /* the polarity  argument is unused */
-//  int i,number,s,ts=0;
-//  char tok;
-//
-//  FILE *fp = glb_fopen(data->file_name,"r");
-//  number=ident;
-//
-//
-//  data->flux_storage=glb_alloc_flux_storage(501);
-//      if (fp!=NULL)
-//	{
-//	  /* peel off all leading comments */
-//	  while(1)
-//	    {
-//	      tok=fgetc(fp);
-//	      if(tok=='#')
-//		{
-//		  while(fgetc(fp)!='\n');
-//		}
-//	      else
-//		{
-//		  ungetc(tok,fp);
-//		  break;
-//		}
-//	    }
-//	  for (i=0; i<=NFLUX; i++)
-//	    {
-//	      /* get rid of comments inside */
-//	      tok=fgetc(fp);
-//	      if(tok=='#')
-//		{
-//		  while(fgetc(fp)!='\n');
-//		  i--;
-//		}
-//	      else
-//		{
-//		  ungetc(tok,fp);
-//		  /* read the data */
-//		  s=fscanf(fp,"%lf %lf %lf %lf %lf %lf %lf \n",
-//			   &data->flux_storage[i][0],
-//			   &data->flux_storage[i][1],
-//			   &data->flux_storage[i][2],
-//			   &data->flux_storage[i][3],
-//			   &data->flux_storage[i][4],
-//			   &data->flux_storage[i][5],
-//			   &data->flux_storage[i][6]);
-//
-//		  if(s!=7)
-//		    fprintf(stderr,"Error: Wrong format in file %s\n",
-//			    data->file_name);
-//		  else
-//		    ts++;
-//		}
-//
-//	    }
-//	  fclose(fp);
-//	}
-//      else
-//	{
-//	  fprintf(stderr,"Error: Could not open %s\n",data->file_name);
-//	}
-//
-//
-//      if(ts!=501) fprintf(stderr,"Error: Wrong format in file %s\n",
-//			  data->file_name);
-//}
-
-
-/***************************************************************************
- *                            F L U X E S                                  *
- ***************************************************************************/
-
-/***************************************************************************
- * Function glb_load_n_columns                                             *
- ***************************************************************************
- * Load data from file. The expected format is n_columns columns and an    *
- * arbitray number of rows. The resulting number of rows will be stored in *
- * n_lines, while for the actual data, arrays will be created (one for     *
- * each column), i.e. data[] should have length n_columns                  *
- ***************************************************************************/
-int glb_load_n_columns(const char *file_name, const int n_columns, int *n_lines, double *data[])
-{
-  if (!file_name || !n_lines || !data)
-    return GLBERR_UNINITIALIZED;
-
-  int j;
-  int buf_length = 100;
-
-  /* Allocate buffer */
-  for (j=0; j < n_columns; j++)
-    data[j] = glb_malloc(buf_length*sizeof(data[j][0]));
-
-  FILE *f = glb_fopen(file_name, "r");
-  if (!f)
-  {
-    fprintf(stderr, "glb_load_n_columns: Cannot open file %s.\n", file_name);
-    return GLBERR_FILE_NOT_FOUND;
-  }
-
-  /* Read from file */
-  const int max_line = 1024;
-  char this_line[max_line];
-  *n_lines = 0;
-  while (fgets(this_line, max_line, f))
-  {
-    if (strlen(this_line) > max_line - 2)
-    {
-      fprintf(stderr, "glb_load_n_columns: Line %d too long in file %s.\n",
-              *n_lines+1, file_name);
-      return GLBERR_INVALID_FILE_FORMAT;
-    }
-
-    if (this_line[0] != '#'  &&  this_line[strspn(this_line, " \t")] != '\n')
-    {                               /* Ignore comments and blank lines */
-      if (*n_lines >= buf_length)   /* If necessary, resize x-sec buffer */
-      {
-        buf_length *= 2;
-        for (j=0; j < n_columns; j++)
-          data[j] = glb_realloc(data[j], buf_length*sizeof(data[j][0]));
-      }
-
-      char *p = strtok(this_line, " \t,");
-      for (j=0; j < n_columns; j++)
-      {
-        if (!p)
-        {
-          fprintf(stderr, "glb_load_n_columns: Line %d too short in file %s.\n",
-                  *n_lines+1, file_name);
-          return GLBERR_INVALID_FILE_FORMAT;
-        }
-        if (sscanf(p, "%lf", &data[j][*n_lines]) != 1)
-        {
-          fprintf(stderr, "glb_load_n_columns: Line %d invalid in file %s.\n",
-                  *n_lines+1, file_name);
-          return GLBERR_INVALID_FILE_FORMAT;
-        }
-        p = strtok(NULL, " \t,");
-      }
-
-      if (*n_lines > 1  &&   /* Check if log10(E) support points are equidistant */
-          fabs(data[0][*n_lines] - 2*data[0][*n_lines-1]
-               + data[0][*n_lines-2])/fabs(data[0][*n_lines]) > 1e-10)
-      {
-        fprintf(stderr, "glb_load_n_columns: Error in %s, line %d: log10(E) sampling points "
-                        "should be equidistant.\n", file_name, *n_lines+1);
-        return GLBERR_INVALID_FILE_FORMAT;
-      }
-      (*n_lines)++;
-    }
-  };
-
-  fclose(f);
-  return GLB_SUCCESS;
 }
 
 
@@ -640,7 +475,7 @@ double glb_get_flux(double E, double L, int f, int cp_sign, const glb_flux *flux
   double E_binsize = (flux->flux_data[0][n_steps] - flux->flux_data[0][0]) / n_steps;
   double result;
   
-  int k = (E - flux->flux_data[0][0]) / E_binsize;
+  int k = floor((E - flux->flux_data[0][0]) / E_binsize);
   if (k < 0 || k >= n_steps)
     return 0.0;
   else
@@ -674,7 +509,7 @@ int glb_free_flux(glb_flux *flux)
  * Function glb_reset_flux                                                 *
  ***************************************************************************
  * Initialize flux data structrue to dummy valus. Any previously allocated *
- * memory for flux->file_name or flux->xsec_data is freed.                 *
+ * memory for flux->file_name or flux->flux_data is freed.                 *
  ***************************************************************************/
 int glb_reset_flux(glb_flux *flux)
 {
@@ -703,7 +538,6 @@ int glb_reset_flux(glb_flux *flux)
       glb_free(flux->file_name);
       flux->file_name = NULL;
     }
-    glb_free(flux);
   }
 
   return GLB_SUCCESS;
@@ -729,9 +563,9 @@ int glb_copy_flux(glb_flux *dest, const glb_flux *src)
     if (!dest->file_name)
       glb_fatal("glb_copy_flux: Cannot copy name of cross section file");
   }
-  if (src->flux_data)
+  for (j=0; j < GLB_FLUX_COLUMNS; j++)
   {
-    for (j=0; j < GLB_FLUX_COLUMNS; j++)
+    if (src->flux_data[j])
     {
       dest->flux_data[j] = glb_malloc(src->n_lines*sizeof(src->flux_data[j][0]));
       for (i=0; i < dest->n_lines; i++)
@@ -775,7 +609,7 @@ double glb_get_xsec(double E, int f, int cp_sign, const glb_xsec *xs)
   int n_steps = xs->n_lines - 1;
   double logE_binsize = (xs->xsec_data[0][n_steps] - xs->xsec_data[0][0]) / n_steps;
   
-  int k = (logE - xs->xsec_data[0][0]) / logE_binsize;
+  int k = floor((logE - xs->xsec_data[0][0]) / logE_binsize);
   if (k < 0 || k >= n_steps)
     return 0.0;
   else
@@ -853,9 +687,9 @@ int glb_copy_xsec(glb_xsec *dest, const glb_xsec *src)
     if (!dest->file_name)
       glb_fatal("glb_copy_xsec: Cannot copy name of cross section file");
   }
-  if (src->xsec_data)
+  for (j=0; j < GLB_XSEC_COLUMNS; j++)
   {
-    for (j=0; j < GLB_XSEC_COLUMNS; j++)
+    if (src->xsec_data[j])
     {
       dest->xsec_data[j] = glb_malloc(src->n_lines*sizeof(src->xsec_data[j][0]));
       for (i=0; i < dest->n_lines; i++)
