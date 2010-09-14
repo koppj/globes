@@ -40,13 +40,4 @@ void glbFreeExp(glb_exp ins);
 
 void glb_set_profile_scaling(double scale,int i);
 
-glb_flux *glb_flux_alloc();
-void glb_flux_free(glb_flux *stale);
-int glb_default_flux(glb_flux *in);
-glb_flux  *cpy_glb_flux(glb_flux *dest, const glb_flux *src);
-
-glb_flux *glb_flux_reset(glb_flux *temp);
-double** glb_alloc_flux_storage(size_t lines);
-void glb_free_flux_storage(double **stale);
-
 #endif /* GLB_MULTIEX_H */

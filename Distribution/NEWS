@@ -162,6 +162,7 @@
 5 Jul 2010 JK
         - New functions glbSetCoefficientInRule
 
-13 Sep 2010 JK
-        - GLoBES now accepts cross section files with an arbitrary number of lines
+14 Sep 2010 JK
+        - GLoBES now accepts cross section and flux files with an arbitrary number of
+          lines
 

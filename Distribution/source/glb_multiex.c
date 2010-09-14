@@ -73,123 +73,117 @@ glb_free_names(glb_naming *stale)
 
 
 
-
-
-
-
-
-
-/* here come the glb_flux functions */
-
-/* Dynamically allocating flux storage */
-double** glb_alloc_flux_storage(size_t lines)
-{
-  double **temp;
-  size_t k;
-  temp = (double **) glb_malloc(sizeof(double *)*(lines+1));
-  for(k=0;k<lines;k++)
-    {
-      temp[k]=(double *) glb_malloc(sizeof(double)*7);
-    }
-  temp[lines]=NULL;
-  return temp;
-}
-
-void glb_free_flux_storage(double **stale)
-{
-  size_t i;
-  if(stale!=NULL){
-  for(i=0;stale[i]!=NULL;i++) glb_free(stale[i]);
-  glb_free(stale);
-  stale=NULL;
-  }
-}
-
-glb_flux *glb_flux_alloc()
-{
-  glb_flux *temp;
-  temp=(glb_flux *) glb_malloc(sizeof(glb_flux));
-  temp->builtin=-1;
-  temp->file_name=NULL;
-  temp->time=-1;
-  temp->target_power=-1;
-  temp->stored_muons=-1;
-  temp->parent_energy=-1;
-  temp->norm=-1;
-  temp->gamma=-1;
-  temp->end_point=-1;
-  temp->flux_storage=NULL;
-  return temp;
-}
-
-glb_flux *glb_flux_reset(glb_flux *temp)
-{
-  temp->builtin=-1;
-
-  glb_free(temp->file_name);
-  temp->time=-1;
-  temp->target_power=-1;
-  temp->stored_muons=-1;
-  temp->parent_energy=-1;
-  temp->gamma=-1;
-  temp->end_point=-1;
-  temp->norm=-1;
-  /* FIXME serious memory leak */
-  glb_free_flux_storage(temp->flux_storage);
-  return temp;
-}
-
-
-
-void glb_flux_free(glb_flux *stale)
-{
-  if(stale!=NULL)
-    {
-      if(stale->file_name!=NULL) glb_free(stale->file_name);
-      if(stale->flux_storage!=NULL) glb_free_flux_storage(stale->flux_storage);
-      glb_free(stale);
-    }
-}
-
-int glb_default_flux(glb_flux *in)
-{
-  int s=0;
-  if(in->builtin==-1) in->builtin=0;
-  if(in->time==-1) in->time=1;
-  if(in->target_power==-1) in->target_power=1;
-  if(in->stored_muons==-1) in->stored_muons=1;
-  if(in->norm==-1) in->norm=1;
-  /* nufact needs parent=muon energy */
-  if(in->builtin==1||in->builtin==2)
-    {
-      if(in->parent_energy==-1) {glb_error("No parent energy defined!");s=1;}
-    }
-  /* beta beam need gamma and end point */
-  if(in->builtin==3||in->builtin==4)
-    {
-      if(in->gamma==-1) {glb_error("No gamma factor defined!");s=1;}
-      if(in->end_point==-1) {glb_error("No beta end point defined!");s=1;}
-
-    }
-  if(in->builtin==0)
-    {
-      if(in->file_name==NULL) {glb_error("No flux file specified!");s=1;}
-    }
-  if(s!=0) glb_error("glb_flux not properly setup");
-  return s;
-}
-
-glb_flux  *cpy_glb_flux(glb_flux *dest, const glb_flux *src)
-{
-  dest=(glb_flux *) memcpy(dest,src,sizeof(glb_flux));
-  if(src->file_name!=NULL)
-    {
-      dest->file_name=(char *) strdup(src->file_name);
-      if(dest->file_name==NULL) glb_fatal("Erros in strdup");
-    }
-  /* FIXME flux_storage is neither copied nor freed */
-  return dest;
-}
+///* here come the glb_flux functions */
+//
+///* Dynamically allocating flux storage */
+//double** glb_alloc_flux_storage(size_t lines)
+//{
+//  double **temp;
+//  size_t k;
+//  temp = (double **) glb_malloc(sizeof(double *)*(lines+1));
+//  for(k=0;k<lines;k++)
+//    {
+//      temp[k]=(double *) glb_malloc(sizeof(double)*7);
+//    }
+//  temp[lines]=NULL;
+//  return temp;
+//}
+//
+//void glb_free_flux_storage(double **stale)
+//{
+//  size_t i;
+//  if(stale!=NULL){
+//  for(i=0;stale[i]!=NULL;i++) glb_free(stale[i]);
+//  glb_free(stale);
+//  stale=NULL;
+//  }
+//}
+//
+//glb_flux *glb_flux_alloc()
+//{
+//  glb_flux *temp;
+//  temp=(glb_flux *) glb_malloc(sizeof(glb_flux));
+//  temp->builtin=-1;
+//  temp->file_name=NULL;
+//  temp->time=-1;
+//  temp->target_power=-1;
+//  temp->stored_muons=-1;
+//  temp->parent_energy=-1;
+//  temp->norm=-1;
+//  temp->gamma=-1;
+//  temp->end_point=-1;
+//  temp->flux_storage=NULL;
+//  return temp;
+//}
+//
+//glb_flux *glb_flux_reset(glb_flux *temp)
+//{
+//  temp->builtin=-1;
+//
+//  glb_free(temp->file_name);
+//  temp->time=-1;
+//  temp->target_power=-1;
+//  temp->stored_muons=-1;
+//  temp->parent_energy=-1;
+//  temp->gamma=-1;
+//  temp->end_point=-1;
+//  temp->norm=-1;
+//  /* FIXME serious memory leak */
+//  glb_free_flux_storage(temp->flux_storage);
+//  return temp;
+//}
+//
+//
+//
+//void glb_flux_free(glb_flux *stale)
+//{
+//  if(stale!=NULL)
+//    {
+//      if(stale->file_name!=NULL) glb_free(stale->file_name);
+//      if(stale->flux_storage!=NULL) glb_free_flux_storage(stale->flux_storage);
+//      glb_free(stale);
+//    }
+//}
+//
+//int glb_default_flux(glb_flux *in)
+//{
+//  int s=0;
+//  if(in->builtin==-1) in->builtin=0;
+//  if(in->time==-1) in->time=1;
+//  if(in->target_power==-1) in->target_power=1;
+//  if(in->stored_muons==-1) in->stored_muons=1;
+//  if(in->norm==-1) in->norm=1;
+//  /* nufact needs parent=muon energy */
+//  if(in->builtin==1||in->builtin==2)
+//    {
+//      if(in->parent_energy==-1) {glb_error("No parent energy defined!");s=1;}
+//    }
+//  /* beta beam need gamma and end point */
+//  if(in->builtin==3||in->builtin==4)
+//    {
+//      if(in->gamma==-1) {glb_error("No gamma factor defined!");s=1;}
+//      if(in->end_point==-1) {glb_error("No beta end point defined!");s=1;}
+//
+//    }
+//  if(in->builtin==0)
+//    {
+//      if(in->file_name==NULL) {glb_error("No flux file specified!");s=1;}
+//    }
+//  if(s!=0) glb_error("glb_flux not properly setup");
+//  return s;
+//}
+//
+//glb_flux  *cpy_glb_flux(glb_flux *dest, const glb_flux *src)
+//{
+//  dest=(glb_flux *) memcpy(dest,src,sizeof(glb_flux));
+//  if(src->file_name!=NULL)
+//    {
+//      dest->file_name=(char *) strdup(src->file_name);
+//      if(dest->file_name==NULL) glb_fatal("Erros in strdup");
+//    }
+//  /* FIXME flux_storage is neither copied nor freed */
+//  return dest;
+//}
 
 
 void glbInitExp(glb_exp ins)
@@ -301,8 +295,8 @@ void glbFreeExp(glb_exp ins)
   glb_free_names(in->names);
   glb_free(in->version);
   glb_free(in->filename);
-  for(i=0;i<32;i++)glb_flux_free(in->fluxes[i]);
-  for(i=0;i<32;i++) { glb_free_xsec(in->xsecs[i]);  in->xsecs[i]=NULL; }
+  for(i=0;i<32;i++) { glb_free_flux(in->fluxes[i]); in->fluxes[i]=NULL; }
+  for(i=0;i<32;i++) { glb_free_xsec(in->xsecs[i]);  in->xsecs[i]=NULL;  }
 
   for(i=0;i<6;i++) my_free(in->listofchannels[i]);
 
@@ -487,21 +481,24 @@ int glbDefaultExp(glb_exp ins)
   if(in->num_of_xsecs>31)  {glb_exp_error(in, "To many X-sections!");status=-1;}
   if(in->num_of_fluxes<1)  {glb_exp_error(in, "No flux selected!");status=-1;}
   if(in->num_of_fluxes>31)  {glb_exp_error(in, "To many fluxes!");status=-1;}
+
+  /* Initialize flux tables */
   if(in->num_of_fluxes>0&&in->num_of_fluxes<32)
+  {
+    for(i=0;i<in->num_of_fluxes;i++)
     {
-      for(i=0;i<in->num_of_fluxes;i++)
-        {
-          if(in->fluxes[i]==NULL)
-            { glb_exp_error(in, "Flux specs missing"); status=-1; }
-          else
-            {
-              if(glb_default_flux(in->fluxes[i])==0)
-                glb_init_fluxtables(in->fluxes[i],i);
-              else
-                status=-1;
-            }
-        }
+      if(in->fluxes[i] == NULL)
+      {
+        glb_exp_error(in, "Missing flux specification");
+        status = -1;
+      }
+      else
+      {
+        if (glb_init_flux(in->fluxes[i]) != GLB_SUCCESS)
+          status=-1;
+      }
     }
+  }
 
   /* Load cross sections */
   if(in->num_of_xsecs > 0 && in->num_of_xsecs < 32)
@@ -511,7 +508,7 @@ int glbDefaultExp(glb_exp ins)
       if(in->xsecs[i] == NULL)
       {
         glb_exp_error(in, "Missing cross section specification");
-        status=-1;
+        status = -1;
       }
       else
       {
@@ -519,10 +516,10 @@ int glbDefaultExp(glb_exp ins)
         {
           glb_exp_error(in, "No builtin cross sections available. "
                             "Please specify cross section file");
-          status=-1;
+          status = -1;
         }
         else
-          glb_load_xsec(in->xsecs[i]);
+          glb_init_xsec(in->xsecs[i]);
       }
     }
   }

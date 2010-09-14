@@ -1845,7 +1845,7 @@ glbFlux(int experiment, int flux_ident,
 
 
 
-  out=glb_flux_calc(energy, distance,0,flavour, anti,in->fluxes[flux_ident]);
+  out=glb_get_flux(energy, distance, flavour, anti, in->fluxes[flux_ident]);
 
   return out;
 }

@@ -42,6 +42,7 @@
 
 #include "glb_types.h"
 #include "glb_error.h"
+#include "glb_fluxes.h"
 #include "glb_multiex.h"
 
 #define PI 3.1415
@@ -57,7 +58,7 @@ static double stored_muons = 2.0E20;  // stored muons per year
 // care must be taken with this, it is a different number for each experiment
 static double power;
 static int    channel = 1;            // channel
-static int NFLUX = 500;
+static int FLUX_STEPS = 500;          // Number of sampling points for builtin fluxes
 
 
 void glb_flux_loader(glb_flux *data, int number, int polarity);
@@ -252,46 +253,49 @@ static double bb_flux(glb_flux *data, double en, int polarity, int l, int anti)
   return ergebnis;
 }
 
-static void builtin_flux_setup(glb_flux *data, flux_calc flx, int id,int pl)
+static void builtin_flux_setup(glb_flux *data, flux_calc flx, int pl)
 {
-  /* the id argument is unused */
   double smb,pb,de,emax;
-  int i;
+  int i, j;
 
-  if(data->builtin==1||data->builtin==2) de=data->parent_energy/501.0;
-  if(data->builtin==3||data->builtin==4) de=2 * data->gamma * (data->end_point + GLB_ELECTRON_MASS)/501.0;
+  if (data->builtin == 1  ||  data->builtin == 2)
+    de=data->parent_energy/(FLUX_STEPS+1);
+  else if (data->builtin == 3  ||  data->builtin == 4)
+    de=2 * data->gamma * (data->end_point + GLB_ELECTRON_MASS)/(FLUX_STEPS+1);
   smb=stored_muons;
   pb=power;
   stored_muons=data->stored_muons;
   power=data->target_power;
   glb_set_max_energy(data->parent_energy);
-  data->flux_storage=glb_alloc_flux_storage(501);
-  for(i=0;i<501;i++)
-    {
-      data->flux_storage[i][0]=i*de;
-      data->flux_storage[i][1]=flx(data,i*de,pl,1,+1);
-      data->flux_storage[i][2]=flx(data,i*de,pl,2,+1);
-      data->flux_storage[i][3]=flx(data,i*de,pl,3,+1);
-      data->flux_storage[i][4]=flx(data,i*de,pl,1,-1);
-      data->flux_storage[i][5]=flx(data,i*de,pl,2,-1);
-      data->flux_storage[i][6]=flx(data,i*de,pl,3,-1);
-    }
+  for (j=0; j < GLB_FLUX_COLUMNS; j++)
+    data->flux_data[j] = glb_malloc((FLUX_STEPS+1) * sizeof(data->flux_data[j][0]));
+  for(i=0; i <= FLUX_STEPS; i++)
+  {
+    data->flux_data[0][i] = i*de;
+    data->flux_data[1][i] = flx(data,i*de,pl,1,+1);
+    data->flux_data[2][i] = flx(data,i*de,pl,2,+1);
+    data->flux_data[3][i] = flx(data,i*de,pl,3,+1);
+    data->flux_data[4][i] = flx(data,i*de,pl,1,-1);
+    data->flux_data[5][i] = flx(data,i*de,pl,2,-1);
+    data->flux_data[6][i] = flx(data,i*de,pl,3,-1);
+  }
   power=pb;
   stored_muons=smb;
 }
 
-void glb_init_fluxtables(glb_flux *data,int pos)
-{
-
-  if(data->builtin==1) builtin_flux_setup(data,&nufact_flux,pos,+1);
-  if(data->builtin==2) builtin_flux_setup(data,&nufact_flux,pos,-1);
-
-  if(data->builtin==3) builtin_flux_setup(data,&bb_flux,pos,+1);
-  if(data->builtin==4) builtin_flux_setup(data,&bb_flux,pos,-1);
-
-  if(data->builtin==0||data->builtin==GLB_OLD_NORM) glb_flux_loader(data,pos,+1);
-
-}
+//FIXME FIXME FIXME
+//void glb_init_fluxtables(glb_flux *data,int pos)
+//{
+//
+//  if(data->builtin==1) builtin_flux_setup(data,&nufact_flux,pos,+1);
+//  if(data->builtin==2) builtin_flux_setup(data,&nufact_flux,pos,-1);
+//
+//  if(data->builtin==3) builtin_flux_setup(data,&bb_flux,pos,+1);
+//  if(data->builtin==4) builtin_flux_setup(data,&bb_flux,pos,-1);
+//
+//  if(data->builtin==0||data->builtin==GLB_OLD_NORM) glb_flux_loader(data,pos,+1);
+//
+//}
 
 
 
@@ -324,225 +328,437 @@ static double norm2(int type)
 
 
 
-double glb_flux_calc(double en, double baseline,
-	    int type, int l, int anti, const glb_flux *data)
-{
-   /* the type argument is unused */
-  double incre;
-  double ergebnis;
-  int lowerind;
-  int higherind;
-  int part=1;
-
-  part = l - ((anti-1)*3)/2;
-
-// JK 2009-11-23 This is slow ...
-//  if (l==1 && anti == 1)
-//    {
-//      part = 1;
-//    }
-// if (l==2 && anti == 1)
-//    {
-//      part = 2;
-//    }
-// if (l==3 && anti == 1)
-//    {
-//      part = 3;
-//    }
-// if (l==1 && anti == -1)
-//    {
-//      part = 4;
-//    }
-// if (l==2 && anti == -1)
-//    {
-//      part = 5;
-//    }
-// if (l==3 && anti == -1)
-//    {
-//      part = 6;
-//    }
+//double glb_flux_calc(double en, double baseline,
+//	    int type, int l, int anti, const glb_flux *data)
+//{
+//   /* the type argument is unused */
+//  double incre;
+//  double ergebnis;
+//  int lowerind;
+//  int higherind;
+//  int part=1;
 //
-//    and the following code should accomplish the same
-  part = l + 3*((1-anti)/2);
-
-
-/* JK 2008-07-06 incre = (data->flux_storage[500][0]-data->flux_storage[0][0])/501.0; */
- incre = (data->flux_storage[500][0]-data->flux_storage[0][0])/500.0;
- lowerind = floor((en-data->flux_storage[0][0])/incre);
- higherind = lowerind + 1;
-
- if (lowerind<0||higherind>500)
-   {
-     ergebnis=0.0;
-   }
- else
-   {
-     ergebnis=((data->flux_storage[higherind][part]-
-		data->flux_storage[lowerind][part])*(((en-data->flux_storage[0][0])
-						  /incre)-lowerind)
-	       +data->flux_storage[lowerind][part])
-       /baseline/baseline;
-   }
- ergebnis = ergebnis*norm2(data->builtin)
-   * data->time * data->target_power * data->stored_muons * data->norm;
- return ergebnis;
-}
-
-
-
-/* Here begins the part where the cross-sections are read from
- * file and made accessible to the program */
-
-
-/***********************************************************
- * Flux-Loader                                             *
- ***********************************************************/
-
-void glb_flux_loader(glb_flux *data, int ident, int polarity)
-{
-   /* the polarity  argument is unused */
-  int i,number,s,ts=0;
-  char tok;
-
-  FILE *fp = glb_fopen(data->file_name,"r");
-  number=ident;
-
-
-  data->flux_storage=glb_alloc_flux_storage(501);
-      if (fp!=NULL)
-	{
-	  /* peel off all leading comments */
-	  while(1)
-	    {
-	      tok=fgetc(fp);
-	      if(tok=='#')
-		{
-		  while(fgetc(fp)!='\n');
-		}
-	      else
-		{
-		  ungetc(tok,fp);
-		  break;
-		}
-	    }
-	  for (i=0; i<=NFLUX; i++)
-	    {
-	      /* get rid of comments inside */
-	      tok=fgetc(fp);
-	      if(tok=='#')
-		{
-		  while(fgetc(fp)!='\n');
-		  i--;
-		}
-	      else
-		{
-		  ungetc(tok,fp);
-		  /* read the data */
-		  s=fscanf(fp,"%lf %lf %lf %lf %lf %lf %lf \n",
-			   &data->flux_storage[i][0],
-			   &data->flux_storage[i][1],
-			   &data->flux_storage[i][2],
-			   &data->flux_storage[i][3],
-			   &data->flux_storage[i][4],
-			   &data->flux_storage[i][5],
-			   &data->flux_storage[i][6]);
-
-		  if(s!=7)
-		    fprintf(stderr,"Error: Wrong format in file %s\n",
-			    data->file_name);
-		  else
-		    ts++;
-		}
-
-	    }
-	  fclose(fp);
-	}
-      else
-	{
-	  fprintf(stderr,"Error: Could not open %s\n",data->file_name);
-	}
-
-
-      if(ts!=501) fprintf(stderr,"Error: Wrong format in file %s\n",
-			  data->file_name);
-}
+//  part = l - ((anti-1)*3)/2;
+//
+//// JK 2009-11-23 This is slow ...
+////  if (l==1 && anti == 1)
+////    {
+////      part = 1;
+////    }
+//// if (l==2 && anti == 1)
+////    {
+////      part = 2;
+////    }
+//// if (l==3 && anti == 1)
+////    {
+////      part = 3;
+////    }
+//// if (l==1 && anti == -1)
+////    {
+////      part = 4;
+////    }
+//// if (l==2 && anti == -1)
+////    {
+////      part = 5;
+////    }
+//// if (l==3 && anti == -1)
+////    {
+////      part = 6;
+////    }
+////
+////    and the following code should accomplish the same
+//  part = l + 3*((1-anti)/2);
+//
+//  //FIXME FIXME FIXME Adapt to new flux storage
+///* JK 2008-07-06 incre = (data->flux_data[500][0]-data->flux_data[0][0])/501.0; */
+// incre = (data->flux_data[500][0]-data->flux_data[0][0])/500.0;
+// lowerind = floor((en-data->flux_data[0][0])/incre);
+// higherind = lowerind + 1;
+//
+// if (lowerind<0||higherind>500)
+//   {
+//     ergebnis=0.0;
+//   }
+// else
+//   {
+//     ergebnis=((data->flux_data[higherind][part]-
+//		data->flux_data[lowerind][part])*(((en-data->flux_data[0][0])
+//						  /incre)-lowerind)
+//	       +data->flux_data[lowerind][part])
+//       /baseline/baseline;
+//   }
+// ergebnis = ergebnis*norm2(data->builtin)
+//   * data->time * data->target_power * data->stored_muons * data->norm;
+// return ergebnis;
+//}
+//
+//
+//
+///* Here begins the part where the cross-sections are read from
+// * file and made accessible to the program */
+//
+//
+///***********************************************************
+// * Flux-Loader                                             *
+// ***********************************************************/
+//
+//void glb_flux_loader(glb_flux *data, int ident, int polarity)
+//{
+//   /* the polarity  argument is unused */
+//  int i,number,s,ts=0;
+//  char tok;
+//
+//  FILE *fp = glb_fopen(data->file_name,"r");
+//  number=ident;
+//
+//
+//  data->flux_storage=glb_alloc_flux_storage(501);
+//      if (fp!=NULL)
+//	{
+//	  /* peel off all leading comments */
+//	  while(1)
+//	    {
+//	      tok=fgetc(fp);
+//	      if(tok=='#')
+//		{
+//		  while(fgetc(fp)!='\n');
+//		}
+//	      else
+//		{
+//		  ungetc(tok,fp);
+//		  break;
+//		}
+//	    }
+//	  for (i=0; i<=NFLUX; i++)
+//	    {
+//	      /* get rid of comments inside */
+//	      tok=fgetc(fp);
+//	      if(tok=='#')
+//		{
+//		  while(fgetc(fp)!='\n');
+//		  i--;
+//		}
+//	      else
+//		{
+//		  ungetc(tok,fp);
+//		  /* read the data */
+//		  s=fscanf(fp,"%lf %lf %lf %lf %lf %lf %lf \n",
+//			   &data->flux_storage[i][0],
+//			   &data->flux_storage[i][1],
+//			   &data->flux_storage[i][2],
+//			   &data->flux_storage[i][3],
+//			   &data->flux_storage[i][4],
+//			   &data->flux_storage[i][5],
+//			   &data->flux_storage[i][6]);
+//
+//		  if(s!=7)
+//		    fprintf(stderr,"Error: Wrong format in file %s\n",
+//			    data->file_name);
+//		  else
+//		    ts++;
+//		}
+//
+//	    }
+//	  fclose(fp);
+//	}
+//      else
+//	{
+//	  fprintf(stderr,"Error: Could not open %s\n",data->file_name);
+//	}
+//
+//
+//      if(ts!=501) fprintf(stderr,"Error: Wrong format in file %s\n",
+//			  data->file_name);
+//}
 
 
 /***************************************************************************
- *                 C R O S S   S E C T I O N S                             *
+ *                            F L U X E S                                  *
  ***************************************************************************/
 
 /***************************************************************************
- * Function glb_load_xsec                                                  *
+ * Function glb_load_n_columns                                             *
  ***************************************************************************
- * Load cross sections from the file specified in xs->file_name and        *
- * store them in xs->xsec_storage                                          *
+ * Load data from file. The expected format is n_columns columns and an    *
+ * arbitray number of rows. The resulting number of rows will be stored in *
+ * n_lines, while for the actual data, arrays will be created (one for     *
+ * each column), i.e. data[] should have length n_columns                  *
  ***************************************************************************/
-int glb_load_xsec(glb_xsec *xs)
+int glb_load_n_columns(const char *file_name, const int n_columns, int *n_lines, double *data[])
 {
-  if (!xs || !xs->file_name)
+  if (!file_name || !n_lines || !data)
     return GLBERR_UNINITIALIZED;
 
   int j;
   int buf_length = 100;
 
-  /* Allocate cross section buffer */
-  for (j=0; j < GLB_XSEC_COLUMNS; j++)
-    xs->xsec_data[j] = glb_malloc(buf_length*sizeof(xs->xsec_data[j][0]));
+  /* Allocate buffer */
+  for (j=0; j < n_columns; j++)
+    data[j] = glb_malloc(buf_length*sizeof(data[j][0]));
 
-  FILE *f = glb_fopen(xs->file_name, "r");
+  FILE *f = glb_fopen(file_name, "r");
   if (!f)
   {
-    fprintf(stderr, "glb_load_xsec: Cannot open file %s.\n", xs->file_name);
+    fprintf(stderr, "glb_load_n_columns: Cannot open file %s.\n", file_name);
     return GLBERR_FILE_NOT_FOUND;
   }
 
   /* Read from file */
   const int max_line = 1024;
   char this_line[max_line];
-  xs->n_lines = 0;
+  *n_lines = 0;
   while (fgets(this_line, max_line, f))
   {
     if (strlen(this_line) > max_line - 2)
     {
-      fprintf(stderr, "glb_load_xsec: Line %d too long in file %s.\n",
-              xs->n_lines+1, xs->file_name);
+      fprintf(stderr, "glb_load_n_columns: Line %d too long in file %s.\n",
+              *n_lines+1, file_name);
       return GLBERR_INVALID_FILE_FORMAT;
     }
 
     if (this_line[0] != '#'  &&  this_line[strspn(this_line, " \t")] != '\n')
-    {                         /* Ignore comments and blank lines */
-      if (xs->n_lines >= buf_length)   /* If necessary, resize x-sec buffer */
+    {                               /* Ignore comments and blank lines */
+      if (*n_lines >= buf_length)   /* If necessary, resize x-sec buffer */
       {
         buf_length *= 2;
-        for (j=0; j < GLB_XSEC_COLUMNS; j++)
-          xs->xsec_data[j] = glb_realloc(xs->xsec_data[j], buf_length*sizeof(xs->xsec_data[j][0]));
+        for (j=0; j < n_columns; j++)
+          data[j] = glb_realloc(data[j], buf_length*sizeof(data[j][0]));
       }
 
-      if (sscanf(this_line, "%lf %lf %lf %lf %lf %lf %lf", &xs->xsec_data[0][xs->n_lines],
-          &xs->xsec_data[1][xs->n_lines], &xs->xsec_data[2][xs->n_lines],
-          &xs->xsec_data[3][xs->n_lines], &xs->xsec_data[4][xs->n_lines],
-          &xs->xsec_data[5][xs->n_lines], &xs->xsec_data[6][xs->n_lines]) != GLB_XSEC_COLUMNS)
+      char *p = strtok(this_line, " \t,");
+      for (j=0; j < n_columns; j++)
       {
-        fprintf(stderr, "glb_load_xsec: Line %d invalid in file %s.\n",
-                xs->n_lines+1, xs->file_name);
-        return GLBERR_INVALID_FILE_FORMAT;
+        if (!p)
+        {
+          fprintf(stderr, "glb_load_n_columns: Line %d too short in file %s.\n",
+                  *n_lines+1, file_name);
+          return GLBERR_INVALID_FILE_FORMAT;
+        }
+        if (sscanf(p, "%lf", &data[j][*n_lines]) != 1)
+        {
+          fprintf(stderr, "glb_load_n_columns: Line %d invalid in file %s.\n",
+                  *n_lines+1, file_name);
+          return GLBERR_INVALID_FILE_FORMAT;
+        }
+        p = strtok(NULL, " \t,");
       }
 
-      if (xs->n_lines > 1  &&   /* Check if log10(E) support points are equidistant */
-          fabs(xs->xsec_data[0][xs->n_lines] - 2*xs->xsec_data[0][xs->n_lines-1]
-               + xs->xsec_data[0][xs->n_lines-2])/fabs(xs->xsec_data[0][xs->n_lines]) > 1e-10)
+      if (*n_lines > 1  &&   /* Check if log10(E) support points are equidistant */
+          fabs(data[0][*n_lines] - 2*data[0][*n_lines-1]
+               + data[0][*n_lines-2])/fabs(data[0][*n_lines]) > 1e-10)
       {
-        fprintf(stderr, "glb_load_xsec: Error in %s, line %d: log10(E) sampling points "
-                        "should be equidistant.\n", xs->file_name, xs->n_lines+1);
+        fprintf(stderr, "glb_load_n_columns: Error in %s, line %d: log10(E) sampling points "
+                        "should be equidistant.\n", file_name, *n_lines+1);
         return GLBERR_INVALID_FILE_FORMAT;
       }
-      xs->n_lines++;
+      (*n_lines)++;
     }
   };
 
   fclose(f);
   return GLB_SUCCESS;
+}
+
+
+/***************************************************************************
+ * Function glb_init_flux                                                  *
+ ***************************************************************************
+ * Initializes a glb_flux structure after it has been partially filled by  *
+ * the parser with the information from the glb file. If a built-in flux   *
+ * definition is to be used, the fluxes are computed, otherwise they are   *
+ * laoded from a file                                                      *
+ ***************************************************************************/
+int glb_init_flux(glb_flux *flux)
+{
+  if (!flux)
+    return GLBERR_UNINITIALIZED;
+
+  if (flux->time < 0)          flux->time         = 1.0;
+  if (flux->target_power < 0)  flux->target_power = 1.0;
+  if (flux->stored_muons < 0)  flux->stored_muons = 1.0;
+  if (flux->norm < 0)          flux->norm         = 1.0;
+
+  /* Initialize flux tables according to user specification */
+  switch (flux->builtin)
+  {
+    case 1:                       /* Neutrino factory, \mu^+ */
+    case 2:                       /* Neutrino factory, \mu^- */
+      if (flux->parent_energy < 0)
+      {
+        glb_error("No parent muon energy defined for NuFact flux");
+        return GLBERR_INVALID_FILE_FORMAT;
+      }
+      if (flux->builtin == 1)
+        builtin_flux_setup(flux, &nufact_flux, +1);
+      else
+        builtin_flux_setup(flux, &nufact_flux, -1);
+      break;
+
+    case 3:                       /* Beta beam, beta^+ decay */
+    case 4:                       /* Beta beam, beta^- decay */
+      if (flux->gamma < 0)
+      {
+        glb_error("No gamma factor specified for Beta Beam");
+        return GLBERR_INVALID_FILE_FORMAT;
+      }
+      if (flux->end_point < 0)
+      {
+        glb_error("No endpoint energy specified for Beta Beam");
+        return GLBERR_INVALID_FILE_FORMAT;
+      }
+
+      if (flux->builtin == 3)
+        builtin_flux_setup(flux, &bb_flux, +1);
+      else
+        builtin_flux_setup(flux, &bb_flux, -1);
+      break;
+
+    default:
+      if (flux->file_name == NULL || strlen(flux->file_name) <= 0)
+      {
+        glb_error("No flux file specified");
+        return GLBERR_INVALID_FILE_FORMAT;
+      }
+      return glb_load_n_columns(flux->file_name, GLB_FLUX_COLUMNS,
+                                &flux->n_lines, flux->flux_data);
+      break;
+  }
+
+  return GLB_SUCCESS;
+}
+
+
+/***************************************************************************
+ * Function glb_get_flux                                                   *
+ ***************************************************************************
+ * Return the flux of neutrinos of flavor f and energy E at the baseline L *
+ ***************************************************************************/
+double glb_get_flux(double E, double L, int f, int cp_sign, const glb_flux *flux)
+{
+  int col = (int) f + 3*(1-cp_sign)/2;  /* Which column of the flux table? */
+  int n_steps = flux->n_lines - 1;
+  double E_binsize = (flux->flux_data[0][n_steps] - flux->flux_data[0][0]) / n_steps;
+  double result;
+  
+  int k = (E - flux->flux_data[0][0]) / E_binsize;
+  if (k < 0 || k >= n_steps)
+    return 0.0;
+  else
+  {
+    double E_lo    = flux->flux_data[0][k];
+    double flux_lo = flux->flux_data[col][k];
+    double flux_up = flux->flux_data[col][k+1];
+    result  = flux_lo + (E - E_lo)*(flux_up - flux_lo)/E_binsize;
+    result *= norm2(flux->builtin) * flux->time * flux->target_power
+                * flux->stored_muons * flux->norm / (L*L);
+  }
+  return result;
+}
+
+
+/***************************************************************************
+ * Function glb_free_flux                                                  *
+ ***************************************************************************
+ * Free flux data structue                                                 *
+ ***************************************************************************/
+int glb_free_flux(glb_flux *flux)
+{
+  int status;
+  status = glb_reset_flux(flux);
+  glb_free(flux);
+  return status;
+}
+
+
+/***************************************************************************
+ * Function glb_reset_flux                                                 *
+ ***************************************************************************
+ * Initialize flux data structrue to dummy valus. Any previously allocated *
+ * memory for flux->file_name or flux->xsec_data is freed.                 *
+ ***************************************************************************/
+int glb_reset_flux(glb_flux *flux)
+{
+  int i;
+  if (flux)
+  {
+    flux->builtin       = -1;
+    flux->time          = -1;
+    flux->target_power  = -1;
+    flux->stored_muons  = -1;
+    flux->parent_energy = -1;
+    flux->gamma         = -1;
+    flux->end_point     = -1;
+    flux->norm          = -1;
+    flux->n_lines       = 0;
+    for (i=0; i < GLB_FLUX_COLUMNS; i++)
+    {
+      if (flux->flux_data[i])
+      {
+        glb_free(flux->flux_data[i]);
+        flux->flux_data[i] = NULL;
+      }
+    }
+    if (flux->file_name)
+    {
+      glb_free(flux->file_name);
+      flux->file_name = NULL;
+    }
+    glb_free(flux);
+  }
+
+  return GLB_SUCCESS;
+}
+
+
+/***************************************************************************
+ * Function glb_copy_flux                                                  *
+ ***************************************************************************
+ * Create a new flux data structure as a copy of an existing one           *
+ ***************************************************************************/
+int glb_copy_flux(glb_flux *dest, const glb_flux *src)
+{
+  int i, j;
+
+  if (!dest)
+    return GLBERR_INVALID_ARGS;
+
+  memcpy(dest, src, sizeof(*src));
+  if (src->file_name)
+  {
+    dest->file_name = strdup(src->file_name);
+    if (!dest->file_name)
+      glb_fatal("glb_copy_flux: Cannot copy name of cross section file");
+  }
+  if (src->flux_data)
+  {
+    for (j=0; j < GLB_FLUX_COLUMNS; j++)
+    {
+      dest->flux_data[j] = glb_malloc(src->n_lines*sizeof(src->flux_data[j][0]));
+      for (i=0; i < dest->n_lines; i++)
+        dest->flux_data[j][i] = src->flux_data[j][i];
+    }
+  }
+
+  return GLB_SUCCESS;
+}
+
+
+/***************************************************************************
+ *                     C R O S S   S E C T I O N S                         *
+ ***************************************************************************/
+
+/***************************************************************************
+ * Function glb_init_xsec                                                  *
+ ***************************************************************************
+ * Load cross sections from the file specified in xs->file_name and        *
+ * store them in xs->xsec_data                                             *
+ ***************************************************************************/
+int glb_init_xsec(glb_xsec *xs)
+{
+  if (!xs || !xs->file_name)
+    return GLBERR_UNINITIALIZED;
+
+  return glb_load_n_columns(xs->file_name, GLB_XSEC_COLUMNS, &xs->n_lines, xs->xsec_data);
 }
 
 
@@ -579,9 +795,26 @@ double glb_get_xsec(double E, int f, int cp_sign, const glb_xsec *xs)
  ***************************************************************************/
 int glb_free_xsec(glb_xsec *xs)
 {
+  int status;
+  status = glb_reset_xsec(xs);
+  glb_free(xs);
+  return status;
+}
+
+
+/***************************************************************************
+ * Function glb_reset_xsec                                                 *
+ ***************************************************************************
+ * Initialize cross section structrue to dummy valus. Any previously       *
+ * allocated memory for xs->file_name or xs->xsec_data is freed.           *
+ ***************************************************************************/
+int glb_reset_xsec(glb_xsec *xs)
+{
   int i;
   if (xs)
   {
+    xs->n_lines   = 0;
+    xs->builtin   = -1;
     for (i=0; i < GLB_XSEC_COLUMNS; i++)
     {
       if (xs->xsec_data[i])
@@ -595,29 +828,8 @@ int glb_free_xsec(glb_xsec *xs)
       glb_free(xs->file_name);
       xs->file_name = NULL;
     }
-    glb_free(xs);
   }
 
-  return GLB_SUCCESS;
-}
-
-
-/***************************************************************************
- * Function glb_init_xsec                                                  *
- ***************************************************************************
- * Initialize cross section structrue to dummy valus                       *
- ***************************************************************************/
-int glb_init_xsec(glb_xsec *xs)
-{
-  int i;
-  if (xs)
-  {
-    xs->file_name = NULL;
-    for (i=0; i < GLB_XSEC_COLUMNS; i++)
-      xs->xsec_data[i] = NULL;
-    xs->n_lines   = 0;
-    xs->builtin   = -1;
-  }
   return GLB_SUCCESS;
 }
 

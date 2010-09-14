@@ -289,15 +289,27 @@ static void grp_end(char* name)
 
 	 if(buff.num_of_fluxes > 0)
 	   {
-	     glb_error("The 'flux' directive is deprecated.\n"
+	     glb_error("The 'flux' directive is deprecated (consider using 'nuflux').\n"
 		       "The flux normalization may not be what you expect.\n"
 		       "Please, consult the manual!");
 	     if(flt.builtin<=0) flt.builtin=GLB_OLD_NORM;
-	     if(buff.fluxes[buff.num_of_fluxes-1]==NULL)
-	       buff.fluxes[buff.num_of_fluxes-1]=glb_flux_alloc();
-	     buff.fluxes[buff.num_of_fluxes-1]=
-	       cpy_glb_flux(buff.fluxes[buff.num_of_fluxes-1],&flt);
-	    glb_flux_reset(&flt);
+
+             if (buff.fluxes[buff.num_of_fluxes-1] == NULL)
+             {
+               buff.fluxes[buff.num_of_fluxes-1] = glb_malloc(sizeof(glb_flux));
+               memset(buff.fluxes[buff.num_of_fluxes-1], 0, sizeof(*buff.fluxes[0]));
+               glb_reset_flux(buff.fluxes[buff.num_of_fluxes-1]);
+             }
+             if (glb_copy_flux(buff.fluxes[buff.num_of_fluxes-1], &flt) != GLB_SUCCESS)
+               glb_error("grp_end: Error copying flux data");
+             glb_reset_flux(&flt);
+
+//FIXME FIXME FIXME
+//	     if(buff.fluxes[buff.num_of_fluxes-1]==NULL)
+//	       buff.fluxes[buff.num_of_fluxes-1]=glb_flux_alloc();
+//	     buff.fluxes[buff.num_of_fluxes-1]=
+//	       cpy_glb_flux(buff.fluxes[buff.num_of_fluxes-1],&flt);
+//	    glb_flux_reset(&flt);
 	   }
        }
 
@@ -306,11 +318,22 @@ static void grp_end(char* name)
        {
 	 if(buff.num_of_fluxes > 0)
 	   {
-	     if(buff.fluxes[buff.num_of_fluxes-1]==NULL)
-	       buff.fluxes[buff.num_of_fluxes-1]=glb_flux_alloc();
-	     buff.fluxes[buff.num_of_fluxes-1]=
-	       cpy_glb_flux(buff.fluxes[buff.num_of_fluxes-1],&flt);
-	    glb_flux_reset(&flt);
+	     if (buff.fluxes[buff.num_of_fluxes-1] == NULL)
+             {
+               buff.fluxes[buff.num_of_fluxes-1] = glb_malloc(sizeof(glb_flux));
+               memset(buff.fluxes[buff.num_of_fluxes-1], 0, sizeof(*buff.fluxes[0]));
+               glb_reset_flux(buff.fluxes[buff.num_of_fluxes-1]);
+             }
+             if (glb_copy_flux(buff.fluxes[buff.num_of_fluxes-1], &flt) != GLB_SUCCESS)
+               glb_error("grp_end: Error copying flux data");
+             glb_reset_flux(&flt);
+
+// FIXME FIXME FIXME
+//	     if(buff.fluxes[buff.num_of_fluxes-1]==NULL)
+//	       buff.fluxes[buff.num_of_fluxes-1]=glb_flux_alloc();
+//	     buff.fluxes[buff.num_of_fluxes-1]=
+//	       cpy_glb_flux(buff.fluxes[buff.num_of_fluxes-1],&flt);
+//	    glb_flux_reset(&flt);
 	   }
        }
 
@@ -318,14 +341,15 @@ static void grp_end(char* name)
        {
 	 if(buff.num_of_xsecs > 0)
 	   {
-	     if (!buff.xsecs[buff.num_of_xsecs-1])
+	     if (buff.xsecs[buff.num_of_xsecs-1] == NULL)
              {
                buff.xsecs[buff.num_of_xsecs-1] = glb_malloc(sizeof(glb_xsec));
-               glb_init_xsec(buff.xsecs[buff.num_of_xsecs-1]);
+               memset(buff.xsecs[buff.num_of_xsecs-1], 0, sizeof(*buff.xsecs[0]));
+               glb_reset_xsec(buff.xsecs[buff.num_of_xsecs-1]);
              }
              if (glb_copy_xsec(buff.xsecs[buff.num_of_xsecs-1], &xsc) != GLB_SUCCESS)
                glb_error("grp_end: Error copying cross section data");
-	     glb_init_xsec(&xsc);
+	     glb_reset_xsec(&xsc);
 	   }
        }
 
@@ -1886,8 +1910,8 @@ void glbResetEOF()
   name_table =(glb_namerec *) NULL;
   sym_table =(glb_symrec *) NULL;
   init_table ();
-  glb_flux_reset(&flt);
-  glb_init_xsec(&xsc);
+  glb_reset_flux(&flt);
+  glb_reset_xsec(&xsc);
 
 }
 
@@ -1912,8 +1936,10 @@ int glbInitExperiment(char *inf,glb_exp *in, int *counter)
   context=(char *) strdup("global");
   glb_smear_reset(&ibf);
   glb_option_type_reset(&opt);
-  flt.file_name=NULL;
-  glb_flux_reset(&flt);
+  memset(&flt, 0, sizeof(flt));
+  glb_reset_flux(&flt);
+  memset(&xsc, 0, sizeof(xsc));
+  glb_reset_xsec(&xsc);
   input=glb_fopen(inf,"r");
   if(input==NULL) return -2;
   /* This line produces a warning with -Wall:

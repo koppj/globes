@@ -47,9 +47,9 @@ struct glb_naming
 typedef struct glb_naming glb_naming;
 
 /* Data structure for handling fluxes and built-in fluxes */
+#define GLB_FLUX_COLUMNS   7           /* Number of columns in flux file         */
 typedef struct {
   int builtin;
-  char* file_name;
   double time;
   double parent_energy;
   double stored_muons;
@@ -57,7 +57,10 @@ typedef struct {
   double norm;
   double gamma;
   double end_point;
-  double** flux_storage;
+
+  int n_lines;                         /* Number of columns in flux file         */
+  char *file_name;                     /* Name of flux file                      */
+  double *flux_data[GLB_FLUX_COLUMNS]; /* Flux data (7 x n_lines array)          */
 } glb_flux;
 
 /* Data structure for handling X-sections and built-in X-sections,
@@ -68,7 +71,7 @@ typedef struct {
   int builtin;
   int n_lines;                         /* Number of lines in cross section file  */
   char *file_name;                     /* Name of cross section file             */
-  double *xsec_data[GLB_XSEC_COLUMNS]; /* Cross section data (n_lines x 7 array) */
+  double *xsec_data[GLB_XSEC_COLUMNS]; /* Cross section data (7 x n_lines array) */
 } glb_xsec;
 
 

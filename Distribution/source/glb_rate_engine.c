@@ -349,30 +349,13 @@ static void CalcAllProbs(double en, double baseline)
     glb_error("Calculation of oscillation probabilities failed.");
 }
 
-// Sum of all NC rates
-
-static double RatesSXX(double en, double baseline, int polarity, int anti, int l, int m,int ident)
-{
-  double ergebnis;
-  /*glbXSection(ident,en,m,anti)*/
-
-  ergebnis = glb_get_xsec(en,m,anti,glb_calc_xsecs[ident])*
-    (glb_flux_calc(en,baseline,polarity,1,anti,glb_calc_fluxes[polarity])+
-     glb_flux_calc(en,baseline,polarity,2,anti,glb_calc_fluxes[polarity])+
-     glb_flux_calc(en,baseline,polarity,3,anti,glb_calc_fluxes[polarity]))
-    *target_mass;
-
-  return ergebnis;
-}
-
-
 static double RatesNOSC(double en, double baseline,
 		 int polarity, int anti, int l, int m,int ident)
 {
   double ergebnis;
 
-  ergebnis=glb_get_xsec(en,m,anti,glb_calc_xsecs[ident])*
-    glb_flux_calc(en,baseline,polarity,l,anti,glb_calc_fluxes[polarity])
+  ergebnis=glb_get_xsec(en,m,anti,glb_calc_xsecs[ident])
+    *glb_get_flux(en,baseline,l,anti,glb_calc_fluxes[polarity])
     *target_mass;
 
   return ergebnis;
@@ -386,13 +369,13 @@ static double RatesXX(double en, double baseline, int polarity, int anti, int l,
   if (anti == 1)
     {
       ergebnis=glb_get_xsec(en,m,anti,glb_calc_xsecs[ident])*
-	glb_flux_calc(en,baseline,polarity,l,anti,glb_calc_fluxes[polarity])
+	glb_get_flux(en,baseline,l,anti,glb_calc_fluxes[polarity])
 	*Probs[l-1][m-1]*target_mass;
     }
   else
     {
       ergebnis=glb_get_xsec(en,m,anti,glb_calc_xsecs[ident])
-	*glb_flux_calc(en,baseline,polarity,l,anti,glb_calc_fluxes[polarity])
+	*glb_get_flux(en,baseline,l,anti,glb_calc_fluxes[polarity])
 	*ProbsAnti[l-1][m-1]*target_mass;
 
     }
