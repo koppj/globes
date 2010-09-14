@@ -108,15 +108,22 @@ LIBS="$GSL_LIBS $LIBS"
 GSLINC="$GSL_CFLAGS"
 AC_SUBST(GSLINC)
 
-# handling rpath for Mac OS in the globes-config script
- if test "$enable_rpath" = "no" ; then
-	linkerflag=""
-    else
-	linkerflag='-Wl,--rpath -Wl,$libdir'	
-    fi
+# JK, May 20, 2010: The following has been making trouble on Macs, since ./configure
+# doesn't understand the --disable-rpath option any more after we switched
+# to the new autotools. If the linker has a way of putting hardcoded
+# library search paths into the binary, it should stored in the variable
+# hardcode_libdir_flag_spec - at least that's where libtool looks for it.
+# Therefore, we are now using $hardcode_libdir_flag_spec
+## handling rpath for Mac OS in the globes-config script
+# if test "$enable_rpath" = "no" ; then
+#	linkerflag=""
+#    else
+#	linkerflag='-Wl,--rpath -Wl,$libdir'	
+#    fi
+# AC_SUBST(linkerflag)
 
-
-AC_SUBST(linkerflag)
+AC_SUBST(hardcode_libdir_flag_spec)
+AC_SUBST(wl)
 
 
 dnl check for the headers of GSL (RedHat!)

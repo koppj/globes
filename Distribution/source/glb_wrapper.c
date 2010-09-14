@@ -1164,6 +1164,13 @@ int glbGetChannelInRule(int exp, int rule, int pos, int signal)
   return i;
 }
 
+/***************************************************************************
+ * Function glbGetCoefficientInRule                                        *
+ ***************************************************************************
+ * Returns the coefficient of term #pos in the given experiment and rule.  *
+ * signal=GLB_SIG is for signal contribution to the rule, signal=GLB_BG is *
+ * for the background contribution                                         *
+ ***************************************************************************/
 double glbGetCoefficientInRule(int exp, int rule, int pos, int signal)
 {
   double res=-1.0;
@@ -1176,6 +1183,26 @@ double glbGetCoefficientInRule(int exp, int rule, int pos, int signal)
     res=((struct glb_experiment *) glb_experiment_list[exp])->bgrulescoeff[rule][pos];
 
   return res;
+}
+
+/***************************************************************************
+ * Function glbSetCoefficientInRule                                        *
+ ***************************************************************************
+ * Sets the coefficient of term #pos in the given experiment and rule      *
+ * to the value coeff. signal=GLB_SIG is for signal contribution to the    *
+ * rule, signal=GLB_BG is for the background contribution                  *
+ ***************************************************************************/
+int glbSetCoefficientInRule(int exp, int rule, int pos, int signal, double coeff)
+{
+  if(pos_range(exp,rule,pos,signal)!=0) return -1.0;
+
+  if(signal==GLB_SIG)
+    ((struct glb_experiment *) glb_experiment_list[exp])->rulescoeff[rule][pos] = coeff;
+
+  if(signal==GLB_BG)
+    ((struct glb_experiment *) glb_experiment_list[exp])->bgrulescoeff[rule][pos] = coeff;
+
+  return 0;
 }
 
 double glbGetNormalizationInRule(int exp, int rule, int signal)
@@ -1836,7 +1863,7 @@ double glbXSection(int experiment, int xsec_ident,
     glb_error("Invalid value for X-section number");
     return -1;}
 
-  out=glb_xsec_calc(energy,flavour, anti,in->xsecs[xsec_ident]);
+  out=glb_get_xsec(energy,flavour, anti,in->xsecs[xsec_ident]);
 
   return out;
 }

@@ -192,92 +192,6 @@ glb_flux  *cpy_glb_flux(glb_flux *dest, const glb_flux *src)
 }
 
 
-/* here come the glb_xsec functions */
-
-/* Dynamically allocating flux storage */
-double** glb_alloc_xsec_storage(size_t lines)
-{
-  double **temp;
-  size_t k;
-  temp = (double **) glb_malloc(sizeof(double *)*(lines+1));
-  for(k=0;k<lines;k++)
-    {
-      temp[k]=(double *) glb_malloc(sizeof(double)*7);
-    }
-  temp[lines]=NULL;
-  return temp;
-}
-
-void glb_free_xsec_storage(double **stale)
-{
-  size_t i;
-  if(stale!=NULL){
-  for(i=0;stale[i]!=NULL;i++) glb_free(stale[i]);
-  glb_free(stale);
-  stale=NULL;
-  }
-}
-
-glb_xsec *glb_xsec_alloc()
-{
-  glb_xsec *temp;
-  temp=(glb_xsec *) glb_malloc(sizeof(glb_xsec));
-  temp->builtin=-1;
-  temp->file_name=NULL;
-  temp->xsec_storage=NULL;
-  return temp;
-}
-
-glb_xsec *glb_xsec_reset(glb_xsec *temp)
-{
-  temp->builtin=-1;
-  /* FIXME memory leak */
-  glb_free(temp->file_name);
-  temp->file_name=NULL;
-  glb_free_xsec_storage(temp->xsec_storage);
-  return temp;
-}
-
-
-
-void glb_xsec_free(glb_xsec *stale)
-{
-  if(stale!=NULL)
-    {
-      if(stale->file_name!=NULL) glb_free(stale->file_name);
-      if(stale->xsec_storage!=NULL) glb_free_xsec_storage(stale->xsec_storage);
-      glb_free(stale);
-    }
-}
-
-int glb_default_xsec(glb_xsec *in)
-{
-  int s=0;
-  if(in->builtin==-1) in->builtin=0;
-  /* if(in->xsec_storage==NULL) {glb_error("No storage for X-section allocated");
-     s=-1;}*/
-  if(s!=0) glb_error("glb_xsec not properly setup");
-  return s;
-}
-
-glb_xsec  *cpy_glb_xsec(glb_xsec *dest, const glb_xsec *src)
-{
-  size_t i;
-  dest=(glb_xsec *) memcpy(dest,src,sizeof(glb_xsec));
-  if(src->file_name!=NULL)
-    {
-      dest->file_name=(char *) strdup(src->file_name);
-      if(dest->file_name==NULL) glb_fatal("Error in strdup");
-    }
-  if(src->xsec_storage!=NULL)
-    {
-      dest->xsec_storage=glb_alloc_xsec_storage(1001);
-      for(i=0;i<1001;i++) dest->xsec_storage[i]=src->xsec_storage[i];
-    }
-  return dest;
-}
-
-
 void glbInitExp(glb_exp ins)
 {
   int i;
@@ -388,7 +302,7 @@ void glbFreeExp(glb_exp ins)
   glb_free(in->version);
   glb_free(in->filename);
   for(i=0;i<32;i++)glb_flux_free(in->fluxes[i]);
-  for(i=0;i<32;i++)glb_xsec_free(in->xsecs[i]);
+  for(i=0;i<32;i++) { glb_free_xsec(in->xsecs[i]);  in->xsecs[i]=NULL; }
 
   for(i=0;i<6;i++) my_free(in->listofchannels[i]);
 
@@ -589,21 +503,29 @@ int glbDefaultExp(glb_exp ins)
         }
     }
 
-  if(in->num_of_xsecs>0&&in->num_of_xsecs<32)
+  /* Load cross sections */
+  if(in->num_of_xsecs > 0 && in->num_of_xsecs < 32)
+  {
+    for(i=0;i < in->num_of_xsecs; i++)
     {
-      for(i=0;i<in->num_of_xsecs;i++)
+      if(in->xsecs[i] == NULL)
+      {
+        glb_exp_error(in, "Missing cross section specification");
+        status=-1;
+      }
+      else
+      {
+        if (in->xsecs[i]->builtin >= 0)
         {
-          if(in->xsecs[i]==NULL)
-            { glb_exp_error(in, "X-section specs missing"); status=-1; }
-          else
-            {
-              if(glb_default_xsec(in->xsecs[i])==0)
-                glb_init_xsectables(in->xsecs[i]);
-              else
-                status=-1;
-            }
+          glb_exp_error(in, "No builtin cross sections available. "
+                            "Please specify cross section file");
+          status=-1;
         }
+        else
+          glb_load_xsec(in->xsecs[i]);
+      }
     }
+  }
 
   /* Initialization of systematics data */
   for (i=0; i < in->numofrules; i++)

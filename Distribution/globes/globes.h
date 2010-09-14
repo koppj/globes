@@ -266,6 +266,7 @@ double *glbGetSamplingPointsListPtr(int exp);
 int glbGetLengthOfRule(int exp, int rule, int signal);
 int glbGetChannelInRule(int exp, int rule, int pos, int signal);
 double glbGetCoefficientInRule(int exp, int rule, int pos, int signal);
+int glbSetCoefficientInRule(int exp, int rule, int pos, int signal, double coeff);
 int glbGetNumberOfFluxes(int exp);
 double glbFlux(int experiment, int flux_ident, 
         double energy, double distance, int flavour, int anti);

@@ -37,6 +37,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <math.h>
 
 #include "glb_types.h"
@@ -467,101 +468,189 @@ void glb_flux_loader(glb_flux *data, int ident, int polarity)
 }
 
 
-void glb_X_section_loader(glb_xsec *data)
+/***************************************************************************
+ *                 C R O S S   S E C T I O N S                             *
+ ***************************************************************************/
+
+/***************************************************************************
+ * Function glb_load_xsec                                                  *
+ ***************************************************************************
+ * Load cross sections from the file specified in xs->file_name and        *
+ * store them in xs->xsec_storage                                          *
+ ***************************************************************************/
+int glb_load_xsec(glb_xsec *xs)
 {
-  int i,number,s,ts=0;
-  char tok;
-  FILE* fp;
-  fp = glb_fopen(data->file_name, "r");
-  data->xsec_storage=glb_alloc_xsec_storage(1001);
-  if (fp!=NULL)
+  if (!xs || !xs->file_name)
+    return GLBERR_UNINITIALIZED;
+
+  int j;
+  int buf_length = 100;
+
+  /* Allocate cross section buffer */
+  for (j=0; j < GLB_XSEC_COLUMNS; j++)
+    xs->xsec_data[j] = glb_malloc(buf_length*sizeof(xs->xsec_data[j][0]));
+
+  FILE *f = glb_fopen(xs->file_name, "r");
+  if (!f)
   {
-    /* peel off all leading comments */
-    while(1)
-      {
-	tok=fgetc(fp);
-	if(tok=='#')
-	  while(fgetc(fp)!='\n');
-	else
-	  {
-	    ungetc(tok,fp);
-	    break;
-	  }
-      }
-
-    for (i=0; i<1001; i++)
-      {
-	/* get rid of comments inside */
-	tok=fgetc(fp);
-	if(tok=='#')
-	  {
-	    while(fgetc(fp)!='\n');
-	    i--;
-	  }
-	else
-	  {
-	    ungetc(tok,fp);
-	    /* read the data */
-	    s=fscanf(fp,"%lf %lf %lf %lf %lf %lf %lf \n",
-		     &data->xsec_storage[i][0],
-		     &data->xsec_storage[i][1],
-		     &data->xsec_storage[i][2],
-		     &data->xsec_storage[i][3],
-		     &data->xsec_storage[i][4],
-		     &data->xsec_storage[i][5],
-		     &data->xsec_storage[i][6]);
-
-	    if(s!=7)
-	      fprintf(stderr,"Error: Wrong format in file %s\n",
-		      data->file_name);
-	    else
-	      ts++;
-	  }
-      }
-    fclose(fp);
+    fprintf(stderr, "glb_load_xsec: Cannot open file %s.\n", xs->file_name);
+    return GLBERR_FILE_NOT_FOUND;
   }
-  else
+
+  /* Read from file */
+  const int max_line = 1024;
+  char this_line[max_line];
+  xs->n_lines = 0;
+  while (fgets(this_line, max_line, f))
+  {
+    if (strlen(this_line) > max_line - 2)
     {
-      fprintf(stderr,"Error: Could not open %s\n",data->file_name);
+      fprintf(stderr, "glb_load_xsec: Line %d too long in file %s.\n",
+              xs->n_lines+1, xs->file_name);
+      return GLBERR_INVALID_FILE_FORMAT;
     }
 
-  if(ts!=1001) fprintf(stderr,"Error: Wrong format in file %s\n",
-		      data->file_name);
+    if (this_line[0] != '#'  &&  this_line[strspn(this_line, " \t")] != '\n')
+    {                         /* Ignore comments and blank lines */
+      if (xs->n_lines >= buf_length)   /* If necessary, resize x-sec buffer */
+      {
+        buf_length *= 2;
+        for (j=0; j < GLB_XSEC_COLUMNS; j++)
+          xs->xsec_data[j] = glb_realloc(xs->xsec_data[j], buf_length*sizeof(xs->xsec_data[j][0]));
+      }
 
+      if (sscanf(this_line, "%lf %lf %lf %lf %lf %lf %lf", &xs->xsec_data[0][xs->n_lines],
+          &xs->xsec_data[1][xs->n_lines], &xs->xsec_data[2][xs->n_lines],
+          &xs->xsec_data[3][xs->n_lines], &xs->xsec_data[4][xs->n_lines],
+          &xs->xsec_data[5][xs->n_lines], &xs->xsec_data[6][xs->n_lines]) != GLB_XSEC_COLUMNS)
+      {
+        fprintf(stderr, "glb_load_xsec: Line %d invalid in file %s.\n",
+                xs->n_lines+1, xs->file_name);
+        return GLBERR_INVALID_FILE_FORMAT;
+      }
+
+      if (xs->n_lines > 1  &&   /* Check if log10(E) support points are equidistant */
+          fabs(xs->xsec_data[0][xs->n_lines] - 2*xs->xsec_data[0][xs->n_lines-1]
+               + xs->xsec_data[0][xs->n_lines-2])/fabs(xs->xsec_data[0][xs->n_lines]) > 1e-10)
+      {
+        fprintf(stderr, "glb_load_xsec: Error in %s, line %d: log10(E) sampling points "
+                        "should be equidistant.\n", xs->file_name, xs->n_lines+1);
+        return GLBERR_INVALID_FILE_FORMAT;
+      }
+      xs->n_lines++;
+    }
+  };
+
+  fclose(f);
+  return GLB_SUCCESS;
 }
 
-double glb_xsec_calc(double enl,int l, int anti, const glb_xsec *data)
+
+/***************************************************************************
+ * Function glb_get_xsec                                                   *
+ ***************************************************************************
+ * Returns the cross section for neutrinos of flavor f from the cross      *
+ * section data set in xs                                                  *
+ ***************************************************************************/
+double glb_get_xsec(double E, int f, int cp_sign, const glb_xsec *xs)
 {
-  double incre;
-  double ergebnis;
-  double en;
-  int lowerind;
-  int higherind;
-
-  int part;
-
-  en = log10(enl);
-  part = (int) l + 3*(1-anti)/2;
-
-  incre = (data->xsec_storage[1000][0]-data->xsec_storage[0][0])/1000.0;
-  lowerind = floor((en-data->xsec_storage[0][0])/incre);
-  higherind = lowerind + 1;
-
-  if (lowerind<0 || higherind>1000) ergebnis=0.0;
+  double logE = log10(E);
+  int col = (int) f + 3*(1-cp_sign)/2;  /* Which column of the xsec table? */
+  int n_steps = xs->n_lines - 1;
+  double logE_binsize = (xs->xsec_data[0][n_steps] - xs->xsec_data[0][0]) / n_steps;
+  
+  int k = (logE - xs->xsec_data[0][0]) / logE_binsize;
+  if (k < 0 || k >= n_steps)
+    return 0.0;
   else
   {
-    ergebnis=((data->xsec_storage[higherind][part]-
-	       data->xsec_storage[lowerind][part])*
-	      (((en-data->xsec_storage[0][0])/incre)-lowerind)
-	      +data->xsec_storage[lowerind][part]);
+    double logE_lo = xs->xsec_data[0][k];
+    double xs_lo   = xs->xsec_data[col][k];
+    double xs_up   = xs->xsec_data[col][k+1];
+    return E * ( xs_lo + (logE - logE_lo)*(xs_up - xs_lo)/logE_binsize );
   }
-  return ergebnis*enl;
 }
 
 
-void glb_init_xsectables(glb_xsec *data)
+/***************************************************************************
+ * Function glb_free_xsec                                                  *
+ ***************************************************************************
+ * Free cross section data structures                                      *
+ ***************************************************************************/
+int glb_free_xsec(glb_xsec *xs)
 {
+  int i;
+  if (xs)
+  {
+    for (i=0; i < GLB_XSEC_COLUMNS; i++)
+    {
+      if (xs->xsec_data[i])
+      {
+        glb_free(xs->xsec_data[i]);
+        xs->xsec_data[i] = NULL;
+      }
+    }
+    if (xs->file_name)
+    {
+      glb_free(xs->file_name);
+      xs->file_name = NULL;
+    }
+    glb_free(xs);
+  }
 
-  if(data->builtin==0) glb_X_section_loader(data);
-
+  return GLB_SUCCESS;
 }
+
+
+/***************************************************************************
+ * Function glb_init_xsec                                                  *
+ ***************************************************************************
+ * Initialize cross section structrue to dummy valus                       *
+ ***************************************************************************/
+int glb_init_xsec(glb_xsec *xs)
+{
+  int i;
+  if (xs)
+  {
+    xs->file_name = NULL;
+    for (i=0; i < GLB_XSEC_COLUMNS; i++)
+      xs->xsec_data[i] = NULL;
+    xs->n_lines   = 0;
+    xs->builtin   = -1;
+  }
+  return GLB_SUCCESS;
+}
+
+
+/***************************************************************************
+ * Function glb_copy_xsec                                                  *
+ ***************************************************************************
+ * Create a new cross section structure as a copy of an existing one       *
+ ***************************************************************************/
+int glb_copy_xsec(glb_xsec *dest, const glb_xsec *src)
+{
+  int i, j;
+
+  if (!dest)
+    return GLBERR_INVALID_ARGS;
+
+  memcpy(dest, src, sizeof(*src));
+  if (src->file_name)
+  {
+    dest->file_name = strdup(src->file_name);
+    if (!dest->file_name)
+      glb_fatal("glb_copy_xsec: Cannot copy name of cross section file");
+  }
+  if (src->xsec_data)
+  {
+    for (j=0; j < GLB_XSEC_COLUMNS; j++)
+    {
+      dest->xsec_data[j] = glb_malloc(src->n_lines*sizeof(src->xsec_data[j][0]));
+      for (i=0; i < dest->n_lines; i++)
+        dest->xsec_data[j][i] = src->xsec_data[j][i];
+    }
+  }
+
+  return GLB_SUCCESS;
+}
+

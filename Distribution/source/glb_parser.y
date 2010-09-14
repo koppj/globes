@@ -318,11 +318,14 @@ static void grp_end(char* name)
        {
 	 if(buff.num_of_xsecs > 0)
 	   {
-	     if(buff.xsecs[buff.num_of_xsecs-1]==NULL)
-	       buff.xsecs[buff.num_of_xsecs-1]=glb_xsec_alloc();
-	     buff.xsecs[buff.num_of_xsecs-1]=
-	       cpy_glb_xsec(buff.xsecs[buff.num_of_xsecs-1],&xsc);
-	     glb_xsec_reset(&xsc);
+	     if (!buff.xsecs[buff.num_of_xsecs-1])
+             {
+               buff.xsecs[buff.num_of_xsecs-1] = glb_malloc(sizeof(glb_xsec));
+               glb_init_xsec(buff.xsecs[buff.num_of_xsecs-1]);
+             }
+             if (glb_copy_xsec(buff.xsecs[buff.num_of_xsecs-1], &xsc) != GLB_SUCCESS)
+               glb_error("grp_end: Error copying cross section data");
+	     glb_init_xsec(&xsc);
 	   }
        }
 
@@ -1884,7 +1887,7 @@ void glbResetEOF()
   sym_table =(glb_symrec *) NULL;
   init_table ();
   glb_flux_reset(&flt);
-  glb_xsec_reset(&xsc);
+  glb_init_xsec(&xsc);
 
 }
 

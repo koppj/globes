@@ -159,3 +159,9 @@
 27 Apr 2010 JK
         - Implemented new function glbSetEnergyWindow
 
+5 Jul 2010 JK
+        - New functions glbSetCoefficientInRule
+
+13 Sep 2010 JK
+        - GLoBES now accepts cross section files with an arbitrary number of lines
+

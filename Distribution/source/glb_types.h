@@ -63,10 +63,12 @@ typedef struct {
 /* Data structure for handling X-sections and built-in X-sections,
  * which will be added later.
  */
+#define GLB_XSEC_COLUMNS   7           /* Number of columns in xsec file         */
 typedef struct {
   int builtin;
-  char* file_name;
-  double** xsec_storage;
+  int n_lines;                         /* Number of lines in cross section file  */
+  char *file_name;                     /* Name of cross section file             */
+  double *xsec_data[GLB_XSEC_COLUMNS]; /* Cross section data (n_lines x 7 array) */
 } glb_xsec;
 
 

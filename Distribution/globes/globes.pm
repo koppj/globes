@@ -140,6 +140,7 @@ package globes;
 *glbGetLengthOfRule = *globesc::glbGetLengthOfRule;
 *glbGetChannelInRule = *globesc::glbGetChannelInRule;
 *glbGetCoefficientInRule = *globesc::glbGetCoefficientInRule;
+*glbSetCoefficientInRule = *globesc::glbSetCoefficientInRule;
 *glbGetNumberOfFluxes = *globesc::glbGetNumberOfFluxes;
 *glbFlux = *globesc::glbFlux;
 *glbXSection = *globesc::glbXSection;

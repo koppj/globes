@@ -219,13 +219,23 @@ FILE *glb_fopen(const char *filename, const char *mode)
 	}
   }
 
-  if(new_name==NULL) {glb_error("File not found");return NULL;}
+  if(new_name==NULL)
+  {
+    char msg[100+strlen(filename)];
+    sprintf(msg, "File %s not found", filename);
+    glb_error(msg);
+    return NULL;
+  }
 
   value = fopen(new_name,mode);
   if(verbosity_level >= 3) fprintf(stderr,"File read: %s\n",new_name);
   glb_free(new_name);
   if(value== NULL)
-    glb_error("Could not open file");
+  {
+    char msg[100+strlen(filename)];
+    sprintf(msg, "Could not open file %s", filename);
+    glb_error(msg);
+  }
   return value;
 }
 

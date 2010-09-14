@@ -77,6 +77,30 @@ double ChiNPWrapper(glb_params base_values, double th12, double th13, double th2
 
 
 /* ---------------------------------------------------------------------------- */
+int convert_index(int j, int d, int n, double *p_steps)
+/* ---------------------------------------------------------------------------- */
+/* Function for converting one-dimensional indices to a multi-dimensional       */
+/* index for (d+1)-th dimension                                                 */
+/* ---------------------------------------------------------------------------- */
+/* Parameters:                                                                  */
+/*   j: Index of prescan point for parameter d                                  */
+/*   d: Index of parameter                                                      */
+/*   n: Total number of points scanned in prescan over multi-dim. space         */
+/*   p_steps: Number of prescan steps for each parameter in prescan             */
+/* ---------------------------------------------------------------------------- */
+{
+  int i;
+  for (i=0; i <= d; i++)
+  {
+    j %= n;
+    n /= p_steps[i] + 1;
+  }
+  j /= n;
+  return j;
+}
+
+
+/* ---------------------------------------------------------------------------- */
 int degfinder(const glb_params base_values, const int n_prescan_params,
       const int *prescan_params, const double *prescan_min,
       const double *prescan_max, const int *prescan_steps,
@@ -175,21 +199,6 @@ int degfinder(const glb_params base_values, const int n_prescan_params,
   for (i=0; i < n_p_params; i++)
     n_prescan_points *= p_steps[i] + 1;
 
-  /* Function for converting one-dimensional indices to a multi-dimensional
-   * index for (d+1)-th dimension */
-  int convert_index(int j, int d)
-  {
-    int k = n_prescan_points;
-    int i;
-    for (i=0; i <= d; i++)
-    {
-      j %= k;
-      k /= p_steps[i] + 1;
-    }
-    j /= k;
-    return j;
-  }
-
   if (debug_level > 0)
     printf("#   Using %lu prescan points.\n", n_prescan_points);
   
@@ -258,14 +267,14 @@ int degfinder(const glb_params base_values, const int n_prescan_params,
       if (p_params[i] == GLB_THETA_13)
       {
         double log_param = p_min[i]
-          + convert_index(j,i) * (p_max[i]-p_min[i])/p_steps[i];
+          + convert_index(j,i,n_prescan_points,p_steps) * (p_max[i]-p_min[i])/p_steps[i];
         prescan_test_values[i] = asin(sqrt(pow(10.0, log_param)))/2.0;
       }
       /* Use linear distribution for all other parameters */
       else
       {
         prescan_test_values[i] = p_min[i]
-          + convert_index(j,i) * (p_max[i]-p_min[i])/p_steps[i];
+          + convert_index(j,i,n_prescan_points,p_steps) * (p_max[i]-p_min[i])/p_steps[i];
       }
 
       glbSetOscParams(Fit_NH, prescan_test_values[i], p_params[i]);
@@ -350,7 +359,7 @@ int degfinder(const glb_params base_values, const int n_prescan_params,
       {
         printf("#   Degeneracy NH at: ");
         for (k=0; k < n_p_params; k++)
-          printf("%d ", convert_index(j, k));
+          printf("%d ", convert_index(j, k, n_prescan_points, p_steps));
         printf("\n");
         printf("#     Prescan: ");
         for (k=0; k < 6; k++)
@@ -378,7 +387,7 @@ int degfinder(const glb_params base_values, const int n_prescan_params,
       {
         printf("#   Degeneracy IH at: ");
         for (k=0; k < n_p_params; k++)
-          printf("%d ", convert_index(j, k));
+          printf("%d ", convert_index(j, k, n_prescan_points, p_steps));
         printf("\n");
         printf("#     Prescan: ");
         for (k=0; k < 6; k++)
