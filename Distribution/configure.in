@@ -28,7 +28,7 @@ dnl middle digit: increment when features have been introduced/removed
 dnl first digit: major improvements/rewrites
 dnl In contrast to the result of autoupdate I had to swap the
 dnl the AC_INIT and AC_CONFIG_SRCDIR
-AC_INIT([GLoBES],[3.1.6],[globes@mpi-hd.mpg.de],[globes])
+AC_INIT([GLoBES],[3.1.7],[globes@mpi-hd.mpg.de],[globes])
 
 AC_CONFIG_SRCDIR([source/glb_wrapper.c])
 AC_CONFIG_MACRO_DIR([m4])

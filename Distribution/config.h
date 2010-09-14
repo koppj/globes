@@ -760,7 +760,7 @@
 #define PACKAGE_NAME "GLoBES"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "GLoBES 3.1.6"
+#define PACKAGE_STRING "GLoBES 3.1.7"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "globes"
@@ -769,7 +769,7 @@
 #define PACKAGE_URL ""
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "3.1.6"
+#define PACKAGE_VERSION "3.1.7"
 
 /* Define to l, ll, u, ul, ull, etc., as suitable for constants of type
    'ptrdiff_t'. */
@@ -807,7 +807,7 @@
 #define STDC_HEADERS 1
 
 /* Version number of package */
-#define VERSION "3.1.6"
+#define VERSION "3.1.7"
 
 /* Define to l, ll, u, ul, ull, etc., as suitable for constants of type
    'wchar_t'. */
