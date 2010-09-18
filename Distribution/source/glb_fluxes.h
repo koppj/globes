@@ -19,12 +19,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-#ifndef GLB_FLUXES_H
-#define GLB_FLUXES_H 1
 
-#if HAVE_CONFIG_H   /* config.h should come before any other includes */
-#  include "config.h"
-#endif
+
+
+
+#ifndef GLB_NUFACT_H
+#define GLB_NUFACT_H 1
 
 #include "glb_types.h"
 
@@ -32,19 +32,16 @@
 void glb_set_max_energy(double en);
 double glb_get_max_energy();
 
-/* Fluxes */
-int glb_load_n_columns(const char *file_name, const int n_columns, int *n_lines, double *data[]);
-int glb_init_flux(glb_flux *flux);
-double glb_get_flux(double E, double L, int f, int cp_sign, const glb_flux *flux);
-int glb_free_flux(glb_flux *flux);
-int glb_reset_flux(glb_flux *flux);
-int glb_copy_flux(glb_flux *dest, const glb_flux *src);
 
-/* Cross sections */
-int glb_init_xsec(glb_xsec *xs);
-double glb_get_xsec(double E, int f, int cp_sign, const glb_xsec *xs);
-int glb_free_xsec(glb_xsec *xs);
-int glb_reset_xsec(glb_xsec *xs);
-int glb_copy_xsec(glb_xsec *dest, const glb_xsec *src);
 
-#endif /* GLB_FLUXES_H */
+double glb_flux_calc(double en, double baseline, 
+	    int type, int l, int anti, const glb_flux *data);
+
+void glb_init_fluxtables(glb_flux *data,int pos);
+
+double glb_xsec_calc(double enl,int l, int anti, const glb_xsec *data);
+void glb_init_xsectables(glb_xsec *data);
+void glb_flux_loader(glb_flux *data, int number, int polarity);
+void glb_X_section_loader(glb_xsec *data);
+
+#endif /* GLB_NUFACT_H */

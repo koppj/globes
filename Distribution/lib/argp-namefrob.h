@@ -1,20 +1,21 @@
 /* Name frobnication for compiling argp outside of glibc
-   Copyright (C) 1997, 2003, 2007, 2009, 2010 Free Software Foundation, Inc.
+   Copyright (C) 1997, 2003 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Written by Miles Bader <miles@gnu.ai.mit.edu>.
 
-   This program is free software: you can redistribute it and/or modify
+   This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
-   (at your option) any later version.
+   the Free Software Foundation; either version 2, or (at your option)
+   any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   You should have received a copy of the GNU General Public License along
+   with this program; if not, write to the Free Software Foundation,
+   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
 #if !_LIBC
 /* This code is written for inclusion in gnu-libc, and uses names in the
@@ -74,6 +75,11 @@
 #define __argp_fmtstream_rmargin argp_fmtstream_rmargin
 #undef __argp_fmtstream_wmargin
 #define __argp_fmtstream_wmargin argp_fmtstream_wmargin
+
+#include "mempcpy.h"
+#include "strcase.h"
+#include "strchrnul.h"
+#include "strndup.h"
 
 /* normal libc functions we call */
 #undef __flockfile
@@ -135,23 +141,16 @@
 # define putchar_unlocked(x) putchar (x)
 # endif
 
+extern char *__argp_basename (char *name);
+
 #endif /* !_LIBC */
 
 #ifndef __set_errno
 #define __set_errno(e) (errno = (e))
 #endif
 
-#if defined GNULIB_ARGP_DISABLE_DIRNAME
-# define __argp_base_name(arg) arg
-#elif defined GNULIB_ARGP_EXTERN_BASENAME
-extern char *__argp_base_name (const char *arg);
-#else
-# include "dirname.h"
-# define __argp_base_name last_component
-#endif
-
 #if defined _LIBC || HAVE_DECL_PROGRAM_INVOCATION_SHORT_NAME
-# define __argp_short_program_name()    (program_invocation_short_name)
+# define __argp_short_program_name()	(program_invocation_short_name)
 #else
 extern char *__argp_short_program_name (void);
 #endif

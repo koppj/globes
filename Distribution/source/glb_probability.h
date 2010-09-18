@@ -19,12 +19,13 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
+
+
+
+
+
 #ifndef GLB_OSZPROB_H
 #define GLB_OSZPROB_H 1
-
-#if HAVE_CONFIG_H   /* config.h should come before any other includes */
-#  include "config.h"
-#endif
 
 #include <complex.h>
 #include <globes/globes.h>
@@ -54,8 +55,8 @@ extern void *glb_probability_user_data;
 
 
 /* Functions */
-//JK 2008-07-22 inline void zhetrd3(double complex A[3][3], double complex Q[3][3],
-//                    double d[3], double e[2]);
+inline void zhetrd3(double complex A[3][3], double complex Q[3][3],
+                    double d[3], double e[2]);
 int zheevc3(double complex A[3][3], double w[3]);
 int zheevq3(double complex A[3][3], double complex Q[3][3], double w[3]);
 int zheevh3(double complex A[3][3], double complex Q[3][3], double w[3]);

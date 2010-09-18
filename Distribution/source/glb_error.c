@@ -27,9 +27,6 @@
 //Gary V. Vaughan.
 
 
-#if HAVE_CONFIG_H   /* config.h should come before any other includes */
-#  include "config.h"
-#endif
 
 #include <stdlib.h>
 #include <string.h>
@@ -67,8 +64,8 @@ int glbSetVerbosityLevel(int level)
 static void
 error (int exit_status, const char *mode, const char *message,int verb_level)
 {
-
-  if((verb_level==1)||(exit_status)>=0)
+  
+  if((verb_level==1)||(exit_status)>=0) 
     fprintf (stderr, "%s: %s: %s.\n", glb_prog_name, mode, message);
 
   if (exit_status >= 0)
@@ -91,7 +88,7 @@ glb_error (const char *message)
   error (-1, "ERROR", message,v);
 }
 
-void
+void  
 glb_fatal (const char *message)
 {
   /* A FATAL message always is displayed */
@@ -161,81 +158,53 @@ FILE *glb_fopen(const char *filename, const char *mode)
   size_t i,a,b;
   char *test_name=NULL;
   char *new_name=NULL;
-
+ 
   FILE *t;
-  register FILE *value;
-
- /* handling an absolute path */
-  if(strlen(filename)>0 && filename[0] == '/')
+  register FILE *value; 
+  for(i=0;i<glb_path_vector_length;i++)
     {
-      if(verbosity_level >= 4)
-	fprintf(stderr,"Searched path: %s\n",filename);
-      t=fopen(filename,"r");
-      if(t!=NULL)
+      a=strlen(filename);
+      b=strlen(glb_path_vector[i]);
+      test_name=glb_malloc((a+b+2)*sizeof(char));
+      test_name=strcpy(test_name,glb_path_vector[i]);
+      test_name=strcat(test_name,filename);
+      if(verbosity_level >= 4) fprintf(stderr,"Searched path: %s\n",test_name);
+      t=fopen(test_name,"r");
+      if(t!=NULL) 
 	{
-	  new_name=strdup(filename);
+	  new_name=strdup(test_name);
 	  fclose(t);
+	  glb_free(test_name);
+	  break;
 	}
+      glb_free(test_name);
+      /* Repeating the exercise with an additional '/' between
+       * path and filename.
+       */
+      a=strlen(filename);
+      b=strlen(glb_path_vector[i]);
+      test_name=glb_malloc((a+b+2)*sizeof(char));
+      test_name=strcpy(test_name,glb_path_vector[i]);
+      test_name=strcat(test_name,"/");
+      test_name=strcat(test_name,filename);
+      t=fopen(test_name,"r");
+      if(t!=NULL) 
+	{
+	  new_name=strdup(test_name); 
+	  glb_free(test_name);
+	  fclose(t);
+	  break;
+	}
+      glb_free(test_name);
     }
 
-  if(new_name==NULL)
-    {
-      for(i=0;i<glb_path_vector_length;i++)
-	{
-	  a=strlen(filename);
-	  b=strlen(glb_path_vector[i]);
-	  test_name=glb_malloc((a+b+2)*sizeof(char));
-	  test_name=strcpy(test_name,glb_path_vector[i]);
-	  test_name=strcat(test_name,filename);
-	  if(verbosity_level >= 4)
-	    fprintf(stderr,"Searched path: %s\n",test_name);
-	  t=fopen(test_name,"r");
-	  if(t!=NULL)
-	    {
-	      new_name=strdup(test_name);
-	      fclose(t);
-	      glb_free(test_name);
-	      break;
-	    }
-	  glb_free(test_name);
-	  /* Repeating the exercise with an additional '/' between
-	   * path and filename.
-	   */
-	  a=strlen(filename);
-	  b=strlen(glb_path_vector[i]);
-	  test_name=glb_malloc((a+b+2)*sizeof(char));
-	  test_name=strcpy(test_name,glb_path_vector[i]);
-	  test_name=strcat(test_name,"/");
-	  test_name=strcat(test_name,filename);
-	  t=fopen(test_name,"r");
-	  if(t!=NULL)
-	    {
-	      new_name=strdup(test_name);
-	      glb_free(test_name);
-	      fclose(t);
-	      break;
-	    }
-	  glb_free(test_name);
-	}
-  }
-
-  if(new_name==NULL)
-  {
-    char msg[100+strlen(filename)];
-    sprintf(msg, "File %s not found", filename);
-    glb_error(msg);
-    return NULL;
-  }
-
+  if(new_name==NULL) {glb_error("File not found");return NULL;}
+  
   value = fopen(new_name,mode);
   if(verbosity_level >= 3) fprintf(stderr,"File read: %s\n",new_name);
   glb_free(new_name);
   if(value== NULL)
-  {
-    char msg[100+strlen(filename)];
-    sprintf(msg, "Could not open file %s", filename);
-    glb_error(msg);
-  }
+    glb_error("Could not open file");
   return value;
 }
 

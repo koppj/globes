@@ -19,9 +19,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-#if HAVE_CONFIG_H   /* config.h should come before any other includes */
-#  include "config.h"
-#endif
+
+
+
+
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -36,7 +37,6 @@
 #include "glb_multiex.h"
 #include "glb_fluxes.h"
 #include "glb_error.h"
-#include "glb_rate_engine.h"
 
 
 #define PI 3.1415
@@ -61,12 +61,12 @@ int* glb_calc_uprange[32];
 int* glb_calc_lowrange[32];
 static int* rules[32];
 static int rule_length[32];
-static double* rule_coeff[32];
+static double* rule_coeff[32]; 
 static int* BGrules[32];
 static int BGrule_length[32];
 static double* BGrule_coeff[32];
  double* glb_calc_signal_rates[32];
- double* glb_calc_bg_rates[32];
+ double* glb_calc_bg_rates[32]; 
 // ---------------------------------
 double* glb_calc_rates_0[32];
 double* glb_calc_rates_1[32];
@@ -95,7 +95,6 @@ double *glb_calc_chrb_1[32];
 double *glb_calc_chra_0[32];
 double *glb_calc_chra_1[32];
 
-double *glb_calc_chr_template[32];
 
 //binwise glb_calc_efficiencies
 double* glb_calc_efficiencies[32];
@@ -143,7 +142,7 @@ void glb_set_baseline(double l)
   ll = e->lengthtab;
   sum=0;
   if(s<=0)
-    {
+    { 
       glb_error("No baseline data to change");
       return;
     }
@@ -153,7 +152,7 @@ void glb_set_baseline(double l)
       glb_error("Sum of lengths of layers does not match baseline");
       return;
     }
-  baseline = sum;
+  baseline = sum;  
 }
 
 double glb_check_baseline()
@@ -212,19 +211,19 @@ int glb_get_number_of_bins()
   return bins;
 }
 
-/* Initialize the controlstructure for signal and backgrounds
- * Here I introduce the concept of channels. In general there are
- * three flavours in a beam, with to CP-signs, thus there six initial
- * states, which can oscillate to six final states. The reaction in
- * the detector can be anything, e.g. CC. This are altogether 72
- * possibilities, of which you usually need only a few. Therefore we
- * define channels.
- * A channel is defined by a flux, the CP-sign, an initial and final state,
+/* Initialize the controlstructure for signal and backgrounds 
+ * Here I introduce the concept of channels. In general there are 
+ * three flavours in a beam, with to CP-signs, thus there six initial 
+ * states, which can oscillate to six final states. The reaction in 
+ * the detector can be anything, e.g. CC. This are altogether 72 
+ * possibilities, of which you usually need only a few. Therefore we 
+ * define channels. 
+ * A channel is defined by a flux, the CP-sign, an initial and final state, 
  * the cross section and the energy resolution function.
  */
 
 
-void glb_set_channel(int i, int polarity, int anti, int l, int m, int cc,
+void glb_set_channel(int i, int polarity, int anti, int l, int m, int cc, 
 		int energysmear)
 {
   channel_list[i][0]=polarity;
@@ -257,8 +256,8 @@ int glb_calc_check_num_of_channels()
  return num_of_ch;
 }
 
-/* Here we define rules, how to convert the channels into the observable
- * signal and background. A rule has variable length, a list of channel
+/* Here we define rules, how to convert the channels into the observable 
+ * signal and background. A rule has variable length, a list of channel 
  * numbers and the coefficients for each channel, like the efficiency.
  */
 
@@ -339,7 +338,7 @@ static void CalcAllProbs(double en, double baseline)
   struct glb_experiment *e = glb_experiment_list[glb_current_exp];
   int i, j;
   int status;
-
+  
   if ((status=glb_hook_probability_matrix(Probs, +1, en, e->psteps, e->lengthtab, e->densitybuffer,
           (e->filter_state == GLB_ON) ? e->filter_value : -1.0, glb_probability_user_data)) != GLB_SUCCESS)
     glb_error("Calculation of oscillation probabilities failed.");
@@ -349,15 +348,32 @@ static void CalcAllProbs(double en, double baseline)
     glb_error("Calculation of oscillation probabilities failed.");
 }
 
-static double RatesNOSC(double en, double baseline,
+// Sum of all NC rates
+
+static double RatesSXX(double en, double baseline, int polarity, int anti, int l, int m,int ident)
+{
+  double ergebnis;
+  /*glbXSection(ident,en,m,anti)*/
+  
+  ergebnis=glb_xsec_calc(en,m,anti,glb_calc_xsecs[ident])*
+    (glb_flux_calc(en,baseline,polarity,1,anti,glb_calc_fluxes[polarity])+
+     glb_flux_calc(en,baseline,polarity,2,anti,glb_calc_fluxes[polarity])+
+     glb_flux_calc(en,baseline,polarity,3,anti,glb_calc_fluxes[polarity]))
+    *target_mass;
+  
+  return ergebnis;
+}
+
+
+static double RatesNOSC(double en, double baseline, 
 		 int polarity, int anti, int l, int m,int ident)
 {
   double ergebnis;
-
-  ergebnis=glb_get_xsec(en,m,anti,glb_calc_xsecs[ident])
-    *glb_get_flux(en,baseline,l,anti,glb_calc_fluxes[polarity])
+ 
+  ergebnis=glb_xsec_calc(en,m,anti,glb_calc_xsecs[ident])*
+    glb_flux_calc(en,baseline,polarity,l,anti,glb_calc_fluxes[polarity])
     *target_mass;
-
+ 
   return ergebnis;
 }
 
@@ -366,24 +382,24 @@ static double RatesNOSC(double en, double baseline,
 static double RatesXX(double en, double baseline, int polarity, int anti, int l, int m,int ident)
 {
   double ergebnis;
-  if (anti == 1)
+  if (anti == 1) 
     {
-      ergebnis=glb_get_xsec(en,m,anti,glb_calc_xsecs[ident])*
-	glb_get_flux(en,baseline,l,anti,glb_calc_fluxes[polarity])
+      ergebnis=glb_xsec_calc(en,m,anti,glb_calc_xsecs[ident])*
+	glb_flux_calc(en,baseline,polarity,l,anti,glb_calc_fluxes[polarity])
 	*Probs[l-1][m-1]*target_mass;
     }
   else
     {
-      ergebnis=glb_get_xsec(en,m,anti,glb_calc_xsecs[ident])
-	*glb_get_flux(en,baseline,l,anti,glb_calc_fluxes[polarity])
+      ergebnis=glb_xsec_calc(en,m,anti,glb_calc_xsecs[ident])
+	*glb_flux_calc(en,baseline,polarity,l,anti,glb_calc_fluxes[polarity])
 	*ProbsAnti[l-1][m-1]*target_mass;
-
+      
     }
   return ergebnis;
 }
 
 
-
+ 
 double glb_calc_channel(int i, double en, double baseline)
 {
   double ergebnis;
@@ -403,7 +419,7 @@ double glb_calc_channel(int i, double en, double baseline)
 			   final_flavour,channel_list[i][4]);
       }
     else
-      {
+      { 
 	ergebnis=RatesXX(en,baseline,channel_list[i][0],
 			 channel_list[i][1],initial_flavour,
 			 final_flavour,channel_list[i][4]);
@@ -419,8 +435,8 @@ static double Signal(int cn, double en, double baseline)
   for (k=0;k<rule_length[cn];k++)
     {
       ergebnis += rule_coeff[cn][k] * glb_calc_channel(rules[cn][k],en,baseline);
-
-
+    
+     
     }
   return ergebnis;
 }
@@ -453,10 +469,10 @@ void glb_set_rates()
 {
   int i, j, k, s;
   int ew_low, ew_high;
-
+ 
   for(j=0; j < bins; j++)
     glb_calc_energy_tab[j] = BinEnergy(j);
-
+  
   /* Calculate pre-smearing rates for all channels */
   for (j=0; j < glb_calc_simbins; j++)
   {
@@ -469,7 +485,7 @@ void glb_set_rates()
       s = channel_list[i][5];
       glb_calc_chrb_0[i][j] = glb_calc_channel(i, glb_sbin_center(j,glb_calc_smear_data[s]),
                                                baseline)
-              * glb_calc_user_pre_sm_channel[i][j]
+              * glb_calc_user_pre_sm_channel[i][j] 
               * glb_calc_smear_data[s]->simbinsize[j]
               + glb_calc_user_pre_sm_background[i][j];
 
@@ -479,7 +495,7 @@ void glb_set_rates()
         glb_calc_chrb_1[i][j] = glb_calc_chrb_0[i][j];
     }
   }
-
+  
   /* Calculate post-smearing rates for all channels */
   for(i=0; i < num_of_ch; i++)
   {
@@ -498,7 +514,7 @@ void glb_set_rates()
       glb_calc_chra_0[i][j] = glb_calc_chra_0[i][j] * glb_calc_user_post_sm_channel[i][j]
                                   + glb_calc_user_post_sm_background[i][j];
     }
-
+      
     /* If NOSC-flag was set in glb-file, the "true" and fitted rates
      * are identical --> store them also in glb_calc_chra_1 */
     if ((channel_list[i][2] > 9 || channel_list[i][3] > 9))
@@ -515,19 +531,20 @@ void glb_set_rates()
       glb_calc_bg_rates[i][j] = 0.0;
       for (k=0; k < BGrule_length[i]; k++)
         glb_calc_bg_rates[i][j] += BGrule_coeff[i][k] * glb_calc_chra_0[BGrules[i][k]][j];
-
+         
       /* Signal */
-      glb_calc_signal_rates[i][j] = 0.0;
+      glb_calc_signal_rates[i][j] = 0.0; 
       for (k=0; k < rule_length[i]; k++)
         glb_calc_signal_rates[i][j] += rule_coeff[i][k] * glb_calc_chra_0[rules[i][k]][j];
     }
 
-    for (j=0; j < bins; j++)
+    glbGetEnergyWindowBins(glb_current_exp, i, &ew_low, &ew_high);
+    for (j=ew_low; j <= ew_high; j++)
     {
       /* Total */
       glb_calc_rates_0[i][j] = glb_calc_signal_rates[i][j]
                                + glb_calc_bg_rates[i][j]*glb_bg_norm_center[i];
-    }
+    }     
   }
 }
 
@@ -536,67 +553,31 @@ void glb_set_rates()
  * Function glb_set_new_rates                                              *
  ***************************************************************************
  * Calculate the fitted event rates for the current experiment.            *
- ***************************************************************************
- * Parameters:                                                             *
- *   fast: if set to GLB_FAST_RATES, the computation is accelerated by     *
- *         using precomputed  prefactors from chr_template                 *
  ***************************************************************************/
-void glb_set_new_rates(int fast)
+void glb_set_new_rates()
 {
   int i, j, k, s;
 
   /* Calculate pre-smearing rates for all channels */
-  if (fast == GLB_FAST_RATES)
+  for (j=0; j < glb_calc_simbins; j++)
   {
-    for (j=0; j < glb_calc_simbins; j++)
+    /* Calculate probability matrix */
+    CalcAllProbs(glb_sbin_center(j, glb_calc_smear_data[0]), baseline);
+    for(i=0; i < num_of_ch; i++)
     {
-      int probs = 0; /* Probabilities already computed? */
-      for(i=0; i < num_of_ch; i++)
+      /* Recalculate rates only if NOSC-flag was not set in glb-file */
+      if (channel_list[i][2] <= 9 && channel_list[i][3] <= 9)
       {
-        int fi = channel_list[i][2]; /* Initial flavour */
-        int ff = channel_list[i][3]; /* Final flavour   */
-
-        /* Recalculate rates only if NOSC-flag was not set in glb-file */
-        if (fi <= 9 && ff <= 9)
-        {
-          if (!probs)
-          {
-            CalcAllProbs(glb_sbin_center(j, glb_calc_smear_data[0]), baseline);
-            probs = 1;
-          }
-          int anti = channel_list[i][1];
-          if (anti == 1)
-            glb_calc_chrb_1[i][j] = glb_calc_chr_template[i][j] * Probs[fi-1][ff-1]
-                                       + glb_calc_user_pre_sm_background[i][j];
-          else
-            glb_calc_chrb_1[i][j] = glb_calc_chr_template[i][j] * ProbsAnti[fi-1][ff-1]
-                                       + glb_calc_user_pre_sm_background[i][j];
-        }
-      } /* for(i) */
-    } /* for(j) */
+        s = channel_list[i][5];
+        glb_calc_chrb_1[i][j] = glb_calc_channel(i, glb_sbin_center(j,glb_calc_smear_data[s]),
+                                                 baseline)
+                * glb_calc_user_pre_sm_channel[i][j] 
+                * glb_calc_smear_data[s]->simbinsize[j]
+                + glb_calc_user_pre_sm_background[i][j];
+      }
+    }
   }
-  else
-  {
-    for (j=0; j < glb_calc_simbins; j++)
-    {
-      /* Calculate probability matrix */
-      CalcAllProbs(glb_sbin_center(j, glb_calc_smear_data[0]), baseline);
-      for(i=0; i < num_of_ch; i++)
-      {
-        /* Recalculate rates only if NOSC-flag was not set in glb-file */
-        if (channel_list[i][2] <= 9 && channel_list[i][3] <= 9)
-        {
-          s = channel_list[i][5];
-          glb_calc_chrb_1[i][j] = glb_calc_channel(i, glb_sbin_center(j,glb_calc_smear_data[s]),
-                                                   baseline)
-                  * glb_calc_user_pre_sm_channel[i][j]
-                  * glb_calc_smear_data[s]->simbinsize[j]
-                  + glb_calc_user_pre_sm_background[i][j];
-        }
-      } /* for(i) */
-    } /* for(j) */
-  } /* if(fast) */
-
+  
   /* Calculate post-smearing rates for all channels */
   for(i=0; i < num_of_ch; i++)
   {
@@ -607,11 +588,11 @@ void glb_set_new_rates(int fast)
       for(j=0; j < bins; j++)
       {
         glb_calc_chra_1[i][j] = 0.0;
-        int k_low  = glb_calc_lowrange[s][j];
-        int k_high = glb_calc_uprange[s][j] + 1;
-        for(k=k_low; k < k_high; k++)
-          glb_calc_chra_1[i][j] += glb_calc_smearing[s][j][k-k_low]
+        for(k=glb_calc_lowrange[s][j]; k < glb_calc_uprange[s][j]+1; k++)
+        {
+          glb_calc_chra_1[i][j] += glb_calc_smearing[s][j][k-glb_calc_lowrange[s][j]]
                                      * glb_calc_chrb_1[i][k];
+        }
         glb_calc_chra_1[i][j] = glb_calc_chra_1[i][j] * glb_calc_user_post_sm_channel[i][j]
                                     + glb_calc_user_post_sm_background[i][j];
       }
@@ -626,43 +607,10 @@ void glb_set_new_rates(int fast)
       glb_calc_rates_1BG[i][j] = 0.0;
       for (k=0; k < BGrule_length[i]; k++)
         glb_calc_rates_1BG[i][j] += BGrule_coeff[i][k] * glb_calc_chra_1[BGrules[i][k]][j];
-
-      glb_calc_rates_1[i][j] = 0.0;
+         
+      glb_calc_rates_1[i][j] = 0.0; 
       for (k=0; k < rule_length[i]; k++)
         glb_calc_rates_1[i][j] += rule_coeff[i][k] * glb_calc_chra_1[rules[i][k]][j];
-    }
-  }
-}
-
-
-/***************************************************************************
- * Function glb_rate_template                                              *
- ***************************************************************************
- * Calculate products of cross sections, fluxes, and prefactors for all    *
- * channels in current experiment. This helps to speed up later            *
- * computations                                                            *
- ***************************************************************************/
-void glb_rate_template()
-{
-  int i, j, s;
-  for (i=0; i < 3; i++)
-    for (j=0; j < 3; j++)
-      Probs[i][j] = ProbsAnti[i][j] = 1.0;
-
-  /* Calculate pre-smearing rates for all channels */
-  for (j=0; j < glb_calc_simbins; j++)
-  {
-    for(i=0; i < num_of_ch; i++)
-    {
-      /* Recalculate rates only if NOSC-flag was not set in glb-file */
-      if (channel_list[i][2] <= 9 && channel_list[i][3] <= 9)
-      {
-        s = channel_list[i][5];
-        glb_calc_chr_template[i][j] =
-          glb_calc_channel(i, glb_sbin_center(j,glb_calc_smear_data[s]), baseline)
-                * glb_calc_user_pre_sm_channel[i][j]
-                * glb_calc_smear_data[s]->simbinsize[j];
-      }
     }
   }
 }
@@ -699,11 +647,11 @@ void glb_remove_calc_pointers()
       glb_calc_smear_data[k]=NULL;
       glb_calc_smearing[k]=NULL;
       rules[k]=NULL;
-      rule_coeff[k]=NULL;
+      rule_coeff[k]=NULL; 
       BGrules[k]=NULL;
       BGrule_coeff[k]=NULL;
       glb_calc_signal_rates[k]=NULL;
-      glb_calc_bg_rates[k]=NULL;
+      glb_calc_bg_rates[k]=NULL; 
       glb_calc_rates_0[k]=NULL;
       glb_calc_rates_1[k]=NULL;
       glb_calc_rates_1BG[k]=NULL;

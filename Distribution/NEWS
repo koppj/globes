@@ -28,7 +28,7 @@
 **********Version 3.0.6
 
 23/01/2007 PH
-	- Added a distcheck-hook which tests the md5-sums file in data
+	- Added a distcheck-hook which tests the md5-sums file in data 
 
 **********Version 3.0.7
 
@@ -54,7 +54,7 @@
 
 17/04/2007 JK
         - Fixed a small bug in glbDefaultExp, leading to a possible read
-          beyond array boundaries of smear_data[0]->bin_center
+          beyond array boundaries of smear_data[0]->bin_center 
 
 
 **********Version 3.0.9
@@ -75,7 +75,7 @@
 
 **********Version 3.0.11
 13/09/2007 JK
-        - Removed libstdc++ from Makefile in source directory
+        - Removed libstdc++ from Makefile in source directory         
  	- Declared fa, fb, fc and fu as long double in
  	  glb_hybrid_bracket to avoid problems with extra floating
  	  point digits on x86 CPUs (in the case of flat directions in
@@ -84,85 +84,4 @@
  	  main memory while the other was retained in the floating
  	  point registers). See also http://gcc.gnu.org/bugzilla/,
  	  entry No. #323.
-
-**********Version 3.0.12
-13/02/2008 PH
-	- Fixed BUG#19
-
-
-07/07/2008 JK
-        - Fixed bug in glb_fluxes.c: Wrong number of flux bins (501
-          instead of 500) had been used in glb_flux_calc. See BUG#20.
-
-**********Version 3.0.13
-16/07/08 PH
-
-09/08/2008 JK
-        - Removed "inline" keywords from declaration of zhetrd3
-          (tentatively fixes BUG#22)
-
-16/11/2009 JK
-        - Corrected bug in lexer/parser (possible access to memory
-          that flex/bison have already freed)
-
-23/11/2009 JK (only branch wbb-tweaks)
-        - If low-pass filter is active and smearing matrix is explicitly
-          given, the effect of the filter is now compensated
-        - Pre-compute part of rates to speed things up by O(10%)
-
-27/11/2009 JK
-        - Fixed bug in BB100/BB100_flux_Ne.dat file: Column for \bar{\nu}_e
-          was not zero.
-
-10/01/2010 JK (only branch wbb-tweaks)
-        - Implemented experimental simulated annealing algorithm
-          (is much too slow to be considered seriously)
-        - Modified order of some operations in glb_filtered_probability_matrix_cd
-          and glb_set_new_rates to improve speed a little
-        - Implemented function glbOptimizeSmearingMatrixInExperiment to
-          remove close-to-zero entries from smearing matrices to improve speed
-
-03/02/2010 JK (only branch wbb-tweaks)
-        - Introduced function glbGetAEDLVariable
-
-30/03/2010 JK (only branch wbb-tweaks)
-        - Fixed bug in Lexer leading to wrong line numbers in error messages
-        - Fixed bug in Lexer leading to errors if "//" comments appear
-          inside other contexts
-
-13 Apr 2010 JK
-        - Fixed bug in glbGetFilterInExperiment -- function returned
-          only integer values
-
-22 Apr 2010 JK
-        - Regenerated all autoconf/automake, libtool, gnulib stuff using
-          the latest versions of these packages:
-            aclocal 1.11.1
-            automake 1.11.1
-            autoconf 2.65
-            autoheader 2.65
-            libtool 2.65
-            gnulib-tool 0.0.3828-6d126
-          The procedure is
-            - Remove m4/ and lib/ directories
-            - Run gnulib-tool --import obstack argp mkstemp
-              (to get copy required modules from GNU library to our build tree)
-            - Get rpm.m4, swig.m4, swig_perl.m4, gsl.m4 macros and copy
-              to m4/
-            - Run aclocal -I m4, autoconf, automake, autoheader
-              (in this order)
-
-23 Apr 2010 JK
-        - Significant modifications to parser. Now accepts line breaks
-          anywhere.
-
-27 Apr 2010 JK
-        - Implemented new function glbSetEnergyWindow
-
-5 Jul 2010 JK
-        - New functions glbSetCoefficientInRule
-
-14 Sep 2010 JK
-        - GLoBES now accepts cross section and flux files with an arbitrary number of
-          lines
 

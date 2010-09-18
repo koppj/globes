@@ -31,19 +31,16 @@ libdir=@libdir@
 pkglibdir=@libdir@/globes
 perl_ext=@really_build_perl@
 extension_list=""
-wl="@wl@"
-hardcode_libdir_flag_spec="@hardcode_libdir_flag_spec@"
 
 if test $perl_ext = "yes"; then
 extension_list="$extension_list perl"
 fi
 
 # linkerflag="-Wl,--rpath -Wl,$libdir"
-#linkerflag="@linkerflag@"
-# JK, May 20, 2010, see also comments in configure.in
-linkerflag=$hardcode_libdir_flag_spec
+linkerflag="@linkerflag@"
 
 newlibs="-L$libdir $linkerflag -lglobes @LIBS@" 
+
 lesslibs=${newlibs%"-lglobes"}
 
 

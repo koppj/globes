@@ -19,13 +19,13 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-%{
-#if HAVE_CONFIG_H   /* config.h should come before any other includes */
-#  include "config.h"
-#endif
 
+
+
+     
+%{
 #define YYDEBUG 1
-//int yydebug = 1; /* Uncomment this line to get debug output from the parser */
+  //    yydebug=1;
 #include <math.h>
 #include <ctype.h>
 #include <stdio.h>
@@ -36,13 +36,13 @@
 #include "glb_multiex.h"
 #include "glb_types.h"
 #include "glb_error.h"
-#include "glb_lexer.h"
+#include "glb_lexer.h"  
 #include "glb_parser_type.h"
 #include "glb_fluxes.h"
 #include "glb_sys.h"
 #include "glb_minimize.h"
 
-#define TWICE 100
+#define TWICE 100  
 
 #define UNTYPE -1
 #define INT 0
@@ -67,12 +67,12 @@
 
   static int exp_count=1;
   static int energy_len;
-  static int loc_count;
+  static int loc_count; 
   static int energy_count=-1;
   static int cross_count=-1;
   static int flux_count=-1;
   static struct glb_experiment buff;
-  static struct glb_experiment buff_list[GLB_MAX_EXP];
+  static struct glb_experiment buff_list[32];
   static glb_smear ibf;
   static glb_option_type opt;
   static glb_flux flt;
@@ -81,48 +81,48 @@
   static int errordim_sys_off=-1;
   static char *context;
 
-  int yyerror (const char *s, ...);           /* Forward declaration to suppress compiler warning */
-
+  int yyerror (const char *s);           /* Forward declaration to suppress compiler warning */
+  
 
   typedef struct
   {
     char *token; // the string which is used as lhs in the ini-file
-    int scalar; // data type flag
+    int scalar; // data type flag 
     double rl;
     double ru; // allowed range
     void *ptr; // this is a pointer the corresponding part of the exp structure
     void *len; /* this is a pointer which points to the length of the vector
-		*  in a struct glb_experiment. Example: if we parse densitytab,
+		*  in a struct glb_experiment. Example: if we parse densitytab, 
 		*  this things points
-		*  to psteps
+		*  to psteps 
 		*/
-
+    
     char *ctx; /* here the type of the environment is given, e.g. rule
 		* thus the corresponding token is matched onyl within
-		* a rule type environment
+		* a rule type environment 
 		*/
   } glb_parser_decl;
-
+  
 
   static glb_parser_decl token_list[]={
     {"$version",CHAR,0,1E8,&buff.version,NULL,"global"},
     {"$parent_energy",DOUBLE,0,GMAX,&buff.emax,NULL,"global"},
     {"$target_mass",DOUBLE,0,GMAX,&buff.targetmass,NULL,"global"},
 #ifdef GLB_OLD_AEDL
-    {"$simbins" ,COUNTER,0,500,&buff.simbins,NULL,"global"},
+    {"$simbins" ,COUNTER,0,500,&buff.simbins,NULL,"global"}, 
     {"$simtresh" ,DOUBLE,0,GMAX,&buff.simtresh,NULL,"global"},
-    {"$simbeam" ,DOUBLE,0,GMAX,&buff.simbeam,NULL,"global"},
+    {"$simbeam" ,DOUBLE,0,GMAX,&buff.simbeam,NULL,"global"},  
     {"$numofbins",COUNTER,0,500,&buff.numofbins,NULL,"global"},
     {"$simbinsize",DOUBLE_LIST,0,GMAX,&buff.simbinsize,
      &buff.simbins,"global"},
 /* JK - Has been removed
-    {"$errorfunction",INT,0,1,&buff.errorfunction,NULL,"global"},
+    {"$errorfunction",INT,0,1,&buff.errorfunction,NULL,"global"}, 
     {"@treshold_setttings" ,DOUBLE_INDEXED_PAIR,
      0,100,&buff.bgtcenter[0],&loc_count,"rule"},
     {"@treshold_error" ,DOUBLE_INDEXED_PAIR,
      0,100,&buff.bgterror[0],&loc_count,"rule"}, */
 #endif /* GLB_OLD_AEDL */
-    {"$sampling_points" ,COUNTER,0,500,&buff.simbins,NULL,"global"},
+    {"$sampling_points" ,COUNTER,0,500,&buff.simbins,NULL,"global"}, 
     {"$sampling_min" ,DOUBLE,0,GMAX,&buff.simtresh,NULL,"global"},
     {"$sampling_max" ,DOUBLE,0,GMAX,&buff.simbeam,NULL,"global"},
     /* FIXME -- this was not properly recognized due to the fact the first match is performed
@@ -131,18 +131,18 @@
      * 'bins'
      */
     {"$binsize",DOUBLE_LIST,0,GMAX,&buff.binsize,
-     &buff.numofbins,"global"},
-
+     &buff.numofbins,"global"},  
+   
     {"$bins",COUNTER,0,500,&buff.numofbins,NULL,"global"},
-    {"$emin",DOUBLE,0,GMAX,&buff.emin,NULL,"global"},
+    {"$emin",DOUBLE,0,GMAX,&buff.emin,NULL,"global"}, 
     {"$emax",DOUBLE,0,GMAX,&buff.emax,NULL,"global"},
 
     {"$baseline",DOUBLE,0,2*GLB_EARTH_RADIUS,&buff.baseline,NULL,"global"},
     {"$profiletype",INT,1,3,&buff.density_profile_type,NULL,"global"},
-
+ 
     {"$sampling_stepsize",DOUBLE_LIST,0,GMAX,&buff.simbinsize,
-     &buff.simbins,"global"},
-
+     &buff.simbins,"global"}, 
+  
    {"$densitytab",DOUBLE_LIST,0,GMAX,&buff.densitytab,&buff.psteps,"global"},
    {"$lengthtab",DOUBLE_LIST,0,2*GLB_EARTH_RADIUS,
     &buff.lengthtab,&buff.psteps,"global"},
@@ -150,7 +150,7 @@
     &buff.lengthofrules[0],"rule"},
    {"rulescoeff",DOUBLE_LIST_INDEXED,0,GMAX,&buff.rulescoeff[0],
     &buff.lengthofrules[0],"rule"},
-
+   
    {"bgrulechannellist",INT_LIST_INDEXED,0,GMAX,&buff.bgrulechannellist[0],
     &buff.lengthofbgrules[0],"rule"},
    {"bgrulescoeff",DOUBLE_LIST_INDEXED,0,GMAX,&buff.bgrulescoeff[0],
@@ -161,17 +161,17 @@
 
     {"@pre_smearing_efficiencies",DOUBLE_LIST_INDEXED,0,GMAX,
      &buff.user_pre_smearing_channel[0],&loc_count,"channel"},
-
+   
     {"@pre_smearing_background",DOUBLE_LIST_INDEXED,0,GMAX,
      &buff.user_pre_smearing_background[0],&loc_count,"channel"},
 
     {"@post_smearing_efficiencies",DOUBLE_LIST_INDEXED,0,GMAX,
      &buff.user_post_smearing_channel[0],&loc_count,"channel"},
-
+   
     {"@post_smearing_background",DOUBLE_LIST_INDEXED,0,GMAX,
      &buff.user_post_smearing_background[0],&loc_count,"channel"},
-
-
+    
+ 
    {"@errordim_sys_on",INT,0,20,&errordim_sys_on,NULL,"rule"},
    {"@errordim_sys_off",INT,0,20,&errordim_sys_off,NULL,"rule"},
    {"@sys_on_function",CHAR,0,20,&buff.sys_on_strings[0],&loc_count,"rule"},
@@ -194,13 +194,13 @@
     &buff.sys_on_errors[0],&loc_count,"rule"},
    {"@sys_off_errors",DOUBLE_LIST_INDEXED,0,GMAX,
     &buff.sys_off_errors[0],&loc_count,"rule"},
-
+   
 
    {"@energy_window" ,DOUBLE_INDEXED_PAIR_INV,0,GMAX,&buff.energy_window[0],
     &loc_count,"rule"},
    {"$densitysteps",COUNTER,1,GMAX,&buff.psteps,NULL,"global"},
-
-
+  
+  
 
    {"$filter_state",INT,GLB_OFF,GLB_ON,&buff.filter_state,NULL,"global"},
    {"$filter_value",DOUBLE,0,GMAX,&buff.filter_value,NULL,"global"},
@@ -221,7 +221,7 @@
     {"@gamma",DOUBLE,0,GMAX,&flt.gamma,NULL,"flux"},
     {"@end_point",DOUBLE,0,GMAX,&flt.end_point,NULL,"flux"},
     {"@stored_ions",DOUBLE,0,GMAX,&flt.stored_muons,NULL,"flux"},
-
+ 
 
 
     {"nuflux",UNTYPE,0,20,NULL,&buff.num_of_fluxes,"global"},
@@ -236,13 +236,13 @@
     {"@gamma",DOUBLE,0,GMAX,&flt.gamma,NULL,"nuflux"},
     {"@end_point",DOUBLE,0,GMAX,&flt.end_point,NULL,"nuflux"},
     {"@stored_ions",DOUBLE,0,GMAX,&flt.stored_muons,NULL,"nuflux"},
-
+ 
 
    {"@type" ,INT,1,2,&ibf.type,&loc_count,"energy"},
    {"@sigma_e" ,DOUBLE_LIST,0,GMAX,&ibf.sigma,&ibf.num_of_params,"energy"},
    {"@sigma_function" ,FUN,0,1000,&ibf.sig_f,NULL,"energy"},
-
-
+    
+  
 
    {NULL,UNTYPE,0,0,NULL,NULL,"global"}
 };
@@ -254,23 +254,23 @@ static void grp_start(char* name)
        {
          /* Reset variables to default values */
          errordim_sys_on  = -1.0;
-         errordim_sys_off = -1.0;
+         errordim_sys_off = -1.0; 
        }
    }
 
-
+ 
 static void grp_end(char* name)
    {
-     char tmp_errordim[2];
-
+     char tmp_errordim[2];    
+     
      if(strncmp(name,"energy",6)==0 )
        {
-	 if(buff.num_of_sm-1 >= 0)
+	 if(buff.num_of_sm-1 >= 0)   
 	   {
 	     ibf.options=glb_option_type_alloc();
 	     ibf.options=(glb_option_type *) memmove(ibf.options,&opt,
 					     sizeof(glb_option_type));
-
+	     
 	     if(buff.smear_data[buff.num_of_sm-1]==NULL)
 	       buff.smear_data[buff.num_of_sm-1]=glb_smear_alloc();
 	     buff.smear_data[buff.num_of_sm-1]=
@@ -279,79 +279,52 @@ static void grp_end(char* name)
 	     glb_option_type_reset(&opt);
 	     if(ibf.sigma!=NULL) glb_free(ibf.sigma);
 	     glb_smear_reset(&ibf);
-
+	     
 	   }
 
-       }
+       } 
 
      if(strncmp(name,"flux",4)==0 )
        {
-
-	 if(buff.num_of_fluxes > 0)
+	
+	 if(buff.num_of_fluxes > 0)   
 	   {
-	     glb_error("The 'flux' directive is deprecated (consider using 'nuflux').\n"
-		       "The flux normalization may not be what you expect.\n"
+	     glb_error("The 'flux' directive is deprecated.\n"
+		       "The flux normalization may not be what you expect.\n" 
 		       "Please, consult the manual!");
 	     if(flt.builtin<=0) flt.builtin=GLB_OLD_NORM;
-
-             if (buff.fluxes[buff.num_of_fluxes-1] == NULL)
-             {
-               buff.fluxes[buff.num_of_fluxes-1] = glb_malloc(sizeof(glb_flux));
-               memset(buff.fluxes[buff.num_of_fluxes-1], 0, sizeof(*buff.fluxes[0]));
-               glb_reset_flux(buff.fluxes[buff.num_of_fluxes-1]);
-             }
-             if (glb_copy_flux(buff.fluxes[buff.num_of_fluxes-1], &flt) != GLB_SUCCESS)
-               glb_error("grp_end: Error copying flux data");
-             glb_reset_flux(&flt);
-
-//FIXME FIXME FIXME
-//	     if(buff.fluxes[buff.num_of_fluxes-1]==NULL)
-//	       buff.fluxes[buff.num_of_fluxes-1]=glb_flux_alloc();
-//	     buff.fluxes[buff.num_of_fluxes-1]=
-//	       cpy_glb_flux(buff.fluxes[buff.num_of_fluxes-1],&flt);
-//	    glb_flux_reset(&flt);
+	     if(buff.fluxes[buff.num_of_fluxes-1]==NULL)
+	       buff.fluxes[buff.num_of_fluxes-1]=glb_flux_alloc();
+	     buff.fluxes[buff.num_of_fluxes-1]=
+	       cpy_glb_flux(buff.fluxes[buff.num_of_fluxes-1],&flt);
+	    glb_flux_reset(&flt);
 	   }
-       }
+       }  
 
 
      if(strncmp(name,"nuflux",6)==0 )
        {
-	 if(buff.num_of_fluxes > 0)
+	 if(buff.num_of_fluxes > 0)   
 	   {
-	     if (buff.fluxes[buff.num_of_fluxes-1] == NULL)
-             {
-               buff.fluxes[buff.num_of_fluxes-1] = glb_malloc(sizeof(glb_flux));
-               memset(buff.fluxes[buff.num_of_fluxes-1], 0, sizeof(*buff.fluxes[0]));
-               glb_reset_flux(buff.fluxes[buff.num_of_fluxes-1]);
-             }
-             if (glb_copy_flux(buff.fluxes[buff.num_of_fluxes-1], &flt) != GLB_SUCCESS)
-               glb_error("grp_end: Error copying flux data");
-             glb_reset_flux(&flt);
-
-// FIXME FIXME FIXME
-//	     if(buff.fluxes[buff.num_of_fluxes-1]==NULL)
-//	       buff.fluxes[buff.num_of_fluxes-1]=glb_flux_alloc();
-//	     buff.fluxes[buff.num_of_fluxes-1]=
-//	       cpy_glb_flux(buff.fluxes[buff.num_of_fluxes-1],&flt);
-//	    glb_flux_reset(&flt);
+	     if(buff.fluxes[buff.num_of_fluxes-1]==NULL)
+	       buff.fluxes[buff.num_of_fluxes-1]=glb_flux_alloc();
+	     buff.fluxes[buff.num_of_fluxes-1]=
+	       cpy_glb_flux(buff.fluxes[buff.num_of_fluxes-1],&flt);
+	    glb_flux_reset(&flt);
 	   }
-       }
+       }  
 
      if(strncmp(name,"cross",5)==0 )
        {
-	 if(buff.num_of_xsecs > 0)
+	 if(buff.num_of_xsecs > 0)   
 	   {
-	     if (buff.xsecs[buff.num_of_xsecs-1] == NULL)
-             {
-               buff.xsecs[buff.num_of_xsecs-1] = glb_malloc(sizeof(glb_xsec));
-               memset(buff.xsecs[buff.num_of_xsecs-1], 0, sizeof(*buff.xsecs[0]));
-               glb_reset_xsec(buff.xsecs[buff.num_of_xsecs-1]);
-             }
-             if (glb_copy_xsec(buff.xsecs[buff.num_of_xsecs-1], &xsc) != GLB_SUCCESS)
-               glb_error("grp_end: Error copying cross section data");
-	     glb_reset_xsec(&xsc);
+	     if(buff.xsecs[buff.num_of_xsecs-1]==NULL)
+	       buff.xsecs[buff.num_of_xsecs-1]=glb_xsec_alloc();
+	     buff.xsecs[buff.num_of_xsecs-1]=
+	       cpy_glb_xsec(buff.xsecs[buff.num_of_xsecs-1],&xsc);
+	     glb_xsec_reset(&xsc);
 	   }
-       }
+       }  
 
 
 
@@ -364,13 +337,13 @@ static void grp_end(char* name)
            buff.sys_on_strings[nr] = glbConvertErrorDim(errordim_sys_on);
          if (buff.sys_off_strings[nr] == NULL  &&  errordim_sys_off >= 0)
            buff.sys_off_strings[nr] = glbConvertErrorDim(errordim_sys_off);
-       }
+       } 
 
      glb_free(context);
      context = (char *) strdup("global");
-
+     
    }
-
+  
 static int set_channel_data(int x[6],int loc_count)
    {
      // I am sorry for this -- it's a kludge
@@ -384,10 +357,10 @@ static int set_channel_data(int x[6],int loc_count)
 
        buff.listofchannels[i][loc_count-1]=x[i];
      }
-
+     
 
      return 0;
-   }
+   } 
 
 
 static int step_counter(char *name)
@@ -400,7 +373,7 @@ static int step_counter(char *name)
       if(strncmp(name,token_list[i].token,
 		 strlen(token_list[i].token))==0 )
 	{
-
+	 
 		     ibf=(int*) token_list[i].len;
 		     if(*ibf==-1) *ibf=1;// first time encounter
 		     else (*ibf)++;
@@ -416,8 +389,8 @@ static int set_fnct(char *name,void *in)
 {
   int i;
   sigfun *dbf;
-
-
+  
+ 
   for(i=0;token_list[i].token!=NULL;i++)
     {
       if(strncmp(name,token_list[i].token,
@@ -428,22 +401,22 @@ static int set_fnct(char *name,void *in)
 	     if(token_list[i].scalar==FUN) //double
 	       {
 		 dbf=(sigfun *) token_list[i].ptr;
-		 *dbf=(sigfun) in;
+		 *dbf=(sigfun) in;	 
 	      	 return 0;
 	       }
-	     else
+	     else       
 	       {
 		 fprintf(stderr,"Error: Value for %s out of range\n",
 			 token_list[i].token);
 		 return 2;
 	       }
 	}
-
-
-    }
-
-
-  return 1;
+      
+      
+    }   
+  
+  
+  return 1;   
 }
 
 
@@ -469,7 +442,7 @@ static int set_exp(char *name,double value,int scalar)
 		     *dbf=value;
 		     return 0;
 		   }
-		 else
+		 else       
 		   {
 		     fprintf(stderr,"Error: Value for %s out of range\n",
 			     token_list[i].token);
@@ -484,7 +457,7 @@ static int set_exp(char *name,double value,int scalar)
 		     *ibf=value;
 		     return 0;
 		   }
-		 else
+		 else       
 		   {
 		     fprintf(stderr,"Error: Value for %s out of range\n",
 			     token_list[i].token);
@@ -496,7 +469,7 @@ static int set_exp(char *name,double value,int scalar)
 	       {
 		 if(value >= token_list[i].rl && value <= token_list[i].ru)
 		   {
-
+		     
 		     ibf=(int*) token_list[i].ptr;
 		     if(!((*ibf == -1) || (*ibf == (int) value))) {
 		       glb_warning("Given length does not"
@@ -507,7 +480,7 @@ static int set_exp(char *name,double value,int scalar)
 		     *ibf=value;
 		     return 0;
 		   }
-		 else
+		 else       
 		   {
 		     fprintf(stderr,"Error: Value for %s out of range\n",
 			     token_list[i].token);
@@ -523,14 +496,14 @@ static int set_exp(char *name,double value,int scalar)
 		     xibf[loc_count-1]=(int) value;
 		     return 0;
 		   }
-		 else
+		 else       
 		   {
 		     fprintf(stderr,"Error: Value for %s out of range\n",
 			     token_list[i].token);
 		     return 2;
 		   }
 	       }
-
+	     
 	     if(token_list[i].scalar==DOUBLE_INDEXED) //int
 	       {
 		 if(value >= token_list[i].rl && value <= token_list[i].ru)
@@ -539,7 +512,7 @@ static int set_exp(char *name,double value,int scalar)
 		     dbf[loc_count-1]=(double) value;
 		     return 0;
 		   }
-		 else
+		 else       
 		   {
 		     fprintf(stderr,"Error: Value for %s out of range\n",
 			     token_list[i].token);
@@ -547,11 +520,11 @@ static int set_exp(char *name,double value,int scalar)
 		   }
 	       }
 
-
-	   }
+	  
+	   }   
        }
 
-   return 1;
+   return 1;   
 }
 
 static int set_pair(char *name,double value,double value2,int scalar)
@@ -570,20 +543,20 @@ static int set_pair(char *name,double value,double value2,int scalar)
 	       {
 		 if(value >= token_list[i].rl && value <= token_list[i].ru)
 		   {
-
+		    
 		     dbf=(double*) token_list[i].ptr;
 		     dbf[0]=(double) value;
 		     dbf[1]=(double) value2;
 		     return 0;
 		   }
-		 else
+		 else       
 		   {
 		     fprintf(stderr,"Error: Value for %s out of range\n",
 			     token_list[i].token);
 		     return 2;
 		   }
 	       }
-
+	     
 	     if(token_list[i].scalar==INT_INDEXED_PAIR) //int
 	       {
 		 if(value >= token_list[i].rl && value <= token_list[i].ru)
@@ -593,25 +566,25 @@ static int set_pair(char *name,double value,double value2,int scalar)
 		     ibf[(loc_count-1)+0*32]=(int) value;
 		     return 0;
 		   }
-		 else
+		 else       
 		   {
 		     fprintf(stderr,"Error: Value for %s out of range\n",
 			     token_list[i].token);
 		     return 2;
 		   }
 	       }
-
+	     
 	     if(token_list[i].scalar==DOUBLE_INDEXED_PAIR) //int
 	       {
 		 if(value >= token_list[i].rl && value <= token_list[i].ru)
 		   {
-
+		    
 		     dbf=(double*) token_list[i].ptr;
 		     dbf[(loc_count-1)+0*32]=(double) value;
 		     dbf[(loc_count-1)+1*32]=(double) value2;
 		     return 0;
 		   }
-		 else
+		 else       
 		   {
 		     fprintf(stderr,"Error: Value for %s out of range\n",
 			     token_list[i].token);
@@ -623,47 +596,47 @@ static int set_pair(char *name,double value,double value2,int scalar)
 	       {
 		 if(value >= token_list[i].rl && value <= token_list[i].ru)
 		   {
-
+		    
 		     dbf=(double*) token_list[i].ptr;
 		     dbf[(loc_count-1)*2+0]=(double) value;
 		     dbf[(loc_count-1)*2+1]=(double) value2;
 		     return 0;
 		   }
-		 else
+		 else       
 		   {
 		     fprintf(stderr,"Error: Value for %s out of range\n",
 			     token_list[i].token);
 		     return 2;
 		   }
 	       }
-	   }
+	   }   
        }
 
-   return 1;
+   return 1;   
 }
 
 
 static size_t list_length (glb_List *head)
 {
-  size_t n;
+  size_t n;  
   for (n = 0; head; ++n)
     head = head->next;
-  return n;
+  return n; 
 }
 
 
 static void list_free(glb_List *stale)
 {
  glb_List *ptr;
- glb_List *dummy;
+ glb_List *dummy;  
  ptr=stale;
  while(ptr != (glb_List *) NULL)
-   {
+   {	
      dummy=ptr->next;
      glb_free(ptr);
-     ptr=dummy;
+     ptr=dummy;  
    }
-
+ 
 }
 
 
@@ -675,7 +648,7 @@ static double glb_reverse(double x)
 
 static glb_List *list_cons (glb_List *tail, double newdata)
 {
-  glb_List *res = (glb_List*) glb_malloc(sizeof(glb_List));
+  glb_List *res = (glb_List*) glb_malloc(sizeof(glb_List)); 
   res->next=tail;
   res->entry=newdata;
   return res;
@@ -700,7 +673,7 @@ static glb_List *thread_list(func_t f, int reverse, int destroy ,glb_List *tail)
   */
   if(reverse==1)
     {
-      head=tail;
+      head=tail;  
       for (n = 0; head; ++n)
 	{
 	  nv=f(head->entry);
@@ -712,8 +685,8 @@ static glb_List *thread_list(func_t f, int reverse, int destroy ,glb_List *tail)
     {
       double *rlist,x;
       l=list_length(tail);
-      rlist=(double *) malloc(sizeof(double)*l);
-      head=tail;
+      rlist=(double *) malloc(sizeof(double)*l);   
+      head=tail;  
       for (n = 0; head; ++n)
 	{
 	  rlist[n]=head->entry;
@@ -731,11 +704,11 @@ static glb_List *thread_list(func_t f, int reverse, int destroy ,glb_List *tail)
   if(destroy==-1) {list_free(res);res=tail;}
   return res;
 }
-
+     
 
 static void showlist(glb_List *lp)
-{
-
+{ 
+ 
   if (lp){
     showlist(lp->next);             // show the tail
     printf("%.10g " , lp->entry);     // show the head
@@ -748,10 +721,10 @@ static double list_take(glb_List *li,int k)
   int i;
   double erg;
   glb_List *bf;
-  bf=li;
+  bf=li; 
   erg=bf->entry;
   for(i=0;i<k;i++)
-    {
+    { 
       bf=bf->next;
       erg=bf->entry;
     }
@@ -773,11 +746,11 @@ static glb_List *glb_interpolation(glb_List *xval,glb_List *yval,int flag,glb_Li
   xl=list_length(xval);
   yl=list_length(yval);
   rl=list_length(where);
-
+ 
   if(yl!=xl) {glb_error("Xval and Yval in glb_interpolation are not of the same length"); return NULL;}
 
   xlist=(double*) malloc(sizeof(double)*xl);
-  ylist=(double*) malloc(sizeof(double)*yl);
+  ylist=(double*) malloc(sizeof(double)*yl);  
   rlist=(double*) malloc(sizeof(double)*rl);
 
   gsl_interp_accel *acc = gsl_interp_accel_alloc();
@@ -788,7 +761,7 @@ static glb_List *glb_interpolation(glb_List *xval,glb_List *yval,int flag,glb_Li
     xlist[i]=head->entry;
     head = head->next;
   }
-
+  
   head=yval;
   for (i = yl-1; head; i--){
     ylist[i]=head->entry;
@@ -796,15 +769,15 @@ static glb_List *glb_interpolation(glb_List *xval,glb_List *yval,int flag,glb_Li
   }
 
   gsl_spline_init(spline,xlist,ylist,yl);
-
+  
   head=where;
   for(i=0; head; i++){
-     rlist[i]=gsl_spline_eval(spline,head->entry,acc);
+     rlist[i]=gsl_spline_eval(spline,head->entry,acc);   
     head=head->next;
  }
 
   for(i=rl;i>0;i--) res=list_cons(res,rlist[i-1]);
-
+ 
   free(xlist);
   free(ylist);
   free(rlist);
@@ -837,26 +810,26 @@ static int set_exp_list(char *name,glb_List *value,int scalar)
 	    //here we will have to do a lot asking asf.
 	    len=list_length(value); // how long is the list
 	    lbf=(int*) token_list[i].len;
-	    if(*lbf==-1) *lbf=len;  // setting the length correctly in exp
+	    if(*lbf==-1) *lbf=len;  // setting the length correctly in exp   
 	    else if(*lbf!=len) glb_warning("Length mismatch or list"
 					   " length changed");
-
-
+	  
+	    
 	    dbf = (double**) token_list[i].ptr;
 	    if(*dbf!=NULL){glb_free(*dbf);*dbf=NULL;}
 	    list=(double*) glb_malloc(sizeof(double)*len);
-	    *dbf=list;
-
-
+	    *dbf=list; 
+	  	     
+	    
 	    for(k=0;k<len;k++)
 	       {
 		  val=list_take(value,len-k-1);
-
+		
 		  if(val >= token_list[i].rl && val <= token_list[i].ru)
 		    {
-		      list[k]=val;
+		      list[k]=val;      
 		    }
-		  else
+		  else       
 		    {
 		      fprintf(stderr,"Error: Value for %s out of range\n",
 			      token_list[i].token);
@@ -864,43 +837,43 @@ static int set_exp_list(char *name,glb_List *value,int scalar)
 		      *dbf=NULL;
 		      return 2;
 		    }
-
+		  
 	       }
 	    if(scalar!=TWICE)  list_free(value);
 	    return 0;
 	    break;
-
-	  case DOUBLE_LIST_INDEXED:
+	  
+	  case DOUBLE_LIST_INDEXED: 
 	    len=list_length(value); // how long is the list
 	    lbf=(int*) token_list[i].len;
-
-
-	    //  lbf[loc_count-1]=len;  // setting the length correctly in exp
-
+	    
+	   
+	    //  lbf[loc_count-1]=len;  // setting the length correctly in exp   
+	  
 	    dbf= (double**) token_list[i].ptr;
 	    if(dbf[loc_count-1]!=NULL){glb_free(dbf[loc_count-1]);dbf[loc_count-1]=NULL;}
 	    list=(double*) glb_malloc(sizeof(double)*(len+1));
-
-	    dbf[loc_count-1]=list;
+	   
+	    dbf[loc_count-1]=list; 
 	    list[len]=-1;
-
+	    
 	    for(k=0;k<len;k++)
 	      {
 		val=list_take(value,len-k-1);
-
+		  
 		if(val >= token_list[i].rl && val <= token_list[i].ru)
 		  {
 		    list[k]=val;
 
 		  }
-		else
+		else       
 		  {
 		    fprintf(stderr,"Error: In line %d: "
 			    "Value for %s out of range\n",
 			    glb_line_num,token_list[i].token);
 		    glb_free(list);
 		    dbf[loc_count-1]=NULL;
-
+		  
 		   return 2;
 		  }
 	      }
@@ -909,30 +882,30 @@ static int set_exp_list(char *name,glb_List *value,int scalar)
 	    break;
 
 
-	  case INT_LIST_INDEXED: //integer list indexed
+	  case INT_LIST_INDEXED: //integer list indexed 
 	    //with loc_counter
-
+	    
 	    //here we will have to do a lot asking asf.
 	    len=list_length(value); // how long is the list
 	    lbf=(int*) token_list[i].len; //FIXME danger !!!!
-	    lbf[loc_count-1]=len;  // setting the length correctly in exp
+	    lbf[loc_count-1]=len;  // setting the length correctly in exp   
 	    ibf= (int**) token_list[i].ptr;
 	    if(ibf[loc_count-1]!=NULL)glb_free(ibf[loc_count-1]);
 	    ilist=(int*) glb_malloc(sizeof(int)*len);
-
-	    ibf[loc_count-1]=ilist;
-
-
+	   
+	    ibf[loc_count-1]=ilist; 
+	
+	      
 	    for(k=0;k<len;k++)
 	      {
 		val=list_take(value,len-k-1);
-
+		
 		if(val >= token_list[i].rl && val <= token_list[i].ru)
 		  {
 		    ilist[k]=(int) val;
-
+		  
 		  }
-		else
+		else       
 		  {
 		    fprintf(stderr,"Error: Value for %s out of range\n",
 			    token_list[i].token);
@@ -942,20 +915,20 @@ static int set_exp_list(char *name,glb_List *value,int scalar)
 	      }
 	    if(scalar!=TWICE) list_free(value);
 	    return 0;
-	    break;
+	    break;	 
 	  default:
 	    return 1;
 	    break;
 	  }
 	}
-    }
-  return 1;
+    }    
+  return 1;    
 }
 
 static int set_exp_energy(char *name, glb_List **value)
 {
   int i,k,l;
-  double ***dbf;
+  double ***dbf;  
   int len;
   double val;
   int v1,v2;
@@ -968,12 +941,12 @@ static int set_exp_energy(char *name, glb_List **value)
 		 strlen(token_list[i].ctx))==0 )
 	{
 	  switch((int) token_list[i].scalar) {
-
+	  
 	  case ENERGY_MATRIX:
 	    list=(double**) glb_malloc(sizeof(double* ) * energy_len);
 	    buff.lowrange[loc_count-1]=(int*) glb_malloc(energy_len*sizeof(int));
 	    buff.uprange[loc_count-1]=(int*) glb_malloc(energy_len*sizeof(int));
-
+      
 	    for(l=0;l<energy_len;l++)
 	      {
 		len=(int) list_length(value[l]); // how long is the list
@@ -981,27 +954,27 @@ static int set_exp_energy(char *name, glb_List **value)
 				   "number %d: sublist %d is too short!\n"
 				   ,glb_line_num,loc_count,l);return 2;}
 		//lbf=(int*) token_list[i].len;
-
-
+	    
+	   
 		//lbf[loc_count-1]=len;  // setting the length correctly in exp
-
-
-
+	
+		
+		
 		dbf= (double***) token_list[i].ptr;
 		list[l]=(double*) glb_malloc(sizeof(double)*(len-2));
-		dbf[loc_count-1]=list;
+		dbf[loc_count-1]=list; 
 
-
+		
 		v1=(int) list_take(value[l],len-0-1);
 		v2=(int) list_take(value[l],len-1-1);
-
+	      
 		if(v1 >= 0 &&  v2 <= buff.simbins
 		   && v2 >= v1&&v2-v1==len-3 )
 		  {
-
-		    buff.lowrange[loc_count-1][l]= v1;
+		   
+		    buff.lowrange[loc_count-1][l]= v1;	
 		    buff.uprange[loc_count-1][l]= v2;
-
+		    
 		  }
 		else
 		  {
@@ -1013,7 +986,7 @@ static int set_exp_energy(char *name, glb_List **value)
 		    glb_free(buff.uprange[loc_count-1]);
 		    return 2;
 		  }
-
+		
 	      	for(k=0;k<len-2;k++)
 		  {
 		    val=list_take(value[l],len-(k+2)-1);
@@ -1021,9 +994,9 @@ static int set_exp_energy(char *name, glb_List **value)
 		    if(val >= token_list[i].rl && val <= token_list[i].ru)
 		      {
 			list[l][k]=val;
-
+		
 		      }
-		    else
+		    else       
 		      {
 			fprintf(stderr,"Error: In line %d: "
 				"Value for %s out of range\n",
@@ -1040,8 +1013,8 @@ static int set_exp_energy(char *name, glb_List **value)
 
 	  }
 	}
-    }
-  return 1;
+    }    
+  return 1;    
 }
 
 
@@ -1049,7 +1022,7 @@ static int set_exp_energy(char *name, glb_List **value)
 %union {
   double  val;  /* For returning numbers.                   */
   double *dpt;  /* for rules */
-  glb_List *ptr;
+  glb_List *ptr; 
   glb_List **ptrq;
   glb_symrec  *tptr;  /* For returning symbol-table pointers      */
   char *name;
@@ -1064,28 +1037,24 @@ static int set_exp_energy(char *name, glb_List **value)
 %token <name> IDN CROSS FLUXP FLUXM NUFLUX
 %token <name> SYS_ON_FUNCTION SYS_OFF_FUNCTION
 %token <name> GRP GID FNAME VERS
-%token <name> SIGNAL BG
-%token <name> ENERGY CHANNEL
-%token <name> NDEF
-%token <in> GRPOPEN GRPCLOSE
-%token <in> PM FLAVOR
-%token <in> NOGLOBES
-%token <in> RULESEP RULEMULT
-%token <nameptr> NAME RDF
-%type <ptr> seq list listcopy
-%type <ptrq> rule brule srule energy ene
-%type <dpt> rulepart
-%type <val> exp
+%token <in> SIGNAL BG GRPOPEN GRPCLOSE PM FLAVOR
+%token <in> NOGLOBES CHANNEL
+%token <in> RULESEP RULEMULT ENERGY
+%token <nameptr> NAME RDF NDEF
+%type <ptr> seq listcopy
+%type <ptrq> rule brule srule ene
+%type <dpt> rulepart 
+%type <val> exp 
 %type <val> group
 %type <in> pm
 %type <nameptr> name
-%type <name> cross
+%type <name> cross 
 %type <name> flux
 %type <name> nuflux
 
 %type <name> version
 
-%expect 2
+%expect 20
 %nonassoc ','
 %right '='
 %left RULESEP
@@ -1098,97 +1067,113 @@ static int set_exp_energy(char *name, glb_List **value)
 %left NEG     /* Negation--unary minus */
 %right '^'    /* Exponentiation        */
 
-%%
-/* Grammar rules and actions */
-/* ------------------------- */
+%% /* Grammar rules and actions follow */
 
-/* input: This is where the parser starts */
-input: topleveldirective {}
-| input topleveldirective {}
+input:    /* empty */
+| input line 
 | NOGLOBES {YYABORT;}
 | '§' {YYABORT;}
 ;
-
-/* topleveldirective: anything that can appear outside any groups */
-topleveldirective: group {}
-| exp {}
-| list {}
+     
+line:   '\n'
+| outchannel '\n'
+| outrule '\n' { /*showlist($1[0]);showlist($1[1]);*/ }
+| exp '\n'  { /*printf ("\t%.10g\n", $1);*/  }
+| seq '\n'  { /*showlist($1);printf("\n");*/ }
+| group '\n' {}
+| error '\n' {yyerrok;}
+| channel '\n' {}
+| ene ';' '\n' {
+ set_exp_energy("@energy",$1);
+}
+| rule '\n' {}
+| cross '\n' {/* printf("%s\n",$1);*/}
+| flux '\n' {/* printf("%s\n",$1);*/}
+| nuflux '\n' {/* printf("%s\n",$1);*/}
 ;
 
-/* exp: An expression, including assignments, algebraic expressions, etc. */
-exp: NUM             { $$ = $1;                     }
-| NAME               { $$ = $1->value;              }
-| VAR                { $$ = $1->value.var;          }
-| VAR '=' exp        { $$ = $3; $1->value.var = $3; }
-| IDN '=' exp {
-  if(set_exp($1,$3,0)==1) yyerror("Unknown identifier: %s", $1);
-  $$ = $3;
-  if ($1)  { glb_free($1);  $1=NULL; }
-}
-| IDN '=' SFNCT {
-  if(set_fnct($1,$3->sf)==1) yyerror("Unknown identifier: %s", $1);
-  if ($1)  { glb_free($1);  $1=NULL; }
-}
-| IDN '=' exp RULESEP exp {
-  if(set_pair($1,$3,$5,0)==1) yyerror("Unknown identifier: %s", $1);
-  $$ = $3;
-  if ($1)  { glb_free($1);  $1=NULL; }
-}
+
+
+exp:      NUM                { $$ = $1;                         }
+| NAME                { $$ = $1->value;              }
+| VAR                { $$ = $1->value.var;              }
+| VAR '=' exp        { $$ = $3; $1->value.var = $3;     }
+| IDN '=' exp        { if(set_exp($1,$3,0)==1) yyerror("Unknown identifier");
+$$ = $3; }
+| IDN '=' SFNCT        { if(set_fnct($1,$3->sf)==1) yyerror("Unknown identifier");}
+| IDN '=' exp RULESEP exp  { if(set_pair($1,$3,$5,0)==1) yyerror("Unknown identifier");
+$$ = $3; }
 | FNCT '(' exp ')'   {
   /* added safety in case the function pointer is NULL, which is
      sometimes useful for special functions */
-  if($1->value.fnctptr==NULL) yyerror("Improper use of special function %s", $1->name);
+  if($1->value.fnctptr==NULL) yyerror("Improper use of special function");
   else $$ = (*($1->value.fnctptr))($3); }
 
-| exp '+' exp        { $$ = $1 + $3;      }
-| exp '-' exp        { $$ = $1 - $3;      }
-| exp '*' exp        { $$ = $1 * $3;      }
-| exp '/' exp        { $$ = $1 / $3;      }
-| '-' exp  %prec NEG { $$ = -$2;          }
-| exp '^' exp        { $$ = pow ($1, $3); }
-| '(' exp ')'        { $$ = $2;           }
-| version            { $$ = 0;            }
-| NDEF               { yyerror("Unknown name: %s", $1); YYERROR; }
+| exp '+' exp        { $$ = $1 + $3;                    }
+| exp '-' exp        { $$ = $1 - $3;                    }
+| exp '*' exp        { $$ = $1 * $3;                    }
+| exp '/' exp        { $$ = $1 / $3;                    }
+| '-' exp  %prec NEG { $$ = -$2;                        }
+| exp '^' exp        { $$ = pow ($1, $3);               }
+| '(' exp ')'        { $$ = $2;                         } 
+| version            { $$ = 0;}
+| NDEF               {yyerror("Unknown name");YYERROR;}
 ;
 
-/* listcopy: A statement that duplicates a list */
+
+
 listcopy: IDN RULESEP '=' LVAR {
   glb_List *ltemp;
-  ltemp=thread_list(&glb_list_copy,0,0,$4->list);
+  ltemp=thread_list(&glb_list_copy,0,0,$4->list); 
   if(set_exp_list($1,ltemp,3)==1) yyerror("Unknown identifier");
   $$ = ltemp;
-  if ($1)  { glb_free($1);  $1=NULL; }
 }
 
-/* seq: A comma-separated sequence of expressions */
-seq: exp ',' exp {
-   glb_List *buf = list_cons(NULL, $1);
-   buf = list_cons(buf, $3);
-   $$  = buf;
-}
-| seq ',' exp { $$ = list_cons($1, $3); }
-;
 
-/* list: A list, i.e. a sequence enclosed in { } */
-list: '{' '}'  {$$=NULL;}
+
+seq:    exp  ','        {$$=list_cons(NULL,$1); }   
+|    exp  ',' '\n'        {$$=list_cons(NULL,$1); }         
+|  seq  exp ',' {
+  glb_List *buf;
+  buf=$1;
+  buf=list_cons(buf,$2);
+  $$=buf;   
+}
+
+|  seq  exp ',' '\n' {
+  glb_List *buf;
+  buf=$1;
+  buf=list_cons(buf,$2);
+  $$=buf;   
+}
+|  seq  exp  {
+  glb_List *buf;
+  buf=$1;
+  buf=list_cons(buf,$2);
+  $$=buf;   
+}
+| '{' '}'      {$$=NULL;}
 | '{' seq '}'  {$$=$2; }
 | '{' exp '}'  {$$=list_cons(NULL,$2); }
-| IDN '=' list {
-  if(set_exp_list($1,$3,3)==1)  yyerror("Unknown identifier");
-  $$ = $3;
-  if ($1)  { glb_free($1);  $1=NULL; }
-}
+
+
+| IDN '=' seq        { if(set_exp_list($1,$3,3)==1) 
+  yyerror("Unknown identifier");
+ $$ = $3; }
+
+//| FNCT '{' exp '}'   { $$ = ($1->value.lfnctptr)($3); }
 | FNCT '(' seq ')' {$$ = thread_list($1->value.fnctptr,$1->reverse,$1->destroy,$3);}
-| FNCT '(' list ')' {$$ = thread_list($1->value.fnctptr,$1->reverse,$1->destroy,$3);}
 | FNCT '('')' {$$ = (*($1->value.lfnctptr))();}
 | LVAR                { $$ = $1->list;              }
-| LVAR '=' list       { $$ = $3; $1->list = $3; }
-| FNCT '(' list ',' list ',' exp  ',' list ')'          {$$=glb_interpolation($3,$5,floor($7),$9);}
+| LVAR '=' seq        { $$ = $3; $1->list = $3;/* printf("%s ",$1->name);showlist($3);printf("\n");*/ }
+| FNCT '(' seq ',' seq ',' exp  ','seq')'          {$$=glb_interpolation($3,$5,floor($7),$9);}
 | listcopy {}
 ;
 
-/* rulepart: Building block of signal and background rules */
-rulepart: exp RULEMULT exp {
+
+
+rulepart: exp RULEMULT exp { 
+
   double *buf;
   buf=(double*) glb_malloc(sizeof(double)*2);
   buf[0]=$1;
@@ -1197,83 +1182,78 @@ rulepart: exp RULEMULT exp {
 }
 ;
 
-/* group: An environment containing statements that belong together */
-group: GID '(' NAME ')'
+expseq: line {}
+|expseq line {}
+;
+
+group: GID '(' NAME ')' 
 { if($3->value==-1) {$3->value=step_counter($1); }
   loc_count=$3->value;
   glb_free(context);
   context =(char *) strdup($1);
   grp_start(context);
-  if ($1)  { glb_free($1);  $1=NULL; }
 }
-GRPOPEN ingroup GRPCLOSE {
-  grp_end(context);
-}
+  GRPOPEN ingroup  GRPCLOSE { 
+   
+grp_end(context);}
 | GID '(' RDF ')' GRPOPEN ingroup  GRPCLOSE {
-    yyerror("Redefinition of an automatic variable %s", $3->name); YYERROR;
-    if ($1)  { glb_free($1);  $1=NULL; }
-}
+  yyerror("Redefinition of an automatic variable");YYERROR;}  
 ;
 
-/* ingroup: The contents of a group environment */
-ingroup: /* empty */
-| ingroup ingroup_statement
-;
-
-/* ingroup_statement: A single statement inside a group */
-ingroup_statement: exp {}
-| list {}
+ingroup: /* empty */ 
+| exp {}
 | rule {}
-| energy {}
+| expseq {}
 | channel {}
 | cross {}
 | flux {}
 | nuflux {}
+
 ;
 
-/* version: A version declaration */
 version: VERS '=' FNAME {
   buff.version=strdup($3);
-  if ($1)  { glb_free($1);  $1=NULL; }
-  if ($3)  { glb_free($3);  $3=NULL; }
 }
 ;
 
-/* cross: Specification of a cross sections file (to be used inside cross group) */
 cross: CROSS '=' FNAME {
   //load_cross($3,loc_count-1);
   xsc.file_name=strdup($3);
   $$=$3;
-  if ($1)  { glb_free($1);  $1=NULL; }
-  if ($3)  { glb_free($3);  $3=NULL; }
 }
 ;
 
-/* flux: Specification of flux file (to be used inside flux group) */
 flux: FLUXP '=' FNAME {
   //load_flux($3,loc_count-1,1);
   flt.file_name=strdup($3);
-
+ 
   //if(set_exp($1,$3,0)==1) yyerror("Unknown identifier");
   $$=$3;
-  if ($1)  { glb_free($1);  $1=NULL; }
-  if ($3)  { glb_free($3);  $3=NULL; }
 }
 ;
 
-/* nuflux: same as flux, but for nuflux group */
+
 nuflux: NUFLUX '=' FNAME {
   //load_flux($3,loc_count-1,1);
   flt.file_name=strdup($3);
-
+ 
   //if(set_exp($1,$3,0)==1) yyerror("Unknown identifier");
   $$=$3;
-  if ($1)  { glb_free($1);  $1=NULL; }
-  if ($3)  { glb_free($3);  $3=NULL; }
 }
 ;
 
-/* channel: A channel definition */
+
+rule: SYS_ON_FUNCTION '=' FNAME {
+  buff.sys_on_strings[buff.numofrules-1] = strdup($3);
+}
+;
+
+rule: SYS_OFF_FUNCTION '=' FNAME {
+  buff.sys_off_strings[buff.numofrules-1] = strdup($3);
+}
+;
+
+
 channel: CHANNEL '=' name RULESEP pm RULESEP FLAVOR RULESEP FLAVOR RULESEP
  name RULESEP name {
 
@@ -1282,37 +1262,46 @@ channel: CHANNEL '=' name RULESEP pm RULESEP FLAVOR RULESEP FLAVOR RULESEP
   x[1]=$5;
   x[2]=$7;
   x[3]=$9;
-  x[4]=(int) $11->value -1;
+  x[4]=(int) $11->value -1; 
   x[5]=(int) $13->value -1;
 
+
   set_channel_data(x,loc_count);
-  if ($1)  { glb_free($1);  $1=NULL; }
 }
 ;
 
-/* name */
 /* FIXME, maybe we had a bug here */
 name: NAME {$$=$1;}
-| NDEF { yyerror("Unknown name: %s", $1); YYERROR; }
+|NDEF {yyerror("Unknown name");YYERROR;}
 ;
+ 
 
-/* unary plus/minus */
 pm: PM {$$=$1;}
 | '+' {$$=1;}
 | '-' {$$=-1;}
 ;
 
-/* ene: Building block of user-defined smearing matrix */
-ene: ENERGY '='  list   {
+
+ene: ENERGY '='  seq   {
   glb_List **buf;
   energy_len=1;
-
-  buf=(glb_List**) glb_malloc(sizeof( glb_List* ) );
+ 
+  buf=(glb_List**) glb_malloc(sizeof( glb_List* ) ); 
   buf[0]=$3;
+ 
   $$=buf;
-  if ($1)  { glb_free($1);  $1=NULL; }
 }
-| ene RULESEP list
+| ene RULESEP seq 
+{
+  glb_List **buf;
+  buf=$1;
+  energy_len++;
+  
+  buf=(glb_List**) glb_realloc((void**) buf , sizeof( glb_List* ) * energy_len);
+ 
+  buf[energy_len-1]=$3; 
+  $$=buf; }
+| ene RULESEP '\n' seq 
 {
   glb_List **buf;
   buf=$1;
@@ -1320,24 +1309,18 @@ ene: ENERGY '='  list   {
 
   buf=(glb_List**) glb_realloc((void**) buf , sizeof( glb_List* ) * energy_len);
 
-  buf[energy_len-1]=$3;
-  $$=buf;
-}
+  buf[energy_len-1]=$4; 
+  $$=buf; }
 ;
 
-/* energy: User-defined smearing matrix */
-energy: ene { set_exp_energy("@energy",$1); }
-| ene ';'   { set_exp_energy("@energy",$1); }
-;
 
-/* brule: Background rule */
+
 brule: BG '=' rulepart {
   glb_List **buf;
   buf=(glb_List**) glb_malloc(sizeof(glb_List*)*2);
   buf[0]=list_cons(NULL,$3[0]);
   buf[1]=list_cons(NULL,$3[1]);
   glb_free($3);
-  if ($1)  { glb_free($1);  $1=NULL; }
   $$=buf;
 }
 | brule RULESEP rulepart {
@@ -1346,19 +1329,17 @@ brule: BG '=' rulepart {
   buf[0]=list_cons(buf[0],$3[0]);
   buf[1]=list_cons(buf[1],$3[1]);
   glb_free($3);
-  $$=buf;
+  $$=buf; 
 }
 ;
 
-/* srule: Signal rule */
 srule: SIGNAL '=' rulepart {
-  glb_List **buf;
-
+  glb_List **buf;  
+ 
   buf=(glb_List**) glb_malloc(sizeof(glb_List*)*2);
   buf[0]=list_cons(NULL,$3[0]);
   buf[1]=list_cons(NULL,$3[1]);
   glb_free($3);
-  if ($1)  { glb_free($1);  $1=NULL; }
   $$=buf;
 }
 | srule RULESEP rulepart {
@@ -1367,72 +1348,72 @@ srule: SIGNAL '=' rulepart {
   buf[0]=list_cons(buf[0],$3[0]);
   buf[1]=list_cons(buf[1],$3[1]);
   glb_free($3);
-  $$=buf;
+  $$=buf; 
 }
 ;
 
-/* rule: Anything that can appear inside a rule environment */
 rule: brule {
-  int flag;
+
+int flag;  
+  
   $$=$1;
+  
   flag=set_exp_list("bgrulescoeff",$1[0],0);
-  if(flag==1) yyerror("Invalid coefficient in @background");
+  if(flag==1) yyerror("Unknown identifier");
   flag=set_exp_list("bgrulechannellist",$1[1],0);
-  if(flag==1) yyerror("Invalid channel in @background");
+  if(flag==1) yyerror("Unknown identifier");
+ 
   glb_free($1);
 }
 | srule {
-  int flag;
+  int flag;  
   $$=$1;
   flag=set_exp_list("rulescoeff",$1[0],0);
-  if(flag==1) yyerror("Invalid coefficient in @signal");
+  if(flag==1) yyerror("Unknown identifier");
   flag=set_exp_list("rulechannellist",$1[1],0);
-  if(flag==1) yyerror("Invalid channel in @signal");
+  if(flag==1) yyerror("Unknown identifier"); 
+
   glb_free($1);
+
+ 
 }
-| SYS_ON_FUNCTION '=' FNAME {
-  buff.sys_on_strings[buff.numofrules-1] = strdup($3);
-  if ($1)  { glb_free($1);  $1=NULL; }
-  if ($3)  { glb_free($3);  $3=NULL; }
-}
-| SYS_OFF_FUNCTION '=' FNAME {
-  buff.sys_off_strings[buff.numofrules-1] = strdup($3);
-  if ($1)  { glb_free($1);  $1=NULL; }
-  if ($3)  { glb_free($3);  $3=NULL; }
-}
+;
+
+outrule: NAME {
+ if($1->value==-1) {$1->value=step_counter("rule");printf("loc step\n"); }
+  loc_count=$1->value;
+  printf("loc_count %d \n",loc_count);
+  YYERROR;}
+  rule { YYERROR;}
+;
+
+
+outchannel: NAME {
+ if($1->value==-1) {$1->value=step_counter("channel");printf("loc step\n"); }
+  loc_count=$1->value;
+  printf("cha loc_count %d \n",loc_count); YYERROR;}
+  channel { YYERROR;}
 ;
 
 %%
 
 extern glb_symrec *sym_table;
-
-
-
-/***************************************************************************
- * Function yyerror                                                        *
- ***************************************************************************
- * Print parser errors including the line number where the error occured   *
- ***************************************************************************/
-int yyerror (const char *s, ...)  /* Called by yyparse on error */
+ 
+int
+yyerror (const char *s)  /* Called by yyparse on error */
 {
-  va_list args;
-  va_start(args, s);
-
-  if(yydebug > 0) fprintf(stderr,"*****************************************\n");
-  fprintf (stderr,"%s:%d: error: ",
-	   glb_file_id, glb_line_num+1);
-  vfprintf(stderr, s, args);
-  fprintf(stderr, "\n");
-  if(yydebug > 0) fprintf(stderr,"*****************************************\n");
-  va_end(args);
+  if(yydebug==1) fprintf(stderr,"*****************************************\n");
+  fprintf (stderr,"%s: ERROR: %s in file [%s]: in line %d\n",
+	   glb_prog_name,s,glb_file_id,glb_line_num+1);
+  if(yydebug==1) fprintf(stderr,"*****************************************\n");
   return 0;
 }
 
 int
 yywarn (const char *s)  /* Called by yyparse on warning */
 {
-  fprintf (stderr,"%s:%d: warning: %s\n",
-	   glb_file_id, glb_line_num+1, s);
+  fprintf (stderr,"%s: Warning: %s in line %d\n",
+	   glb_prog_name,s,glb_line_num);
   return 0;
 }
 
@@ -1467,7 +1448,7 @@ struct glb_init_sig
   char *fname;
   sigfun sf;
 };
-
+     
 static double echo(double x)
 {
   fprintf(stdout,"%f ",x);
@@ -1518,19 +1499,19 @@ static glb_List *glb_bincenter(void)
   glb_List *res=NULL;
   glb_smear *test;
   test=glb_smear_alloc();
-
+  
   if(buff.numofbins<0) {glb_error("Cannot compute bincenter. Binning not set up properly."); return NULL;}
 
   glb_set_up_smear_data(test,&buff);
 
-
+ 
   for(i=0;i<test->numofbins;i++)
-    {
+    {    
       res=list_cons(res,test->bincenter[i]);
     }
-
+ 
   glb_smear_free(test);
-
+ 
   return res;
 }
 
@@ -1541,21 +1522,21 @@ static glb_List *glb_samplingbincenter(void)
   glb_List *res=NULL;
   glb_smear *test;
   test=glb_smear_alloc();
-
+  
   if(buff.simbins<0) {glb_error("Cannot compute samplingbincenter. Sampling-binning not set up properly."); return NULL;}
 
-
+  
   glb_set_up_smear_data(test,&buff);
 
   for(i=0;i<test->simbins;i++)
     {
-
+      
       res=list_cons(res,test->simbincenter[i]);
     }
-
+ 
   glb_smear_free(test);
-
-
+ 
+  
   return res;
 }
 
@@ -1591,17 +1572,17 @@ struct glb_init_sig sig_fncts[] =
   };
 
 /* The symbol table: a chain of `struct glb_symrec'.  */
-static glb_namerec *name_table = (glb_namerec *) NULL;
+static glb_namerec *name_table = (glb_namerec *) NULL; 
 /* cannot use static here, since its declared earlier as extern */
 glb_symrec *sym_table = (glb_symrec *) NULL;
-glb_symrec *pre_sym_table = (glb_symrec *) NULL;
+static glb_symrec *pre_sym_table = (glb_symrec *) NULL;
 
 #define BIN_LIST 1
 #define SAMPLING_LIST 2
 #define DENSITY_LIST 3
 
 
-/* Put arithmetic functions in table.
+/* Put arithmetic functions in table. 
  * And all user-defined stuff.
  */
 static void
@@ -1609,7 +1590,7 @@ init_table (void)
 {
   int i;
   glb_symrec *ptr,*p;
-
+  
   glb_namerec *sptr;
   for (i = 0; arith_fncts[i].fname != 0; i++)
     {
@@ -1617,7 +1598,7 @@ init_table (void)
       ptr->value.fnctptr = arith_fncts[i].fnct;
       ptr->destroy=arith_fncts[i].destroy;
       ptr->reverse=arith_fncts[i].reverse;
-
+ 
     }
   for (i = 0; list_fncts[i].fname != 0; i++)
     {
@@ -1631,10 +1612,10 @@ init_table (void)
     {
       p=glb_putsym(ptr->name,ptr->type);
       p->value.var=ptr->value.var;
-      if(ptr->list!=NULL) p->list=thread_list(&glb_list_copy,0,0,ptr->list);
+      if(ptr->list!=NULL) p->list=thread_list(&glb_list_copy,0,0,ptr->list); 
     ptr=ptr->next;
     }
-
+  
   for (i = 0; sig_fncts[i].fname != 0; i++)
     {
       sptr = glb_putname (sig_fncts[i].fname,"energy",SFNCT);
@@ -1649,12 +1630,12 @@ free_symtable()
     glb_symrec *dummy;
     ptr=sym_table;
     while(ptr != (glb_symrec *) NULL)
-      {
+      {	
 	glb_free(ptr->name);
 	if(ptr->list!=NULL){ list_free(ptr->list);}
 	dummy=ptr->next;
 	glb_free(ptr);
-	ptr=dummy;
+	ptr=dummy;  
       }
     sym_table=NULL;
 }
@@ -1666,12 +1647,12 @@ free_presymtable()
     glb_symrec *dummy;
     ptr=pre_sym_table;
     while(ptr != (glb_symrec *) NULL)
-      {
+      {	
 	glb_free(ptr->name);
 	if(ptr->list!=NULL){ list_free(ptr->list);}
 	dummy=ptr->next;
 	glb_free(ptr);
-	ptr=dummy;
+	ptr=dummy;  
       }
     pre_sym_table=NULL;
 }
@@ -1682,16 +1663,16 @@ free_presymtable()
 static void
 free_nametable()
 {
-    glb_namerec *ptr;
+    glb_namerec *ptr;  
     glb_namerec *dummy;
     ptr=name_table;
     while(ptr != (glb_namerec *) NULL)
-      {
+      {	
 	glb_free(ptr->name);
 	glb_free(ptr->context);
 	dummy=ptr->next;
 	glb_free(ptr);
-	ptr=dummy;
+	ptr=dummy;  
       }
     name_table=NULL;
 }
@@ -1728,7 +1709,7 @@ static glb_naming *glb_putnames (char *sym_name, char *context, int value,
   ptr->context = (char *) glb_malloc (strlen (context) + 1);
   strcpy (ptr->context,context);
   ptr->value = value; /* set value to -1 for new ones  */
-
+  
   ptr->next = (struct glb_naming *) in;
   //in = ptr;
   return ptr;
@@ -1736,7 +1717,7 @@ static glb_naming *glb_putnames (char *sym_name, char *context, int value,
 
 static glb_naming *copy_names (glb_naming *in)
 {
-
+  
   glb_namerec *ptr;
   for (ptr = name_table; ptr != (glb_namerec *) NULL;
        ptr = (glb_namerec *)ptr->next)
@@ -1768,7 +1749,7 @@ glb_namerec *glb_putname (char *sym_name, char *context, int sym_type)
   strcpy (ptr->context,context);
   ptr->type = sym_type;
   ptr->value = -1; /* set value to -1 for new ones  */
-
+  
   ptr->next = (struct glb_namerec *)name_table;
   name_table = ptr;
   return ptr;
@@ -1813,7 +1794,7 @@ glb_getpresym (const char *sym_name)
 
 
 /* A new an powerful function which allows the user to define variables
- * for substitution in the AEDL files
+ * for substitution in the AEDL files 
  */
 
 
@@ -1826,18 +1807,9 @@ void glbDefineAEDLVariable(const char *name, double value)
   return;
 }
 
-double glbGetAEDLVariable(const char *name)
-{
-  glb_symrec *ptr;
-  ptr=glb_getpresym(name);
-  if (!ptr)
-    return GLB_NAN;
-  return ptr->value.var;
-}
-
 void glbClearAEDLVariables()
 {
-   if(pre_sym_table!=NULL) free_presymtable();
+   if(pre_sym_table!=NULL) free_presymtable(); 
 }
 
 
@@ -1847,13 +1819,13 @@ void glbDefineAEDLList(const char *name, double *list, size_t length)
 {
   size_t i;
   glb_symrec *ptr;
-  if(name==NULL) return;
+  if(name==NULL) return;   
   if(name[0]!='%'){ fprintf(stderr,"ERROR: AEDL lists have to start with '\%'\n");return;}
   ptr=glb_getpresym(name);
   if(ptr==0) ptr = glb_putpresym (name, LVAR);
   for(i=0;i<length;i++) {ptr->list=list_cons(ptr->list,list[i]);
   }
-
+  
   return;
 }
 
@@ -1865,11 +1837,11 @@ void glb_copy_buff()
   /* I am not sure how well this assigment really works */
   buff.names=copy_names(buff.names);
   buff.filename=strdup(glb_file_id);
-  buff_list[exp_count]=buff;
+  buff_list[exp_count]=buff; 
   exp_count++;
 }
 
-void glbReset()
+void glbReset() 
 {
   glb_line_num=0;
   energy_len=1;
@@ -1877,7 +1849,7 @@ void glbReset()
   loc_count=-1;
   flux_count=-1;
   glbInitExp(&buff);
-
+ 
   if(name_table!=NULL) free_nametable();
   if(sym_table!=NULL) free_symtable();
   name_table =(glb_namerec *) NULL;
@@ -1886,12 +1858,12 @@ void glbReset()
 }
 
 void glbResetCounters()
-{
+{ 
   flux_count=-1;
   cross_count=-1;
 }
 
-void glbResetEOF()
+void glbResetEOF() 
 {
   int i;
   exp_count=0;
@@ -1901,7 +1873,7 @@ void glbResetEOF()
   loc_count=-1;
   flux_count=-1;
   glbInitExp(&buff);
-  for(i=0;i<GLB_MAX_EXP;i++)   glbInitExp(&buff_list[i]);
+  for(i=0;i<32;i++)   glbInitExp(&buff_list[i]);
   /* this here would be the place to check for unuses variables, but
      for that we need an access counter */
   if(name_table!=NULL) free_nametable();
@@ -1910,9 +1882,9 @@ void glbResetEOF()
   name_table =(glb_namerec *) NULL;
   sym_table =(glb_symrec *) NULL;
   init_table ();
-  glb_reset_flux(&flt);
-  glb_reset_xsec(&xsc);
-
+  glb_flux_reset(&flt);
+  glb_xsec_reset(&xsc);
+ 
 }
 
 void glb_clean_parser()
@@ -1920,14 +1892,14 @@ void glb_clean_parser()
   if(name_table!=NULL) free_nametable();
   if(sym_table!=NULL) free_symtable();
   if(pre_sym_table!=NULL) free_presymtable();
-
+  
 }
 
 int glbInitExperiment(char *inf,glb_exp *in, int *counter)
 {
   FILE *input;
   int k,i;
-  const char tch[]="%!GLoBES";
+  const char tch[]="%!GLoBES"; 
   char tct[11];
   struct glb_experiment **ins;
   ins=(struct glb_experiment **) in;
@@ -1936,10 +1908,8 @@ int glbInitExperiment(char *inf,glb_exp *in, int *counter)
   context=(char *) strdup("global");
   glb_smear_reset(&ibf);
   glb_option_type_reset(&opt);
-  memset(&flt, 0, sizeof(flt));
-  glb_reset_flux(&flt);
-  memset(&xsc, 0, sizeof(xsc));
-  glb_reset_xsec(&xsc);
+  flt.file_name=NULL;
+  glb_flux_reset(&flt);
   input=glb_fopen(inf,"r");
   if(input==NULL) return -2;
   /* This line produces a warning with -Wall:
@@ -1958,14 +1928,13 @@ int glbInitExperiment(char *inf,glb_exp *in, int *counter)
   glb_fclose(yyin);
   glb_free(context);
   glb_free(glb_file_id);
-
+  
   if(k!=0) return -2;
-
+  
   k=0;
-
-  if(*counter+exp_count>GLB_MAX_EXP) glb_fatal("Too many experiments!");
+  if(*counter+exp_count>32) glb_fatal("Too many experiments!");
   for(i=0;i<exp_count;i++)
-    {
+    {  
       *ins[*counter+i]=buff_list[i];
       k=+glbDefaultExp(ins[*counter+i]);
     }
@@ -1975,7 +1944,7 @@ int glbInitExperiment(char *inf,glb_exp *in, int *counter)
   glb_init_minimizer();
 
   if(k!=0) return -1;
-
+  
   return 0;
 
 }

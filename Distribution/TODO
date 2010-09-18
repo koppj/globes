@@ -1,5 +1,0 @@
-- Allow line breaks in AEDL files (especially in rule definitions)
-
-- globes standalone binary should not complain if user-defined chi^2
-  function is used
-

@@ -19,9 +19,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-#if HAVE_CONFIG_H   /* config.h should come before any other includes */
-#  include "config.h"
-#endif
+
 
 #include <stdlib.h>
 #include <string.h>
@@ -36,16 +34,16 @@
 #include "glb_error.h"
 
 const char *glb_release_version = VERSION;
-static const char *library_version = GLB_LIBVERSION;
+static const char *library_version = GLB_LIBVERSION; 
 
-static int
+static int 
 break_up_version(char const *version,int *first,int *second, int *third)
 {
-
+  
   char c;
   size_t length,i,k,ct=0,ctb=0;
   char *vec=NULL;
-  int res[4]={-1,-1,-1,-1};
+  int res[3]={-1,-1,-1};
   if(version==NULL)
     {
       *third=-1;
@@ -63,11 +61,11 @@ break_up_version(char const *version,int *first,int *second, int *third)
 	  vec=(char *) glb_realloc(vec,sizeof(char)*(ct+1));
 	  vec[ct-1]=c;
 	  vec[ct]='\0';
-	}
+	} 
       else
 	{
 	  ctb++;
-	  if((ctb>4)||(vec==NULL))
+	  if((ctb>3)||(vec==NULL)) 
 	    {glb_fatal("Invalid version string");exit(1);}
 	  sscanf(vec,"%d",&res[ctb-1]);
 	  ct=0;
@@ -88,12 +86,12 @@ glbTestReleaseVersion(const char *version)
   int major,minor,bug,tmajor,tminor,tbug;
   break_up_version(version,&major,&minor,&bug);
   break_up_version(glb_release_version,&tmajor,&tminor,&tbug);
-
-  if(major==tmajor)
+  
+  if(major==tmajor) 
     {
-      if(minor==tminor)
+      if(minor==tminor) 
 	{
-	  if(bug==tbug)
+	  if(bug==tbug) 
 	    {
 	      s=0;
 	    }
@@ -115,11 +113,11 @@ glbTestLibraryVersion(const char *version)
   int major,minor,bug,tmajor,tminor,tbug;
   break_up_version(version,&major,&bug,&minor);
   break_up_version(library_version,&tmajor,&tbug,&tminor);
-  if(major==tmajor)
+  if(major==tmajor) 
     {
-      if(minor==tminor)
+      if(minor==tminor) 
 	{
-	  if(bug==tbug)
+	  if(bug==tbug) 
 	    {
 	      s=0;
 	    }

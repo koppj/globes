@@ -42,16 +42,6 @@ list. Please mail to
     <td><a href="glb/T2HK.html">Description and Download</a></td>
   </tr>
   <tr>
-    <td><b>sys-T2HK</b></td>
-    <td>
-      J-PARC to Hyper-K, 2 years &nu;-running and 6 years
-      <span style="text-decoration: overline"> &nu;</span>-running
-    </td>
-    <td><a href="glb/sys-T2HK.html">Description and Download</a></td>
-  </tr>
-
-
-  <tr>
     <td><b>NO&nu;A</b></td>
     <td>
       FermiLab NuMI beamline off-axis, 3 years &nu;-running and 3 years
@@ -67,29 +57,6 @@ list. Please mail to
     </td>
     <td><a href="glb/SPL.html">Description and Download</a></td>
   </tr>
-
-<tr>
-    <td><b>NO&nu;A as of July 2009</b></td>
-    <td>
-      FermiLab NuMI beamline off-axis, 3 years &nu;-running and 3 years
-      <span style="text-decoration: overline"> &nu;</span>-running
-     
-    </td>
-    <td><a href="glb/0709-nova.html">Description and Download</a></td>
-  </tr>
-
-
-<tr>
-    <td><b>T2K as of July 2009</b></td>
-    <td>
-      J-PARC to Super-K, 5 years &nu;-running. Files for
-      <span style="text-decoration: overline"> &nu;</span>-running are
-      included.
-    </td>
-    <td><a href="glb/0709-t2k.html">Description and Download</a></td>
-  </tr>
-
-
 </table>
 
 <br>
@@ -117,19 +84,6 @@ list. Please mail to
     <td>DoubleCHOOZ, 5 years data taking, near and far detector</td>
     <td><a href="glb/DoubleCHOOZ.html">Description and Download</a></td>
   </tr>
-
-<tr>
-    <td><b>Double Chooz as of July 2009</b></td>
-    <td>Double Chooz, 3 years data taking, near and far detector, 2 cores</td>
-    <td><a href="glb/0709-doublechooz.html">Description and Download</a></td>
-  </tr>
-
-<tr>
-    <td><b>RENO</b></td>
-    <td>RENO, 3 years data taking, near and far detector, 6 cores</td>
-    <td><a href="glb/0709-reno.html">Description and Download</a></td>
-  </tr>
-
 </table>
 
 <br>
