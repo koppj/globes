@@ -19,11 +19,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-
-
-
 #ifndef GLB_TYPES_H
 #define GLB_TYPES_H 1
+
+#if HAVE_CONFIG_H   /* config.h should come before any other includes */
+#  include "config.h"
+#endif
 
 #include "globes/globes.h"
 
@@ -46,9 +47,9 @@ struct glb_naming
 typedef struct glb_naming glb_naming;
 
 /* Data structure for handling fluxes and built-in fluxes */
+#define GLB_FLUX_COLUMNS   7           /* Number of columns in flux file         */
 typedef struct {
   int builtin;
-  char* file_name;
   double time;
   double parent_energy;
   double stored_muons;
@@ -56,16 +57,21 @@ typedef struct {
   double norm;
   double gamma;
   double end_point;
-  double** flux_storage;
+
+  int n_lines;                         /* Number of columns in flux file         */
+  char *file_name;                     /* Name of flux file                      */
+  double *flux_data[GLB_FLUX_COLUMNS]; /* Flux data (7 x n_lines array)          */
 } glb_flux;
 
 /* Data structure for handling X-sections and built-in X-sections,
  * which will be added later.
  */
+#define GLB_XSEC_COLUMNS   7           /* Number of columns in xsec file         */
 typedef struct {
   int builtin;
-  char* file_name;
-  double** xsec_storage;
+  int n_lines;                         /* Number of lines in cross section file  */
+  char *file_name;                     /* Name of cross section file             */
+  double *xsec_data[GLB_XSEC_COLUMNS]; /* Cross section data (7 x n_lines array) */
 } glb_xsec;
 
 
@@ -412,7 +418,8 @@ struct glb_experiment {
   * All mallocing has to be done at intialization of a given experiment!
   */
   double *chrb_0[32], *chrb_1[32]; /* True and fitted pre-smearing rates by channel   */
-  double *chra_0[32], *chra_1[32]; /* True and fitted post-smearing rates  by channel */
+  double *chra_0[32], *chra_1[32]; /* True and fitted post-smearing rates by channel */
+  double *chr_template[32];   /* Products of fluxes, cross sections, and prefactors by channel */
   double* SignalRates[32];    /* "True" signal event rates for all rules */
   double* BackgroundRates[32];/* "True" background event rates for all rules */
   double* rates0[32];         /* "True" event rates for all rules */

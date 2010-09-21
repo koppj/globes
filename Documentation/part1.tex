@@ -1961,7 +1961,7 @@ The user-defined prior function reads as follows and is very similar to the stan
   \hspace*{0.5cm}  double pv = 0.0; \\
   \hspace*{0.5cm}  double fitvalue,centralvalue,inputerror; 
 
- \hspace*{0.5cm} /* Add oscillation parameter priors */ \\
+  \hspace*{0.5cm} /* Add oscillation parameter priors */ \\
   \hspace*{0.5cm}  for(i=0;i<6;i++) \\
   \hspace*{0.5cm} if(glbGetProjectionFlag(p,i)==GLB\_FREE) \\
   \hspace*{0.5cm} \{ \\
@@ -1971,13 +1971,13 @@ The user-defined prior function reads as follows and is very similar to the stan
   \hspace*{1cm} if(inputerror>1e-12) 
   \hspace*{1cm} \{ \\
   \hspace*{1.5cm} if(i==GLB\_THETA\_12) /* Prior on $\sin^2 \theta_{12}$ */ \\ 
-\hspace*{2.0cm} pv+=square((startvalue-square(sin(fitvalue)))/inputerror);\\ 
+  \hspace*{2.0cm} pv+=square((centralvalue-square(sin(fitvalue)))/inputerror);\\
   \hspace*{1.5cm} else \\ 
-  \hspace*{2.0cm}  pv+=square((startvalue-fitvalue)/inputerror); \\
+  \hspace*{2.0cm}  pv+=square((centralvalue-fitvalue)/inputerror); \\
   \hspace*{1cm} \} \\
   \hspace*{0.5cm} \} 
 
-\hspace*{0.5cm} /* Add matter parameter priors */ \\
+  \hspace*{0.5cm} /* Add matter parameter priors */ \\
   \hspace*{0.5cm} for(i=0;i<glb\_num\_of\_exps;i++) \\
   \hspace*{0.5cm} if(glbGetDensityProjectionFlag(p,i)==GLB\_FREE) \\
   \hspace*{0.5cm} \{ \\

@@ -4,6 +4,7 @@ INCLUDES = -I$(top_builddir) -I$(top_srcdir) -I$(top_srcdir)/lib $(GSLINC)
 AM_YFLAGS =  -d 
 
 lib_LTLIBRARIES = libglobes.la
+BUILT_SOURCES = glb_parser.h glb_parser.c
 libglobes_la_SOURCES =  glb_minimize.c glb_error.c glb_path.c glb_multiex.c \
  glb_version.c glb_rate_engine.c  glb_parser.y glb_min_sup.c glb_fluxes.c \
  glb_smear.c glb_lexer.l glb_probability.c glb_profile.c glb_sys.c glb_wrapper.c \

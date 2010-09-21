@@ -20,8 +20,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-
-
 /* This routines computes the smear matrix in the same way as CalcSmearA
    in GlobesMESbeta.m.
 
@@ -31,6 +29,10 @@
 
 #ifndef GLB_SMEAR_H
 #define GLB_SMEAR_H 1
+
+#if HAVE_CONFIG_H   /* config.h should come before any other includes */
+#  include "config.h"
+#endif
 
 #include "glb_types.h"
 
@@ -57,7 +59,8 @@ glb_smear  *glb_smear_reset(glb_smear *in);
 void glb_compute_smearing_matrix(double ***matrix, 
 			   int **low, int **up, glb_smear *in
 			   ,const struct glb_experiment *head);
-
+void glb_optimize_smearing_matrix(glb_smear *s, double **matrix, int *lower, int *upper);
+void glb_filter_compensate(glb_smear *s, double **matrix, int *lower, int *upper);
 
 
 void glb_set_up_smear_data(glb_smear *test,const struct glb_experiment *head);

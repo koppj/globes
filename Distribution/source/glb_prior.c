@@ -18,19 +18,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
  */
-
+#if HAVE_CONFIG_H   /* config.h should come before any other includes */
+#  include "config.h"
+#endif
 
 /* Headers needed by this module */
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
-
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
 
 #include "globes/globes.h"
 #include "glb_prior.h"
@@ -39,17 +36,17 @@
 static glb_params sv;
 static glb_params er;
 
-/* glb_module_init is mandatory. Any module must have glb_module_init, 
- * which returns 0 on succes or -1 on failure. This function is called 
+/* glb_module_init is mandatory. Any module must have glb_module_init,
+ * which returns 0 on succes or -1 on failure. This function is called
  * when the module is loaded.
  *
- * In our case it allocates memory for sv and er and sets sv/er to any 
- * input errors starting values which have already been defined 
- */   
+ * In our case it allocates memory for sv and er and sets sv/er to any
+ * input errors starting values which have already been defined
+ */
 int glb_builtin_prior_init()
 {
   sv=glbAllocParams();
-  er=glbAllocParams(); 
+  er=glbAllocParams();
   glbGetStartingValues(sv);
   glbGetInputErrors(er);
 
@@ -69,20 +66,20 @@ void glb_builtin_prior_clean()
 }
 
 /* This is a local function which implements the prior calculation
- * and ensure that the builtin prior behaves as described in the 
+ * and ensure that the builtin prior behaves as described in the
  * documentation, i.e. it returns 0 when the error is below 1E-12
  */
 static double sprior(double x, double center, double sigma)
 {
   if(fabs(sigma-0)<1E-12) return 0;
   return (x-center)*(x-center)/sigma/sigma;
-}  
+}
 
 /* glb_builtin_prior_prior is mandatory (for prior modules).
  *
  * This is the default prior, i.e. priors are only added for free
  * parameters, and the prior accepts starting values as stored in sv
- * and input errors as stored in er. 
+ * and input errors as stored in er.
  */
 double glb_builtin_prior_prior(const glb_params in, void *user_data)
 {
@@ -93,18 +90,18 @@ double glb_builtin_prior_prior(const glb_params in, void *user_data)
 
   glbGetProjection(pro);
   for(i=0;i<glbGetNumOfOscParams();i++)
-    {   
-    if(glbGetProjectionFlag(pro,i)==GLB_FREE) res += 
+    {
+    if(glbGetProjectionFlag(pro,i)==GLB_FREE) res +=
 						sprior(glbGetOscParams(in,i),
 						       glbGetOscParams(sv,i),
 						       glbGetOscParams(er,i)
 						       );
     }
-  
+
   for(i=0;i<glb_num_of_exps;i++)
     {
-      if(glbGetDensityProjectionFlag(pro,i)==GLB_FREE) 
-	res += 
+      if(glbGetDensityProjectionFlag(pro,i)==GLB_FREE)
+	res +=
 	  sprior(glbGetDensityParams(in,i),
 		 glbGetDensityParams(sv,i),
 		 glbGetDensityParams(er,i)
@@ -122,7 +119,7 @@ double glb_builtin_prior_prior(const glb_params in, void *user_data)
  * with the same argument.
  *
  * Here we just copy the argument to our local buffer.
- */ 
+ */
 int glb_builtin_prior_starting_values(const glb_params in, void *user_data)
 {
   if(glbCopyParams(in,sv)!=NULL) return 0;
@@ -135,9 +132,9 @@ int glb_builtin_prior_starting_values(const glb_params in, void *user_data)
  * with the same argument.
  *
  * Here we just copy the argument to our local buffer.
- */ 
+ */
 int glb_builtin_prior_input_errors(const glb_params in, void *user_data)
-{ 
+{
   if(glbCopyParams(in,er)!=NULL) return 0;
   return -1;
 }

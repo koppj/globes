@@ -19,10 +19,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-
-
-
-
+#if HAVE_CONFIG_H   /* config.h should come before any other includes */
+#  include "config.h"
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -32,21 +31,14 @@
 #include <argp.h>
 #include <ctype.h>
 #include "glb_error.h"
-
-
 #include "globes/globes.h"
-
-#if HAVE_CONFIG_H
-#  include "config.h"
-#endif
-
 
 #ifdef TEST
 #include "glb_modules.h"
 #endif /* TEST */
 
 const char *argp_program_version =
-"globes "VERSION"\n(C) 2002 - 2007 The GLoBES Team\n"
+"globes "VERSION"\n(C) 2002 - 2010 The GLoBES Team\n"
 "This is free software see the source for copying conditions. There is NO\n"
 "warranty; not even for MERCHANTABILITY or"
 " FITNESS FOR A PARTICULAR PURPOSE.";
@@ -82,13 +74,13 @@ static int parse_definition(const char *str)
   inc=strdup(str);
   if(inc==NULL) return 0;
   token=strtok(inc,delim);
-  if(token!=NULL) 
+  if(token!=NULL)
     {
      lhs=strdup(token);
      length++;
     }
-  token=strtok(NULL,delim); 
-  if(token!=NULL) 
+  token=strtok(NULL,delim);
+  if(token!=NULL)
     {
      rhs=strdup(token);
      length++;
@@ -103,21 +95,21 @@ static int parse_definition(const char *str)
   wrk=dummy;
   if(rhs[0]=='{' && rhs[s-1]=='}') {strncpy(wrk,&rhs[1],s);vec=1;wrk[s-2]='\0';}
   else strncpy(wrk,&rhs[0],s+1);
-  
+
   while(wrk)
     {
         errno=0;
       res=strtod(wrk,&endp);
-     
+
       if(errno) {fprintf(stderr,"globes: ERROR: While parsing input the following"
 			 " error occured\nFATAL: '%s'\n",
                          strerror(errno));exit(1);}
       c++;
       result = (double* ) glb_realloc(result, c * sizeof(double));
       result[c-1]=res;
-  
+
       if(strlen(endp)==0) {break;} /* stop if there is nothing left */
- 
+
       wrk=endp;
       /* Eat up trailing white space */
       while(isspace(wrk[0])) wrk++;
@@ -126,7 +118,7 @@ static int parse_definition(const char *str)
 
     }
 
-  
+
   if(c==1&&vec==0&& lhs[0] != '\%') glbDefineAEDLVariable(lhs,result[0]);
   else if (c>0&&vec==1 && lhs[0] == '%') glbDefineAEDLList(lhs,result,c);
   else {fprintf(stderr,"globes: ERROR: Confusion about vector vs scalar definition.\n");c=0;}
@@ -149,12 +141,12 @@ static char args_doc[] = "glb-file";
 
 /* The options we understand. */
 static struct argp_option options[] ={
-  {"channel",'c',  "NUMBER", OPTION_ARG_OPTIONAL,  
+  {"channel",'c',  "NUMBER", OPTION_ARG_OPTIONAL,
    "Show rates for channel given by NUMBER,\n"
-   "   if no argument is given all channels are shown" }, 
-  {"rule",'r', "NUMBER", OPTION_ARG_OPTIONAL, 
+   "   if no argument is given all channels are shown" },
+  {"rule",'r', "NUMBER", OPTION_ARG_OPTIONAL,
    "Show rates for a rule given by NUMBER,\n"
-   "   if no argument is given all rules are shown" }, 
+   "   if no argument is given all rules are shown" },
   {"experiment",'e', "NUMBER",0 ,"For multiple experiments, chose experiment number" },
   {"output",   'o', "FILE", 0,
    "Output to FILE instead of standard output" },
@@ -184,7 +176,7 @@ static struct argp_option options[] ={
    " formatting output"},
   {"user",'u',0,0,"Output formatting in user defined mode"},
   {"wahrscheinlichkeit",'w',0,0,"probability"},
-  { 0 } 
+  { 0 }
 };
 
 /* Used by `main' to communicate with `parse_opt'. */
@@ -206,7 +198,7 @@ parse_opt (int key, char *arg, struct argp_state *state)
   /* Get the INPUT argument from `argp_parse', which we
      know is a pointer to our arguments structure. */
   struct arguments *arguments = state->input;
-  
+
   switch (key)
     {
     case 'v':
@@ -283,24 +275,24 @@ parse_opt (int key, char *arg, struct argp_state *state)
     case 'w':
       arguments->probability = 1;
       break;
-      
 
-      
+
+
     case ARGP_KEY_ARG:
       if (state->arg_num > 1)
 	/* Too many arguments. */
 	argp_usage (state);
       else
 //      arguments->args[state->arg_num]=arg;
-        arguments->args[state->arg_num]=strdup(arg);    
+        arguments->args[state->arg_num]=strdup(arg);
       break;
-      
+
     case ARGP_KEY_END:
       if (state->arg_num < 1)
 	/* Not enough arguments. */
 	argp_usage (state);
       break;
-      
+
     default:
       return ARGP_ERR_UNKNOWN;
     }
@@ -320,7 +312,7 @@ static void glb_channel_printf_sub_total(FILE *stream,
   int i,k;
   double *sum;
   sum=(double *) malloc(sizeof(double)*c);
-  if(sum==NULL) 
+  if(sum==NULL)
     {
       fprintf(stderr,"glb: FATAL: Memory allocation failed\n");
       exit(1);
@@ -329,7 +321,7 @@ static void glb_channel_printf_sub_total(FILE *stream,
   for(i=0;i<l;i++)
     for(k=0;k<c;k++)
       sum[k]+=res[k][i];
-  
+
   fprintf(stream,"\n");
   for(k=0;k<c;k++)
     {
@@ -346,7 +338,7 @@ static void glb_channel_printf_total(FILE *stream,
   int i,k;
   double *sum,tsum;
   sum=(double *) malloc(sizeof(double)*c);
-  if(sum==NULL) 
+  if(sum==NULL)
     {
       fprintf(stderr,"glb: FATAL: Memory allocation failed\n");
       exit(1);
@@ -379,7 +371,7 @@ static void glb_channel_printf_mathematica(FILE *stream,
     {
        glbPrintDelimiter(stream,'l');
       for(i=0;i<l;i++)
-	{  
+	{
 	   glbPrintDelimiter(stream,'l');
 	  fprintf(stream,"%f",energy[i]);
 	   glbPrintDelimiter(stream,'m');
@@ -389,8 +381,8 @@ static void glb_channel_printf_mathematica(FILE *stream,
 	}
        glbPrintDelimiter(stream,'r');
       if(k<c-1)  glbPrintDelimiter(stream,'m');
-     
-      
+
+
     }
    glbPrintDelimiter(stream,'r');
   fprintf(stream,"\n");
@@ -404,12 +396,12 @@ static void rule_name(FILE *stream,int exp,int number)
 static void channel_name(FILE *stream,int exp,int number,int spec)
 {
   size_t c,i;
-  
+
   c=glbGetNumberOfChannels(exp);
   if(spec!=1) fprintf(stream,"\n      \t");
   else fprintf(stream,"\n          \t");
 
-  for(i=0;i<c;i++) 
+  for(i=0;i<c;i++)
     {
       if(number!=GLB_ALL) i=number;
       fprintf(stream,"%s\t",glbValueToName(exp,"channel",i));
@@ -418,7 +410,7 @@ static void channel_name(FILE *stream,int exp,int number,int spec)
     }
 
   fprintf(stream,"\n");
-  
+
   return;
 }
 
@@ -428,8 +420,8 @@ static void channel_name(FILE *stream,int exp,int number,int spec)
 // ---------------------------------------------
 
 int main(int argc, char *argv[])
-{  
- 
+{
+
 
 #ifdef TEST
   glb_projection pro;
@@ -448,10 +440,10 @@ int main(int argc, char *argv[])
   glb_params oscp;
   double *osc=NULL;
 
-  
- 
+
+
   /* This serves to make globes working, even with --disable-shared */
-  //  LTDL_SET_PRELOADED_SYMBOLS(); 
+  //  LTDL_SET_PRELOADED_SYMBOLS();
 
   arguments.args[0]="-";
   arguments.channel=GLB_ALL;
@@ -473,18 +465,18 @@ int main(int argc, char *argv[])
   arguments.middle="\t";
   arguments.user=0;
   arguments.probability=0;
- 
+
 
 
   /* Parse our arguments; every option seen by `parse_opt' will
      be reflected in `arguments'. */
-  argp_parse (&argp, argc, argv, 0, 0, &arguments);  
+  argp_parse (&argp, argc, argv, 0, 0, &arguments);
 
   /* Initialize libglobes */
   glbInit(argv[0]);
   glbSetPrintDelimiters(arguments.left,arguments.middle,arguments.right);
   glbSetVerbosityLevel(arguments.verbosity);
-  
+
   /* Values of oscillation parameters, taken from hep-ph/0405172v5.
    * The value of theta_13 is the 2-sigma limit */
   if (glbGetNumOfOscParams() < 6)
@@ -517,8 +509,8 @@ int main(int argc, char *argv[])
   else
     {
       stream=fopen(arguments.output_file,"w");
-      if(stream==NULL) 
-	{ 
+      if(stream==NULL)
+	{
 	  fprintf(stderr,"%s: FATAL: Could not open file for output\n"
 		  ,argv[0]);
 	  exit(1);
@@ -573,30 +565,30 @@ int main(int argc, char *argv[])
     }
 
 
- 
+
 #ifdef TEST
 
 glbDefineAEDLList("%para", osc,6);
-  
+
   fprintf(stderr,"... seems to work\n now to something real ...\n");
   glb_load_prior("prior-template.la",&prf);
-  
-  
+
+
   glbDefineAEDLVariable("REP",1.0);
 
 #endif /* TEST */
   /* Processing the argument file */
   s=glbInitExperiment(arguments.args[0],&glb_experiment_list[0],
 		      &glb_num_of_exps);
-  
+
 
   /* Testing for failure */
   if(s<-1) {fprintf(stderr,"%s: FATAL: Unrecoverable parse error\n",
 		    argv[0]);exit(1);}
 
 #ifdef TEST
-  
-  
+
+
   fprintf(stdout,"x-sec %lf\n",glbXSection(0,0,0.005,1,-1));
   fprintf(stdout,"x-sec %lf\n",glbXSection(0,0,0.01,1,-1));
 #endif /* TEST */
@@ -619,7 +611,7 @@ glbDefineAEDLList("%para", osc,6);
   glbSetOscillationParameters(oscp);
   glbSetRates();
 
-  
+
 #ifdef TEST
 
   printf("fluxes %d\n",glbGetNumberOfFluxes(0));
@@ -632,7 +624,7 @@ glbDefineAEDLList("%para", osc,6);
   fprintf(stderr,"glbValueToName ... %s\n",glbValueToName(0,"flux",0));
 #endif /* TEST */
 
- 
+
   /* Chosing the right outputformat */
   print_buf= glbSetChannelPrintFunction(NULL);
   if(arguments.spectrum==0)
@@ -642,20 +634,20 @@ glbDefineAEDLList("%para", osc,6);
       else
 	glbSetChannelPrintFunction(glb_channel_printf_sub_total);
     }
-  
-  if(arguments.spectrum==1) 
+
+  if(arguments.spectrum==1)
     glbSetChannelPrintFunction(print_buf);
-  if(arguments.mathematica==1) 
+  if(arguments.mathematica==1)
     {
       glbSetChannelPrintFunction(glb_channel_printf_mathematica);
       glbSetPrintDelimiters("{",",","}");
     }
 
-  if(arguments.user==1) 
+  if(arguments.user==1)
     {
-      glbSetChannelPrintFunction(glb_channel_printf_mathematica);     
+      glbSetChannelPrintFunction(glb_channel_printf_mathematica);
     }
- 
+
   /* Probability-only output */
   if(arguments.probability==1)
     {
@@ -665,16 +657,16 @@ glbDefineAEDLList("%para", osc,6);
 					   arguments.spectrum);
       glbShowChannelProbs(stream,arguments.experiment,arguments.channel,
 			  arguments.smearing,arguments.eff,arguments.bg);
-      
+
       /* Cleaning up */
       glbFreeParams(oscp);
       if(stream!=stdout) fclose(stream);
-      exit(0);  
+      exit(0);
     }
 
 
   /* Displaying the channel rates */
-  if(arguments.rule==-2) 
+  if(arguments.rule==-2)
     {
       if(arguments.pretty==1) channel_name(stream,arguments.experiment,
 					   arguments.channel,
@@ -682,10 +674,10 @@ glbDefineAEDLList("%para", osc,6);
       glbShowChannelRates(stream,arguments.experiment,arguments.channel,
 		      arguments.smearing,arguments.eff,arguments.bg);
     }
-  
+
   /* Displaying the rule level rates */
   if(arguments.rule!=-2)
-    {     
+    {
       if(arguments.rule!=GLB_ALL)
 	{
 	 if(arguments.pretty==1) rule_name(stream,arguments.experiment,
@@ -700,7 +692,7 @@ glbDefineAEDLList("%para", osc,6);
 	}
       else
 	{
-	  
+
 	   glbPrintDelimiter(stream,'l');
 	  fprintf(stream,"\n");
 	  for(i=0;i<glbGetNumberOfRules(arguments.experiment);i++)
@@ -717,19 +709,19 @@ glbDefineAEDLList("%para", osc,6);
 			       GLB_ALL,arguments.eff,arguments.bg,
 			       arguments.coeff,GLB_BG);
 	      glbPrintDelimiter(stream,'r');
-	      if(i< glbGetNumberOfRules(arguments.experiment)-1) 
+	      if(i< glbGetNumberOfRules(arguments.experiment)-1)
 		 glbPrintDelimiter(stream,'m');
-	   
+
 	    }
 	   glbPrintDelimiter(stream,'r');
 	}
     }
 
-  /* Cleaning up */  
+  /* Cleaning up */
   glbFreeParams(oscp);
   if(stream!=stdout) fclose(stream);
   if(osc!=NULL) glb_free(osc);
-  exit(0); 
+  exit(0);
 }
 
 

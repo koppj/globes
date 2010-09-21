@@ -177,7 +177,8 @@ GLoBES-FAQ-1/05
 
 \begin{abstract}
 A common issue with \GLOBES\ is confusion about the proper units for
-the input flux files for use in \AEDL\ experiment descriptions. 
+the input flux files for use in \AEDL\ experiment descriptions. This
+version describes globes versions 3.0 and later.
 \end{abstract}
 
 
@@ -217,10 +218,9 @@ differential cross section divided by energy $x=\sigma/E$, and the flux file
 gives $f$. The differential number of events per GeV $n$ as computed in
 \GLOBES\ without oscillation and efficiencies is given by
 \begin{eqnarray}
-n &=& 5.20034\times x\times E\times f\times\\
+n &=&  x\times E\times f\times\\
 &&\mathtt{@norm}\times\mathtt{@power}\times\mathtt{@stored\_muons}\times\mathtt{@time}\times\mathtt{\$target\_mass}\times(\mathtt{\$baseline})^{-2}\nonumber
 \end{eqnarray}
- Beware: $5.2\ldots$ is a undocumented fudge factor!
 
 It is the sole responsibility of the author of the \AEDL\ file and its
 supporting files, to ensure that the result makes actually sense. In
@@ -249,7 +249,7 @@ energy bin of width $\Delta E$ at a distance $L$ from the source, one
 obtains
 
 \begin{eqnarray}
-\mathtt{@norm}=\frac{1}{5.20034}\left(\frac{\mathrm{GeV}}{\Delta
+\mathtt{@norm}=\left(\frac{\mathrm{GeV}}{\Delta
       E}\right)
 \left(\frac{\mathrm{cm}^2}{A}\right)\left(\frac{L}{\mathrm{km}}\right)^2\left(\frac{\tau}{m_u}\right)\times10^{-38}\times\left(\frac{\mathcal{L}_u}{\mathcal{L}}\right)
 \end{eqnarray}

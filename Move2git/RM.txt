@@ -91,3 +91,111 @@ We require tagging only for release, so that getting the state of the
 repo when a certain version was release is easy. Besides, we may tag
 major events, like fixing the chi^2 bug.
 
+How to make an actual release
+-----------------------------
+
+First check-out the master branch
+
+---------------
+git checkout master
+---------------
+
+Make sure it is up to date with respect to the central repo
+
+--------------
+git pull
+--------------
+
+Check whether all te bugfixes etc. are in there and nothing more than
+what you actually want to publish.
+
+-----------------
+git checkout version-3-0
+-----------------
+
+Assuming you prepare the release of a version called 3.0.x, where x is
+an integer.
+
+Typically, this will result in merge conflicts in Distribution/
+
+-----------
+BUGS
+NEWS
+configure.in
+configure
+-----------
+
+The solution is the exit NEWS and BUGS to get rid of the
+conflicts. Next you change the version number in configure.in to 3.0.x
+and remove the obvious conflict created by the 3.1.y number from the
+master branch. Now run (in Distribution)
+
+-----------
+autoconf
+-----------
+
+but only if your autotools suite is reasonably up to date: autoconf
+2.61 and libtool  1.5.22 seem to work.
+
+Next, inform git about your clean-ups
+
+-----------
+git add BUGS
+git add NEWS
+git add configure.in
+git add configure
+git commit -a
+-----------
+
+Now run
+
+-------------
+./configure
+make clean
+make distcheck
+-------------
+
+If everything works fine copy
+
+--------------
+cp globes-3.0.x.tar.gz ../Web-3.0/html/downloads/
+cd ../Web-3.0/html/downloads/
+git add globes-3.0.x.tar.gz
+--------------
+
+Now, you can go and edit the webpages in Web-3.0/src, which typically
+means to set the download link to the new version and add the old
+version to old versions on the website. Now you may want to run
+
+---------------
+cd Web-3.0/src
+gmtl globes.gtp
+---------------
+
+In order to check out what you've done to webpages. If you
+changed/added glb-files additonal steps may be required!
+
+Commit once more to git and push to the central repo
+
+-------------
+git commit -a
+git push
+-------------
+
+Now log on to Heidelberg
+
+-------------
+ssh -l globes lsf4.mpk-mp.de
+./webupdate-globes
+exit
+-------------
+
+Check the public webpages! If everything is okay, tag your version
+
+-------------
+git tag version-3-0-x
+git push
+-------------
+
+
+Done.

@@ -1,7 +1,9 @@
-/* A Bison parser, made by GNU Bison 1.875.  */
+/* A Bison parser, made by GNU Bison 2.3.  */
 
-/* Skeleton parser for Yacc-like parsing with Bison,
-   Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002 Free Software Foundation, Inc.
+/* Skeleton interface for Bison's Yacc-like parsers in C
+
+   Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006
+   Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,13 +17,21 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place - Suite 330,
-   Boston, MA 02111-1307, USA.  */
+   Foundation, Inc., 51 Franklin Street, Fifth Floor,
+   Boston, MA 02110-1301, USA.  */
 
-/* As a special exception, when this file is copied by Bison into a
-   Bison output file, you may use that output file without restriction.
-   This special exception was added by the Free Software Foundation
-   in version 1.24 of Bison.  */
+/* As a special exception, you may create a larger work that contains
+   part or all of the Bison parser skeleton and distribute that work
+   under terms of your choice, so long as that work isn't itself a
+   parser generator using the skeleton or a modified version thereof
+   as a parser skeleton.  Alternatively, if you modify or redistribute
+   the parser skeleton itself, you may (at your option) remove this
+   special exception, which will cause the skeleton and the resulting
+   Bison output files to be licensed under the GNU General Public
+   License without this special exception.
+
+   This special exception was added by the Free Software Foundation in
+   version 2.2 of Bison.  */
 
 /* Tokens.  */
 #ifndef YYTOKENTYPE
@@ -48,21 +58,22 @@
      VERS = 274,
      SIGNAL = 275,
      BG = 276,
-     GRPOPEN = 277,
-     GRPCLOSE = 278,
-     PM = 279,
-     FLAVOR = 280,
-     NOGLOBES = 281,
-     CHANNEL = 282,
-     RULESEP = 283,
-     RULEMULT = 284,
-     ENERGY = 285,
-     NAME = 286,
-     RDF = 287,
-     NDEF = 288,
+     ENERGY = 277,
+     CHANNEL = 278,
+     NDEF = 279,
+     GRPOPEN = 280,
+     GRPCLOSE = 281,
+     PM = 282,
+     FLAVOR = 283,
+     NOGLOBES = 284,
+     RULESEP = 285,
+     RULEMULT = 286,
+     NAME = 287,
+     RDF = 288,
      NEG = 289
    };
 #endif
+/* Tokens.  */
 #define NUM 258
 #define SFNCT 259
 #define BOGUS 260
@@ -82,44 +93,44 @@
 #define VERS 274
 #define SIGNAL 275
 #define BG 276
-#define GRPOPEN 277
-#define GRPCLOSE 278
-#define PM 279
-#define FLAVOR 280
-#define NOGLOBES 281
-#define CHANNEL 282
-#define RULESEP 283
-#define RULEMULT 284
-#define ENERGY 285
-#define NAME 286
-#define RDF 287
-#define NDEF 288
+#define ENERGY 277
+#define CHANNEL 278
+#define NDEF 279
+#define GRPOPEN 280
+#define GRPCLOSE 281
+#define PM 282
+#define FLAVOR 283
+#define NOGLOBES 284
+#define RULESEP 285
+#define RULEMULT 286
+#define NAME 287
+#define RDF 288
 #define NEG 289
 
 
 
 
-#if ! defined (YYSTYPE) && ! defined (YYSTYPE_IS_DECLARED)
-#line 1022 "glb_parser.y"
-typedef union YYSTYPE {
+#if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
+typedef union YYSTYPE
+#line 1049 "glb_parser.y"
+{
   double  val;  /* For returning numbers.                   */
   double *dpt;  /* for rules */
-  glb_List *ptr; 
+  glb_List *ptr;
   glb_List **ptrq;
   glb_symrec  *tptr;  /* For returning symbol-table pointers      */
   char *name;
   char *iname;
   int in;
   glb_namerec *nameptr;
-} YYSTYPE;
-/* Line 1249 of yacc.c.  */
-#line 116 "glb_parser.h"
+}
+/* Line 1529 of yacc.c.  */
+#line 129 "glb_parser.h"
+	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
 # define YYSTYPE_IS_TRIVIAL 1
 #endif
 
 extern YYSTYPE yylval;
-
-
 

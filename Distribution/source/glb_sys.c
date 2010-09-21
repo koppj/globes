@@ -19,6 +19,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
+#if HAVE_CONFIG_H   /* config.h should come before any other includes */
+#  include "config.h"
+#endif
+
 #include <math.h>
 #include <string.h>
 #include <globes/globes.h>
@@ -31,7 +35,7 @@
 /* Global variables */
 glb_systematic *glb_sys_list;   /* Connected list of systematics definitions */
 
-static const char *glb_2011_compatible_chi_functions[] = 
+static const char *glb_2011_compatible_chi_functions[] =
   {
     "chiSpectrumTilt",
     "chiNoSysSpectrum",
@@ -77,7 +81,7 @@ int glbIsChiFunction2011Compatible(const char *name)
 glb_systematic *glbFindChiFunctionByName(const char *name)
 {
   glb_systematic *sys;
-  
+
   for (sys = glb_sys_list; sys != NULL; sys = sys->next)
     if (strcmp(name, sys->name) == 0)
       break;
@@ -103,7 +107,7 @@ glb_systematic *glbFindChiFunctionByName(const char *name)
 char *glbConvertErrorDim(int errordim)
 {
   char name[50];
-  
+
   switch (errordim)
   {
     case 0:
@@ -166,7 +170,7 @@ int glbSetChiFunctionInRule(struct glb_experiment *exp, int rule, int on_off,
   glb_systematic *sys;
   double tmp_errorlist[5];
   int k;
-  
+
   /* Something tells me that people will come up with the idea to pass
    * exp->sys_on_errors; this has to be blockes */
   if (errors != NULL  &&
@@ -175,7 +179,7 @@ int glbSetChiFunctionInRule(struct glb_experiment *exp, int rule, int on_off,
     glb_error("glbSetChiFunctionInRule: Invalid error array");
     return -1;
   }
-  
+
   /* Find requested glb_sys_list entry */
   if ((sys=glbFindChiFunctionByName(sys_id)) == NULL)
   {
@@ -211,7 +215,7 @@ int glbSetChiFunctionInRule(struct glb_experiment *exp, int rule, int on_off,
     }
   }
 
- 
+
   if (on_off == GLB_ON)
   {
     if (rule >= 0 && rule < exp->numofrules)
@@ -318,7 +322,7 @@ int glbSetChiFunctionInRule(struct glb_experiment *exp, int rule, int on_off,
     exp->bg_errors[1][rule]        = errors[3];
     exp->bg_startvals[1][rule]     = 0.0;
   }
-  
+
   return 0;
 }
 
@@ -335,7 +339,7 @@ int glbSetChiFunctionInExperiment(struct glb_experiment *exp, int rule, int on_o
                                   const char *sys_id, double *errors)
 {
   int j;
-  
+
   if (rule == GLB_ALL)
   {
     for (j=0; j < exp->numofrules; j++)
@@ -360,7 +364,7 @@ int glbSwitchSystematicsInExperiment(int experiment, int rule, int on_off)
 {
   int i;
   struct glb_experiment *in;
-  
+
   if(on_off != GLB_ON  &&  on_off!=GLB_OFF)
   {
     glb_error("glbSwitchSystematicsInExperiment: Invalid value for on_off");
@@ -375,7 +379,7 @@ int glbSwitchSystematicsInExperiment(int experiment, int rule, int on_off)
   }
   else if (rule >= 0  &&  rule < in->numofrules)
     in->sys_on_off[rule] = on_off;
-  else 
+  else
   {
     glb_error("glbSwitchSystematicsInExperiment: Invalid value for rule number");
     return -1;
@@ -393,7 +397,7 @@ int glbSwitchSystematicsInExperiment(int experiment, int rule, int on_off)
 int glbSetSignalErrorsInRule(int exp, int rule, double norm, double tilt)
 {
   struct glb_experiment *in;
-  
+
   if (exp >= 0  &&  exp < glb_num_of_exps)
   {
     in = glb_experiment_list[exp];
@@ -431,7 +435,7 @@ int glbSetSignalErrorsInRule(int exp, int rule, double norm, double tilt)
   else
     { glb_error("glbSetSignalErrorsInRule: Invalid experiment number"); return -1; }
 
-  return 0; 
+  return 0;
 }
 
 
@@ -444,7 +448,7 @@ int glbSetSignalErrorsInRule(int exp, int rule, double norm, double tilt)
 int glbSetBGErrorsInRule(int exp, int rule, double norm, double tilt)
 {
   struct glb_experiment *in;
-  
+
   if (exp >= 0  &&  exp < glb_num_of_exps)
   {
     in = glb_experiment_list[exp];
@@ -482,7 +486,7 @@ int glbSetBGErrorsInRule(int exp, int rule, double norm, double tilt)
   else
     { glb_error("glbSetBGErrorsInRule: Invalid experiment number"); return -1; }
 
-  return 0; 
+  return 0;
 }
 
 
@@ -496,10 +500,10 @@ int glbSetSysErrorsListInRule(int exp, int rule, int on_off, const double *sys_l
 {
   struct glb_experiment *in;
   int i;
-  
+
   if (sys_list == NULL)
     { glb_error("glbSetSysErrorsListInRule: Input list is NULL"); return -1; }
-  
+
   if (exp >= 0  &&  exp < glb_num_of_exps)
   {
     in = glb_experiment_list[exp];
@@ -528,7 +532,7 @@ int glbSetSysErrorsListInRule(int exp, int rule, int on_off, const double *sys_l
       {
         for (i=0; i < glbGetSysDimInExperiment(exp, rule, on_off); i++)
           in->sys_off_errors[rule][i] = sys_list[i];
-        
+
         if (glbIsChiFunction2011Compatible(in->sys_off_strings[rule]))
         {
           if (glbGetSysDimInExperiment(exp, rule, on_off) > 0)
@@ -550,7 +554,7 @@ int glbSetSysErrorsListInRule(int exp, int rule, int on_off, const double *sys_l
   else
     { glb_error("glbSetSysErrorsListInRule: Invalid experiment number"); return -1; }
 
-  return 0; 
+  return 0;
 }
 
 
@@ -563,7 +567,7 @@ int glbSetSysErrorsListInRule(int exp, int rule, int on_off, const double *sys_l
 int glbSetSignalStartingValuesInRule(int exp, int rule, double norm, double tilt)
 {
   struct glb_experiment *in;
-  
+
   if (exp >= 0  &&  exp < glb_num_of_exps)
   {
     in = glb_experiment_list[exp];
@@ -596,7 +600,7 @@ int glbSetSignalStartingValuesInRule(int exp, int rule, double norm, double tilt
   else
     { glb_error("glbSetSignalStartingValuesInRule: Invalid experiment number"); return -1; }
 
-  return 0; 
+  return 0;
 }
 
 
@@ -609,7 +613,7 @@ int glbSetSignalStartingValuesInRule(int exp, int rule, double norm, double tilt
 int glbSetBGStartingValuesInRule(int exp, int rule, double norm, double tilt)
 {
   struct glb_experiment *in;
-  
+
   if (exp >= 0  &&  exp < glb_num_of_exps)
   {
     in = glb_experiment_list[exp];
@@ -642,7 +646,7 @@ int glbSetBGStartingValuesInRule(int exp, int rule, double norm, double tilt)
   else
     { glb_error("glbSetBGStartingValuesInRule: Invalid experiment number"); return -1; }
 
-  return 0; 
+  return 0;
 }
 
 
@@ -656,10 +660,10 @@ int glbSetSysStartingValuesListInRule(int exp, int rule, int on_off, const doubl
 {
   struct glb_experiment *in;
   int i;
-  
+
   if (sys_list == NULL)
     { glb_error("glbSetSysStartingValuesListInRule: Input list is NULL"); return -1; }
-  
+
   if (exp >= 0  &&  exp < glb_num_of_exps)
   {
     in = glb_experiment_list[exp];
@@ -688,7 +692,7 @@ int glbSetSysStartingValuesListInRule(int exp, int rule, int on_off, const doubl
       {
         for (i=0; i < glbGetSysDimInExperiment(exp, rule, on_off); i++)
           in->sys_off_startvals[rule][i] = sys_list[i];
-        
+
         if (glbIsChiFunction2011Compatible(in->sys_off_strings[rule]))
         {
           if (glbGetSysDimInExperiment(exp, rule, on_off) > 0)
@@ -711,10 +715,10 @@ int glbSetSysStartingValuesListInRule(int exp, int rule, int on_off, const doubl
   else
     { glb_error("glbSetSysStartingValuesListInRule: Invalid experiment number"); return -1; }
 
-  return 0; 
+  return 0;
 }
 
-  
+
 
 /***************************************************************************
  * Function glb_likelihood                                                 *
@@ -726,26 +730,42 @@ inline double glb_likelihood(double true_rate, double fit_rate)
 {
   double res;
   res = fit_rate - true_rate;
+  if (true_rate > 0)
+  {
+    if (fit_rate <= 0.0)
+      res = 1e100;
+    else
+      res += true_rate * log(true_rate/fit_rate);
+  }
+  else
+    res = fabs(res);
+
+  return 2.0 * res;
+
+/* JK - 2008-03-11
+  double res;
+  res = fit_rate - true_rate;
   if (fit_rate <= 0.0)
     res = 1e100;
   else if (true_rate > 0)
     res += true_rate * log(true_rate/fit_rate);
 
-  return 2.0 * res; 
+  return 2.0 * res;
+*/
 
-/* JK - 2007-06-29  
-  double res; 
+/* JK - 2007-06-29
+  double res;
   res = fit_rate - true_rate;
   if (true_rate > 0)
   {
-    if (fit_rate <= 0.0) 
+    if (fit_rate <= 0.0)
       res = 1e100;
     else
       res += true_rate * log(true_rate/fit_rate);
   }
   return 2.0 * res;
 */
-  
+
 /* JK - 29.03.2007
   if(fit_rate > 0)
     return 2*(true_rate - fit_rate) + 2*fit_rate * log(fit_rate/true_rate);
@@ -755,7 +775,7 @@ inline double glb_likelihood(double true_rate, double fit_rate)
 }
 
 /* Alternative version of likelihood, using Gauss distribution */
-/*inline double likelihood(double ntheo, double nobs) 
+/*inline double likelihood(double ntheo, double nobs)
 {
   if(nobs>0)
     return (ntheo-nobs)*(ntheo-nobs)/ntheo;
@@ -773,7 +793,7 @@ inline double glb_prior(double x, double center, double sigma)
 {
   double tmp = (x - center)/sigma;
   return tmp*tmp;
-}  
+}
 
 
 /***************************************************************************
@@ -885,7 +905,7 @@ double glbChiSpectrumOnly(int exp, int rule, int n_params, double *x, double *er
     fit_rate = signal_norm*signal_fit_rates[i] + bg_norm_center*bg_fit_rates[i];
     chi2 += glb_likelihood(true_rates[i], fit_rate);
   }
-  
+
   return chi2;
 }
 
@@ -1009,7 +1029,7 @@ double glbChiSpectrumCalib(int exp, int rule, int n_params, double *x, double *e
   signal_norm = 1.0 + x[0];
   bg_norm     = bg_norm_center * (1.0 + x[2]);
   bg_tilt     = bg_tilt_center + x[3];
-  
+
   glbShiftEnergyScale(x[1], glbGetSignalFitRatePtr(exp, rule),
                       signal_fit_rates, n_bins, emin, emax);
   glbShiftEnergyScale(bg_tilt, glbGetBGFitRatePtr(exp, rule),
@@ -1025,7 +1045,7 @@ double glbChiSpectrumCalib(int exp, int rule, int n_params, double *x, double *e
             + glb_prior(x[1], 0.0, errors[1])
             + glb_prior(bg_norm, bg_norm_center, errors[2])
             + glb_prior(bg_tilt, bg_tilt_center, errors[3]);
-  
+
   return chi2;
 }
 
@@ -1070,7 +1090,7 @@ int glbDefineChiFunction(glb_chi_function chi_func, int dim, const char *name,
     glb_error("glbDefineChiFunction: Dimension of parameter space must be >= 0");
     return -1;
   }
-  
+
   /* Create new list entry */
   glb_sys_list = (glb_systematic *) glb_malloc(sizeof(glb_systematic));
   if (glb_sys_list != NULL)
@@ -1085,8 +1105,8 @@ int glbDefineChiFunction(glb_chi_function chi_func, int dim, const char *name,
       glb_sys_list->next = old_root;         /* Reconnect list */
       return 0;
     }
-  } 
-  
+  }
+
   return -1;
 }
 
@@ -1193,7 +1213,7 @@ int glbGetChiFunction(int exp, int rule, int on_off, char *sys_id, size_t max_le
 glb_chi_function glbGetChiFunctionPtr(const char *name)
 {
   glb_systematic *sys;
-  
+
   /* Find requested glb_sys_list entry */
   if ((sys=glbFindChiFunctionByName(name)) == NULL)
   {
@@ -1245,7 +1265,7 @@ int glbSetErrorDim(int exp, int rule, int on_off, int errordim)
 {
   char *name;
   int status;
-  
+
   /* Convert the error dimension to the name of a chi^2 function */
   if ((name=glbConvertErrorDim(errordim)) == NULL)
   {
@@ -1270,7 +1290,7 @@ int glbGetErrorDim(int exp, int rule, int on_off)
 {
   char sys_id[100];
   int i;
-  
+
   if (glbGetChiFunction(exp, rule, on_off, sys_id, 100) != 0)
   {
     glb_error("glbGetErrorDim: Invalid parameters");
@@ -1309,7 +1329,7 @@ int glbGetErrorDim(int exp, int rule, int on_off)
 int glbGetSysDim(const char *name)
 {
   glb_systematic *sys;
-  
+
   /* Find requested glb_sys_list entry */
   if ((sys=glbFindChiFunctionByName(name)) == NULL)
   {
@@ -1374,22 +1394,22 @@ int glbGetSysDimInExperiment(int exp, int rule, int on_off)
 int glbSwitchSystematics(int experiment, int rule, int on_off)
 {
   int i, s=0;
-  
+
   if (experiment == GLB_ALL)
   {
-    for(i=0; i < glb_num_of_exps; i++) 
+    for(i=0; i < glb_num_of_exps; i++)
       s += glbSwitchSystematicsInExperiment(i, rule, on_off);
   }
   else if (experiment >= 0  &&  experiment < glb_num_of_exps)
   {
     s += glbSwitchSystematicsInExperiment(experiment, rule, on_off);
   }
-  else 
+  else
   {
     glb_error("glbSwitchSystematics: Invalid value for experiment number");
     return -1;
   }
-  
+
   return s;
 }
 
@@ -1414,8 +1434,8 @@ int glbGetSysOnOffState(int exp, int rule)
   }
   else
     { glb_error("glbGetSysOnOffState: Invalid experiment number"); return -1; }
-  
-  return 0;  
+
+  return 0;
 }
 
 
@@ -1431,10 +1451,10 @@ int glbSetSignalErrors(int exp, int rule, double norm, double tilt)
 {
   struct glb_experiment *in;
   int i, k;
-  
+
   if (exp == GLB_ALL)
   {
-    for(i=0; i < glb_num_of_exps; i++) 
+    for(i=0; i < glb_num_of_exps; i++)
     {
       in = glb_experiment_list[i];
       if (rule == GLB_ALL)
@@ -1469,7 +1489,7 @@ int glbSetSignalErrors(int exp, int rule, double norm, double tilt)
     else
       { glb_error("glbSetSignalErrors: Invalid rule number"); return -1; }
   }
-  else 
+  else
     { glb_error("glbSetSignalErrors: Invalid experiment number"); return -1; }
 
   return 0;
@@ -1491,7 +1511,7 @@ int glbGetSignalErrors(int exp, int rule, double *norm, double *tilt)
 
   if (norm == NULL  ||  tilt == NULL)
     { glb_error("glbGetSignalErrors: Input pointers may not be NULL"); return -1; }
-  
+
   if (exp >= 0  &&  exp < glb_num_of_exps)
   {
     in = glb_experiment_list[exp];
@@ -1505,10 +1525,10 @@ int glbGetSignalErrors(int exp, int rule, double *norm, double *tilt)
   }
   else
     { glb_error("glbGetSignalErrors: Invalid experiment number"); return -1; }
-  
-  return 0;  
+
+  return 0;
 }
-  
+
 
 /***************************************************************************
  * Function glbSetBGErrors                                                 *
@@ -1522,10 +1542,10 @@ int glbSetBGErrors(int exp, int rule, double norm, double tilt)
 {
   struct glb_experiment *in;
   int i, k;
-  
+
   if (exp == GLB_ALL)
   {
-    for(i=0; i < glb_num_of_exps; i++) 
+    for(i=0; i < glb_num_of_exps; i++)
     {
       in = glb_experiment_list[i];
       if (rule == GLB_ALL)
@@ -1560,7 +1580,7 @@ int glbSetBGErrors(int exp, int rule, double norm, double tilt)
     else
       { glb_error("glbSetBGErrors: Invalid rule number"); return -1; }
   }
-  else 
+  else
     { glb_error("glbSetBGErrors: Invalid experiment number"); return -1; }
 
   return 0;
@@ -1582,7 +1602,7 @@ int glbGetBGErrors(int exp, int rule, double *norm, double *tilt)
 
   if (norm == NULL  ||  tilt == NULL)
     { glb_error("glbGetBGErrors: Input pointers may not be NULL"); return -1; }
-  
+
   if (exp >= 0  &&  exp < glb_num_of_exps)
   {
     in = glb_experiment_list[exp];
@@ -1596,8 +1616,8 @@ int glbGetBGErrors(int exp, int rule, double *norm, double *tilt)
   }
   else
     { glb_error("glbGetBGErrors: Invalid experiment number"); return -1; }
-  
-  return 0;  
+
+  return 0;
 }
 
 
@@ -1610,10 +1630,10 @@ int glbSetBGCenters(int exp, int rule, double norm, double tilt)
 {
   struct glb_experiment *in;
   int i, k;
-  
+
   if (exp == GLB_ALL)
   {
-    for(i=0; i < glb_num_of_exps; i++) 
+    for(i=0; i < glb_num_of_exps; i++)
     {
       in = glb_experiment_list[i];
       if (rule == GLB_ALL)
@@ -1652,7 +1672,7 @@ int glbSetBGCenters(int exp, int rule, double norm, double tilt)
     else
       { glb_error("glbSetBGCenters: Invalid rule number"); return -1; }
   }
-  else 
+  else
     { glb_error("glbSetBGCenters: Invalid experiment number"); return -1; }
 
   return 0;
@@ -1671,7 +1691,7 @@ int glbGetBGCenters(int exp, int rule, double *norm, double *tilt)
 
   if (norm == NULL  ||  tilt == NULL)
     { glb_error("glbGetBGCenters: Input pointers may not be NULL"); return -1; }
-  
+
   if (exp >= 0  &&  exp < glb_num_of_exps)
   {
     in = glb_experiment_list[exp];
@@ -1685,8 +1705,8 @@ int glbGetBGCenters(int exp, int rule, double *norm, double *tilt)
   }
   else
     { glb_error("glbGetBGCenters: Invalid experiment number"); return -1; }
-  
-  return 0;  
+
+  return 0;
 }
 
 
@@ -1699,10 +1719,10 @@ int glbSetSysErrorsList(int exp, int rule, int on_off, const double *sys_list)
 {
   struct glb_experiment *in;
   int i, k;
-  
+
   if (exp == GLB_ALL)
   {
-    for(i=0; i < glb_num_of_exps; i++) 
+    for(i=0; i < glb_num_of_exps; i++)
     {
       in = glb_experiment_list[i];
       if (rule == GLB_ALL)
@@ -1737,7 +1757,7 @@ int glbSetSysErrorsList(int exp, int rule, int on_off, const double *sys_list)
     else
       { glb_error("glbSetSysErrorsList: Invalid rule number"); return -1; }
   }
-  else 
+  else
     { glb_error("glbSetSysErrorsList: Invalid experiment number"); return -1; }
 
   return 0;
@@ -1771,7 +1791,7 @@ double *glbGetSysErrorsListPtr(int exp, int rule, int on_off)
   }
   else
     { glb_error("glbGetSysErrorsListPtr: Invalid experiment number"); return NULL; }
-  
+
   return NULL;
 }
 
@@ -1788,10 +1808,10 @@ int glbSetSignalStartingValues(int exp, int rule, double norm, double tilt)
 {
   struct glb_experiment *in;
   int i, k;
-  
+
   if (exp == GLB_ALL)
   {
-    for(i=0; i < glb_num_of_exps; i++) 
+    for(i=0; i < glb_num_of_exps; i++)
     {
       in = glb_experiment_list[i];
       if (rule == GLB_ALL)
@@ -1826,7 +1846,7 @@ int glbSetSignalStartingValues(int exp, int rule, double norm, double tilt)
     else
       { glb_error("glbSetSignalStartingValues: Invalid rule number"); return -1; }
   }
-  else 
+  else
     { glb_error("glbSetSignalStartingValues: Invalid experiment number"); return -1; }
 
   return 0;
@@ -1848,7 +1868,7 @@ int glbGetSignalStartingValues(int exp, int rule, double *norm, double *tilt)
 
   if (norm == NULL  ||  tilt == NULL)
     { glb_error("glbGetSignalStartingValues: Input pointers may not be NULL"); return -1; }
-  
+
   if (exp >= 0  &&  exp < glb_num_of_exps)
   {
     in = glb_experiment_list[exp];
@@ -1862,10 +1882,10 @@ int glbGetSignalStartingValues(int exp, int rule, double *norm, double *tilt)
   }
   else
     { glb_error("glbGetSignalStartingValues: Invalid experiment number"); return -1; }
-  
-  return 0;  
+
+  return 0;
 }
-  
+
 
 /***************************************************************************
  * Function glbSetBGStartingValues                                         *
@@ -1879,10 +1899,10 @@ int glbSetBGStartingValues(int exp, int rule, double norm, double tilt)
 {
   struct glb_experiment *in;
   int i, k;
-  
+
   if (exp == GLB_ALL)
   {
-    for(i=0; i < glb_num_of_exps; i++) 
+    for(i=0; i < glb_num_of_exps; i++)
     {
       in = glb_experiment_list[i];
       if (rule == GLB_ALL)
@@ -1917,7 +1937,7 @@ int glbSetBGStartingValues(int exp, int rule, double norm, double tilt)
     else
       { glb_error("glbSetBGStartingValues: Invalid rule number"); return -1; }
   }
-  else 
+  else
     { glb_error("glbSetBGStartingValues: Invalid experiment number"); return -1; }
 
   return 0;
@@ -1939,7 +1959,7 @@ int glbGetBGStartingValues(int exp, int rule, double *norm, double *tilt)
 
   if (norm == NULL  ||  tilt == NULL)
     { glb_error("glbGetBGStartingValues: Input pointers may not be NULL"); return -1; }
-  
+
   if (exp >= 0  &&  exp < glb_num_of_exps)
   {
     in = glb_experiment_list[exp];
@@ -1953,8 +1973,8 @@ int glbGetBGStartingValues(int exp, int rule, double *norm, double *tilt)
   }
   else
     { glb_error("glbGetBGStartingValues: Invalid experiment number"); return -1; }
-  
-  return 0;  
+
+  return 0;
 }
 
 
@@ -1968,10 +1988,10 @@ int glbSetSysStartingValuesList(int exp, int rule, int on_off, const double *sys
 {
   struct glb_experiment *in;
   int i, k;
-  
+
   if (exp == GLB_ALL)
   {
-    for(i=0; i < glb_num_of_exps; i++) 
+    for(i=0; i < glb_num_of_exps; i++)
     {
       in = glb_experiment_list[i];
       if (rule == GLB_ALL)
@@ -2006,7 +2026,7 @@ int glbSetSysStartingValuesList(int exp, int rule, int on_off, const double *sys
     else
       { glb_error("glbSetSysStartingValuesList: Invalid rule number"); return -1; }
   }
-  else 
+  else
     { glb_error("glbSetSysStartingValuesList: Invalid experiment number"); return -1; }
 
   return 0;
@@ -2041,7 +2061,7 @@ double *glbGetSysStartingValuesListPtr(int exp, int rule, int on_off)
   }
   else
     { glb_error("glbGetSysStartingValuesListPtr: Invalid experiment number"); return NULL; }
-  
+
   return NULL;
 }
 
@@ -2073,7 +2093,7 @@ void glbShiftEnergyScale(double b, double *rates_in, double *rates_out,
     else
       rates_out[i] = (1 + b) * ((rates_in[k+1] - rates_in[k]) * (delta - k) + rates_in[k]);
 
-/* JK - 2007-06-25 
+/* JK - 2007-06-25
     if (k < 0 || k > n_bins - 1)
       rates_out[i] = 0.0;
     else if (k == n_bins - 1)

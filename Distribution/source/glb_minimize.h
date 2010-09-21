@@ -22,6 +22,10 @@
 #ifndef GLB_MMINIMIZE_H
 #define GLB_MMINIMIZE_H 1
 
+#if HAVE_CONFIG_H   /* config.h should come before any other includes */
+#  include "config.h"
+#endif
+
 #include <glb_min_sup.h>
 
 
@@ -57,6 +61,7 @@ double* glb_return_input_values();
 
 
 int glb_invoke_hybrid_minimizer(int exp, int rule, double *x, double *chi2);
+int glb_invoke_siman_minimizer(int exp, int rule, double *x, double *chi2);
 
 
 // various projections with th12 fixed for a single experiment

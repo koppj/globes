@@ -59,7 +59,7 @@ enum glb_enum_efficiency_types
 
 /* Available minimization algorithms */
 enum glb_enum_minimizers
-       { GLB_MIN_NESTED_POWELL, GLB_MIN_POWELL };
+       { GLB_MIN_NESTED_POWELL, GLB_MIN_POWELL, GLB_MIN_SIMAN };
 #define GLB_MIN_DEFAULT  GLB_MIN_NESTED_POWELL
 
 
@@ -76,6 +76,12 @@ enum glb_enum_minimizers
 #define GLB_EV_TO_KM_FACTOR  1.9747235e-10
 #define GLB_KM_TO_EV(x)      ((x) / GLB_EV_TO_KM_FACTOR)
 #define GLB_EV_TO_KM(x)      ((x) * GLB_EV_TO_KM_FACTOR)
+
+
+/* maximum number of experiments */
+
+#define GLB_MAX_EXP 300
+
 
 
 
@@ -113,9 +119,9 @@ extern int glb_single_experiment_number;
  * declare this one to SWIG and the other global 
  * variables not
  */
-glb_exp glb_experiment_list[32];
+glb_exp glb_experiment_list[GLB_MAX_EXP];
 #else
-extern glb_exp glb_experiment_list[32];
+extern glb_exp glb_experiment_list[GLB_MAX_EXP];
 #endif
 extern int glb_rule_number;
 
@@ -133,6 +139,7 @@ void glbInit(char *name);
 void glbClearExperimentList();
 void glbDefineAEDLVariable(const char *name, double value);
 void glbDefineAEDLList(const char *name, double *list, size_t length);
+double glbGetAEDLVariable(const char *name);
 void glbClearAEDLVariables();
 int glbInitExperiment(char *inf, glb_exp *in, int *counter);
 
@@ -236,6 +243,8 @@ int glbSetSourcePower(int experiment, int flux_ident, double power);
 int glbSetRunningTime(int experiment, int flux_ident, double time);
 int glbSetFilterStateInExperiment(int experiment,int on_off);
 int glbSetFilterInExperiment(int experiment,double filter);
+int glbCompensateFilterInExperiment(int experiment);
+int glbOptimizeSmearingMatrixInExperiment(int experiment);
 
 double glbGetTargetMass(int experiment);
 double glbGetSourcePower(int experiment, int flux_ident);
@@ -245,6 +254,7 @@ double glbGetFilterInExperiment(int experiment);
 int glbGetEminEmax(int experiment, double *emin, double *emax);
 int glbGetEnergyWindow(int experiment, int rule, double *low, double *high);
 int glbGetEnergyWindowBins(int experiment, int rule, int *low_bin, int *high_bin);
+int glbSetEnergyWindow(int experiment, int rule, double low, double high);
 int glbGetNumberOfSamplingPoints(int exp);
 int glbGetNumberOfBins(int exp);
 int glbGetNumberOfRules(int exp);
@@ -256,6 +266,7 @@ double *glbGetSamplingPointsListPtr(int exp);
 int glbGetLengthOfRule(int exp, int rule, int signal);
 int glbGetChannelInRule(int exp, int rule, int pos, int signal);
 double glbGetCoefficientInRule(int exp, int rule, int pos, int signal);
+int glbSetCoefficientInRule(int exp, int rule, int pos, int signal, double coeff);
 int glbGetNumberOfFluxes(int exp);
 double glbFlux(int experiment, int flux_ident, 
         double energy, double distance, int flavour, int anti);
@@ -335,7 +346,6 @@ double glbFilteredConstantDensityProbability(int exp,int initial_flavour,
 
 /* Selecting a minization algorithm */
 int glbSelectMinimizer(int minimizer_ID);
-
 
 
 
