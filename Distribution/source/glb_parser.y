@@ -303,13 +303,6 @@ static void grp_end(char* name)
              if (glb_copy_flux(buff.fluxes[buff.num_of_fluxes-1], &flt) != GLB_SUCCESS)
                glb_error("grp_end: Error copying flux data");
              glb_reset_flux(&flt);
-
-//FIXME FIXME FIXME
-//	     if(buff.fluxes[buff.num_of_fluxes-1]==NULL)
-//	       buff.fluxes[buff.num_of_fluxes-1]=glb_flux_alloc();
-//	     buff.fluxes[buff.num_of_fluxes-1]=
-//	       cpy_glb_flux(buff.fluxes[buff.num_of_fluxes-1],&flt);
-//	    glb_flux_reset(&flt);
 	   }
        }
 
@@ -327,13 +320,6 @@ static void grp_end(char* name)
              if (glb_copy_flux(buff.fluxes[buff.num_of_fluxes-1], &flt) != GLB_SUCCESS)
                glb_error("grp_end: Error copying flux data");
              glb_reset_flux(&flt);
-
-// FIXME FIXME FIXME
-//	     if(buff.fluxes[buff.num_of_fluxes-1]==NULL)
-//	       buff.fluxes[buff.num_of_fluxes-1]=glb_flux_alloc();
-//	     buff.fluxes[buff.num_of_fluxes-1]=
-//	       cpy_glb_flux(buff.fluxes[buff.num_of_fluxes-1],&flt);
-//	    glb_flux_reset(&flt);
 	   }
        }
 
