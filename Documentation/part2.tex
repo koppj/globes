@@ -541,10 +541,10 @@ The name of the flux {\tt \#name} will later be referred to in the channel defin
 & & {\tt @stored\_muons} &  \\
 2 & Neutrino factory $\mu^-$ decay & {\tt @parent\_energy} [GeV], & 2.0 \\
 & & {\tt @stored\_muons} &  \\
-3 & Beta beam, inv. beta decay & {\tt @end\_point} [GeV], & 3.0 \\
+3 & Beta beam, $\beta^+$ decay & {\tt @end\_point} [GeV], & 3.0 \\
 & & {\tt @stored\_ions}, &  \\
 & & {\tt @gamma} & \\
-4 & Beta beam, beta decay & {\tt @end\_point} [GeV], & 3.0 \\
+4 & Beta beam, $\beta^-$ decay & {\tt @end\_point} [GeV], & 3.0 \\
 & & {\tt @stored\_ions}, &  \\
 & & {\tt @gamma} & \\
 \hline
@@ -615,7 +615,8 @@ For more details on the flux definition, see \App~\ref{app:flux}.
 
 \index{aedl}{nuflux@{\tt nuflux}!flux file@{\tt "@flux\_file}}\index{norm}{Flux!file}
 The software assumes that the given flux file has seven columns and
-501 lines with equidistant energies. The format is:
+501 lines\footnote{The requirement of exactly $501$ lines 
+has been removed in versions 3.1.7 and higher.} with equidistant energies. The format is:
 \begin{quotation}
 $ E\quad
 \Phi_{\nu_e}\quad
@@ -736,7 +737,9 @@ Cross sections in \GLOBES\ are given as total cross section divided by energy:
 \frac{\mathrm{cm}^2}{\mathrm{GeV}} \right]
 \end{equation}
 The software assumes that the cross section files are text files with 
-seven columns and $1001$ lines of the form
+seven columns and $1001$ lines\footnote{The requirement of exactly $1001$ lines 
+has been removed in versions 3.1.7 and higher.}
+of the form
 \index{norm}{Cross section!file}
 \index{aedl}{cross@{\tt cross}!cross file@{\tt  "@cross\_file}}
 \begin{quotation}
@@ -1166,6 +1169,7 @@ $R^c(E,E')$ in \eq~(\ref{eq:kernel}) is concerned, the algorithm uses
 a Gau\ss ian
 \begin{equation}
 R^c(E,E')=\frac{1}{\sigma(E)\,\sqrt{2\pi}}\,e^{-\frac{(E-E')^2}{2\sigma^2(E)}} \, .
+\label{eq:respfun}
 \end{equation} 
 %
 \index{aedl}{energy@{\tt energy}!sigma function@{\tt "@sigma\_function}}
@@ -1225,8 +1229,7 @@ automatic energy smearing is, for example,
 In order to ensure that very fast oscillations do not lead to 
 aliasing,\index{norm}{Aliasing}
 it is possible to impose a low-pass filter already during the calculation
-of the probabilities itself. This highly
-experimental feature will be called ``filter''\index{norm}{Filter} in the following. 
+of the probabilities itself. This in the meanwhile frequently used feature will be called ``filter''\index{norm}{Filter} in the following. 
 The calculation of oscillation
 probabilities is, in principle, a computation of phase differences. Restricting the maximum admissible size of those phase differences effectively filters
 the high frequency component of the oscillation probability. This idea is
@@ -1236,22 +1239,15 @@ implemented according to
 P_{\alpha\beta}(E)&=&\sum_{ij}
 U_{\alpha j} U^*_{\beta j} U^*_{\alpha i} U_{\beta i} 
 e^{-i\Phi_{ij}}\times 
-e^{ -\Phi_{ij}^2/\sigma_f(E)^2 }\,,
+e^{ - \sigma_e^2 \, \Phi_{ij}^2/(2 E^2) }\,,
 \end{eqnarray}
 where $\Phi_{ij}:=\Delta m_{ij}^2 L/2E$ is the usual phase difference and
-the last term is a Gau\ss ian filter with width $\sigma_f(E)$. Choosing
-$\sigma_f(E):=\sigma_f^0 \cdot E$ ensures that this filter behaves 
-approximately as an energy resolution function with constant width 
-$\sigma_e=\sqrt{2}/\sigma_f^0$, \ie\
-\begin{equation}
-\label{eq:filter_b}
-\int d\tilde E\quad P(\tilde E) \frac{1}{\sigma_e\,\sqrt{2\pi}}\,
-e^{-\frac{(E-\tilde E)^2}{2\sigma^2_e}}\,.
-\end{equation}
-The relationship between \eqs~\eqref{eq:filter_a} and~\eqref{eq:filter_b}
-is not obvious and connected to the properties of $P_{\alpha\beta}$: 
-see \Refs~\cite{Kiers:1996zj,Giunti:2003ax}. This feature works \emph{only} 
-for vacuum and constant densities and is controlled
+the last term is a Gau\ss ian filter with width $\sigma_e$ [GeV]; for details,
+see  theory of neutrino oscillations with wave packets, \eg, 
+\Refs~\cite{Kiers:1996zj,Giunti:2003ax}. In fact, it can be shown that this filter
+corresponds to \eq~(\ref{eq:respfun}) with a constant function $\sigma(E)=\sigma_e$.
+ This feature works 
+for vacuum and constant densities \emph{only}, and it is controlled
 by the filer state variable. In addition, $\sigma_e$ is set by the filter value variable:
 \index{aedl}{filter state@{\tt \$filter\_state}}
 \index{aedl}{filter value@{\tt \$filter\_value}}
