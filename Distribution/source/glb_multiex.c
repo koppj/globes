@@ -79,6 +79,7 @@ void glbInitExp(glb_exp ins)
   struct glb_experiment *in;
   in=(struct glb_experiment *) ins;
   in->version=NULL;
+  in->citation=NULL;
   in->filename=NULL;
   in->names=NULL;
   in->num_of_fluxes=-1;
@@ -181,6 +182,7 @@ void glbFreeExp(glb_exp ins)
   if(ins==NULL) return;
   glb_free_names(in->names);
   glb_free(in->version);
+  glb_free(in->citation);
   glb_free(in->filename);
   for(i=0;i<32;i++) { glb_free_flux(in->fluxes[i]); in->fluxes[i]=NULL; }
   for(i=0;i<32;i++) { glb_free_xsec(in->xsecs[i]);  in->xsecs[i]=NULL;  }

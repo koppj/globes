@@ -173,3 +173,14 @@
           names to parameters, and then use these names in subsequent calls
           to glbSetOscParamByName, glbGetOscParamByName
 
+26 Sep 2010 JK
+        - New function glbGetFilenameOfExperiment
+        - Changes to Lexer and parser:
+          * New directive $citation
+          * Strings (with double quotes '"') may now contain arbitrary characters,
+            including line breaks. This was necessary to allow for multi-line
+            citation information in glb files.
+        - New function glbGetCitationForExperiment
+
+********** This version tagged 3.1.8 ************
+

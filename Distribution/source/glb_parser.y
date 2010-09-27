@@ -106,6 +106,7 @@
 
   static glb_parser_decl token_list[]={
     {"$version",CHAR,0,1E8,&buff.version,NULL,"global"},
+    {"$citation",CHAR,0,1E8,&buff.citation,NULL,"global"},
     {"$parent_energy",DOUBLE,0,GMAX,&buff.emax,NULL,"global"},
     {"$target_mass",DOUBLE,0,GMAX,&buff.targetmass,NULL,"global"},
 #ifdef GLB_OLD_AEDL
@@ -626,6 +627,22 @@ static int set_pair(char *name,double value,double value2,int scalar)
        }
 
    return 1;
+}
+
+
+static int set_string(char *name, char *str)
+{
+  int i;
+  for(i=0; token_list[i].token !=NULL; i++)
+  {
+    if (strncmp(name, token_list[i].token, strlen(token_list[i].token)) == 0)
+    {
+      char **p = (char **)(token_list[i].ptr);
+      *p = strdup(str);
+      return 0;
+    }
+  }
+  return 1;
 }
 
 
@@ -1219,7 +1236,9 @@ ingroup_statement: exp {}
 
 /* version: A version declaration */
 version: VERS '=' FNAME {
-  buff.version=strdup($3);
+//  buff.version=strdup($3);
+  if (set_string($1, $3) != 0)
+    yyerror("Unknown identifier: %s", $1);
   if ($1)  { glb_free($1);  $1=NULL; }
   if ($3)  { glb_free($3);  $3=NULL; }
 }

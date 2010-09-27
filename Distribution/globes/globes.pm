@@ -58,6 +58,8 @@ package globes;
 *glbTestReleaseVersion = *globesc::glbTestReleaseVersion;
 *glbTestLibraryVersion = *globesc::glbTestLibraryVersion;
 *glbVersionOfExperiment = *globesc::glbVersionOfExperiment;
+*glbGetFilenameOfExperiment = *globesc::glbGetFilenameOfExperiment;
+*glbGetCitationForExperiment = *globesc::glbGetCitationForExperiment;
 *glbSetVerbosityLevel = *globesc::glbSetVerbosityLevel;
 *glbAllocParams = *globesc::glbAllocParams;
 *glbFreeParams = *globesc::glbFreeParams;

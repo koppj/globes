@@ -92,11 +92,16 @@ static size_t len,i;
 
 void glb_lexer_cleanup();
 
+// JK, 2010-09-26
+// We now allow any character except '"' inside strings to allow for
+// multi-line citation information
+//FN       [a-zA-Z0-9./][a-zA-Z0-9_./-]*
+
 
 %}
 
 EOE       #NEXT#
-FN       [a-zA-Z0-9./][a-zA-Z0-9_./-]*
+FN       [^"]*
 
 GLOB     GLoBES
 RL       @signal
@@ -180,8 +185,8 @@ include             {cond_buf_i=YY_START;BEGIN(glb_lexer_incl);}
   /* Remove quotes from filename */
   fnbuf = strdup(yytext);
   len   = strlen(fnbuf);
-  if (fnbuf[len-1] != '\"') { fprintf(stderr,"FATAL: Unterminated filename\n"); exit(1); }
-  if (fnbuf[0] != '\"')     { fprintf(stderr,"FATAL: Unquoted filename\n");     exit(1); }
+  if (fnbuf[len-1] != '\"') { fprintf(stderr,"FATAL: Unterminated filename: %s\n", fnbuf); exit(1); }
+  if (fnbuf[0] != '\"')     { fprintf(stderr,"FATAL: Unquoted filename: %s\n", fnbuf);     exit(1); }
   glb_file_id = (char *) glb_malloc((len-1)*sizeof(char));
   strncpy(glb_file_id, fnbuf+1, len-2);
   glb_file_id[len-2] = '\0';
@@ -271,13 +276,20 @@ return SYS_OFF_FUNCTION;
 
 <glb_lexer_str>\" {BEGIN(cond_buf_str);}
 
-<glb_lexer_str>\n {glb_fatal("Lexer error: Unterminated string");exit(1);}
+ /* JK 2010-09-26
+    <glb_lexer_str>\n {glb_fatal("Lexer error: Unterminated string");exit(1);}
+ */;
 
 <glb_lexer_str>{FN} {
 yylval.name=strdup(yytext);
 return FNAME;}
 
 $version {
+yylval.name=strdup(yytext);
+return VERS;
+}
+
+$citation {
 yylval.name=strdup(yytext);
 return VERS;
 }

@@ -151,7 +151,9 @@ const char *glbValueToName(int exp,const char* context, int value);
 /* Version control / verbosity */
 int glbTestReleaseVersion(const char *version);
 int glbTestLibraryVersion(const char *version);
-const char *glbVersionOfExperiment(int experiment);
+const char *glbVersionOfExperiment(int exp);
+const char *glbGetFilenameOfExperiment(int exp);
+const char *glbGetCitationForExperiment(int exp);
 int glbSetVerbosityLevel(int level);
 
 

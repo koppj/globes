@@ -40,17 +40,21 @@ AC_DEFUN([gl_EARLY],
   # Code from module getopt-gnu:
   # Code from module getopt-posix:
   # Code from module gettext-h:
+  # Code from module gettimeofday:
   # Code from module include_next:
   # Code from module intprops:
+  # Code from module lstat:
   # Code from module malloc:
   # Code from module malloc-posix:
   # Code from module memchr:
   # Code from module mempcpy:
+  # Code from module mkstemp:
   # Code from module multiarch:
   # Code from module obstack:
   # Code from module rawmemchr:
   # Code from module size_max:
   # Code from module sleep:
+  # Code from module stat:
   # Code from module stdbool:
   # Code from module stddef:
   # Code from module stdint:
@@ -63,7 +67,11 @@ AC_DEFUN([gl_EARLY],
   # Code from module strings:
   # Code from module strndup:
   # Code from module strnlen:
+  # Code from module sys_stat:
+  # Code from module sys_time:
   # Code from module sysexits:
+  # Code from module tempname:
+  # Code from module time:
   # Code from module unistd:
   # Code from module vasnprintf:
   # Code from module verify:
@@ -119,8 +127,14 @@ AC_SUBST([LTALLOCA])
   # Code from module gettext-h:
   AC_SUBST([LIBINTL])
   AC_SUBST([LTLIBINTL])
+  # Code from module gettimeofday:
+  gl_FUNC_GETTIMEOFDAY
+  gl_SYS_TIME_MODULE_INDICATOR([gettimeofday])
   # Code from module include_next:
   # Code from module intprops:
+  # Code from module lstat:
+  gl_FUNC_LSTAT
+  gl_SYS_STAT_MODULE_INDICATOR([lstat])
   # Code from module malloc:
   AC_FUNC_MALLOC
   AC_DEFINE([GNULIB_MALLOC_GNU], 1, [Define to indicate the 'malloc' module.])
@@ -133,6 +147,9 @@ AC_SUBST([LTALLOCA])
   # Code from module mempcpy:
   gl_FUNC_MEMPCPY
   gl_STRING_MODULE_INDICATOR([mempcpy])
+  # Code from module mkstemp:
+  gl_FUNC_MKSTEMP
+  gl_STDLIB_MODULE_INDICATOR([mkstemp])
   # Code from module multiarch:
   gl_MULTIARCH
   # Code from module obstack:
@@ -146,6 +163,9 @@ AC_SUBST([LTALLOCA])
   # Code from module sleep:
   gl_FUNC_SLEEP
   gl_UNISTD_MODULE_INDICATOR([sleep])
+  # Code from module stat:
+  gl_FUNC_STAT
+  gl_SYS_STAT_MODULE_INDICATOR([stat])
   # Code from module stdbool:
   AM_STDBOOL_H
   # Code from module stddef:
@@ -174,8 +194,18 @@ AC_SUBST([LTALLOCA])
   # Code from module strnlen:
   gl_FUNC_STRNLEN
   gl_STRING_MODULE_INDICATOR([strnlen])
+  # Code from module sys_stat:
+  gl_HEADER_SYS_STAT_H
+  AC_PROG_MKDIR_P
+  # Code from module sys_time:
+  gl_HEADER_SYS_TIME_H
+  AC_PROG_MKDIR_P
   # Code from module sysexits:
   gl_SYSEXITS
+  # Code from module tempname:
+  gl_FUNC_GEN_TEMPNAME
+  # Code from module time:
+  gl_HEADER_TIME_H
   # Code from module unistd:
   gl_UNISTD_H
   # Code from module vasnprintf:
@@ -357,11 +387,14 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/getopt1.c
   lib/getopt_int.h
   lib/gettext.h
+  lib/gettimeofday.c
   lib/intprops.h
+  lib/lstat.c
   lib/malloc.c
   lib/memchr.c
   lib/memchr.valgrind
   lib/mempcpy.c
+  lib/mkstemp.c
   lib/obstack.c
   lib/obstack.h
   lib/printf-args.c
@@ -372,6 +405,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/rawmemchr.valgrind
   lib/size_max.h
   lib/sleep.c
+  lib/stat.c
   lib/stdbool.in.h
   lib/stddef.in.h
   lib/stdint.in.h
@@ -388,7 +422,12 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/strncasecmp.c
   lib/strndup.c
   lib/strnlen.c
+  lib/sys_stat.in.h
+  lib/sys_time.in.h
   lib/sysexits.in.h
+  lib/tempname.c
+  lib/tempname.h
+  lib/time.in.h
   lib/unistd.in.h
   lib/vasnprintf.c
   lib/vasnprintf.h
@@ -406,14 +445,17 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/extensions.m4
   m4/float_h.m4
   m4/getopt.m4
+  m4/gettimeofday.m4
   m4/gnulib-common.m4
   m4/include_next.m4
   m4/intmax_t.m4
   m4/inttypes_h.m4
   m4/longlong.m4
+  m4/lstat.m4
   m4/malloc.m4
   m4/memchr.m4
   m4/mempcpy.m4
+  m4/mkstemp.m4
   m4/mmap-anon.m4
   m4/multiarch.m4
   m4/onceonly.m4
@@ -421,6 +463,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/rawmemchr.m4
   m4/size_max.m4
   m4/sleep.m4
+  m4/stat.m4
   m4/stdbool.m4
   m4/stddef_h.m4
   m4/stdint.m4
@@ -434,7 +477,11 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/strings_h.m4
   m4/strndup.m4
   m4/strnlen.m4
+  m4/sys_stat_h.m4
+  m4/sys_time_h.m4
   m4/sysexits.m4
+  m4/tempname.m4
+  m4/time_h.m4
   m4/unistd_h.m4
   m4/vasnprintf.m4
   m4/vsnprintf.m4

@@ -68,7 +68,7 @@ struct random_data
 };
 #endif
 
-#if (0 || 0 || defined GNULIB_POSIXCHECK) && ! defined __GLIBC__ && !((defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__)
+#if (1 || 0 || defined GNULIB_POSIXCHECK) && ! defined __GLIBC__ && !((defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__)
 /* On MacOS X 10.3, only <unistd.h> declares mkstemp.  */
 /* On Cygwin 1.7.1, only <unistd.h> declares getsubopt.  */
 /* But avoid namespace pollution on glibc systems and native Windows.  */
@@ -604,7 +604,7 @@ _GL_WARN_ON_USE (mkostemps, "mkostemps is unportable - "
 # endif
 #endif
 
-#if 0
+#if 1
 /* Create a unique temporary file from TEMPLATE.
    The last six characters of TEMPLATE must be "XXXXXX";
    they are replaced with a string that makes the file name unique.

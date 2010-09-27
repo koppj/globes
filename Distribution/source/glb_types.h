@@ -164,6 +164,9 @@ struct glb_experiment {
   /* Version string */
   char *version;
 
+  /* A string containing citation information for this experiment */
+  char *citation;
+
   /* Name of AEDL file on which this experiment is based */
   char *filename;
 

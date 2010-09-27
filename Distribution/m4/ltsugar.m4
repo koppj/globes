@@ -1,1 +1,0 @@
-/home/jkopp/software/installed/share/aclocal/ltsugar.m4

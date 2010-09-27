@@ -2031,14 +2031,74 @@ glbGetTargetMass(int experiment)
 }
 
 
-const char *glbVersionOfExperiment(int experiment)
+/***************************************************************************
+ * Function glbVersionOfExperiment                                         *
+ ***************************************************************************
+ * Return the version of the given experiment, as specified in the AEDL    *
+ * file. Note: The return value is a pointer to the internal GLoBES        *
+ * storage space for the version string; it's content should not be        *
+ * modified by any user code.                                              *
+ ***************************************************************************/
+const char *glbVersionOfExperiment(int exp)
 {
   struct glb_experiment *in;
-  if(!(((experiment >= 0)&&(experiment < glb_num_of_exps)))) {
-    glb_error("Invalid value for experiment number");
-    return NULL;}
-  in=(struct glb_experiment *) glb_experiment_list[experiment];
+  if (exp < 0  ||  exp >= glb_num_of_exps)
+  {
+    char msg[255];
+    sprintf(msg, "glbVersionOfExperiment: Invalid experiment number: %d", exp);
+    glb_error(msg);
+    return NULL;
+  }
+  in = (struct glb_experiment *) glb_experiment_list[exp];
   return in->version;
+}
+
+
+/***************************************************************************
+ * Function glbGetFilenameOfExperiment                                     *
+ ***************************************************************************
+ * Returns the name of the AEDL file from which the given experiment was   *
+ * loaded.                                                                 *
+ * Note: The return value is a pointer to the internal GLoBES              *
+ * storage space for the filename string; it's content should not be       *
+ * modified by any user code.                                              *
+ ***************************************************************************/
+const char *glbGetFilenameOfExperiment(int exp)
+{
+  struct glb_experiment *in;
+  if (exp < 0  ||  exp >= glb_num_of_exps)
+  {
+    char msg[255];
+    sprintf(msg, "glbGetFilenameOfExperiment: Invalid experiment number: %d", exp);
+    glb_error(msg);
+    return NULL;
+  }
+  in = (struct glb_experiment *) glb_experiment_list[exp];
+  return in->filename;
+}
+
+
+/***************************************************************************
+ * Function glbGetCitationForExperiment                                    *
+ ***************************************************************************
+ * Returns the citation information for the given experiment as specified  *
+ * in the glb file                                                         *
+ * Note: The return value is a pointer to the internal GLoBES              *
+ * storage space for the filename string; it's content should not be       *
+ * modified by any user code.                                              *
+ ***************************************************************************/
+const char *glbGetCitationForExperiment(int exp)
+{
+  struct glb_experiment *in;
+  if (exp < 0  ||  exp >= glb_num_of_exps)
+  {
+    char msg[255];
+    sprintf(msg, "glbGetCitationForExperiment: Invalid experiment number: %d", exp);
+    glb_error(msg);
+    return NULL;
+  }
+  in = (struct glb_experiment *) glb_experiment_list[exp];
+  return in->citation;
 }
 
 

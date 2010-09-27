@@ -1,1 +1,0 @@
-/home/jkopp/software/installed/share/aclocal/lt~obsolete.m4

@@ -44,6 +44,13 @@
    followed by a file name component separator. */
 #define FILE_SYSTEM_DRIVE_PREFIX_CAN_BE_RELATIVE 0
 
+/* Define if gettimeofday clobbers the localtime buffer. */
+/* #undef GETTIMEOFDAY_CLOBBERS_LOCALTIME */
+
+/* Define this to 'void' or 'struct timezone' to match the system's
+   declaration of the second argument to gettimeofday. */
+#define GETTIMEOFDAY_TIMEZONE struct timezone
+
 /* The version of libglb in libtool format c:r:a */
 #define GLB_LIBVERSION "9:0:1"
 
@@ -61,6 +68,12 @@
 /* Define to 1 when the gnulib module getopt-gnu should be tested. */
 #define GNULIB_TEST_GETOPT_GNU 1
 
+/* Define to 1 when the gnulib module gettimeofday should be tested. */
+#define GNULIB_TEST_GETTIMEOFDAY 1
+
+/* Define to 1 when the gnulib module lstat should be tested. */
+#define GNULIB_TEST_LSTAT 1
+
 /* Define to 1 when the gnulib module malloc-posix should be tested. */
 #define GNULIB_TEST_MALLOC_POSIX 1
 
@@ -70,11 +83,17 @@
 /* Define to 1 when the gnulib module mempcpy should be tested. */
 #define GNULIB_TEST_MEMPCPY 1
 
+/* Define to 1 when the gnulib module mkstemp should be tested. */
+#define GNULIB_TEST_MKSTEMP 1
+
 /* Define to 1 when the gnulib module rawmemchr should be tested. */
 #define GNULIB_TEST_RAWMEMCHR 1
 
 /* Define to 1 when the gnulib module sleep should be tested. */
 #define GNULIB_TEST_SLEEP 1
+
+/* Define to 1 when the gnulib module stat should be tested. */
+#define GNULIB_TEST_STAT 1
 
 /* Define to 1 when the gnulib module strchrnul should be tested. */
 #define GNULIB_TEST_STRCHRNUL 1
@@ -226,6 +245,9 @@
 /* Define to 1 if you have the `getopt_long_only' function. */
 #define HAVE_GETOPT_LONG_ONLY 1
 
+/* Define to 1 if you have the `gettimeofday' function. */
+#define HAVE_GETTIMEOFDAY 1
+
 /* Define to 1 if you have the <gsl/gsl_errno.h> header file. */
 #define HAVE_GSL_GSL_ERRNO_H 1
 
@@ -253,6 +275,9 @@
 
 /* Define to 1 if the system has the type `long long int'. */
 #define HAVE_LONG_LONG_INT 1
+
+/* Define to 1 if you have the `lstat' function. */
+#define HAVE_LSTAT 1
 
 /* Define to 1 if your system has a GNU libc compatible `malloc' function, and
    to 0 otherwise. */
@@ -338,6 +363,9 @@
 /* Define to 1 if fchdir is declared even after undefining macros. */
 #define HAVE_RAW_DECL_FCHDIR 1
 
+/* Define to 1 if fchmodat is declared even after undefining macros. */
+#define HAVE_RAW_DECL_FCHMODAT 1
+
 /* Define to 1 if fchownat is declared even after undefining macros. */
 #define HAVE_RAW_DECL_FCHOWNAT 1
 
@@ -347,6 +375,9 @@
 /* Define to 1 if fseeko is declared even after undefining macros. */
 #define HAVE_RAW_DECL_FSEEKO 1
 
+/* Define to 1 if fstatat is declared even after undefining macros. */
+#define HAVE_RAW_DECL_FSTATAT 1
+
 /* Define to 1 if fsync is declared even after undefining macros. */
 #define HAVE_RAW_DECL_FSYNC 1
 
@@ -355,6 +386,9 @@
 
 /* Define to 1 if ftruncate is declared even after undefining macros. */
 #define HAVE_RAW_DECL_FTRUNCATE 1
+
+/* Define to 1 if futimens is declared even after undefining macros. */
+/* #undef HAVE_RAW_DECL_FUTIMENS */
 
 /* Define to 1 if getcwd is declared even after undefining macros. */
 #define HAVE_RAW_DECL_GETCWD 1
@@ -392,6 +426,9 @@
 /* Define to 1 if getsubopt is declared even after undefining macros. */
 #define HAVE_RAW_DECL_GETSUBOPT 1
 
+/* Define to 1 if gettimeofday is declared even after undefining macros. */
+#define HAVE_RAW_DECL_GETTIMEOFDAY 1
+
 /* Define to 1 if getusershell is declared even after undefining macros. */
 #define HAVE_RAW_DECL_GETUSERSHELL 1
 
@@ -400,6 +437,9 @@
 
 /* Define to 1 if initstat_r is declared even after undefining macros. */
 /* #undef HAVE_RAW_DECL_INITSTAT_R */
+
+/* Define to 1 if lchmod is declared even after undefining macros. */
+#define HAVE_RAW_DECL_LCHMOD 1
 
 /* Define to 1 if lchown is declared even after undefining macros. */
 #define HAVE_RAW_DECL_LCHOWN 1
@@ -412,6 +452,9 @@
 
 /* Define to 1 if lseek is declared even after undefining macros. */
 #define HAVE_RAW_DECL_LSEEK 1
+
+/* Define to 1 if lstat is declared even after undefining macros. */
+#define HAVE_RAW_DECL_LSTAT 1
 
 /* Define to 1 if mbrlen is declared even after undefining macros. */
 #define HAVE_RAW_DECL_MBRLEN 1
@@ -437,8 +480,23 @@
 /* Define to 1 if memrchr is declared even after undefining macros. */
 #define HAVE_RAW_DECL_MEMRCHR 1
 
+/* Define to 1 if mkdirat is declared even after undefining macros. */
+#define HAVE_RAW_DECL_MKDIRAT 1
+
 /* Define to 1 if mkdtemp is declared even after undefining macros. */
 #define HAVE_RAW_DECL_MKDTEMP 1
+
+/* Define to 1 if mkfifo is declared even after undefining macros. */
+#define HAVE_RAW_DECL_MKFIFO 1
+
+/* Define to 1 if mkfifoat is declared even after undefining macros. */
+#define HAVE_RAW_DECL_MKFIFOAT 1
+
+/* Define to 1 if mknod is declared even after undefining macros. */
+#define HAVE_RAW_DECL_MKNOD 1
+
+/* Define to 1 if mknodat is declared even after undefining macros. */
+#define HAVE_RAW_DECL_MKNODAT 1
 
 /* Define to 1 if mkostemp is declared even after undefining macros. */
 /* #undef HAVE_RAW_DECL_MKOSTEMP */
@@ -505,6 +563,9 @@
 
 /* Define to 1 if srandom_r is declared even after undefining macros. */
 #define HAVE_RAW_DECL_SRANDOM_R 1
+
+/* Define to 1 if stat is declared even after undefining macros. */
+#define HAVE_RAW_DECL_STAT 1
 
 /* Define to 1 if stpcpy is declared even after undefining macros. */
 #define HAVE_RAW_DECL_STPCPY 1
@@ -586,6 +647,9 @@
 
 /* Define to 1 if usleep is declared even after undefining macros. */
 #define HAVE_RAW_DECL_USLEEP 1
+
+/* Define to 1 if utimensat is declared even after undefining macros. */
+/* #undef HAVE_RAW_DECL_UTIMENSAT */
 
 /* Define to 1 if vdprintf is declared even after undefining macros. */
 #define HAVE_RAW_DECL_VDPRINTF 1
@@ -692,11 +756,20 @@
 /* Define to 1 if you have the <sys/stat.h> header file. */
 #define HAVE_SYS_STAT_H 1
 
+/* Define to 1 if you have the <sys/timeb.h> header file. */
+/* #undef HAVE_SYS_TIMEB_H */
+
+/* Define to 1 if you have the <sys/time.h> header file. */
+#define HAVE_SYS_TIME_H 1
+
 /* Define to 1 if you have the <sys/types.h> header file. */
 #define HAVE_SYS_TYPES_H 1
 
 /* Define to 1 if you have the `tempnam' function. */
 #define HAVE_TEMPNAM 1
+
+/* Define to 1 if you have the <time.h> header file. */
+#define HAVE_TIME_H 1
 
 /* Define to 1 if you have the <unistd.h> header file. */
 #define HAVE_UNISTD_H 1
@@ -737,11 +810,18 @@
 /* Define to 1 if the system has the type `_Bool'. */
 #define HAVE__BOOL 1
 
+/* Define to 1 if you have the `_ftime' function. */
+/* #undef HAVE__FTIME */
+
 #if FILE_SYSTEM_BACKSLASH_IS_FILE_NAME_SEPARATOR
 # define ISSLASH(C) ((C) == '/' || (C) == '\\')
 #else
 # define ISSLASH(C) ((C) == '/')
 #endif
+
+/* Define to 1 if `lstat' dereferences a symlink specified with a trailing
+   slash. */
+#define LSTAT_FOLLOWS_SLASHED_SYMLINK 1
 
 /* Define to the sub-directory in which libtool stores uninstalled libraries.
    */
@@ -760,7 +840,7 @@
 #define PACKAGE_NAME "GLoBES"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "GLoBES 3.1.7"
+#define PACKAGE_STRING "GLoBES 3.1.8"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "globes"
@@ -769,11 +849,19 @@
 #define PACKAGE_URL ""
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "3.1.7"
+#define PACKAGE_VERSION "3.1.8"
 
 /* Define to l, ll, u, ul, ull, etc., as suitable for constants of type
    'ptrdiff_t'. */
 /* #undef PTRDIFF_T_SUFFIX */
+
+/* Define to 1 if stat needs help when passed a directory name with a trailing
+   slash */
+/* #undef REPLACE_FUNC_STAT_DIR */
+
+/* Define to 1 if stat needs help when passed a file name with a trailing
+   slash */
+/* #undef REPLACE_FUNC_STAT_FILE */
 
 /* Define this to 1 if strerror is broken. */
 /* #undef REPLACE_STRERROR */
@@ -803,11 +891,14 @@
 	STACK_DIRECTION = 0 => direction of growth unknown */
 /* #undef STACK_DIRECTION */
 
+/* Define to 1 if the `S_IS*' macros in <sys/stat.h> do not work properly. */
+/* #undef STAT_MACROS_BROKEN */
+
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
 
 /* Version number of package */
-#define VERSION "3.1.7"
+#define VERSION "3.1.8"
 
 /* Define to l, ll, u, ul, ull, etc., as suitable for constants of type
    'wchar_t'. */
@@ -820,6 +911,12 @@
 /* Define to 1 if `lex' declares `yytext' as a `char *' by default, not a
    `char[]'. */
 #define YYTEXT_POINTER 1
+
+/* Number of bits in a file offset, on hosts where this is settable. */
+#define _FILE_OFFSET_BITS 64
+
+/* Define for large files, on AIX-style hosts. */
+/* #undef _LARGE_FILES */
 
 /* Define to 1 if on MINIX. */
 /* #undef _MINIX */
@@ -863,6 +960,9 @@
 /* Define to empty if `const' does not conform to ANSI C. */
 /* #undef const */
 
+/* Define to rpl_gmtime if the replacement function should be used. */
+/* #undef gmtime */
+
 /* Define to `__inline__' or `__inline' if that's what the C compiler
    calls it, or to nothing if 'inline' is not supported under any name.  */
 #ifndef __cplusplus
@@ -882,8 +982,14 @@
 # define __GNUC_STDC_INLINE__ 1
 #endif
 
+/* Define to rpl_localtime if the replacement function should be used. */
+/* #undef localtime */
+
 /* Define to rpl_malloc if the replacement function should be used. */
 /* #undef malloc */
+
+/* Define to the type of st_nlink in struct stat, or a supertype. */
+/* #undef nlink_t */
 
 /* Define as the type of the result of subtracting two pointers, if the system
    doesn't define it. */
