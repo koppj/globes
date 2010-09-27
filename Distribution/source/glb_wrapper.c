@@ -51,6 +51,7 @@ int glb_num_of_exps;
 glb_exp glb_experiment_list[GLB_MAX_EXP];
 int glb_rule_number;
 
+char **glb_param_names = NULL;
 
 
 #define obstack_chunk_alloc glb_malloc
@@ -189,7 +190,9 @@ glb_params glbSetOscParams(glb_params in,
     in->osc->osc_params[which] = osc;
   else
   {
-    glb_error("glbSetOscParams: Oscillation list length mismatch");
+    char msg[255];
+    sprintf(msg, "glbSetOscParams: Invalid parameter index: %d", which);
+    glb_error(msg);
     return NULL;
   }
   return in;
@@ -204,7 +207,9 @@ double glbGetOscParams(const glb_params in, int which)
     }
   else
     {
-      glb_error("glbGetOscParams: Oscillation list length mismatch");
+      char msg[255];
+      sprintf(msg, "glbGetOscParams: Invalid parameter index: %d", which);
+      glb_error(msg);
       return 0;
     }
   return out;
@@ -274,6 +279,217 @@ void glbPrintParams(FILE *stream, const glb_params in)
   fprintf(stream,"\n");
   fprintf(stream,"Iterations: %d\n",in->iterations);
 }
+
+
+/***************************************************************************
+ * Function glbClearParamNames                                             *
+ ***************************************************************************
+ * Clear all names assigned to oscillation parameters.                     *
+ ***************************************************************************/
+int glbClearParamNames()
+{
+  int i;
+  if (glb_param_names)
+  {
+    for (i=0; i < glbGetNumOfOscParams(); i++)
+      if (glb_param_names[i])
+      {
+        glb_free(glb_param_names[i]);
+        glb_param_names[i] = NULL;
+      }
+    glb_free(glb_param_names);
+    glb_param_names = NULL;
+  }
+
+  return GLB_SUCCESS;
+}
+
+
+/***************************************************************************
+ * Function glbSetParamNames                                               *
+ ***************************************************************************
+ * Assign human-readable names to the oscillation parameters that can be   *
+ * used in subsequent calls to glbSetOscParamByName etc. The array names   *
+ * must have length glbGetNuOfOscParams(); some entries may be NULL, in    *
+ * which case no name will be assigned to the corresponding parameter      *
+ ***************************************************************************/
+int glbSetParamNames(char **names)
+{
+  int i;
+
+  if (!names)
+  {
+    glb_error("glbSetParamNames: Invalid parameter names (NULL)");
+    return GLBERR_INVALID_ARGS;
+  }
+
+  if (!glb_param_names)
+  {
+    glb_param_names = glb_malloc(glbGetNumOfOscParams() * sizeof(glb_param_names[0]));
+    memset(glb_param_names, 0, glbGetNumOfOscParams() * sizeof(glb_param_names[0]));
+  }
+
+  for (i=0; i < glbGetNumOfOscParams(); i++)
+  {
+    if (glb_param_names[i])
+    {
+      glb_free(glb_param_names[i]);
+      glb_param_names[i] = NULL;
+    }
+    if (names[i])
+      glb_param_names[i] = strdup(names[i]);
+  }
+
+  return GLB_SUCCESS;
+}
+
+
+/***************************************************************************
+ * Function glbSetParamName                                                *
+ ***************************************************************************
+ * Similar to glbSetParamNames, but assigns a name to only one oscillation *
+ * parameter, identified by the index i                                    *
+ ***************************************************************************/
+int glbSetParamName(const char *name, int i)
+{
+  if (!name)
+  {
+    glb_error("glbSetParamName: Invalid parameter name (NULL)");
+    return GLBERR_INVALID_ARGS;
+  }
+
+  if (i < 0 || i >= glbGetNumOfOscParams())
+  {
+    char msg[255];
+    sprintf(msg, "glbSetParamName: Invalid parameter index: %d", i);
+    glb_error(msg);
+    return GLBERR_INVALID_ARGS;
+  }
+
+  if (!glb_param_names)
+  {
+    glb_param_names = glb_malloc(glbGetNumOfOscParams() * sizeof(glb_param_names[0]));
+    memset(glb_param_names, 0, glbGetNumOfOscParams() * sizeof(glb_param_names[0]));
+  }
+
+  if (glb_param_names[i])
+  {
+    glb_free(glb_param_names[i]);
+    glb_param_names[i] = NULL;
+  }
+  glb_param_names[i] = strdup(name);
+
+  return GLB_SUCCESS;
+}
+
+
+/***************************************************************************
+ * Function glbGetParamName                                                *
+ ***************************************************************************
+ * Returns a string containing the name of the oscillation parameter       *
+ * identified by its index i. The return value is NULL if that parameter   *
+ * has not been assigned a name. It is the user's responsibility to free   *
+ * the memory associated with the returned string.                         *
+ ***************************************************************************/
+char *glbGetParamName(int i)
+{
+  if (i < 0 || i >= glbGetNumOfOscParams())
+  {
+    char msg[255];
+    sprintf(msg, "glbSetParamName: Invalid parameter index: %d", i);
+    glb_error(msg);
+    return NULL;
+  }
+
+  if (!glb_param_names || !glb_param_names[i])
+    return NULL;
+
+  return strdup(glb_param_names[i]);
+}
+
+
+/***************************************************************************
+ * Function glbFindParamByName                                             *
+ ***************************************************************************
+ * Returns the index of the oscillation parameter that has been assigned   *
+ * the given name; the return value is negative in case of an error        *
+ ***************************************************************************/
+int glbFindParamByName(const char *name)
+{
+  int i;
+
+  if (!name)
+  {
+    glb_error("glbFindParamByName: Invalid parameter name (NULL)");
+    return GLBERR_INVALID_ARGS;
+  }
+
+  if (glb_param_names)
+  {
+    for (i=0; i < glbGetNumOfOscParams(); i++)
+      if (glb_param_names[i] && strcmp(glb_param_names[i], name) == 0)
+        return i;
+  }
+
+  char msg[255];
+  sprintf(msg, "glbFindParamByName: Name not found: %s", name);
+  glb_error(msg);
+  return GLBERR_NAME_NOT_FOUND;
+}
+
+
+/***************************************************************************
+ * Function glbSetOscParamByName                                           *
+ ***************************************************************************
+ * Same as glbSetOscParams, but identifies the parameter by name. Return   *
+ * value is GLB_SUCCESS or one of the (negative) GLBERR_XXX error codes    *
+ ***************************************************************************/
+int glbSetOscParamByName(glb_params in, double value, const char *name)
+{
+  int index;
+
+  if (!name)
+  {
+    glb_error("glbSetOscParamByName: Invalid parameter name (NULL)");
+    return GLBERR_INVALID_ARGS;
+  }
+
+  if ((index=glbFindParamByName(name)) < 0)
+    return index;
+  else
+  {
+    if (!glbSetOscParams(in, value, index))
+      return GLBERR_GENERIC;
+    else
+      return GLB_SUCCESS;
+  }
+}
+
+
+/***************************************************************************
+ * Function glbGetOscParamByName                                           *
+ ***************************************************************************
+ * Same as glbGetOscParams, but identifies the parameter by name.          *
+ * In case of an error, the return value is 0.0                            *
+ ***************************************************************************/
+double glbGetOscParamByName(const glb_params in, const char *name)
+{
+  int index;
+  double value;
+
+  if (!name)
+  {
+    glb_error("glbSetOscParamByName: Invalid parameter name (NULL)");
+    return 0.0;
+  }
+
+  if ((index=glbFindParamByName(name)) < 0)
+    return index;
+  else
+    return glbGetOscParams(in, index);
+}
+
+
 
 /* This  is a bunch of function in order to deal with the
  * glb_projection_type type

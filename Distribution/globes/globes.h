@@ -169,6 +169,14 @@ double glbGetDensityParams(glb_params in, int which);
 int glbGetIteration(const glb_params in);
 void glbPrintParams(FILE *stream, const glb_params in);
 
+int glbClearParamNames();
+int glbSetParamNames(char **names);
+int glbSetParamName(const char *name, int i);
+char *glbGetParamName(int i);
+int glbFindParamByName(const char *name);
+int glbSetOscParamByName(glb_params in, double value, const char *name);
+double glbGetOscParamByName(const glb_params in, const char *name);
+
 int glbSetOscillationParameters(const glb_params in);
 int glbSetInputErrors(const glb_params in);
 int glbGetOscillationParameters(glb_params in);

@@ -31,6 +31,9 @@
 /* NIL value for the projection flag */
 #define GLB_UNDEFINED  -2
 
+/* External variables */
+extern char **glb_param_names;
+
 typedef struct {
   double *osc_params;
   size_t length;

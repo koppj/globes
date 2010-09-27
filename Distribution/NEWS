@@ -166,3 +166,10 @@
         - GLoBES now accepts cross section and flux files with an arbitrary number of
           lines
 
+********** This version tagged 3.1.7 ************
+
+25 Sep 2010 JK
+        - Implemented a bunch of functions that allow the user to assign
+          names to parameters, and then use these names in subsequent calls
+          to glbSetOscParamByName, glbGetOscParamByName
+

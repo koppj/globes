@@ -45,6 +45,7 @@
 #define GLBERR_PREM_NOT_LOADED     -8  /* Error with PREM profile data                          */
 #define GLBERR_NOT_IMPLEMENTED     -9  /* Requested a feature that has not been implemented yet */
 #define GLBERR_DEPRECATED         -10  /* Requested a deprecated feature                        */
+#define GLBERR_NAME_NOT_FOUND     -11  /* A name could not be translated into an index          */
 #define GLBERR_GENERIC            -99  /* Unspecified error                                     */
 
 

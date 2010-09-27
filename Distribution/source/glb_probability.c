@@ -603,7 +603,7 @@ int glb_S_matrix_cd(double E, double L, double V, int cp_sign)
   int status;
   int i, j, k;
 
-  if (V < V_THRESHOLD)                             /* Vacuum */
+  if (fabs(V) < V_THRESHOLD)                       /* Vacuum */
   {
     /* Use vacuum mixing angles and masses */
     double inv_E = 0.5/E;
@@ -697,7 +697,7 @@ int glb_filtered_probability_matrix_cd(double P[3][3], double E, double L, doubl
   int status;
   int i, j, k, l;
 
-  if (V < V_THRESHOLD)                             /* Vacuum */
+  if (fabs(V) < V_THRESHOLD)                       /* Vacuum */
   {
     /* Use vacuum mixing angles and masses */
     double inv_E = 0.5/E;
@@ -874,6 +874,11 @@ int glbRegisterProbabilityEngine(int n_parameters,
                     glb_get_oscillation_parameters_function get_params_func,
                     void *user_data)
 {
+  int i;
+
+  /* Free array containing parameter names */
+  glbClearParamNames();
+
   if (n_parameters <= 0)
     glb_oscp = 6;
   else
