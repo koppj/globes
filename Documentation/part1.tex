@@ -1961,7 +1961,7 @@ The user-defined prior function reads as follows and is very similar to the stan
   \hspace*{0.5cm}  double pv = 0.0; \\
   \hspace*{0.5cm}  double fitvalue,centralvalue,inputerror; 
 
-  \hspace*{0.5cm} /* Add oscillation parameter priors */ \\
+ \hspace*{0.5cm} /* Add oscillation parameter priors */ \\
   \hspace*{0.5cm}  for(i=0;i<6;i++) \\
   \hspace*{0.5cm} if(glbGetProjectionFlag(p,i)==GLB\_FREE) \\
   \hspace*{0.5cm} \{ \\
@@ -1971,13 +1971,13 @@ The user-defined prior function reads as follows and is very similar to the stan
   \hspace*{1cm} if(inputerror>1e-12) 
   \hspace*{1cm} \{ \\
   \hspace*{1.5cm} if(i==GLB\_THETA\_12) /* Prior on $\sin^2 \theta_{12}$ */ \\ 
-  \hspace*{2.0cm} pv+=square((centralvalue-square(sin(fitvalue)))/inputerror);\\
+\hspace*{2.0cm} pv+=square((startvalue-square(sin(fitvalue)))/inputerror);\\ 
   \hspace*{1.5cm} else \\ 
-  \hspace*{2.0cm}  pv+=square((centralvalue-fitvalue)/inputerror); \\
+  \hspace*{2.0cm}  pv+=square((startvalue-fitvalue)/inputerror); \\
   \hspace*{1cm} \} \\
   \hspace*{0.5cm} \} 
 
-  \hspace*{0.5cm} /* Add matter parameter priors */ \\
+\hspace*{0.5cm} /* Add matter parameter priors */ \\
   \hspace*{0.5cm} for(i=0;i<glb\_num\_of\_exps;i++) \\
   \hspace*{0.5cm} if(glbGetDensityProjectionFlag(p,i)==GLB\_FREE) \\
   \hspace*{0.5cm} \{ \\
@@ -2221,10 +2221,10 @@ energy range [{\tt emin}, {\tt emax}] covered by the binning as defined in the \
 {\tt experiment}.
 \end{function}
 \begin{function}
-\GLBNS{GetEnergyWindow}
+\GLBNS{GetEnergyWindow} \label{glbGetEnergyWindow}
 {\tt int glbGetEnergyWindow(int exp, int rule, double *low, double *high)} returns the
 energy window [{\tt low}, {\tt high}] defined in the \AEDL\ file for the experiment
-{\tt exp} and rule {\tt rule}.
+{\tt exp} and rule {\tt rule}. See also {\tt glbSetEnergyWindow} on page~\pageref{glbSetEnergyWindow}.
 \end{function}
 \begin{function}
 \GLBNS{GetEnergyWindowBins}
@@ -2293,12 +2293,12 @@ The parameter {\tt signal} refers to signal (\GLBC{GLB\_SIG}) or background
 (\GLBC{GLB\_BG}).
 \end{function}
 \begin{function}
-\GLBNS{GetCoefficientInRule}
+\GLBNS{GetCoefficientInRule} \label{glbGetCoefficientInRule}
 {\tt double glbGetCoefficientInRule(int exp, int rule, int pos, int signal)}
 returns the coefficient of the component {\tt pos} in rule {\tt rule} 
 of the experiment {\tt exp}.
 The parameter {\tt signal} refers to signal (\GLBC{GLB\_SIG}) or background
-(\GLBC{GLB\_BG}).
+(\GLBC{GLB\_BG}). See also {\tt glbSetCoefficientInRule} on page~\pageref{glbSetCoefficientInRule}.
 \end{function}
 %
 Similarly to the rules, one can find the number of channels of an experiment:
@@ -2739,6 +2739,17 @@ to {\tt norm} (normalization error) and {\tt tilt} (tilt/calibration error).
 writes the background errors of experiment {\tt exp} and rule {\tt rule}
 to {\tt norm} (normalization error) and {\tt tilt} (tilt/calibration error).
 \end{function}
+In addition, the coefficients in the rules can be manipulated by\footnote{Available in GLoBES 3.1.7 and higher.}
+\begin{function}
+\GLBNS{SetCoefficientInRule} \label{glbSetCoefficientInRule}
+{\tt int glbSetCoefficientInRule(int exp, int rule, int pos, int signal, double coeff)}
+sets the coefficient of the component {\tt pos} in rule {\tt rule} 
+of the experiment {\tt exp} to value {\tt coeff}.
+The parameter {\tt signal} refers to signal (\GLBC{GLB\_SIG}) or background
+(\GLBC{GLB\_BG}). See also {\tt glbGetCoefficientInRule} on page~\pageref{glbGetCoefficientInRule}.
+\end{function}
+
+
 % ELIMINATED FROM DOC, BECAUSE WE WANT TO AVOID THE BG CENTERS IN THE FUTURE (CONFUSION) [WW]
 %
 % \begin{function}
@@ -2773,7 +2784,13 @@ returns a pointer to the list of systematical errors as defined in the \AEDL\ fi
 rule {\tt rule}. Choose
 systematics on or systematics off by using {\tt GLB\_ON} or {\tt GLB\_OFF} for {\tt on\_off}. 
 \end{function}
-As usual, all these functions return $-1$ if they were not successful.
+Furthermore, the energy window can be manipulated by\footnote{Available in GLoBES 3.1.7 and higher.}
+\begin{function}
+\GLBNS{SetEnergyWindow} \label{glbSetEnergyWindow}
+{\tt int glbSetEnergyWindow(int experiment, int rule, double low, double high)}
+sets the energy window in {\tt experiment} and {\tt rule}, which can be also {\tt GLB\_ALL}. The energy window is limited by the energies {\tt low} and {\tt high}. See also {\tt glbGetEnergyWindow} on page~\pageref{glbGetEnergyWindow}.
+\end{function}
+As usual, all the set-functions return $-1$ if they were not successful.
 %.
 For user-defined systematics, see \Sec~\ref{sec:userchi}, and 
 for the definitions of these quantities, see \Sec~\ref{sec:rules}. 
@@ -2968,7 +2985,13 @@ for(i=5;i<20;i++) \\
 \end{quote}
 Note that one does not have to re-initialize the oscillation
 parameter vectors every time within the loop as long as the
-number of experiments does not change.
+number of experiments does not change. The counterpart of that
+function is\footnote{Supported by version 3.1.7 and higher.}
+\begin{function}
+\GLBNS{GetAEDLVariable}
+{\tt double glbGetAEDLVariable(const char* name)}
+returns the value of the \AEDL\ variable {\tt name}.
+\end{function}
 
 Similar to a simple \AEDL\ variable, one can transfer the value of an
 \AEDL\ list with (\cf, \Sec~\ref{sec:syntax})
