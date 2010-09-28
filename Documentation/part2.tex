@@ -258,11 +258,14 @@ The experiment defined here represents a first simplified version of a neutrino 
 We now give a short introduction to the syntax of \AEDL .
  The first eight characters have to be {\tt \%!GLoBES}
 in order to avoid parsing megabytes of chunk
- and producing thousands of error messages.  In addition, the minimum
+ and producing thousands of error messages.  The minimum
 \GLOBES\ version that the \AEDL\ file is supposed to run with has to be
 defined by a {\tt \$version} statement, such as
 {\tt \$version="3.0.0"}.
-\index{aedl}{version@{\tt \$version}}
+\index{aedl}{version@{\tt \$version}} 
+Furthermore, references linked to the \AEDL\ file can be defined with {\tt \$citation="..."},
+which can later be retrieved with {\tt glbGetCitationForExperiment}, see page~\pageref{glbGetCitationForExperiment}.\footnote{Available in \GLOBES\ 3.1.7 and higher.}
+\index{aedl}{citation@{\tt \$citation}} \label{citation}
 %
 Comments can be used in the same way as in C:
 \begin{quote}

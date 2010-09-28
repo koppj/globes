@@ -2213,6 +2213,16 @@ In some cases, it is necessary to obtain information from the loaded \AEDL\
 files. This and the next sections are marked as advanced because knowledge of \AEDL\ is
 required, \ie,  the reader should be familiar with Part~\ref{part:2} of the manual.
 %
+The file name of an \AEDL\ file can be retrived with\footnote{The following two functions are available in \GLOBES\ 3.1.7 and higher.}
+\begin{function}
+\GLBNS{GetFilenameOfExperiment}
+{\tt const char *glbGetFilenameOfExperiment(int experiment)} returns the file name of the \AEDL\ file for the experiment number {\tt experiment}. Note that the returned pointer cannot be modified.
+\end{function}
+and the references to be cited with
+\begin{function}
+\GLBNS{GetCitationForExperiment} \label{glbGetCitationForExperiment}
+{\tt const char *glbGetCitationForExperiment(int experiment)} returns the citation defined in the \AEDL\ file for the experiment number {\tt experiment}. Note that the returned pointer cannot be modified. See also {\tt \$citation} in \AEDL\ on  page~\pageref{citation}.
+\end{function}
 Very basic information is supplied with
 \begin{function}
 \GLBNS{GetEminEmax}
@@ -2739,7 +2749,7 @@ to {\tt norm} (normalization error) and {\tt tilt} (tilt/calibration error).
 writes the background errors of experiment {\tt exp} and rule {\tt rule}
 to {\tt norm} (normalization error) and {\tt tilt} (tilt/calibration error).
 \end{function}
-In addition, the coefficients in the rules can be manipulated by\footnote{Available in GLoBES 3.1.7 and higher.}
+In addition, the coefficients in the rules can be manipulated by\footnote{Available in \GLOBES\ 3.1.7 and higher.}
 \begin{function}
 \GLBNS{SetCoefficientInRule} \label{glbSetCoefficientInRule}
 {\tt int glbSetCoefficientInRule(int exp, int rule, int pos, int signal, double coeff)}
@@ -2784,7 +2794,7 @@ returns a pointer to the list of systematical errors as defined in the \AEDL\ fi
 rule {\tt rule}. Choose
 systematics on or systematics off by using {\tt GLB\_ON} or {\tt GLB\_OFF} for {\tt on\_off}. 
 \end{function}
-Furthermore, the energy window can be manipulated by\footnote{Available in GLoBES 3.1.7 and higher.}
+Furthermore, the energy window can be manipulated by\footnote{Available in \GLOBES\ 3.1.7 and higher.}
 \begin{function}
 \GLBNS{SetEnergyWindow} \label{glbSetEnergyWindow}
 {\tt int glbSetEnergyWindow(int experiment, int rule, double low, double high)}
@@ -3298,7 +3308,45 @@ with a self-defined behavior with respect to the new dimensions using {\tt glbCh
 the marginalization over the extra parameter(s) by {\tt glbSetProjectionFlag}. You can find a simple
 example using non-standard physics with the code from the last section on page~\pageref{ex:nsphysics}.
 
+\section{Defining oscillation parameter names at running times}
 
+One can either define constants for the non-standard physics parameters, as in our example
+\begin{quote}
+{\tt
+  const int GLB\_SIGMA\_E = 6;  
+}
+\end{quote}
+or assign and read out names dynamically. This feature is available in \GLOBES\ 3.1.7 and higher. The following functions are supported:
+\begin{function}
+\GLBNS{SetParamName}
+{\tt int glbSetParamName(const char *name, int i)} assigns {\tt name} to the oscillation parameter {\tt i} (starting at 0 for {\tt GLB\_THETA\_12}).  
+\end{function}
+As usual, the return value is $0$ ({\tt GLB\_SUCCESS}) if successful.
+Note that the string is copied, which means that the original pointer can be modied or destroyed thereafter.
+\begin{function}
+\GLBNS{SetParamNames}
+{\tt int glbSetParamNames(char **names)} assigns names to all of the oscillation parameters at once. The array of strings {\tt names} must be of length {\tt glbGetNumOfOscParams()}. Individual entries are allowed to be {\tt NULL}.
+\end{function}
+\begin{function}
+\GLBNS{GetParamName}
+{\tt char *glbGetParamName(int i)} returns the name of the oscillation parameter {\tt i}.  
+\end{function}
+\begin{function}
+\GLBNS{FindParamByName}
+{\tt int glbFindParamByName(const char *name)} returns the number of the oscillation parameter named {\tt name}.
+\end{function}
+\begin{function}
+\GLBNS{SetOscParamByName}
+{\tt int glbSetOscParamByName(glb\_params in, double value, const char *name)} sets an oscillation parameter in the structure {\tt in} to {\tt value}. Compared to the similar function {\tt glbSetOscParams}, which parameter is to be accessed is determined by the {\tt name}, not the number.
+\end{function}
+\begin{function}
+\GLBNS{GetOscParamByName}
+{\tt double glbGetOscParamByName(glb\_params in, const char *name)} returns an oscillation parameter in the structure {\tt in}. Compared to the similar function {\tt glbGetOscParams}, which parameter is to be accessed is determined by the {\tt name}, not the number.
+\end{function}
+\begin{function}
+\GLBNS{ClearParamNames}
+{\tt int glbClearParamNames()} clears all names assigned to oscillation parameters and returns the allocated memory.
+\end{function}
 
 \chapter{Experimental features$^*$}
 \label{chapt:experimental}
