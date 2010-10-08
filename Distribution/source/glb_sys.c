@@ -172,7 +172,7 @@ int glbSetChiFunctionInRule(struct glb_experiment *exp, int rule, int on_off,
   int k;
 
   /* Something tells me that people will come up with the idea to pass
-   * exp->sys_on_errors; this has to be blockes */
+   * exp->sys_on_errors; this has to be blocked */
   if (errors != NULL  &&
         (errors == exp->sys_on_errors[rule]  ||  errors == exp->sys_off_errors[rule]))
   {

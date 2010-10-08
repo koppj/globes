@@ -49,6 +49,10 @@
 /* global variables */
 int glb_current_exp = -1;  // Indicates which experiment is currently
                            // being processed by the rate engine
+int glb_ignore_invalid_chi2 = 0; /* If != 0, use chiZero instead of throwing an error
+                                    if unknown chi^2 function is used. This is necessary
+                                    when an AEDL file using user-defined systematics is
+                                    run through the standalone globes binary */
 
 static struct glb_experiment MInitMemory0(struct glb_experiment in);
 
@@ -414,6 +418,13 @@ int glbDefaultExp(glb_exp ins)
   }
 
   /* Initialization of systematics data */
+  /* ---------------------------------- */
+  int old_verbosity = glbGetVerbosityLevel();
+  int old_status    = status;
+  if (glb_ignore_invalid_chi2)
+    glbSetVerbosityLevel(0);
+
+  /* Definitions for systematics ON */
   for (i=0; i < in->numofrules; i++)
   {
     if (in->sys_on_strings[i] == NULL)
@@ -439,16 +450,21 @@ int glbDefaultExp(glb_exp ins)
         }
       }
       else
-        { glb_rule_error(in, i, "Invalid systematics specification"); status=-1; }
+        { glb_rule_error(in, i, "Invalid @sys_on_function/@sys_on_errors"); status=-1; }
 
-      // FIXME Shall we be so strict here, or should we use some default?
-      // (was default formerly)
       if (glbSetChiFunctionInExperiment(in, i, GLB_ON, in->sys_on_strings[i],
                                         tmp_errorlist) != 0)
-        { glb_rule_error(in, i, "Invalid systematics specification"); status=-1; }
+        { glb_rule_error(in, i, "Invalid @sys_on_function/@sys_on_errors"); status=-1; }
 
       glb_free(tmp_errorlist);
     }
+
+    if (glb_ignore_invalid_chi2 && status != 0)
+    {
+      if (glbSetChiFunctionInExperiment(in, i, GLB_ON, "chiZero", NULL) == 0)
+        status = old_status;
+    }
+
 
     /* Treatment of parameters for systematics OFF is equivalent to systematics ON */
     if (in->sys_off_strings[i] == NULL)
@@ -474,18 +490,24 @@ int glbDefaultExp(glb_exp ins)
         }
       }
       else
-        { glb_rule_error(in, i, "Invalid systematics specification"); status=-1; }
+        { glb_rule_error(in, i, "Invalid @sys_off_function/@sys_off_errors"); status=-1; }
 
-      // FIXME Shall we be so strict here, or should we use some default?
-      // (was default formerly)
       if (glbSetChiFunctionInExperiment(in, i, GLB_OFF, in->sys_off_strings[i],
                                         tmp_errorlist) != 0)
-        { glb_rule_error(in, i, "Invalid systematics specification"); status=-1; }
+        { glb_rule_error(in, i, "Invalid @sys_off_function/@sys_off_errors"); status=-1; }
 
       glb_free(tmp_errorlist);
     }
+
+    if (glb_ignore_invalid_chi2 && status != 0)
+    {
+      if (glbSetChiFunctionInExperiment(in, i, GLB_OFF, "chiZero", NULL) == 0)
+        status = old_status;
+    }
   }
 
+  if (glb_ignore_invalid_chi2)
+    glbSetVerbosityLevel(old_verbosity);
 
   if(in->baseline==-1){glb_exp_error(in, "No baseline specified!");status=-1;}
   if(in->emin==-1){glb_exp_error(in, "No emin specified!");status=-1;}

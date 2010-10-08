@@ -1198,7 +1198,9 @@ void glbResetRateStack()
 static int exp_range(int exp)
 {
   if((exp>=0)&&(exp<glb_num_of_exps)) return 0;
-  glb_error("Experiment index out of range");
+  char msg[255];
+  sprintf(msg, "Experiment index %d out of range", exp);
+  glb_error(msg);
   return -1;
 }
 
@@ -1208,7 +1210,9 @@ static int channel_range(int exp, int channel)
   if(exp_range(exp)!=0) return -1;
   if((channel>=0)&&
      (channel<((struct glb_experiment *) glb_experiment_list[exp])->numofchannels)) return 0;
-  glb_error("Channel index out of range");
+  char msg[255];
+  sprintf(msg, "Channel index %d in experiment %d out of range", channel, exp);
+  glb_error(msg);
   return -1;
 }
 
@@ -1226,7 +1230,9 @@ static int rule_range(int exp, int rule)
   if(exp_range(exp)!=0) return -1;
   if((rule>=0)&&
      (rule<((struct glb_experiment *) glb_experiment_list[exp])->numofrules)) return 0;
-  glb_error("Rule index out of range");
+  char msg[255];
+  sprintf(msg, "Rule index %d in experiment %d out of range", rule, exp);
+  glb_error(msg);
   return -1;
 }
 
@@ -1245,7 +1251,9 @@ static int pos_range(int exp, int rule, int pos, int signal)
        (pos<((struct glb_experiment *)
 	     glb_experiment_list[exp])->lengthofbgrules[rule])) return 0;
 
-  glb_error("Position index out of range");
+  char msg[255];
+  sprintf(msg, "Position index %d in experiment %d, rule %d out of range", pos, exp, rule);
+  glb_error(msg);
   return -1;
 }
 
@@ -1380,6 +1388,7 @@ int glbGetChannelInRule(int exp, int rule, int pos, int signal)
   return i;
 }
 
+
 /***************************************************************************
  * Function glbGetCoefficientInRule                                        *
  ***************************************************************************
@@ -1401,6 +1410,7 @@ double glbGetCoefficientInRule(int exp, int rule, int pos, int signal)
   return res;
 }
 
+
 /***************************************************************************
  * Function glbSetCoefficientInRule                                        *
  ***************************************************************************
@@ -1420,6 +1430,23 @@ int glbSetCoefficientInRule(int exp, int rule, int pos, int signal, double coeff
 
   return 0;
 }
+
+/***************************************************************************
+ * Function glbGetChannelFlux                                              *
+ ***************************************************************************
+ * Returns the index of the neutrino flux definition used in the given     *
+ * channel, or -1 in case of an error.                                     *
+ ***************************************************************************/
+int glbGetChannelFlux(int exp, int channel)
+{
+  if (channel_range(exp, channel) != 0)
+    return -1;
+  else
+    return glb_experiment_list[exp]->listofchannels[0][channel];
+}
+
+//FIXME Write more functions to allow read and write access to all elements of
+//channel definition
 
 double glbGetNormalizationInRule(int exp, int rule, int signal)
 {

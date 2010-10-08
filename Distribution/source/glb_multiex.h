@@ -29,6 +29,7 @@
 #include "glb_types.h"
 
 extern int glb_current_exp;
+extern int glb_ignore_invalid_chi2;
 
 glb_exp glbAllocExp();
 

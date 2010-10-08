@@ -155,6 +155,7 @@ const char *glbVersionOfExperiment(int exp);
 const char *glbGetFilenameOfExperiment(int exp);
 const char *glbGetCitationForExperiment(int exp);
 int glbSetVerbosityLevel(int level);
+int glbGetVerbosityLevel();
 
 
 /* Handling of oscillation parameter data structure */
@@ -277,6 +278,7 @@ int glbGetLengthOfRule(int exp, int rule, int signal);
 int glbGetChannelInRule(int exp, int rule, int pos, int signal);
 double glbGetCoefficientInRule(int exp, int rule, int pos, int signal);
 int glbSetCoefficientInRule(int exp, int rule, int pos, int signal, double coeff);
+int glbGetChannelFlux(int exp, int channel);
 int glbGetNumberOfFluxes(int exp);
 double glbFlux(int experiment, int flux_ident, 
         double energy, double distance, int flavour, int anti);

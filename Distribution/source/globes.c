@@ -31,6 +31,7 @@
 #include <argp.h>
 #include <ctype.h>
 #include "glb_error.h"
+#include "glb_multiex.h"
 #include "globes/globes.h"
 
 #ifdef TEST
@@ -476,6 +477,7 @@ int main(int argc, char *argv[])
   glbInit(argv[0]);
   glbSetPrintDelimiters(arguments.left,arguments.middle,arguments.right);
   glbSetVerbosityLevel(arguments.verbosity);
+  glb_ignore_invalid_chi2 = 1;  /* Avoid errors about undefined chi^2 functions */
 
   /* Values of oscillation parameters, taken from hep-ph/0405172v5.
    * The value of theta_13 is the 2-sigma limit */

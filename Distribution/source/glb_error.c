@@ -57,11 +57,29 @@ void glb_prog_name_init (const char *path)
 
 static int verbosity_level=1;
 
+
+/***************************************************************************
+ * Function glbSetVerbosityLevel                                           *
+ ***************************************************************************
+ * Set the verbosity level.                                                *
+ ***************************************************************************/
+/* Set and return the level of verbosity */
 int glbSetVerbosityLevel(int level)
 {
   if(level<0) return -1;
   verbosity_level=level;
   return 0;
+}
+
+
+/***************************************************************************
+ * Function glbGetVerbosityLevel                                           *
+ ***************************************************************************
+ * Return the current verbosity level.                                     *
+ ***************************************************************************/
+int glbGetVerbosityLevel()
+{
+  return verbosity_level;
 }
 
 static void

@@ -184,3 +184,8 @@
 
 ********** This version tagged 3.1.8 ************
 
+08 Oct 2010 JK
+        - New function glbGetVerbosityLevel
+        - Standalone globes binary no longer complains if user-defined chi^2
+          function is used
+
