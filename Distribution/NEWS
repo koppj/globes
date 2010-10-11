@@ -189,3 +189,8 @@
         - Standalone globes binary no longer complains if user-defined chi^2
           function is used
 
+11 Oct 2010 JK
+        - Rebuilt the autoconf/automake system.
+          It is important to use libtoolize -c -f to get copies of dependencies
+          rather than just symlinks.
+
