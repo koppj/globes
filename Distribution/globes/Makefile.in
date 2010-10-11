@@ -57,29 +57,32 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/00gnulib.m4 \
 	$(top_srcdir)/m4/gnulib-common.m4 \
 	$(top_srcdir)/m4/gnulib-comp.m4 $(top_srcdir)/m4/gsl.m4 \
 	$(top_srcdir)/m4/include_next.m4 $(top_srcdir)/m4/intmax_t.m4 \
-	$(top_srcdir)/m4/inttypes_h.m4 $(top_srcdir)/m4/longlong.m4 \
-	$(top_srcdir)/m4/lstat.m4 $(top_srcdir)/m4/malloc.m4 \
-	$(top_srcdir)/m4/memchr.m4 $(top_srcdir)/m4/mempcpy.m4 \
-	$(top_srcdir)/m4/mkstemp.m4 $(top_srcdir)/m4/mmap-anon.m4 \
-	$(top_srcdir)/m4/multiarch.m4 $(top_srcdir)/m4/onceonly.m4 \
-	$(top_srcdir)/m4/printf.m4 $(top_srcdir)/m4/rawmemchr.m4 \
-	$(top_srcdir)/m4/rpm.m4 $(top_srcdir)/m4/size_max.m4 \
-	$(top_srcdir)/m4/sleep.m4 $(top_srcdir)/m4/stat.m4 \
-	$(top_srcdir)/m4/stdbool.m4 $(top_srcdir)/m4/stddef_h.m4 \
-	$(top_srcdir)/m4/stdint.m4 $(top_srcdir)/m4/stdint_h.m4 \
-	$(top_srcdir)/m4/stdio_h.m4 $(top_srcdir)/m4/stdlib_h.m4 \
-	$(top_srcdir)/m4/strcase.m4 $(top_srcdir)/m4/strchrnul.m4 \
-	$(top_srcdir)/m4/strerror.m4 $(top_srcdir)/m4/string_h.m4 \
-	$(top_srcdir)/m4/strings_h.m4 $(top_srcdir)/m4/strndup.m4 \
-	$(top_srcdir)/m4/strnlen.m4 $(top_srcdir)/m4/swig.m4 \
-	$(top_srcdir)/m4/swig_perl.m4 $(top_srcdir)/m4/sys_stat_h.m4 \
-	$(top_srcdir)/m4/sys_time_h.m4 $(top_srcdir)/m4/sysexits.m4 \
-	$(top_srcdir)/m4/tempname.m4 $(top_srcdir)/m4/time_h.m4 \
-	$(top_srcdir)/m4/unistd_h.m4 $(top_srcdir)/m4/vasnprintf.m4 \
-	$(top_srcdir)/m4/vsnprintf.m4 $(top_srcdir)/m4/warn-on-use.m4 \
-	$(top_srcdir)/m4/wchar_h.m4 $(top_srcdir)/m4/wchar_t.m4 \
-	$(top_srcdir)/m4/wint_t.m4 $(top_srcdir)/m4/xsize.m4 \
-	$(top_srcdir)/acinclude.m4 $(top_srcdir)/configure.in
+	$(top_srcdir)/m4/inttypes_h.m4 $(top_srcdir)/m4/libtool.m4 \
+	$(top_srcdir)/m4/longlong.m4 $(top_srcdir)/m4/lstat.m4 \
+	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
+	$(top_srcdir)/m4/ltversion.m4 $(top_srcdir)/m4/lt~obsolete.m4 \
+	$(top_srcdir)/m4/malloc.m4 $(top_srcdir)/m4/memchr.m4 \
+	$(top_srcdir)/m4/mempcpy.m4 $(top_srcdir)/m4/mkstemp.m4 \
+	$(top_srcdir)/m4/mmap-anon.m4 $(top_srcdir)/m4/multiarch.m4 \
+	$(top_srcdir)/m4/onceonly.m4 $(top_srcdir)/m4/printf.m4 \
+	$(top_srcdir)/m4/rawmemchr.m4 $(top_srcdir)/m4/rpm.m4 \
+	$(top_srcdir)/m4/size_max.m4 $(top_srcdir)/m4/sleep.m4 \
+	$(top_srcdir)/m4/stat.m4 $(top_srcdir)/m4/stdbool.m4 \
+	$(top_srcdir)/m4/stddef_h.m4 $(top_srcdir)/m4/stdint.m4 \
+	$(top_srcdir)/m4/stdint_h.m4 $(top_srcdir)/m4/stdio_h.m4 \
+	$(top_srcdir)/m4/stdlib_h.m4 $(top_srcdir)/m4/strcase.m4 \
+	$(top_srcdir)/m4/strchrnul.m4 $(top_srcdir)/m4/strerror.m4 \
+	$(top_srcdir)/m4/string_h.m4 $(top_srcdir)/m4/strings_h.m4 \
+	$(top_srcdir)/m4/strndup.m4 $(top_srcdir)/m4/strnlen.m4 \
+	$(top_srcdir)/m4/swig.m4 $(top_srcdir)/m4/swig_perl.m4 \
+	$(top_srcdir)/m4/sys_stat_h.m4 $(top_srcdir)/m4/sys_time_h.m4 \
+	$(top_srcdir)/m4/sysexits.m4 $(top_srcdir)/m4/tempname.m4 \
+	$(top_srcdir)/m4/time_h.m4 $(top_srcdir)/m4/unistd_h.m4 \
+	$(top_srcdir)/m4/vasnprintf.m4 $(top_srcdir)/m4/vsnprintf.m4 \
+	$(top_srcdir)/m4/warn-on-use.m4 $(top_srcdir)/m4/wchar_h.m4 \
+	$(top_srcdir)/m4/wchar_t.m4 $(top_srcdir)/m4/wint_t.m4 \
+	$(top_srcdir)/m4/xsize.m4 $(top_srcdir)/acinclude.m4 \
+	$(top_srcdir)/configure.in
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
