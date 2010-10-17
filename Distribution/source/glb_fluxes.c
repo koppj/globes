@@ -76,6 +76,9 @@ static int FLUX_STEPS = 500;          // Number of sampling points for builtin f
  ***************************************************************************/
 int glb_load_n_columns(const char *file_name, const int n_columns, int *n_lines, double *data[])
 {
+  //FIXME: Line numbers in error messages should count also comment lines
+  //FIXME: Use glb_error instead of fprintf
+  //FIXME: Test for equidistance should take into account # of digits given in file
   if (!file_name || !n_lines || !data)
     return GLBERR_UNINITIALIZED;
 

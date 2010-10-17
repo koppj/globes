@@ -194,3 +194,6 @@
           It is important to use libtoolize -c -f to get copies of dependencies
           rather than just symlinks.
 
+15 Oct 2010 JK
+        - Added degfinder and NSI probability engine to distribution
+

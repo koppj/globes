@@ -7,11 +7,26 @@
 <h1>Download</h1>
 
 <h2>Source code</h2>
-GLoBES can be downloaded as a single gzip-ed tar ball. The latest up-to-date
-version is here: 
+Latest stable version:
 <ul>
   <li><a href="download/globes-3.0.11.tar.gz">globes-3.0.11.tar.gz</a>
-  &nbsp;(September, 14, 2007)</li> </ul> <b>Note</b>: In v3.0.8, we have
+      &nbsp;(September, 14, 2007)
+  </li>
+</ul>
+
+Current development version:
+<ul>
+  <li><a href="download/globes-3.1.8.tar.gz">globes-3.1.8.tar.gz</a>
+      &nbsp;(September, 28, 2010)
+  </li>
+</ul>
+The development version roughly reflects the current development status of GLoBES.
+Compared to the stable version, it has some added features, but has
+not been tested as thoroughly yet as the stable version. Please refer to the
+NEWS file for a change log and list of new features.
+
+<p>
+<b>Note</b>: In v3.0.8, we have
   fixed a bug in the &chi;&sup2; calculations. Up to v3.0.7, the true
   and fitted event rates were interchanged in the computation of the
   Poissonian &chi;&sup2;. This may have some visible effect only in
@@ -27,38 +42,6 @@ of the experiment data tar-balls provided below. Unpack everthing to the same
 directory and just type 'globes X.glb', where X is one of the glb-files you just
 unpacked.-->
 
-<h2>Documentation and tutorials</h2>
-<ul>
-  <li>
-    <b>GLoBES user manual</b> version 3.0.8:
-    [<a href="documentation/globes-manual-3.0.8.pdf">PDF</a>]
-    [<a href="documentation/globes-manual-3.0.8.ps.gz">zipped Postscript</a>]
-    [<a href="documentation/globes-manual-3.0.8.ps">Postscript</a>]
-  </li>
-  <li>
-    <b>GLoBES publication</b> hep-ph/0407333:
-    [<a href="documentation/paper.pdf">PDF</a>]
-    [<a href="documentation/paper.ps.gz">zipped Postscript</a>]
-    [<a href="documentation/paper.ps">Postscript</a>]
-  </li>
-  <li>
-    <b>GLoBES publication</b> hep-ph/0701187:
-    [<a href="documentation/paper2.pdf">PDF</a>]
-    [<a href="documentation/paper2.ps.gz">zipped Postscript</a>]
-    [<a href="documentation/paper2.ps">Postscript</a>]
-  </li>
-  <li>
-    <b>GLoBES tutorials</b>: [<a href="documentation/globes-tutorials.tar.gz">tar.gz</a>]<br>
-    These tutorials were given at the <a href="http://www.mpi-hd.mpg.de/~jkopp/glb07/">
-    Workshop on Physics and Applications of GLoBES</a>, which took place in
-    Heidelberg from 24 - 26 January 2007.
-  </li>
-  <li>
-    <b>GLoBES poster</b> from Neutrino 2004 in Paris
-    [<a href="documentation/poster.pdf">PDF</a>]
-    [<a href="documentation/poster.ps.gz">zipped Postscript</a>]
-    [<a href="documentation/poster.ps">Postscript</a>]
-</ul>
 
 <h2>Software Requirements</h2>
 GLoBES is currently available for Linux and Mac OS under the GNU Public License. 
@@ -69,7 +52,12 @@ are installed:
   <li><a href="http://www.gnu.org/software/gsl/">GNU Scientific Library</a></li>
 </ul>
 These tools are included in many Linux distributions. Otherwise they can
-easily be downloaded from the provided links. 
+easily be downloaded from the provided links.
+
+<p>
+<b>Note to Mac users:</b> We have had reports of compilation problems
+of GLoBES 3.0.x on newer versions of Mac OS. If you encounter any such problems,
+please use the development version of GLoBES, in which they should be fixed.
 
 <h2>Terms of Use</h2>
 GLoBES is released under the <a href="http://www.gnu.org/licenses/gpl.html">GNU
@@ -91,18 +79,6 @@ correctly according to the comments in the respective files.
   <li><a href="download/globes-2.0.11.tar.gz">globes-2.0.11.tar.gz</a> &nbsp;(March 14, 2005)</li>
   <li><a href="download/globes-2.0.1.tar.gz">globes-2.0.1.tar.gz</a> &nbsp;(August 10, 2004)</li>
   <li><a href="download/globes-2.0.0.tar.gz">globes-2.0.0.tar.gz</a> &nbsp;(July 29, 2004)</li>
-  <li>
-    <b>GLoBES user manual</b> version 2.0.11:
-    [<a href="documentation/globes-manual-2.0.11.pdf">PDF</a>]
-    [<a href="documentation/globes-manual-2.0.11.ps.gz">zipped Postscript</a>]
-    [<a href="documentation/globes-manual-2.0.11.ps">Postscript</a>]
-  </li>
-  <li>
-    <b>GLoBES user manual</b> version 2.0:
-    [<a href="documentation/globes-manual-2.0.pdf">PDF</a>]
-    [<a href="documentation/globes-manual-2.0.ps.gz">zipped Postscript</a>]
-    [<a href="documentation/globes-manual-2.0.ps">Postscript</a>]
-  </li>  
 </ul>
 
 #include "template_foot.gtml"

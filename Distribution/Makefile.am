@@ -7,7 +7,8 @@ INCLUDES = $(F2CINC) $(GSLINC)
 EXTRA_DIST = examples/Makefile.in examples/example1.c	      \
   examples/example3.c examples/myio.c examples/example-tour.c \
   examples/example2.c examples/example4.c examples/example5.c examples/example6.c \
-  examples/myio.h \
+  examples/myio.h examples/degfinder.c examples/degfinder.h examples/nsi_probability.c \
+  example/nsi_probability.h \
   examples/NFstandard.glb examples/D-Chooz_far.glb examples/D-Chooz_near.glb \
   examples/Reactor1.glb examples/Reactor.dat examples/XCC.dat examples/XNC.dat \
   examples/XCCreactor.dat BUGS globes.m4 data/md5-sums \

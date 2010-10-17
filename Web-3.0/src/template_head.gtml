@@ -66,25 +66,25 @@
             <<nav_entry(download.html,Download,<<mycolor3>>)>>
           </tr>
           <tr>
-            <<nav_entry(experiments.html,Experiments,<<mycolor4>>)>>
+            <<nav_entry(documentation.html,Documentation,<<mycolor4>>)>>
+          </tr>
+          <tr>
+            <<nav_entry(experiments.html,Experiments,<<mycolor5>>)>>
           </tr>
 <!--          <tr>
-            <<nav_entry(faq.html,FAQ,<<mycolor5>>)>>
+            <<nav_entry(faq.html,FAQ,<<mycolor6>>)>>
           </tr>-->
           <tr>
-            <<nav_entry(meetings.html,Meetings,<<mycolor6>>)>>
+            <<nav_entry(meetings.html,Meetings,<<mycolor7>>)>>
           </tr>
           <tr>
-            <<nav_entry(credits.html,Credits,<<mycolor7>>)>>
+            <<nav_entry(credits.html,Credits,<<mycolor8>>)>>
           </tr>
           <tr>
-            <<nav_entry(contact.html,Contact,<<mycolor8>>)>>
+            <<nav_entry(contact.html,Contact,<<mycolor9>>)>>
           </tr>
           <tr>
-            <<nav_entry(impressum.html,Impressum,<<mycolor9>>)>>
-          </tr>
-          <tr>
-            <td>&nbsp;</td> <td bgcolor="<<mycolor10>>">&nbsp;</td>
+            <<nav_entry(impressum.html,Impressum,<<mycolor10>>)>>
           </tr>
           <tr>
             <td>&nbsp;</td> <td bgcolor="<<mycolor11>>">&nbsp;</td>

@@ -1,0 +1,94 @@
+#define TITLE       GLoBES - Documentation
+#define KEYWORDS    GLoBES, documentation, manual, user guide, reference guide, AEDL, glb, experiment, definitions, long, baseline, neutrino, oscillation
+#define DESCRIPTION Documentation of the GLoBES software
+
+#include "template_head.gtml"
+
+<h1>Documentation</h1>
+
+<h2>User manual and tutorials</h2>
+Latest stable version:
+<ul>
+  <li>
+    <b>GLoBES user manual</b> version 3.0.8:
+    [<a href="documentation/globes-manual-3.0.8.pdf">PDF</a>]
+    [<a href="documentation/globes-manual-3.0.8.ps.gz">zipped Postscript</a>]
+    [<a href="documentation/globes-manual-3.0.8.ps">Postscript</a>]
+  </li>
+  <li>
+    <b>GLoBES tutorials</b>: [<a href="documentation/globes-tutorials.tar.gz">tar.gz</a>]<br>
+    These tutorials were given at the <a href="http://www.mpi-hd.mpg.de/lin/events/globes07/">
+    Workshop on Physics and Applications of GLoBES</a>, which took place in
+    Heidelberg from 24 - 26 January 2007.
+  </li>
+</ul>
+
+Current development version:
+<ul>
+  <li>
+    <b>GLoBES user manual</b> version 3.1.8:
+    [<a href="documentation/globes-manual-3.1.8.pdf">PDF</a>]
+  </li>
+</ul>
+
+Older versions:
+<ul>
+  <li>
+    <b>GLoBES user manual</b> version 2.0.11:
+    [<a href="documentation/globes-manual-2.0.11.pdf">PDF</a>]
+    [<a href="documentation/globes-manual-2.0.11.ps.gz">zipped Postscript</a>]
+    [<a href="documentation/globes-manual-2.0.11.ps">Postscript</a>]
+  </li>
+  <li>
+    <b>GLoBES user manual</b> version 2.0:
+    [<a href="documentation/globes-manual-2.0.pdf">PDF</a>]
+    [<a href="documentation/globes-manual-2.0.ps.gz">zipped Postscript</a>]
+    [<a href="documentation/globes-manual-2.0.ps">Postscript</a>]
+  </li>  
+</ul>
+
+<h2>GLoBES publications</h2>
+
+Journal articles:
+<ul>
+  <li>
+    <b>GLoBES 3.0 paper</b> <a href="http://arxiv.org/abs/hep-ph/0701187">hep-ph/0701187</a>:
+    [<a href="documentation/paper2.pdf">PDF</a>]
+    [<a href="documentation/paper2.ps.gz">zipped Postscript</a>]
+    [<a href="documentation/paper2.ps">Postscript</a>]
+  </li>
+  <li>
+    <b>GLoBES 2.0 paper</b> <a href="http://arxiv.org/abs/hep-ph/0407333">hep-ph/0407333</a>:
+    [<a href="documentation/paper.pdf">PDF</a>]
+    [<a href="documentation/paper.ps.gz">zipped Postscript</a>]
+    [<a href="documentation/paper.ps">Postscript</a>]
+  </li>
+</ul>
+
+Selected conference contributions:
+<ul>
+  <li>
+    <b>GLoBES 3.0 poster</b>, presented, for instance, at NuFact 08
+    [<a href="documentation/poster2.pdf">PDF</a>]
+  </li>
+  <li>
+    <b>GLoBES poster</b> from Neutrino 2004 in Paris
+    [<a href="documentation/poster.pdf">PDF</a>]
+    [<a href="documentation/poster.ps.gz">zipped Postscript</a>]
+    [<a href="documentation/poster.ps">Postscript</a>]
+  </li>
+</ul>
+
+
+<h2>Citing GLoBES</h2>
+
+When using GLoBES to prepare a scientific publication, please refer to
+<a href="http://arxiv.org/abs/hep-ph/0407333">hep-ph/0407333</a>
+[<a href="http://inspirebeta.net/record/655407/export/hx">BibTeX</a>]
+and <a href="http://arxiv.org/abs/hep-ph/0701187">hep-ph/0701187</a>
+[<a href="http://inspirebeta.net/record/742961/export/hx">BibTeX</a>].
+Also, please look for additional citation information in the
+specific <a href="./experiments.html">AEDL files</a> and other data files you
+are using.
+
+#include "template_foot.gtml"
