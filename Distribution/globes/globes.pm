@@ -244,7 +244,6 @@ package globes;
 *GLB_POST = *globesc::GLB_POST;
 *GLB_MIN_NESTED_POWELL = *globesc::GLB_MIN_NESTED_POWELL;
 *GLB_MIN_POWELL = *globesc::GLB_MIN_POWELL;
-*GLB_MIN_SIMAN = *globesc::GLB_MIN_SIMAN;
 *GLB_EFF = *globesc::GLB_EFF;
 *GLB_BG = *globesc::GLB_BG;
 *GLB_SIG = *globesc::GLB_SIG;
