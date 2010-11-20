@@ -60,7 +60,7 @@ enum glb_enum_efficiency_types
 /* Available minimization algorithms */
 enum glb_enum_minimizers
        { GLB_MIN_NESTED_POWELL, GLB_MIN_POWELL };
-#define GLB_MIN_DEFAULT  GLB_MIN_NESTED_POWELL
+#define GLB_MIN_DEFAULT  GLB_MIN_POWELL
 
 
 #define GLB_EFF    1
