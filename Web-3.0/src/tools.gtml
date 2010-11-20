@@ -7,7 +7,7 @@
 <h1>GLoBES tools</h1>
 
 The following is a collection of tools and add-ons which solve common problem such
-as degeneracy finding, simulating new physics, etc. These tools are not part of the main
+as degeneracy finding, simulating new physics, etc. These tools are not part of
 GLoBES itself, and the responsibility for development, documentation, and support
 lies with the respective authors.
 
@@ -25,8 +25,7 @@ this website, please contact us at
 <h2>Degeneracy finding</h2>
 <ul>
   <li><b>Event rate based degeneracy finder</b><br>
-    <i>by<a href="http://www.slac.stanford.edu/spires/find/hepnames/wwwhist?irn=546500">
-    Joachim Kopp</a></i><br>
+    <i>by <a href="http://www.slac.stanford.edu/spires/find/hepnames/wwwhist?irn=546500">Joachim Kopp</a></i><br>
     This flexible and customizable function splits the minimization of
     &chi;<sup>2</sup> into two steps. The first is a rough but fast scan over
     a user-defined part of the parameter space, during which many features
@@ -46,8 +45,7 @@ this website, please contact us at
 <h2>New physics</h2>
 <ul>
   <li><b>Sterile neutrinos and non-standard interactions</b><br>
-    <i>by<a href="http://www.slac.stanford.edu/spires/find/hepnames/wwwhist?irn=546500">
-    Joachim Kopp</a></i><br>
+    <i>by <a href="http://www.slac.stanford.edu/spires/find/hepnames/wwwhist?irn=546500">Joachim Kopp</a></i><br>
     An oscillation engine that includes up to 6 sterile neutrino flavors and non-standard
     interactions affecting the production, propagation, and detection processes for both
     active and sterile neutrinos.

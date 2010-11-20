@@ -720,7 +720,7 @@ int glbSetProjectionFlagByName(glb_projection in, int flag, const char *name)
   if((flag!=GLB_FREE)&&(flag!=GLB_FIXED))
   {
     glb_error("glbSetProjectionFlagByName: Projection flag must be GLB_FREE or GLB_FIXED");
-    return NULL;
+    return GLBERR_INVALID_ARGS;
   }
 
   if (!name)
