@@ -706,6 +706,65 @@ void glbPrintProjection(FILE *stream, const glb_projection in)
 }
 
 
+/***************************************************************************
+ * Function glbSetProjectionFlagByName                                     *
+ ***************************************************************************
+ * Same as glbSetProjectionFlag, but identifies the parameter by name.     *
+ * Return value is GLB_SUCCESS or one of the (negative) GLBERR_XXX error   *
+ * codes                                                                   *
+ ***************************************************************************/
+int glbSetProjectionFlagByName(glb_projection in, int flag, const char *name)
+{
+  int index;
+
+  if((flag!=GLB_FREE)&&(flag!=GLB_FIXED))
+  {
+    glb_error("glbSetProjectionFlagByName: Projection flag must be GLB_FREE or GLB_FIXED");
+    return NULL;
+  }
+
+  if (!name)
+  {
+    glb_error("glbSetProjectionFlagByName: Invalid parameter name (NULL)");
+    return GLBERR_INVALID_ARGS;
+  }
+
+  if ((index=glbFindParamByName(name)) < 0)
+    return index;
+  else
+  {
+    if (!glbSetProjectionFlag(in, flag, index))
+      return GLBERR_GENERIC;
+    else
+      return GLB_SUCCESS;
+  }
+}
+
+
+/***************************************************************************
+ * Function glbGetProjectionFlagByName                                     *
+ ***************************************************************************
+ * Same as glbGetProjectionFlag, but identifies the parameter by name.     *
+ * In case of an error, the return value is negative                       *
+ ***************************************************************************/
+int glbGetProjectionFlagByName(const glb_projection in, const char *name)
+{
+  int index;
+  
+  if (!name)
+  {
+    glb_error("glbSetProjectionFlagByName: Invalid parameter name (NULL)");
+    return GLBERR_INVALID_ARGS;
+  }
+
+  if ((index=glbFindParamByName(name)) < 0)
+    return index;
+  else
+    return glbGetProjectionFlag(in, index);
+}
+
+
+
 /* Wrappers for the old functions dealing with setting the oscillation
  * parameters
  */

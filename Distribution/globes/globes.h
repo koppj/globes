@@ -216,6 +216,8 @@ glb_projection glbSetDensityProjectionFlag(glb_projection in, int flag, int whic
 int glbGetProjectionFlag(const glb_projection in, int which);
 int glbGetDensityProjectionFlag(const glb_projection in, int which);
 void glbPrintProjection(FILE *stream, const glb_projection in);
+int glbSetProjectionFlagByName(glb_projection in, int flag, const char *name);
+int glbGetProjectionFlagByName(const glb_projection in, const char *name);
 
 int glbSetProjection(const glb_projection in);
 int glbGetProjection(glb_projection in);

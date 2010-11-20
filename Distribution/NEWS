@@ -197,3 +197,14 @@
 15 Oct 2010 JK
         - Added degfinder and NSI probability engine to distribution
 
+22 Oct 2010 JK
+        - Added %option nounistd to glb_lexer.l since getopt.h, included from
+          unistd.h, was causing trouble on Macs
+
+03 Nov 2010 JK
+        - Degfinder and NSI probability engine removed from distribution
+          again; will be made available as separate add-ons
+
+20 Nov 2010 JK
+        - New functions glbSetProjectionFlagByName, glbGetProjectionFlagByName
+

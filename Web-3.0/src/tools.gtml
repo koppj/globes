@@ -1,0 +1,116 @@
+#define TITLE       GLoBES -  Tools
+#define KEYWORDS    GLoBES, long, baseline, neutrino, oscillation, experiment, simulate, simulating, long baseline, neutrino oscillation, tools, add-ons, degeneracy, probability, engine
+#define DESCRIPTION GLoBES tools for taks like degeneracy finding, simulating new physics, etc.
+
+#include "template_head.gtml"
+
+<h1>GLoBES tools</h1>
+
+The following is a collection of tools and add-ons which solve common problem such
+as degeneracy finding, simulating new physics, etc. These tools are not part of the main
+GLoBES itself, and the responsibility for development, documentation, and support
+lies with the respective authors.
+
+<p>
+For comments or questions on the individual tools, please contact the respective
+authors directly.
+</p>
+
+<p>
+If you have a GLoBES add-on that you would like to share with other users through
+this website, please contact us at
+<a href="mailto:globes@mpi-hd.mpg.de?subject=GLoBES Add-on">globes@mpi-hd.mpg.de</a>.
+</p>
+
+<h2>Degeneracy finding</h2>
+<ul>
+  <li><b>Event rate based degeneracy finder</b><br>
+    <i>by<a href="http://www.slac.stanford.edu/spires/find/hepnames/wwwhist?irn=546500">
+    Joachim Kopp</a></i><br>
+    This flexible and customizable function splits the minimization of
+    &chi;<sup>2</sup> into two steps. The first is a rough but fast scan over
+    a user-defined part of the parameter space, during which many features
+    (such as systematic uncertainties) are switched off. In a second step, the
+    local minima identified during the scan are then refined using the
+    full-fledged GLoBES minimizer.
+    <ul>
+      <li>v1.0 (Nov 2010)
+        [<a href="tools/degfinder-1.0.tar.gz">Source</a>]&nbsp;
+        [<a href="tools/degfinder-1.0.pdf">Documentation</a>]
+      </li>
+    </ul>
+  </li>
+</ul>
+
+
+<h2>New physics</h2>
+<ul>
+  <li><b>Sterile neutrinos and non-standard interactions</b><br>
+    <i>by<a href="http://www.slac.stanford.edu/spires/find/hepnames/wwwhist?irn=546500">
+    Joachim Kopp</a></i><br>
+    An oscillation engine that includes up to 6 sterile neutrino flavors and non-standard
+    interactions affecting the production, propagation, and detection processes for both
+    active and sterile neutrinos.
+    <ul>
+      <li>v1.0 (Nov 2010)
+        [<a href="tools/snu-1.0.tar.gz">Source</a>]&nbsp;
+        [<a href="tools/snu-1.0.pdf">Documentation</a>]
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<a href="http://wwwth.mppmu.mpg.de/members/blennow/montecubes/"><h2>MonteCUBES</h2></a>
+
+<i>by <a href="http://www.slac.stanford.edu/spires/find/hepnames/wwwhist?irn=467987">
+Mattias Blennow</a> and
+<a href="http://www.slac.stanford.edu/spires/find/hepnames/wwwhist?irn=567850">
+Enrique Fernandez-Martinez</a></i>
+
+<p>
+A GLoBES plugin that replaces the deterministic GLoBES minimizer by a <b>Markov
+Chain Monte Carlo</b> method that is able to handle higher dimensional parameter
+spaces and has a better chance of finding degenerate solutions.
+MonteCUBES also extends GLoBES by including support for <b>non-unitary mixing
+matrices</b> and <b>non-standard interactions</b>. The software comes with a versatile
+<b>Matlab</b> interface for analyzing simulation results.
+
+<p>
+<a href="http://wwwth.mppmu.mpg.de/members/blennow/montecubes/">MonteCUBES homepage</a>
+
+<!--
+<table frame="border" rules="all" cellspacing="4" cellpadding="4">
+  <colgroup>
+    <col width="150">
+    <col width="180">
+    <col width="60">
+    <col width="100">
+    <col width="200">
+  </colgroup>
+  <tr>
+    <td colspan="5" align="center"> <font size="+2">Degeneracy finding</font></td>
+  </tr>
+  <tr>
+    <td><b>Degfinder</b></td>
+    <td>
+      <a href="http://www.slac.stanford.edu/spires/find/hepnames/wwwhist?irn=546500">
+      J. Kopp</a>
+    </td>
+    <td>
+      v1.0
+    </td>
+    <td>
+      8 Nov 2010
+    </td>
+    <td>
+      [<a href="tools/degfinder-1.0.tar.gz">Source</a>]&nbsp;
+      [Documentation]
+    </td>
+  </tr>
+</table>
+-->
+
+
+
+#include "template_foot.gtml"
+

@@ -1,0 +1,169 @@
+\documentclass{article}
+
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{ctable}
+\usepackage{longtable}
+
+% Define bold face typewriter font
+\DeclareFontShape{OT1}{cmtt}{bx}{n}{
+  <5><6><7><8><9><10><10.95><12><14.4><17.28><20.74><24.88>cmttb10}{}
+
+
+\title{{\tt degfinder} --- Event rate based degeneracy finding in GLoBES}
+\author{Joachim Kopp}
+\date{v1.0 (Nov 2010)}
+
+\begin{document}
+
+\maketitle
+
+\begin{center}
+\framebox{
+\begin{minipage}{11cm}
+{\bf IMPORTANT NOTICE:} It is important to keep in mind that degeneracy finding is
+not a foolproof process. The performance of {\tt degfinder} depends critically
+on the way it is configured by the user. For example, it is the user's
+responsibility to determine which parameters need to be scanned over in
+the pre-scan, which parameter correlations need to be taken into account,
+etc. If a mistake is made, results may be too optimistic, and it is often
+hard to notice when this happens. If your plots show
+funny features (kinks, spikes, tiny islands of good sensitivity), this
+is often an indication that degeneracy finding has gone wrong.
+Once again, {\bf \texttt{\textbf{degfinder}} MUST NOT BE USED AS A BLACK BOX!}
+\end{minipage}}
+\end{center}
+
+\section{Introduction}
+
+In a fit to data from a high-precision neutrinon oscillation experiment, one
+often has to deal with the problem of multiple degenerate solutions in the
+high-dimensional space of oscillation parameters. For example, the two cases
+$\Delta m_{31}^2 > 0$ (normal mass hierarchy) and $\Delta m_{31}^2 < 0$ (inverted
+mass hierarchy) often cannot be distinguished
+(``mass hierarchy degneracy''). The fitting algorithm in GLoBES is based on 
+\emph{local} minimization of $\chi^2$ in the space of oscillation parameters
+and systematic nuisance parameters. This local minimization can only find
+one degenerate solution at a time. For example, if a $\Delta m_{31}^2 > 0$
+is used as a starting value (the {\tt in} parameters passed to {\tt glbChiNP}
+etc.), the minimizer will usually converge into a normal hierarchy solution
+and ignore the inverted hierarchy solution. This may lead to results that
+are too optimistic, and hence it is mandatory to address the problem of
+degenerate solutions carefully.
+
+This is the aim of the {\tt degfinder} add-pon. The function {\tt degfinder}
+first performs a rough scan (the so-called \emph{pre-scan}) of part of the
+parameter space during which many features like systematic uncertainties
+and parameter correlations are switched off to improve speed. Which part of
+the parameter space is scanned over is determined by the user. The pre-scan
+provides rough estimates for the locations of the local $\chi^2$ minima,
+and each of these is then used as a starting points for a full-fledged
+minimization including all features.
+
+
+\section{Installation}
+
+To use degfinder in your GLoBES application, simply {\tt \#include} the header file
+{\tt degfinder.h} in your source code and add the source file {\tt degfinder.c} to
+your {\tt Makefile} so that it is compiled and linked to your executable.
+
+Note that {\tt degfinder} is written in the GNU version of C99. To compile it
+with {\tt gcc}, use the option {\tt -std=gnu99}. I haven't tested {\tt
+degfinder} with other compilers, so I cannot exclude that some tweaking may be
+necessary to compile it with them.
+
+\section{Usage}
+
+The syntax of {\tt degfinder} is
+
+\begin{verbatim}
+int degfinder(const glb_params base_values,
+  const int n_prescan_params, const int *prescan_params,
+  const double *prescan_min, const double *prescan_max,
+  const int *prescan_steps, const glb_projection prescan_proj,
+  const glb_projection fit_proj, int *n_deg, glb_params *deg_pos,
+  double *deg_chi2, const long flags);
+\end{verbatim}
+
+\noindent The arguments are \\
+\begin{longtable}{p{3cm}p{9cm}}
+  \toprule
+  {\tt base\_values} & Vector of oscillation parameters.
+                       Parameters that are not scanned in the pre-scan (i.e.\ parameters
+                       that are not included in {\tt prescan\_params}) are treated in
+                       the same way as {\tt in} parameters passed to {\tt glbChiNP}
+                       and similar function. This means that if a parameter is declared as
+                       {\tt GLB\_FIXED} in {\tt prescan\_proj} or {\tt fit\_proj}, it is
+                       assumed to be known with a zero uncertainty in the pre-scan or
+                       during the final fit, respectively. The value of a parameter that
+                       is declared as {\tt GLB\_FREE} in {\tt prescan\_proj} or {\tt fit\_proj}
+                       is used as starting values for local minimizations of $\chi^2$ with
+                       respect to that parameter during the pre-scan or during the final
+                       minimization, respectively. The {\tt base\_values} of parameters included in
+                       {\tt prescan\_params} are ignored. \\\midrule
+  {\tt n\_prescan\_params} & The number of parameters that should be scanned over during
+                             the pre-scan. \\\midrule
+  {\tt prescan\_params}    & A list of parameters to be scanned over during the pre-scan.
+                             Parameters are referred to by their numerical index, e.g.\
+                             {\tt GLB\_THETA\_12}, {\tt GLB\_THETA\_13}, etc. There should
+                             be {\tt n\_prescan\_params} entries in {\tt prescan\_params}. \\\midrule
+  {\tt prescan\_min}, {\tt prescan\_max}, {\tt prescan\_steps}
+                           & Parameter ranges for the pre-scan. For each entry of
+                             {\tt prescan\_params}, a minimum value, a maximum value, and
+                             a number of steps is given. The number of points sampled for
+                             each parameter is the number of steps plus one. Note that all
+                             parameters except $\theta_{13}$ are scanned on a linear scale,
+                             while $\theta_{13}$ is scanned on a logarithmic scale in
+                             $\sin^2 2\theta_{13}$. For example, if {\tt prescan\_min = -3},
+                             {\tt prescan\_max = -1}, $\sin^2 2\theta_{13}$ will be varied
+                             between $10^{-3}$ and $10^{-1}$, using {\tt prescan\_steps+1}
+                             logarithmically spaced sampling points. \\\midrule
+  {\tt prescan\_proj}      & The projection to be used in the pre-scan. Typically, most or
+                             all entries will be declared as {\tt GLB\_FIXED} to make
+                             the pre-scan as efficient as possible. Sometimes, however,
+                             it may be necessary to declare one or several parameters as
+                             {\tt GLB\_FREE} to tell {\tt degfinder} to do a local minimization
+                             over that parameter even during the pre-scan. \\\midrule
+  {\tt fit\_proj}          & The projection to be used in the final fit. Typically, most
+                             parameters will be declared as {\tt GLB\_FREE} here. \\\midrule
+  {\tt n\_deg}             & Input: Pointer to an integer giving the maximum number of degenerate
+                             solutions to accept (the length of the vectors {\tt deg\_pos}
+                             and {\tt deg\_chi}). \newline
+                             Output: The number of degenerate solutions actually found. \\\midrule
+  {\tt deg\_pos}           & An array of pointers to {\tt glb\_params} structures that will be
+                             filled with the locations of the degenerate solutions in the space
+                             of oscillation parameters. \\\midrule
+  {\tt deg\_chi}           & This array will be filled with the $\chi^2$ values of the
+                             degenerate solutions. \\\midrule
+  {\tt flags}              & Some flags that control the behavior of {\tt degfinder}. \newline
+                             \begin{tabular}{lp{6.3cm}}
+                               {\tt DEG\_NO\_NH}   & Omit normal hierarchy solutions. \\
+                               {\tt DEG\_NO\_IH}   & Omit inverted hierarchy solutions. \\
+                               {\tt DEG\_NO\_SYS}  & Switch off systematics even during the final fit
+                                                     (systematics are always off during the pre-scan). \\
+                               {\tt DEG\_NO\_CORR} & Switch off parameter correlations. Equivalent to
+                                                     declaring all parameters as {\tt GLB\_FIXED} in both
+                                                     {\tt prescan\_proj} and {\tt fit\_proj}. \\
+                               {\tt DEG\_NO\_DEG}  & Switch off degeneracies. Equivalent to
+                                                     setting {\tt n\_prescan\_params = 0}. Note that in
+                                                     this case, {\tt degfinder} should behave just like
+                                                     {\tt glbChiNP}. \\
+                             \end{tabular} \\
+  \bottomrule
+\end{longtable}
+
+
+\section{{\tt degfinder} and non-standard interactions}
+
+{\tt degfinder} works together with my non-standard interaction code. If you want to
+use this feature, include {\tt nsi\_probability.h} in the header of {\tt degfinder.c}. If non-standard
+parameters are included in the pre-scan, {\tt degfinder} will step through the non-standard phases
+on a linear scale, while the absolute values of the non-standard parameters are scanned
+on a log scale. Consequently, for the absolute values of the non-standard paremeters,
+{\tt prescan\_min} and {\tt prescan\_max} should be logarithmic. For example, a range
+$[-3, -1]$ means that this parameter will be varied between $10^{-3}$ and $10^{-1}$,
+with logarithmically spaced sampling points. Note that degeneracy finding in high
+dimensional NSI parameter spaces can be extremely inefficient.
+
+\end{document}
+

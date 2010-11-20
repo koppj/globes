@@ -30,7 +30,20 @@
 
 #include <globes/globes.h>
 #include "degfinder.h"
-#include "nsi_probability.h"
+/*#include "nsi_probability.h"*/ /* Uncomment if you want to use degfinder with JK's NSI engine */
+
+#ifndef FIRST_NSI_INDEX
+#define FIRST_NSI_INDEX -100
+#define LAST_NSI_INDEX  -101
+#endif
+
+#define SQR(x)      ((x)*(x))                              // x^2 
+#define POW10(x)    (exp(M_LN10*(x)))                      // 10^x
+#define MIN(X,Y)    ( ((X) < (Y)) ? (X) : (Y) )
+#define MAX(X,Y)    ( ((X) > (Y)) ? (X) : (Y) )
+#define SIGN(a,b)   ( ((b) > 0.0) ? (fabs(a)) : (-fabs(a)) )
+#define SGN(a)      ( ((a) >= 0.0) ? (1) : (-1) )
+#define ROUND(x)    ( (int)((x) + 0.5) )
 
 /* Global variables */
 extern const char *param_strings[];

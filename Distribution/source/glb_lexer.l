@@ -23,6 +23,7 @@
 
 %pointer
 %option noyywrap
+%option nounistd
 
 
 /* This here caused an unpleasant problem:

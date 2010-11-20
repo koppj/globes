@@ -1,0 +1,143 @@
+\documentclass{article}
+
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{ctable}
+\usepackage{longtable}
+
+% Define bold face typewriter font
+\DeclareFontShape{OT1}{cmtt}{bx}{n}{
+  <5><6><7><8><9><10><10.95><12><14.4><17.28><20.74><24.88>cmttb10}{}
+
+
+\title{Sterile neutrinos and non-standard neutrino interactions in GLoBES}
+\author{Joachim Kopp}
+\date{v1.0 (Nov 2010)}
+
+\begin{document}
+
+\maketitle
+
+Sterile neutrinos and non-standard neutrino interactions (NSI) are two of
+the most generic types of new physics possible in the neutrino sector.
+For an introduction to the formalism of NSI, see e.g.\ \cite{Kopp:2007ne}.
+
+There are several implementations of NSI in GLoBES (e.g.\ the MonteCubes plugin
+\cite{Blennow:2009pk}, for instance, can handle NSI), but to the best of
+my knowledge, there is no publicly available implementation of sterile neutrinos.
+The code discussed here can handle both: It works with up to 9 neutrino flavors,
+and can handle NSI in the production and detection processes as well as
+non-standard matter effects (NSI in propagation). The non-standard operators
+can affect the active neutrino species as well as the sterile ones.
+
+To use the code, include {\tt snu.c} in your project by modifying your
+{\tt Makefile} accordingly, and {\tt \#include} the header file {\tt snu.h}
+in your source code.
+
+The first step is to initialize the sterile neutrino/NSI engine. If you only
+need NSI, but no sterile neutrinos, you may use the simple command
+\begin{verbatim}
+  snu_init_probability_engine();
+\end{verbatim}
+On the other hand, if you need sterile neutrinos, you need to specify how
+many neutrino species you would like to include, and how the mixing matrix
+is defined. The syntax for this is
+\begin{verbatim}
+  int snu_init_probability_engine(int n_flavors,
+    int rotation_order\left[2], int phase_order[]);
+\end{verbatim}
+\noindent The arguments are
+\begin{longtable}{p{2.5cm}p{8.5cm}}
+  \toprule
+  {\tt n\_flavors}      & The number of neutrino flavors. Must be $\geq 3$.
+                          Note that for ${\tt n\_flavors} = 3$, the optimized
+                          algorithms from \cite{Kopp:2006wp} are used to
+                          diagonalize the Hamiltonian, while for more than four
+                          flavors, the GNU Scientific Library is used. \\\midrule
+  {\tt rotation\_order}, {\tt phase\_order} &
+    Specifies how the neutrino mixing matrix $U$ is composed of individual rotation
+    matrices, and which of the rotation matrices carry the complex phases. A
+    definition of the form
+    \begin{flushleft}
+      {\tt rotation\_order} = \{\{$i_1$, $j_1$\}, \{$i_2$, $j_2$\}, \dots \} \\
+      {\tt phase\_order} = $\{k_1, k_2, \dots\}$
+    \end{flushleft}
+    means $U = R(\theta_{i_1 j_1},
+    \delta_{k_1}) R(\theta_{i_2 j_2}, \delta_{k_2}) \cdots$, where
+    \begin{displaymath}
+      R(\theta_{ij},\delta_k) =
+        \begin{pmatrix}
+          0      & \cdots &   0             & \cdots &   0                    & \cdots & 0 \\
+          \vdots &        & \vdots          &        & \vdots                 &        & \vdots \\
+          0      & \cdots & \cos\theta_{ij} & \cdots & e^{i\delta_k} \sin\theta_{ij} & \cdots & 0 \\
+          \vdots &        & \vdots          &        & \vdots                 &        & \vdots \\
+          0      & \cdots & -e^{-i\delta_k} \sin\theta_{ij} & \cdots & \cos\theta_{ij} & \cdots & 0 \\
+          \vdots &        & \vdots          &        & \vdots                 &        & \vdots \\
+          0      & \cdots &   0             & \cdots &   0                    & \cdots & 0 \\
+        \end{pmatrix}
+    \end{displaymath}
+    is a rotation matrix in the $ij$-sector with complex phase $\delta_k$. The
+    indices $i$ and $j$ run from $1$ to {\tt n\_flavors}. Both {\tt
+    rotation\_order} and {\tt phase\_order} should have ${\tt n\_flavors}
+    ({\tt n\_flavors}-1)/2$ entries. Since there are only
+    $({\tt n\_flavors}-1)({\tt n\_flavors}-2)/2$ phases, some of the entries
+    of {\tt phase\_order} should be $-1$, indicating that the respective
+    rotation matrices will be treated as real. In the above syntax, the
+    standard three-flavor mixing matrix $U_{3\times3} = R(\theta_{23},0)
+    R(\theta_{13},\delta) R(\theta_{12},0)$ would be given by
+    \begin{flushleft}
+      {\tt rotation\_order} = \{\{2, 3\}, \{1, 3\}, \{1, 2\} \} \\
+      {\tt phase\_order} = \{-1, 0, -1\}\,.
+    \end{flushleft} \\
+  \bottomrule
+\end{longtable}
+After initializing the sterile neutrino/NSI engine, you have to make it known
+to GLoBES by calling
+\begin{verbatim}
+  glbRegisterProbabilityEngine(6*SQR(n_flavors) - n_flavors,
+                               &snu_probability_matrix,
+                               &snu_set_oscillation_parameters,
+                               &snu_get_oscillation_parameters,
+                               NULL);
+\end{verbatim}
+Note the expression for the number of oscillation parameters in the first line.
+As with any new probability engine, the call to {\tt
+glbRegisterProbabilityEngine} has to occur before any calls to {\tt
+glbAllocParams} or {\tt glbAllocProjection} to make sure that all parameter and
+projection vectors have the correct length.
+
+It is recommended to use {\tt glbSetParamName} to assign human-readable
+names to the oscillation parameters by which they can be referred to in
+subsequent calls to {\tt glbSetOscParamByName} and {\tt
+glbSetProjectionFlagByName}. A list of suitable names is provided in the global
+array {\tt char snu\_param\_strings[][64]}. The syntax is {\tt TH12},
+{\tt TH13}, {\tt TH14}, etc. for the mixing angles, {\tt DELTA\_0},
+{\tt DELTA\_1}, \dots for the CP phases, {\tt ABS\_EPS\_$c$\_$\alpha\beta$}
+for the absolute values of the non-standard parameters, and
+{\tt ARG\_EPS\_$c$\_$\alpha\beta$} for their phases. Here, $c = {\tt S},
+{\tt M}, {\tt D}$ to identify NSI in the source, in propagation (non-standard
+matter effects), and in detection. $\alpha$ and $\beta$ are neutrino flavors,
+where the standard flavors are denoted by {\tt E}, {\tt MU}, {\tt TAU},
+and the sterile flavors are {\tt S1}, {\tt S2}, {\tt S3}, \dots. For
+example, {\tt ABS\_EPS\_M\_ETAU} refers to $|\varepsilon^m_{e\tau}|$
+in the notation of \cite{Kopp:2007ne}.
+
+Having initialized and registered the non-standard probability engine, you can
+use all GLoBES functions in the same way as you would for standard
+oscillations.  Note, however that at the moment the initial and final flavors
+in the definition of an oscillation channel can only involve the three active
+flavors. It is for instance not possible to compute sterile neutrino
+appearance.
+
+After using the sterile neutrino/NSI engine, you may want to release the
+(small) amount of memory allocated by it by calling
+\begin{verbatim}
+  snu_free_probability_engine();
+\end{verbatim}
+
+\bibliographystyle{plain}
+\bibliography{snu}
+
+
+\end{document}
+

@@ -154,7 +154,7 @@ static struct argp_option options[] ={
   {"parameters",'p',"PARAMETERS",0,
    "Set of oscillation parameters\n   for which the rates are computed\n"
    "   Format 'th12,th13,th23,delta,dm21,dm31'"},
-  {"before",'b',0,0,"Channel rates before smearing (implies -c)"},
+  {"before",'b',0,0,"Channel rates before smearing (ignored if -c is not used)"},
   {"after",'a',0,0,"Rates after smearing"},
   {"efficiencies",'f',0,0,"Rates without efficiencies"},
   {"backgrounds",'g',0,0,"Rates without backgrounds"},

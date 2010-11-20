@@ -4022,6 +4022,94 @@ XS(_wrap_glbPrintProjection) {
 }
 
 
+XS(_wrap_glbSetProjectionFlagByName) {
+  {
+    glb_projection arg1 = (glb_projection) 0 ;
+    int arg2 ;
+    char *arg3 = (char *) 0 ;
+    int result;
+    void *argp1 = 0 ;
+    int res1 = 0 ;
+    int val2 ;
+    int ecode2 = 0 ;
+    int res3 ;
+    char *buf3 = 0 ;
+    int alloc3 = 0 ;
+    int argvi = 0;
+    dXSARGS;
+    
+    if ((items < 3) || (items > 3)) {
+      SWIG_croak("Usage: glbSetProjectionFlagByName(in,flag,name);");
+    }
+    res1 = SWIG_ConvertPtr(ST(0), &argp1,SWIGTYPE_p_glb_projection_type, 0 |  0 );
+    if (!SWIG_IsOK(res1)) {
+      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "glbSetProjectionFlagByName" "', argument " "1"" of type '" "glb_projection""'"); 
+    }
+    arg1 = (glb_projection)(argp1);
+    ecode2 = SWIG_AsVal_int SWIG_PERL_CALL_ARGS_2(ST(1), &val2);
+    if (!SWIG_IsOK(ecode2)) {
+      SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "glbSetProjectionFlagByName" "', argument " "2"" of type '" "int""'");
+    } 
+    arg2 = (int)(val2);
+    res3 = SWIG_AsCharPtrAndSize(ST(2), &buf3, NULL, &alloc3);
+    if (!SWIG_IsOK(res3)) {
+      SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "glbSetProjectionFlagByName" "', argument " "3"" of type '" "char const *""'");
+    }
+    arg3 = buf3;
+    result = (int)glbSetProjectionFlagByName(arg1,arg2,(char const *)arg3);
+    ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
+    
+    
+    if (alloc3 == SWIG_NEWOBJ) free((char*)buf3);
+    XSRETURN(argvi);
+  fail:
+    
+    
+    if (alloc3 == SWIG_NEWOBJ) free((char*)buf3);
+    SWIG_croak_null();
+  }
+}
+
+
+XS(_wrap_glbGetProjectionFlagByName) {
+  {
+    glb_projection arg1 = (glb_projection) (glb_projection)0 ;
+    char *arg2 = (char *) 0 ;
+    int result;
+    void *argp1 = 0 ;
+    int res1 = 0 ;
+    int res2 ;
+    char *buf2 = 0 ;
+    int alloc2 = 0 ;
+    int argvi = 0;
+    dXSARGS;
+    
+    if ((items < 2) || (items > 2)) {
+      SWIG_croak("Usage: glbGetProjectionFlagByName(in,name);");
+    }
+    res1 = SWIG_ConvertPtr(ST(0), &argp1,SWIGTYPE_p_glb_projection_type, 0 |  0 );
+    if (!SWIG_IsOK(res1)) {
+      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "glbGetProjectionFlagByName" "', argument " "1"" of type '" "glb_projection const""'"); 
+    }
+    arg1 = (glb_projection)(argp1);
+    res2 = SWIG_AsCharPtrAndSize(ST(1), &buf2, NULL, &alloc2);
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "glbGetProjectionFlagByName" "', argument " "2"" of type '" "char const *""'");
+    }
+    arg2 = buf2;
+    result = (int)glbGetProjectionFlagByName(arg1,(char const *)arg2);
+    ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
+    
+    if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+    XSRETURN(argvi);
+  fail:
+    
+    if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+    SWIG_croak_null();
+  }
+}
+
+
 XS(_wrap_glbSetProjection) {
   {
     glb_projection arg1 = (glb_projection) (glb_projection)0 ;
@@ -9318,6 +9406,8 @@ static swig_command_info swig_commands[] = {
 {"globesc::glbGetProjectionFlag", _wrap_glbGetProjectionFlag},
 {"globesc::glbGetDensityProjectionFlag", _wrap_glbGetDensityProjectionFlag},
 {"globesc::glbPrintProjection", _wrap_glbPrintProjection},
+{"globesc::glbSetProjectionFlagByName", _wrap_glbSetProjectionFlagByName},
+{"globesc::glbGetProjectionFlagByName", _wrap_glbGetProjectionFlagByName},
 {"globesc::glbSetProjection", _wrap_glbSetProjection},
 {"globesc::glbGetProjection", _wrap_glbGetProjection},
 {"globesc::glbChiSys", _wrap_glbChiSys},

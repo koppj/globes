@@ -27,9 +27,18 @@ neutrino oscillation experiments. Main features are:
 
 <p>
 The latest stable release of GLoBES,  version 3.0 is available for
-<a href="download.html">download</a>.<br>
-<b>NEW:</b> We now offer also the latest, frequently updated, development releases
+<a href="download.html">download</a>.
+</p>
+
+<p>
+<span class="red"><b>NEW:</b></span>
+We now offer also the latest, frequently updated, development releases
 for <a href="download.html">download</a>.
+</p>
+<p>
+<span class="red"><b>NEW:</b></span>
+A collection of <a href="tools.html">additional tools</a> for degeneracy finding,
+new physics simulation, etc. is now available for <a href="tools.html">download</a>.
 </p>
 <p>
 GLoBES is maintained by <b>Patrick Huber</b>, <b>Joachim Kopp</b>, <b>Manfred Lindner</b>,

@@ -71,9 +71,9 @@
           <tr>
             <<nav_entry(experiments.html,Experiments,<<mycolor5>>)>>
           </tr>
-<!--          <tr>
-            <<nav_entry(faq.html,FAQ,<<mycolor6>>)>>
-          </tr>-->
+          <tr>
+            <<nav_entry(tools.html,Tools,<<mycolor6>>)>>
+          </tr>
           <tr>
             <<nav_entry(meetings.html,Meetings,<<mycolor7>>)>>
           </tr>

@@ -103,6 +103,8 @@ package globes;
 *glbGetProjectionFlag = *globesc::glbGetProjectionFlag;
 *glbGetDensityProjectionFlag = *globesc::glbGetDensityProjectionFlag;
 *glbPrintProjection = *globesc::glbPrintProjection;
+*glbSetProjectionFlagByName = *globesc::glbSetProjectionFlagByName;
+*glbGetProjectionFlagByName = *globesc::glbGetProjectionFlagByName;
 *glbSetProjection = *globesc::glbSetProjection;
 *glbGetProjection = *globesc::glbGetProjection;
 *glbChiSys = *globesc::glbChiSys;
