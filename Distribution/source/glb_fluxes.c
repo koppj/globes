@@ -76,13 +76,11 @@ static int FLUX_STEPS = 500;          // Number of sampling points for builtin f
  ***************************************************************************/
 int glb_load_n_columns(const char *file_name, const int n_columns, int *n_lines, double *data[])
 {
-  //FIXME: Line numbers in error messages should count also comment lines
-  //FIXME: Use glb_error instead of fprintf
-  //FIXME: Test for equidistance should take into account # of digits given in file
   if (!file_name || !n_lines || !data)
     return GLBERR_UNINITIALIZED;
 
   int j;
+  int nl;  // Counter for "real" lines, including blank lines and comments
   int buf_length = 100;
 
   /* Allocate buffer */
@@ -92,20 +90,21 @@ int glb_load_n_columns(const char *file_name, const int n_columns, int *n_lines,
   FILE *f = glb_fopen(file_name, "r");
   if (!f)
   {
-    fprintf(stderr, "glb_load_n_columns: Cannot open file %s.\n", file_name);
+    glb_error("glb_load_n_columns: Cannot open file %s", file_name);
     return GLBERR_FILE_NOT_FOUND;
   }
 
   /* Read from file */
   const int max_line = 1024;
   char this_line[max_line];
-  *n_lines = 0;
+  *n_lines = nl = 0;
   while (fgets(this_line, max_line, f))
   {
+    nl++;
     if (strlen(this_line) > max_line - 2)
     {
-      fprintf(stderr, "glb_load_n_columns: Line %d too long in file %s.\n",
-              *n_lines+1, file_name);
+      glb_error("glb_load_n_columns: Line %d too long in file %s",
+                nl, file_name);
       return GLBERR_INVALID_FILE_FORMAT;
     }
 
@@ -123,27 +122,27 @@ int glb_load_n_columns(const char *file_name, const int n_columns, int *n_lines,
       {
         if (!p)
         {
-          fprintf(stderr, "glb_load_n_columns: Line %d too short in file %s.\n",
-                  *n_lines+1, file_name);
+          glb_error("glb_load_n_columns: Line %d too short in file %s",
+                    nl, file_name);
           return GLBERR_INVALID_FILE_FORMAT;
         }
         if (sscanf(p, "%lf", &data[j][*n_lines]) != 1)
         {
-          fprintf(stderr, "glb_load_n_columns: Line %d invalid in file %s.\n",
-                  *n_lines+1, file_name);
+          glb_error("glb_load_n_columns: Line %d invalid in file %s",
+                    nl, file_name);
           return GLBERR_INVALID_FILE_FORMAT;
         }
         p = strtok(NULL, " \t,");
       }
 
-      if (*n_lines > 1  &&   /* Check if log10(E) support points are equidistant */
-          fabs(data[0][*n_lines] - 2*data[0][*n_lines-1]
-               + data[0][*n_lines-2])/fabs(data[0][*n_lines]) > 1e-10)
-      {
-        fprintf(stderr, "glb_load_n_columns: Error in %s, line %d: log10(E) sampling points "
-                        "should be equidistant.\n", file_name, *n_lines+1);
-        return GLBERR_INVALID_FILE_FORMAT;
-      }
+//      if (*n_lines > 1  &&   /* Check if log10(E) support points are equidistant */
+//          fabs(data[0][*n_lines] - 2*data[0][*n_lines-1]
+//               + data[0][*n_lines-2])/fabs(data[0][*n_lines]) > 1e-10)
+//      {
+//        glb_error("glb_load_n_columns: Error in %s, line %d: log10(E) sampling points "
+//                  "should be equidistant", file_name, nl);
+//        return GLBERR_INVALID_FILE_FORMAT;
+//      }
       (*n_lines)++;
     }
   };
@@ -473,20 +472,42 @@ int glb_init_flux(glb_flux *flux)
  ***************************************************************************/
 double glb_get_flux(double E, double L, int f, int cp_sign, const glb_flux *flux)
 {
+// JK 2010-11-27 We now allow non-equidistant support points 
+//  int col = (int) f + 3*(1-cp_sign)/2;  /* Which column of the flux table? */
+//  int n_steps = flux->n_lines - 1;
+//  double E_binsize = (flux->flux_data[0][n_steps] - flux->flux_data[0][0]) / n_steps;
+//  double result;
+//
+//  int k = floor((E - flux->flux_data[0][0]) / E_binsize);
+//  if (k < 0 || k >= n_steps)
+//    return 0.0;
+//  else
+//  {
+//    double E_lo    = flux->flux_data[0][k];
+//    double flux_lo = flux->flux_data[col][k];
+//    double flux_up = flux->flux_data[col][k+1];
+//    result  = flux_lo + (E - E_lo)*(flux_up - flux_lo)/E_binsize;
+//    result *= norm2(flux->builtin) * flux->time * flux->target_power
+//                * flux->stored_muons * flux->norm / (L*L);
+//  }
+//  return result;
+
   int col = (int) f + 3*(1-cp_sign)/2;  /* Which column of the flux table? */
   int n_steps = flux->n_lines - 1;
-  double E_binsize = (flux->flux_data[0][n_steps] - flux->flux_data[0][0]) / n_steps;
   double result;
-  
-  int k = floor((E - flux->flux_data[0][0]) / E_binsize);
-  if (k < 0 || k >= n_steps)
+
+  int k=0;
+  while (k <= n_steps  &&  flux->flux_data[0][k] < E)
+    k++;
+  if (k <= 0 || k > n_steps)
     return 0.0;
   else
   {
-    double E_lo    = flux->flux_data[0][k];
-    double flux_lo = flux->flux_data[col][k];
-    double flux_up = flux->flux_data[col][k+1];
-    result  = flux_lo + (E - E_lo)*(flux_up - flux_lo)/E_binsize;
+    double E_lo    = flux->flux_data[0][k-1];
+    double E_up    = flux->flux_data[0][k];
+    double flux_lo = flux->flux_data[col][k-1];
+    double flux_up = flux->flux_data[col][k];
+    result  = flux_lo + (E - E_lo)*(flux_up - flux_lo)/(E_up - E_lo);
     result *= norm2(flux->builtin) * flux->time * flux->target_power
                 * flux->stored_muons * flux->norm / (L*L);
   }
@@ -607,20 +628,39 @@ int glb_init_xsec(glb_xsec *xs)
  ***************************************************************************/
 double glb_get_xsec(double E, int f, int cp_sign, const glb_xsec *xs)
 {
+// JK 2010-11-27 We now allow non-equidistant support points 
+//  double logE = log10(E);
+//  int col = (int) f + 3*(1-cp_sign)/2;  /* Which column of the xsec table? */
+//  int n_steps = xs->n_lines - 1;
+//  double logE_binsize = (xs->xsec_data[0][n_steps] - xs->xsec_data[0][0]) / n_steps;
+//  
+//  int k = floor((logE - xs->xsec_data[0][0]) / logE_binsize);
+//  if (k < 0 || k >= n_steps)
+//    return 0.0;
+//  else
+//  {
+//    double logE_lo = xs->xsec_data[0][k];
+//    double xs_lo   = xs->xsec_data[col][k];
+//    double xs_up   = xs->xsec_data[col][k+1];
+//    return E * ( xs_lo + (logE - logE_lo)*(xs_up - xs_lo)/logE_binsize );
+//  }
+
   double logE = log10(E);
   int col = (int) f + 3*(1-cp_sign)/2;  /* Which column of the xsec table? */
   int n_steps = xs->n_lines - 1;
-  double logE_binsize = (xs->xsec_data[0][n_steps] - xs->xsec_data[0][0]) / n_steps;
   
-  int k = floor((logE - xs->xsec_data[0][0]) / logE_binsize);
-  if (k < 0 || k >= n_steps)
+  int k=0;
+  while (k <= n_steps  &&  xs->xsec_data[0][k] < logE)
+    k++;
+  if (k <= 0 || k > n_steps)
     return 0.0;
   else
   {
-    double logE_lo = xs->xsec_data[0][k];
-    double xs_lo   = xs->xsec_data[col][k];
-    double xs_up   = xs->xsec_data[col][k+1];
-    return E * ( xs_lo + (logE - logE_lo)*(xs_up - xs_lo)/logE_binsize );
+    double logE_lo = xs->xsec_data[0][k-1];
+    double logE_up = xs->xsec_data[0][k];
+    double xs_lo   = xs->xsec_data[col][k-1];
+    double xs_up   = xs->xsec_data[col][k];
+    return E * ( xs_lo + (logE - logE_lo)*(xs_up - xs_lo)/(logE_up - logE_lo) );
   }
 }
 

@@ -569,7 +569,7 @@ glb_projection glbSetDensityProjectionFlag(glb_projection in,
     }
   else
     {
-      glb_error("Density list length mismatch");
+      glb_error("glbSetDensityProjectionFlag: Invalid experiment index");
       return NULL;
     }
   return in;
@@ -584,7 +584,7 @@ int glbGetDensityProjectionFlag(const glb_projection in, int which)
     }
   else
     {
-      glb_error("Density list length mismatch");
+      glb_error("glbGetDensityProjectionFlag: Invalid experiment index");
       return -1;
     }
   return out;
@@ -604,7 +604,7 @@ glb_projection glbSetProjectionFlag(glb_projection in,
     }
   else
     {
-      glb_error("Oscillation list length mismatch");
+      glb_error("glbSetProjectionFlag: Invalid oscillation parameter");
       return NULL;
     }
   return in;
@@ -619,7 +619,7 @@ int glbGetProjectionFlag(const glb_projection in, int which)
     }
   else
     {
-      glb_error("Oscillation list length mismatch");
+      glb_error("glbGetProjectionFlag: Invalid oscillation parameter");
       return -1;
     }
   return out;

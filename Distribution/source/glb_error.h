@@ -65,11 +65,11 @@ extern void glb_prog_name_init (const char *argv0);
 extern int glbSetVerbosityLevel(int level);
 
 
-extern void glb_warning      (const char *message);
-extern void glb_error        (const char *message);
-extern void glb_fatal        (const char *message);
-extern void glb_exp_error    (const struct glb_experiment *exp, const char *message);
-extern void glb_rule_error   (const struct glb_experiment *exp, int rule, const char *message);
+extern void glb_warning      (const char *message, ...);
+extern void glb_error        (const char *message, ...);
+extern void glb_fatal        (const char *message, ...);
+extern void glb_exp_error    (const struct glb_experiment *exp, const char *message, ...);
+extern void glb_rule_error   (const struct glb_experiment *exp, int rule, const char *message, ...);
 
 extern void *glb_malloc (size_t size);
 extern void *glb_realloc (void *ptr, size_t size);

@@ -34,6 +34,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdarg.h>
 
 #include "glb_error.h"
 #include <globes/globes.h>
@@ -82,69 +83,93 @@ int glbGetVerbosityLevel()
   return verbosity_level;
 }
 
-static void
-error (int exit_status, const char *mode, const char *message,int verb_level)
+/***************************************************************************
+ * Function error                                                          *
+ ***************************************************************************
+ * Print error message with suitable prefix ("ERROR", "FATAL", etc.) and,  *
+ * if exit_status >= 0, terminate the program. The error message can be    *
+ * composed in the printf style                                            *
+ ***************************************************************************/
+static void error(int exit_status, int verb_level, const char *type, const char *format,
+                  va_list args)
 {
-
   if((verb_level==1)||(exit_status)>=0)
-    fprintf (stderr, "%s: %s: %s.\n", glb_prog_name, mode, message);
+  {
+    char s[1024];
+    sprintf(s, "%s: %s: %s.\n", glb_prog_name, type, format);
+    vfprintf(stderr, s, args);
+  }
+  va_end(args);
 
   if (exit_status >= 0)
     exit (exit_status);
 }
 
 void
-glb_warning (const char *message)
+glb_warning (const char *message, ...)
 {
   int v=0;
+  va_list args;
+  va_start(args, message);
   if(verbosity_level >= 2) v=1;
-  error (-1, "Warning", message,v);
+  error (-1, v, "Warning", message, args);
 }
 
 void
-glb_error (const char *message)
+glb_error (const char *message, ...)
 {
   int v=0;
+  va_list args;
+  va_start(args, message);
   if(verbosity_level >= 1) v=1;
-  error (-1, "ERROR", message,v);
+  error(-1, v, "ERROR", message, args);
 }
 
 void
-glb_fatal (const char *message)
+glb_fatal (const char *message, ...)
 {
+  va_list args;
+  va_start(args, message);
   /* A FATAL message always is displayed */
-  error (EXIT_FAILURE, "FATAL", message,1);
+  error(EXIT_FAILURE, 1, "FATAL", message, args);
 }
 
 void
-glb_exp_error (const struct glb_experiment *exp, const char *message)
+glb_exp_error (const struct glb_experiment *exp, const char *message, ...)
 {
   char s[100];
   int v=0;
+  va_list args;
+  va_start(args, message);
+  if(verbosity_level >= 1) v=1;
   if (exp == NULL  ||  exp->filename == NULL)
-    glb_error(message);
+    error(-1, v, "ERROR", message, args);
   else
   {
     sprintf(s, "ERROR in experiment %.60s", exp->filename);
-    if(verbosity_level >= 1) v=1;
-    error (-1, s, message,v);
+    error(-1, v, s, message, args);
   }
 }
 
 void
-glb_rule_error (const struct glb_experiment *exp, int rule, const char *message)
+glb_rule_error (const struct glb_experiment *exp, int rule, const char *message, ...)
 {
   char s[100];
   int v=0;
+  va_list args;
+  va_start(args, message);
+  if(verbosity_level >= 1) v=1;
   if (exp == NULL  ||  exp->filename == NULL)
-    glb_error(message);
+    error(-1, v, "ERROR", message, args);
   else if (rule < 0  ||  rule >= exp->numofrules)
-    glb_exp_error(exp, message);
+  {
+    sprintf(s, "ERROR in experiment %.60s", exp->filename);
+    error(-1, v, s, message, args);
+  }
   else
   {
     sprintf(s, "ERROR in experiment %.60s, rule %d", exp->filename, rule);
-    if(verbosity_level >= 1) v=1;
-    error (-1, s, message,v);
+    error(-1, v, s, message, args);
   }
 }
 

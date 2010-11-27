@@ -214,3 +214,11 @@
         - Removed all code related to simulated annealing
         - Default minimizer is now GLB_POWELL
 
+22 Nov 2010 JK
+        - Changed some error messages in glb_wrapper.c to make them more meaningful
+
+27 Nov 2010 JK
+        - GLoBES now accepts flux and cross section files with non-equidistant
+          sampling points
+        - glb_warning, glb_error, glb_fatal are now more flexible: They now allow
+          a printf-like syntax with a format string and a list of optional arguments
