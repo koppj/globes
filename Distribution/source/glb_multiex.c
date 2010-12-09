@@ -684,7 +684,10 @@ int glbDefaultExp(glb_exp ins)
               }
             }
         }
+    }
 
+    for(i=0;i<in->numofrules;i++)
+    {
       if (in->energy_window[i][0] == -1  ||  in->energy_window[i][0] < in->emin)
       {
         in->energy_window[i][0] = in->emin;

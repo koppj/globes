@@ -222,3 +222,9 @@
           sampling points
         - glb_warning, glb_error, glb_fatal are now more flexible: They now allow
           a printf-like syntax with a format string and a list of optional arguments
+
+8 Dec 2010 JK
+        - Fixed small bug in glb_multiex.c (Loop in initialization of energy window
+          ran over i=0,n_channels rather than i=0,n_rules. Should be a problem
+          only in experiments with more rules than channels (I've never seen one).
+
