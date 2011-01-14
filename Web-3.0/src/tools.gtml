@@ -50,6 +50,11 @@ this website, please contact us at
     interactions affecting the production, propagation, and detection processes for both
     active and sterile neutrinos.
     <ul>
+      <li>v1.1 (Jan 2011)
+        [<a href="tools/snu-1.1.tar.gz">Source</a>]&nbsp;
+        [<a href="tools/snu-1.0.pdf">Documentation</a>]
+        (now supports low-pass filter)
+      </li>
       <li>v1.0 (Nov 2010)
         [<a href="tools/snu-1.0.tar.gz">Source</a>]&nbsp;
         [<a href="tools/snu-1.0.pdf">Documentation</a>]
