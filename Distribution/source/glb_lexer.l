@@ -116,6 +116,7 @@ LID      %[a-zA-Z][a-zA-Z0-9_]*
 %%
 
 "//"         {cond_buf=YY_START; BEGIN(glb_lexer_linecomment);}
+<glb_lexer_linecomment>[^\n]*     /* eat anything that's not a line break */
 <glb_lexer_linecomment>\n     BEGIN(cond_buf);
 
 "/*"         {cond_buf=YY_START;BEGIN(glb_lexer_comment);}
