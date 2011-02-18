@@ -231,13 +231,13 @@ int glb_default_smear(glb_smear *in,const struct glb_experiment *head)
    * {glb_exp_error(head, "Number of simbins must be positive!");s=-1;}
    */
   if(in->e_min==-1) {glb_exp_error(head, "No minimal energy defined!");s=-1;}
-  if(in->e_min<=0) {glb_exp_error(head, "Minimal energy must be positive!");s=-1;}
+  if(in->e_min<0) {glb_exp_error(head, "Minimal energy must be positive!");s=-1;}
   if(in->e_max==-1) {glb_exp_error(head, "No maximal energy defined!");s=-1;}
   if(in->e_max<=in->e_min) {glb_error("Maximal energy must be larger than"
                                       " the minimal energy!");s=-1;}
   if(in->e_sim_min!=-1||in->e_sim_max!=-1)
     {
-      if(in->e_sim_min<=0)
+      if(in->e_sim_min<0)
         {glb_exp_error(head, "Minimal sim energy must be positive!");s=-1;}
       if(in->e_sim_max<=in->e_sim_min)
         {glb_exp_error(head, "Maximal sim energy must belarger than the minimal"

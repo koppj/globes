@@ -228,10 +228,18 @@
           ran over i=0,n_channels rather than i=0,n_rules. Should be a problem
           only in experiments with more rules than channels (I've never seen one).
 
-26 Jan 2010 JK
+26 Jan 2011 JK
         - Enclosed #include config.h in %top{ } block in glb_lexer.l to fix
           another Mac compilation problems. I think Apple should pay
           me for the time I spend getting software to run on their system ;-)
 
 ********** This version tagged 3.1.10 ************
 
+13 feb 2011 JK
+        - Fixed Lexer problem with one-line comments ("//") that led to incorrect
+          line counting
+        - No error message if $emin or $sampling_min is zero
+
+18 Feb 2011 JK
+        - Fixed another small bug in the lexer - occasional syntax error when
+          encountering empty "//" comments
