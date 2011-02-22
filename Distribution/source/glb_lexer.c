@@ -1108,7 +1108,7 @@ case 3:
 /* rule 3 can match eol */
 YY_RULE_SETUP
 #line 120 "glb_lexer.l"
-BEGIN(cond_buf);
+{ ++glb_line_num; BEGIN(cond_buf); }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP

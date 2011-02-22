@@ -243,3 +243,6 @@
 18 Feb 2011 JK
         - Fixed another small bug in the lexer - occasional syntax error when
           encountering empty "//" comments
+
+21 Feb 2011 JK
+        - One more problem with the line counting in the lexer fixed
