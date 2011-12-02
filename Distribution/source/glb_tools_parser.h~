@@ -1,0 +1,14 @@
+#ifndef PARSER_H
+#define PARSER_H 1
+
+void parse_definition(const char *in);
+int vector_read_double(const char *str, double *result, 
+		       size_t n, void (*parse_error)(void));
+int vector_read_int(const char *str, int *result, 
+		    size_t n,void (*parse_error)(void));
+void parse_error();
+void my_print_params(FILE *fp,const glb_params iv);
+
+char *get_output_filename(const char *basename);
+
+#endif /* PARSER_H */
