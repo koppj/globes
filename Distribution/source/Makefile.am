@@ -1,6 +1,5 @@
 INCLUDES = -I$(top_builddir) -I$(top_srcdir) -I$(top_srcdir)/lib $(GSLINC) 
 
-
 AM_YFLAGS =  -d 
 
 lib_LTLIBRARIES = libglobes.la
@@ -13,32 +12,30 @@ libglobes_la_SOURCES =  glb_minimize.c glb_error.c glb_path.c glb_multiex.c \
  glb_min_sup.h  glb_version.h glb_lexer.h glb_fluxes.h glb_parser_type.h \
  glb_wrapper.h glb_profile.h glb_sys.h glb_glb.c glb_prior.h glb_prior.c glb_compat.c
 
-
 libglobes_la_LDFLAGS = @LIBS@ -version-info @GLBLIBVERSION@
 libglobes_la_CPPFLAGS = -DGLB_MODULE_DIR=\"$(pkglibdir)\"
 libglobes_la_DEPENDENCIES =
 libglobes_la_LDFLAGS += $(top_builddir)/lib/libgnu.la
-
-
 
 bin_PROGRAMS = globes globes-accuracy globes-deltatheta globes-discovery\
  globes-simple
 
 globes_SOURCES = globes.c 
 globes_LDADD = libglobes.la @LIBS@
- 
-globes_accuracy_SOURCES = glb_tools_parser.h glb_tools_parser.c\
-glb_tools_header.h  glb_tools_header.c glb_tools_eightfold.h\
+
+globes_accuracy_SOURCES = glb_tools_parser.h glb_tools_parser.c \
+glb_tools_header.h  glb_tools_header.c glb_tools_eightfold.h \
 glb_tools_eightfold.c globes-accuracy.c
 
-globes_deltatheta_SOURCES =  glb_tools_parser.h  glb_tools_parser.c  
-glb_tools_header.h  glb_tools_header.c globes-deltatheta.c\
-globes_discovery_SOURCES =  glb_tools_parser.h  glb_tools_parser.c\
-glb_tools_header.h  glb_tools_header.c glb_tools_eightfold.h\
+globes_deltatheta_SOURCES =  glb_tools_parser.h  glb_tools_parser.c \
+glb_tools_header.h  glb_tools_header.c globes-deltatheta.c
+
+globes_discovery_SOURCES =  glb_tools_parser.h  glb_tools_parser.c \
+glb_tools_header.h  glb_tools_header.c glb_tools_eightfold.h \
 glb_tools_eightfold.c globes-discovery.c
-globes_simple_SOURCES =  glb_tools_parser.h  glb_tools_parser.c\  \glb_tools_header.h  glb_tools_header.c glb_tools_eightfold.h globes-simple.c
 
-
+globes_simple_SOURCES =  glb_tools_parser.h  glb_tools_parser.c \
+glb_tools_header.h  glb_tools_header.c glb_tools_eightfold.h globes-simple.c
 
 globes_deltatheta_LDADD =   libglobes.la @LIBS@ 
 globes_accuracy_LDADD =   libglobes.la @LIBS@ 
