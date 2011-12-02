@@ -21222,7 +21222,7 @@ ac_config_files="$ac_config_files globes.spec"
 
 
 
-ac_config_files="$ac_config_files Makefile lib/Makefile globes/Makefile globes/example.pl source/Makefile examples/Makefile data/Makefile globes-config"
+ac_config_files="$ac_config_files Makefile lib/Makefile globes/Makefile globes/example.pl source/Makefile examples/Makefile data/Makefile globes-config doc/Makefile"
 
 
 
@@ -22251,6 +22251,7 @@ do
     "examples/Makefile") CONFIG_FILES="$CONFIG_FILES examples/Makefile" ;;
     "data/Makefile") CONFIG_FILES="$CONFIG_FILES data/Makefile" ;;
     "globes-config") CONFIG_FILES="$CONFIG_FILES globes-config" ;;
+    "doc/Makefile") CONFIG_FILES="$CONFIG_FILES doc/Makefile" ;;
 
   *) as_fn_error "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
   esac

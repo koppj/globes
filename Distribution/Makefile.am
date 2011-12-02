@@ -1,7 +1,7 @@
 ACLOCAL_AMFLAGS = -I m4
 
-DIST_SUBDIRS = lib source data  globes
-SUBDIRS = lib source data globes
+DIST_SUBDIRS = lib source data  globes doc
+SUBDIRS = lib source data globes doc
 INCLUDES = $(F2CINC) $(GSLINC)
 
 EXTRA_DIST = examples/Makefile.in examples/example1.c	      \

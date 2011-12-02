@@ -165,7 +165,7 @@ AC_CONFIG_FILES(globes.spec)
 AC_CONFIG_FILES([Makefile lib/Makefile \
  globes/Makefile globes/example.pl source/Makefile\
  examples/Makefile\
- data/Makefile  globes-config])
+ data/Makefile  globes-config doc/Makefile])
 
 
 AC_OUTPUT
