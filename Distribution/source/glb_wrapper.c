@@ -800,7 +800,7 @@ void
 glbClearExperimentList()
 {
   int i;
-  for(i=0;i<GLB_MAX_EXP;i++) glbFreeExp(glb_experiment_list[i]);
+  for(i=0;i<GLB_MAX_EXP;i++) glbExpDecrRefCounter(glb_experiment_list[i]);
   for(i=0;i<GLB_MAX_EXP;i++) glb_experiment_list[i]=glbAllocExp();
   glb_num_of_exps=0;
   glbResetCounters();
@@ -2002,7 +2002,7 @@ void glb_clean_up()
 {
   int i;
 
-  for(i=0;i<GLB_MAX_EXP;i++) {glbFreeExp(glb_experiment_list[i]);}
+  for(i=0;i<GLB_MAX_EXP;i++) {glbExpDecrRefCounter(glb_experiment_list[i]);}
  glbCleanSysList();
  glb_clean_parser();
  glb_lexer_cleanup();

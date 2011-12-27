@@ -79,8 +79,10 @@ enum glb_enum_minimizers
 
 
 /* maximum number of experiments */
-
 #define GLB_MAX_EXP 300
+
+/* maximum number of nuisance parameters per experiment */
+#define GLB_MAX_NUISANCE 128
 
 
 

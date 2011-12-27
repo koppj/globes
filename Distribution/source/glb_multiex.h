@@ -37,7 +37,8 @@ void glbSetExperiment(glb_exp in);
 int glbDefaultExp(glb_exp ins);      
 void glbInitExp(glb_exp ins);        
 void glbFreeExp(glb_exp ins);        
-
+void glbExpIncrRefCounter(struct glb_experiment *exp);
+void glbExpDecrRefCounter(struct glb_experiment *exp);
 
 void glb_set_profile_scaling(double scale,int i);
 

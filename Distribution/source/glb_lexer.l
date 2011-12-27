@@ -52,12 +52,14 @@
 %s glb_lexer_cross
 %s glb_lexer_flux
 %s glb_lexer_nuflux
+%s glb_lexer_sys
 %s glb_lexer_defr
 %s glb_lexer_defc
 %s glb_lexer_defe
 %s glb_lexer_defx
 %s glb_lexer_deff
 %s glb_lexer_defnf
+%s glb_lexer_defsys
 %x glb_lexer_comment
 %x glb_lexer_linecomment
 %x glb_lexer_str
@@ -103,7 +105,8 @@ void glb_lexer_cleanup();
 
 %}
 
-EOE       #NEXT#
+EOE      #NEXT#
+DET      #DETECTOR#
 FN       [^"]*
 
 GLOB     GLoBES
@@ -130,6 +133,11 @@ glb_copy_buff();
 glbReset();
 }
 
+{DET}   {
+  glb_copy_buff();
+  glbNewDetector();
+}
+
 
 <INITIAL>{
 rule    {BEGIN(glb_lexer_defr);yylval.name=strdup(yytext);return GID;}
@@ -137,7 +145,8 @@ channel {BEGIN(glb_lexer_defc);yylval.name=strdup(yytext);return GID;}
 energy  {BEGIN(glb_lexer_defe);yylval.name=strdup(yytext);return GID;}
 cross   {BEGIN(glb_lexer_defx);yylval.name=strdup(yytext);return GID;}
 flux    {BEGIN(glb_lexer_deff);yylval.name=strdup(yytext);return GID;}
-nuflux    {BEGIN(glb_lexer_defnf);yylval.name=strdup(yytext);return GID;}
+nuflux  {BEGIN(glb_lexer_defnf);yylval.name=strdup(yytext);return GID;}
+sys     {BEGIN(glb_lexer_defsys);yylval.name=strdup(yytext);return GID;}
 }
 
 include             {cond_buf_i=YY_START;BEGIN(glb_lexer_incl);}
@@ -228,7 +237,7 @@ include             {cond_buf_i=YY_START;BEGIN(glb_lexer_incl);}
 }
 
 
-<glb_lexer_rule,glb_lexer_chl,glb_lexer_energy,glb_lexer_cross,glb_lexer_flux,glb_lexer_nuflux>[<]  {
+<glb_lexer_rule,glb_lexer_chl,glb_lexer_energy,glb_lexer_cross,glb_lexer_flux,glb_lexer_nuflux,glb_lexer_sys>[<]  {
 yylval.in=-1;
 return GRPOPEN;}
 
@@ -323,7 +332,6 @@ return NUFLUX;}
 yylval.name=strdup(yytext);
 return NUFLUX;}
 
-
 :        {return RULESEP;}
 @        {return RULEMULT;}
 
@@ -414,6 +422,17 @@ yylval.nameptr = s;
 return s->type;
 }
 
+<glb_lexer_defsys>#{ID}        {
+  glb_namerec *s = glb_getname(yytext,"sys");
+  if (s == 0)  s = glb_putname(yytext,"sys",NAME);
+  BEGIN(INITIAL);
+  BEGIN(glb_lexer_sys);
+  if(strcmp(s->context,"sys") != 0)
+    { yylval.nameptr=s;return RDF; }
+  yylval.nameptr = s;
+  return s->type;
+}
+
 #{ID}        {glb_namerec *s;
 s = glb_getname (yytext,"rule");
 if (s == 0) { yylval.name=strdup(yytext); return NDEF; }
@@ -421,13 +440,13 @@ yylval.nameptr = s;
 return s->type;
 }
 
-<glb_lexer_rule,glb_lexer_chl,glb_lexer_energy,glb_lexer_cross,glb_lexer_flux,glb_lexer_nuflux>[>]        {
+<glb_lexer_rule,glb_lexer_chl,glb_lexer_energy,glb_lexer_cross,glb_lexer_flux,glb_lexer_nuflux,glb_lexer_sys>[>]        {
 BEGIN(INITIAL);
 yylval.in=-1;
 return GRPCLOSE;}
 
 
-<glb_lexer_chl,glb_lexer_rule,glb_lexer_energy,glb_lexer_cross,glb_lexer_flux,glb_lexer_nuflux>@{ID} {
+<glb_lexer_chl,glb_lexer_rule,glb_lexer_energy,glb_lexer_cross,glb_lexer_flux,glb_lexer_nuflux,glb_lexer_sys>@{ID} {
 yylval.name=strdup(yytext);
 return IDN;
 }

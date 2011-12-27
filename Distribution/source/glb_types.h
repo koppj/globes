@@ -145,6 +145,18 @@ typedef struct glb_systematic
 } glb_systematic;
 
 
+/* Data structure containing information about one nuisance parameter
+ * (as defined in an AEDL "sys< >" block */
+typedef struct glb_nuisance
+{
+  char *name;                  /* Name of this nuisance parameter                    */
+  double error;                /* The uncertainty on this nuisance parameter         */
+  double *energy_list, *error_list; /* Energies and associated uncertainties if this */
+                               /* nuisance parameter is energy-dependent             */
+  int n_energies;              /* Number of entries in energy_list and error_list    */
+} glb_nuisance;
+
+
 
 /** This structure contains a large part of the information for defining
  * an experiment.
@@ -169,6 +181,16 @@ struct glb_experiment {
 
   /* Name of AEDL file on which this experiment is based */
   char *filename;
+
+  /* A pointer to the primary detector in the case of multi-detector experiment
+   * (defined using the #DETECTOR# diretive in AEDL) */
+  struct glb_experiment *parent;
+  int ref_count;
+    /* The number of pointers that exist to this experiment, either from
+     * glb_experiment_list, or from other experiments' parent pointers.
+     * Shall be incremented/decremented by using glbIncrExpRefCount and
+     * glbDecrExpRefCount, when ref_count reaches zero, the experimental
+     * data structure will be destroyed. */
 
   /* This contains the parsing meta-information like names of rules etc. */
   glb_naming *names;
@@ -448,6 +470,10 @@ struct glb_experiment {
   double bg_errors[2][32];       /* Background norm/energy errors for old chi^2 functions */
   double bg_startvals[2][32];    /* BG starting values for old chi^2 functions */
   double bg_centers[2][32];      /* BG central values for old chi^2 functions */
+
+  /** Nuisance parameters for global/multi-experiment systematics */
+  int n_nuisance;
+  glb_nuisance nuisance_params[GLB_MAX_NUISANCE];
 };
 
 #endif /* GLB_TYPES_H 1 */

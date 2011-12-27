@@ -77,6 +77,7 @@
   static glb_option_type opt;
   static glb_flux flt;
   static glb_xsec xsc;
+  static glb_nuisance nuis;
   static int errordim_sys_on=-1;         /* Temp. storage for the old numerical errordims */
   static int errordim_sys_off=-1;
   static char *context;
@@ -84,7 +85,13 @@
   int yyerror (const char *s, ...);           /* Forward declaration to suppress compiler warning */
 
 
-  typedef struct
+  /* The name and symbol tables: a chain of `struct glb_symrec'.  */
+  static glb_namerec *name_table = (glb_namerec *) NULL;
+  glb_symrec *sym_table = (glb_symrec *) NULL;
+  glb_symrec *pre_sym_table = (glb_symrec *) NULL;
+          /* cannot use static here, since its declared earlier as extern */
+
+ typedef struct
   {
     char *token; // the string which is used as lhs in the ini-file
     int scalar; // data type flag
@@ -104,6 +111,8 @@
   } glb_parser_decl;
 
 
+  /* IMPORTANT NOTE: Token names that are substrings of other token names
+     (e.g. @error and @error_list) should appear *after* that other token */
   static glb_parser_decl token_list[]={
     {"$version",CHAR,0,1E8,&buff.version,NULL,"global"},
     {"$citation",CHAR,0,1E8,&buff.citation,NULL,"global"},
@@ -195,6 +204,11 @@
     &buff.sys_on_errors[0],&loc_count,"rule"},
    {"@sys_off_errors",DOUBLE_LIST_INDEXED,0,GMAX,
     &buff.sys_off_errors[0],&loc_count,"rule"},
+
+   {"sys", UNTYPE, 0, 20, NULL, &buff.n_nuisance, "global"},
+   {"@energy_list", DOUBLE_LIST, 0, GMAX, &nuis.energy_list, &nuis.n_energies, "sys"},
+   {"@error_list",  DOUBLE_LIST, 0, GMAX, &nuis.error_list,  &nuis.n_energies, "sys"},
+   {"@error",       DOUBLE,      0, GMAX, &nuis.error,       NULL,             "sys"},
 
 
    {"@energy_window" ,DOUBLE_INDEXED_PAIR_INV,0,GMAX,&buff.energy_window[0],
@@ -352,6 +366,13 @@ static void grp_end(char* name)
          if (buff.sys_off_strings[nr] == NULL  &&  errordim_sys_off >= 0)
            buff.sys_off_strings[nr] = glbConvertErrorDim(errordim_sys_off);
        }
+
+     if( strncmp(name,"sys",3) == 0)
+     {
+       nuis.name = strdup(name_table->name);
+       memcpy(&(buff.nuisance_params[buff.n_nuisance-1]), &nuis, sizeof(glb_nuisance));
+       glbResetNuisance();
+     }
 
      glb_free(context);
      context = (char *) strdup("global");
@@ -841,8 +862,8 @@ static int set_exp_list(char *name,glb_List *value,int scalar)
 	    len=list_length(value); // how long is the list
 	    lbf=(int*) token_list[i].len;
 	    if(*lbf==-1) *lbf=len;  // setting the length correctly in exp
-	    else if(*lbf!=len) glb_warning("Length mismatch or list"
-					   " length changed");
+	    else if(*lbf!=len) glb_error("Line %d: Length mismatch or list"
+					 " length changed", glb_line_num);
 
 
 	    dbf = (double**) token_list[i].ptr;
@@ -952,6 +973,7 @@ static int set_exp_list(char *name,glb_List *value,int scalar)
 	  }
 	}
     }
+
   return 1;
 }
 
@@ -1295,6 +1317,7 @@ channel: CHANNEL '=' name RULESEP pm RULESEP FLAVOR RULESEP FLAVOR RULESEP
 }
 ;
 
+
 /* name */
 /* FIXME, maybe we had a bug here */
 name: NAME {$$=$1;}
@@ -1595,11 +1618,6 @@ struct glb_init_sig sig_fncts[] =
     {NULL, NULL}
   };
 
-/* The symbol table: a chain of `struct glb_symrec'.  */
-static glb_namerec *name_table = (glb_namerec *) NULL;
-/* cannot use static here, since its declared earlier as extern */
-glb_symrec *sym_table = (glb_symrec *) NULL;
-glb_symrec *pre_sym_table = (glb_symrec *) NULL;
 
 #define BIN_LIST 1
 #define SAMPLING_LIST 2
@@ -1881,6 +1899,7 @@ void glbReset()
   energy_count=-1;
   loc_count=-1;
   flux_count=-1;
+  glbResetNuisance();
   glbInitExp(&buff);
 
   if(name_table!=NULL) free_nametable();
@@ -1888,6 +1907,27 @@ void glbReset()
   name_table =(glb_namerec *) NULL;
   sym_table =(glb_symrec *) NULL;
   init_table ();
+}
+
+/* Starts a new detector that inherits everything from the previously defined one,
+   including the namespace */
+void glbNewDetector()
+{
+  glbResetNuisance();
+  buff.parent    = &buff_list[exp_count-1];
+  buff.ref_count = 0;
+  glbExpIncrRefCounter(&buff_list[exp_count-1]);
+     //FIXME FIXME FIXME What if parent is not/incorrectly defined?
+//FIXME FIXME FIXME TBD
+}
+
+void glbResetNuisance()
+{
+  nuis.name        = NULL;
+  nuis.error       = GLB_NAN;
+  nuis.n_energies  = -1;
+  nuis.energy_list = NULL;
+  nuis.error_list  = NULL;
 }
 
 void glbResetCounters()
@@ -1905,6 +1945,7 @@ void glbResetEOF()
   energy_count=-1;
   loc_count=-1;
   flux_count=-1;
+  glbResetNuisance();
   glbInitExp(&buff);
   for(i=0;i<GLB_MAX_EXP;i++)   glbInitExp(&buff_list[i]);
   /* this here would be the place to check for unuses variables, but
@@ -1971,6 +2012,7 @@ int glbInitExperiment(char *inf,glb_exp *in, int *counter)
   if(*counter+exp_count>GLB_MAX_EXP) glb_fatal("Too many experiments!");
   for(i=0;i<exp_count;i++)
     {
+      glbExpIncrRefCounter(&buff_list[i]);
       *ins[*counter+i]=buff_list[i];
       k=+glbDefaultExp(ins[*counter+i]);
     }

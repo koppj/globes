@@ -84,6 +84,8 @@ void glbInitExp(glb_exp ins)
   in=(struct glb_experiment *) ins;
   in->version=NULL;
   in->citation=NULL;
+  in->parent=NULL;
+  in->ref_count = 0;
   in->filename=NULL;
   in->names=NULL;
   in->num_of_fluxes=-1;
@@ -131,6 +133,15 @@ void glbInitExp(glb_exp ins)
   for(i=0;i<32;i++) in->sys_on_startvals[i]=NULL;
   for(i=0;i<32;i++) in->sys_off_errors[i]=NULL;
   for(i=0;i<32;i++) in->sys_off_startvals[i]=NULL;
+  in->n_nuisance = -1;
+  for(i=0; i < GLB_MAX_NUISANCE; i++)
+  {
+    in->nuisance_params[i].name        = NULL;
+    in->nuisance_params[i].error       = GLB_NAN;
+    in->nuisance_params[i].n_energies  = 0;
+    in->nuisance_params[i].energy_list = NULL;
+    in->nuisance_params[i].error_list  = NULL;
+  }
   for(i=0;i<32;i++) {in->smear_data[i]=NULL;}
   for(i=0;i<32;i++) in->smear[i]=NULL;
   for(i=0;i<32;i++) in->lowrange[i]=NULL;
@@ -178,6 +189,40 @@ static void my_free(void *ptr)
   ptr=NULL;
 }
 
+
+/***************************************************************************
+ * Function glbExpIncrRefCounter                                           *
+ ***************************************************************************
+ * Increments the reference counter of the given experiment by 1           *
+ ***************************************************************************/
+void glbExpIncrRefCounter(struct glb_experiment *exp)
+{
+  if (exp)
+    exp->ref_count++;
+  else
+    glb_error("glbExpIncrRefCounter: Invalid pointer");
+}
+
+
+/***************************************************************************
+ * Function glbExpDecrRefCounter                                           *
+ ***************************************************************************
+ * Decrements the reference counter of the given experiment by 1. If the   *
+ * the counter reaches zero, the experimental data structure is destroyed. *
+ ***************************************************************************/
+void glbExpDecrRefCounter(struct glb_experiment *exp)
+{
+  if (exp)
+  {
+    exp->ref_count--;
+    if (exp->ref_count <= 0)
+      glbFreeExp(exp);
+  }
+  else
+    glb_error("glbExpDecrRefCounter: Invalid pointer");
+}
+
+
 void glbFreeExp(glb_exp ins)
 {
   int i,j;
@@ -187,6 +232,12 @@ void glbFreeExp(glb_exp ins)
   glb_free_names(in->names);
   glb_free(in->version);
   glb_free(in->citation);
+  if (in->parent != NULL)
+  {
+    glbExpDecrRefCounter(in->parent);
+    in->parent = NULL;
+  }
+  in->ref_count = 0;
   glb_free(in->filename);
   for(i=0;i<32;i++) { glb_free_flux(in->fluxes[i]); in->fluxes[i]=NULL; }
   for(i=0;i<32;i++) { glb_free_xsec(in->xsecs[i]);  in->xsecs[i]=NULL;  }
@@ -253,6 +304,19 @@ void glbFreeExp(glb_exp ins)
       my_free(in->sys_off_errors[i]);
       my_free(in->sys_off_startvals[i]);
     }
+
+  for (i=0; i < in->n_nuisance; i++)
+  {
+    my_free(in->nuisance_params[i].name);
+    my_free(in->nuisance_params[i].energy_list);
+    my_free(in->nuisance_params[i].error_list);
+    in->nuisance_params[i].name        = NULL;
+    in->nuisance_params[i].error       = GLB_NAN;
+    in->nuisance_params[i].n_energies  = 0;
+    in->nuisance_params[i].energy_list = NULL;
+    in->nuisance_params[i].error_list  = NULL;
+  }
+  in->n_nuisance = -1;
   my_free(in->energy_tab);
   my_free(in);
 
@@ -503,6 +567,35 @@ int glbDefaultExp(glb_exp ins)
     {
       if (glbSetChiFunctionInExperiment(in, i, GLB_OFF, "chiZero", NULL) == 0)
         status = old_status;
+    }
+  }
+
+  /* Check definitions of nuisance parameters for global/multi-experiment systematics */
+  for (i=0; i < in->n_nuisance; i++)
+  {//FIXME FIXME FIXME TBD
+    if (in->nuisance_params[i].name == NULL)
+      glb_exp_error(in, "Nuisance parameter #%d has no name", i);
+    else if (in->nuisance_params[i].n_energies <= 0)   /* Energy-independent nuisance parameter */
+    {
+      if (GLB_ISNAN(in->nuisance_params[i].error)) {
+        glb_exp_error(in, "No error specified for nuisance parameter %s",
+                      in->nuisance_params[i].name);
+        status=-1;
+      }
+    }
+    else                                               /* Energy-dependent nuisance parameter */
+    {
+      if (!GLB_ISNAN(in->nuisance_params[i].error)) {
+        glb_exp_error(in, "Nuisance parameter %s cannot contain energy-dependent and "
+                          "energy-independent parts", in->nuisance_params[i].name);
+        status = -1;
+      }
+      if (in->nuisance_params[i].energy_list == NULL ||
+          in->nuisance_params[i].error_list == NULL) {
+        glb_exp_error(in, "Definition of nuisance parameter %s is incomplete",
+                          in->nuisance_params[i].name);
+        status = -1;
+      }
     }
   }
 
