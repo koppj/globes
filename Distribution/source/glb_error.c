@@ -190,6 +190,19 @@ void *glb_realloc (void *ptr, size_t size)
   return value;
 }
 
+void *glb_duplicate_array(void *src, size_t size)
+{
+  void *dest = NULL;
+  if (src)
+  {
+    dest = glb_malloc(size);
+    if (dest)
+      memcpy(dest, src, size);
+  }
+  
+  return dest;
+}
+
 void glb_free(void *ptr)
 {
   if (ptr != NULL)

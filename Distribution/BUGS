@@ -73,3 +73,11 @@ Date: 21.04.2010
 
 -------------------------------------------------------------------------------
 
+BUG #24 GLoBES does not check whether a smearing matrix given in an AEDL file
+        has the correct number of rows
+
+From: Joachim Kopp
+Date: 29.12.2011
+
+-------------------------------------------------------------------------------
+

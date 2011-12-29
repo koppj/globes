@@ -70,7 +70,9 @@
      RULEMULT = 286,
      NAME = 287,
      RDF = 288,
-     NEG = 289
+     ENDEXP = 289,
+     ENDDET = 290,
+     NEG = 291
    };
 #endif
 /* Tokens.  */
@@ -105,14 +107,16 @@
 #define RULEMULT 286
 #define NAME 287
 #define RDF 288
-#define NEG 289
+#define ENDEXP 289
+#define ENDDET 290
+#define NEG 291
 
 
 
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 1074 "glb_parser.y"
+#line 1075 "glb_parser.y"
 {
   double  val;  /* For returning numbers.                   */
   double *dpt;  /* for rules */
@@ -125,7 +129,7 @@ typedef union YYSTYPE
   glb_namerec *nameptr;
 }
 /* Line 1529 of yacc.c.  */
-#line 129 "glb_parser.h"
+#line 133 "glb_parser.h"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1

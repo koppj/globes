@@ -2019,6 +2019,30 @@ void glb_clean_up()
 }
 
 
+/***************************************************************************
+ * Function glbPrintExp                                                    *
+ ***************************************************************************
+ * Prints selected experiment parameters to stdout in AEDL format          *
+ ***************************************************************************/
+int glbPrintExp(int exp)
+{
+  int i, status=0;
+
+  if(!(exp >= 0  &&  exp < glb_num_of_exps)  ||  exp==GLB_ALL)
+  {
+    glb_error("glbPrintExp: Invalid value for experiment number: %d", exp);
+    return -1;
+  }
+
+  if (exp == GLB_ALL)
+    for(i=0; i < glb_num_of_exps; i++)
+      status += glbPrintExpByPointer(glb_experiment_list[i]);
+  else
+    status = glbPrintExpByPointer(glb_experiment_list[exp]);
+
+  return status;
+}
+
 
 /* The all important init function */
 

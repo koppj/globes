@@ -128,15 +128,17 @@ LID      %[a-zA-Z][a-zA-Z0-9_]*
 <glb_lexer_comment>\n             ++glb_line_num;
 <glb_lexer_comment>"*"+"/"        BEGIN(cond_buf);
 
+
 {EOE}   {
-glb_copy_buff();
-glbReset();
+  yylval.in = -1;
+  return ENDEXP;
 }
 
 {DET}   {
-  glb_copy_buff();
-  glbNewDetector();
+  yylval.in = -1;
+  return ENDDET;
 }
+
 
 
 <INITIAL>{
@@ -219,8 +221,10 @@ include             {cond_buf_i=YY_START;BEGIN(glb_lexer_incl);}
 <<EOF>> {
   if (--include_stack_ptr < 0)  /* If top level buffer ends, we're done */
   {
+/*JK 2011-12-29 This would have potentially disregarded the last line in the file
     glb_copy_buff();
-    glbReset();
+    glbReset();*/
+
     /* BUGFIX #9 -- This lines fixes a tricky bug in the parser */
     include_stack_ptr = 0;
     yyterminate();

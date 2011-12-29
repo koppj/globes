@@ -79,11 +79,14 @@ enum glb_enum_minimizers
 
 
 /* maximum number of experiments */
-#define GLB_MAX_EXP 300
+#define GLB_MAX_EXP      300
 
-/* maximum number of nuisance parameters per experiment */
+/* maximum numbers of channels, rules, ... per experiment */
+/* FIXME not used consistently throughout the code yet */
+#define GLB_MAX_CHANNELS  32
+#define GLB_MAX_RULES     32
 #define GLB_MAX_NUISANCE 128
-
+#define GLB_MAX_SMEAR     32
 
 
 
@@ -200,6 +203,7 @@ void glbPrintDelimiter(FILE *stream, int character);
 void *glbSetChannelPrintFunction(void *fp);
 void glbSetPrintDelimiters(const char *left,const char *middle,
                            const char *right);
+int glbPrintExp(int exp);
 
 
 /* Event rate calculation */

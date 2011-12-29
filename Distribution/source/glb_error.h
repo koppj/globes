@@ -73,6 +73,7 @@ extern void glb_rule_error   (const struct glb_experiment *exp, int rule, const 
 
 extern void *glb_malloc (size_t size);
 extern void *glb_realloc (void *ptr, size_t size);
+void *glb_duplicate_array(void *src, size_t size);
 extern void glb_free(void *ptr);
 extern FILE *glb_fopen(const char *filename, const char *mode);
 extern int glb_fclose(FILE *stream);

@@ -654,11 +654,12 @@ static int set_pair(char *name,double value,double value2,int scalar)
 static int set_string(char *name, char *str)
 {
   int i;
-  for(i=0; token_list[i].token !=NULL; i++)
+  for(i=0; token_list[i].token != NULL; i++)
   {
     if (strncmp(name, token_list[i].token, strlen(token_list[i].token)) == 0)
     {
       char **p = (char **)(token_list[i].ptr);
+      if (*p)  glb_free(*p);
       *p = strdup(str);
       return 0;
     }
@@ -1097,6 +1098,7 @@ static int set_exp_energy(char *name, glb_List **value)
 %token <in> NOGLOBES
 %token <in> RULESEP RULEMULT
 %token <nameptr> NAME RDF
+%token <in> ENDEXP ENDDET
 %type <ptr> seq list listcopy
 %type <ptrq> rule brule srule energy ene
 %type <dpt> rulepart
@@ -1107,7 +1109,6 @@ static int set_exp_energy(char *name, glb_List **value)
 %type <name> cross
 %type <name> flux
 %type <name> nuflux
-
 %type <name> version
 
 %expect 2
@@ -1138,6 +1139,8 @@ input: topleveldirective {}
 topleveldirective: group {}
 | exp {}
 | list {}
+| ENDEXP { glb_copy_buff();  glbReset(); }
+| ENDDET { glb_copy_buff();  glbNewDetector(); }
 ;
 
 /* exp: An expression, including assignments, algebraic expressions, etc. */
@@ -1887,18 +1890,26 @@ void glb_copy_buff()
 {
   /* I am not sure how well this assigment really works */
   buff.names=copy_names(buff.names);
+  if (buff.filename)  glb_free(buff.filename);
   buff.filename=strdup(glb_file_id);
   buff_list[exp_count]=buff;
   exp_count++;
 }
 
+
+/***************************************************************************
+ * Function glbReset                                                       *
+ ***************************************************************************
+ * Resets the parser's internal data structures to prepare for the parsing *
+ * of a new experiment.                                                    *
+ ***************************************************************************/
 void glbReset()
 {
-  glb_line_num=0;
-  energy_len=1;
-  energy_count=-1;
-  loc_count=-1;
-  flux_count=-1;
+  glb_line_num =  0;
+  energy_len   =  1;
+  energy_count = -1;
+  loc_count    = -1;
+  flux_count   = -1;
   glbResetNuisance();
   glbInitExp(&buff);
 
@@ -1909,16 +1920,19 @@ void glbReset()
   init_table ();
 }
 
-/* Starts a new detector that inherits everything from the previously defined one,
-   including the namespace */
+
+/***************************************************************************
+ * Function glbNewDetector                                                 *
+ ***************************************************************************
+ * Starts a new detector that inherits everything from the previously      *
+ * defined one, including the namespace.                                   *
+ ***************************************************************************/
 void glbNewDetector()
 {
+  energy_len = 1;
   glbResetNuisance();
-  buff.parent    = &buff_list[exp_count-1];
-  buff.ref_count = 0;
-  glbExpIncrRefCounter(&buff_list[exp_count-1]);
+  glbInitExpFromParent(&buff, &buff_list[exp_count-1]);
      //FIXME FIXME FIXME What if parent is not/incorrectly defined?
-//FIXME FIXME FIXME TBD
 }
 
 void glbResetNuisance()
@@ -2000,6 +2014,10 @@ int glbInitExperiment(char *inf,glb_exp *in, int *counter)
   glb_file_id=(char*) strdup(inf);
   glbResetEOF();
   k=yyparse ();
+
+  /* Copy last experiment and reset data structures */
+  glb_copy_buff();
+  glbReset();
 
   glb_fclose(yyin);
   glb_free(context);

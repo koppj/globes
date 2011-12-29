@@ -76,12 +76,32 @@ glb_free_names(glb_naming *stale)
 }
 
 
+/***************************************************************************
+ * Function glbAllocExp                                                    *
+ ***************************************************************************
+ * Allocate a new glb_experiment data structure and initialize with dummy  *
+ * values.                                                                 *
+ ***************************************************************************/
+glb_exp glbAllocExp()
+{
+  struct glb_experiment *in;
+  in = (struct glb_experiment *) glb_malloc(sizeof(struct glb_experiment));
+  glbInitExp((glb_exp) in);
+  return (glb_exp) in;
+}
 
+
+/***************************************************************************
+ * Function glbInitExp                                                     *
+ ***************************************************************************
+ * Initialize a glb_experiment data structure with safe dummy values.      *
+ * This must be done before the experiment definition is read from an      *
+ * AEDL file.                                                              *
+ ***************************************************************************/
 void glbInitExp(glb_exp ins)
 {
   int i;
-  struct glb_experiment *in;
-  in=(struct glb_experiment *) ins;
+  struct glb_experiment *in = (struct glb_experiment *) ins;
   in->version=NULL;
   in->citation=NULL;
   in->parent=NULL;
@@ -98,41 +118,72 @@ void glbInitExp(glb_exp ins)
 
   in->binsize=NULL;
   in->simbinsize=NULL;
-  for(i=0;i<32;i++) in->sys_on[i]=NULL;
-  for(i=0;i<32;i++) in->sys_off[i]=NULL;
-  for(i=0;i<32;i++) in->sys_on_strings[i]=NULL;
-  for(i=0;i<32;i++) in->sys_off_strings[i]=NULL;
-  for(i=0;i<32;i++) in->sys_on_off[i]=GLB_ON;
   in->baseline=-1;
   in->emin=-1;
   in->emax=-1;
   in->numofbins=-1;
   in->targetmass=-1;
 
+  in->numofrules = -1;
+  for (i=0; i < GLB_MAX_RULES; i++)
+  {
+    in->lengthofrules[i]         = -1;
+    in->rulescoeff[i]            = NULL;
+    in->rulechannellist[i]       = NULL;
+    in->lengthofbgrules[i]       = -1;
+    in->bgrulescoeff[i]          = NULL;
+    in->bgrulechannellist[i]     = NULL;
+                                 
+    in->sys_on[i]                = NULL;
+    in->sys_off[i]               = NULL;
+    in->sys_on_strings[i]        = NULL;
+    in->sys_off_strings[i]       = NULL;
+    in->sys_on_off[i]            = GLB_ON;
+    in->sys_on_errors[i]         = NULL;
+    in->sys_on_startvals[i]      = NULL;
+    in->sys_off_errors[i]        = NULL;
+    in->sys_off_startvals[i]     = NULL;
+                                 
+    in->bg_centers[0][i]         =  1.0;
+    in->bg_centers[1][i]         =  0.0;
+    in->signal_errors[0][i]      = -1.0;
+    in->signal_errors[1][i]      = -1.0;
+    in->signal_startvals[0][i]   =  0.0;
+    in->signal_startvals[1][i]   =  0.0;
+    in->bg_errors[0][i]          = -1.0;
+    in->bg_errors[1][i]          = -1.0;
+    in->bg_startvals[0][i]       =  0.0;
+    in->bg_startvals[1][i]       =  0.0;
+
+    in->energy_window[i][0]      = -1.0;
+    in->energy_window[i][1]      = -1.0;
+    in->energy_window_bins[i][0] = -1;
+    in->energy_window_bins[i][1] = -1;
+
+    in->SignalRates[i]           = NULL;
+    in->BackgroundRates[i]       = NULL;
+    in->rates0[i]                = NULL;
+    in->rates1[i]                = NULL;
+    in->rates1BG[i]              = NULL;
+  }
+
   in->numofchannels=-1;
-  for(i=0;i<6;i++) in->listofchannels[i]=NULL;
-  in->numofrules=-1;
+  for (i=0; i < GLB_MAX_CHANNELS; i++)
+  {
+    in->chrb_0[i]                        = NULL;
+    in->chrb_1[i]                        = NULL;
+    in->chra_0[i]                        = NULL;
+    in->chra_1[i]                        = NULL;
+    in->chr_template[i]                  = NULL; 
+    in->user_pre_smearing_channel[i]     = NULL;
+    in->user_post_smearing_channel[i]    = NULL;
+    in->user_pre_smearing_background[i]  = NULL;
+    in->user_post_smearing_background[i] = NULL;
+  }
+  for(i=0; i < 6; i++)
+    in->listofchannels[i] = NULL;
+
   in->num_of_sm=-1;
-  for(i=0;i<32;i++) in->lengthofrules[i]=-1;
-  for(i=0;i<32;i++) in->rulescoeff[i]=NULL;
-  for(i=0;i<32;i++) in->rulechannellist[i]=NULL;
-  for(i=0;i<32;i++) in->lengthofbgrules[i]=-1;
-  for(i=0;i<32;i++) in->bgrulescoeff[i]=NULL;
-  for(i=0;i<32;i++) in->bgrulechannellist[i]=NULL;
-  for(i=0;i<32;i++) in->bg_centers[0][i]=1.0;
-  for(i=0;i<32;i++) in->bg_centers[1][i]=0.0;
-  for(i=0;i<32;i++) in->signal_errors[0][i]=-1;
-  for(i=0;i<32;i++) in->signal_errors[1][i]=-1;
-  for(i=0;i<32;i++) in->signal_startvals[0][i]=0.0;
-  for(i=0;i<32;i++) in->signal_startvals[1][i]=0.0;
-  for(i=0;i<32;i++) in->bg_errors[0][i]=-1;
-  for(i=0;i<32;i++) in->bg_errors[1][i]=-1;
-  for(i=0;i<32;i++) in->bg_startvals[0][i]=0.0;
-  for(i=0;i<32;i++) in->bg_startvals[1][i]=0.0;
-  for(i=0;i<32;i++) in->sys_on_errors[i]=NULL;
-  for(i=0;i<32;i++) in->sys_on_startvals[i]=NULL;
-  for(i=0;i<32;i++) in->sys_off_errors[i]=NULL;
-  for(i=0;i<32;i++) in->sys_off_startvals[i]=NULL;
   in->n_nuisance = -1;
   for(i=0; i < GLB_MAX_NUISANCE; i++)
   {
@@ -146,11 +197,6 @@ void glbInitExp(glb_exp ins)
   for(i=0;i<32;i++) in->smear[i]=NULL;
   for(i=0;i<32;i++) in->lowrange[i]=NULL;
   for(i=0;i<32;i++) in->uprange[i]=NULL;
-  for(i=0;i<32;i++) in->chrb_0[i]=NULL;
-  for(i=0;i<32;i++) in->chrb_1[i]=NULL;
-  for(i=0;i<32;i++) in->chra_0[i]=NULL;
-  for(i=0;i<32;i++) in->chra_1[i]=NULL;
-  for(i=0;i<32;i++) in->chr_template[i]=NULL;
   in->simtresh=-1;
   in->simbeam=-1;
   in->simbins=-1;
@@ -161,24 +207,7 @@ void glbInitExp(glb_exp ins)
   in->lengthtab=NULL;
   in->densitytab=NULL;
   in->densitybuffer=NULL;
-  for(i=0;i<32;i++) in->user_pre_smearing_channel[i]=NULL;
-  for(i=0;i<32;i++) in->user_post_smearing_channel[i]=NULL;
-  for(i=0;i<32;i++) in->user_pre_smearing_background[i]=NULL;
-  for(i=0;i<32;i++) in->user_post_smearing_background[i]=NULL;
-  for(i=0;i<32;i++) in->energy_window[i][0]=-1;
-  for(i=0;i<32;i++) in->energy_window[i][1]=-1;
-  for(i=0;i<32;i++) in->energy_window_bins[i][0]=-1;
-  for(i=0;i<32;i++) in->energy_window_bins[i][1]=-1;
-  for(i=0;i<32;i++)
-    {
-      in->SignalRates[i]=NULL;
-      in->BackgroundRates[i]=NULL;
-      in->rates0[i]=NULL;
-      in->rates1[i]=NULL;
-      in->rates1BG[i]=NULL;
-    }
   in->energy_tab=NULL;
-  for(i=0;i<32;i++) in->no_osc_background[i]=NULL;
 }
 
 
@@ -187,6 +216,188 @@ static void my_free(void *ptr)
   if(ptr==NULL) return;
   glb_free(ptr);
   ptr=NULL;
+}
+
+
+/***************************************************************************
+ * Function glbInitExpFromParent                                           *
+ ***************************************************************************
+ * Initialize a glb_experiment data structure by copying certain properties*
+ * from another detector. This is used when the AEDL parser encounters a   *
+ * #DETECTOR# directive. The rules of the parent experiment are copied,    *
+ * but nomofrules is *not* copied -- if the child experiment has its own   *
+ * rules, it is assumed that *only* those should be used. If it does not   *
+ * have its own rules, nomofrules will be  copied later, in glbDefaultExp  *
+ ***************************************************************************/
+void glbInitExpFromParent(struct glb_experiment *exp, struct glb_experiment *p)
+{
+  int i, j;
+
+  if (!exp)
+    glb_error("glbInitExpFromParent: NULL is not a valid experiment");
+  if (!p)
+    glb_error("glbInitExpFromParent: NULL is not a valid parent experiment");
+
+  /* Start with a clean data structure */
+  glbInitExp(exp);
+
+  exp->parent     = p;
+  glbExpIncrRefCounter(p);
+  exp->ref_count  = 0;
+  exp->names      = p->names;
+
+  if (p->version)   exp->version  = strdup(p->version);
+  if (p->citation)  exp->citation = strdup(p->citation);
+  if (p->filename)  exp->filename = strdup(p->filename);
+
+  /* Binning */
+  exp->emin       = p->emin;
+  exp->emax       = p->emax;
+  exp->numofbins  = p->numofbins;
+  exp->binsize    = glb_duplicate_array(p->binsize, exp->numofbins * sizeof(double));
+  exp->simtresh   = p->simtresh;
+  exp->simbeam    = p->simbeam;
+  exp->simbins    = p->simbins;
+  exp->simbinsize = glb_duplicate_array(p->simbinsize, exp->simbins * sizeof(double));
+
+  /* Detector parameteres */
+  exp->targetmass           = p->targetmass;
+  exp->baseline             = p->baseline;
+  exp->density_profile_type = p->density_profile_type;
+  exp->psteps               = p->psteps;
+  /* FIXME What if lengthtab and densitytab have unequal lengths? */
+  exp->lengthtab            = glb_duplicate_array(p->lengthtab, exp->psteps * sizeof(double));
+  exp->densitytab           = glb_duplicate_array(p->lengthtab, exp->psteps * sizeof(double));
+  exp->filter_state         = p->filter_state;
+  exp->filter_value         = p->filter_value;
+
+  /* Copy fluxes from parent */
+  exp->num_of_fluxes = p->num_of_fluxes;
+  for (i=0; i < exp->num_of_fluxes; i++)
+    exp->fluxes[i] = p->fluxes[i];
+
+  /* Copy cross sections from parent */
+  exp->num_of_xsecs = p->num_of_xsecs;
+  for (i=0; i < exp->num_of_xsecs; i++)
+    exp->xsecs[i] = p->xsecs[i];
+
+  /* Copy smearing definitions from parent */
+  /* FIXME FIXME FIXME: What if smearing matrix has wrong dimensions? */
+  exp->num_of_sm = p->num_of_sm;
+  for (i=0; i < exp->num_of_sm; i++)
+  {
+    if (p->smear_data[i])   /* Parametrized smearing */
+    {
+      exp->smear_data[i] = glb_smear_alloc();
+      glb_copy_smear(exp->smear_data[i], p->smear_data[i]);
+    }
+    if (p->smear[i])        /* Explicit smearing matrix given in AEDL file */
+    {
+      exp->lowrange[i] = glb_malloc(p->numofbins * sizeof(int));
+      exp->uprange[i]  = glb_malloc(p->numofbins * sizeof(int));
+      exp->smear[i]    = glb_malloc(p->numofbins * sizeof(double *));
+      if (exp->lowrange[i]  &&  exp->uprange[i]  &&  exp->smear[i])
+      {
+        for (j=0; j < p->numofbins; j++)
+        {
+          if (p->smear[i][j])
+          {
+            exp->lowrange[i][j] = p->lowrange[i][j];
+            exp->uprange[i][j]  = p->uprange[i][j];
+            exp->smear[i][j]    = glb_malloc((exp->lowrange[i][j] - exp->uprange[i][j] + 1)
+                                    * sizeof(double));
+            memcpy(exp->smear[i][j], p->smear[i][j],
+                   (exp->lowrange[i][j] - exp->uprange[i][j] + 1) * sizeof(double));
+          }
+        }
+      }
+      else
+      {
+        glb_free(exp->lowrange[i]);  exp->lowrange[i] = NULL;
+        glb_free(exp->uprange[i]);   exp->uprange[i]  = NULL;
+        glb_free(exp->smear[i]);     exp->smear[i]    = NULL;
+      }
+    }
+  }
+
+  /* Copy channels from parent */
+  exp->numofchannels = p->numofchannels;
+  for (i=0; i < 6; i++)
+    exp->listofchannels[i] = glb_duplicate_array(p->listofchannels[i],
+                                                 sizeof(int) * exp->numofchannels);
+  for (i=0; i < exp->numofchannels; i++)
+  {
+    int n = sizeof(double) * p->simbins;
+    exp->user_pre_smearing_channel[i]
+      = glb_duplicate_array(p->user_pre_smearing_channel[i], n);
+    exp->user_post_smearing_channel[i]
+      = glb_duplicate_array(p->user_post_smearing_channel[i], n);
+    exp->user_pre_smearing_background[i]
+      = glb_duplicate_array(p->user_pre_smearing_background[i], n);
+    exp->user_post_smearing_background[i]
+      = glb_duplicate_array(p->user_post_smearing_background[i], n);
+  }
+
+  /* Copy rules from parent. Do *not* copy numofrules! */
+  for (i=0; i < p->numofrules; i++)
+  {
+    exp->lengthofrules[i]         = p->lengthofrules[i];
+    exp->rulescoeff[i]            = glb_duplicate_array(p->rulescoeff[i],
+                                      exp->lengthofrules[i] * sizeof(double));
+    exp->rulechannellist[i]       = glb_duplicate_array(p->rulechannellist[i],
+                                      exp->lengthofrules[i] * sizeof(int));
+
+    exp->lengthofbgrules[i]       = p->lengthofbgrules[i];
+    exp->bgrulescoeff[i]          = glb_duplicate_array(p->bgrulescoeff[i],
+                                      exp->lengthofbgrules[i] * sizeof(double));
+    exp->bgrulechannellist[i]     = glb_duplicate_array(p->bgrulechannellist[i],
+                                      exp->lengthofbgrules[i] * sizeof(int));
+
+    exp->energy_window[i][0]      = p->energy_window[i][0];
+    exp->energy_window[i][1]      = p->energy_window[i][1];
+    exp->energy_window_bins[i][0] = p->energy_window_bins[i][0];
+    exp->energy_window_bins[i][1] = p->energy_window_bins[i][1];
+
+    exp->sys_on_off[i]            = p->sys_on_off[i];
+    exp->sys_on[i]                = p->sys_on[i];
+    exp->sys_off[i]               = p->sys_off[i];
+    exp->sys_on_strings[i]        = strdup(p->sys_on_strings[i]);
+    exp->sys_off_strings[i]       = strdup(p->sys_off_strings[i]);
+    if (p->sys_on_errors[i])
+    {
+      for (j=0; p->sys_on_errors[i][j] > 0.0; j++)
+        ;
+      exp->sys_on_errors[i] = glb_duplicate_array(p->sys_on_errors[i], (j+1)*sizeof(double));
+    }
+    if (p->sys_on_startvals[i])
+    {
+      for (j=0; p->sys_on_startvals[i][j] > 0.0; j++)
+        ;
+      exp->sys_on_startvals[i] = glb_duplicate_array(p->sys_on_startvals[i], (j+1)*sizeof(double));
+    }
+    if (p->sys_off_errors[i])
+    {
+      for (j=0; p->sys_off_errors[i][j] > 0.0; j++)
+        ;
+      exp->sys_off_errors[i] = glb_duplicate_array(p->sys_off_errors[i], (j+1)*sizeof(double));
+    }
+    if (p->sys_off_startvals[i])
+    {
+      for (j=0; p->sys_off_startvals[i][j] > 0.0; j++)
+        ;
+      exp->sys_off_startvals[i] = glb_duplicate_array(p->sys_off_startvals[i],(j+1)*sizeof(double));
+    }
+    for (j=0; j < 2; j++)
+    {
+      exp->signal_errors[j][i]    = p->signal_errors[j][i];
+      exp->signal_startvals[j][i] = p->signal_startvals[j][i];
+      exp->bg_errors[j][i]        = p->bg_errors[j][i];
+      exp->bg_startvals[j][i]     = p->bg_startvals[j][i];
+      exp->bg_centers[j][i]       = p->bg_centers[j][i];
+    }
+  }
+
+  //FIXME FIXME FIXME What to do about nuisance parameters?
 }
 
 
@@ -223,12 +434,19 @@ void glbExpDecrRefCounter(struct glb_experiment *exp)
 }
 
 
+/***************************************************************************
+ * Function glbFreeExp                                                     *
+ ***************************************************************************
+ * Release dynamically allocated memory for a given experiment             *
+ ***************************************************************************/
 void glbFreeExp(glb_exp ins)
 {
   int i,j;
-  struct glb_experiment *in;
-  in=(struct glb_experiment *) ins;
-  if(ins==NULL) return;
+  struct glb_experiment *in = (struct glb_experiment *) ins;
+
+  if(ins==NULL)
+    return;
+
   glb_free_names(in->names);
   glb_free(in->version);
   glb_free(in->citation);
@@ -319,22 +537,8 @@ void glbFreeExp(glb_exp ins)
   in->n_nuisance = -1;
   my_free(in->energy_tab);
   my_free(in);
-
 }
 
-
-
-
-
-
-
-glb_exp glbAllocExp()
-{
-  struct glb_experiment *in;
-  in=(struct glb_experiment *) glb_malloc(sizeof(struct glb_experiment));
-  glbInitExp((glb_exp) in);
-  return (glb_exp) in;
-}
 
 
 static int setup_density_profile(glb_exp ins)
@@ -408,11 +612,22 @@ static int setup_density_profile(glb_exp ins)
   return s;
 }
 
+
+/***************************************************************************
+ * Function glbDefaultExp                                                  *
+ ***************************************************************************
+ * This function is called after the basic properties of the experiment    *
+ * have been read from an AEDL file. It prepares the glb_experiment        *
+ * structure for productive use by allocating memory (as specified in      *
+ * the AEDL file), performing numerous consistency checks, and assigning   *
+ * default values where appropriate.                                       *
+ * In the case of a sub-detector (#DETECTOR# directive), those defaults    *
+ * are taken from the parent experiment.                                   *
+ ***************************************************************************/
 int glbDefaultExp(glb_exp ins)
 {
   int i,k,status,def,ct;
   int sys_dim;
-
 
   struct glb_experiment *in;
   in=(struct glb_experiment *) ins;
@@ -438,6 +653,13 @@ int glbDefaultExp(glb_exp ins)
   if(in->num_of_xsecs>31)  {glb_exp_error(in, "To many X-sections!");status=-1;}
   if(in->num_of_fluxes<1)  {glb_exp_error(in, "No flux selected!");status=-1;}
   if(in->num_of_fluxes>31)  {glb_exp_error(in, "To many fluxes!");status=-1;}
+
+  /* For sub-experiments: complete initialization from parent experiment */
+  if (in->parent)
+  {
+    /* No rules defined for sub-experiment -> use rules from parent */
+    if (in->numofrules < 0)  in->numofrules = in->parent->numofrules;
+  }
 
   /* Initialize flux tables */
   if(in->num_of_fluxes>0&&in->num_of_fluxes<32)
@@ -514,7 +736,7 @@ int glbDefaultExp(glb_exp ins)
         }
       }
       else
-        { glb_rule_error(in, i, "Invalid @sys_on_function/@sys_on_errors"); status=-1; }
+        { glb_rule_error(in, i, "Invalid @sys_on_function"); status=-1; }
 
       if (glbSetChiFunctionInExperiment(in, i, GLB_ON, in->sys_on_strings[i],
                                         tmp_errorlist) != 0)
@@ -554,7 +776,7 @@ int glbDefaultExp(glb_exp ins)
         }
       }
       else
-        { glb_rule_error(in, i, "Invalid @sys_off_function/@sys_off_errors"); status=-1; }
+        { glb_rule_error(in, i, "Invalid @sys_off_function"); status=-1; }
 
       if (glbSetChiFunctionInExperiment(in, i, GLB_OFF, in->sys_off_strings[i],
                                         tmp_errorlist) != 0)
@@ -838,7 +1060,6 @@ int glbDefaultExp(glb_exp ins)
 
   // okay thats missing
   /*
-    for(i=0;i<32;i++) in->no_osc_background[i]=NULL;
     for(i=0;i<32;i++) init_struct_systematic(&(in->sys[i]));
   */
   // issue a final report
@@ -849,20 +1070,47 @@ int glbDefaultExp(glb_exp ins)
 };
 
 
-
-
-//#include "StructExp.c"
-
-
-
-
-// function setting glb_num_of_exps
-
-static void glbSetNumberOfExperiments(int in)
+/***************************************************************************
+ * Function glbPrintExp                                                    *
+ ***************************************************************************
+ * Prints selected experiment parameters to stdout in AEDL format          *
+ ***************************************************************************/
+int glbPrintExpByPointer(struct glb_experiment *e)
 {
-  glb_num_of_exps = in;
-  return;
+  printf("%!GLoBES\n");
+  printf("\n");
+  printf("// WARNING: glbPrintExp prints only some experimental properties.\n");
+  printf("//          It cannot be used to recreate the original AEDL file.\n");
+  printf("\n");
+  printf("// Experiment loaded from file %s\n", e->filename ? e->filename : "NULL");
+  if (e->parent)
+    printf("// Based on parent experiment from file %s\n",
+           e->parent->filename ? e->parent->filename : "NULL");
+  printf("// -------------------------------------------------------------------\n");
+  printf("\n");
+  if (e->version)
+    printf("$version = ""%s""\n", e->version);
+  printf("\n");
+  printf("// Detector properties\n");
+  printf("$target_mass     = %g\n", e->targetmass);
+  printf("\n");
+  printf("$profile_type    = %d\n", e->density_profile_type);
+  printf("$baseline        = %g\n", e->baseline);
+  printf("\n");
+  printf("// Energy ranges\n");
+  printf("$emin            = %g\n", e->emin);
+  printf("$emax            = %g\n", e->emax);
+  printf("$bins            = %d\n", e->numofbins);
+  printf("\n");
+  printf("$sampling_min    = %g\n", e->simtresh);
+  printf("$sampling_max    = %g\n", e->simbeam);
+  printf("$sampling_points = %d\n", e->simbins);
+  printf("\n");
+
+  return GLB_SUCCESS;
 }
+
+
 
 
 // this function moves the pointers to the ratevectors to the correct address
