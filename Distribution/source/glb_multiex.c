@@ -41,6 +41,7 @@
 #include "glb_multiex.h"
 #include "glb_version.h"
 #include "glb_sys.h"
+#include "glb_wrapper.h"
 
 #define FLOAT double
 
@@ -224,10 +225,9 @@ static void my_free(void *ptr)
  ***************************************************************************
  * Initialize a glb_experiment data structure by copying certain properties*
  * from another detector. This is used when the AEDL parser encounters a   *
- * #DETECTOR# directive. The rules of the parent experiment are copied,    *
- * but nomofrules is *not* copied -- if the child experiment has its own   *
- * rules, it is assumed that *only* those should be used. If it does not   *
- * have its own rules, nomofrules will be  copied later, in glbDefaultExp  *
+ * #DETECTOR# directive. Note that rules inherited from a parent experiment*
+ * will only be used if the child does not have its own rule defined in    *
+ * the AEDL file.                                                          *
  ***************************************************************************/
 void glbInitExpFromParent(struct glb_experiment *exp, struct glb_experiment *p)
 {
@@ -338,8 +338,9 @@ void glbInitExpFromParent(struct glb_experiment *exp, struct glb_experiment *p)
       = glb_duplicate_array(p->user_post_smearing_background[i], n);
   }
 
-  /* Copy rules from parent. Do *not* copy numofrules! */
-  for (i=0; i < p->numofrules; i++)
+  /* Copy rules from parent */
+  exp->numofrules = p->numofrules;
+  for (i=0; i < exp->numofrules; i++)
   {
     exp->lengthofrules[i]         = p->lengthofrules[i];
     exp->rulescoeff[i]            = glb_duplicate_array(p->rulescoeff[i],
@@ -397,7 +398,10 @@ void glbInitExpFromParent(struct glb_experiment *exp, struct glb_experiment *p)
     }
   }
 
-  //FIXME FIXME FIXME What to do about nuisance parameters?
+  /* Copy nuisance parameter info */
+  exp->n_nuisance = p->n_nuisance;
+  for (i=0; i < exp->n_nuisance; i++)
+    memcpy(&exp->nuisance_params[i], &p->nuisance_params[i], sizeof(exp->nuisance_params[i]));
 }
 
 
@@ -621,8 +625,6 @@ static int setup_density_profile(glb_exp ins)
  * structure for productive use by allocating memory (as specified in      *
  * the AEDL file), performing numerous consistency checks, and assigning   *
  * default values where appropriate.                                       *
- * In the case of a sub-detector (#DETECTOR# directive), those defaults    *
- * are taken from the parent experiment.                                   *
  ***************************************************************************/
 int glbDefaultExp(glb_exp ins)
 {
@@ -654,13 +656,20 @@ int glbDefaultExp(glb_exp ins)
   if(in->num_of_fluxes<1)  {glb_exp_error(in, "No flux selected!");status=-1;}
   if(in->num_of_fluxes>31)  {glb_exp_error(in, "To many fluxes!");status=-1;}
 
-  /* For sub-experiments: complete initialization from parent experiment */
+  /* If this experiment is a subdetector in a multi-detector setup, and if it has
+   * its own rules, the parent's rules should not be used */
   if (in->parent)
   {
-    /* No rules defined for sub-experiment -> use rules from parent */
-    if (in->numofrules < 0)  in->numofrules = in->parent->numofrules;
+    if (in->numofrules > in->parent->numofrules)
+    {
+      for (i=0; i < in->parent->numofrules; i++)
+      {
+        glbSetChiFunctionInRule(in, i, GLB_ON, "chiZero", NULL);
+        glbSetChiFunctionInRule(in, i, GLB_OFF, "chiZero", NULL);
+      }
+    }
   }
-
+  
   /* Initialize flux tables */
   if(in->num_of_fluxes>0&&in->num_of_fluxes<32)
   {
@@ -1071,12 +1080,40 @@ int glbDefaultExp(glb_exp ins)
 
 
 /***************************************************************************
+ * Function glbPrintDblArray                                               *
+ ***************************************************************************
+ * Helper function for glbPrintExp - prints an array of doubles            *
+ ***************************************************************************/
+int glbPrintDblArray(double *x, int n)
+{
+  int j;
+
+  printf("{ ");
+  if (x)
+  {
+    for (j=0; j < n; j++)
+    {
+      printf("%10.7g", x[j]);
+      if (j < n - 1)  printf(", ");
+      if (j % 6 == 5)          printf("\n    ");
+    }
+  }
+  printf(" }\n");
+
+  return GLB_SUCCESS;
+}
+
+
+/***************************************************************************
  * Function glbPrintExp                                                    *
  ***************************************************************************
  * Prints selected experiment parameters to stdout in AEDL format          *
  ***************************************************************************/
 int glbPrintExpByPointer(struct glb_experiment *e)
 {
+  int i, j, k;
+  int status = GLB_SUCCESS;
+
   printf("%!GLoBES\n");
   printf("\n");
   printf("// WARNING: glbPrintExp prints only some experimental properties.\n");
@@ -1091,12 +1128,71 @@ int glbPrintExpByPointer(struct glb_experiment *e)
   if (e->version)
     printf("$version = ""%s""\n", e->version);
   printf("\n");
+
+  printf("// Fluxes\n");
+  for (i=0; i < e->num_of_fluxes; i++)
+  {
+    glb_flux *f = e->fluxes[i];
+    printf("nuflux(%s)<\n", glbValueToNameByPointer(e, "nuflux", i));
+    if (f->builtin > 0)        printf("  @builtin       = %d\n", f->builtin);
+    if (f->time > 0.)          printf("  @time          = %g\n", f->time);
+    if (f->target_power > 0.)  printf("  @power         = %g\n", f->target_power);
+    if (f->parent_energy > 0.) printf("  @parent_energy = %g\n", f->parent_energy);
+    if (f->stored_muons > 0.)  printf("  @stored_muons  = %g\n", f->stored_muons);
+    if (f->gamma > 0.)         printf("  @gamma         = %g\n", f->gamma);
+    if (f->end_point > 0.)     printf("  @end_point     = %g\n", f->end_point);
+    if (f->file_name)          printf("  @file_name     = %s\n", f->file_name);
+    if (f->norm > 0.)          printf("  @norm          = %g\n", f->norm);
+    printf(">\n");
+    printf("\n");
+  }
+  printf("\n");
+
+  printf("// Cross sections\n");
+  for (i=0; i < e->num_of_xsecs; i++)
+  {
+    glb_xsec *x = e->xsecs[i];
+    printf("cross(%s)<\n", glbValueToNameByPointer(e, "cross", i));
+    if (x->file_name)          printf("  @cross_file    = %s\n", x->file_name);
+    printf(">\n");
+    printf("\n");
+  }
+  printf("\n");
+
+  printf("// Energy resolution\n");
+  for (i=0; i < e->num_of_sm; i++)
+  {
+    printf("energy(%s)<\n", glbValueToNameByPointer(e, "energy", i));
+    printf("  @energy = \n");
+    for (j=0; j < e->numofbins; j++)
+    {
+      printf("  { %4d, %4d, ", e->lowrange[i][j], e->uprange[i][j]);
+      for (k=0; k < e->uprange[i][j] - e->lowrange[i][j] + 1; k++)
+      {
+        printf("%10.7g", e->smear[i][j][k]);
+        if (k < e->uprange[i][j] - e->lowrange[i][j])  printf(", ");
+        if (k % 6 == 5) printf("\n                ");
+      }
+      if (j < e->numofbins-1)  printf(" }:\n");
+      else                     printf(" };\n");
+    }
+    printf(">\n");
+    printf("\n");
+  }
+  printf("\n");
+
   printf("// Detector properties\n");
   printf("$target_mass     = %g\n", e->targetmass);
   printf("\n");
-  printf("$profile_type    = %d\n", e->density_profile_type);
-  printf("$baseline        = %g\n", e->baseline);
+  printf("$profiletype     = 3\n");
+  printf("$lengthtab       = ");
+  glbPrintDblArray(e->lengthtab, e->psteps);
+  printf("$densitytab      = ");
+  glbPrintDblArray(e->densitytab, e->psteps);
+//  printf("$profile_type    = %d\n", e->density_profile_type);
+//  printf("$baseline        = %g\n", e->baseline);
   printf("\n");
+
   printf("// Energy ranges\n");
   printf("$emin            = %g\n", e->emin);
   printf("$emax            = %g\n", e->emax);
@@ -1105,6 +1201,101 @@ int glbPrintExpByPointer(struct glb_experiment *e)
   printf("$sampling_min    = %g\n", e->simtresh);
   printf("$sampling_max    = %g\n", e->simbeam);
   printf("$sampling_points = %d\n", e->simbins);
+  printf("\n");
+  printf("\n");
+
+  printf("// Nuisance parameters\n");
+  for (i=0; i < e->n_nuisance; i++)
+  {
+    printf("sys(%s)<\n", glbValueToNameByPointer(e, "sys", i));
+    if (e->nuisance_params[i].energy_list  &&  e->nuisance_params[i].error_list)
+    {
+      printf("  @energy_list = ");
+      glbPrintDblArray(e->nuisance_params[i].energy_list, e->nuisance_params[i].n_energies);
+      printf("  @error_list = ");
+      glbPrintDblArray(e->nuisance_params[i].error_list, e->nuisance_params[i].n_energies);
+    }
+    else
+      printf("  @error = %g\n", e->nuisance_params[i].error);
+    printf(">\n");
+    printf("\n");
+  }
+  printf("\n");
+  printf("\n");
+
+
+  printf("// Channels\n");
+  printf("$filter_state    = %d\n", e->filter_state);
+  printf("$filter_value    = %g\n", e->filter_value);
+  for (i=0; i < e->numofchannels; i++)
+  {
+    char fi[10]=" ", ff[10]=" ";
+    printf("channel(%s)<\n", glbValueToNameByPointer(e, "channel", i));
+    switch(e->listofchannels[2][i])
+    {
+      case 1:   strcpy(fi, "e"); break;
+      case 2:   strcpy(fi, "m"); break;
+      case 3:   strcpy(fi, "t"); break;
+      case 11:  strcpy(fi, "NOSC_e"); break;
+      case 12:  strcpy(fi, "NOSC_m"); break;
+      case 13:  strcpy(fi, "NOSC_t"); break;
+    }
+    switch(e->listofchannels[3][i])
+    {
+      case 1:   strcpy(ff, "e"); break;
+      case 2:   strcpy(ff, "m"); break;
+      case 3:   strcpy(ff, "t"); break;
+      case 11:  strcpy(ff, "NOSC_e"); break;
+      case 12:  strcpy(ff, "NOSC_m"); break;
+      case 13:  strcpy(ff, "NOSC_t"); break;
+    }
+    printf("  @channel = %10s : %c : %6s : %6s : %10s : %10s\n",
+           glbValueToNameByPointer(e, "nuflux", e->listofchannels[0][i]),
+           e->listofchannels[1][i] > 0 ? '+' : '-', fi, ff,
+           glbValueToNameByPointer(e, "cross", e->listofchannels[4][i]),
+           glbValueToNameByPointer(e, "energy", e->listofchannels[5][i]));
+    printf("  @pre_smearing_efficiencies = ");
+    glbPrintDblArray(e->user_pre_smearing_channel[i], e->simbins);
+    printf("  @post_smearing_efficiencies = ");
+    glbPrintDblArray(e->user_post_smearing_channel[i], e->numofbins);
+    printf("  @pre_smearing_background = ");
+    glbPrintDblArray(e->user_pre_smearing_background[i], e->simbins);
+    printf("  @post_smearing_background = ");
+    glbPrintDblArray(e->user_post_smearing_background[i], e->numofbins);
+    printf(">\n");
+    printf("\n");
+  }
+  printf("\n");
+
+  printf("// Rules\n");
+  for (i=0; i < e->numofrules; i++)
+  {
+    printf("rule(%s)<\n", glbValueToNameByPointer(e, "rule", i));
+    printf("  @signal           = ");
+    for (j=0; j < e->lengthofrules[i]; j++)
+    {
+      printf("%10.7g @ %s", e->rulescoeff[i][j],
+             glbValueToNameByPointer(e, "channel", e->rulechannellist[i][j]));
+      if (j < e->lengthofrules[i]-1)  printf(" : ");
+    }
+    printf("\n");
+    printf("  @background       = ");
+    for (j=0; j < e->lengthofbgrules[i]; j++)
+    {
+      printf("%10.7g @ %s", e->bgrulescoeff[i][j],
+             glbValueToNameByPointer(e, "channel", e->bgrulechannellist[i][j]));
+      if (j < e->lengthofbgrules[i]-1)  printf(" : ");
+    }
+    printf("\n");
+    printf("  @sys_on_function  = %s\n", e->sys_on_strings[i]);
+    printf("  @sys_off_function = %s\n", e->sys_off_strings[i]);
+    printf("  @sys_on_errors    = ");
+    glbPrintDblArray(e->sys_on_errors[i], glbGetSysDim(e->sys_on_strings[i]));
+    printf("  @sys_off_errors    = ");
+    glbPrintDblArray(e->sys_off_errors[i], glbGetSysDim(e->sys_off_strings[i]));
+    printf(">\n");
+    printf("\n");
+  }
   printf("\n");
 
   return GLB_SUCCESS;

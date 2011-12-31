@@ -371,6 +371,9 @@ static void grp_end(char* name)
      {
        nuis.name = strdup(name_table->name);
        memcpy(&(buff.nuisance_params[buff.n_nuisance-1]), &nuis, sizeof(glb_nuisance));
+       /* For multi-detector setups, the parent detector has to know about all systematics */
+       if (buff.parent)   
+         memcpy(&(buff.parent->nuisance_params[buff.parent->n_nuisance++]), &nuis, sizeof(glb_nuisance));
        glbResetNuisance();
      }
 

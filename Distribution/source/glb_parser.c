@@ -495,6 +495,9 @@ static void grp_end(char* name)
      {
        nuis.name = strdup(name_table->name);
        memcpy(&(buff.nuisance_params[buff.n_nuisance-1]), &nuis, sizeof(glb_nuisance));
+       /* For multi-detector setups, the parent detector has to know about all systematics */
+       if (buff.parent)   
+         memcpy(&(buff.parent->nuisance_params[buff.parent->n_nuisance++]), &nuis, sizeof(glb_nuisance));
        glbResetNuisance();
      }
 
@@ -1217,7 +1220,7 @@ static int set_exp_energy(char *name, glb_List **value)
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 1075 "glb_parser.y"
+#line 1078 "glb_parser.y"
 {
   double  val;  /* For returning numbers.                   */
   double *dpt;  /* for rules */
@@ -1230,7 +1233,7 @@ typedef union YYSTYPE
   glb_namerec *nameptr;
 }
 /* Line 193 of yacc.c.  */
-#line 1234 "glb_parser.c"
+#line 1237 "glb_parser.c"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
@@ -1243,7 +1246,7 @@ typedef union YYSTYPE
 
 
 /* Line 216 of yacc.c.  */
-#line 1247 "glb_parser.c"
+#line 1250 "glb_parser.c"
 
 #ifdef short
 # undef short
@@ -1561,14 +1564,14 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,  1132,  1132,  1133,  1134,  1135,  1139,  1140,  1141,  1142,
-    1143,  1147,  1148,  1149,  1150,  1151,  1156,  1160,  1165,  1171,
-    1172,  1173,  1174,  1175,  1176,  1177,  1178,  1179,  1183,  1192,
-    1197,  1201,  1202,  1203,  1204,  1209,  1210,  1211,  1212,  1213,
-    1214,  1215,  1219,  1230,  1229,  1240,  1247,  1248,  1252,  1253,
-    1254,  1255,  1256,  1257,  1258,  1259,  1263,  1273,  1283,  1295,
-    1307,  1326,  1327,  1331,  1332,  1333,  1337,  1346,  1360,  1361,
-    1365,  1374,  1385,  1395,  1406,  1415,  1424,  1429
+       0,  1135,  1135,  1136,  1137,  1138,  1142,  1143,  1144,  1145,
+    1146,  1150,  1151,  1152,  1153,  1154,  1159,  1163,  1168,  1174,
+    1175,  1176,  1177,  1178,  1179,  1180,  1181,  1182,  1186,  1195,
+    1200,  1204,  1205,  1206,  1207,  1212,  1213,  1214,  1215,  1216,
+    1217,  1218,  1222,  1233,  1232,  1243,  1250,  1251,  1255,  1256,
+    1257,  1258,  1259,  1260,  1261,  1262,  1266,  1276,  1286,  1298,
+    1310,  1329,  1330,  1334,  1335,  1336,  1340,  1349,  1363,  1364,
+    1368,  1377,  1388,  1398,  1409,  1418,  1427,  1432
 };
 #endif
 
@@ -2609,72 +2612,72 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 1132 "glb_parser.y"
+#line 1135 "glb_parser.y"
     {}
     break;
 
   case 3:
-#line 1133 "glb_parser.y"
+#line 1136 "glb_parser.y"
     {}
     break;
 
   case 4:
-#line 1134 "glb_parser.y"
+#line 1137 "glb_parser.y"
     {YYABORT;}
     break;
 
   case 5:
-#line 1135 "glb_parser.y"
+#line 1138 "glb_parser.y"
     {YYABORT;}
     break;
 
   case 6:
-#line 1139 "glb_parser.y"
+#line 1142 "glb_parser.y"
     {}
     break;
 
   case 7:
-#line 1140 "glb_parser.y"
+#line 1143 "glb_parser.y"
     {}
     break;
 
   case 8:
-#line 1141 "glb_parser.y"
+#line 1144 "glb_parser.y"
     {}
     break;
 
   case 9:
-#line 1142 "glb_parser.y"
+#line 1145 "glb_parser.y"
     { glb_copy_buff();  glbReset(); }
     break;
 
   case 10:
-#line 1143 "glb_parser.y"
+#line 1146 "glb_parser.y"
     { glb_copy_buff();  glbNewDetector(); }
     break;
 
   case 11:
-#line 1147 "glb_parser.y"
+#line 1150 "glb_parser.y"
     { (yyval.val) = (yyvsp[(1) - (1)].val);                     }
     break;
 
   case 12:
-#line 1148 "glb_parser.y"
+#line 1151 "glb_parser.y"
     { (yyval.val) = (yyvsp[(1) - (1)].nameptr)->value;              }
     break;
 
   case 13:
-#line 1149 "glb_parser.y"
+#line 1152 "glb_parser.y"
     { (yyval.val) = (yyvsp[(1) - (1)].tptr)->value.var;          }
     break;
 
   case 14:
-#line 1150 "glb_parser.y"
+#line 1153 "glb_parser.y"
     { (yyval.val) = (yyvsp[(3) - (3)].val); (yyvsp[(1) - (3)].tptr)->value.var = (yyvsp[(3) - (3)].val); }
     break;
 
   case 15:
-#line 1151 "glb_parser.y"
+#line 1154 "glb_parser.y"
     {
   if(set_exp((yyvsp[(1) - (3)].name),(yyvsp[(3) - (3)].val),0)==1) yyerror("Unknown identifier: %s", (yyvsp[(1) - (3)].name));
   (yyval.val) = (yyvsp[(3) - (3)].val);
@@ -2683,7 +2686,7 @@ yyreduce:
     break;
 
   case 16:
-#line 1156 "glb_parser.y"
+#line 1159 "glb_parser.y"
     {
   if(set_fnct((yyvsp[(1) - (3)].name),(yyvsp[(3) - (3)].nameptr)->sf)==1) yyerror("Unknown identifier: %s", (yyvsp[(1) - (3)].name));
   if ((yyvsp[(1) - (3)].name))  { glb_free((yyvsp[(1) - (3)].name));  (yyvsp[(1) - (3)].name)=NULL; }
@@ -2691,7 +2694,7 @@ yyreduce:
     break;
 
   case 17:
-#line 1160 "glb_parser.y"
+#line 1163 "glb_parser.y"
     {
   if(set_pair((yyvsp[(1) - (5)].name),(yyvsp[(3) - (5)].val),(yyvsp[(5) - (5)].val),0)==1) yyerror("Unknown identifier: %s", (yyvsp[(1) - (5)].name));
   (yyval.val) = (yyvsp[(3) - (5)].val);
@@ -2700,7 +2703,7 @@ yyreduce:
     break;
 
   case 18:
-#line 1165 "glb_parser.y"
+#line 1168 "glb_parser.y"
     {
   /* added safety in case the function pointer is NULL, which is
      sometimes useful for special functions */
@@ -2709,52 +2712,52 @@ yyreduce:
     break;
 
   case 19:
-#line 1171 "glb_parser.y"
+#line 1174 "glb_parser.y"
     { (yyval.val) = (yyvsp[(1) - (3)].val) + (yyvsp[(3) - (3)].val);      }
     break;
 
   case 20:
-#line 1172 "glb_parser.y"
+#line 1175 "glb_parser.y"
     { (yyval.val) = (yyvsp[(1) - (3)].val) - (yyvsp[(3) - (3)].val);      }
     break;
 
   case 21:
-#line 1173 "glb_parser.y"
+#line 1176 "glb_parser.y"
     { (yyval.val) = (yyvsp[(1) - (3)].val) * (yyvsp[(3) - (3)].val);      }
     break;
 
   case 22:
-#line 1174 "glb_parser.y"
+#line 1177 "glb_parser.y"
     { (yyval.val) = (yyvsp[(1) - (3)].val) / (yyvsp[(3) - (3)].val);      }
     break;
 
   case 23:
-#line 1175 "glb_parser.y"
+#line 1178 "glb_parser.y"
     { (yyval.val) = -(yyvsp[(2) - (2)].val);          }
     break;
 
   case 24:
-#line 1176 "glb_parser.y"
+#line 1179 "glb_parser.y"
     { (yyval.val) = pow ((yyvsp[(1) - (3)].val), (yyvsp[(3) - (3)].val)); }
     break;
 
   case 25:
-#line 1177 "glb_parser.y"
+#line 1180 "glb_parser.y"
     { (yyval.val) = (yyvsp[(2) - (3)].val);           }
     break;
 
   case 26:
-#line 1178 "glb_parser.y"
+#line 1181 "glb_parser.y"
     { (yyval.val) = 0;            }
     break;
 
   case 27:
-#line 1179 "glb_parser.y"
+#line 1182 "glb_parser.y"
     { yyerror("Unknown name: %s", (yyvsp[(1) - (1)].name)); YYERROR; }
     break;
 
   case 28:
-#line 1183 "glb_parser.y"
+#line 1186 "glb_parser.y"
     {
   glb_List *ltemp;
   ltemp=thread_list(&glb_list_copy,0,0,(yyvsp[(4) - (4)].tptr)->list);
@@ -2765,7 +2768,7 @@ yyreduce:
     break;
 
   case 29:
-#line 1192 "glb_parser.y"
+#line 1195 "glb_parser.y"
     {
    glb_List *buf = list_cons(NULL, (yyvsp[(1) - (3)].val));
    buf = list_cons(buf, (yyvsp[(3) - (3)].val));
@@ -2774,27 +2777,27 @@ yyreduce:
     break;
 
   case 30:
-#line 1197 "glb_parser.y"
+#line 1200 "glb_parser.y"
     { (yyval.ptr) = list_cons((yyvsp[(1) - (3)].ptr), (yyvsp[(3) - (3)].val)); }
     break;
 
   case 31:
-#line 1201 "glb_parser.y"
+#line 1204 "glb_parser.y"
     {(yyval.ptr)=NULL;}
     break;
 
   case 32:
-#line 1202 "glb_parser.y"
+#line 1205 "glb_parser.y"
     {(yyval.ptr)=(yyvsp[(2) - (3)].ptr); }
     break;
 
   case 33:
-#line 1203 "glb_parser.y"
+#line 1206 "glb_parser.y"
     {(yyval.ptr)=list_cons(NULL,(yyvsp[(2) - (3)].val)); }
     break;
 
   case 34:
-#line 1204 "glb_parser.y"
+#line 1207 "glb_parser.y"
     {
   if(set_exp_list((yyvsp[(1) - (3)].name),(yyvsp[(3) - (3)].ptr),3)==1)  yyerror("Unknown identifier");
   (yyval.ptr) = (yyvsp[(3) - (3)].ptr);
@@ -2803,42 +2806,42 @@ yyreduce:
     break;
 
   case 35:
-#line 1209 "glb_parser.y"
+#line 1212 "glb_parser.y"
     {(yyval.ptr) = thread_list((yyvsp[(1) - (4)].tptr)->value.fnctptr,(yyvsp[(1) - (4)].tptr)->reverse,(yyvsp[(1) - (4)].tptr)->destroy,(yyvsp[(3) - (4)].ptr));}
     break;
 
   case 36:
-#line 1210 "glb_parser.y"
+#line 1213 "glb_parser.y"
     {(yyval.ptr) = thread_list((yyvsp[(1) - (4)].tptr)->value.fnctptr,(yyvsp[(1) - (4)].tptr)->reverse,(yyvsp[(1) - (4)].tptr)->destroy,(yyvsp[(3) - (4)].ptr));}
     break;
 
   case 37:
-#line 1211 "glb_parser.y"
+#line 1214 "glb_parser.y"
     {(yyval.ptr) = (*((yyvsp[(1) - (3)].tptr)->value.lfnctptr))();}
     break;
 
   case 38:
-#line 1212 "glb_parser.y"
+#line 1215 "glb_parser.y"
     { (yyval.ptr) = (yyvsp[(1) - (1)].tptr)->list;              }
     break;
 
   case 39:
-#line 1213 "glb_parser.y"
+#line 1216 "glb_parser.y"
     { (yyval.ptr) = (yyvsp[(3) - (3)].ptr); (yyvsp[(1) - (3)].tptr)->list = (yyvsp[(3) - (3)].ptr); }
     break;
 
   case 40:
-#line 1214 "glb_parser.y"
+#line 1217 "glb_parser.y"
     {(yyval.ptr)=glb_interpolation((yyvsp[(3) - (10)].ptr),(yyvsp[(5) - (10)].ptr),floor((yyvsp[(7) - (10)].val)),(yyvsp[(9) - (10)].ptr));}
     break;
 
   case 41:
-#line 1215 "glb_parser.y"
+#line 1218 "glb_parser.y"
     {}
     break;
 
   case 42:
-#line 1219 "glb_parser.y"
+#line 1222 "glb_parser.y"
     {
   double *buf;
   buf=(double*) glb_malloc(sizeof(double)*2);
@@ -2849,7 +2852,7 @@ yyreduce:
     break;
 
   case 43:
-#line 1230 "glb_parser.y"
+#line 1233 "glb_parser.y"
     { if((yyvsp[(3) - (4)].nameptr)->value==-1) {(yyvsp[(3) - (4)].nameptr)->value=step_counter((yyvsp[(1) - (4)].name)); }
   loc_count=(yyvsp[(3) - (4)].nameptr)->value;
   glb_free(context);
@@ -2860,14 +2863,14 @@ yyreduce:
     break;
 
   case 44:
-#line 1237 "glb_parser.y"
+#line 1240 "glb_parser.y"
     {
   grp_end(context);
 }
     break;
 
   case 45:
-#line 1240 "glb_parser.y"
+#line 1243 "glb_parser.y"
     {
     yyerror("Redefinition of an automatic variable %s", (yyvsp[(3) - (7)].nameptr)->name); YYERROR;
     if ((yyvsp[(1) - (7)].name))  { glb_free((yyvsp[(1) - (7)].name));  (yyvsp[(1) - (7)].name)=NULL; }
@@ -2875,47 +2878,47 @@ yyreduce:
     break;
 
   case 48:
-#line 1252 "glb_parser.y"
-    {}
-    break;
-
-  case 49:
-#line 1253 "glb_parser.y"
-    {}
-    break;
-
-  case 50:
-#line 1254 "glb_parser.y"
-    {}
-    break;
-
-  case 51:
 #line 1255 "glb_parser.y"
     {}
     break;
 
-  case 52:
+  case 49:
 #line 1256 "glb_parser.y"
     {}
     break;
 
-  case 53:
+  case 50:
 #line 1257 "glb_parser.y"
     {}
     break;
 
-  case 54:
+  case 51:
 #line 1258 "glb_parser.y"
     {}
     break;
 
-  case 55:
+  case 52:
 #line 1259 "glb_parser.y"
     {}
     break;
 
+  case 53:
+#line 1260 "glb_parser.y"
+    {}
+    break;
+
+  case 54:
+#line 1261 "glb_parser.y"
+    {}
+    break;
+
+  case 55:
+#line 1262 "glb_parser.y"
+    {}
+    break;
+
   case 56:
-#line 1263 "glb_parser.y"
+#line 1266 "glb_parser.y"
     {
 //  buff.version=strdup($3);
   if (set_string((yyvsp[(1) - (3)].name), (yyvsp[(3) - (3)].name)) != 0)
@@ -2926,7 +2929,7 @@ yyreduce:
     break;
 
   case 57:
-#line 1273 "glb_parser.y"
+#line 1276 "glb_parser.y"
     {
   //load_cross($3,loc_count-1);
   xsc.file_name=strdup((yyvsp[(3) - (3)].name));
@@ -2937,7 +2940,7 @@ yyreduce:
     break;
 
   case 58:
-#line 1283 "glb_parser.y"
+#line 1286 "glb_parser.y"
     {
   //load_flux($3,loc_count-1,1);
   flt.file_name=strdup((yyvsp[(3) - (3)].name));
@@ -2950,7 +2953,7 @@ yyreduce:
     break;
 
   case 59:
-#line 1295 "glb_parser.y"
+#line 1298 "glb_parser.y"
     {
   //load_flux($3,loc_count-1,1);
   flt.file_name=strdup((yyvsp[(3) - (3)].name));
@@ -2963,7 +2966,7 @@ yyreduce:
     break;
 
   case 60:
-#line 1308 "glb_parser.y"
+#line 1311 "glb_parser.y"
     {
 
   int x[6];
@@ -2980,32 +2983,32 @@ yyreduce:
     break;
 
   case 61:
-#line 1326 "glb_parser.y"
+#line 1329 "glb_parser.y"
     {(yyval.nameptr)=(yyvsp[(1) - (1)].nameptr);}
     break;
 
   case 62:
-#line 1327 "glb_parser.y"
+#line 1330 "glb_parser.y"
     { yyerror("Unknown name: %s", (yyvsp[(1) - (1)].name)); YYERROR; }
     break;
 
   case 63:
-#line 1331 "glb_parser.y"
+#line 1334 "glb_parser.y"
     {(yyval.in)=(yyvsp[(1) - (1)].in);}
     break;
 
   case 64:
-#line 1332 "glb_parser.y"
+#line 1335 "glb_parser.y"
     {(yyval.in)=1;}
     break;
 
   case 65:
-#line 1333 "glb_parser.y"
+#line 1336 "glb_parser.y"
     {(yyval.in)=-1;}
     break;
 
   case 66:
-#line 1337 "glb_parser.y"
+#line 1340 "glb_parser.y"
     {
   glb_List **buf;
   energy_len=1;
@@ -3018,7 +3021,7 @@ yyreduce:
     break;
 
   case 67:
-#line 1347 "glb_parser.y"
+#line 1350 "glb_parser.y"
     {
   glb_List **buf;
   buf=(yyvsp[(1) - (3)].ptrq);
@@ -3032,17 +3035,17 @@ yyreduce:
     break;
 
   case 68:
-#line 1360 "glb_parser.y"
+#line 1363 "glb_parser.y"
     { set_exp_energy("@energy",(yyvsp[(1) - (1)].ptrq)); }
     break;
 
   case 69:
-#line 1361 "glb_parser.y"
+#line 1364 "glb_parser.y"
     { set_exp_energy("@energy",(yyvsp[(1) - (2)].ptrq)); }
     break;
 
   case 70:
-#line 1365 "glb_parser.y"
+#line 1368 "glb_parser.y"
     {
   glb_List **buf;
   buf=(glb_List**) glb_malloc(sizeof(glb_List*)*2);
@@ -3055,7 +3058,7 @@ yyreduce:
     break;
 
   case 71:
-#line 1374 "glb_parser.y"
+#line 1377 "glb_parser.y"
     {
   glb_List **buf;
   buf=(yyvsp[(1) - (3)].ptrq);
@@ -3067,7 +3070,7 @@ yyreduce:
     break;
 
   case 72:
-#line 1385 "glb_parser.y"
+#line 1388 "glb_parser.y"
     {
   glb_List **buf;
 
@@ -3081,7 +3084,7 @@ yyreduce:
     break;
 
   case 73:
-#line 1395 "glb_parser.y"
+#line 1398 "glb_parser.y"
     {
   glb_List **buf;
   buf=(yyvsp[(1) - (3)].ptrq);
@@ -3093,7 +3096,7 @@ yyreduce:
     break;
 
   case 74:
-#line 1406 "glb_parser.y"
+#line 1409 "glb_parser.y"
     {
   int flag;
   (yyval.ptrq)=(yyvsp[(1) - (1)].ptrq);
@@ -3106,7 +3109,7 @@ yyreduce:
     break;
 
   case 75:
-#line 1415 "glb_parser.y"
+#line 1418 "glb_parser.y"
     {
   int flag;
   (yyval.ptrq)=(yyvsp[(1) - (1)].ptrq);
@@ -3119,7 +3122,7 @@ yyreduce:
     break;
 
   case 76:
-#line 1424 "glb_parser.y"
+#line 1427 "glb_parser.y"
     {
   buff.sys_on_strings[buff.numofrules-1] = strdup((yyvsp[(3) - (3)].name));
   if ((yyvsp[(1) - (3)].name))  { glb_free((yyvsp[(1) - (3)].name));  (yyvsp[(1) - (3)].name)=NULL; }
@@ -3128,7 +3131,7 @@ yyreduce:
     break;
 
   case 77:
-#line 1429 "glb_parser.y"
+#line 1432 "glb_parser.y"
     {
   buff.sys_off_strings[buff.numofrules-1] = strdup((yyvsp[(3) - (3)].name));
   if ((yyvsp[(1) - (3)].name))  { glb_free((yyvsp[(1) - (3)].name));  (yyvsp[(1) - (3)].name)=NULL; }
@@ -3138,7 +3141,7 @@ yyreduce:
 
 
 /* Line 1267 of yacc.c.  */
-#line 3142 "glb_parser.c"
+#line 3145 "glb_parser.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -3352,7 +3355,7 @@ yyreturn:
 }
 
 
-#line 1436 "glb_parser.y"
+#line 1439 "glb_parser.y"
 
 
 extern glb_symrec *sym_table;

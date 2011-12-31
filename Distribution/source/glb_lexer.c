@@ -1202,71 +1202,67 @@ YY_RULE_SETUP
 #line 132 "glb_lexer.l"
 {
   yylval.in = -1;
-//  glb_copy_buff();
-//  glbReset();
   return ENDEXP;
 }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 139 "glb_lexer.l"
+#line 137 "glb_lexer.l"
 {
   yylval.in = -1;
-//  glb_copy_buff();
-//  glbNewDetector();
   return ENDDET;
 }
 	YY_BREAK
 
 case 11:
 YY_RULE_SETUP
-#line 149 "glb_lexer.l"
+#line 145 "glb_lexer.l"
 {BEGIN(glb_lexer_defr);yylval.name=strdup(yytext);return GID;}
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 150 "glb_lexer.l"
+#line 146 "glb_lexer.l"
 {BEGIN(glb_lexer_defc);yylval.name=strdup(yytext);return GID;}
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 151 "glb_lexer.l"
+#line 147 "glb_lexer.l"
 {BEGIN(glb_lexer_defe);yylval.name=strdup(yytext);return GID;}
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 152 "glb_lexer.l"
+#line 148 "glb_lexer.l"
 {BEGIN(glb_lexer_defx);yylval.name=strdup(yytext);return GID;}
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 153 "glb_lexer.l"
+#line 149 "glb_lexer.l"
 {BEGIN(glb_lexer_deff);yylval.name=strdup(yytext);return GID;}
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 154 "glb_lexer.l"
+#line 150 "glb_lexer.l"
 {BEGIN(glb_lexer_defnf);yylval.name=strdup(yytext);return GID;}
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 155 "glb_lexer.l"
+#line 151 "glb_lexer.l"
 {BEGIN(glb_lexer_defsys);yylval.name=strdup(yytext);return GID;}
 	YY_BREAK
 
 case 18:
 YY_RULE_SETUP
-#line 158 "glb_lexer.l"
+#line 154 "glb_lexer.l"
 {cond_buf_i=YY_START;BEGIN(glb_lexer_incl);}
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 160 "glb_lexer.l"
+#line 156 "glb_lexer.l"
 /* eat the whitespace */
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 161 "glb_lexer.l"
+#line 157 "glb_lexer.l"
 { /* got the include file name */
   if (include_stack_ptr >= MAX_INCLUDE_DEPTH)
   {
@@ -1349,7 +1345,7 @@ case YY_STATE_EOF(glb_lexer_defsys):
 case YY_STATE_EOF(glb_lexer_comment):
 case YY_STATE_EOF(glb_lexer_linecomment):
 case YY_STATE_EOF(glb_lexer_str):
-#line 225 "glb_lexer.l"
+#line 221 "glb_lexer.l"
 {
   if (--include_stack_ptr < 0)  /* If top level buffer ends, we're done */
   {
@@ -1374,14 +1370,14 @@ case YY_STATE_EOF(glb_lexer_str):
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 248 "glb_lexer.l"
+#line 244 "glb_lexer.l"
 {
 yylval.in=-1;
 return GRPOPEN;}
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 252 "glb_lexer.l"
+#line 248 "glb_lexer.l"
 {
 yylval.name=strdup(yytext);
 
@@ -1389,47 +1385,47 @@ return CHANNEL;}
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 257 "glb_lexer.l"
+#line 253 "glb_lexer.l"
 {yylval.in=+1;return PM;}
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 258 "glb_lexer.l"
+#line 254 "glb_lexer.l"
 {yylval.in=-1;return PM;}
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 260 "glb_lexer.l"
+#line 256 "glb_lexer.l"
 {yylval.in=1;return FLAVOR;}
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 261 "glb_lexer.l"
+#line 257 "glb_lexer.l"
 {yylval.in=2;return FLAVOR;}
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 262 "glb_lexer.l"
+#line 258 "glb_lexer.l"
 {yylval.in=3;return FLAVOR;}
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 264 "glb_lexer.l"
+#line 260 "glb_lexer.l"
 {yylval.in=11;return FLAVOR;}
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 265 "glb_lexer.l"
+#line 261 "glb_lexer.l"
 {yylval.in=12;return FLAVOR;}
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 266 "glb_lexer.l"
+#line 262 "glb_lexer.l"
 {yylval.in=13;return FLAVOR;}
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 269 "glb_lexer.l"
+#line 265 "glb_lexer.l"
 {
 yylval.name=strdup(yytext);
 
@@ -1437,7 +1433,7 @@ return ENERGY;}
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 274 "glb_lexer.l"
+#line 270 "glb_lexer.l"
 {
 yylval.name=strdup(yytext);
 
@@ -1445,7 +1441,7 @@ return SIGNAL;}
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 279 "glb_lexer.l"
+#line 275 "glb_lexer.l"
 {
 yylval.name=strdup(yytext);
 
@@ -1453,7 +1449,7 @@ return BG;}
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 284 "glb_lexer.l"
+#line 280 "glb_lexer.l"
 {
 yylval.name=strdup(yytext);
 return SYS_ON_FUNCTION;
@@ -1461,7 +1457,7 @@ return SYS_ON_FUNCTION;
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 289 "glb_lexer.l"
+#line 285 "glb_lexer.l"
 {
 yylval.name=strdup(yytext);
 return SYS_OFF_FUNCTION;
@@ -1469,12 +1465,12 @@ return SYS_OFF_FUNCTION;
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 296 "glb_lexer.l"
+#line 292 "glb_lexer.l"
 {cond_buf_str=YY_START;BEGIN(glb_lexer_str);}
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 298 "glb_lexer.l"
+#line 294 "glb_lexer.l"
 {BEGIN(cond_buf_str);}
 	YY_BREAK
 /* JK 2010-09-26
@@ -1483,14 +1479,14 @@ YY_RULE_SETUP
 case 38:
 /* rule 38 can match eol */
 YY_RULE_SETUP
-#line 304 "glb_lexer.l"
+#line 300 "glb_lexer.l"
 {
 yylval.name=strdup(yytext);
 return FNAME;}
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 308 "glb_lexer.l"
+#line 304 "glb_lexer.l"
 {
 yylval.name=strdup(yytext);
 return VERS;
@@ -1498,7 +1494,7 @@ return VERS;
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 313 "glb_lexer.l"
+#line 309 "glb_lexer.l"
 {
 yylval.name=strdup(yytext);
 return VERS;
@@ -1506,52 +1502,52 @@ return VERS;
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 318 "glb_lexer.l"
+#line 314 "glb_lexer.l"
 {
 yylval.name=strdup(yytext);
 return CROSS;}
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 322 "glb_lexer.l"
+#line 318 "glb_lexer.l"
 {
 yylval.name=strdup(yytext);
 return FLUXP;}
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 327 "glb_lexer.l"
+#line 323 "glb_lexer.l"
 {
 yylval.name=strdup(yytext);
 return FLUXM;}
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 334 "glb_lexer.l"
+#line 330 "glb_lexer.l"
 {
 yylval.name=strdup(yytext);
 return NUFLUX;}
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 339 "glb_lexer.l"
+#line 335 "glb_lexer.l"
 {
 yylval.name=strdup(yytext);
 return NUFLUX;}
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 343 "glb_lexer.l"
+#line 339 "glb_lexer.l"
 {return RULESEP;}
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 344 "glb_lexer.l"
+#line 340 "glb_lexer.l"
 {return RULEMULT;}
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 348 "glb_lexer.l"
+#line 344 "glb_lexer.l"
 {glb_namerec *s;
 s = glb_getname (yytext,"rule");
 if (s == 0)
@@ -1568,7 +1564,7 @@ return s->type;
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 362 "glb_lexer.l"
+#line 358 "glb_lexer.l"
 {glb_namerec *s;
 s = glb_getname (yytext,"channel");
 if (s == 0)
@@ -1585,7 +1581,7 @@ return s->type;
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 376 "glb_lexer.l"
+#line 372 "glb_lexer.l"
 {glb_namerec *s;
 s = glb_getname (yytext,"energy");
 if (s == 0)
@@ -1602,7 +1598,7 @@ return s->type;
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 390 "glb_lexer.l"
+#line 386 "glb_lexer.l"
 {glb_namerec *s;
 s = glb_getname (yytext,"cross");
 if (s == 0)
@@ -1619,7 +1615,7 @@ return s->type;
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 405 "glb_lexer.l"
+#line 401 "glb_lexer.l"
 {glb_namerec *s;
 s = glb_getname (yytext,"flux");
 if (s == 0)
@@ -1636,7 +1632,7 @@ return s->type;
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 419 "glb_lexer.l"
+#line 415 "glb_lexer.l"
 {glb_namerec *s;
 s = glb_getname (yytext,"nuflux");
 if (s == 0)
@@ -1653,7 +1649,7 @@ return s->type;
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
-#line 433 "glb_lexer.l"
+#line 429 "glb_lexer.l"
 {
   glb_namerec *s = glb_getname(yytext,"sys");
   if (s == 0)  s = glb_putname(yytext,"sys",NAME);
@@ -1667,7 +1663,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 55:
 YY_RULE_SETUP
-#line 444 "glb_lexer.l"
+#line 440 "glb_lexer.l"
 {glb_namerec *s;
 s = glb_getname (yytext,"rule");
 if (s == 0) { yylval.name=strdup(yytext); return NDEF; }
@@ -1677,7 +1673,7 @@ return s->type;
 	YY_BREAK
 case 56:
 YY_RULE_SETUP
-#line 451 "glb_lexer.l"
+#line 447 "glb_lexer.l"
 {
 BEGIN(INITIAL);
 yylval.in=-1;
@@ -1685,7 +1681,7 @@ return GRPCLOSE;}
 	YY_BREAK
 case 57:
 YY_RULE_SETUP
-#line 457 "glb_lexer.l"
+#line 453 "glb_lexer.l"
 {
 yylval.name=strdup(yytext);
 return IDN;
@@ -1693,19 +1689,19 @@ return IDN;
 	YY_BREAK
 case 58:
 YY_RULE_SETUP
-#line 465 "glb_lexer.l"
+#line 461 "glb_lexer.l"
 {yylval.val=atof(yytext);
 return NUM;
 }
 	YY_BREAK
 case 59:
 YY_RULE_SETUP
-#line 469 "glb_lexer.l"
+#line 465 "glb_lexer.l"
 {yylval.name=strdup(yytext);return IDN;}
 	YY_BREAK
 case 60:
 YY_RULE_SETUP
-#line 471 "glb_lexer.l"
+#line 467 "glb_lexer.l"
 {
 yylval.val=atof(yytext);
 return NUM;
@@ -1713,7 +1709,7 @@ return NUM;
 	YY_BREAK
 case 61:
 YY_RULE_SETUP
-#line 476 "glb_lexer.l"
+#line 472 "glb_lexer.l"
 {
  yylval.val=atof(yytext);
  return NUM;
@@ -1721,7 +1717,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 62:
 YY_RULE_SETUP
-#line 481 "glb_lexer.l"
+#line 477 "glb_lexer.l"
 {
 yylval.val=atof(yytext);
 return NUM;
@@ -1729,7 +1725,7 @@ return NUM;
 	YY_BREAK
 case 63:
 YY_RULE_SETUP
-#line 486 "glb_lexer.l"
+#line 482 "glb_lexer.l"
 {
 yylval.val=atof(yytext);
 return NUM;
@@ -1737,7 +1733,7 @@ return NUM;
 	YY_BREAK
 case 64:
 YY_RULE_SETUP
-#line 491 "glb_lexer.l"
+#line 487 "glb_lexer.l"
 {
 yylval.val=atof(yytext);
 return NUM;
@@ -1745,7 +1741,7 @@ return NUM;
 	YY_BREAK
 case 65:
 YY_RULE_SETUP
-#line 499 "glb_lexer.l"
+#line 495 "glb_lexer.l"
 {glb_symrec *s;
 s = glb_getsym (yytext);
 if (s == 0)
@@ -1756,7 +1752,7 @@ return s->type;
 	YY_BREAK
 case 66:
 YY_RULE_SETUP
-#line 508 "glb_lexer.l"
+#line 504 "glb_lexer.l"
 {glb_symrec *s;
 s = glb_getsym (yytext);
 if (s == 0)
@@ -1767,31 +1763,31 @@ return s->type;
 	YY_BREAK
 case 67:
 YY_RULE_SETUP
-#line 520 "glb_lexer.l"
+#line 516 "glb_lexer.l"
 /* eat up whitespace */
 	YY_BREAK
 case 68:
 YY_RULE_SETUP
-#line 522 "glb_lexer.l"
+#line 518 "glb_lexer.l"
 /* empty */
 	YY_BREAK
 case 69:
 YY_RULE_SETUP
-#line 524 "glb_lexer.l"
+#line 520 "glb_lexer.l"
 return (int) yytext[0];
 	YY_BREAK
 case 70:
 /* rule 70 can match eol */
 YY_RULE_SETUP
-#line 527 "glb_lexer.l"
+#line 523 "glb_lexer.l"
 /* yylloc.first_line++;*/ glb_line_num++; /*return '\n';*/
 	YY_BREAK
 case 71:
 YY_RULE_SETUP
-#line 528 "glb_lexer.l"
+#line 524 "glb_lexer.l"
 ECHO;
 	YY_BREAK
-#line 1795 "glb_lexer.c"
+#line 1791 "glb_lexer.c"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -2787,7 +2783,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 528 "glb_lexer.l"
+#line 524 "glb_lexer.l"
 
 
 

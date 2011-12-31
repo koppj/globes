@@ -2776,6 +2776,20 @@ const char
 }
 
 
+const char
+*glbValueToNameByPointer(struct glb_experiment *in,const char* context, int value)
+{
+  glb_naming *ptr;
+  for (ptr = in->names; ptr != (glb_naming *) NULL;
+       ptr = (glb_naming *)ptr->next)
+    {
+        if (ptr->value == value + 1  && strcmp(ptr->context,context)==0)
+	  return ptr->name;
+    }
+  return NULL;
+}
+
+
 /*********************************************
  * Calculation of oscillation probabilities  *
  *********************************************/
