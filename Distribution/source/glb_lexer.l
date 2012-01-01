@@ -92,8 +92,8 @@ static int cond_buf;
 /* I am not sure wether this works with nested contexts */
 static int cond_buf_i;
 static int cond_buf_str;
-static char *fnbuf,*fnbuf2;
-static size_t len,i;
+static char *fnbuf;
+static size_t len;
 
 void glb_lexer_cleanup();
 
@@ -285,6 +285,11 @@ return SYS_ON_FUNCTION;
 <glb_lexer_rule>@sys_off_function   {
 yylval.name=strdup(yytext);
 return SYS_OFF_FUNCTION;
+}
+
+<glb_lexer_rule>@sys_multiex_errors_sig|@sys_multiex_errors_bg {
+yylval.name=strdup(yytext);
+return SYS_MULTIEX_ERRORS;
 }
 
 

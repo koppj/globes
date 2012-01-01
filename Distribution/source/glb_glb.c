@@ -81,6 +81,7 @@ void glbInit(char *name)
   glbDefineChiFunction(&glbChiTotalRatesTilt,   4, "chiTotalRatesTilt",  NULL);
   glbDefineChiFunction(&glbChiNoSysTotalRates,  0, "chiNoSysTotalRates", NULL);
   glbDefineChiFunction(&glbChiSpectrumCalib,    4, "chiSpectrumCalib",   NULL);
+  glbDefineChiFunction(&glbChiMultiExp,         0, "chiMultiExp",        NULL);
   glbDefineChiFunction(&glbChiZero,             0, "chiZero",            NULL);
 
   /* Initialize built-in priors */

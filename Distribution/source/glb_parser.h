@@ -52,27 +52,28 @@
      NUFLUX = 268,
      SYS_ON_FUNCTION = 269,
      SYS_OFF_FUNCTION = 270,
-     GRP = 271,
-     GID = 272,
-     FNAME = 273,
-     VERS = 274,
-     SIGNAL = 275,
-     BG = 276,
-     ENERGY = 277,
-     CHANNEL = 278,
-     NDEF = 279,
-     GRPOPEN = 280,
-     GRPCLOSE = 281,
-     PM = 282,
-     FLAVOR = 283,
-     NOGLOBES = 284,
-     RULESEP = 285,
-     RULEMULT = 286,
-     NAME = 287,
-     RDF = 288,
-     ENDEXP = 289,
-     ENDDET = 290,
-     NEG = 291
+     SYS_MULTIEX_ERRORS = 271,
+     GRP = 272,
+     GID = 273,
+     FNAME = 274,
+     VERS = 275,
+     SIGNAL = 276,
+     BG = 277,
+     ENERGY = 278,
+     CHANNEL = 279,
+     NDEF = 280,
+     GRPOPEN = 281,
+     GRPCLOSE = 282,
+     PM = 283,
+     FLAVOR = 284,
+     NOGLOBES = 285,
+     RULESEP = 286,
+     RULEMULT = 287,
+     NAME = 288,
+     RDF = 289,
+     ENDEXP = 290,
+     ENDDET = 291,
+     NEG = 292
    };
 #endif
 /* Tokens.  */
@@ -89,34 +90,35 @@
 #define NUFLUX 268
 #define SYS_ON_FUNCTION 269
 #define SYS_OFF_FUNCTION 270
-#define GRP 271
-#define GID 272
-#define FNAME 273
-#define VERS 274
-#define SIGNAL 275
-#define BG 276
-#define ENERGY 277
-#define CHANNEL 278
-#define NDEF 279
-#define GRPOPEN 280
-#define GRPCLOSE 281
-#define PM 282
-#define FLAVOR 283
-#define NOGLOBES 284
-#define RULESEP 285
-#define RULEMULT 286
-#define NAME 287
-#define RDF 288
-#define ENDEXP 289
-#define ENDDET 290
-#define NEG 291
+#define SYS_MULTIEX_ERRORS 271
+#define GRP 272
+#define GID 273
+#define FNAME 274
+#define VERS 275
+#define SIGNAL 276
+#define BG 277
+#define ENERGY 278
+#define CHANNEL 279
+#define NDEF 280
+#define GRPOPEN 281
+#define GRPCLOSE 282
+#define PM 283
+#define FLAVOR 284
+#define NOGLOBES 285
+#define RULESEP 286
+#define RULEMULT 287
+#define NAME 288
+#define RDF 289
+#define ENDEXP 290
+#define ENDDET 291
+#define NEG 292
 
 
 
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 1078 "glb_parser.y"
+#line 1139 "glb_parser.y"
 {
   double  val;  /* For returning numbers.                   */
   double *dpt;  /* for rules */
@@ -129,7 +131,7 @@ typedef union YYSTYPE
   glb_namerec *nameptr;
 }
 /* Line 1529 of yacc.c.  */
-#line 133 "glb_parser.h"
+#line 135 "glb_parser.h"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1

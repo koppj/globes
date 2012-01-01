@@ -32,17 +32,17 @@
 #define GLB_SLOW_RATES 0
 
 extern int glb_num_of_rules;
-extern double glb_glb_sig_norm_error[32];
-extern double glb_sig_tilt_error[32];
-extern double glb_bg_norm_error[32];
-extern double glb_bg_tilt_error[32];
-extern double glb_bg_norm_center[32];
-extern double glb_bg_tilt_center[32];
+extern double glb_glb_sig_norm_error[GLB_MAX_RULES];
+extern double glb_sig_tilt_error[GLB_MAX_RULES];
+extern double glb_bg_norm_error[GLB_MAX_RULES];
+extern double glb_bg_tilt_error[GLB_MAX_RULES];
+extern double glb_bg_norm_center[GLB_MAX_RULES];
+extern double glb_bg_tilt_center[GLB_MAX_RULES];
 
 extern int glb_calc_simbins;
 extern double glb_calc_simtresh;
 extern double glb_calc_simbeam;
-extern double glb_calc_energy_window[32][2];
+extern double glb_calc_energy_window[GLB_MAX_RULES][2];
 
 void glb_set_baseline(double l);
 void glb_set_target_mass(double mass);
@@ -115,42 +115,40 @@ double glbChiSpectrumOnly(int exp, int rule, int n_params, double *x, double *er
 double glbChiTotalRatesTilt(int exp, int rule, int n_params, double *x, double *errors, void *user_data);
 double glbChiNoSysTotalRates(int exp, int rule, int n_params, double *x, double *errors, void *user_data);
 double glbChiSpectrumCalib(int exp, int rule, int n_params, double *x, double *errors, void *user_data);
+double glbChiMultiExp(int exp, int rule, int n_params, double *x, double *errors, void *user_data);
 double glbChiZero(int exp, int rule, int n_params, double *x, double *errors, void *user_data);
 
 
 
 extern double* glb_chirate;
-extern double** glb_calc_smearing[32];
-extern int* glb_calc_uprange[32];
-extern int* glb_calc_lowrange[32];
-extern double* glb_calc_signal_rates[32];
-extern double* glb_calc_bg_rates[32]; 
-extern double* glb_calc_rates_0[32];
-extern double* glb_calc_rates_1[32];
-extern double* glb_calc_rates_1T[32];
-extern double* glb_calc_rates_1BG[32];
-extern double* glb_calc_rates_1BGT[32];
+extern double** glb_calc_smearing[GLB_MAX_SMEAR];
+extern int* glb_calc_uprange[GLB_MAX_SMEAR];
+extern int* glb_calc_lowrange[GLB_MAX_SMEAR];
+extern double* glb_calc_signal_rates[GLB_MAX_RULES];
+extern double* glb_calc_bg_rates[GLB_MAX_RULES]; 
+extern double* glb_calc_rates_0[GLB_MAX_RULES];
+extern double* glb_calc_rates_1[GLB_MAX_RULES];
+extern double* glb_calc_rates_1T[GLB_MAX_RULES];
+extern double* glb_calc_rates_1BG[GLB_MAX_RULES];
+extern double* glb_calc_rates_1BGT[GLB_MAX_RULES];
 extern double* glb_calc_energy_tab;
 
-extern glb_smear *glb_calc_smear_data[32];
+extern glb_smear *glb_calc_smear_data[GLB_MAX_SMEAR];
 
-extern glb_flux *glb_calc_fluxes[32];
-extern glb_xsec *glb_calc_xsecs[32];
+extern glb_flux *glb_calc_fluxes[GLB_MAX_FLUXES];
+extern glb_xsec *glb_calc_xsecs[GLB_MAX_XSECS];
 
 extern double *glb_calc_buffer;
-extern double *glb_calc_chrb_0[32];
-extern double *glb_calc_chrb_1[32];
-extern double *glb_calc_chra_0[32];
-extern double *glb_calc_chra_1[32];
-extern double *glb_calc_chr_template[32];
+extern double *glb_calc_chrb_0[GLB_MAX_CHANNELS];
+extern double *glb_calc_chrb_1[GLB_MAX_CHANNELS];
+extern double *glb_calc_chra_0[GLB_MAX_CHANNELS];
+extern double *glb_calc_chra_1[GLB_MAX_CHANNELS];
+extern double *glb_calc_chr_template[GLB_MAX_CHANNELS];
 
-extern double *glb_calc_user_pre_sm_channel[32];
-extern double *glb_calc_user_post_sm_channel[32];
-extern double *glb_calc_user_pre_sm_background[32];
-extern double *glb_calc_user_post_sm_background[32];
-
-extern double* glb_calc_efficiencies[32];
-extern double* glb_calc_const_background[32];
+extern double *glb_calc_user_pre_sm_channel[GLB_MAX_CHANNELS];
+extern double *glb_calc_user_post_sm_channel[GLB_MAX_CHANNELS];
+extern double *glb_calc_user_pre_sm_background[GLB_MAX_CHANNELS];
+extern double *glb_calc_user_post_sm_background[GLB_MAX_CHANNELS];
 
 
 #endif /* GLB_CALC_H */

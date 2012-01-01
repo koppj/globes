@@ -475,7 +475,6 @@ int glbSetOscParamByName(glb_params in, double value, const char *name)
 double glbGetOscParamByName(const glb_params in, const char *name)
 {
   int index;
-  double value;
 
   if (!name)
   {
@@ -800,8 +799,11 @@ void
 glbClearExperimentList()
 {
   int i;
-  for(i=0;i<GLB_MAX_EXP;i++) glbExpDecrRefCounter(glb_experiment_list[i]);
-  for(i=0;i<GLB_MAX_EXP;i++) glb_experiment_list[i]=glbAllocExp();
+  for(i=0; i < GLB_MAX_EXP; i++)
+  {
+    glbFreeExp(glb_experiment_list[i]);
+    glb_experiment_list[i] = glbAllocExp();
+  }
   glb_num_of_exps=0;
   glbResetCounters();
   glb_init_minimizer();   /* Re-initialize minimizer */
@@ -1656,7 +1658,7 @@ glbShowChannelProbs(FILE *stream,
 {
   int i,s,cc,currentchannel[6],filter;
   size_t k,l,m,c;
-  double *ch,*bg,*eff,*temp,**res,*energy,sum;
+  double *ch,**res,*energy,sum;
   glb_smear *smt;
   s=0;
   sum=0.0;
@@ -1865,8 +1867,7 @@ glbTotalRuleRate(
   double out;
   int i,s,cc,channel;
   size_t k,l,m,c,bins;
-  double *ch,*bg,*eff,*temp,*ceff,**res,*energy,sum,coeff;
-  glb_smear *smt;
+  double *ch,*bg,*eff,*temp,*ceff,**res,sum,coeff;
   s=0;
   sum=0.0;
   bins=glb_experiment_list[exp]->numofbins;
@@ -2002,20 +2003,24 @@ void glb_clean_up()
 {
   int i;
 
-  for(i=0;i<GLB_MAX_EXP;i++) {glbExpDecrRefCounter(glb_experiment_list[i]);}
- glbCleanSysList();
- glb_clean_parser();
- glb_lexer_cleanup();
- obstack_free(&glb_rate_stack,NULL);
- glb_free((char *) printf_left);
- glb_free((char *) printf_right);
- glb_free((char *) printf_middle);
- glb_free((char *) glb_prog_name);
- for(i=0;i<glb_path_vector_length;i++)
-   glb_free((char *) glb_path_vector[i]);
- glb_free((char **) glb_path_vector);
- glb_free_minimizer();
- glb_free_probability_engine();
+  for(i=0;i<GLB_MAX_EXP;i++)
+  {
+    glbFreeExp(glb_experiment_list[i]);
+    glb_experiment_list[i] = NULL;
+  }
+  glbCleanSysList();
+  glb_clean_parser();
+  glb_lexer_cleanup();
+  obstack_free(&glb_rate_stack,NULL);
+  glb_free((char *) printf_left);
+  glb_free((char *) printf_right);
+  glb_free((char *) printf_middle);
+  glb_free((char *) glb_prog_name);
+  for(i=0;i<glb_path_vector_length;i++)
+    glb_free((char *) glb_path_vector[i]);
+  glb_free((char **) glb_path_vector);
+  glb_free_minimizer();
+  glb_free_probability_engine();
 }
 
 

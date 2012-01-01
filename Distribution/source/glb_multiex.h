@@ -31,15 +31,17 @@
 extern int glb_current_exp;
 extern int glb_ignore_invalid_chi2;
 
-glb_exp glbAllocExp();
+int glb_copy_nuisance(glb_nuisance *dest, glb_nuisance *src);
 
+glb_exp glbAllocExp();
 void glbSetExperiment(glb_exp in);   
 int glbDefaultExp(glb_exp ins);      
 void glbInitExp(glb_exp ins);        
 void glbInitExpFromParent(struct glb_experiment *exp, struct glb_experiment *p);
-void glbFreeExp(glb_exp ins);        
-void glbExpIncrRefCounter(struct glb_experiment *exp);
-void glbExpDecrRefCounter(struct glb_experiment *exp);
+void glbResetExp(struct glb_experiment *in);        
+void glbFreeExp(struct glb_experiment *in);        
+void glbExpAddChild(struct glb_experiment *parent, struct glb_experiment *child);
+void glbExpRemoveChild(struct glb_experiment *parent, struct glb_experiment *child);
 int glbPrintExpByPointer(struct glb_experiment *exp);
 
 void glb_set_profile_scaling(double scale,int i);

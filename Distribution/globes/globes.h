@@ -87,6 +87,8 @@ enum glb_enum_minimizers
 #define GLB_MAX_RULES     32
 #define GLB_MAX_NUISANCE 128
 #define GLB_MAX_SMEAR     32
+#define GLB_MAX_FLUXES    32
+#define GLB_MAX_XSECS     32
 
 
 

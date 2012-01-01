@@ -292,13 +292,6 @@ static void SelectProjection(int *vec, int check_proj)
 }
 
 
-static int CheckFree()
-{
-  int k;
-  k=n_free;
-  return k;
-}
-
 static int* CheckProjection()
 {
   return &para_tab[0];
@@ -655,8 +648,6 @@ double glbChiSys(const glb_params in, int experiment, int rule)
  ***************************************************************************/
 int glbSetInputErrors(const glb_params in)
 {
-  int i;
-
   if (in == NULL  ||  input_errors == NULL)
     { glb_error("glbSetInputErrors: NULL pointer detected"); return -1; }
   if (glbCopyParams(in, input_errors) == NULL)
@@ -688,8 +679,6 @@ int glbGetInputErrors(glb_params in)
  ***************************************************************************/
 int glbSetCentralValues(const glb_params in)
 {
-  int i;
-
   if (in == NULL  ||  central_values == NULL)
     { glb_error("glbSetCentralValues: NULL pointer detected"); return -1; }
   if (glbCopyParams(in, central_values) == NULL)
@@ -721,12 +710,6 @@ int glbGetCentralValues(glb_params in)
 //---- Chi^2 with arbitrary number of free parameters --------------
 //----------------------- 23.01.2004 -------------------------------
 //------------------------------------------------------------------
-
-static double sglb_prior(double x, double center, double sigma)
-{
-  if(fabs(sigma-0)<1E-12) return 0;
-  return (x-center)*(x-center)/sigma/sigma;
-}
 
 static int my_default_sv(const glb_params in, void *user_data)
 {
@@ -871,7 +854,6 @@ static double chi_NP(double x[])
 {
   glb_params prior_input;
   double erg2;
-  double nsp[glbGetNumOfOscParams()-6+1];
   double y[glbGetNumOfOscParams()+1];
   int i;
   prior_input=glbAllocParams();

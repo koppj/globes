@@ -78,6 +78,32 @@ glb_free_names(glb_naming *stale)
 
 
 /***************************************************************************
+ * Function glb_copy_nuisance                                              *
+ ***************************************************************************
+ * Duplicates a nuisance parameter data structure. dest must already       *
+ * exist.                                                                  *
+ ***************************************************************************/
+int glb_copy_nuisance(glb_nuisance *dest, glb_nuisance *src)
+{
+  if (src && dest)
+  {
+    dest->name        = strdup(src->name);
+    dest->error       = src->error;
+    dest->n_energies  = src->n_energies;
+    dest->energy_list = glb_duplicate_array(src->energy_list, src->n_energies*sizeof(double));
+    dest->error_list  = glb_duplicate_array(src->error_list, src->n_energies*sizeof(double));
+
+    return GLB_SUCCESS;
+  }
+  else
+  {
+    glb_error("glb_copy_nuisance: NULL is not a valid glb_nuisance structure");
+    return GLBERR_UNINITIALIZED;
+  }
+}
+
+
+/***************************************************************************
  * Function glbAllocExp                                                    *
  ***************************************************************************
  * Allocate a new glb_experiment data structure and initialize with dummy  *
@@ -101,21 +127,23 @@ glb_exp glbAllocExp()
  ***************************************************************************/
 void glbInitExp(glb_exp ins)
 {
-  int i;
+  int i, j;
   struct glb_experiment *in = (struct glb_experiment *) ins;
   in->version=NULL;
   in->citation=NULL;
   in->parent=NULL;
-  in->ref_count = 0;
+  in->n_children = 0;
+  for (i=0; i < GLB_MAX_EXP; i++)
+    in->children[i] = NULL;
   in->filename=NULL;
   in->names=NULL;
   in->num_of_fluxes=-1;
   in->density_profile_type=-1;
   /* FIXME - a potential memory leak */
-  for(i=0;i<32;i++) in->fluxes[i]=NULL;
+  for(i=0;i<GLB_MAX_FLUXES;i++) in->fluxes[i]=NULL;
   in->num_of_xsecs=-1;
   /* FIXME - a potential memory leak */
-  for(i=0;i<32;i++) in->xsecs[i]=NULL;
+  for(i=0;i<GLB_MAX_XSECS;i++) in->xsecs[i]=NULL;
 
   in->binsize=NULL;
   in->simbinsize=NULL;
@@ -144,6 +172,11 @@ void glbInitExp(glb_exp ins)
     in->sys_on_startvals[i]      = NULL;
     in->sys_off_errors[i]        = NULL;
     in->sys_off_startvals[i]     = NULL;
+    for (j=0; j < GLB_MAX_CHANNELS; j++)
+    {
+      in->sys_multiex_errors_sig[i][j] = NULL;
+      in->sys_multiex_errors_bg[i][j]  = NULL;
+    }
                                  
     in->bg_centers[0][i]         =  1.0;
     in->bg_centers[1][i]         =  0.0;
@@ -194,10 +227,10 @@ void glbInitExp(glb_exp ins)
     in->nuisance_params[i].energy_list = NULL;
     in->nuisance_params[i].error_list  = NULL;
   }
-  for(i=0;i<32;i++) {in->smear_data[i]=NULL;}
-  for(i=0;i<32;i++) in->smear[i]=NULL;
-  for(i=0;i<32;i++) in->lowrange[i]=NULL;
-  for(i=0;i<32;i++) in->uprange[i]=NULL;
+  for(i=0;i<GLB_MAX_SMEAR;i++) {in->smear_data[i]=NULL;}
+  for(i=0;i<GLB_MAX_SMEAR;i++) in->smear[i]=NULL;
+  for(i=0;i<GLB_MAX_SMEAR;i++) in->lowrange[i]=NULL;
+  for(i=0;i<GLB_MAX_SMEAR;i++) in->uprange[i]=NULL;
   in->simtresh=-1;
   in->simbeam=-1;
   in->simbins=-1;
@@ -231,7 +264,7 @@ static void my_free(void *ptr)
  ***************************************************************************/
 void glbInitExpFromParent(struct glb_experiment *exp, struct glb_experiment *p)
 {
-  int i, j;
+  int i, j, k;
 
   if (!exp)
     glb_error("glbInitExpFromParent: NULL is not a valid experiment");
@@ -242,8 +275,7 @@ void glbInitExpFromParent(struct glb_experiment *exp, struct glb_experiment *p)
   glbInitExp(exp);
 
   exp->parent     = p;
-  glbExpIncrRefCounter(p);
-  exp->ref_count  = 0;
+  glbExpAddChild(p, exp);
   exp->names      = p->names;
 
   if (p->version)   exp->version  = strdup(p->version);
@@ -396,73 +428,131 @@ void glbInitExpFromParent(struct glb_experiment *exp, struct glb_experiment *p)
       exp->bg_startvals[j][i]     = p->bg_startvals[j][i];
       exp->bg_centers[j][i]       = p->bg_centers[j][i];
     }
+    for (j=0; j < GLB_MAX_CHANNELS; j++)
+    {
+      if (p->sys_multiex_errors_sig[i][j])
+      {
+        for (k=0; p->sys_multiex_errors_sig[i][j][k] >= 0; k++)
+          ;
+        exp->sys_multiex_errors_sig[i][j]
+          = glb_duplicate_array(p->sys_multiex_errors_sig[i], (k+1)*sizeof(int));
+      }
+      if (p->sys_multiex_errors_bg[i][j])
+      {
+        for (k=0; p->sys_multiex_errors_bg[i][j][k] >= 0; k++)
+          ;
+        exp->sys_multiex_errors_bg[i][j]
+          = glb_duplicate_array(p->sys_multiex_errors_bg[i], (k+1)*sizeof(int));
+      }
+    }
   }
 
   /* Copy nuisance parameter info */
   exp->n_nuisance = p->n_nuisance;
   for (i=0; i < exp->n_nuisance; i++)
-    memcpy(&exp->nuisance_params[i], &p->nuisance_params[i], sizeof(exp->nuisance_params[i]));
+    glb_copy_nuisance(&exp->nuisance_params[i], &p->nuisance_params[i]);
 }
 
 
 /***************************************************************************
- * Function glbExpIncrRefCounter                                           *
+ * Function glbExpAddChild                                                 *
  ***************************************************************************
- * Increments the reference counter of the given experiment by 1           *
+ * Adds a child experiment to an experiment.                               *
  ***************************************************************************/
-void glbExpIncrRefCounter(struct glb_experiment *exp)
+void glbExpAddChild(struct glb_experiment *parent, struct glb_experiment *child)
 {
-  if (exp)
-    exp->ref_count++;
-  else
-    glb_error("glbExpIncrRefCounter: Invalid pointer");
-}
-
-
-/***************************************************************************
- * Function glbExpDecrRefCounter                                           *
- ***************************************************************************
- * Decrements the reference counter of the given experiment by 1. If the   *
- * the counter reaches zero, the experimental data structure is destroyed. *
- ***************************************************************************/
-void glbExpDecrRefCounter(struct glb_experiment *exp)
-{
-  if (exp)
+  if (parent && child)
   {
-    exp->ref_count--;
-    if (exp->ref_count <= 0)
-      glbFreeExp(exp);
+    child->parent = parent;
+    parent->children[parent->n_children++] = child;
   }
   else
-    glb_error("glbExpDecrRefCounter: Invalid pointer");
+    glb_error("glbExpAddChild: Invalid pointer");
 }
 
 
 /***************************************************************************
- * Function glbFreeExp                                                     *
+ * Function glbExpRemoveChild                                              *
  ***************************************************************************
- * Release dynamically allocated memory for a given experiment             *
+ * Removes a child experiment from an experiment. The child experiment     *
+ * is not automatically destroyed, but this should be done manually.       *
+ * (The child and the parent share common memory, which will be relased    *
+ * when the parent is destroyed.)                                          *
  ***************************************************************************/
-void glbFreeExp(glb_exp ins)
+void glbExpRemoveChild(struct glb_experiment *parent, struct glb_experiment *child)
 {
-  int i,j;
-  struct glb_experiment *in = (struct glb_experiment *) ins;
+  if (parent && child)
+  {
+    int i;
+    for (i=0; i < parent->n_children && parent->children[i] != child; i++)
+      ;
+    if (i == parent->n_children)
+      glb_error("glbExpRemoveChild: Child not found");
+    else
+    {
+      parent->n_children--;
+      child->parent = NULL;
+      while (i < parent->n_children)
+        parent->children[i] = parent->children[i+1];
+      parent->children[i] = NULL;
+    }
+  }
+  else
+    glb_error("glbExpRemoveChild: Invalid pointer");
+}
 
-  if(ins==NULL)
+
+/***************************************************************************
+ * Function glbResetExp                                                    *
+ ***************************************************************************
+ * Release dynamically allocated memory for a given experiment and its     *
+ * children and re-initialize the glb_experiment structure using           *
+ * glbInitExp.                                                             *
+ ***************************************************************************/
+void glbResetExp(struct glb_experiment *in)
+{
+  int i, j;
+  int has_parent = 0;
+
+  if (in == NULL)
     return;
 
-  glb_free_names(in->names);
+  has_parent = (in->parent != NULL);
+
+  /* Destroy child experiments, starting from the back of the list (otherwise,
+   * pointers to child experiments would change positions in the list while
+   * being consecutively removed. We do not destroy the glb_experiment data
+   * structures of the children themselves since there may still be pointers
+   * to them in glb_experiment_list */
+  for (i=in->n_children-1; i >= 0; i--)
+    glbResetExp(in->children[i]);
+  if (in->n_children != 0)
+    glb_error("Something went wrong in the experiment management.\n");
+  in->n_children = 0;
+
   glb_free(in->version);
   glb_free(in->citation);
-  if (in->parent != NULL)
-  {
-    glbExpDecrRefCounter(in->parent);
-    in->parent = NULL;
-  }
-  in->ref_count = 0;
+  if (has_parent)
+    glbExpRemoveChild(in->parent, in);
+  in->n_children = 0;
   glb_free(in->filename);
-  for(i=0;i<32;i++) { glb_free_flux(in->fluxes[i]); in->fluxes[i]=NULL; }
-  for(i=0;i<32;i++) { glb_free_xsec(in->xsecs[i]);  in->xsecs[i]=NULL;  }
+
+  /* Fluxes, cross sections, and the namespace belong to the parent and
+   * are only released when the parent is destroyed */
+  if (!has_parent)
+  {
+    glb_free_names(in->names);
+    for(i=0; i < GLB_MAX_FLUXES; i++)
+    {
+      glb_free_flux(in->fluxes[i]);
+      in->fluxes[i] = NULL;
+    }
+    for(i=0; i < GLB_MAX_XSECS; i++)
+    {
+      glb_free_xsec(in->xsecs[i]);
+      in->xsecs[i] = NULL;
+    }
+  }
 
   for(i=0;i<6;i++) my_free(in->listofchannels[i]);
 
@@ -486,7 +576,7 @@ void glbFreeExp(glb_exp ins)
   }
 
 
-  for(i=0;i<32;i++) glb_smear_free(in->smear_data[i]);
+  for(i=0;i<GLB_MAX_SMEAR;i++) glb_smear_free(in->smear_data[i]);
   for(i=0;i<in->num_of_sm;i++)
     {
       my_free(in->lowrange[i]);
@@ -522,6 +612,11 @@ void glbFreeExp(glb_exp ins)
       my_free(in->rates1[i]);
       my_free(in->rates1BG[i]);
       my_free(in->sys_on_errors[i]);
+      for(j=0;j<in->numofchannels;j++)
+      {
+        my_free(in->sys_multiex_errors_sig[i][j]);
+        my_free(in->sys_multiex_errors_bg[i][j]);
+      }
       my_free(in->sys_on_startvals[i]);
       my_free(in->sys_off_errors[i]);
       my_free(in->sys_off_startvals[i]);
@@ -540,6 +635,21 @@ void glbFreeExp(glb_exp ins)
   }
   in->n_nuisance = -1;
   my_free(in->energy_tab);
+
+  /* Re-initialize */
+  glbInitExp(in);
+}
+
+
+/***************************************************************************
+ * Function glbFreeExp                                                     *
+ ***************************************************************************
+ * Release dynamically allocated memory for a given experiment and its     *
+ * children, and destroy the glb_experiment data structure.                *
+ ***************************************************************************/
+void glbFreeExp(struct glb_experiment *in)
+{
+  glbResetExp(in);
   my_free(in);
 }
 
@@ -671,7 +781,7 @@ int glbDefaultExp(glb_exp ins)
   }
   
   /* Initialize flux tables */
-  if(in->num_of_fluxes>0&&in->num_of_fluxes<32)
+  if(in->num_of_fluxes>0&&in->num_of_fluxes<GLB_MAX_FLUXES)
   {
     for(i=0;i<in->num_of_fluxes;i++)
     {
@@ -689,7 +799,7 @@ int glbDefaultExp(glb_exp ins)
   }
 
   /* Load cross sections */
-  if(in->num_of_xsecs > 0 && in->num_of_xsecs < 32)
+  if(in->num_of_xsecs > 0 && in->num_of_xsecs < GLB_MAX_XSECS)
   {
     for(i=0;i < in->num_of_xsecs; i++)
     {
@@ -714,6 +824,36 @@ int glbDefaultExp(glb_exp ins)
 
   /* Initialization of systematics data */
   /* ---------------------------------- */
+
+  /* Check definitions of nuisance parameters for global/multi-experiment systematics */
+  for (i=0; i < in->n_nuisance; i++)
+  {//FIXME FIXME FIXME TBD
+    if (in->nuisance_params[i].name == NULL)
+      glb_exp_error(in, "Nuisance parameter #%d has no name", i);
+    else if (in->nuisance_params[i].n_energies <= 0)   /* Energy-independent nuisance parameter */
+    {
+      if (GLB_ISNAN(in->nuisance_params[i].error)) {
+        glb_exp_error(in, "No error specified for nuisance parameter %s",
+                      in->nuisance_params[i].name);
+        status=-1;
+      }
+    }
+    else                                               /* Energy-dependent nuisance parameter */
+    {
+      if (!GLB_ISNAN(in->nuisance_params[i].error)) {
+        glb_exp_error(in, "Nuisance parameter %s cannot contain energy-dependent and "
+                          "energy-independent parts", in->nuisance_params[i].name);
+        status = -1;
+      }
+      if (in->nuisance_params[i].energy_list == NULL ||
+          in->nuisance_params[i].error_list == NULL) {
+        glb_exp_error(in, "Definition of nuisance parameter %s is incomplete",
+                          in->nuisance_params[i].name);
+        status = -1;
+      }
+    }
+  }
+
   int old_verbosity = glbGetVerbosityLevel();
   int old_status    = status;
   if (glb_ignore_invalid_chi2)
@@ -800,38 +940,25 @@ int glbDefaultExp(glb_exp ins)
         status = old_status;
     }
   }
+  if (glb_ignore_invalid_chi2)
+    glbSetVerbosityLevel(old_verbosity);
 
-  /* Check definitions of nuisance parameters for global/multi-experiment systematics */
-  for (i=0; i < in->n_nuisance; i++)
-  {//FIXME FIXME FIXME TBD
-    if (in->nuisance_params[i].name == NULL)
-      glb_exp_error(in, "Nuisance parameter #%d has no name", i);
-    else if (in->nuisance_params[i].n_energies <= 0)   /* Energy-independent nuisance parameter */
+  /* Check definitions of multi-experiment systematics definitions */
+  for (i=0; i < in->numofrules; i++)
+  {
+    if (strcmp(in->sys_on_strings[i], "chiMultiExp") == 0  ||    
+        strcmp(in->sys_off_strings[i], "chiMultiExp") == 0)
     {
-      if (GLB_ISNAN(in->nuisance_params[i].error)) {
-        glb_exp_error(in, "No error specified for nuisance parameter %s",
-                      in->nuisance_params[i].name);
-        status=-1;
-      }
-    }
-    else                                               /* Energy-dependent nuisance parameter */
-    {
-      if (!GLB_ISNAN(in->nuisance_params[i].error)) {
-        glb_exp_error(in, "Nuisance parameter %s cannot contain energy-dependent and "
-                          "energy-independent parts", in->nuisance_params[i].name);
-        status = -1;
-      }
-      if (in->nuisance_params[i].energy_list == NULL ||
-          in->nuisance_params[i].error_list == NULL) {
-        glb_exp_error(in, "Definition of nuisance parameter %s is incomplete",
-                          in->nuisance_params[i].name);
-        status = -1;
+      if (in->parent != NULL)
+        { glb_rule_error(in, i, "Only the first detector in a multi-detector setup "
+                                "use chiMultiEx."); status=-1; }
+      else
+      {
+//        XXX
       }
     }
   }
-
-  if (glb_ignore_invalid_chi2)
-    glbSetVerbosityLevel(old_verbosity);
+  //FIXME FIXME FIXME TBD
 
   if(in->baseline==-1){glb_exp_error(in, "No baseline specified!");status=-1;}
   if(in->emin==-1){glb_exp_error(in, "No emin specified!");status=-1;}
@@ -1076,6 +1203,7 @@ int glbDefaultExp(glb_exp ins)
   if(def!=0) glb_warning("Incompletely defined experiment!"
                          " Defaults are going to be used!");
   return def+status;
+  //FIXME FIXME FIXME Missing: Check @sys_multiex_errors and nuisance param definitions
 };
 
 
@@ -1114,7 +1242,7 @@ int glbPrintExpByPointer(struct glb_experiment *e)
   int i, j, k;
   int status = GLB_SUCCESS;
 
-  printf("%!GLoBES\n");
+  printf("%%!GLoBES\n");
   printf("\n");
   printf("// WARNING: glbPrintExp prints only some experimental properties.\n");
   printf("//          It cannot be used to recreate the original AEDL file.\n");
@@ -1271,7 +1399,7 @@ int glbPrintExpByPointer(struct glb_experiment *e)
   for (i=0; i < e->numofrules; i++)
   {
     printf("rule(%s)<\n", glbValueToNameByPointer(e, "rule", i));
-    printf("  @signal           = ");
+    printf("  @signal            = ");
     for (j=0; j < e->lengthofrules[i]; j++)
     {
       printf("%10.7g @ %s", e->rulescoeff[i][j],
@@ -1279,7 +1407,7 @@ int glbPrintExpByPointer(struct glb_experiment *e)
       if (j < e->lengthofrules[i]-1)  printf(" : ");
     }
     printf("\n");
-    printf("  @background       = ");
+    printf("  @background        = ");
     for (j=0; j < e->lengthofbgrules[i]; j++)
     {
       printf("%10.7g @ %s", e->bgrulescoeff[i][j],
@@ -1287,18 +1415,50 @@ int glbPrintExpByPointer(struct glb_experiment *e)
       if (j < e->lengthofbgrules[i]-1)  printf(" : ");
     }
     printf("\n");
-    printf("  @sys_on_function  = %s\n", e->sys_on_strings[i]);
-    printf("  @sys_off_function = %s\n", e->sys_off_strings[i]);
-    printf("  @sys_on_errors    = ");
+    printf("  @sys_on_function   = %s\n", e->sys_on_strings[i]);
+    printf("  @sys_off_function  = %s\n", e->sys_off_strings[i]);
+    printf("  @sys_on_errors     = ");
     glbPrintDblArray(e->sys_on_errors[i], glbGetSysDim(e->sys_on_strings[i]));
-    printf("  @sys_off_errors    = ");
+    printf("  @sys_off_errors     = ");
     glbPrintDblArray(e->sys_off_errors[i], glbGetSysDim(e->sys_off_strings[i]));
+    if (e->sys_multiex_errors_sig[i][0])
+    {
+      printf("  @sys_multiex_errors_sig = ");
+      for (j=0; e->sys_multiex_errors_sig[i][j] != NULL; j++)
+      {
+        if (j > 0) printf(" : ");
+        printf("{ ");
+        for (k=0; e->sys_multiex_errors_sig[i][j][k] >= 0; k++)
+        {
+          if (k > 0)  printf(", ");
+          printf("%s", glbValueToNameByPointer(e, "sys", e->sys_multiex_errors_sig[i][j][k]));
+        }
+        printf("}");
+      }
+      printf("\n");
+    }
+    if (e->sys_multiex_errors_bg[i][0])
+    {
+      printf("  @sys_multiex_errors_bg  = ");
+      for (j=0; e->sys_multiex_errors_bg[i][j] != NULL; j++)
+      {
+        if (j > 0) printf(" : ");
+        printf("{ ");
+        for (k=0; e->sys_multiex_errors_bg[i][j][k] >= 0; k++)
+        {
+          if (k > 0)  printf(", ");
+          printf("%s", glbValueToNameByPointer(e, "sys", e->sys_multiex_errors_bg[i][j][k]));
+        }
+        printf("}");
+      }
+      printf("\n");
+    }
     printf(">\n");
     printf("\n");
   }
   printf("\n");
 
-  return GLB_SUCCESS;
+  return status;
 }
 
 

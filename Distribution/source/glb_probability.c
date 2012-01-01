@@ -874,8 +874,6 @@ int glbRegisterProbabilityEngine(int n_parameters,
                     glb_get_oscillation_parameters_function get_params_func,
                     void *user_data)
 {
-  int i;
-
   /* Free array containing parameter names */
   glbClearParamNames();
 

@@ -256,6 +256,8 @@ package globes;
 *GLB_MAX_RULES = *globesc::GLB_MAX_RULES;
 *GLB_MAX_NUISANCE = *globesc::GLB_MAX_NUISANCE;
 *GLB_MAX_SMEAR = *globesc::GLB_MAX_SMEAR;
+*GLB_MAX_FLUXES = *globesc::GLB_MAX_FLUXES;
+*GLB_MAX_XSECS = *globesc::GLB_MAX_XSECS;
 *glb_path_vector = *globesc::glb_path_vector;
 *glb_path_vector_length = *globesc::glb_path_vector_length;
 *glb_num_of_exps = *globesc::glb_num_of_exps;

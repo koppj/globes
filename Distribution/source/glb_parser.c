@@ -79,27 +79,28 @@
      NUFLUX = 268,
      SYS_ON_FUNCTION = 269,
      SYS_OFF_FUNCTION = 270,
-     GRP = 271,
-     GID = 272,
-     FNAME = 273,
-     VERS = 274,
-     SIGNAL = 275,
-     BG = 276,
-     ENERGY = 277,
-     CHANNEL = 278,
-     NDEF = 279,
-     GRPOPEN = 280,
-     GRPCLOSE = 281,
-     PM = 282,
-     FLAVOR = 283,
-     NOGLOBES = 284,
-     RULESEP = 285,
-     RULEMULT = 286,
-     NAME = 287,
-     RDF = 288,
-     ENDEXP = 289,
-     ENDDET = 290,
-     NEG = 291
+     SYS_MULTIEX_ERRORS = 271,
+     GRP = 272,
+     GID = 273,
+     FNAME = 274,
+     VERS = 275,
+     SIGNAL = 276,
+     BG = 277,
+     ENERGY = 278,
+     CHANNEL = 279,
+     NDEF = 280,
+     GRPOPEN = 281,
+     GRPCLOSE = 282,
+     PM = 283,
+     FLAVOR = 284,
+     NOGLOBES = 285,
+     RULESEP = 286,
+     RULEMULT = 287,
+     NAME = 288,
+     RDF = 289,
+     ENDEXP = 290,
+     ENDDET = 291,
+     NEG = 292
    };
 #endif
 /* Tokens.  */
@@ -116,27 +117,28 @@
 #define NUFLUX 268
 #define SYS_ON_FUNCTION 269
 #define SYS_OFF_FUNCTION 270
-#define GRP 271
-#define GID 272
-#define FNAME 273
-#define VERS 274
-#define SIGNAL 275
-#define BG 276
-#define ENERGY 277
-#define CHANNEL 278
-#define NDEF 279
-#define GRPOPEN 280
-#define GRPCLOSE 281
-#define PM 282
-#define FLAVOR 283
-#define NOGLOBES 284
-#define RULESEP 285
-#define RULEMULT 286
-#define NAME 287
-#define RDF 288
-#define ENDEXP 289
-#define ENDDET 290
-#define NEG 291
+#define SYS_MULTIEX_ERRORS 271
+#define GRP 272
+#define GID 273
+#define FNAME 274
+#define VERS 275
+#define SIGNAL 276
+#define BG 277
+#define ENERGY 278
+#define CHANNEL 279
+#define NDEF 280
+#define GRPOPEN 281
+#define GRPCLOSE 282
+#define PM 283
+#define FLAVOR 284
+#define NOGLOBES 285
+#define RULESEP 286
+#define RULEMULT 287
+#define NAME 288
+#define RDF 289
+#define ENDEXP 290
+#define ENDDET 291
+#define NEG 292
 
 
 
@@ -196,7 +198,7 @@
   static int cross_count=-1;
   static int flux_count=-1;
   static struct glb_experiment buff;
-  static struct glb_experiment buff_list[GLB_MAX_EXP];
+  static struct glb_experiment *buff_list[GLB_MAX_EXP];
   static glb_smear ibf;
   static glb_option_type opt;
   static glb_flux flt;
@@ -223,15 +225,15 @@
     double ru; // allowed range
     void *ptr; // this is a pointer the corresponding part of the exp structure
     void *len; /* this is a pointer which points to the length of the vector
-		*  in a struct glb_experiment. Example: if we parse densitytab,
-		*  this things points
-		*  to psteps
-		*/
+                *  in a struct glb_experiment. Example: if we parse densitytab,
+                *  this things points
+                *  to psteps
+                */
 
     char *ctx; /* here the type of the environment is given, e.g. rule
-		* thus the corresponding token is matched onyl within
-		* a rule type environment
-		*/
+                * thus the corresponding token is matched onyl within
+                * a rule type environment
+                */
   } glb_parser_decl;
 
 
@@ -328,6 +330,8 @@
     &buff.sys_on_errors[0],&loc_count,"rule"},
    {"@sys_off_errors",DOUBLE_LIST_INDEXED,0,GMAX,
     &buff.sys_off_errors[0],&loc_count,"rule"},
+   {"@sys_multiex_errors_sig",ENERGY_MATRIX,-1,GMAX,&buff.sys_multiex_errors_sig[0],&loc_count,"rule"},
+   {"@sys_multiex_errors_bg", ENERGY_MATRIX,-1,GMAX,&buff.sys_multiex_errors_bg[0],&loc_count,"rule"},
 
    {"sys", UNTYPE, 0, 20, NULL, &buff.n_nuisance, "global"},
    {"@energy_list", DOUBLE_LIST, 0, GMAX, &nuis.energy_list, &nuis.n_energies, "sys"},
@@ -400,38 +404,36 @@ static void grp_start(char* name)
 
 static void grp_end(char* name)
    {
-     char tmp_errordim[2];
-
      if(strncmp(name,"energy",6)==0 )
        {
-	 if(buff.num_of_sm-1 >= 0)
-	   {
-	     ibf.options=glb_option_type_alloc();
-	     ibf.options=(glb_option_type *) memmove(ibf.options,&opt,
-					     sizeof(glb_option_type));
+         if(buff.num_of_sm-1 >= 0)
+           {
+             ibf.options=glb_option_type_alloc();
+             ibf.options=(glb_option_type *) memmove(ibf.options,&opt,
+                                             sizeof(glb_option_type));
 
-	     if(buff.smear_data[buff.num_of_sm-1]==NULL)
-	       buff.smear_data[buff.num_of_sm-1]=glb_smear_alloc();
-	     buff.smear_data[buff.num_of_sm-1]=
-	       glb_copy_smear(buff.smear_data[buff.num_of_sm-1],&ibf);
-	     glb_option_type_free(ibf.options);
-	     glb_option_type_reset(&opt);
-	     if(ibf.sigma!=NULL) glb_free(ibf.sigma);
-	     glb_smear_reset(&ibf);
+             if(buff.smear_data[buff.num_of_sm-1]==NULL)
+               buff.smear_data[buff.num_of_sm-1]=glb_smear_alloc();
+             buff.smear_data[buff.num_of_sm-1]=
+               glb_copy_smear(buff.smear_data[buff.num_of_sm-1],&ibf);
+             glb_option_type_free(ibf.options);
+             glb_option_type_reset(&opt);
+             if(ibf.sigma!=NULL) glb_free(ibf.sigma);
+             glb_smear_reset(&ibf);
 
-	   }
+           }
 
        }
 
      if(strncmp(name,"flux",4)==0 )
        {
 
-	 if(buff.num_of_fluxes > 0)
-	   {
-	     glb_error("The 'flux' directive is deprecated (consider using 'nuflux').\n"
-		       "The flux normalization may not be what you expect.\n"
-		       "Please, consult the manual!");
-	     if(flt.builtin<=0) flt.builtin=GLB_OLD_NORM;
+         if(buff.num_of_fluxes > 0)
+           {
+             glb_error("The 'flux' directive is deprecated (consider using 'nuflux').\n"
+                       "The flux normalization may not be what you expect.\n"
+                       "Please, consult the manual!");
+             if(flt.builtin<=0) flt.builtin=GLB_OLD_NORM;
 
              if (buff.fluxes[buff.num_of_fluxes-1] == NULL)
              {
@@ -442,15 +444,15 @@ static void grp_end(char* name)
              if (glb_copy_flux(buff.fluxes[buff.num_of_fluxes-1], &flt) != GLB_SUCCESS)
                glb_error("grp_end: Error copying flux data");
              glb_reset_flux(&flt);
-	   }
+           }
        }
 
 
      if(strncmp(name,"nuflux",6)==0 )
        {
-	 if(buff.num_of_fluxes > 0)
-	   {
-	     if (buff.fluxes[buff.num_of_fluxes-1] == NULL)
+         if(buff.num_of_fluxes > 0)
+           {
+             if (buff.fluxes[buff.num_of_fluxes-1] == NULL)
              {
                buff.fluxes[buff.num_of_fluxes-1] = glb_malloc(sizeof(glb_flux));
                memset(buff.fluxes[buff.num_of_fluxes-1], 0, sizeof(*buff.fluxes[0]));
@@ -459,14 +461,14 @@ static void grp_end(char* name)
              if (glb_copy_flux(buff.fluxes[buff.num_of_fluxes-1], &flt) != GLB_SUCCESS)
                glb_error("grp_end: Error copying flux data");
              glb_reset_flux(&flt);
-	   }
+           }
        }
 
      if(strncmp(name,"cross",5)==0 )
        {
-	 if(buff.num_of_xsecs > 0)
-	   {
-	     if (buff.xsecs[buff.num_of_xsecs-1] == NULL)
+         if(buff.num_of_xsecs > 0)
+           {
+             if (buff.xsecs[buff.num_of_xsecs-1] == NULL)
              {
                buff.xsecs[buff.num_of_xsecs-1] = glb_malloc(sizeof(glb_xsec));
                memset(buff.xsecs[buff.num_of_xsecs-1], 0, sizeof(*buff.xsecs[0]));
@@ -474,8 +476,8 @@ static void grp_end(char* name)
              }
              if (glb_copy_xsec(buff.xsecs[buff.num_of_xsecs-1], &xsc) != GLB_SUCCESS)
                glb_error("grp_end: Error copying cross section data");
-	     glb_reset_xsec(&xsc);
-	   }
+             glb_reset_xsec(&xsc);
+           }
        }
 
 
@@ -496,8 +498,8 @@ static void grp_end(char* name)
        nuis.name = strdup(name_table->name);
        memcpy(&(buff.nuisance_params[buff.n_nuisance-1]), &nuis, sizeof(glb_nuisance));
        /* For multi-detector setups, the parent detector has to know about all systematics */
-       if (buff.parent)   
-         memcpy(&(buff.parent->nuisance_params[buff.parent->n_nuisance++]), &nuis, sizeof(glb_nuisance));
+       if (buff.parent)
+         glb_copy_nuisance(&(buff.parent->nuisance_params[buff.parent->n_nuisance++]), &nuis);
        glbResetNuisance();
      }
 
@@ -514,8 +516,8 @@ static int set_channel_data(int x[6],int loc_count)
      for(i=0;i<6;i++) {
        if (loc_count >= buff.numofchannels) /* Don't realloc when parsing a re-definition */
          buff.listofchannels[i]=
-			(int*) glb_realloc(buff.listofchannels[i]
-					,sizeof(int)*loc_count);
+                        (int*) glb_realloc(buff.listofchannels[i]
+                                        ,sizeof(int)*loc_count);
 
        buff.listofchannels[i][loc_count-1]=x[i];
      }
@@ -533,14 +535,14 @@ static int step_counter(char *name)
   for(i=0;token_list[i].token!=NULL;i++)
     {
       if(strncmp(name,token_list[i].token,
-		 strlen(token_list[i].token))==0 )
-	{
+                 strlen(token_list[i].token))==0 )
+        {
 
-		     ibf=(int*) token_list[i].len;
-		     if(*ibf==-1) *ibf=1;// first time encounter
-		     else (*ibf)++;
+                     ibf=(int*) token_list[i].len;
+                     if(*ibf==-1) *ibf=1;// first time encounter
+                     else (*ibf)++;
 
-	}
+        }
     }
   if(ibf!=NULL) return *ibf; // otherwise a SEGFAULT occurs when there
   // is no matching name
@@ -556,23 +558,23 @@ static int set_fnct(char *name,void *in)
   for(i=0;token_list[i].token!=NULL;i++)
     {
       if(strncmp(name,token_list[i].token,
-		 strlen(token_list[i].token))==0&&
-	 strncmp(context,token_list[i].ctx,
-		 strlen(token_list[i].ctx))==0 )
-	{
-	     if(token_list[i].scalar==FUN) //double
-	       {
-		 dbf=(sigfun *) token_list[i].ptr;
-		 *dbf=(sigfun) in;
-	      	 return 0;
-	       }
-	     else
-	       {
-		 fprintf(stderr,"Error: Value for %s out of range\n",
-			 token_list[i].token);
-		 return 2;
-	       }
-	}
+                 strlen(token_list[i].token))==0&&
+         strncmp(context,token_list[i].ctx,
+                 strlen(token_list[i].ctx))==0 )
+        {
+             if(token_list[i].scalar==FUN) //double
+               {
+                 dbf=(sigfun *) token_list[i].ptr;
+                 *dbf=(sigfun) in;
+                 return 0;
+               }
+             else
+               {
+                 fprintf(stderr,"Error: Value for %s out of range\n",
+                         token_list[i].token);
+                 return 2;
+               }
+        }
 
 
     }
@@ -591,99 +593,99 @@ static int set_exp(char *name,double value,int scalar)
   for(i=0;token_list[i].token!=NULL;i++)
     {
       if(strncmp(name,token_list[i].token,
-		 strlen(token_list[i].token))==0 &&
-	 strncmp(context,token_list[i].ctx,
-		 strlen(token_list[i].ctx))==0
-	 )
-	{
-	     if(token_list[i].scalar==DOUBLE) //double
-	       {
-		 if(value >= token_list[i].rl && value <= token_list[i].ru)
-		   {
-		     dbf=(double*) token_list[i].ptr;
-		     *dbf=value;
-		     return 0;
-		   }
-		 else
-		   {
-		     fprintf(stderr,"Error: Value for %s out of range\n",
-			     token_list[i].token);
-		     return 2;
-		   }
-	       }
-	     if(token_list[i].scalar==INT) //int
-	       {
-		 if(value >= token_list[i].rl && value <= token_list[i].ru)
-		   {
-		     ibf=(int*) token_list[i].ptr;
-		     *ibf=value;
-		     return 0;
-		   }
-		 else
-		   {
-		     fprintf(stderr,"Error: Value for %s out of range\n",
-			     token_list[i].token);
-		     return 2;
-		   }
-	       }
+                 strlen(token_list[i].token))==0 &&
+         strncmp(context,token_list[i].ctx,
+                 strlen(token_list[i].ctx))==0
+         )
+        {
+             if(token_list[i].scalar==DOUBLE) //double
+               {
+                 if(value >= token_list[i].rl && value <= token_list[i].ru)
+                   {
+                     dbf=(double*) token_list[i].ptr;
+                     *dbf=value;
+                     return 0;
+                   }
+                 else
+                   {
+                     fprintf(stderr,"Error: Value for %s out of range\n",
+                             token_list[i].token);
+                     return 2;
+                   }
+               }
+             if(token_list[i].scalar==INT) //int
+               {
+                 if(value >= token_list[i].rl && value <= token_list[i].ru)
+                   {
+                     ibf=(int*) token_list[i].ptr;
+                     *ibf=value;
+                     return 0;
+                   }
+                 else
+                   {
+                     fprintf(stderr,"Error: Value for %s out of range\n",
+                             token_list[i].token);
+                     return 2;
+                   }
+               }
 
-	     if(token_list[i].scalar==COUNTER) //counter
-	       {
-		 if(value >= token_list[i].rl && value <= token_list[i].ru)
-		   {
+             if(token_list[i].scalar==COUNTER) //counter
+               {
+                 if(value >= token_list[i].rl && value <= token_list[i].ru)
+                   {
 
-		     ibf=(int*) token_list[i].ptr;
-		     if(!((*ibf == -1) || (*ibf == (int) value))) {
-		       glb_warning("Given length does not"
-				   " match actual length");
-		       return 2;
+                     ibf=(int*) token_list[i].ptr;
+                     if(!((*ibf == -1) || (*ibf == (int) value))) {
+                       glb_warning("Given length does not"
+                                   " match actual length");
+                       return 2;
 
-		     }
-		     *ibf=value;
-		     return 0;
-		   }
-		 else
-		   {
-		     fprintf(stderr,"Error: Value for %s out of range\n",
-			     token_list[i].token);
-		     return 2;
-		   }
-	       }
+                     }
+                     *ibf=value;
+                     return 0;
+                   }
+                 else
+                   {
+                     fprintf(stderr,"Error: Value for %s out of range\n",
+                             token_list[i].token);
+                     return 2;
+                   }
+               }
 
-	     if(token_list[i].scalar==INT_INDEXED) //int
-	       {
-		 if(value >= token_list[i].rl && value <= token_list[i].ru)
-		   {
-		     xibf=(int*) token_list[i].ptr;
-		     xibf[loc_count-1]=(int) value;
-		     return 0;
-		   }
-		 else
-		   {
-		     fprintf(stderr,"Error: Value for %s out of range\n",
-			     token_list[i].token);
-		     return 2;
-		   }
-	       }
+             if(token_list[i].scalar==INT_INDEXED) //int
+               {
+                 if(value >= token_list[i].rl && value <= token_list[i].ru)
+                   {
+                     xibf=(int*) token_list[i].ptr;
+                     xibf[loc_count-1]=(int) value;
+                     return 0;
+                   }
+                 else
+                   {
+                     fprintf(stderr,"Error: Value for %s out of range\n",
+                             token_list[i].token);
+                     return 2;
+                   }
+               }
 
-	     if(token_list[i].scalar==DOUBLE_INDEXED) //int
-	       {
-		 if(value >= token_list[i].rl && value <= token_list[i].ru)
-		   {
-		     dbf=(double*) token_list[i].ptr;
-		     dbf[loc_count-1]=(double) value;
-		     return 0;
-		   }
-		 else
-		   {
-		     fprintf(stderr,"Error: Value for %s out of range\n",
-			     token_list[i].token);
-		     return 2;
-		   }
-	       }
+             if(token_list[i].scalar==DOUBLE_INDEXED) //int
+               {
+                 if(value >= token_list[i].rl && value <= token_list[i].ru)
+                   {
+                     dbf=(double*) token_list[i].ptr;
+                     dbf[loc_count-1]=(double) value;
+                     return 0;
+                   }
+                 else
+                   {
+                     fprintf(stderr,"Error: Value for %s out of range\n",
+                             token_list[i].token);
+                     return 2;
+                   }
+               }
 
 
-	   }
+           }
        }
 
    return 1;
@@ -697,81 +699,81 @@ static int set_pair(char *name,double value,double value2,int scalar)
   for(i=0;token_list[i].token!=NULL;i++)
     {
       if(strncmp(name,token_list[i].token,
-		 strlen(token_list[i].token))==0&&
-	 strncmp(context,token_list[i].ctx,
-		 strlen(token_list[i].ctx))==0 )
-	{
-	     if(token_list[i].scalar==DOUBLE_PAIR)
-	       {
-		 if(value >= token_list[i].rl && value <= token_list[i].ru)
-		   {
+                 strlen(token_list[i].token))==0&&
+         strncmp(context,token_list[i].ctx,
+                 strlen(token_list[i].ctx))==0 )
+        {
+             if(token_list[i].scalar==DOUBLE_PAIR)
+               {
+                 if(value >= token_list[i].rl && value <= token_list[i].ru)
+                   {
 
-		     dbf=(double*) token_list[i].ptr;
-		     dbf[0]=(double) value;
-		     dbf[1]=(double) value2;
-		     return 0;
-		   }
-		 else
-		   {
-		     fprintf(stderr,"Error: Value for %s out of range\n",
-			     token_list[i].token);
-		     return 2;
-		   }
-	       }
+                     dbf=(double*) token_list[i].ptr;
+                     dbf[0]=(double) value;
+                     dbf[1]=(double) value2;
+                     return 0;
+                   }
+                 else
+                   {
+                     fprintf(stderr,"Error: Value for %s out of range\n",
+                             token_list[i].token);
+                     return 2;
+                   }
+               }
 
-	     if(token_list[i].scalar==INT_INDEXED_PAIR) //int
-	       {
-		 if(value >= token_list[i].rl && value <= token_list[i].ru)
-		   {
+             if(token_list[i].scalar==INT_INDEXED_PAIR) //int
+               {
+                 if(value >= token_list[i].rl && value <= token_list[i].ru)
+                   {
 
-		     ibf=(int*) token_list[i].ptr;
-		     ibf[(loc_count-1)+0*32]=(int) value;
-		     return 0;
-		   }
-		 else
-		   {
-		     fprintf(stderr,"Error: Value for %s out of range\n",
-			     token_list[i].token);
-		     return 2;
-		   }
-	       }
+                     ibf=(int*) token_list[i].ptr;
+                     ibf[(loc_count-1)+0*32]=(int) value;
+                     return 0;
+                   }
+                 else
+                   {
+                     fprintf(stderr,"Error: Value for %s out of range\n",
+                             token_list[i].token);
+                     return 2;
+                   }
+               }
 
-	     if(token_list[i].scalar==DOUBLE_INDEXED_PAIR) //int
-	       {
-		 if(value >= token_list[i].rl && value <= token_list[i].ru)
-		   {
+             if(token_list[i].scalar==DOUBLE_INDEXED_PAIR) //int
+               {
+                 if(value >= token_list[i].rl && value <= token_list[i].ru)
+                   {
 
-		     dbf=(double*) token_list[i].ptr;
-		     dbf[(loc_count-1)+0*32]=(double) value;
-		     dbf[(loc_count-1)+1*32]=(double) value2;
-		     return 0;
-		   }
-		 else
-		   {
-		     fprintf(stderr,"Error: Value for %s out of range\n",
-			     token_list[i].token);
-		     return 2;
-		   }
-	       }
+                     dbf=(double*) token_list[i].ptr;
+                     dbf[(loc_count-1)+0*32]=(double) value;
+                     dbf[(loc_count-1)+1*32]=(double) value2;
+                     return 0;
+                   }
+                 else
+                   {
+                     fprintf(stderr,"Error: Value for %s out of range\n",
+                             token_list[i].token);
+                     return 2;
+                   }
+               }
 
-	     if(token_list[i].scalar==DOUBLE_INDEXED_PAIR_INV) //int
-	       {
-		 if(value >= token_list[i].rl && value <= token_list[i].ru)
-		   {
+             if(token_list[i].scalar==DOUBLE_INDEXED_PAIR_INV) //int
+               {
+                 if(value >= token_list[i].rl && value <= token_list[i].ru)
+                   {
 
-		     dbf=(double*) token_list[i].ptr;
-		     dbf[(loc_count-1)*2+0]=(double) value;
-		     dbf[(loc_count-1)*2+1]=(double) value2;
-		     return 0;
-		   }
-		 else
-		   {
-		     fprintf(stderr,"Error: Value for %s out of range\n",
-			     token_list[i].token);
-		     return 2;
-		   }
-	       }
-	   }
+                     dbf=(double*) token_list[i].ptr;
+                     dbf[(loc_count-1)*2+0]=(double) value;
+                     dbf[(loc_count-1)*2+1]=(double) value2;
+                     return 0;
+                   }
+                 else
+                   {
+                     fprintf(stderr,"Error: Value for %s out of range\n",
+                             token_list[i].token);
+                     return 2;
+                   }
+               }
+           }
        }
 
    return 1;
@@ -854,11 +856,11 @@ static glb_List *thread_list(func_t f, int reverse, int destroy ,glb_List *tail)
     {
       head=tail;
       for (n = 0; head; ++n)
-	{
-	  nv=f(head->entry);
-	  res=list_cons(res,nv);
-	  head = head->next;
-	}
+        {
+          nv=f(head->entry);
+          res=list_cons(res,nv);
+          head = head->next;
+        }
     }
   else
     {
@@ -867,16 +869,16 @@ static glb_List *thread_list(func_t f, int reverse, int destroy ,glb_List *tail)
       rlist=(double *) malloc(sizeof(double)*l);
       head=tail;
       for (n = 0; head; ++n)
-	{
-	  rlist[n]=head->entry;
-	  head = head->next;
-	}
+        {
+          rlist[n]=head->entry;
+          head = head->next;
+        }
 
       for(n=l;n>0; n--)
-	{
-	  x=f(rlist[n-1]);
-	  res=list_cons(res,x);
-	}
+        {
+          x=f(rlist[n-1]);
+          res=list_cons(res,x);
+        }
       free(rlist);
     }
   if(destroy==1) list_free(tail);
@@ -915,7 +917,7 @@ static glb_List *glb_interpolation(glb_List *xval,glb_List *yval,int flag,glb_Li
 {
   glb_List *head,*res=NULL;
   size_t xl,yl,rl,i;
-  double *xlist,*ylist,*rlist,x;
+  double *xlist,*ylist,*rlist;
   gsl_interp_type type;
 
   if(flag==1) type=*gsl_interp_linear;
@@ -980,126 +982,126 @@ static int set_exp_list(char *name,glb_List *value,int scalar)
   for(i=0;token_list[i].token!=NULL;i++)
     {
       if(strncmp(name,token_list[i].token,strlen(token_list[i].token))==0 &&
-	 strncmp(context,token_list[i].ctx,
-		 strlen(token_list[i].ctx))==0)
-	{
-	  switch((int) token_list[i].scalar) {
-	  case DOUBLE_LIST:
+         strncmp(context,token_list[i].ctx,
+                 strlen(token_list[i].ctx))==0)
+        {
+          switch((int) token_list[i].scalar) {
+          case DOUBLE_LIST:
 
-	    //here we will have to do a lot asking asf.
-	    len=list_length(value); // how long is the list
-	    lbf=(int*) token_list[i].len;
-	    if(*lbf==-1) *lbf=len;  // setting the length correctly in exp
-	    else if(*lbf!=len) glb_error("Line %d: Length mismatch or list"
-					 " length changed", glb_line_num);
-
-
-	    dbf = (double**) token_list[i].ptr;
-	    if(*dbf!=NULL){glb_free(*dbf);*dbf=NULL;}
-	    list=(double*) glb_malloc(sizeof(double)*len);
-	    *dbf=list;
+            //here we will have to do a lot asking asf.
+            len=list_length(value); // how long is the list
+            lbf=(int*) token_list[i].len;
+            if(*lbf==-1) *lbf=len;  // setting the length correctly in exp
+            else if(*lbf!=len) glb_fatal("Line %d: Length mismatch or list"
+                                         " length changed", glb_line_num);
 
 
-	    for(k=0;k<len;k++)
-	       {
-		  val=list_take(value,len-k-1);
-
-		  if(val >= token_list[i].rl && val <= token_list[i].ru)
-		    {
-		      list[k]=val;
-		    }
-		  else
-		    {
-		      fprintf(stderr,"Error: Value for %s out of range\n",
-			      token_list[i].token);
-		      glb_free(list);
-		      *dbf=NULL;
-		      return 2;
-		    }
-
-	       }
-	    if(scalar!=TWICE)  list_free(value);
-	    return 0;
-	    break;
-
-	  case DOUBLE_LIST_INDEXED:
-	    len=list_length(value); // how long is the list
-	    lbf=(int*) token_list[i].len;
+            dbf = (double**) token_list[i].ptr;
+            if(*dbf!=NULL){glb_free(*dbf);*dbf=NULL;}
+            list=(double*) glb_malloc(sizeof(double)*len);
+            *dbf=list;
 
 
-	    //  lbf[loc_count-1]=len;  // setting the length correctly in exp
+            for(k=0;k<len;k++)
+               {
+                  val=list_take(value,len-k-1);
 
-	    dbf= (double**) token_list[i].ptr;
-	    if(dbf[loc_count-1]!=NULL){glb_free(dbf[loc_count-1]);dbf[loc_count-1]=NULL;}
-	    list=(double*) glb_malloc(sizeof(double)*(len+1));
+                  if(val >= token_list[i].rl && val <= token_list[i].ru)
+                    {
+                      list[k]=val;
+                    }
+                  else
+                    {
+                      fprintf(stderr,"Error: Value for %s out of range\n",
+                              token_list[i].token);
+                      glb_free(list);
+                      *dbf=NULL;
+                      return 2;
+                    }
 
-	    dbf[loc_count-1]=list;
-	    list[len]=-1;
+               }
+            if(scalar!=TWICE)  list_free(value);
+            return 0;
+            break;
 
-	    for(k=0;k<len;k++)
-	      {
-		val=list_take(value,len-k-1);
-
-		if(val >= token_list[i].rl && val <= token_list[i].ru)
-		  {
-		    list[k]=val;
-
-		  }
-		else
-		  {
-		    fprintf(stderr,"Error: In line %d: "
-			    "Value for %s out of range\n",
-			    glb_line_num,token_list[i].token);
-		    glb_free(list);
-		    dbf[loc_count-1]=NULL;
-
-		   return 2;
-		  }
-	      }
-	    if(scalar!=TWICE) list_free(value);
-	    return 0;
-	    break;
+          case DOUBLE_LIST_INDEXED:
+            len=list_length(value); // how long is the list
+            lbf=(int*) token_list[i].len;
 
 
-	  case INT_LIST_INDEXED: //integer list indexed
-	    //with loc_counter
+            //  lbf[loc_count-1]=len;  // setting the length correctly in exp
 
-	    //here we will have to do a lot asking asf.
-	    len=list_length(value); // how long is the list
-	    lbf=(int*) token_list[i].len; //FIXME danger !!!!
-	    lbf[loc_count-1]=len;  // setting the length correctly in exp
-	    ibf= (int**) token_list[i].ptr;
-	    if(ibf[loc_count-1]!=NULL)glb_free(ibf[loc_count-1]);
-	    ilist=(int*) glb_malloc(sizeof(int)*len);
+            dbf= (double**) token_list[i].ptr;
+            if(dbf[loc_count-1]!=NULL){glb_free(dbf[loc_count-1]);dbf[loc_count-1]=NULL;}
+            list=(double*) glb_malloc(sizeof(double)*(len+1));
 
-	    ibf[loc_count-1]=ilist;
+            dbf[loc_count-1]=list;
+            list[len]=-1;
+
+            for(k=0;k<len;k++)
+              {
+                val=list_take(value,len-k-1);
+
+                if(val >= token_list[i].rl && val <= token_list[i].ru)
+                  {
+                    list[k]=val;
+
+                  }
+                else
+                  {
+                    fprintf(stderr,"Error: In line %d: "
+                            "Value for %s out of range\n",
+                            glb_line_num,token_list[i].token);
+                    glb_free(list);
+                    dbf[loc_count-1]=NULL;
+
+                   return 2;
+                  }
+              }
+            if(scalar!=TWICE) list_free(value);
+            return 0;
+            break;
 
 
-	    for(k=0;k<len;k++)
-	      {
-		val=list_take(value,len-k-1);
+          case INT_LIST_INDEXED: //integer list indexed
+            //with loc_counter
 
-		if(val >= token_list[i].rl && val <= token_list[i].ru)
-		  {
-		    ilist[k]=(int) val;
+            //here we will have to do a lot asking asf.
+            len=list_length(value); // how long is the list
+            lbf=(int*) token_list[i].len; //FIXME danger !!!!
+            lbf[loc_count-1]=len;  // setting the length correctly in exp
+            ibf= (int**) token_list[i].ptr;
+            if(ibf[loc_count-1]!=NULL)glb_free(ibf[loc_count-1]);
+            ilist=(int*) glb_malloc(sizeof(int)*len);
 
-		  }
-		else
-		  {
-		    fprintf(stderr,"Error: Value for %s out of range\n",
-			    token_list[i].token);
-		   glb_free(ilist);
-		    return 2;
-		  }
-	      }
-	    if(scalar!=TWICE) list_free(value);
-	    return 0;
-	    break;
-	  default:
-	    return 1;
-	    break;
-	  }
-	}
+            ibf[loc_count-1]=ilist;
+
+
+            for(k=0;k<len;k++)
+              {
+                val=list_take(value,len-k-1);
+
+                if(val >= token_list[i].rl && val <= token_list[i].ru)
+                  {
+                    ilist[k]=(int) val;
+
+                  }
+                else
+                  {
+                    fprintf(stderr,"Error: Value for %s out of range\n",
+                            token_list[i].token);
+                   glb_free(ilist);
+                    return 2;
+                  }
+              }
+            if(scalar!=TWICE) list_free(value);
+            return 0;
+            break;
+          default:
+            return 1;
+            break;
+          }
+        }
     }
 
   return 1;
@@ -1117,83 +1119,144 @@ static int set_exp_energy(char *name, glb_List **value)
   for(i=0;token_list[i].token!=NULL;i++)
     {
       if(strncmp(name,token_list[i].token,strlen(token_list[i].token))==0&&
-	 strncmp(context,token_list[i].ctx,
-		 strlen(token_list[i].ctx))==0 )
-	{
-	  switch((int) token_list[i].scalar) {
+         strncmp(context,token_list[i].ctx,
+                 strlen(token_list[i].ctx))==0 )
+        {
+          switch((int) token_list[i].scalar) {
 
-	  case ENERGY_MATRIX:
-	    list=(double**) glb_malloc(sizeof(double* ) * energy_len);
-	    buff.lowrange[loc_count-1]=(int*) glb_malloc(energy_len*sizeof(int));
-	    buff.uprange[loc_count-1]=(int*) glb_malloc(energy_len*sizeof(int));
+          case ENERGY_MATRIX:
+            list=(double**) glb_malloc(sizeof(double* ) * energy_len);
+            buff.lowrange[loc_count-1]=(int*) glb_malloc(energy_len*sizeof(int));
+            buff.uprange[loc_count-1]=(int*) glb_malloc(energy_len*sizeof(int));
 
-	    for(l=0;l<energy_len;l++)
-	      {
-		len=(int) list_length(value[l]); // how long is the list
-		if(len<2) {fprintf(stderr,"Error: in line %d: in @smear "
-				   "number %d: sublist %d is too short!\n"
-				   ,glb_line_num,loc_count,l);return 2;}
-		//lbf=(int*) token_list[i].len;
-
-
-		//lbf[loc_count-1]=len;  // setting the length correctly in exp
+            for(l=0;l<energy_len;l++)
+              {
+                len=(int) list_length(value[l]); // how long is the list
+                if(len<2) {fprintf(stderr,"Error: in line %d: in @smear "
+                                   "number %d: sublist %d is too short!\n"
+                                   ,glb_line_num,loc_count,l);return 2;}
+                //lbf=(int*) token_list[i].len;
 
 
-
-		dbf= (double***) token_list[i].ptr;
-		list[l]=(double*) glb_malloc(sizeof(double)*(len-2));
-		dbf[loc_count-1]=list;
+                //lbf[loc_count-1]=len;  // setting the length correctly in exp
 
 
-		v1=(int) list_take(value[l],len-0-1);
-		v2=(int) list_take(value[l],len-1-1);
 
-		if(v1 >= 0 &&  v2 <= buff.simbins
-		   && v2 >= v1&&v2-v1==len-3 )
-		  {
+                dbf= (double***) token_list[i].ptr;
+                list[l]=(double*) glb_malloc(sizeof(double)*(len-2));
+                dbf[loc_count-1]=list;
 
-		    buff.lowrange[loc_count-1][l]= v1;
-		    buff.uprange[loc_count-1][l]= v2;
 
-		  }
-		else
-		  {
-		    fprintf(stderr,"Error: In line %d: "
-			    "Value for ranges in smear out of range\n",
-			    glb_line_num);
-		    glb_free(list[l]);
-		    glb_free(buff.lowrange[loc_count-1]);
-		    glb_free(buff.uprange[loc_count-1]);
-		    return 2;
-		  }
+                v1=(int) list_take(value[l],len-0-1);
+                v2=(int) list_take(value[l],len-1-1);
 
-	      	for(k=0;k<len-2;k++)
-		  {
-		    val=list_take(value[l],len-(k+2)-1);
+                if(v1 >= 0 &&  v2 <= buff.simbins
+                   && v2 >= v1&&v2-v1==len-3 )
+                  {
 
-		    if(val >= token_list[i].rl && val <= token_list[i].ru)
-		      {
-			list[l][k]=val;
+                    buff.lowrange[loc_count-1][l]= v1;
+                    buff.uprange[loc_count-1][l]= v2;
 
-		      }
-		    else
-		      {
-			fprintf(stderr,"Error: In line %d: "
-				"Value for %s out of range\n",
-				glb_line_num,token_list[i].token);
-			free(list[l]);
-			return 2;
-		      }
-		  }
-		list_free(value[l]);
-	      }
-	    glb_free(value);
-	    return 0;
-	    break;
+                  }
+                else
+                  {
+                    fprintf(stderr,"Error: In line %d: "
+                            "Value for ranges in smear out of range\n",
+                            glb_line_num);
+                    glb_free(list[l]);
+                    glb_free(buff.lowrange[loc_count-1]);
+                    glb_free(buff.uprange[loc_count-1]);
+                    return 2;
+                  }
 
-	  }
-	}
+                for(k=0;k<len-2;k++)
+                  {
+                    val=list_take(value[l],len-(k+2)-1);
+
+                    if(val >= token_list[i].rl && val <= token_list[i].ru)
+                      {
+                        list[l][k]=val;
+
+                      }
+                    else
+                      {
+                        fprintf(stderr,"Error: In line %d: "
+                                "Value for %s out of range\n",
+                                glb_line_num,token_list[i].token);
+                        free(list[l]);
+                        return 2;
+                      }
+                  }
+                list_free(value[l]);
+              }
+            glb_free(value);
+            return 0;
+            break;
+
+          }
+        }
     }
+  return 1;
+}
+
+
+static int set_multiex_errors(char *name, glb_List **value)
+{
+  int i, j, k;
+  for(i=0; token_list[i].token != NULL; i++)
+  {
+      if(strncmp(name, token_list[i].token, strlen(token_list[i].token)) == 0  &&
+         strncmp(context,token_list[i].ctx, strlen(token_list[i].ctx)) == 0)
+      {
+        switch((int) token_list[i].scalar)
+        {
+          case ENERGY_MATRIX:
+            if (energy_len > GLB_MAX_RULES)
+            {
+              fprintf(stderr, "Error in line %d: @sys_multiex_errors_X definition too long.\n",
+                      glb_line_num);
+              return 2;
+            }
+            for (j=0; j < energy_len; j++)
+            {
+              int len = (int) list_length(value[j]);
+              if (len > GLB_MAX_CHANNELS)
+              {
+                fprintf(stderr, "Error in line %d: Entry %d in @sys_multiex_errors_X too long.\n",
+                        glb_line_num, j+1);
+                return 3;
+              }
+              if (len > 0)
+              {
+                int *(*x)[GLB_MAX_CHANNELS] = (int *(*)[GLB_MAX_CHANNELS]) token_list[i].ptr;
+                x[loc_count-1][j] = glb_malloc(sizeof(int) * (len+1));
+                for (k=0; k < len; k++)
+                {
+                  double val = list_take(value[j], len-k-1);
+                  if(val >= token_list[i].rl && val <= token_list[i].ru)
+                    x[loc_count-1][j][k] = (int)(val+0.5);
+                  else
+                  {
+                    fprintf(stderr, "Error in line %d: Value for %s out of range\n",
+                            glb_line_num, token_list[i].token);
+                    glb_free(x[loc_count-1][j]);
+                    x[loc_count-1][j] = NULL;
+                  }
+                } /* for (k) */
+                x[loc_count-1][j][k] = -1;
+              }
+ 
+              list_free(value[j]);
+              value[j] = NULL;
+            } /* for (j) */
+
+            free(value);
+            return 0;
+            break;
+        }
+      }
+  } /* for (i) */
+
   return 1;
 }
 
@@ -1220,7 +1283,7 @@ static int set_exp_energy(char *name, glb_List **value)
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 1078 "glb_parser.y"
+#line 1139 "glb_parser.y"
 {
   double  val;  /* For returning numbers.                   */
   double *dpt;  /* for rules */
@@ -1233,7 +1296,7 @@ typedef union YYSTYPE
   glb_namerec *nameptr;
 }
 /* Line 193 of yacc.c.  */
-#line 1237 "glb_parser.c"
+#line 1300 "glb_parser.c"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
@@ -1246,7 +1309,7 @@ typedef union YYSTYPE
 
 
 /* Line 216 of yacc.c.  */
-#line 1250 "glb_parser.c"
+#line 1313 "glb_parser.c"
 
 #ifdef short
 # undef short
@@ -1461,20 +1524,20 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  38
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   328
+#define YYLAST   355
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  51
+#define YYNTOKENS  52
 /* YYNNTS -- Number of nonterminals.  */
 #define YYNNTS  24
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  77
+#define YYNRULES  78
 /* YYNRULES -- Number of states.  */
-#define YYNSTATES  164
+#define YYNSTATES  167
 
 /* YYTRANSLATE(YYLEX) -- Bison symbol number corresponding to YYLEX.  */
 #define YYUNDEFTOK  2
-#define YYMAXUTOK   291
+#define YYMAXUTOK   292
 
 #define YYTRANSLATE(YYX)						\
   ((unsigned int) (YYX) <= YYMAXUTOK ? yytranslate[YYX] : YYUNDEFTOK)
@@ -1486,19 +1549,19 @@ static const yytype_uint8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-      48,    49,    43,    42,    36,    41,     2,    44,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,    50,
-       2,    37,    38,     2,     2,     2,     2,     2,     2,     2,
+      49,    50,    44,    43,    37,    42,     2,    45,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,    51,
+       2,    38,    39,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,    46,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,    47,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,    40,     2,    39,     2,     2,     2,     2,
+       2,     2,     2,    41,     2,    40,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,    47,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,    48,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -1511,7 +1574,7 @@ static const yytype_uint8 yytranslate[] =
        5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
       15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
       25,    26,    27,    28,    29,    30,    31,    32,    33,    34,
-      35,    45
+      35,    36,    46
 };
 
 #if YYDEBUG
@@ -1525,53 +1588,54 @@ static const yytype_uint16 yyprhs[] =
       91,    95,    98,   102,   106,   110,   115,   120,   124,   126,
      130,   141,   143,   147,   148,   157,   165,   166,   169,   171,
      173,   175,   177,   179,   181,   183,   185,   189,   193,   197,
-     201,   215,   217,   219,   221,   223,   225,   229,   233,   235,
-     238,   242,   246,   250,   254,   256,   258,   262
+     201,   215,   217,   219,   221,   223,   225,   227,   231,   235,
+     240,   244,   248,   252,   256,   258,   260,   264,   268
 };
 
 /* YYRHS -- A `-1'-separated list of the rules' RHS.  */
 static const yytype_int8 yyrhs[] =
 {
-      52,     0,    -1,    53,    -1,    52,    53,    -1,    29,    -1,
-      47,    -1,    59,    -1,    54,    -1,    57,    -1,    34,    -1,
-      35,    -1,     3,    -1,    32,    -1,     7,    -1,     7,    37,
-      54,    -1,     9,    37,    54,    -1,     9,    37,     4,    -1,
-       9,    37,    54,    30,    54,    -1,     8,    48,    54,    49,
-      -1,    54,    42,    54,    -1,    54,    41,    54,    -1,    54,
-      43,    54,    -1,    54,    44,    54,    -1,    41,    54,    -1,
-      54,    46,    54,    -1,    48,    54,    49,    -1,    63,    -1,
-      24,    -1,     9,    30,    37,     6,    -1,    54,    36,    54,
-      -1,    56,    36,    54,    -1,    40,    39,    -1,    40,    56,
-      39,    -1,    40,    54,    39,    -1,     9,    37,    57,    -1,
-       8,    48,    56,    49,    -1,     8,    48,    57,    49,    -1,
-       8,    48,    49,    -1,     6,    -1,     6,    37,    57,    -1,
-       8,    48,    57,    36,    57,    36,    54,    36,    57,    49,
-      -1,    55,    -1,    54,    31,    54,    -1,    -1,    17,    48,
-      32,    49,    60,    25,    61,    26,    -1,    17,    48,    33,
-      49,    25,    61,    26,    -1,    -1,    61,    62,    -1,    54,
-      -1,    57,    -1,    74,    -1,    71,    -1,    67,    -1,    64,
-      -1,    65,    -1,    66,    -1,    19,    37,    18,    -1,    10,
-      37,    18,    -1,    11,    37,    18,    -1,    13,    37,    18,
-      -1,    23,    37,    68,    30,    69,    30,    28,    30,    28,
-      30,    68,    30,    68,    -1,    32,    -1,    24,    -1,    27,
-      -1,    42,    -1,    41,    -1,    22,    37,    57,    -1,    70,
-      30,    57,    -1,    70,    -1,    70,    50,    -1,    21,    37,
-      58,    -1,    72,    30,    58,    -1,    20,    37,    58,    -1,
-      73,    30,    58,    -1,    72,    -1,    73,    -1,    14,    37,
-      18,    -1,    15,    37,    18,    -1
+      53,     0,    -1,    54,    -1,    53,    54,    -1,    30,    -1,
+      48,    -1,    60,    -1,    55,    -1,    58,    -1,    35,    -1,
+      36,    -1,     3,    -1,    33,    -1,     7,    -1,     7,    38,
+      55,    -1,     9,    38,    55,    -1,     9,    38,     4,    -1,
+       9,    38,    55,    31,    55,    -1,     8,    49,    55,    50,
+      -1,    55,    43,    55,    -1,    55,    42,    55,    -1,    55,
+      44,    55,    -1,    55,    45,    55,    -1,    42,    55,    -1,
+      55,    47,    55,    -1,    49,    55,    50,    -1,    64,    -1,
+      25,    -1,     9,    31,    38,     6,    -1,    55,    37,    55,
+      -1,    57,    37,    55,    -1,    41,    40,    -1,    41,    57,
+      40,    -1,    41,    55,    40,    -1,     9,    38,    58,    -1,
+       8,    49,    57,    50,    -1,     8,    49,    58,    50,    -1,
+       8,    49,    50,    -1,     6,    -1,     6,    38,    58,    -1,
+       8,    49,    58,    37,    58,    37,    55,    37,    58,    50,
+      -1,    56,    -1,    55,    32,    55,    -1,    -1,    18,    49,
+      33,    50,    61,    26,    62,    27,    -1,    18,    49,    34,
+      50,    26,    62,    27,    -1,    -1,    62,    63,    -1,    55,
+      -1,    58,    -1,    75,    -1,    72,    -1,    68,    -1,    65,
+      -1,    66,    -1,    67,    -1,    20,    38,    19,    -1,    10,
+      38,    19,    -1,    11,    38,    19,    -1,    13,    38,    19,
+      -1,    24,    38,    69,    31,    70,    31,    29,    31,    29,
+      31,    69,    31,    69,    -1,    33,    -1,    25,    -1,    28,
+      -1,    43,    -1,    42,    -1,    58,    -1,    71,    31,    58,
+      -1,    23,    38,    71,    -1,    23,    38,    71,    51,    -1,
+      22,    38,    59,    -1,    73,    31,    59,    -1,    21,    38,
+      59,    -1,    74,    31,    59,    -1,    73,    -1,    74,    -1,
+      14,    38,    19,    -1,    15,    38,    19,    -1,    16,    38,
+      71,    -1
 };
 
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,  1135,  1135,  1136,  1137,  1138,  1142,  1143,  1144,  1145,
-    1146,  1150,  1151,  1152,  1153,  1154,  1159,  1163,  1168,  1174,
-    1175,  1176,  1177,  1178,  1179,  1180,  1181,  1182,  1186,  1195,
-    1200,  1204,  1205,  1206,  1207,  1212,  1213,  1214,  1215,  1216,
-    1217,  1218,  1222,  1233,  1232,  1243,  1250,  1251,  1255,  1256,
-    1257,  1258,  1259,  1260,  1261,  1262,  1266,  1276,  1286,  1298,
-    1310,  1329,  1330,  1334,  1335,  1336,  1340,  1349,  1363,  1364,
-    1368,  1377,  1388,  1398,  1409,  1418,  1427,  1432
+       0,  1196,  1196,  1197,  1198,  1199,  1203,  1204,  1205,  1206,
+    1207,  1211,  1212,  1213,  1214,  1215,  1220,  1224,  1229,  1235,
+    1236,  1237,  1238,  1239,  1240,  1241,  1242,  1243,  1247,  1256,
+    1261,  1265,  1266,  1267,  1268,  1273,  1274,  1275,  1276,  1277,
+    1278,  1279,  1283,  1294,  1293,  1304,  1311,  1312,  1316,  1317,
+    1318,  1319,  1320,  1321,  1322,  1323,  1327,  1337,  1347,  1359,
+    1371,  1390,  1391,  1395,  1396,  1397,  1402,  1410,  1424,  1428,
+    1435,  1444,  1455,  1465,  1476,  1485,  1494,  1499,  1504
 };
 #endif
 
@@ -1582,11 +1646,11 @@ static const char *const yytname[] =
 {
   "$end", "error", "$undefined", "NUM", "SFNCT", "BOGUS", "LVAR", "VAR",
   "FNCT", "IDN", "CROSS", "FLUXP", "FLUXM", "NUFLUX", "SYS_ON_FUNCTION",
-  "SYS_OFF_FUNCTION", "GRP", "GID", "FNAME", "VERS", "SIGNAL", "BG",
-  "ENERGY", "CHANNEL", "NDEF", "GRPOPEN", "GRPCLOSE", "PM", "FLAVOR",
-  "NOGLOBES", "RULESEP", "RULEMULT", "NAME", "RDF", "ENDEXP", "ENDDET",
-  "','", "'='", "'>'", "'}'", "'{'", "'-'", "'+'", "'*'", "'/'", "NEG",
-  "'^'", "'\\247'", "'('", "')'", "';'", "$accept", "input",
+  "SYS_OFF_FUNCTION", "SYS_MULTIEX_ERRORS", "GRP", "GID", "FNAME", "VERS",
+  "SIGNAL", "BG", "ENERGY", "CHANNEL", "NDEF", "GRPOPEN", "GRPCLOSE", "PM",
+  "FLAVOR", "NOGLOBES", "RULESEP", "RULEMULT", "NAME", "RDF", "ENDEXP",
+  "ENDDET", "','", "'='", "'>'", "'}'", "'{'", "'-'", "'+'", "'*'", "'/'",
+  "NEG", "'^'", "'\\247'", "'('", "')'", "';'", "$accept", "input",
   "topleveldirective", "exp", "listcopy", "seq", "list", "rulepart",
   "group", "@1", "ingroup", "ingroup_statement", "version", "cross",
   "flux", "nuflux", "channel", "name", "pm", "ene", "energy", "brule",
@@ -1602,23 +1666,23 @@ static const yytype_uint16 yytoknum[] =
        0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
      265,   266,   267,   268,   269,   270,   271,   272,   273,   274,
      275,   276,   277,   278,   279,   280,   281,   282,   283,   284,
-     285,   286,   287,   288,   289,   290,    44,    61,    62,   125,
-     123,    45,    43,    42,    47,   291,    94,   167,    40,    41,
-      59
+     285,   286,   287,   288,   289,   290,   291,    44,    61,    62,
+     125,   123,    45,    43,    42,    47,   292,    94,   167,    40,
+      41,    59
 };
 # endif
 
 /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_uint8 yyr1[] =
 {
-       0,    51,    52,    52,    52,    52,    53,    53,    53,    53,
-      53,    54,    54,    54,    54,    54,    54,    54,    54,    54,
-      54,    54,    54,    54,    54,    54,    54,    54,    55,    56,
-      56,    57,    57,    57,    57,    57,    57,    57,    57,    57,
-      57,    57,    58,    60,    59,    59,    61,    61,    62,    62,
-      62,    62,    62,    62,    62,    62,    63,    64,    65,    66,
-      67,    68,    68,    69,    69,    69,    70,    70,    71,    71,
-      72,    72,    73,    73,    74,    74,    74,    74
+       0,    52,    53,    53,    53,    53,    54,    54,    54,    54,
+      54,    55,    55,    55,    55,    55,    55,    55,    55,    55,
+      55,    55,    55,    55,    55,    55,    55,    55,    56,    57,
+      57,    58,    58,    58,    58,    58,    58,    58,    58,    58,
+      58,    58,    59,    61,    60,    60,    62,    62,    63,    63,
+      63,    63,    63,    63,    63,    63,    64,    65,    66,    67,
+      68,    69,    69,    70,    70,    70,    71,    71,    72,    72,
+      73,    73,    74,    74,    75,    75,    75,    75,    75
 };
 
 /* YYR2[YYN] -- Number of symbols composing right hand side of rule YYN.  */
@@ -1630,8 +1694,8 @@ static const yytype_uint8 yyr2[] =
        3,     2,     3,     3,     3,     4,     4,     3,     1,     3,
       10,     1,     3,     0,     8,     7,     0,     2,     1,     1,
        1,     1,     1,     1,     1,     1,     3,     3,     3,     3,
-      13,     1,     1,     1,     1,     1,     3,     3,     1,     2,
-       3,     3,     3,     3,     1,     1,     3,     3
+      13,     1,     1,     1,     1,     1,     1,     3,     3,     4,
+       3,     3,     3,     3,     1,     1,     3,     3,     3
 };
 
 /* YYDEFACT[STATE-NAME] -- Default rule to reduce with in state
@@ -1649,53 +1713,53 @@ static const yytype_uint8 yydefact[] =
       22,    24,     0,     0,    18,    35,     0,    36,    28,     0,
       43,     0,     0,    29,    30,     0,     0,    17,     0,    46,
        0,    46,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,    45,    48,    49,    47,    53,    54,
-      55,    52,    68,    51,    74,    75,    50,     0,    44,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,    69,
-       0,     0,     0,    57,    58,    59,    76,    77,     0,    72,
-      70,    66,    62,    61,     0,    67,    71,    73,    40,     0,
-       0,    42,    63,    65,    64,     0,     0,     0,     0,     0,
-       0,     0,     0,    60
+       0,     0,     0,     0,     0,    45,    48,    49,    47,    53,
+      54,    55,    52,    51,    74,    75,    50,     0,    44,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,    57,    58,    59,    76,    77,    66,    78,     0,
+      72,    70,    68,    62,    61,     0,    71,    73,    40,     0,
+       0,    69,     0,    67,    42,    63,    65,    64,     0,     0,
+       0,     0,     0,     0,     0,     0,    60
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int16 yydefgoto[] =
 {
-      -1,    17,    18,   138,    20,    51,    21,   139,    22,    88,
-      92,   107,    23,   108,   109,   110,   111,   144,   155,   112,
+      -1,    17,    18,   139,    20,    51,    21,   140,    22,    88,
+      92,   108,    23,   109,   110,   111,   112,   145,   158,   138,
      113,   114,   115,   116
 };
 
 /* YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
    STATE-NUM.  */
-#define YYPACT_NINF -115
+#define YYPACT_NINF -73
 static const yytype_int16 yypact[] =
 {
-     207,  -115,    -6,    12,   -40,   -26,     2,    20,  -115,  -115,
-    -115,  -115,  -115,    15,   256,  -115,   256,    74,  -115,    43,
-    -115,  -115,  -115,  -115,    27,   256,    94,    32,   226,     5,
-      52,    28,    38,  -115,   240,   -27,    42,   249,  -115,  -115,
-     256,   256,   256,   256,   256,    30,   -10,  -115,    43,  -115,
-      95,   -30,    -4,    89,  -115,    86,  -115,    50,    55,  -115,
-     256,   253,   256,  -115,   256,  -115,  -115,    22,    22,    42,
-      42,    42,    94,    27,  -115,  -115,    27,  -115,  -115,   256,
-    -115,    85,   279,    43,    43,   264,    75,    43,    87,  -115,
-     256,  -115,   144,   273,   180,    80,    82,    83,    84,    88,
-      96,   103,   108,   109,  -115,    43,  -115,  -115,  -115,  -115,
-    -115,  -115,   -29,  -115,    93,   118,  -115,    27,  -115,   106,
-     138,   142,   143,   151,   256,   256,    27,   -22,    27,  -115,
-     256,   256,   122,  -115,  -115,  -115,  -115,  -115,   131,  -115,
-    -115,  -115,  -115,  -115,   148,  -115,  -115,  -115,  -115,   256,
-     -12,    43,  -115,  -115,  -115,   149,   152,   166,   153,   167,
-     -22,   168,   -22,  -115
+     216,   -73,   -32,   -28,   -22,   -30,     7,    21,   -73,   -73,
+     -73,   -73,   -73,   259,   306,   -73,   306,    75,   -73,    23,
+     -73,   -73,   -73,   -73,    12,   306,   106,    25,   236,     5,
+      31,    20,    36,   -73,   143,   -25,    30,   280,   -73,   -73,
+     306,   306,   306,   306,   306,    49,   -27,   -73,    23,   -73,
+      90,    -3,    -1,    74,   -73,   -12,   -73,    35,    51,   -73,
+     306,   286,   306,   -73,   306,   -73,   -73,     1,     1,    30,
+      30,    30,   106,    12,   -73,   -73,    12,   -73,   -73,   306,
+     -73,    76,   299,    23,    23,    99,    67,    23,    79,   -73,
+     306,   -73,   151,   260,   188,    69,    80,    81,    82,    83,
+      84,    85,    87,    91,    92,   -73,    23,   -73,   -73,   -73,
+     -73,   -73,   -73,   -73,   107,   114,   -73,    12,   -73,   130,
+     132,   133,   134,   144,    12,   306,   306,    12,     4,   306,
+     306,   118,   -73,   -73,   -73,   -73,   -73,   -73,   138,    44,
+     -73,   -73,   -29,   -73,   -73,   139,   -73,   -73,   -73,    12,
+     306,   -73,   -19,   -73,    23,   -73,   -73,   -73,   146,   150,
+     158,   152,   174,     4,   175,     4,   -73
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int16 yypgoto[] =
 {
-    -115,  -115,   165,     0,  -115,   192,   -21,   -72,  -115,  -115,
-     116,  -115,  -115,  -115,  -115,  -115,  -115,  -114,  -115,  -115,
-    -115,  -115,  -115,  -115
+     -73,   -73,   165,     0,   -73,   194,   -21,   -72,   -73,   -73,
+     123,   -73,   -73,   -73,   -73,   -73,   -73,   -66,   -73,    89,
+     -73,   -73,   -73,   -73
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]].  What to do in state STATE-NUM.  If
@@ -1705,99 +1769,105 @@ static const yytype_int16 yypgoto[] =
 #define YYTABLE_NINF -1
 static const yytype_uint8 yytable[] =
 {
-      19,   128,   142,    47,    27,    52,    64,    56,    26,    64,
-     143,    28,    65,    34,    36,   152,    37,    19,     1,    75,
-      27,   129,     3,    31,    32,    48,    50,    73,    55,   153,
-     154,    24,    76,     2,     7,    45,    46,    57,    58,     8,
-      67,    68,    69,    70,    71,    77,   161,    10,   163,    25,
-      29,    52,    56,   140,    33,    86,    14,    30,   146,   147,
-      82,    55,    83,    16,    84,    42,    43,    13,    44,    53,
-      59,   106,    85,   106,    38,    61,    60,     1,    72,    87,
-       2,     3,     4,     5,    40,    41,    42,    43,    44,    44,
-      93,     6,   105,     7,   105,    78,   132,     1,     8,    80,
-       2,     3,     4,     5,    81,   141,    10,   145,    11,    12,
-      89,    90,    91,     7,    13,    14,    79,   119,     8,   120,
-     121,   122,    16,   130,   133,   123,    10,    40,    41,    42,
-      43,    62,    44,   124,    13,    14,    40,    41,    42,    43,
-     125,    44,    16,    49,    74,   126,   127,     1,   131,   151,
-       2,     3,     4,     5,    95,    96,   134,    97,    98,    99,
-     135,   136,   149,     7,   100,   101,   102,   103,     8,   137,
-     104,   148,    40,    41,    42,    43,    10,    44,   150,   156,
-     157,   159,    39,     1,    13,    14,     2,     3,     4,     5,
-      95,    96,    16,    97,    98,    99,   158,   160,   162,     7,
-     100,   101,   102,   103,     8,    35,   118,    94,     0,     0,
-       1,     0,    10,     2,     3,     4,     5,     0,     0,     0,
-      13,    14,     0,     0,     6,     0,     7,     0,    16,     1,
+      19,    27,   149,    47,    27,    52,    24,    56,    28,   155,
+      25,    73,    64,    34,    36,    65,    37,    19,     2,    79,
+      45,    46,   151,   156,   157,    48,    50,    26,    55,   143,
+      40,    41,    42,    43,    64,    44,    76,   144,    57,    58,
+      67,    68,    69,    70,    71,    42,    43,    75,    44,    77,
+      59,    52,    56,    13,   141,    86,    29,   146,   147,    30,
+      82,    55,    83,    53,    84,    40,    41,    42,    43,    60,
+      44,   107,    85,   107,    61,    38,   150,    44,     1,    87,
+      78,     2,     3,     4,     5,    80,    40,    41,    42,    43,
+      93,    44,   106,     6,   106,     7,   131,   164,    72,   166,
+       8,    81,    89,   137,    90,    91,   137,   119,    10,     1,
+      11,    12,     2,     3,     4,     5,    13,    14,   120,   121,
+     122,   123,   124,   125,    16,   126,     7,    62,   153,   127,
+     128,     8,    40,    41,    42,    43,    62,    44,   129,    10,
+      74,    40,    41,    42,    43,   130,    44,    13,    14,   132,
+     154,   133,   134,   135,     1,    16,    49,     2,     3,     4,
+       5,    95,    96,   136,    97,    98,    99,   100,   148,   149,
+     152,     7,   101,   102,   103,   104,     8,   159,   105,   160,
+      62,   162,    39,    63,    10,    40,    41,    42,    43,   161,
+      44,     1,    13,    14,     2,     3,     4,     5,    95,    96,
+      16,    97,    98,    99,   100,   163,   165,    35,     7,   101,
+     102,   103,   104,     8,    94,   118,   142,     0,     0,     1,
+       0,    10,     2,     3,     4,     5,     0,     0,     0,    13,
+      14,     0,     0,     0,     6,     0,     7,    16,     0,     1,
       54,     8,     2,     3,     4,     5,     9,     0,     0,    10,
-       0,    11,    12,     0,     0,     7,     0,    13,    14,     0,
-       8,     0,     0,     0,    15,    16,     1,    54,    10,     1,
-       3,    31,    32,     3,    31,    32,    13,    14,     0,     0,
-       0,     0,     7,     0,    16,     7,    62,     8,     0,    63,
-       8,    40,    41,    42,    43,    10,    44,     0,    10,     0,
-      40,    41,    42,    43,    14,    44,     0,    14,    66,     0,
-      62,    16,     0,     0,    16,    40,    41,    42,    43,   117,
-      44,     0,     0,     0,    40,    41,    42,    43,     0,    44,
-      40,    41,    42,    43,     0,    44,     0,     0,    74
+       0,    11,    12,     0,     0,     0,     7,    13,    14,     0,
+       0,     8,     1,     0,    15,    16,     3,    31,    32,    10,
+       0,     0,     0,     0,     0,     0,     0,    13,    14,     7,
+       0,     0,     0,     0,     8,    16,     0,     0,     0,     1,
+      54,     0,    10,     3,    31,    32,     0,   117,     0,    33,
+       0,    14,    40,    41,    42,    43,     7,    44,    16,     1,
+       0,     8,     0,     3,    31,    32,     0,     0,     0,    10,
+       0,     0,    40,    41,    42,    43,     7,    44,    14,     0,
+      66,     8,     0,     0,     0,    16,     0,     0,     0,    10,
+       0,    40,    41,    42,    43,     0,    44,     0,    14,    74,
+       0,     0,     0,     0,     0,    16
 };
 
 static const yytype_int16 yycheck[] =
 {
-       0,    30,    24,    24,    30,    26,    36,    28,    48,    36,
-      32,    37,    39,    13,    14,    27,    16,    17,     3,    49,
-      30,    50,     7,     8,     9,    25,    26,    37,    28,    41,
-      42,    37,    36,     6,    19,     8,     9,    32,    33,    24,
-      40,    41,    42,    43,    44,    49,   160,    32,   162,    37,
-      48,    72,    73,   125,    39,    76,    41,    37,   130,   131,
-      60,    61,    62,    48,    64,    43,    44,    40,    46,    37,
-      18,    92,    72,    94,     0,    37,    48,     3,    48,    79,
-       6,     7,     8,     9,    41,    42,    43,    44,    46,    46,
-      90,    17,    92,    19,    94,     6,   117,     3,    24,    49,
-       6,     7,     8,     9,    49,   126,    32,   128,    34,    35,
-      25,    36,    25,    19,    40,    41,    30,    37,    24,    37,
-      37,    37,    48,    30,    18,    37,    32,    41,    42,    43,
-      44,    36,    46,    37,    40,    41,    41,    42,    43,    44,
-      37,    46,    48,    49,    49,    37,    37,     3,    30,   149,
-       6,     7,     8,     9,    10,    11,    18,    13,    14,    15,
-      18,    18,    31,    19,    20,    21,    22,    23,    24,    18,
-      26,    49,    41,    42,    43,    44,    32,    46,    30,    30,
-      28,    28,    17,     3,    40,    41,     6,     7,     8,     9,
-      10,    11,    48,    13,    14,    15,    30,    30,    30,    19,
-      20,    21,    22,    23,    24,    13,    26,    91,    -1,    -1,
-       3,    -1,    32,     6,     7,     8,     9,    -1,    -1,    -1,
-      40,    41,    -1,    -1,    17,    -1,    19,    -1,    48,     3,
-       4,    24,     6,     7,     8,     9,    29,    -1,    -1,    32,
-      -1,    34,    35,    -1,    -1,    19,    -1,    40,    41,    -1,
-      24,    -1,    -1,    -1,    47,    48,     3,     4,    32,     3,
-       7,     8,     9,     7,     8,     9,    40,    41,    -1,    -1,
-      -1,    -1,    19,    -1,    48,    19,    36,    24,    -1,    39,
-      24,    41,    42,    43,    44,    32,    46,    -1,    32,    -1,
-      41,    42,    43,    44,    41,    46,    -1,    41,    49,    -1,
-      36,    48,    -1,    -1,    48,    41,    42,    43,    44,    36,
-      46,    -1,    -1,    -1,    41,    42,    43,    44,    -1,    46,
-      41,    42,    43,    44,    -1,    46,    -1,    -1,    49
+       0,    31,    31,    24,    31,    26,    38,    28,    38,    28,
+      38,    38,    37,    13,    14,    40,    16,    17,     6,    31,
+       8,     9,    51,    42,    43,    25,    26,    49,    28,    25,
+      42,    43,    44,    45,    37,    47,    37,    33,    33,    34,
+      40,    41,    42,    43,    44,    44,    45,    50,    47,    50,
+      19,    72,    73,    41,   126,    76,    49,   129,   130,    38,
+      60,    61,    62,    38,    64,    42,    43,    44,    45,    49,
+      47,    92,    72,    94,    38,     0,    32,    47,     3,    79,
+       6,     6,     7,     8,     9,    50,    42,    43,    44,    45,
+      90,    47,    92,    18,    94,    20,   117,   163,    49,   165,
+      25,    50,    26,   124,    37,    26,   127,    38,    33,     3,
+      35,    36,     6,     7,     8,     9,    41,    42,    38,    38,
+      38,    38,    38,    38,    49,    38,    20,    37,   149,    38,
+      38,    25,    42,    43,    44,    45,    37,    47,    31,    33,
+      50,    42,    43,    44,    45,    31,    47,    41,    42,    19,
+     150,    19,    19,    19,     3,    49,    50,     6,     7,     8,
+       9,    10,    11,    19,    13,    14,    15,    16,    50,    31,
+      31,    20,    21,    22,    23,    24,    25,    31,    27,    29,
+      37,    29,    17,    40,    33,    42,    43,    44,    45,    31,
+      47,     3,    41,    42,     6,     7,     8,     9,    10,    11,
+      49,    13,    14,    15,    16,    31,    31,    13,    20,    21,
+      22,    23,    24,    25,    91,    27,   127,    -1,    -1,     3,
+      -1,    33,     6,     7,     8,     9,    -1,    -1,    -1,    41,
+      42,    -1,    -1,    -1,    18,    -1,    20,    49,    -1,     3,
+       4,    25,     6,     7,     8,     9,    30,    -1,    -1,    33,
+      -1,    35,    36,    -1,    -1,    -1,    20,    41,    42,    -1,
+      -1,    25,     3,    -1,    48,    49,     7,     8,     9,    33,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    41,    42,    20,
+      -1,    -1,    -1,    -1,    25,    49,    -1,    -1,    -1,     3,
+       4,    -1,    33,     7,     8,     9,    -1,    37,    -1,    40,
+      -1,    42,    42,    43,    44,    45,    20,    47,    49,     3,
+      -1,    25,    -1,     7,     8,     9,    -1,    -1,    -1,    33,
+      -1,    -1,    42,    43,    44,    45,    20,    47,    42,    -1,
+      50,    25,    -1,    -1,    -1,    49,    -1,    -1,    -1,    33,
+      -1,    42,    43,    44,    45,    -1,    47,    -1,    42,    50,
+      -1,    -1,    -1,    -1,    -1,    49
 };
 
 /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
    symbol of state STATE-NUM.  */
 static const yytype_uint8 yystos[] =
 {
-       0,     3,     6,     7,     8,     9,    17,    19,    24,    29,
-      32,    34,    35,    40,    41,    47,    48,    52,    53,    54,
-      55,    57,    59,    63,    37,    37,    48,    30,    37,    48,
-      37,     8,     9,    39,    54,    56,    54,    54,     0,    53,
-      41,    42,    43,    44,    46,     8,     9,    57,    54,    49,
-      54,    56,    57,    37,     4,    54,    57,    32,    33,    18,
-      48,    37,    36,    39,    36,    39,    49,    54,    54,    54,
-      54,    54,    48,    37,    49,    49,    36,    49,     6,    30,
-      49,    49,    54,    54,    54,    54,    57,    54,    60,    25,
-      36,    25,    61,    54,    61,    10,    11,    13,    14,    15,
-      20,    21,    22,    23,    26,    54,    57,    62,    64,    65,
-      66,    67,    70,    71,    72,    73,    74,    36,    26,    37,
-      37,    37,    37,    37,    37,    37,    37,    37,    30,    50,
-      30,    30,    57,    18,    18,    18,    18,    18,    54,    58,
-      58,    57,    24,    32,    68,    57,    58,    58,    49,    31,
-      30,    54,    27,    41,    42,    69,    30,    28,    30,    28,
-      30,    68,    30,    68
+       0,     3,     6,     7,     8,     9,    18,    20,    25,    30,
+      33,    35,    36,    41,    42,    48,    49,    53,    54,    55,
+      56,    58,    60,    64,    38,    38,    49,    31,    38,    49,
+      38,     8,     9,    40,    55,    57,    55,    55,     0,    54,
+      42,    43,    44,    45,    47,     8,     9,    58,    55,    50,
+      55,    57,    58,    38,     4,    55,    58,    33,    34,    19,
+      49,    38,    37,    40,    37,    40,    50,    55,    55,    55,
+      55,    55,    49,    38,    50,    50,    37,    50,     6,    31,
+      50,    50,    55,    55,    55,    55,    58,    55,    61,    26,
+      37,    26,    62,    55,    62,    10,    11,    13,    14,    15,
+      16,    21,    22,    23,    24,    27,    55,    58,    63,    65,
+      66,    67,    68,    72,    73,    74,    75,    37,    27,    38,
+      38,    38,    38,    38,    38,    38,    38,    38,    38,    31,
+      31,    58,    19,    19,    19,    19,    19,    58,    71,    55,
+      59,    59,    71,    25,    33,    69,    59,    59,    50,    31,
+      32,    51,    31,    58,    55,    28,    42,    43,    70,    31,
+      29,    31,    29,    31,    69,    31,    69
 };
 
 #define yyerrok		(yyerrstatus = 0)
@@ -2612,72 +2682,72 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 1135 "glb_parser.y"
+#line 1196 "glb_parser.y"
     {}
     break;
 
   case 3:
-#line 1136 "glb_parser.y"
+#line 1197 "glb_parser.y"
     {}
     break;
 
   case 4:
-#line 1137 "glb_parser.y"
+#line 1198 "glb_parser.y"
     {YYABORT;}
     break;
 
   case 5:
-#line 1138 "glb_parser.y"
+#line 1199 "glb_parser.y"
     {YYABORT;}
     break;
 
   case 6:
-#line 1142 "glb_parser.y"
+#line 1203 "glb_parser.y"
     {}
     break;
 
   case 7:
-#line 1143 "glb_parser.y"
+#line 1204 "glb_parser.y"
     {}
     break;
 
   case 8:
-#line 1144 "glb_parser.y"
+#line 1205 "glb_parser.y"
     {}
     break;
 
   case 9:
-#line 1145 "glb_parser.y"
+#line 1206 "glb_parser.y"
     { glb_copy_buff();  glbReset(); }
     break;
 
   case 10:
-#line 1146 "glb_parser.y"
-    { glb_copy_buff();  glbNewDetector(); }
+#line 1207 "glb_parser.y"
+    { glbNewDetector(); }
     break;
 
   case 11:
-#line 1150 "glb_parser.y"
+#line 1211 "glb_parser.y"
     { (yyval.val) = (yyvsp[(1) - (1)].val);                     }
     break;
 
   case 12:
-#line 1151 "glb_parser.y"
+#line 1212 "glb_parser.y"
     { (yyval.val) = (yyvsp[(1) - (1)].nameptr)->value;              }
     break;
 
   case 13:
-#line 1152 "glb_parser.y"
+#line 1213 "glb_parser.y"
     { (yyval.val) = (yyvsp[(1) - (1)].tptr)->value.var;          }
     break;
 
   case 14:
-#line 1153 "glb_parser.y"
+#line 1214 "glb_parser.y"
     { (yyval.val) = (yyvsp[(3) - (3)].val); (yyvsp[(1) - (3)].tptr)->value.var = (yyvsp[(3) - (3)].val); }
     break;
 
   case 15:
-#line 1154 "glb_parser.y"
+#line 1215 "glb_parser.y"
     {
   if(set_exp((yyvsp[(1) - (3)].name),(yyvsp[(3) - (3)].val),0)==1) yyerror("Unknown identifier: %s", (yyvsp[(1) - (3)].name));
   (yyval.val) = (yyvsp[(3) - (3)].val);
@@ -2686,7 +2756,7 @@ yyreduce:
     break;
 
   case 16:
-#line 1159 "glb_parser.y"
+#line 1220 "glb_parser.y"
     {
   if(set_fnct((yyvsp[(1) - (3)].name),(yyvsp[(3) - (3)].nameptr)->sf)==1) yyerror("Unknown identifier: %s", (yyvsp[(1) - (3)].name));
   if ((yyvsp[(1) - (3)].name))  { glb_free((yyvsp[(1) - (3)].name));  (yyvsp[(1) - (3)].name)=NULL; }
@@ -2694,7 +2764,7 @@ yyreduce:
     break;
 
   case 17:
-#line 1163 "glb_parser.y"
+#line 1224 "glb_parser.y"
     {
   if(set_pair((yyvsp[(1) - (5)].name),(yyvsp[(3) - (5)].val),(yyvsp[(5) - (5)].val),0)==1) yyerror("Unknown identifier: %s", (yyvsp[(1) - (5)].name));
   (yyval.val) = (yyvsp[(3) - (5)].val);
@@ -2703,7 +2773,7 @@ yyreduce:
     break;
 
   case 18:
-#line 1168 "glb_parser.y"
+#line 1229 "glb_parser.y"
     {
   /* added safety in case the function pointer is NULL, which is
      sometimes useful for special functions */
@@ -2712,52 +2782,52 @@ yyreduce:
     break;
 
   case 19:
-#line 1174 "glb_parser.y"
+#line 1235 "glb_parser.y"
     { (yyval.val) = (yyvsp[(1) - (3)].val) + (yyvsp[(3) - (3)].val);      }
     break;
 
   case 20:
-#line 1175 "glb_parser.y"
+#line 1236 "glb_parser.y"
     { (yyval.val) = (yyvsp[(1) - (3)].val) - (yyvsp[(3) - (3)].val);      }
     break;
 
   case 21:
-#line 1176 "glb_parser.y"
+#line 1237 "glb_parser.y"
     { (yyval.val) = (yyvsp[(1) - (3)].val) * (yyvsp[(3) - (3)].val);      }
     break;
 
   case 22:
-#line 1177 "glb_parser.y"
+#line 1238 "glb_parser.y"
     { (yyval.val) = (yyvsp[(1) - (3)].val) / (yyvsp[(3) - (3)].val);      }
     break;
 
   case 23:
-#line 1178 "glb_parser.y"
+#line 1239 "glb_parser.y"
     { (yyval.val) = -(yyvsp[(2) - (2)].val);          }
     break;
 
   case 24:
-#line 1179 "glb_parser.y"
+#line 1240 "glb_parser.y"
     { (yyval.val) = pow ((yyvsp[(1) - (3)].val), (yyvsp[(3) - (3)].val)); }
     break;
 
   case 25:
-#line 1180 "glb_parser.y"
+#line 1241 "glb_parser.y"
     { (yyval.val) = (yyvsp[(2) - (3)].val);           }
     break;
 
   case 26:
-#line 1181 "glb_parser.y"
+#line 1242 "glb_parser.y"
     { (yyval.val) = 0;            }
     break;
 
   case 27:
-#line 1182 "glb_parser.y"
+#line 1243 "glb_parser.y"
     { yyerror("Unknown name: %s", (yyvsp[(1) - (1)].name)); YYERROR; }
     break;
 
   case 28:
-#line 1186 "glb_parser.y"
+#line 1247 "glb_parser.y"
     {
   glb_List *ltemp;
   ltemp=thread_list(&glb_list_copy,0,0,(yyvsp[(4) - (4)].tptr)->list);
@@ -2768,7 +2838,7 @@ yyreduce:
     break;
 
   case 29:
-#line 1195 "glb_parser.y"
+#line 1256 "glb_parser.y"
     {
    glb_List *buf = list_cons(NULL, (yyvsp[(1) - (3)].val));
    buf = list_cons(buf, (yyvsp[(3) - (3)].val));
@@ -2777,27 +2847,27 @@ yyreduce:
     break;
 
   case 30:
-#line 1200 "glb_parser.y"
+#line 1261 "glb_parser.y"
     { (yyval.ptr) = list_cons((yyvsp[(1) - (3)].ptr), (yyvsp[(3) - (3)].val)); }
     break;
 
   case 31:
-#line 1204 "glb_parser.y"
+#line 1265 "glb_parser.y"
     {(yyval.ptr)=NULL;}
     break;
 
   case 32:
-#line 1205 "glb_parser.y"
+#line 1266 "glb_parser.y"
     {(yyval.ptr)=(yyvsp[(2) - (3)].ptr); }
     break;
 
   case 33:
-#line 1206 "glb_parser.y"
+#line 1267 "glb_parser.y"
     {(yyval.ptr)=list_cons(NULL,(yyvsp[(2) - (3)].val)); }
     break;
 
   case 34:
-#line 1207 "glb_parser.y"
+#line 1268 "glb_parser.y"
     {
   if(set_exp_list((yyvsp[(1) - (3)].name),(yyvsp[(3) - (3)].ptr),3)==1)  yyerror("Unknown identifier");
   (yyval.ptr) = (yyvsp[(3) - (3)].ptr);
@@ -2806,42 +2876,42 @@ yyreduce:
     break;
 
   case 35:
-#line 1212 "glb_parser.y"
+#line 1273 "glb_parser.y"
     {(yyval.ptr) = thread_list((yyvsp[(1) - (4)].tptr)->value.fnctptr,(yyvsp[(1) - (4)].tptr)->reverse,(yyvsp[(1) - (4)].tptr)->destroy,(yyvsp[(3) - (4)].ptr));}
     break;
 
   case 36:
-#line 1213 "glb_parser.y"
+#line 1274 "glb_parser.y"
     {(yyval.ptr) = thread_list((yyvsp[(1) - (4)].tptr)->value.fnctptr,(yyvsp[(1) - (4)].tptr)->reverse,(yyvsp[(1) - (4)].tptr)->destroy,(yyvsp[(3) - (4)].ptr));}
     break;
 
   case 37:
-#line 1214 "glb_parser.y"
+#line 1275 "glb_parser.y"
     {(yyval.ptr) = (*((yyvsp[(1) - (3)].tptr)->value.lfnctptr))();}
     break;
 
   case 38:
-#line 1215 "glb_parser.y"
+#line 1276 "glb_parser.y"
     { (yyval.ptr) = (yyvsp[(1) - (1)].tptr)->list;              }
     break;
 
   case 39:
-#line 1216 "glb_parser.y"
+#line 1277 "glb_parser.y"
     { (yyval.ptr) = (yyvsp[(3) - (3)].ptr); (yyvsp[(1) - (3)].tptr)->list = (yyvsp[(3) - (3)].ptr); }
     break;
 
   case 40:
-#line 1217 "glb_parser.y"
+#line 1278 "glb_parser.y"
     {(yyval.ptr)=glb_interpolation((yyvsp[(3) - (10)].ptr),(yyvsp[(5) - (10)].ptr),floor((yyvsp[(7) - (10)].val)),(yyvsp[(9) - (10)].ptr));}
     break;
 
   case 41:
-#line 1218 "glb_parser.y"
+#line 1279 "glb_parser.y"
     {}
     break;
 
   case 42:
-#line 1222 "glb_parser.y"
+#line 1283 "glb_parser.y"
     {
   double *buf;
   buf=(double*) glb_malloc(sizeof(double)*2);
@@ -2852,7 +2922,7 @@ yyreduce:
     break;
 
   case 43:
-#line 1233 "glb_parser.y"
+#line 1294 "glb_parser.y"
     { if((yyvsp[(3) - (4)].nameptr)->value==-1) {(yyvsp[(3) - (4)].nameptr)->value=step_counter((yyvsp[(1) - (4)].name)); }
   loc_count=(yyvsp[(3) - (4)].nameptr)->value;
   glb_free(context);
@@ -2863,14 +2933,14 @@ yyreduce:
     break;
 
   case 44:
-#line 1240 "glb_parser.y"
+#line 1301 "glb_parser.y"
     {
   grp_end(context);
 }
     break;
 
   case 45:
-#line 1243 "glb_parser.y"
+#line 1304 "glb_parser.y"
     {
     yyerror("Redefinition of an automatic variable %s", (yyvsp[(3) - (7)].nameptr)->name); YYERROR;
     if ((yyvsp[(1) - (7)].name))  { glb_free((yyvsp[(1) - (7)].name));  (yyvsp[(1) - (7)].name)=NULL; }
@@ -2878,47 +2948,47 @@ yyreduce:
     break;
 
   case 48:
-#line 1255 "glb_parser.y"
+#line 1316 "glb_parser.y"
     {}
     break;
 
   case 49:
-#line 1256 "glb_parser.y"
+#line 1317 "glb_parser.y"
     {}
     break;
 
   case 50:
-#line 1257 "glb_parser.y"
+#line 1318 "glb_parser.y"
     {}
     break;
 
   case 51:
-#line 1258 "glb_parser.y"
+#line 1319 "glb_parser.y"
     {}
     break;
 
   case 52:
-#line 1259 "glb_parser.y"
+#line 1320 "glb_parser.y"
     {}
     break;
 
   case 53:
-#line 1260 "glb_parser.y"
+#line 1321 "glb_parser.y"
     {}
     break;
 
   case 54:
-#line 1261 "glb_parser.y"
+#line 1322 "glb_parser.y"
     {}
     break;
 
   case 55:
-#line 1262 "glb_parser.y"
+#line 1323 "glb_parser.y"
     {}
     break;
 
   case 56:
-#line 1266 "glb_parser.y"
+#line 1327 "glb_parser.y"
     {
 //  buff.version=strdup($3);
   if (set_string((yyvsp[(1) - (3)].name), (yyvsp[(3) - (3)].name)) != 0)
@@ -2929,7 +2999,7 @@ yyreduce:
     break;
 
   case 57:
-#line 1276 "glb_parser.y"
+#line 1337 "glb_parser.y"
     {
   //load_cross($3,loc_count-1);
   xsc.file_name=strdup((yyvsp[(3) - (3)].name));
@@ -2940,7 +3010,7 @@ yyreduce:
     break;
 
   case 58:
-#line 1286 "glb_parser.y"
+#line 1347 "glb_parser.y"
     {
   //load_flux($3,loc_count-1,1);
   flt.file_name=strdup((yyvsp[(3) - (3)].name));
@@ -2953,7 +3023,7 @@ yyreduce:
     break;
 
   case 59:
-#line 1298 "glb_parser.y"
+#line 1359 "glb_parser.y"
     {
   //load_flux($3,loc_count-1,1);
   flt.file_name=strdup((yyvsp[(3) - (3)].name));
@@ -2966,7 +3036,7 @@ yyreduce:
     break;
 
   case 60:
-#line 1311 "glb_parser.y"
+#line 1372 "glb_parser.y"
     {
 
   int x[6];
@@ -2983,45 +3053,44 @@ yyreduce:
     break;
 
   case 61:
-#line 1329 "glb_parser.y"
+#line 1390 "glb_parser.y"
     {(yyval.nameptr)=(yyvsp[(1) - (1)].nameptr);}
     break;
 
   case 62:
-#line 1330 "glb_parser.y"
+#line 1391 "glb_parser.y"
     { yyerror("Unknown name: %s", (yyvsp[(1) - (1)].name)); YYERROR; }
     break;
 
   case 63:
-#line 1334 "glb_parser.y"
+#line 1395 "glb_parser.y"
     {(yyval.in)=(yyvsp[(1) - (1)].in);}
     break;
 
   case 64:
-#line 1335 "glb_parser.y"
+#line 1396 "glb_parser.y"
     {(yyval.in)=1;}
     break;
 
   case 65:
-#line 1336 "glb_parser.y"
+#line 1397 "glb_parser.y"
     {(yyval.in)=-1;}
     break;
 
   case 66:
-#line 1340 "glb_parser.y"
+#line 1402 "glb_parser.y"
     {
   glb_List **buf;
   energy_len=1;
 
   buf=(glb_List**) glb_malloc(sizeof( glb_List* ) );
-  buf[0]=(yyvsp[(3) - (3)].ptr);
+  buf[0]=(yyvsp[(1) - (1)].ptr);
   (yyval.ptrq)=buf;
-  if ((yyvsp[(1) - (3)].name))  { glb_free((yyvsp[(1) - (3)].name));  (yyvsp[(1) - (3)].name)=NULL; }
 }
     break;
 
   case 67:
-#line 1350 "glb_parser.y"
+#line 1411 "glb_parser.y"
     {
   glb_List **buf;
   buf=(yyvsp[(1) - (3)].ptrq);
@@ -3035,17 +3104,23 @@ yyreduce:
     break;
 
   case 68:
-#line 1363 "glb_parser.y"
-    { set_exp_energy("@energy",(yyvsp[(1) - (1)].ptrq)); }
+#line 1424 "glb_parser.y"
+    {
+  set_exp_energy("@energy",(yyvsp[(3) - (3)].ptrq));
+  if ((yyvsp[(1) - (3)].name))  { glb_free((yyvsp[(1) - (3)].name));  (yyvsp[(1) - (3)].name)=NULL; }
+}
     break;
 
   case 69:
-#line 1364 "glb_parser.y"
-    { set_exp_energy("@energy",(yyvsp[(1) - (2)].ptrq)); }
+#line 1428 "glb_parser.y"
+    {
+  set_exp_energy("@energy",(yyvsp[(3) - (4)].ptrq)); 
+  if ((yyvsp[(1) - (4)].name))  { glb_free((yyvsp[(1) - (4)].name));  (yyvsp[(1) - (4)].name)=NULL; }
+}
     break;
 
   case 70:
-#line 1368 "glb_parser.y"
+#line 1435 "glb_parser.y"
     {
   glb_List **buf;
   buf=(glb_List**) glb_malloc(sizeof(glb_List*)*2);
@@ -3058,7 +3133,7 @@ yyreduce:
     break;
 
   case 71:
-#line 1377 "glb_parser.y"
+#line 1444 "glb_parser.y"
     {
   glb_List **buf;
   buf=(yyvsp[(1) - (3)].ptrq);
@@ -3070,7 +3145,7 @@ yyreduce:
     break;
 
   case 72:
-#line 1388 "glb_parser.y"
+#line 1455 "glb_parser.y"
     {
   glb_List **buf;
 
@@ -3084,7 +3159,7 @@ yyreduce:
     break;
 
   case 73:
-#line 1398 "glb_parser.y"
+#line 1465 "glb_parser.y"
     {
   glb_List **buf;
   buf=(yyvsp[(1) - (3)].ptrq);
@@ -3096,7 +3171,7 @@ yyreduce:
     break;
 
   case 74:
-#line 1409 "glb_parser.y"
+#line 1476 "glb_parser.y"
     {
   int flag;
   (yyval.ptrq)=(yyvsp[(1) - (1)].ptrq);
@@ -3109,7 +3184,7 @@ yyreduce:
     break;
 
   case 75:
-#line 1418 "glb_parser.y"
+#line 1485 "glb_parser.y"
     {
   int flag;
   (yyval.ptrq)=(yyvsp[(1) - (1)].ptrq);
@@ -3122,7 +3197,7 @@ yyreduce:
     break;
 
   case 76:
-#line 1427 "glb_parser.y"
+#line 1494 "glb_parser.y"
     {
   buff.sys_on_strings[buff.numofrules-1] = strdup((yyvsp[(3) - (3)].name));
   if ((yyvsp[(1) - (3)].name))  { glb_free((yyvsp[(1) - (3)].name));  (yyvsp[(1) - (3)].name)=NULL; }
@@ -3131,7 +3206,7 @@ yyreduce:
     break;
 
   case 77:
-#line 1432 "glb_parser.y"
+#line 1499 "glb_parser.y"
     {
   buff.sys_off_strings[buff.numofrules-1] = strdup((yyvsp[(3) - (3)].name));
   if ((yyvsp[(1) - (3)].name))  { glb_free((yyvsp[(1) - (3)].name));  (yyvsp[(1) - (3)].name)=NULL; }
@@ -3139,9 +3214,17 @@ yyreduce:
 }
     break;
 
+  case 78:
+#line 1504 "glb_parser.y"
+    {
+  set_multiex_errors((yyvsp[(1) - (3)].name), (yyvsp[(3) - (3)].ptrq));
+  if ((yyvsp[(1) - (3)].name))  { glb_free((yyvsp[(1) - (3)].name));  (yyvsp[(1) - (3)].name)=NULL; }
+}
+    break;
+
 
 /* Line 1267 of yacc.c.  */
-#line 3145 "glb_parser.c"
+#line 3228 "glb_parser.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -3355,7 +3438,7 @@ yyreturn:
 }
 
 
-#line 1439 "glb_parser.y"
+#line 1510 "glb_parser.y"
 
 
 extern glb_symrec *sym_table;
@@ -3374,7 +3457,7 @@ int yyerror (const char *s, ...)  /* Called by yyparse on error */
 
   if(yydebug > 0) fprintf(stderr,"*****************************************\n");
   fprintf (stderr,"%s:%d: error: ",
-	   glb_file_id, glb_line_num+1);
+           glb_file_id, glb_line_num+1);
   vfprintf(stderr, s, args);
   fprintf(stderr, "\n");
   if(yydebug > 0) fprintf(stderr,"*****************************************\n");
@@ -3386,7 +3469,7 @@ int
 yywarn (const char *s)  /* Called by yyparse on warning */
 {
   fprintf (stderr,"%s:%d: warning: %s\n",
-	   glb_file_id, glb_line_num+1, s);
+           glb_file_id, glb_line_num+1, s);
   return 0;
 }
 
@@ -3599,11 +3682,11 @@ free_symtable()
     ptr=sym_table;
     while(ptr != (glb_symrec *) NULL)
       {
-	glb_free(ptr->name);
-	if(ptr->list!=NULL){ list_free(ptr->list);}
-	dummy=ptr->next;
-	glb_free(ptr);
-	ptr=dummy;
+        glb_free(ptr->name);
+        if(ptr->list!=NULL){ list_free(ptr->list);}
+        dummy=ptr->next;
+        glb_free(ptr);
+        ptr=dummy;
       }
     sym_table=NULL;
 }
@@ -3616,11 +3699,11 @@ free_presymtable()
     ptr=pre_sym_table;
     while(ptr != (glb_symrec *) NULL)
       {
-	glb_free(ptr->name);
-	if(ptr->list!=NULL){ list_free(ptr->list);}
-	dummy=ptr->next;
-	glb_free(ptr);
-	ptr=dummy;
+        glb_free(ptr->name);
+        if(ptr->list!=NULL){ list_free(ptr->list);}
+        dummy=ptr->next;
+        glb_free(ptr);
+        ptr=dummy;
       }
     pre_sym_table=NULL;
 }
@@ -3636,11 +3719,11 @@ free_nametable()
     ptr=name_table;
     while(ptr != (glb_namerec *) NULL)
       {
-	glb_free(ptr->name);
-	glb_free(ptr->context);
-	dummy=ptr->next;
-	glb_free(ptr);
-	ptr=dummy;
+        glb_free(ptr->name);
+        glb_free(ptr->context);
+        dummy=ptr->next;
+        glb_free(ptr);
+        ptr=dummy;
       }
     name_table=NULL;
 }
@@ -3654,7 +3737,7 @@ glb_putsym (char *sym_name, int sym_type)
   strcpy (ptr->name,sym_name);
   ptr->type = sym_type;
   ptr->value.var = GLB_NAN; /* set value to GLB_NAN, which ensures an
-			       error if an undefined variable is used  */
+                               error if an undefined variable is used  */
   ptr->list= NULL;
   ptr->next = (struct glb_symrec *) sym_table;
   sym_table = ptr;
@@ -3668,7 +3751,7 @@ glb_putsym (char *sym_name, int sym_type)
 /* Name handling */
 
 static glb_naming *glb_putnames (char *sym_name, char *context, int value,
-				 glb_naming *in)
+                                 glb_naming *in)
 {
   glb_naming *ptr;
   ptr = (glb_naming *) glb_malloc (sizeof (glb_naming));
@@ -3703,7 +3786,7 @@ glb_namerec *glb_getname (const char *sym_name, char* context)
   for (ptr = name_table; ptr != (glb_namerec *) NULL;
        ptr = (glb_namerec *)ptr->next)
     if (strcmp (ptr->name,sym_name) == 0 )
-	return ptr;
+        return ptr;
   return 0;
 }
 
@@ -3797,7 +3880,7 @@ void glbDefineAEDLList(const char *name, double *list, size_t length)
   size_t i;
   glb_symrec *ptr;
   if(name==NULL) return;
-  if(name[0]!='%'){ fprintf(stderr,"ERROR: AEDL lists have to start with '\%'\n");return;}
+  if(name[0]!='%'){ fprintf(stderr,"ERROR: Names of AEDL lists have to start with %%\n");return;}
   ptr=glb_getpresym(name);
   if(ptr==0) ptr = glb_putpresym (name, LVAR);
   for(i=0;i<length;i++) {ptr->list=list_cons(ptr->list,list[i]);
@@ -3815,7 +3898,14 @@ void glb_copy_buff()
   buff.names=copy_names(buff.names);
   if (buff.filename)  glb_free(buff.filename);
   buff.filename=strdup(glb_file_id);
-  buff_list[exp_count]=buff;
+  buff_list[exp_count]  = glbAllocExp();
+  *buff_list[exp_count] = buff;
+  if (buff.parent)
+  {
+    struct glb_experiment *p = buff.parent;
+    glbExpRemoveChild(p, &buff);
+    glbExpAddChild(p, buff_list[exp_count]);
+  }
   exp_count++;
 }
 
@@ -3852,9 +3942,10 @@ void glbReset()
  ***************************************************************************/
 void glbNewDetector()
 {
+  glb_copy_buff();
   energy_len = 1;
   glbResetNuisance();
-  glbInitExpFromParent(&buff, &buff_list[exp_count-1]);
+  glbInitExpFromParent(&buff, buff_list[exp_count-1]);
      //FIXME FIXME FIXME What if parent is not/incorrectly defined?
 }
 
@@ -3884,7 +3975,13 @@ void glbResetEOF()
   flux_count=-1;
   glbResetNuisance();
   glbInitExp(&buff);
-  for(i=0;i<GLB_MAX_EXP;i++)   glbInitExp(&buff_list[i]);
+  for(i=0;i < GLB_MAX_EXP; i++)
+    if (buff_list[i])
+    {
+      glbFreeExp(buff_list[i]);
+      buff_list[i] = NULL;
+    }
+//FIXME      glbInitExp(buff_list[i]);
   /* this here would be the place to check for unuses variables, but
      for that we need an access counter */
   if(name_table!=NULL) free_nametable();
@@ -3953,9 +4050,9 @@ int glbInitExperiment(char *inf,glb_exp *in, int *counter)
   if(*counter+exp_count>GLB_MAX_EXP) glb_fatal("Too many experiments!");
   for(i=0;i<exp_count;i++)
     {
-      glbExpIncrRefCounter(&buff_list[i]);
-      *ins[*counter+i]=buff_list[i];
-      k=+glbDefaultExp(ins[*counter+i]);
+      ins[*counter+i] = buff_list[i];
+      buff_list[i]    = NULL; /* Remove our pointer to that exp to prevent destruction */
+      k              += glbDefaultExp(ins[*counter+i]);
     }
   (*counter)= (*counter) + exp_count;
 

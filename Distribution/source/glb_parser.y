@@ -72,7 +72,7 @@
   static int cross_count=-1;
   static int flux_count=-1;
   static struct glb_experiment buff;
-  static struct glb_experiment buff_list[GLB_MAX_EXP];
+  static struct glb_experiment *buff_list[GLB_MAX_EXP];
   static glb_smear ibf;
   static glb_option_type opt;
   static glb_flux flt;
@@ -99,15 +99,15 @@
     double ru; // allowed range
     void *ptr; // this is a pointer the corresponding part of the exp structure
     void *len; /* this is a pointer which points to the length of the vector
-		*  in a struct glb_experiment. Example: if we parse densitytab,
-		*  this things points
-		*  to psteps
-		*/
+                *  in a struct glb_experiment. Example: if we parse densitytab,
+                *  this things points
+                *  to psteps
+                */
 
     char *ctx; /* here the type of the environment is given, e.g. rule
-		* thus the corresponding token is matched onyl within
-		* a rule type environment
-		*/
+                * thus the corresponding token is matched onyl within
+                * a rule type environment
+                */
   } glb_parser_decl;
 
 
@@ -204,6 +204,8 @@
     &buff.sys_on_errors[0],&loc_count,"rule"},
    {"@sys_off_errors",DOUBLE_LIST_INDEXED,0,GMAX,
     &buff.sys_off_errors[0],&loc_count,"rule"},
+   {"@sys_multiex_errors_sig",ENERGY_MATRIX,-1,GMAX,&buff.sys_multiex_errors_sig[0],&loc_count,"rule"},
+   {"@sys_multiex_errors_bg", ENERGY_MATRIX,-1,GMAX,&buff.sys_multiex_errors_bg[0],&loc_count,"rule"},
 
    {"sys", UNTYPE, 0, 20, NULL, &buff.n_nuisance, "global"},
    {"@energy_list", DOUBLE_LIST, 0, GMAX, &nuis.energy_list, &nuis.n_energies, "sys"},
@@ -276,38 +278,36 @@ static void grp_start(char* name)
 
 static void grp_end(char* name)
    {
-     char tmp_errordim[2];
-
      if(strncmp(name,"energy",6)==0 )
        {
-	 if(buff.num_of_sm-1 >= 0)
-	   {
-	     ibf.options=glb_option_type_alloc();
-	     ibf.options=(glb_option_type *) memmove(ibf.options,&opt,
-					     sizeof(glb_option_type));
+         if(buff.num_of_sm-1 >= 0)
+           {
+             ibf.options=glb_option_type_alloc();
+             ibf.options=(glb_option_type *) memmove(ibf.options,&opt,
+                                             sizeof(glb_option_type));
 
-	     if(buff.smear_data[buff.num_of_sm-1]==NULL)
-	       buff.smear_data[buff.num_of_sm-1]=glb_smear_alloc();
-	     buff.smear_data[buff.num_of_sm-1]=
-	       glb_copy_smear(buff.smear_data[buff.num_of_sm-1],&ibf);
-	     glb_option_type_free(ibf.options);
-	     glb_option_type_reset(&opt);
-	     if(ibf.sigma!=NULL) glb_free(ibf.sigma);
-	     glb_smear_reset(&ibf);
+             if(buff.smear_data[buff.num_of_sm-1]==NULL)
+               buff.smear_data[buff.num_of_sm-1]=glb_smear_alloc();
+             buff.smear_data[buff.num_of_sm-1]=
+               glb_copy_smear(buff.smear_data[buff.num_of_sm-1],&ibf);
+             glb_option_type_free(ibf.options);
+             glb_option_type_reset(&opt);
+             if(ibf.sigma!=NULL) glb_free(ibf.sigma);
+             glb_smear_reset(&ibf);
 
-	   }
+           }
 
        }
 
      if(strncmp(name,"flux",4)==0 )
        {
 
-	 if(buff.num_of_fluxes > 0)
-	   {
-	     glb_error("The 'flux' directive is deprecated (consider using 'nuflux').\n"
-		       "The flux normalization may not be what you expect.\n"
-		       "Please, consult the manual!");
-	     if(flt.builtin<=0) flt.builtin=GLB_OLD_NORM;
+         if(buff.num_of_fluxes > 0)
+           {
+             glb_error("The 'flux' directive is deprecated (consider using 'nuflux').\n"
+                       "The flux normalization may not be what you expect.\n"
+                       "Please, consult the manual!");
+             if(flt.builtin<=0) flt.builtin=GLB_OLD_NORM;
 
              if (buff.fluxes[buff.num_of_fluxes-1] == NULL)
              {
@@ -318,15 +318,15 @@ static void grp_end(char* name)
              if (glb_copy_flux(buff.fluxes[buff.num_of_fluxes-1], &flt) != GLB_SUCCESS)
                glb_error("grp_end: Error copying flux data");
              glb_reset_flux(&flt);
-	   }
+           }
        }
 
 
      if(strncmp(name,"nuflux",6)==0 )
        {
-	 if(buff.num_of_fluxes > 0)
-	   {
-	     if (buff.fluxes[buff.num_of_fluxes-1] == NULL)
+         if(buff.num_of_fluxes > 0)
+           {
+             if (buff.fluxes[buff.num_of_fluxes-1] == NULL)
              {
                buff.fluxes[buff.num_of_fluxes-1] = glb_malloc(sizeof(glb_flux));
                memset(buff.fluxes[buff.num_of_fluxes-1], 0, sizeof(*buff.fluxes[0]));
@@ -335,14 +335,14 @@ static void grp_end(char* name)
              if (glb_copy_flux(buff.fluxes[buff.num_of_fluxes-1], &flt) != GLB_SUCCESS)
                glb_error("grp_end: Error copying flux data");
              glb_reset_flux(&flt);
-	   }
+           }
        }
 
      if(strncmp(name,"cross",5)==0 )
        {
-	 if(buff.num_of_xsecs > 0)
-	   {
-	     if (buff.xsecs[buff.num_of_xsecs-1] == NULL)
+         if(buff.num_of_xsecs > 0)
+           {
+             if (buff.xsecs[buff.num_of_xsecs-1] == NULL)
              {
                buff.xsecs[buff.num_of_xsecs-1] = glb_malloc(sizeof(glb_xsec));
                memset(buff.xsecs[buff.num_of_xsecs-1], 0, sizeof(*buff.xsecs[0]));
@@ -350,8 +350,8 @@ static void grp_end(char* name)
              }
              if (glb_copy_xsec(buff.xsecs[buff.num_of_xsecs-1], &xsc) != GLB_SUCCESS)
                glb_error("grp_end: Error copying cross section data");
-	     glb_reset_xsec(&xsc);
-	   }
+             glb_reset_xsec(&xsc);
+           }
        }
 
 
@@ -372,8 +372,8 @@ static void grp_end(char* name)
        nuis.name = strdup(name_table->name);
        memcpy(&(buff.nuisance_params[buff.n_nuisance-1]), &nuis, sizeof(glb_nuisance));
        /* For multi-detector setups, the parent detector has to know about all systematics */
-       if (buff.parent)   
-         memcpy(&(buff.parent->nuisance_params[buff.parent->n_nuisance++]), &nuis, sizeof(glb_nuisance));
+       if (buff.parent)
+         glb_copy_nuisance(&(buff.parent->nuisance_params[buff.parent->n_nuisance++]), &nuis);
        glbResetNuisance();
      }
 
@@ -390,8 +390,8 @@ static int set_channel_data(int x[6],int loc_count)
      for(i=0;i<6;i++) {
        if (loc_count >= buff.numofchannels) /* Don't realloc when parsing a re-definition */
          buff.listofchannels[i]=
-			(int*) glb_realloc(buff.listofchannels[i]
-					,sizeof(int)*loc_count);
+                        (int*) glb_realloc(buff.listofchannels[i]
+                                        ,sizeof(int)*loc_count);
 
        buff.listofchannels[i][loc_count-1]=x[i];
      }
@@ -409,14 +409,14 @@ static int step_counter(char *name)
   for(i=0;token_list[i].token!=NULL;i++)
     {
       if(strncmp(name,token_list[i].token,
-		 strlen(token_list[i].token))==0 )
-	{
+                 strlen(token_list[i].token))==0 )
+        {
 
-		     ibf=(int*) token_list[i].len;
-		     if(*ibf==-1) *ibf=1;// first time encounter
-		     else (*ibf)++;
+                     ibf=(int*) token_list[i].len;
+                     if(*ibf==-1) *ibf=1;// first time encounter
+                     else (*ibf)++;
 
-	}
+        }
     }
   if(ibf!=NULL) return *ibf; // otherwise a SEGFAULT occurs when there
   // is no matching name
@@ -432,23 +432,23 @@ static int set_fnct(char *name,void *in)
   for(i=0;token_list[i].token!=NULL;i++)
     {
       if(strncmp(name,token_list[i].token,
-		 strlen(token_list[i].token))==0&&
-	 strncmp(context,token_list[i].ctx,
-		 strlen(token_list[i].ctx))==0 )
-	{
-	     if(token_list[i].scalar==FUN) //double
-	       {
-		 dbf=(sigfun *) token_list[i].ptr;
-		 *dbf=(sigfun) in;
-	      	 return 0;
-	       }
-	     else
-	       {
-		 fprintf(stderr,"Error: Value for %s out of range\n",
-			 token_list[i].token);
-		 return 2;
-	       }
-	}
+                 strlen(token_list[i].token))==0&&
+         strncmp(context,token_list[i].ctx,
+                 strlen(token_list[i].ctx))==0 )
+        {
+             if(token_list[i].scalar==FUN) //double
+               {
+                 dbf=(sigfun *) token_list[i].ptr;
+                 *dbf=(sigfun) in;
+                 return 0;
+               }
+             else
+               {
+                 fprintf(stderr,"Error: Value for %s out of range\n",
+                         token_list[i].token);
+                 return 2;
+               }
+        }
 
 
     }
@@ -467,99 +467,99 @@ static int set_exp(char *name,double value,int scalar)
   for(i=0;token_list[i].token!=NULL;i++)
     {
       if(strncmp(name,token_list[i].token,
-		 strlen(token_list[i].token))==0 &&
-	 strncmp(context,token_list[i].ctx,
-		 strlen(token_list[i].ctx))==0
-	 )
-	{
-	     if(token_list[i].scalar==DOUBLE) //double
-	       {
-		 if(value >= token_list[i].rl && value <= token_list[i].ru)
-		   {
-		     dbf=(double*) token_list[i].ptr;
-		     *dbf=value;
-		     return 0;
-		   }
-		 else
-		   {
-		     fprintf(stderr,"Error: Value for %s out of range\n",
-			     token_list[i].token);
-		     return 2;
-		   }
-	       }
-	     if(token_list[i].scalar==INT) //int
-	       {
-		 if(value >= token_list[i].rl && value <= token_list[i].ru)
-		   {
-		     ibf=(int*) token_list[i].ptr;
-		     *ibf=value;
-		     return 0;
-		   }
-		 else
-		   {
-		     fprintf(stderr,"Error: Value for %s out of range\n",
-			     token_list[i].token);
-		     return 2;
-		   }
-	       }
+                 strlen(token_list[i].token))==0 &&
+         strncmp(context,token_list[i].ctx,
+                 strlen(token_list[i].ctx))==0
+         )
+        {
+             if(token_list[i].scalar==DOUBLE) //double
+               {
+                 if(value >= token_list[i].rl && value <= token_list[i].ru)
+                   {
+                     dbf=(double*) token_list[i].ptr;
+                     *dbf=value;
+                     return 0;
+                   }
+                 else
+                   {
+                     fprintf(stderr,"Error: Value for %s out of range\n",
+                             token_list[i].token);
+                     return 2;
+                   }
+               }
+             if(token_list[i].scalar==INT) //int
+               {
+                 if(value >= token_list[i].rl && value <= token_list[i].ru)
+                   {
+                     ibf=(int*) token_list[i].ptr;
+                     *ibf=value;
+                     return 0;
+                   }
+                 else
+                   {
+                     fprintf(stderr,"Error: Value for %s out of range\n",
+                             token_list[i].token);
+                     return 2;
+                   }
+               }
 
-	     if(token_list[i].scalar==COUNTER) //counter
-	       {
-		 if(value >= token_list[i].rl && value <= token_list[i].ru)
-		   {
+             if(token_list[i].scalar==COUNTER) //counter
+               {
+                 if(value >= token_list[i].rl && value <= token_list[i].ru)
+                   {
 
-		     ibf=(int*) token_list[i].ptr;
-		     if(!((*ibf == -1) || (*ibf == (int) value))) {
-		       glb_warning("Given length does not"
-				   " match actual length");
-		       return 2;
+                     ibf=(int*) token_list[i].ptr;
+                     if(!((*ibf == -1) || (*ibf == (int) value))) {
+                       glb_warning("Given length does not"
+                                   " match actual length");
+                       return 2;
 
-		     }
-		     *ibf=value;
-		     return 0;
-		   }
-		 else
-		   {
-		     fprintf(stderr,"Error: Value for %s out of range\n",
-			     token_list[i].token);
-		     return 2;
-		   }
-	       }
+                     }
+                     *ibf=value;
+                     return 0;
+                   }
+                 else
+                   {
+                     fprintf(stderr,"Error: Value for %s out of range\n",
+                             token_list[i].token);
+                     return 2;
+                   }
+               }
 
-	     if(token_list[i].scalar==INT_INDEXED) //int
-	       {
-		 if(value >= token_list[i].rl && value <= token_list[i].ru)
-		   {
-		     xibf=(int*) token_list[i].ptr;
-		     xibf[loc_count-1]=(int) value;
-		     return 0;
-		   }
-		 else
-		   {
-		     fprintf(stderr,"Error: Value for %s out of range\n",
-			     token_list[i].token);
-		     return 2;
-		   }
-	       }
+             if(token_list[i].scalar==INT_INDEXED) //int
+               {
+                 if(value >= token_list[i].rl && value <= token_list[i].ru)
+                   {
+                     xibf=(int*) token_list[i].ptr;
+                     xibf[loc_count-1]=(int) value;
+                     return 0;
+                   }
+                 else
+                   {
+                     fprintf(stderr,"Error: Value for %s out of range\n",
+                             token_list[i].token);
+                     return 2;
+                   }
+               }
 
-	     if(token_list[i].scalar==DOUBLE_INDEXED) //int
-	       {
-		 if(value >= token_list[i].rl && value <= token_list[i].ru)
-		   {
-		     dbf=(double*) token_list[i].ptr;
-		     dbf[loc_count-1]=(double) value;
-		     return 0;
-		   }
-		 else
-		   {
-		     fprintf(stderr,"Error: Value for %s out of range\n",
-			     token_list[i].token);
-		     return 2;
-		   }
-	       }
+             if(token_list[i].scalar==DOUBLE_INDEXED) //int
+               {
+                 if(value >= token_list[i].rl && value <= token_list[i].ru)
+                   {
+                     dbf=(double*) token_list[i].ptr;
+                     dbf[loc_count-1]=(double) value;
+                     return 0;
+                   }
+                 else
+                   {
+                     fprintf(stderr,"Error: Value for %s out of range\n",
+                             token_list[i].token);
+                     return 2;
+                   }
+               }
 
 
-	   }
+           }
        }
 
    return 1;
@@ -573,81 +573,81 @@ static int set_pair(char *name,double value,double value2,int scalar)
   for(i=0;token_list[i].token!=NULL;i++)
     {
       if(strncmp(name,token_list[i].token,
-		 strlen(token_list[i].token))==0&&
-	 strncmp(context,token_list[i].ctx,
-		 strlen(token_list[i].ctx))==0 )
-	{
-	     if(token_list[i].scalar==DOUBLE_PAIR)
-	       {
-		 if(value >= token_list[i].rl && value <= token_list[i].ru)
-		   {
+                 strlen(token_list[i].token))==0&&
+         strncmp(context,token_list[i].ctx,
+                 strlen(token_list[i].ctx))==0 )
+        {
+             if(token_list[i].scalar==DOUBLE_PAIR)
+               {
+                 if(value >= token_list[i].rl && value <= token_list[i].ru)
+                   {
 
-		     dbf=(double*) token_list[i].ptr;
-		     dbf[0]=(double) value;
-		     dbf[1]=(double) value2;
-		     return 0;
-		   }
-		 else
-		   {
-		     fprintf(stderr,"Error: Value for %s out of range\n",
-			     token_list[i].token);
-		     return 2;
-		   }
-	       }
+                     dbf=(double*) token_list[i].ptr;
+                     dbf[0]=(double) value;
+                     dbf[1]=(double) value2;
+                     return 0;
+                   }
+                 else
+                   {
+                     fprintf(stderr,"Error: Value for %s out of range\n",
+                             token_list[i].token);
+                     return 2;
+                   }
+               }
 
-	     if(token_list[i].scalar==INT_INDEXED_PAIR) //int
-	       {
-		 if(value >= token_list[i].rl && value <= token_list[i].ru)
-		   {
+             if(token_list[i].scalar==INT_INDEXED_PAIR) //int
+               {
+                 if(value >= token_list[i].rl && value <= token_list[i].ru)
+                   {
 
-		     ibf=(int*) token_list[i].ptr;
-		     ibf[(loc_count-1)+0*32]=(int) value;
-		     return 0;
-		   }
-		 else
-		   {
-		     fprintf(stderr,"Error: Value for %s out of range\n",
-			     token_list[i].token);
-		     return 2;
-		   }
-	       }
+                     ibf=(int*) token_list[i].ptr;
+                     ibf[(loc_count-1)+0*32]=(int) value;
+                     return 0;
+                   }
+                 else
+                   {
+                     fprintf(stderr,"Error: Value for %s out of range\n",
+                             token_list[i].token);
+                     return 2;
+                   }
+               }
 
-	     if(token_list[i].scalar==DOUBLE_INDEXED_PAIR) //int
-	       {
-		 if(value >= token_list[i].rl && value <= token_list[i].ru)
-		   {
+             if(token_list[i].scalar==DOUBLE_INDEXED_PAIR) //int
+               {
+                 if(value >= token_list[i].rl && value <= token_list[i].ru)
+                   {
 
-		     dbf=(double*) token_list[i].ptr;
-		     dbf[(loc_count-1)+0*32]=(double) value;
-		     dbf[(loc_count-1)+1*32]=(double) value2;
-		     return 0;
-		   }
-		 else
-		   {
-		     fprintf(stderr,"Error: Value for %s out of range\n",
-			     token_list[i].token);
-		     return 2;
-		   }
-	       }
+                     dbf=(double*) token_list[i].ptr;
+                     dbf[(loc_count-1)+0*32]=(double) value;
+                     dbf[(loc_count-1)+1*32]=(double) value2;
+                     return 0;
+                   }
+                 else
+                   {
+                     fprintf(stderr,"Error: Value for %s out of range\n",
+                             token_list[i].token);
+                     return 2;
+                   }
+               }
 
-	     if(token_list[i].scalar==DOUBLE_INDEXED_PAIR_INV) //int
-	       {
-		 if(value >= token_list[i].rl && value <= token_list[i].ru)
-		   {
+             if(token_list[i].scalar==DOUBLE_INDEXED_PAIR_INV) //int
+               {
+                 if(value >= token_list[i].rl && value <= token_list[i].ru)
+                   {
 
-		     dbf=(double*) token_list[i].ptr;
-		     dbf[(loc_count-1)*2+0]=(double) value;
-		     dbf[(loc_count-1)*2+1]=(double) value2;
-		     return 0;
-		   }
-		 else
-		   {
-		     fprintf(stderr,"Error: Value for %s out of range\n",
-			     token_list[i].token);
-		     return 2;
-		   }
-	       }
-	   }
+                     dbf=(double*) token_list[i].ptr;
+                     dbf[(loc_count-1)*2+0]=(double) value;
+                     dbf[(loc_count-1)*2+1]=(double) value2;
+                     return 0;
+                   }
+                 else
+                   {
+                     fprintf(stderr,"Error: Value for %s out of range\n",
+                             token_list[i].token);
+                     return 2;
+                   }
+               }
+           }
        }
 
    return 1;
@@ -730,11 +730,11 @@ static glb_List *thread_list(func_t f, int reverse, int destroy ,glb_List *tail)
     {
       head=tail;
       for (n = 0; head; ++n)
-	{
-	  nv=f(head->entry);
-	  res=list_cons(res,nv);
-	  head = head->next;
-	}
+        {
+          nv=f(head->entry);
+          res=list_cons(res,nv);
+          head = head->next;
+        }
     }
   else
     {
@@ -743,16 +743,16 @@ static glb_List *thread_list(func_t f, int reverse, int destroy ,glb_List *tail)
       rlist=(double *) malloc(sizeof(double)*l);
       head=tail;
       for (n = 0; head; ++n)
-	{
-	  rlist[n]=head->entry;
-	  head = head->next;
-	}
+        {
+          rlist[n]=head->entry;
+          head = head->next;
+        }
 
       for(n=l;n>0; n--)
-	{
-	  x=f(rlist[n-1]);
-	  res=list_cons(res,x);
-	}
+        {
+          x=f(rlist[n-1]);
+          res=list_cons(res,x);
+        }
       free(rlist);
     }
   if(destroy==1) list_free(tail);
@@ -791,7 +791,7 @@ static glb_List *glb_interpolation(glb_List *xval,glb_List *yval,int flag,glb_Li
 {
   glb_List *head,*res=NULL;
   size_t xl,yl,rl,i;
-  double *xlist,*ylist,*rlist,x;
+  double *xlist,*ylist,*rlist;
   gsl_interp_type type;
 
   if(flag==1) type=*gsl_interp_linear;
@@ -856,126 +856,126 @@ static int set_exp_list(char *name,glb_List *value,int scalar)
   for(i=0;token_list[i].token!=NULL;i++)
     {
       if(strncmp(name,token_list[i].token,strlen(token_list[i].token))==0 &&
-	 strncmp(context,token_list[i].ctx,
-		 strlen(token_list[i].ctx))==0)
-	{
-	  switch((int) token_list[i].scalar) {
-	  case DOUBLE_LIST:
+         strncmp(context,token_list[i].ctx,
+                 strlen(token_list[i].ctx))==0)
+        {
+          switch((int) token_list[i].scalar) {
+          case DOUBLE_LIST:
 
-	    //here we will have to do a lot asking asf.
-	    len=list_length(value); // how long is the list
-	    lbf=(int*) token_list[i].len;
-	    if(*lbf==-1) *lbf=len;  // setting the length correctly in exp
-	    else if(*lbf!=len) glb_error("Line %d: Length mismatch or list"
-					 " length changed", glb_line_num);
-
-
-	    dbf = (double**) token_list[i].ptr;
-	    if(*dbf!=NULL){glb_free(*dbf);*dbf=NULL;}
-	    list=(double*) glb_malloc(sizeof(double)*len);
-	    *dbf=list;
+            //here we will have to do a lot asking asf.
+            len=list_length(value); // how long is the list
+            lbf=(int*) token_list[i].len;
+            if(*lbf==-1) *lbf=len;  // setting the length correctly in exp
+            else if(*lbf!=len) glb_fatal("Line %d: Length mismatch or list"
+                                         " length changed", glb_line_num);
 
 
-	    for(k=0;k<len;k++)
-	       {
-		  val=list_take(value,len-k-1);
-
-		  if(val >= token_list[i].rl && val <= token_list[i].ru)
-		    {
-		      list[k]=val;
-		    }
-		  else
-		    {
-		      fprintf(stderr,"Error: Value for %s out of range\n",
-			      token_list[i].token);
-		      glb_free(list);
-		      *dbf=NULL;
-		      return 2;
-		    }
-
-	       }
-	    if(scalar!=TWICE)  list_free(value);
-	    return 0;
-	    break;
-
-	  case DOUBLE_LIST_INDEXED:
-	    len=list_length(value); // how long is the list
-	    lbf=(int*) token_list[i].len;
+            dbf = (double**) token_list[i].ptr;
+            if(*dbf!=NULL){glb_free(*dbf);*dbf=NULL;}
+            list=(double*) glb_malloc(sizeof(double)*len);
+            *dbf=list;
 
 
-	    //  lbf[loc_count-1]=len;  // setting the length correctly in exp
+            for(k=0;k<len;k++)
+               {
+                  val=list_take(value,len-k-1);
 
-	    dbf= (double**) token_list[i].ptr;
-	    if(dbf[loc_count-1]!=NULL){glb_free(dbf[loc_count-1]);dbf[loc_count-1]=NULL;}
-	    list=(double*) glb_malloc(sizeof(double)*(len+1));
+                  if(val >= token_list[i].rl && val <= token_list[i].ru)
+                    {
+                      list[k]=val;
+                    }
+                  else
+                    {
+                      fprintf(stderr,"Error: Value for %s out of range\n",
+                              token_list[i].token);
+                      glb_free(list);
+                      *dbf=NULL;
+                      return 2;
+                    }
 
-	    dbf[loc_count-1]=list;
-	    list[len]=-1;
+               }
+            if(scalar!=TWICE)  list_free(value);
+            return 0;
+            break;
 
-	    for(k=0;k<len;k++)
-	      {
-		val=list_take(value,len-k-1);
-
-		if(val >= token_list[i].rl && val <= token_list[i].ru)
-		  {
-		    list[k]=val;
-
-		  }
-		else
-		  {
-		    fprintf(stderr,"Error: In line %d: "
-			    "Value for %s out of range\n",
-			    glb_line_num,token_list[i].token);
-		    glb_free(list);
-		    dbf[loc_count-1]=NULL;
-
-		   return 2;
-		  }
-	      }
-	    if(scalar!=TWICE) list_free(value);
-	    return 0;
-	    break;
+          case DOUBLE_LIST_INDEXED:
+            len=list_length(value); // how long is the list
+            lbf=(int*) token_list[i].len;
 
 
-	  case INT_LIST_INDEXED: //integer list indexed
-	    //with loc_counter
+            //  lbf[loc_count-1]=len;  // setting the length correctly in exp
 
-	    //here we will have to do a lot asking asf.
-	    len=list_length(value); // how long is the list
-	    lbf=(int*) token_list[i].len; //FIXME danger !!!!
-	    lbf[loc_count-1]=len;  // setting the length correctly in exp
-	    ibf= (int**) token_list[i].ptr;
-	    if(ibf[loc_count-1]!=NULL)glb_free(ibf[loc_count-1]);
-	    ilist=(int*) glb_malloc(sizeof(int)*len);
+            dbf= (double**) token_list[i].ptr;
+            if(dbf[loc_count-1]!=NULL){glb_free(dbf[loc_count-1]);dbf[loc_count-1]=NULL;}
+            list=(double*) glb_malloc(sizeof(double)*(len+1));
 
-	    ibf[loc_count-1]=ilist;
+            dbf[loc_count-1]=list;
+            list[len]=-1;
+
+            for(k=0;k<len;k++)
+              {
+                val=list_take(value,len-k-1);
+
+                if(val >= token_list[i].rl && val <= token_list[i].ru)
+                  {
+                    list[k]=val;
+
+                  }
+                else
+                  {
+                    fprintf(stderr,"Error: In line %d: "
+                            "Value for %s out of range\n",
+                            glb_line_num,token_list[i].token);
+                    glb_free(list);
+                    dbf[loc_count-1]=NULL;
+
+                   return 2;
+                  }
+              }
+            if(scalar!=TWICE) list_free(value);
+            return 0;
+            break;
 
 
-	    for(k=0;k<len;k++)
-	      {
-		val=list_take(value,len-k-1);
+          case INT_LIST_INDEXED: //integer list indexed
+            //with loc_counter
 
-		if(val >= token_list[i].rl && val <= token_list[i].ru)
-		  {
-		    ilist[k]=(int) val;
+            //here we will have to do a lot asking asf.
+            len=list_length(value); // how long is the list
+            lbf=(int*) token_list[i].len; //FIXME danger !!!!
+            lbf[loc_count-1]=len;  // setting the length correctly in exp
+            ibf= (int**) token_list[i].ptr;
+            if(ibf[loc_count-1]!=NULL)glb_free(ibf[loc_count-1]);
+            ilist=(int*) glb_malloc(sizeof(int)*len);
 
-		  }
-		else
-		  {
-		    fprintf(stderr,"Error: Value for %s out of range\n",
-			    token_list[i].token);
-		   glb_free(ilist);
-		    return 2;
-		  }
-	      }
-	    if(scalar!=TWICE) list_free(value);
-	    return 0;
-	    break;
-	  default:
-	    return 1;
-	    break;
-	  }
-	}
+            ibf[loc_count-1]=ilist;
+
+
+            for(k=0;k<len;k++)
+              {
+                val=list_take(value,len-k-1);
+
+                if(val >= token_list[i].rl && val <= token_list[i].ru)
+                  {
+                    ilist[k]=(int) val;
+
+                  }
+                else
+                  {
+                    fprintf(stderr,"Error: Value for %s out of range\n",
+                            token_list[i].token);
+                   glb_free(ilist);
+                    return 2;
+                  }
+              }
+            if(scalar!=TWICE) list_free(value);
+            return 0;
+            break;
+          default:
+            return 1;
+            break;
+          }
+        }
     }
 
   return 1;
@@ -993,83 +993,144 @@ static int set_exp_energy(char *name, glb_List **value)
   for(i=0;token_list[i].token!=NULL;i++)
     {
       if(strncmp(name,token_list[i].token,strlen(token_list[i].token))==0&&
-	 strncmp(context,token_list[i].ctx,
-		 strlen(token_list[i].ctx))==0 )
-	{
-	  switch((int) token_list[i].scalar) {
+         strncmp(context,token_list[i].ctx,
+                 strlen(token_list[i].ctx))==0 )
+        {
+          switch((int) token_list[i].scalar) {
 
-	  case ENERGY_MATRIX:
-	    list=(double**) glb_malloc(sizeof(double* ) * energy_len);
-	    buff.lowrange[loc_count-1]=(int*) glb_malloc(energy_len*sizeof(int));
-	    buff.uprange[loc_count-1]=(int*) glb_malloc(energy_len*sizeof(int));
+          case ENERGY_MATRIX:
+            list=(double**) glb_malloc(sizeof(double* ) * energy_len);
+            buff.lowrange[loc_count-1]=(int*) glb_malloc(energy_len*sizeof(int));
+            buff.uprange[loc_count-1]=(int*) glb_malloc(energy_len*sizeof(int));
 
-	    for(l=0;l<energy_len;l++)
-	      {
-		len=(int) list_length(value[l]); // how long is the list
-		if(len<2) {fprintf(stderr,"Error: in line %d: in @smear "
-				   "number %d: sublist %d is too short!\n"
-				   ,glb_line_num,loc_count,l);return 2;}
-		//lbf=(int*) token_list[i].len;
-
-
-		//lbf[loc_count-1]=len;  // setting the length correctly in exp
+            for(l=0;l<energy_len;l++)
+              {
+                len=(int) list_length(value[l]); // how long is the list
+                if(len<2) {fprintf(stderr,"Error: in line %d: in @smear "
+                                   "number %d: sublist %d is too short!\n"
+                                   ,glb_line_num,loc_count,l);return 2;}
+                //lbf=(int*) token_list[i].len;
 
 
-
-		dbf= (double***) token_list[i].ptr;
-		list[l]=(double*) glb_malloc(sizeof(double)*(len-2));
-		dbf[loc_count-1]=list;
+                //lbf[loc_count-1]=len;  // setting the length correctly in exp
 
 
-		v1=(int) list_take(value[l],len-0-1);
-		v2=(int) list_take(value[l],len-1-1);
 
-		if(v1 >= 0 &&  v2 <= buff.simbins
-		   && v2 >= v1&&v2-v1==len-3 )
-		  {
+                dbf= (double***) token_list[i].ptr;
+                list[l]=(double*) glb_malloc(sizeof(double)*(len-2));
+                dbf[loc_count-1]=list;
 
-		    buff.lowrange[loc_count-1][l]= v1;
-		    buff.uprange[loc_count-1][l]= v2;
 
-		  }
-		else
-		  {
-		    fprintf(stderr,"Error: In line %d: "
-			    "Value for ranges in smear out of range\n",
-			    glb_line_num);
-		    glb_free(list[l]);
-		    glb_free(buff.lowrange[loc_count-1]);
-		    glb_free(buff.uprange[loc_count-1]);
-		    return 2;
-		  }
+                v1=(int) list_take(value[l],len-0-1);
+                v2=(int) list_take(value[l],len-1-1);
 
-	      	for(k=0;k<len-2;k++)
-		  {
-		    val=list_take(value[l],len-(k+2)-1);
+                if(v1 >= 0 &&  v2 <= buff.simbins
+                   && v2 >= v1&&v2-v1==len-3 )
+                  {
 
-		    if(val >= token_list[i].rl && val <= token_list[i].ru)
-		      {
-			list[l][k]=val;
+                    buff.lowrange[loc_count-1][l]= v1;
+                    buff.uprange[loc_count-1][l]= v2;
 
-		      }
-		    else
-		      {
-			fprintf(stderr,"Error: In line %d: "
-				"Value for %s out of range\n",
-				glb_line_num,token_list[i].token);
-			free(list[l]);
-			return 2;
-		      }
-		  }
-		list_free(value[l]);
-	      }
-	    glb_free(value);
-	    return 0;
-	    break;
+                  }
+                else
+                  {
+                    fprintf(stderr,"Error: In line %d: "
+                            "Value for ranges in smear out of range\n",
+                            glb_line_num);
+                    glb_free(list[l]);
+                    glb_free(buff.lowrange[loc_count-1]);
+                    glb_free(buff.uprange[loc_count-1]);
+                    return 2;
+                  }
 
-	  }
-	}
+                for(k=0;k<len-2;k++)
+                  {
+                    val=list_take(value[l],len-(k+2)-1);
+
+                    if(val >= token_list[i].rl && val <= token_list[i].ru)
+                      {
+                        list[l][k]=val;
+
+                      }
+                    else
+                      {
+                        fprintf(stderr,"Error: In line %d: "
+                                "Value for %s out of range\n",
+                                glb_line_num,token_list[i].token);
+                        free(list[l]);
+                        return 2;
+                      }
+                  }
+                list_free(value[l]);
+              }
+            glb_free(value);
+            return 0;
+            break;
+
+          }
+        }
     }
+  return 1;
+}
+
+
+static int set_multiex_errors(char *name, glb_List **value)
+{
+  int i, j, k;
+  for(i=0; token_list[i].token != NULL; i++)
+  {
+      if(strncmp(name, token_list[i].token, strlen(token_list[i].token)) == 0  &&
+         strncmp(context,token_list[i].ctx, strlen(token_list[i].ctx)) == 0)
+      {
+        switch((int) token_list[i].scalar)
+        {
+          case ENERGY_MATRIX:
+            if (energy_len > GLB_MAX_RULES)
+            {
+              fprintf(stderr, "Error in line %d: @sys_multiex_errors_X definition too long.\n",
+                      glb_line_num);
+              return 2;
+            }
+            for (j=0; j < energy_len; j++)
+            {
+              int len = (int) list_length(value[j]);
+              if (len > GLB_MAX_CHANNELS)
+              {
+                fprintf(stderr, "Error in line %d: Entry %d in @sys_multiex_errors_X too long.\n",
+                        glb_line_num, j+1);
+                return 3;
+              }
+              if (len > 0)
+              {
+                int *(*x)[GLB_MAX_CHANNELS] = (int *(*)[GLB_MAX_CHANNELS]) token_list[i].ptr;
+                x[loc_count-1][j] = glb_malloc(sizeof(int) * (len+1));
+                for (k=0; k < len; k++)
+                {
+                  double val = list_take(value[j], len-k-1);
+                  if(val >= token_list[i].rl && val <= token_list[i].ru)
+                    x[loc_count-1][j][k] = (int)(val+0.5);
+                  else
+                  {
+                    fprintf(stderr, "Error in line %d: Value for %s out of range\n",
+                            glb_line_num, token_list[i].token);
+                    glb_free(x[loc_count-1][j]);
+                    x[loc_count-1][j] = NULL;
+                  }
+                } /* for (k) */
+                x[loc_count-1][j][k] = -1;
+              }
+ 
+              list_free(value[j]);
+              value[j] = NULL;
+            } /* for (j) */
+
+            free(value);
+            return 0;
+            break;
+        }
+      }
+  } /* for (i) */
+
   return 1;
 }
 
@@ -1091,7 +1152,7 @@ static int set_exp_energy(char *name, glb_List **value)
 %token <nameptr> SFNCT
 %token <tptr> BOGUS LVAR VAR FNCT   /* Variable and Function */
 %token <name> IDN CROSS FLUXP FLUXM NUFLUX
-%token <name> SYS_ON_FUNCTION SYS_OFF_FUNCTION
+%token <name> SYS_ON_FUNCTION SYS_OFF_FUNCTION SYS_MULTIEX_ERRORS
 %token <name> GRP GID FNAME VERS
 %token <name> SIGNAL BG
 %token <name> ENERGY CHANNEL
@@ -1143,7 +1204,7 @@ topleveldirective: group {}
 | exp {}
 | list {}
 | ENDEXP { glb_copy_buff();  glbReset(); }
-| ENDDET { glb_copy_buff();  glbNewDetector(); }
+| ENDDET { glbNewDetector(); }
 ;
 
 /* exp: An expression, including assignments, algebraic expressions, etc. */
@@ -1336,15 +1397,15 @@ pm: PM {$$=$1;}
 | '-' {$$=-1;}
 ;
 
-/* ene: Building block of user-defined smearing matrix */
-ene: ENERGY '='  list   {
+/* ene: Building block of user-defined smearing matrix and multi-experiment 
+        nuisance parameter definitions */
+ene: list   {
   glb_List **buf;
   energy_len=1;
 
   buf=(glb_List**) glb_malloc(sizeof( glb_List* ) );
-  buf[0]=$3;
+  buf[0]=$1;
   $$=buf;
-  if ($1)  { glb_free($1);  $1=NULL; }
 }
 | ene RULESEP list
 {
@@ -1360,8 +1421,14 @@ ene: ENERGY '='  list   {
 ;
 
 /* energy: User-defined smearing matrix */
-energy: ene { set_exp_energy("@energy",$1); }
-| ene ';'   { set_exp_energy("@energy",$1); }
+energy: ENERGY '=' ene {
+  set_exp_energy("@energy",$3);
+  if ($1)  { glb_free($1);  $1=NULL; }
+}
+| ENERGY '=' ene ';' {
+  set_exp_energy("@energy",$3); 
+  if ($1)  { glb_free($1);  $1=NULL; }
+}
 ;
 
 /* brule: Background rule */
@@ -1434,6 +1501,10 @@ rule: brule {
   if ($1)  { glb_free($1);  $1=NULL; }
   if ($3)  { glb_free($3);  $3=NULL; }
 }
+| SYS_MULTIEX_ERRORS '=' ene {
+  set_multiex_errors($1, $3);
+  if ($1)  { glb_free($1);  $1=NULL; }
+}
 ;
 
 %%
@@ -1454,7 +1525,7 @@ int yyerror (const char *s, ...)  /* Called by yyparse on error */
 
   if(yydebug > 0) fprintf(stderr,"*****************************************\n");
   fprintf (stderr,"%s:%d: error: ",
-	   glb_file_id, glb_line_num+1);
+           glb_file_id, glb_line_num+1);
   vfprintf(stderr, s, args);
   fprintf(stderr, "\n");
   if(yydebug > 0) fprintf(stderr,"*****************************************\n");
@@ -1466,7 +1537,7 @@ int
 yywarn (const char *s)  /* Called by yyparse on warning */
 {
   fprintf (stderr,"%s:%d: warning: %s\n",
-	   glb_file_id, glb_line_num+1, s);
+           glb_file_id, glb_line_num+1, s);
   return 0;
 }
 
@@ -1679,11 +1750,11 @@ free_symtable()
     ptr=sym_table;
     while(ptr != (glb_symrec *) NULL)
       {
-	glb_free(ptr->name);
-	if(ptr->list!=NULL){ list_free(ptr->list);}
-	dummy=ptr->next;
-	glb_free(ptr);
-	ptr=dummy;
+        glb_free(ptr->name);
+        if(ptr->list!=NULL){ list_free(ptr->list);}
+        dummy=ptr->next;
+        glb_free(ptr);
+        ptr=dummy;
       }
     sym_table=NULL;
 }
@@ -1696,11 +1767,11 @@ free_presymtable()
     ptr=pre_sym_table;
     while(ptr != (glb_symrec *) NULL)
       {
-	glb_free(ptr->name);
-	if(ptr->list!=NULL){ list_free(ptr->list);}
-	dummy=ptr->next;
-	glb_free(ptr);
-	ptr=dummy;
+        glb_free(ptr->name);
+        if(ptr->list!=NULL){ list_free(ptr->list);}
+        dummy=ptr->next;
+        glb_free(ptr);
+        ptr=dummy;
       }
     pre_sym_table=NULL;
 }
@@ -1716,11 +1787,11 @@ free_nametable()
     ptr=name_table;
     while(ptr != (glb_namerec *) NULL)
       {
-	glb_free(ptr->name);
-	glb_free(ptr->context);
-	dummy=ptr->next;
-	glb_free(ptr);
-	ptr=dummy;
+        glb_free(ptr->name);
+        glb_free(ptr->context);
+        dummy=ptr->next;
+        glb_free(ptr);
+        ptr=dummy;
       }
     name_table=NULL;
 }
@@ -1734,7 +1805,7 @@ glb_putsym (char *sym_name, int sym_type)
   strcpy (ptr->name,sym_name);
   ptr->type = sym_type;
   ptr->value.var = GLB_NAN; /* set value to GLB_NAN, which ensures an
-			       error if an undefined variable is used  */
+                               error if an undefined variable is used  */
   ptr->list= NULL;
   ptr->next = (struct glb_symrec *) sym_table;
   sym_table = ptr;
@@ -1748,7 +1819,7 @@ glb_putsym (char *sym_name, int sym_type)
 /* Name handling */
 
 static glb_naming *glb_putnames (char *sym_name, char *context, int value,
-				 glb_naming *in)
+                                 glb_naming *in)
 {
   glb_naming *ptr;
   ptr = (glb_naming *) glb_malloc (sizeof (glb_naming));
@@ -1783,7 +1854,7 @@ glb_namerec *glb_getname (const char *sym_name, char* context)
   for (ptr = name_table; ptr != (glb_namerec *) NULL;
        ptr = (glb_namerec *)ptr->next)
     if (strcmp (ptr->name,sym_name) == 0 )
-	return ptr;
+        return ptr;
   return 0;
 }
 
@@ -1877,7 +1948,7 @@ void glbDefineAEDLList(const char *name, double *list, size_t length)
   size_t i;
   glb_symrec *ptr;
   if(name==NULL) return;
-  if(name[0]!='%'){ fprintf(stderr,"ERROR: AEDL lists have to start with '\%'\n");return;}
+  if(name[0]!='%'){ fprintf(stderr,"ERROR: Names of AEDL lists have to start with %%\n");return;}
   ptr=glb_getpresym(name);
   if(ptr==0) ptr = glb_putpresym (name, LVAR);
   for(i=0;i<length;i++) {ptr->list=list_cons(ptr->list,list[i]);
@@ -1895,7 +1966,14 @@ void glb_copy_buff()
   buff.names=copy_names(buff.names);
   if (buff.filename)  glb_free(buff.filename);
   buff.filename=strdup(glb_file_id);
-  buff_list[exp_count]=buff;
+  buff_list[exp_count]  = glbAllocExp();
+  *buff_list[exp_count] = buff;
+  if (buff.parent)
+  {
+    struct glb_experiment *p = buff.parent;
+    glbExpRemoveChild(p, &buff);
+    glbExpAddChild(p, buff_list[exp_count]);
+  }
   exp_count++;
 }
 
@@ -1932,9 +2010,10 @@ void glbReset()
  ***************************************************************************/
 void glbNewDetector()
 {
+  glb_copy_buff();
   energy_len = 1;
   glbResetNuisance();
-  glbInitExpFromParent(&buff, &buff_list[exp_count-1]);
+  glbInitExpFromParent(&buff, buff_list[exp_count-1]);
      //FIXME FIXME FIXME What if parent is not/incorrectly defined?
 }
 
@@ -1964,7 +2043,13 @@ void glbResetEOF()
   flux_count=-1;
   glbResetNuisance();
   glbInitExp(&buff);
-  for(i=0;i<GLB_MAX_EXP;i++)   glbInitExp(&buff_list[i]);
+  for(i=0;i < GLB_MAX_EXP; i++)
+    if (buff_list[i])
+    {
+      glbFreeExp(buff_list[i]);
+      buff_list[i] = NULL;
+    }
+//FIXME      glbInitExp(buff_list[i]);
   /* this here would be the place to check for unuses variables, but
      for that we need an access counter */
   if(name_table!=NULL) free_nametable();
@@ -2033,9 +2118,9 @@ int glbInitExperiment(char *inf,glb_exp *in, int *counter)
   if(*counter+exp_count>GLB_MAX_EXP) glb_fatal("Too many experiments!");
   for(i=0;i<exp_count;i++)
     {
-      glbExpIncrRefCounter(&buff_list[i]);
-      *ins[*counter+i]=buff_list[i];
-      k=+glbDefaultExp(ins[*counter+i]);
+      ins[*counter+i] = buff_list[i];
+      buff_list[i]    = NULL; /* Remove our pointer to that exp to prevent destruction */
+      k              += glbDefaultExp(ins[*counter+i]);
     }
   (*counter)= (*counter) + exp_count;
 

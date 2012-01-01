@@ -185,7 +185,8 @@ struct glb_experiment {
   /* A pointer to the primary detector in the case of multi-detector experiment
    * (defined using the #DETECTOR# diretive in AEDL) */
   struct glb_experiment *parent;
-  int ref_count;
+  struct glb_experiment *children[GLB_MAX_EXP];
+  int n_children;
     /* The number of pointers that exist to this experiment, either from
      * glb_experiment_list, or from other experiments' parent pointers.
      * Shall be incremented/decremented by using glbIncrExpRefCount and
@@ -199,11 +200,11 @@ struct glb_experiment {
    */
 
   /** That is a new way to define and load fluxes */
-  glb_flux *fluxes[32];
+  glb_flux *fluxes[GLB_MAX_FLUXES];
   int num_of_fluxes;
 
   /** That is a new way to define and load x-sections */
-  glb_xsec *xsecs[32];
+  glb_xsec *xsecs[GLB_MAX_XSECS];
   int num_of_xsecs;
 
  
@@ -468,6 +469,8 @@ struct glb_experiment {
   /** Nuisance parameters for global/multi-experiment systematics */
   int n_nuisance;
   glb_nuisance nuisance_params[GLB_MAX_NUISANCE];
+  int *sys_multiex_errors_sig[GLB_MAX_RULES][GLB_MAX_CHANNELS];
+  int *sys_multiex_errors_bg[GLB_MAX_RULES][GLB_MAX_CHANNELS];
 };
 
 #endif /* GLB_TYPES_H 1 */

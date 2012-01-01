@@ -869,7 +869,6 @@ void glb_filter_compensate(glb_smear *s, double **matrix, int *lower, int *upper
   gsl_vector *b    = gsl_vector_alloc(hires_bins);
   gsl_vector *sv   = gsl_vector_alloc(s->simbins);
   gsl_vector *x    = gsl_vector_alloc(s->simbins);
-  int signum;
 
   if (!Sin || !Sout | !R || !SR || !F || !FT || !V || !b || !sv || !x)
     glb_fatal("glb_filter_compensate: Unable to allocate temporary memory for smearing matrix.");

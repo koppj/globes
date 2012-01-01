@@ -62,7 +62,6 @@ static int parse_definition(const char *str)
   char *endp=NULL;
   char *wrk,*dummy;
   const char *delim="=";
-  double val;
   char *token=NULL;
   char *lhs=NULL;
   char *rhs=NULL;
