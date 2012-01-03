@@ -1114,6 +1114,22 @@ double glbChiMultiExp(int exp, int rule, int n_params, double *x, double *errors
   for (i=ew_low; i <= ew_high; i++)
     fit_rates[i] = 0.0;
 
+//  for (i=0; i < e->n_nuisance; i++)
+//  {
+//    glb_nuisance *n = e->nuisance_params[i];
+//    if (n->n_energies > 0)
+//    {
+//      int l;
+//      printf("N %3d ", i);
+//      for (l=0; l < n->n_energies; l++)
+//        printf("%10.7g ", n->a_list[l]);
+//      printf("\n");
+//    }
+//    else
+//      printf("N %3d %10.7g\n", i, n->a);
+//  }
+//  printf("\n");
+
   /* Signal channels */
   for (j=0; j < nch_sig; j++)
   {
@@ -1128,21 +1144,24 @@ double glbChiMultiExp(int exp, int rule, int n_params, double *x, double *errors
         int l = 1;
         double E0 = n->energy_list[0]; /* Note: glbDefaultExp ensures that energy_list */
         double E1 = n->energy_list[1]; /* and a_list have at least two entries */
-        double r = (n->a_list[1] - n->a_list[0]) / (E1 - E0);
+        double a0 = n->a_list[0];
+        double r = (n->a_list[1] - a0) / (E1 - E0);
         for (i=ew_low; i <= ew_high; i++)
         {
           /* Find energy support point straddling this bin */
           while (bin_centers[i] > E1  &&  l < n->n_energies)
           {
+//            printf("CC %g %g %g\n", E0, bin_centers[i], E1);
+            a0 = n->a_list[l];
             E0 = E1;
-            E1 = n->energy_list[l];
-            r = (n->a_list[l] - n->a_list[l-1]) / (E1 - E0);
-            l++;
+            E1 = n->energy_list[++l];
+            r = (n->a_list[l] - a0) / (E1 - E0);
           }
 
           /* Interpole nuisance parameters between energy support points. Extrapolate
            * outside the range of support points */
-          fit_rates[i] += (bin_centers[i] - E0) * r * coeff_sig[j] * chr_sig[j][i];
+          fit_rates[i] += (a0 + (bin_centers[i] - E0) * r) * coeff_sig[j] * chr_sig[j][i];
+//          printf("%10.7g %10.7g\n", bin_centers[i], a0 + (bin_centers[i] - E0) * r);
         }
       }
       else
@@ -1167,21 +1186,22 @@ double glbChiMultiExp(int exp, int rule, int n_params, double *x, double *errors
         int l = 1;
         double E0 = n->energy_list[0]; /* Note: glbDefaultExp ensures that energy_list */
         double E1 = n->energy_list[1]; /* and a_list have at least two entries */
-        double r = (n->a_list[1] - n->a_list[0]) / (E1 - E0);
+        double a0 = n->a_list[0];
+        double r = (n->a_list[1] - a0) / (E1 - E0);
         for (i=ew_low; i <= ew_high; i++)
         {
           /* Find energy support point straddling this bin */
           while (bin_centers[i] > E1  &&  l < n->n_energies)
           {
+            a0 = n->a_list[l];
             E0 = E1;
-            E1 = n->energy_list[l];
-            r = (n->a_list[l] - n->a_list[l-1]) / (E1 - E0);
-            l++;
+            E1 = n->energy_list[++l];
+            r = (n->a_list[l] - a0) / (E1 - E0);
           }
 
           /* Interpole nuisance parameters between energy support points. Extrapolate
            * outside the range of support points */
-          fit_rates[i] += (bin_centers[i] - E0) * r * coeff_bg[j] * chr_bg[j][i];
+          fit_rates[i] += (a0 + (bin_centers[i] - E0) * r) * coeff_bg[j] * chr_bg[j][i];
         }
       }
       else
@@ -1196,7 +1216,7 @@ double glbChiMultiExp(int exp, int rule, int n_params, double *x, double *errors
   for (i=ew_low; i <= ew_high; i++)
     chi2 += glb_likelihood(true_rates[i], fit_rates[i]);
 
-  printf("chi2 = %g\n", chi2);
+//  printf("chi2 = %g\n", chi2);
   return chi2;
 }
 

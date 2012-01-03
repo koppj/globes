@@ -1123,7 +1123,7 @@ static int set_multiex_errors(char *name, glb_List **value)
                     return 4;
                   }
                 } /* for (k) */
-                x[loc_count-1][j][k] = -1;
+                x[loc_count-1][j][k] = -1; /* This signals the end of the list */
               }
               else
                 x[loc_count-1][j][0] = -1;
@@ -2059,7 +2059,6 @@ void glbResetEOF()
       glbFreeExp(buff_list[i]);
       buff_list[i] = NULL;
     }
-//FIXME      glbInitExp(buff_list[i]);
   /* this here would be the place to check for unuses variables, but
      for that we need an access counter */
   if(name_table!=NULL) free_nametable();

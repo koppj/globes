@@ -491,28 +491,28 @@ void glbInitExpFromParent(struct glb_experiment *exp, struct glb_experiment *p)
         for (k=0; p->sys_on_multiex_errors_sig[i][j][k] >= 0; k++)
           ;
         exp->sys_on_multiex_errors_sig[i][j]
-          = glb_duplicate_array(p->sys_on_multiex_errors_sig[i], (k+1)*sizeof(int));
+          = glb_duplicate_array(p->sys_on_multiex_errors_sig[i][j], (k+1)*sizeof(int));
       }
       if (p->sys_on_multiex_errors_bg[i][j])
       {
         for (k=0; p->sys_on_multiex_errors_bg[i][j][k] >= 0; k++)
           ;
         exp->sys_on_multiex_errors_bg[i][j]
-          = glb_duplicate_array(p->sys_on_multiex_errors_bg[i], (k+1)*sizeof(int));
+          = glb_duplicate_array(p->sys_on_multiex_errors_bg[i][j], (k+1)*sizeof(int));
       }
       if (p->sys_off_multiex_errors_sig[i][j])
       {
         for (k=0; p->sys_off_multiex_errors_sig[i][j][k] >= 0; k++)
           ;
         exp->sys_off_multiex_errors_sig[i][j]
-          = glb_duplicate_array(p->sys_off_multiex_errors_sig[i], (k+1)*sizeof(int));
+          = glb_duplicate_array(p->sys_off_multiex_errors_sig[i][j], (k+1)*sizeof(int));
       }
       if (p->sys_off_multiex_errors_bg[i][j])
       {
         for (k=0; p->sys_off_multiex_errors_bg[i][j][k] >= 0; k++)
           ;
         exp->sys_off_multiex_errors_bg[i][j]
-          = glb_duplicate_array(p->sys_off_multiex_errors_bg[i], (k+1)*sizeof(int));
+          = glb_duplicate_array(p->sys_off_multiex_errors_bg[i][j], (k+1)*sizeof(int));
       }
     }
   }
@@ -855,19 +855,6 @@ int glbDefaultExp(glb_exp ins)
   if(in->num_of_fluxes<1)  {glb_exp_error(in, "No flux selected!");status=-1;}
   if(in->num_of_fluxes>31)  {glb_exp_error(in, "To many fluxes!");status=-1;}
 
-  /* If this experiment is a subdetector in a multi-detector setup, and if it has
-   * its own rules, the parent's rules should not be used */
-  if (in->parent)
-  {
-    if (in->numofrules > in->parent->numofrules)
-    {
-      for (i=0; i < in->parent->numofrules; i++)
-      {
-        glbSetChiFunctionInRule(in, i, GLB_ON, "chiZero", NULL);
-        glbSetChiFunctionInRule(in, i, GLB_OFF, "chiZero", NULL);
-      }
-    }
-  }
   
   /* Initialize flux tables */
   if(in->num_of_fluxes>0&&in->num_of_fluxes<GLB_MAX_FLUXES)
@@ -944,10 +931,8 @@ int glbDefaultExp(glb_exp ins)
     }
 
 
-  /* Initialization and sanity check of systematics data */
-  /* --------------------------------------------------- */
-
   /* Check definitions of nuisance parameters for global/multi-experiment systematics */
+  /* -------------------------------------------------------------------------------- */
   for (i=0; i < in->n_nuisance; i++)
   {
     if (in->nuisance_params[i] == NULL)
@@ -994,7 +979,9 @@ int glbDefaultExp(glb_exp ins)
   if (glb_ignore_invalid_chi2)
     glbSetVerbosityLevel(0);
 
-  /* Definitions for systematics ON */
+
+  /* Systematics definitions for systematics ON */
+  /* ------------------------------------------ */
   for (i=0; i < in->numofrules; i++)
   {
     /* chi^2 function defined? */
@@ -1077,7 +1064,7 @@ int glbDefaultExp(glb_exp ins)
           if (in->sys_on_multiex_errors_sig[i][j] != NULL)
           {
             glb_rule_error(in, i, "@sys_on_multiex_errors_sig is allowed only in "
-                                  "conjunction with chiMultiEx");
+                                  "conjunction with chiMultiExp");
             status = -1;
             break;
           }
@@ -1085,7 +1072,7 @@ int glbDefaultExp(glb_exp ins)
           if (in->sys_on_multiex_errors_bg[i][j] != NULL)
           {
             glb_rule_error(in, i, "@sys_on_multiex_errors_bg is allowed only in "
-                                  "conjunction with chiMultiEx");
+                                  "conjunction with chiMultiExp");
             status = -1;
             break;
           }
@@ -1124,9 +1111,12 @@ int glbDefaultExp(glb_exp ins)
       if (glbSetChiFunctionInExperiment(in, i, GLB_ON, "chiZero", NULL) == 0)
         status = old_status;
     }
+  }
 
-
-    /* Treatment of parameters for systematics OFF is equivalent to systematics ON */
+  /* Treatment of parameters for systematics OFF is equivalent to systematics ON */
+  /* --------------------------------------------------------------------------- */
+  for (i=0; i < in->numofrules; i++)
+  {
     if (in->sys_off_strings[i] == NULL)
       { glb_rule_error(in, i, "No chi^2 function specified"); status=-1; }
     else
@@ -1199,7 +1189,7 @@ int glbDefaultExp(glb_exp ins)
           if (in->sys_off_multiex_errors_sig[i][j] != NULL)
           {
             glb_rule_error(in, i, "@sys_off_multiex_errors_sig is allowed only in "
-                                  "conjunction with chiMultiEx");
+                                  "conjunction with chiMultiExp");
             status = -1;
             break;
           }
@@ -1207,7 +1197,7 @@ int glbDefaultExp(glb_exp ins)
           if (in->sys_off_multiex_errors_bg[i][j] != NULL)
           {
             glb_rule_error(in, i, "@sys_off_multiex_errors_bg is allowed only in "
-                                  "conjunction with chiMultiEx");
+                                  "conjunction with chiMultiExp");
             status = -1;
             break;
           }
@@ -1249,6 +1239,21 @@ int glbDefaultExp(glb_exp ins)
   }
   if (glb_ignore_invalid_chi2)
     glbSetVerbosityLevel(old_verbosity);
+
+
+  /* If this experiment is a subdetector in a multi-detector setup, and if it has
+   * its own rules, the parent's rules should not be used */
+  if (in->parent)
+  {
+    if (in->numofrules > in->parent->numofrules)
+    {
+      for (i=0; i < in->parent->numofrules; i++)
+      {
+        glbSetChiFunctionInRule(in, i, GLB_ON, "chiZero", NULL);
+        glbSetChiFunctionInRule(in, i, GLB_OFF, "chiZero", NULL);
+      }
+    }
+  }
 
 
   if(in->filter_state==-1){in->filter_state=1;def=-1;}

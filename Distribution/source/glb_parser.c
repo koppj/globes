@@ -1249,7 +1249,7 @@ static int set_multiex_errors(char *name, glb_List **value)
                     return 4;
                   }
                 } /* for (k) */
-                x[loc_count-1][j][k] = -1;
+                x[loc_count-1][j][k] = -1; /* This signals the end of the list */
               }
               else
                 x[loc_count-1][j][0] = -1;
