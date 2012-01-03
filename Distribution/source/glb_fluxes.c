@@ -57,7 +57,6 @@ static double stored_muons = 2.0E20;  // stored muons per year
 // or protons on target
 // care must be taken with this, it is a different number for each experiment
 static double power;
-static int    channel = 1;            // channel
 static int FLUX_STEPS = 500;          // Number of sampling points for builtin fluxes
 
 

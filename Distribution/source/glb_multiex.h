@@ -31,7 +31,9 @@
 extern int glb_current_exp;
 extern int glb_ignore_invalid_chi2;
 
+glb_nuisance *glb_alloc_nuisance();
 int glb_copy_nuisance(glb_nuisance *dest, glb_nuisance *src);
+int glb_free_nuisance(glb_nuisance *n);
 
 glb_exp glbAllocExp();
 void glbSetExperiment(glb_exp in);   

@@ -287,7 +287,7 @@ yylval.name=strdup(yytext);
 return SYS_OFF_FUNCTION;
 }
 
-<glb_lexer_rule>@sys_multiex_errors_sig|@sys_multiex_errors_bg {
+<glb_lexer_rule>@sys_on_multiex_errors_sig|@sys_on_multiex_errors_bg|@sys_off_multiex_errors_sig|@sys_off_multiex_errors_bg {
 yylval.name=strdup(yytext);
 return SYS_MULTIEX_ERRORS;
 }

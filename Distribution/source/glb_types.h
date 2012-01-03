@@ -151,6 +151,8 @@ typedef struct glb_nuisance
 {
   char *name;                  /* Name of this nuisance parameter                    */
   double error;                /* The uncertainty on this nuisance parameter         */
+  double a;                    /* The current value of the nuisance parameter        */
+  double *a_list;              /* List of a values for energy-dependent parameters   */
   double *energy_list, *error_list; /* Energies and associated uncertainties if this */
                                /* nuisance parameter is energy-dependent             */
   int n_energies;              /* Number of entries in energy_list and error_list    */
@@ -467,10 +469,17 @@ struct glb_experiment {
   double bg_centers[2][GLB_MAX_RULES];      /* BG central values for old chi^2 functions */
 
   /** Nuisance parameters for global/multi-experiment systematics */
-  int n_nuisance;
-  glb_nuisance nuisance_params[GLB_MAX_NUISANCE];
-  int *sys_multiex_errors_sig[GLB_MAX_RULES][GLB_MAX_CHANNELS];
-  int *sys_multiex_errors_bg[GLB_MAX_RULES][GLB_MAX_CHANNELS];
+  int n_nuisance;                           /* Number of nuisance parameters */
+  glb_nuisance *nuisance_params[GLB_MAX_NUISANCE]; /* Pointers to nuisance params */
+
+  int sys_on_n_nuis_sig[GLB_MAX_RULES][GLB_MAX_CHANNELS]; /* # of nuisance params applied to */
+  int sys_on_n_nuis_bg[GLB_MAX_RULES][GLB_MAX_CHANNELS];  /* the channels making up a rule   */ 
+  int sys_off_n_nuis_sig[GLB_MAX_RULES][GLB_MAX_CHANNELS];
+  int sys_off_n_nuis_bg[GLB_MAX_RULES][GLB_MAX_CHANNELS];
+  int *sys_on_multiex_errors_sig[GLB_MAX_RULES][GLB_MAX_CHANNELS]; /* Pointers to the nuisance */
+  int *sys_on_multiex_errors_bg[GLB_MAX_RULES][GLB_MAX_CHANNELS];  /* parameters relevant to   */
+  int *sys_off_multiex_errors_sig[GLB_MAX_RULES][GLB_MAX_CHANNELS];/* the channels making up   */
+  int *sys_off_multiex_errors_bg[GLB_MAX_RULES][GLB_MAX_CHANNELS]; /* the rules                */
 };
 
 #endif /* GLB_TYPES_H 1 */

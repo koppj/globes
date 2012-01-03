@@ -2937,18 +2937,82 @@ double glbFilteredConstantDensityProbability(int exp,int initial_flavour, int fi
 }
 
 
-/* Number of fluxes in an experiment */
-
+/***************************************************************************
+ * glbGetNumberOfFluxes                                                    *
+ ***************************************************************************
+ * Get number of neutrino flux definitions in an experiment                *
+ ***************************************************************************/
 int glbGetNumberOfFluxes(int exp)
 {
-  int s;
-  /* Testing the experiment number */
-  if(!(((exp >= 0)&&(exp < glb_num_of_exps)))) {
-    glb_error("Invalid value for experiment number");
-    return -1;}
-
-  s=glb_experiment_list[exp]->num_of_fluxes;
-  return s;
-
+  if (exp < 0  ||  exp >= glb_num_of_exps)
+  {
+    glb_error("glbGetNumberOfFluxes: Invalid experiment index: %d", exp);
+    return -1;
+  }
+  else
+    return glb_experiment_list[exp]->num_of_fluxes;
 }
+
+
+/***************************************************************************
+ * glbGetNumberOfNuisanceParams                                            *
+ ***************************************************************************
+ * Get number of nuisance parameter definitions in an experiment           *
+ ***************************************************************************/
+int glbGetNumberOfNuisanceParams(int exp)
+{
+  if (exp < 0  ||  exp >= glb_num_of_exps)
+  {
+    glb_error("glbGetNumberOfFluxes: Invalid experiment index: %d", exp);
+    return -1;
+  }
+  else
+    return glb_experiment_list[exp]->n_nuisance;
+}
+
+
+/***************************************************************************
+ * glbHasParentExp                                                         *
+ ***************************************************************************
+ * Return 1 of the given experiment has a parent experiment, 0 if not, and *
+ * -1 in case of error.                                                    *
+ ***************************************************************************/
+int glbHasParentExp(int exp)
+{
+  if (exp < 0  ||  exp >= glb_num_of_exps)
+  {
+    glb_error("glbHasParentExp: Invalid experiment index: %d", exp);
+    return -1;
+  }
+
+  if (glb_experiment_list[exp]->parent != NULL)
+    return 1;
+  else
+    return 0;
+}
+
+
+/***************************************************************************
+ * glbGetParentExp                                                         *
+ ***************************************************************************
+ * Find the index of an experiments' parent experiment, or return -1 if    *
+ * the experiment has no parent, or -2 in case of error                    *
+ ***************************************************************************/
+int glbGetParentExp(int exp)
+{
+  int i;
+
+  if (exp < 0  ||  exp >= glb_num_of_exps)
+  {
+    glb_error("glbGetParentExp: Invalid experiment index: %d", exp);
+    return -10;
+  }
+  else
+    for (i=0; i < glb_num_of_exps; i++)
+      if (glb_experiment_list[i] == glb_experiment_list[exp]->parent)
+        return i;
+
+  return -1;
+}
+
 

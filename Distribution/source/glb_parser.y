@@ -204,8 +204,14 @@
     &buff.sys_on_errors[0],&loc_count,"rule"},
    {"@sys_off_errors",DOUBLE_LIST_INDEXED,0,GMAX,
     &buff.sys_off_errors[0],&loc_count,"rule"},
-   {"@sys_multiex_errors_sig",ENERGY_MATRIX,-1,GMAX,&buff.sys_multiex_errors_sig[0],&loc_count,"rule"},
-   {"@sys_multiex_errors_bg", ENERGY_MATRIX,-1,GMAX,&buff.sys_multiex_errors_bg[0],&loc_count,"rule"},
+   {"@sys_on_multiex_errors_sig",  ENERGY_MATRIX, 1, GLB_MAX_NUISANCE,
+     &buff.sys_on_multiex_errors_sig[0], &loc_count, "rule"},
+   {"@sys_on_multiex_errors_bg",   ENERGY_MATRIX, 1, GLB_MAX_NUISANCE,
+     &buff.sys_on_multiex_errors_bg[0], &loc_count, "rule"},
+   {"@sys_off_multiex_errors_sig", ENERGY_MATRIX, 1, GLB_MAX_NUISANCE,
+     &buff.sys_off_multiex_errors_sig[0], &loc_count, "rule"},
+   {"@sys_off_multiex_errors_bg",  ENERGY_MATRIX, 1, GLB_MAX_NUISANCE,
+     &buff.sys_off_multiex_errors_bg[0], &loc_count, "rule"},
 
    {"sys", UNTYPE, 0, 20, NULL, &buff.n_nuisance, "global"},
    {"@energy_list", DOUBLE_LIST, 0, GMAX, &nuis.energy_list, &nuis.n_energies, "sys"},
@@ -370,10 +376,8 @@ static void grp_end(char* name)
      if( strncmp(name,"sys",3) == 0)
      {
        nuis.name = strdup(name_table->name);
-       memcpy(&(buff.nuisance_params[buff.n_nuisance-1]), &nuis, sizeof(glb_nuisance));
-       /* For multi-detector setups, the parent detector has to know about all systematics */
-       if (buff.parent)
-         glb_copy_nuisance(&(buff.parent->nuisance_params[buff.parent->n_nuisance++]), &nuis);
+       glb_nuisance *n = buff.nuisance_params[buff.n_nuisance-1] = glb_alloc_nuisance();
+       if (n)  memcpy(n, &nuis, sizeof(glb_nuisance));
        glbResetNuisance();
      }
 
@@ -1087,38 +1091,42 @@ static int set_multiex_errors(char *name, glb_List **value)
           case ENERGY_MATRIX:
             if (energy_len > GLB_MAX_RULES)
             {
-              fprintf(stderr, "Error in line %d: @sys_multiex_errors_X definition too long.\n",
+              fprintf(stderr, "Error in line %d: @sys_XX_multiex_errors_YY definition too long.\n",
                       glb_line_num);
               return 2;
             }
             for (j=0; j < energy_len; j++)
             {
               int len = (int) list_length(value[j]);
-              if (len > GLB_MAX_CHANNELS)
+              if (len > GLB_MAX_CHANNELS-1)
               {
-                fprintf(stderr, "Error in line %d: Entry %d in @sys_multiex_errors_X too long.\n",
+                fprintf(stderr, "Error in line %d: Entry %d in @sys_XX_multiex_errors_YY too long.\n",
                         glb_line_num, j+1);
                 return 3;
               }
+              int *(*x)[GLB_MAX_CHANNELS] = (int *(*)[GLB_MAX_CHANNELS]) token_list[i].ptr;
+              x[loc_count-1][j] = glb_malloc(sizeof(int) * (len+1));
               if (len > 0)
               {
-                int *(*x)[GLB_MAX_CHANNELS] = (int *(*)[GLB_MAX_CHANNELS]) token_list[i].ptr;
-                x[loc_count-1][j] = glb_malloc(sizeof(int) * (len+1));
                 for (k=0; k < len; k++)
                 {
                   double val = list_take(value[j], len-k-1);
                   if(val >= token_list[i].rl && val <= token_list[i].ru)
-                    x[loc_count-1][j][k] = (int)(val+0.5);
+                    x[loc_count-1][j][k] = (int)(val+0.5 - 1);
+                      /* -1 because first sys<> name has index 1 in parser */
                   else
                   {
                     fprintf(stderr, "Error in line %d: Value for %s out of range\n",
                             glb_line_num, token_list[i].token);
                     glb_free(x[loc_count-1][j]);
                     x[loc_count-1][j] = NULL;
+                    return 4;
                   }
                 } /* for (k) */
                 x[loc_count-1][j][k] = -1;
               }
+              else
+                x[loc_count-1][j][0] = -1;
  
               list_free(value[j]);
               value[j] = NULL;
@@ -2021,9 +2029,11 @@ void glbResetNuisance()
 {
   nuis.name        = NULL;
   nuis.error       = GLB_NAN;
+  nuis.a           = GLB_NAN;
   nuis.n_energies  = -1;
   nuis.energy_list = NULL;
   nuis.error_list  = NULL;
+  nuis.a_list      = NULL;
 }
 
 void glbResetCounters()

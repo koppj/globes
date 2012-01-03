@@ -7552,6 +7552,90 @@ XS(_wrap_glbShiftEnergyScale) {
 }
 
 
+XS(_wrap_glbGetNumberOfNuisanceParams) {
+  {
+    int arg1 ;
+    int result;
+    int val1 ;
+    int ecode1 = 0 ;
+    int argvi = 0;
+    dXSARGS;
+    
+    if ((items < 1) || (items > 1)) {
+      SWIG_croak("Usage: glbGetNumberOfNuisanceParams(exp);");
+    }
+    ecode1 = SWIG_AsVal_int SWIG_PERL_CALL_ARGS_2(ST(0), &val1);
+    if (!SWIG_IsOK(ecode1)) {
+      SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "glbGetNumberOfNuisanceParams" "', argument " "1"" of type '" "int""'");
+    } 
+    arg1 = (int)(val1);
+    result = (int)glbGetNumberOfNuisanceParams(arg1);
+    ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
+    
+    XSRETURN(argvi);
+  fail:
+    
+    SWIG_croak_null();
+  }
+}
+
+
+XS(_wrap_glbHasParentExp) {
+  {
+    int arg1 ;
+    int result;
+    int val1 ;
+    int ecode1 = 0 ;
+    int argvi = 0;
+    dXSARGS;
+    
+    if ((items < 1) || (items > 1)) {
+      SWIG_croak("Usage: glbHasParentExp(exp);");
+    }
+    ecode1 = SWIG_AsVal_int SWIG_PERL_CALL_ARGS_2(ST(0), &val1);
+    if (!SWIG_IsOK(ecode1)) {
+      SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "glbHasParentExp" "', argument " "1"" of type '" "int""'");
+    } 
+    arg1 = (int)(val1);
+    result = (int)glbHasParentExp(arg1);
+    ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
+    
+    XSRETURN(argvi);
+  fail:
+    
+    SWIG_croak_null();
+  }
+}
+
+
+XS(_wrap_glbGetParentExp) {
+  {
+    int arg1 ;
+    int result;
+    int val1 ;
+    int ecode1 = 0 ;
+    int argvi = 0;
+    dXSARGS;
+    
+    if ((items < 1) || (items > 1)) {
+      SWIG_croak("Usage: glbGetParentExp(exp);");
+    }
+    ecode1 = SWIG_AsVal_int SWIG_PERL_CALL_ARGS_2(ST(0), &val1);
+    if (!SWIG_IsOK(ecode1)) {
+      SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "glbGetParentExp" "', argument " "1"" of type '" "int""'");
+    } 
+    arg1 = (int)(val1);
+    result = (int)glbGetParentExp(arg1);
+    ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
+    
+    XSRETURN(argvi);
+  fail:
+    
+    SWIG_croak_null();
+  }
+}
+
+
 XS(_wrap_glbRegisterProbabilityEngine) {
   {
     int arg1 ;
@@ -9511,6 +9595,9 @@ static swig_command_info swig_commands[] = {
 {"globesc::glbGetSysErrorsListPtr", _wrap_glbGetSysErrorsListPtr},
 {"globesc::glbGetSysStartingValuesListPtr", _wrap_glbGetSysStartingValuesListPtr},
 {"globesc::glbShiftEnergyScale", _wrap_glbShiftEnergyScale},
+{"globesc::glbGetNumberOfNuisanceParams", _wrap_glbGetNumberOfNuisanceParams},
+{"globesc::glbHasParentExp", _wrap_glbHasParentExp},
+{"globesc::glbGetParentExp", _wrap_glbGetParentExp},
 {"globesc::glbRegisterProbabilityEngine", _wrap_glbRegisterProbabilityEngine},
 {"globesc::glbGetNumOfOscParams", _wrap_glbGetNumOfOscParams},
 {"globesc::glbTotalRuleRate", _wrap_glbTotalRuleRate},

@@ -1070,44 +1070,133 @@ double glbChiZero(int exp, int rule, int n_params, double *x, double *errors,
 double glbChiMultiExp(int exp, int rule, int n_params, double *x, double *errors,
                       void *user_data)
 {
-  //FIXME FIXME FIXME
-  //TO BE IMPLEMENTED
-//  int n_bins = glbGetNumberOfBins(exp);
-//  double *true_rates       = glbGetRuleRatePtr(exp, rule);
-//  double *signal_fit_rates = glbGetSignalFitRatePtr(exp, rule);
-//  double *bg_fit_rates     = glbGetBGFitRatePtr(exp, rule);
-//  double *bin_centers      = glbGetBinCentersListPtr(exp);
-//  double signal_norm, signal_tilt;
-//  double bg_norm_center, bg_tilt_center;
-//  double bg_norm, bg_tilt;
-//  int ew_low, ew_high;
-//  double emin, emax, ecenter;
-//  double fit_rate, true_rate;
+  struct glb_experiment *e = glb_experiment_list[exp];
+  int n_bins = glbGetNumberOfBins(exp);
+  int nch_sig              = e->lengthofrules[rule];
+  int nch_bg               = e->lengthofbgrules[rule];
+  double *bin_centers      = glbGetBinCentersListPtr(exp);
+  double *true_rates       = glbGetRuleRatePtr(exp, rule);
+  double fit_rates[n_bins];
+  double *coeff_sig        = e->rulescoeff[rule];
+  double *coeff_bg         = e->bgrulescoeff[rule];
+  int *n_nuis_sig, *n_nuis_bg;
+  int **nuis_sig, **nuis_bg;
+  double *chr_sig[nch_sig];
+  double *chr_bg[nch_bg];
+  int ew_low, ew_high;
   double chi2 = 0.0;
-//  int i;
-//
-//  glbGetEminEmax(exp, &emin, &emax);
-//  ecenter = 0.5 * (emax + emin);
-//  glbGetEnergyWindowBins(exp, rule, &ew_low, &ew_high);
-//  glbGetBGCenters(exp, rule, &bg_norm_center, &bg_tilt_center);
-//  signal_norm = 1.0 + x[0];
-//  signal_tilt = x[1] / (emax - emin);
-//  bg_norm = bg_norm_center * (1.0 + x[2]);
-//  bg_tilt = x[3] / (emax - emin);
-//  for (i=ew_low; i <= ew_high; i++)
-//  {
-//    fit_rate = signal_norm*signal_fit_rates[i]
-//                + signal_tilt*(bin_centers[i]-ecenter)*signal_fit_rates[i]
-//                + bg_norm*bg_fit_rates[i]
-//                + bg_tilt*(bin_centers[i]-ecenter)*bg_fit_rates[i];
-//    chi2 += glb_likelihood(true_rates[i], fit_rate);
-//  }
-//
-//  chi2 += glb_prior(x[0], 0.0, errors[0])
-//            + glb_prior(x[1], 0.0, errors[1])
-//            + glb_prior(bg_norm, bg_norm_center, errors[2])
-//            + glb_prior(bg_tilt, bg_tilt_center, errors[3]);
-//
+  int i, j, k;
+
+  if (e->sys_on_off[rule] == GLB_ON)
+  {
+    n_nuis_sig = e->sys_on_n_nuis_sig[rule];
+    n_nuis_bg  = e->sys_on_n_nuis_bg[rule];
+    nuis_sig   = e->sys_on_multiex_errors_sig[rule];
+    nuis_bg    = e->sys_on_multiex_errors_bg[rule];
+  }
+  else
+  {
+    n_nuis_sig = e->sys_off_n_nuis_sig[rule];
+    n_nuis_bg  = e->sys_off_n_nuis_bg[rule];
+    nuis_sig   = e->sys_off_multiex_errors_sig[rule];
+    nuis_bg    = e->sys_off_multiex_errors_bg[rule];
+  }
+
+  /* FIXME FIXME FIXME
+   * - Test this function
+   * - Optimize speed (e.g. collect fit_rates separately for each channel first?
+   *   (remember to switch -O2 back on!) */
+  glbGetEnergyWindowBins(exp, rule, &ew_low, &ew_high);
+  for (j=0; j < nch_sig; j++)
+    chr_sig[j] = glbGetChannelRatePtr(exp, e->rulechannellist[rule][j], GLB_POST);
+  for (j=0; j < nch_bg; j++)
+    chr_bg[j]  = glbGetChannelRatePtr(exp, e->bgrulechannellist[rule][j], GLB_POST);
+  for (i=ew_low; i <= ew_high; i++)
+    fit_rates[i] = 0.0;
+
+  /* Signal channels */
+  for (j=0; j < nch_sig; j++)
+  {
+    for (i=ew_low; i <= ew_high; i++) /* Unperturbed rate (all nuisance params = 0.0) */
+      fit_rates[i] += coeff_sig[j] * chr_sig[j][i];
+
+    for (k=0; k < n_nuis_sig[j]; k++)      /* Add nuisance terms */
+    {
+      glb_nuisance *n = e->nuisance_params[nuis_sig[j][k]];
+      if (n->n_energies > 0)   /* Energy-independent nuisance param */
+      {
+        int l = 1;
+        double E0 = n->energy_list[0]; /* Note: glbDefaultExp ensures that energy_list */
+        double E1 = n->energy_list[1]; /* and a_list have at least two entries */
+        double r = (n->a_list[1] - n->a_list[0]) / (E1 - E0);
+        for (i=ew_low; i <= ew_high; i++)
+        {
+          /* Find energy support point straddling this bin */
+          while (bin_centers[i] > E1  &&  l < n->n_energies)
+          {
+            E0 = E1;
+            E1 = n->energy_list[l];
+            r = (n->a_list[l] - n->a_list[l-1]) / (E1 - E0);
+            l++;
+          }
+
+          /* Interpole nuisance parameters between energy support points. Extrapolate
+           * outside the range of support points */
+          fit_rates[i] += (bin_centers[i] - E0) * r * coeff_sig[j] * chr_sig[j][i];
+        }
+      }
+      else
+      {
+        for (i=ew_low; i <= ew_high; i++)
+          fit_rates[i] += n->a * coeff_sig[j] * chr_sig[j][i];
+      }
+    }
+  }
+
+  /* Background channels */
+  for (j=0; j < nch_bg; j++)
+  {
+    for (i=ew_low; i <= ew_high; i++) /* Unperturbed rate (all nuisance params = 0.0) */
+      fit_rates[i] += coeff_bg[j] * chr_bg[j][i];
+
+    for (k=0; k < n_nuis_bg[j]; k++)      /* Add nuisance terms */
+    {
+      glb_nuisance *n = e->nuisance_params[nuis_bg[j][k]];
+      if (n->n_energies > 0)   /* Energy-independent nuisance param */
+      {
+        int l = 1;
+        double E0 = n->energy_list[0]; /* Note: glbDefaultExp ensures that energy_list */
+        double E1 = n->energy_list[1]; /* and a_list have at least two entries */
+        double r = (n->a_list[1] - n->a_list[0]) / (E1 - E0);
+        for (i=ew_low; i <= ew_high; i++)
+        {
+          /* Find energy support point straddling this bin */
+          while (bin_centers[i] > E1  &&  l < n->n_energies)
+          {
+            E0 = E1;
+            E1 = n->energy_list[l];
+            r = (n->a_list[l] - n->a_list[l-1]) / (E1 - E0);
+            l++;
+          }
+
+          /* Interpole nuisance parameters between energy support points. Extrapolate
+           * outside the range of support points */
+          fit_rates[i] += (bin_centers[i] - E0) * r * coeff_bg[j] * chr_bg[j][i];
+        }
+      }
+      else
+      {
+        for (i=ew_low; i <= ew_high; i++)
+          fit_rates[i] += n->a * coeff_bg[j] * chr_bg[j][i];
+      }
+    }
+  }
+
+  /* Compute chi^2 */
+  for (i=ew_low; i <= ew_high; i++)
+    chi2 += glb_likelihood(true_rates[i], fit_rates[i]);
+
+  printf("chi2 = %g\n", chi2);
   return chi2;
 }
 

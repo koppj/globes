@@ -323,6 +323,9 @@ double *glbGetSysStartingValuesListPtr(int exp, int rule, int on_off);
 void glbShiftEnergyScale(double g, double *rates_in, double *rates_out,
                          int n_bins, double emin, double emax);
 
+int glbGetNumberOfNuisanceParams(int exp);
+int glbHasParentExp(int exp);
+int glbGetParentExp(int exp);
 
 #ifndef SWIG
 int glbRegisterPriorFunction(double (*prior)(const glb_params, void *user_data),

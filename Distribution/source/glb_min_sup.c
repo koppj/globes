@@ -96,7 +96,6 @@ int glb_hybrid_bracket(double *P, double *xi, double *a, double *b, double *c, i
   double ax, bx, cx;
   long double fa, fb, fc, fu; /* long double declaration avoids problems with  */
   double u, ulim, q, r;       /* extra floating point digits on x86 processors */
-  int i, j;
 
   ax = 0.0;
   bx = 1.0;
