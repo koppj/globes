@@ -631,17 +631,17 @@ void glbResetExp(struct glb_experiment *in)
   }
   else
   {
-    for(i=p->num_of_fluxes; i < GLB_MAX_FLUXES; i++)
+    for(i=MAX(0, p->num_of_fluxes); i < GLB_MAX_FLUXES; i++)
     {
       glb_free_flux(in->fluxes[i]);
       in->fluxes[i] = NULL;
     }
-    for(i=p->num_of_xsecs; i < GLB_MAX_XSECS; i++)
+    for(i=MAX(0, p->num_of_xsecs); i < GLB_MAX_XSECS; i++)
     {
       glb_free_xsec(in->xsecs[i]);
       in->xsecs[i] = NULL;
     }
-    for(i=p->n_nuisance; i < GLB_MAX_NUISANCE; i++)
+    for(i=MAX(0, p->n_nuisance); i < GLB_MAX_NUISANCE; i++)
     {
       glb_free_nuisance(in->nuisance_params[i]);
       in->nuisance_params[i] = NULL;
@@ -933,6 +933,7 @@ int glbDefaultExp(glb_exp ins)
 
   /* Check definitions of nuisance parameters for global/multi-experiment systematics */
   /* -------------------------------------------------------------------------------- */
+  if (in->n_nuisance < 0)  in->n_nuisance = 0; /* The dummy value of -1 is needed only in the parser */
   for (i=0; i < in->n_nuisance; i++)
   {
     if (in->nuisance_params[i] == NULL)
@@ -1259,10 +1260,9 @@ int glbDefaultExp(glb_exp ins)
   if(in->filter_state==-1){in->filter_state=1;def=-1;}
   if(in->filter_value==-1){in->filter_value=0;def=-1;}
 
-  if(in->num_of_sm==-1){
-    glb_exp_error(in, "No smearing data specified!");status=-1;}
 
   /* Energy resolution/detector response function (``smearing'') */
+  if (in->num_of_sm == -1) { glb_exp_error(in, "No smearing data specified!"); status=-1; }
   for(i=0;i<in->num_of_sm;i++)
   {
     /* Smearing matrix explicitly given in AEDL file? */

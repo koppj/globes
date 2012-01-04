@@ -1064,8 +1064,7 @@ double glbChiZero(int exp, int rule, int n_params, double *x, double *errors,
  * Function glbChiMultiExp                                                 *
  ***************************************************************************
  * A chi^2 function designed for use with multi-detector setups. Requires  *
- * valid nuisance parameter definitions. The chi^2 functions of the sub-   *
- * detectors should be set to chiZero to avoid double counting             *
+ * valid nuisance parameter definitions.                                   *
  ***************************************************************************/
 double glbChiMultiExp(int exp, int rule, int n_params, double *x, double *errors,
                       void *user_data)
@@ -1102,15 +1101,11 @@ double glbChiMultiExp(int exp, int rule, int n_params, double *x, double *errors
     nuis_bg    = e->sys_off_multiex_errors_bg[rule];
   }
 
-  /* FIXME FIXME FIXME
-   * - Test this function
-   * - Optimize speed (e.g. collect fit_rates separately for each channel first?
-   *   (remember to switch -O2 back on!) */
   glbGetEnergyWindowBins(exp, rule, &ew_low, &ew_high);
   for (j=0; j < nch_sig; j++)
-    chr_sig[j] = glbGetChannelRatePtr(exp, e->rulechannellist[rule][j], GLB_POST);
+    chr_sig[j] = glbGetChannelFitRatePtr(exp, e->rulechannellist[rule][j], GLB_POST);
   for (j=0; j < nch_bg; j++)
-    chr_bg[j]  = glbGetChannelRatePtr(exp, e->bgrulechannellist[rule][j], GLB_POST);
+    chr_bg[j]  = glbGetChannelFitRatePtr(exp, e->bgrulechannellist[rule][j], GLB_POST);
   for (i=ew_low; i <= ew_high; i++)
     fit_rates[i] = 0.0;
 
@@ -1122,7 +1117,7 @@ double glbChiMultiExp(int exp, int rule, int n_params, double *x, double *errors
 //      int l;
 //      printf("N %3d ", i);
 //      for (l=0; l < n->n_energies; l++)
-//        printf("%10.7g ", n->a_list[l]);
+//        printf("%10.7g (%4.1g)  ", n->a_list[l], n->error_list[l]);
 //      printf("\n");
 //    }
 //    else
@@ -1158,7 +1153,7 @@ double glbChiMultiExp(int exp, int rule, int n_params, double *x, double *errors
             r = (n->a_list[l] - a0) / (E1 - E0);
           }
 
-          /* Interpole nuisance parameters between energy support points. Extrapolate
+          /* Interpolate nuisance parameters between energy support points. Extrapolate
            * outside the range of support points */
           fit_rates[i] += (a0 + (bin_centers[i] - E0) * r) * coeff_sig[j] * chr_sig[j][i];
 //          printf("%10.7g %10.7g\n", bin_centers[i], a0 + (bin_centers[i] - E0) * r);
@@ -1199,7 +1194,7 @@ double glbChiMultiExp(int exp, int rule, int n_params, double *x, double *errors
             r = (n->a_list[l] - a0) / (E1 - E0);
           }
 
-          /* Interpole nuisance parameters between energy support points. Extrapolate
+          /* Interpolate nuisance parameters between energy support points. Extrapolate
            * outside the range of support points */
           fit_rates[i] += (a0 + (bin_centers[i] - E0) * r) * coeff_bg[j] * chr_bg[j][i];
         }
