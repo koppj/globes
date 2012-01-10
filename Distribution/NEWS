@@ -246,3 +246,8 @@
 
 21 Feb 2011 JK
         - One more problem with the line counting in the lexer fixed
+
+4 Jan 2011 JK
+        - First implementation of new multi-experiment systematics:
+          sys()< > environment + new chi^2 function glbChiMultiExp
+        - New #DETECTOR# directive
