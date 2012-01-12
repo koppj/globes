@@ -35,7 +35,9 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = globes$(EXEEXT)
+bin_PROGRAMS = globes$(EXEEXT) globes-accuracy$(EXEEXT) \
+	globes-deltatheta$(EXEEXT) globes-discovery$(EXEEXT) \
+	globes-simple$(EXEEXT)
 subdir = source
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in glb_lexer.c \
 	glb_parser.c glb_parser.h
@@ -127,6 +129,24 @@ PROGRAMS = $(bin_PROGRAMS)
 am_globes_OBJECTS = globes.$(OBJEXT)
 globes_OBJECTS = $(am_globes_OBJECTS)
 globes_DEPENDENCIES = libglobes.la
+am_globes_accuracy_OBJECTS = glb_tools_parser.$(OBJEXT) \
+	glb_tools_header.$(OBJEXT) glb_tools_eightfold.$(OBJEXT) \
+	globes-accuracy.$(OBJEXT)
+globes_accuracy_OBJECTS = $(am_globes_accuracy_OBJECTS)
+globes_accuracy_DEPENDENCIES = libglobes.la
+am_globes_deltatheta_OBJECTS = glb_tools_parser.$(OBJEXT) \
+	glb_tools_header.$(OBJEXT) globes-deltatheta.$(OBJEXT)
+globes_deltatheta_OBJECTS = $(am_globes_deltatheta_OBJECTS)
+globes_deltatheta_DEPENDENCIES = libglobes.la
+am_globes_discovery_OBJECTS = glb_tools_parser.$(OBJEXT) \
+	glb_tools_header.$(OBJEXT) glb_tools_eightfold.$(OBJEXT) \
+	globes-discovery.$(OBJEXT)
+globes_discovery_OBJECTS = $(am_globes_discovery_OBJECTS)
+globes_discovery_DEPENDENCIES = libglobes.la
+am_globes_simple_OBJECTS = glb_tools_parser.$(OBJEXT) \
+	glb_tools_header.$(OBJEXT) globes-simple.$(OBJEXT)
+globes_simple_OBJECTS = $(am_globes_simple_OBJECTS)
+globes_simple_DEPENDENCIES = libglobes.la
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -168,8 +188,12 @@ am__v_YACC_0 = @echo "  YACC  " $@;
 AM_V_GEN = $(am__v_GEN_$(V))
 am__v_GEN_ = $(am__v_GEN_$(AM_DEFAULT_VERBOSITY))
 am__v_GEN_0 = @echo "  GEN   " $@;
-SOURCES = $(libglobes_la_SOURCES) $(globes_SOURCES)
-DIST_SOURCES = $(libglobes_la_SOURCES) $(globes_SOURCES)
+SOURCES = $(libglobes_la_SOURCES) $(globes_SOURCES) \
+	$(globes_accuracy_SOURCES) $(globes_deltatheta_SOURCES) \
+	$(globes_discovery_SOURCES) $(globes_simple_SOURCES)
+DIST_SOURCES = $(libglobes_la_SOURCES) $(globes_SOURCES) \
+	$(globes_accuracy_SOURCES) $(globes_deltatheta_SOURCES) \
+	$(globes_discovery_SOURCES) $(globes_simple_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -812,6 +836,24 @@ libglobes_la_CPPFLAGS = -DGLB_MODULE_DIR=\"$(pkglibdir)\"
 libglobes_la_DEPENDENCIES = 
 globes_SOURCES = globes.c 
 globes_LDADD = libglobes.la @LIBS@
+globes_accuracy_SOURCES = glb_tools_parser.h glb_tools_parser.c \
+glb_tools_header.h  glb_tools_header.c glb_tools_eightfold.h \
+glb_tools_eightfold.c globes-accuracy.c
+
+globes_deltatheta_SOURCES = glb_tools_parser.h  glb_tools_parser.c \
+glb_tools_header.h  glb_tools_header.c globes-deltatheta.c
+
+globes_discovery_SOURCES = glb_tools_parser.h  glb_tools_parser.c \
+glb_tools_header.h  glb_tools_header.c glb_tools_eightfold.h \
+glb_tools_eightfold.c globes-discovery.c
+
+globes_simple_SOURCES = glb_tools_parser.h  glb_tools_parser.c \
+glb_tools_header.h  glb_tools_header.c glb_tools_eightfold.h globes-simple.c
+
+globes_deltatheta_LDADD = libglobes.la @LIBS@ 
+globes_accuracy_LDADD = libglobes.la @LIBS@ 
+globes_discovery_LDADD = libglobes.la @LIBS@ 
+globes_simple_LDADD = libglobes.la @LIBS@ 
 all: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
@@ -931,6 +973,18 @@ clean-binPROGRAMS:
 globes$(EXEEXT): $(globes_OBJECTS) $(globes_DEPENDENCIES) 
 	@rm -f globes$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(globes_OBJECTS) $(globes_LDADD) $(LIBS)
+globes-accuracy$(EXEEXT): $(globes_accuracy_OBJECTS) $(globes_accuracy_DEPENDENCIES) 
+	@rm -f globes-accuracy$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(globes_accuracy_OBJECTS) $(globes_accuracy_LDADD) $(LIBS)
+globes-deltatheta$(EXEEXT): $(globes_deltatheta_OBJECTS) $(globes_deltatheta_DEPENDENCIES) 
+	@rm -f globes-deltatheta$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(globes_deltatheta_OBJECTS) $(globes_deltatheta_LDADD) $(LIBS)
+globes-discovery$(EXEEXT): $(globes_discovery_OBJECTS) $(globes_discovery_DEPENDENCIES) 
+	@rm -f globes-discovery$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(globes_discovery_OBJECTS) $(globes_discovery_LDADD) $(LIBS)
+globes-simple$(EXEEXT): $(globes_simple_OBJECTS) $(globes_simple_DEPENDENCIES) 
+	@rm -f globes-simple$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(globes_simple_OBJECTS) $(globes_simple_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -938,6 +992,13 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/glb_tools_eightfold.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/glb_tools_header.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/glb_tools_parser.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/globes-accuracy.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/globes-deltatheta.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/globes-discovery.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/globes-simple.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/globes.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libglobes_la-glb_compat.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libglobes_la-glb_error.Plo@am__quote@

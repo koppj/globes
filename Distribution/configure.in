@@ -28,7 +28,7 @@ dnl middle digit: increment when features have been introduced/removed
 dnl first digit: major improvements/rewrites
 dnl In contrast to the result of autoupdate I had to swap the
 dnl the AC_INIT and AC_CONFIG_SRCDIR
-AC_INIT([GLoBES],[3.1.10],[globes@mpi-hd.mpg.de],[globes])
+AC_INIT([GLoBES],[3.1.11],[globes@mpi-hd.mpg.de],[globes])
 
 AC_CONFIG_SRCDIR([source/glb_wrapper.c])
 AC_CONFIG_MACRO_DIR([m4])
@@ -165,7 +165,7 @@ AC_CONFIG_FILES(globes.spec)
 AC_CONFIG_FILES([Makefile lib/Makefile \
  globes/Makefile globes/example.pl source/Makefile\
  examples/Makefile\
- data/Makefile  globes-config])
+ data/Makefile  globes-config doc/Makefile])
 
 
 AC_OUTPUT
