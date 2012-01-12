@@ -24,12 +24,15 @@
 #  include "config.h"
 #endif
 
+
+
 #define YYDEBUG 1
 //int yydebug = 1; /* Uncomment this line to get debug output from the parser */
 #include <math.h>
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdarg.h>
 #include <globes/globes.h>
 #include <gsl/gsl_spline.h>
 #include "glb_smear.h"
