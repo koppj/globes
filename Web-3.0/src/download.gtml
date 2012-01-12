@@ -16,8 +16,8 @@ Latest stable version:
 
 Current development version:
 <ul>
-  <li><a href="download/globes-3.1.10.tar.gz">globes-3.1.10.tar.gz</a>
-      &nbsp;(January 26, 2010)
+  <li><a href="download/globes-3.1.11.tar.gz">globes-3.1.11.tar.gz</a>
+      &nbsp;(January 12, 2012)
   </li>
 </ul>
 The development version roughly reflects the current development status of GLoBES.
@@ -43,6 +43,10 @@ NEWS file for a change log and list of new features.
   almost degenerate local minima), but if you need to switch back to the older,
   slower GLB_NESTED_POWELL, you can do so by calling
   glbSelectMinimizer(GLB_NESTED_POWELL).
+
+<p> 
+<b>Note</b>: v3.1.11 represents the first release of
+globes-tools, which offers degeneracy finding. Currently, there is minimal documentation in form of a manpage for globes-discovery.
 
 <!--You may also want to check out this statically linked binary
 <a href="download/globes.gz">globes.gz</a>, which should run right of the box
@@ -81,6 +85,7 @@ correctly according to the comments in the respective files.
 <h2>Previous versions</h2>
 <p>For compatibility we provide als some previous versions of GLoBES:
 <ul>
+<li><a href="download/globes-3.1.10.tar.gz">globes-3.1.10.tar.gz</a> &nbsp;(January 26, 2011)</li>
   <li><a href="download/globes-3.1.9.tar.gz">globes-3.1.9.tar.gz</a> &nbsp;(November 20, 2010)</li>
   <li><a href="download/globes-3.0.10.tar.gz">globes-3.0.10.tar.gz</a> &nbsp;(July 2, 2007)</li>
   <li><a href="download/globes-3.0.9.tar.gz">globes-3.0.9.tar.gz</a> &nbsp;(May 27, 2007)</li>
