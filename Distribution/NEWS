@@ -251,3 +251,12 @@
         - First implementation of new multi-experiment systematics:
           sys()< > environment + new chi^2 function glbChiMultiExp
         - New #DETECTOR# directive
+
+********** This version tagged 3.2.0 ************
+
+28 Jan 2011 JK
+        - Fixed problems with copying of efficiencies and smearing matrices to
+          subdetector
+
+********** This version tagged 3.2.1 ************
+
