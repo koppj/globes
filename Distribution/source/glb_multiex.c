@@ -384,10 +384,10 @@ void glbInitExpFromParent(struct glb_experiment *exp, struct glb_experiment *p)
           {
             exp->lowrange[i][j] = p->lowrange[i][j];
             exp->uprange[i][j]  = p->uprange[i][j];
-            exp->smear[i][j]    = glb_malloc((exp->lowrange[i][j] - exp->uprange[i][j] + 1)
+            exp->smear[i][j]    = glb_malloc((exp->uprange[i][j] - exp->lowrange[i][j] + 1)
                                     * sizeof(double));
             memcpy(exp->smear[i][j], p->smear[i][j],
-                   (exp->lowrange[i][j] - exp->uprange[i][j] + 1) * sizeof(double));
+                   (exp->uprange[i][j] - exp->lowrange[i][j] + 1) * sizeof(double));
           }
         }
       }
@@ -407,7 +407,7 @@ void glbInitExpFromParent(struct glb_experiment *exp, struct glb_experiment *p)
                                                  sizeof(int) * exp->numofchannels);
   for (i=0; i < exp->numofchannels; i++)
   {
-    int n = sizeof(double) * p->simbins;
+    int n = sizeof(double) * (p->simbins + 1);
     exp->user_pre_smearing_channel[i]
       = glb_duplicate_array(p->user_pre_smearing_channel[i], n);
     exp->user_post_smearing_channel[i]
