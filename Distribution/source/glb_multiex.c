@@ -117,7 +117,7 @@ int glb_copy_nuisance(glb_nuisance *dest, glb_nuisance *src)
     dest->n_energies  = src->n_energies;
     dest->energy_list = glb_duplicate_array(src->energy_list, src->n_energies*sizeof(double));
     dest->error_list  = glb_duplicate_array(src->error_list, src->n_energies*sizeof(double));
-    dest->a_list       = glb_duplicate_array(src->a_list, src->n_energies*sizeof(double));
+    dest->a_list      = glb_duplicate_array(src->a_list, src->n_energies*sizeof(double));
 
     return GLB_SUCCESS;
   }
@@ -520,10 +520,7 @@ void glbInitExpFromParent(struct glb_experiment *exp, struct glb_experiment *p)
   /* Copy nuisance parameter info */
   exp->n_nuisance = p->n_nuisance;
   for (i=0; i < exp->n_nuisance; i++)
-  {
-    exp->nuisance_params[i] = glb_alloc_nuisance();
-    glb_copy_nuisance(exp->nuisance_params[i], p->nuisance_params[i]);
-  }
+    exp->nuisance_params[i] = p->nuisance_params[i];
 }
 
 
@@ -933,7 +930,7 @@ int glbDefaultExp(glb_exp ins)
 
   /* Check definitions of nuisance parameters for global/multi-experiment systematics */
   /* -------------------------------------------------------------------------------- */
-  if (in->n_nuisance < 0)  in->n_nuisance = 0; /* The dummy value of -1 is needed only in the parser */
+  if (in->n_nuisance < 0)  in->n_nuisance = 0; /* The dummy value -1 is needed only in the parser */
   for (i=0; i < in->n_nuisance; i++)
   {
     if (in->nuisance_params[i] == NULL)

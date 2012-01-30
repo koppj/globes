@@ -1121,7 +1121,7 @@ double glbChiMultiExp(int exp, int rule, int n_params, double *x, double *errors
 //      printf("\n");
 //    }
 //    else
-//      printf("N %3d %10.7g\n", i, n->a);
+//      printf("N %3d %10.7g (%4.1g)\n", i, n->a, n->error);
 //  }
 //  printf("\n");
 

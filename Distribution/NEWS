@@ -260,3 +260,9 @@
 
 ********** This version tagged 3.2.1 ************
 
+30 Jan 2011 JK
+        - Fixed bug in treatment of nuisance parameters in child experiments
+          (child did not inherit the current value of the parameter properly)
+
+********** This version tagged 3.2.2 ************
+  
