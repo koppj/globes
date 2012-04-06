@@ -1069,6 +1069,8 @@ double glbChiZero(int exp, int rule, int n_params, double *x, double *errors,
 double glbChiMultiExp(int exp, int rule, int n_params, double *x, double *errors,
                       void *user_data)
 {
+  // FIXME: There should be an error message if the user tries to do
+  // arithmetic with names (e.g. #sys1 * #sys2)
   struct glb_experiment *e = glb_experiment_list[exp];
   int n_bins = glbGetNumberOfBins(exp);
   int nch_sig              = e->lengthofrules[rule];
