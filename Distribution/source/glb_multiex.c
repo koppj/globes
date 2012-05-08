@@ -1251,6 +1251,37 @@ int glbDefaultExp(glb_exp ins)
         glbSetChiFunctionInRule(in, i, GLB_OFF, "chiZero", NULL);
       }
     }
+    else
+    {
+      for (i=0; i < in->numofrules; i++)
+      {
+        if (strcmp(in->sys_on[i]->name, "chiSpectrumTilt") != 0 &&
+            strcmp(in->sys_on[i]->name, "chiNoSysSpectrum") != 0 &&
+            strcmp(in->sys_on[i]->name, "chiSpectrumOnly") != 0 &&
+            strcmp(in->sys_on[i]->name, "chiTotalRatesTilt") != 0 &&
+            strcmp(in->sys_on[i]->name, "chiNoSysTotalRates") != 0 &&
+            strcmp(in->sys_on[i]->name, "chiSpectrumCalib") != 0 &&
+            strcmp(in->sys_on[i]->name, "chiZero") != 0)
+        {
+          glb_warning("in rule %d: Rule with non-trivial systematics treatment %s inherited\n"
+                      "  from parent experiment. Make sure correlations among systematical "
+                      "errors are treated correctly", i, in->sys_on[i]->name);
+        }
+
+        if (strcmp(in->sys_off[i]->name, "chiSpectrumTilt") != 0 &&
+            strcmp(in->sys_off[i]->name, "chiNoSysSpectrum") != 0 &&
+            strcmp(in->sys_off[i]->name, "chiSpectrumOnly") != 0 &&
+            strcmp(in->sys_off[i]->name, "chiTotalRatesTilt") != 0 &&
+            strcmp(in->sys_off[i]->name, "chiNoSysTotalRates") != 0 &&
+            strcmp(in->sys_off[i]->name, "chiSpectrumCalib") != 0 &&
+            strcmp(in->sys_off[i]->name, "chiZero") != 0)
+        {
+          glb_warning("in rule %d: Rule with non-trivial systematics treatment %s inherited\n"
+                      "  from parent experiment. Make sure correlations among systematical "
+                      "errors are treated correctly", i, in->sys_off[i]->name);
+        }
+      }
+    }
   }
 
 

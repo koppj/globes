@@ -247,22 +247,28 @@
 21 Feb 2011 JK
         - One more problem with the line counting in the lexer fixed
 
-4 Jan 2011 JK
+4 Jan 2012 JK
         - First implementation of new multi-experiment systematics:
           sys()< > environment + new chi^2 function glbChiMultiExp
         - New #DETECTOR# directive
 
 ********** This version tagged 3.2.0 ************
 
-28 Jan 2011 JK
+28 Jan 2012 JK
         - Fixed problems with copying of efficiencies and smearing matrices to
           subdetector
 
 ********** This version tagged 3.2.1 ************
 
-30 Jan 2011 JK
+30 Jan 2012 JK
         - Fixed bug in treatment of nuisance parameters in child experiments
           (child did not inherit the current value of the parameter properly)
 
 ********** This version tagged 3.2.2 ************
-  
+
+8 May 2012 JK
+        - (in branch newsys) A warning is now given if a rule with non-trivial
+          systematics treatment is inherited from the parent experiment
+
+********** This version tagged 3.2.3 ************
+
