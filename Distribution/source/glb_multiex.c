@@ -419,103 +419,104 @@ void glbInitExpFromParent(struct glb_experiment *exp, struct glb_experiment *p)
   }
 
   /* Copy rules from parent */
-  exp->numofrules = p->numofrules;
-  for (i=0; i < exp->numofrules; i++)
-  {
-    exp->lengthofrules[i]         = p->lengthofrules[i];
-    exp->rulescoeff[i]            = glb_duplicate_array(p->rulescoeff[i],
-                                      exp->lengthofrules[i] * sizeof(double));
-    exp->rulechannellist[i]       = glb_duplicate_array(p->rulechannellist[i],
-                                      exp->lengthofrules[i] * sizeof(int));
-
-    exp->lengthofbgrules[i]       = p->lengthofbgrules[i];
-    exp->bgrulescoeff[i]          = glb_duplicate_array(p->bgrulescoeff[i],
-                                      exp->lengthofbgrules[i] * sizeof(double));
-    exp->bgrulechannellist[i]     = glb_duplicate_array(p->bgrulechannellist[i],
-                                      exp->lengthofbgrules[i] * sizeof(int));
-
-    exp->energy_window[i][0]      = p->energy_window[i][0];
-    exp->energy_window[i][1]      = p->energy_window[i][1];
-    exp->energy_window_bins[i][0] = p->energy_window_bins[i][0];
-    exp->energy_window_bins[i][1] = p->energy_window_bins[i][1];
-
-    exp->sys_on_off[i]            = p->sys_on_off[i];
-    exp->sys_on[i]                = p->sys_on[i];
-    exp->sys_off[i]               = p->sys_off[i];
-    exp->sys_on_strings[i]        = strdup(p->sys_on_strings[i]);
-    exp->sys_off_strings[i]       = strdup(p->sys_off_strings[i]);
-    if (p->sys_on_errors[i])
-    {
-      for (j=0; p->sys_on_errors[i][j] > 0.0; j++)
-        ;
-      exp->sys_on_errors[i] = glb_duplicate_array(p->sys_on_errors[i], (j+1)*sizeof(double));
-    }
-    if (p->sys_on_startvals[i])
-    {
-      for (j=0; p->sys_on_startvals[i][j] > 0.0; j++)
-        ;
-      exp->sys_on_startvals[i] = glb_duplicate_array(p->sys_on_startvals[i], (j+1)*sizeof(double));
-    }
-    if (p->sys_off_errors[i])
-    {
-      for (j=0; p->sys_off_errors[i][j] > 0.0; j++)
-        ;
-      exp->sys_off_errors[i] = glb_duplicate_array(p->sys_off_errors[i], (j+1)*sizeof(double));
-    }
-    if (p->sys_off_startvals[i])
-    {
-      for (j=0; p->sys_off_startvals[i][j] > 0.0; j++)
-        ;
-      exp->sys_off_startvals[i] = glb_duplicate_array(p->sys_off_startvals[i],(j+1)*sizeof(double));
-    }
-    for (j=0; j < 2; j++)
-    {
-      exp->signal_errors[j][i]    = p->signal_errors[j][i];
-      exp->signal_startvals[j][i] = p->signal_startvals[j][i];
-      exp->bg_errors[j][i]        = p->bg_errors[j][i];
-      exp->bg_startvals[j][i]     = p->bg_startvals[j][i];
-      exp->bg_centers[j][i]       = p->bg_centers[j][i];
-    }
-    for (j=0; j < GLB_MAX_CHANNELS; j++)
-    {
-      exp->sys_on_n_nuis_sig[i][j]  = p->sys_on_n_nuis_sig[i][j];
-      exp->sys_on_n_nuis_bg[i][j]   = p->sys_on_n_nuis_bg[i][j];
-      exp->sys_off_n_nuis_sig[i][j] = p->sys_off_n_nuis_sig[i][j];
-      exp->sys_off_n_nuis_bg[i][j]  = p->sys_off_n_nuis_bg[i][j];
-
-      /* Don't rely on sys_on/off_n_nuis_sig/bg for the copying since they
-       * may not be initialized yet (that happens only in glbDefaultExp, not
-       * in the parser */
-      if (p->sys_on_multiex_errors_sig[i][j])
-      {
-        for (k=0; p->sys_on_multiex_errors_sig[i][j][k] >= 0; k++)
-          ;
-        exp->sys_on_multiex_errors_sig[i][j]
-          = glb_duplicate_array(p->sys_on_multiex_errors_sig[i][j], (k+1)*sizeof(int));
-      }
-      if (p->sys_on_multiex_errors_bg[i][j])
-      {
-        for (k=0; p->sys_on_multiex_errors_bg[i][j][k] >= 0; k++)
-          ;
-        exp->sys_on_multiex_errors_bg[i][j]
-          = glb_duplicate_array(p->sys_on_multiex_errors_bg[i][j], (k+1)*sizeof(int));
-      }
-      if (p->sys_off_multiex_errors_sig[i][j])
-      {
-        for (k=0; p->sys_off_multiex_errors_sig[i][j][k] >= 0; k++)
-          ;
-        exp->sys_off_multiex_errors_sig[i][j]
-          = glb_duplicate_array(p->sys_off_multiex_errors_sig[i][j], (k+1)*sizeof(int));
-      }
-      if (p->sys_off_multiex_errors_bg[i][j])
-      {
-        for (k=0; p->sys_off_multiex_errors_bg[i][j][k] >= 0; k++)
-          ;
-        exp->sys_off_multiex_errors_bg[i][j]
-          = glb_duplicate_array(p->sys_off_multiex_errors_bg[i][j], (k+1)*sizeof(int));
-      }
-    }
-  }
+  /* JK - 2012-05-11 Removed because it was very confusing */
+//  exp->numofrules = p->numofrules;
+//  for (i=0; i < exp->numofrules; i++)
+//  {
+//    exp->lengthofrules[i]         = p->lengthofrules[i];
+//    exp->rulescoeff[i]            = glb_duplicate_array(p->rulescoeff[i],
+//                                      exp->lengthofrules[i] * sizeof(double));
+//    exp->rulechannellist[i]       = glb_duplicate_array(p->rulechannellist[i],
+//                                      exp->lengthofrules[i] * sizeof(int));
+//
+//    exp->lengthofbgrules[i]       = p->lengthofbgrules[i];
+//    exp->bgrulescoeff[i]          = glb_duplicate_array(p->bgrulescoeff[i],
+//                                      exp->lengthofbgrules[i] * sizeof(double));
+//    exp->bgrulechannellist[i]     = glb_duplicate_array(p->bgrulechannellist[i],
+//                                      exp->lengthofbgrules[i] * sizeof(int));
+//
+//    exp->energy_window[i][0]      = p->energy_window[i][0];
+//    exp->energy_window[i][1]      = p->energy_window[i][1];
+//    exp->energy_window_bins[i][0] = p->energy_window_bins[i][0];
+//    exp->energy_window_bins[i][1] = p->energy_window_bins[i][1];
+//
+//    exp->sys_on_off[i]            = p->sys_on_off[i];
+//    exp->sys_on[i]                = p->sys_on[i];
+//    exp->sys_off[i]               = p->sys_off[i];
+//    exp->sys_on_strings[i]        = strdup(p->sys_on_strings[i]);
+//    exp->sys_off_strings[i]       = strdup(p->sys_off_strings[i]);
+//    if (p->sys_on_errors[i])
+//    {
+//      for (j=0; p->sys_on_errors[i][j] > 0.0; j++)
+//        ;
+//      exp->sys_on_errors[i] = glb_duplicate_array(p->sys_on_errors[i], (j+1)*sizeof(double));
+//    }
+//    if (p->sys_on_startvals[i])
+//    {
+//      for (j=0; p->sys_on_startvals[i][j] > 0.0; j++)
+//        ;
+//      exp->sys_on_startvals[i] = glb_duplicate_array(p->sys_on_startvals[i], (j+1)*sizeof(double));
+//    }
+//    if (p->sys_off_errors[i])
+//    {
+//      for (j=0; p->sys_off_errors[i][j] > 0.0; j++)
+//        ;
+//      exp->sys_off_errors[i] = glb_duplicate_array(p->sys_off_errors[i], (j+1)*sizeof(double));
+//    }
+//    if (p->sys_off_startvals[i])
+//    {
+//      for (j=0; p->sys_off_startvals[i][j] > 0.0; j++)
+//        ;
+//      exp->sys_off_startvals[i] = glb_duplicate_array(p->sys_off_startvals[i],(j+1)*sizeof(double));
+//    }
+//    for (j=0; j < 2; j++)
+//    {
+//      exp->signal_errors[j][i]    = p->signal_errors[j][i];
+//      exp->signal_startvals[j][i] = p->signal_startvals[j][i];
+//      exp->bg_errors[j][i]        = p->bg_errors[j][i];
+//      exp->bg_startvals[j][i]     = p->bg_startvals[j][i];
+//      exp->bg_centers[j][i]       = p->bg_centers[j][i];
+//    }
+//    for (j=0; j < GLB_MAX_CHANNELS; j++)
+//    {
+//      exp->sys_on_n_nuis_sig[i][j]  = p->sys_on_n_nuis_sig[i][j];
+//      exp->sys_on_n_nuis_bg[i][j]   = p->sys_on_n_nuis_bg[i][j];
+//      exp->sys_off_n_nuis_sig[i][j] = p->sys_off_n_nuis_sig[i][j];
+//      exp->sys_off_n_nuis_bg[i][j]  = p->sys_off_n_nuis_bg[i][j];
+//
+//      /* Don't rely on sys_on/off_n_nuis_sig/bg for the copying since they
+//       * may not be initialized yet (that happens only in glbDefaultExp, not
+//       * in the parser */
+//      if (p->sys_on_multiex_errors_sig[i][j])
+//      {
+//        for (k=0; p->sys_on_multiex_errors_sig[i][j][k] >= 0; k++)
+//          ;
+//        exp->sys_on_multiex_errors_sig[i][j]
+//          = glb_duplicate_array(p->sys_on_multiex_errors_sig[i][j], (k+1)*sizeof(int));
+//      }
+//      if (p->sys_on_multiex_errors_bg[i][j])
+//      {
+//        for (k=0; p->sys_on_multiex_errors_bg[i][j][k] >= 0; k++)
+//          ;
+//        exp->sys_on_multiex_errors_bg[i][j]
+//          = glb_duplicate_array(p->sys_on_multiex_errors_bg[i][j], (k+1)*sizeof(int));
+//      }
+//      if (p->sys_off_multiex_errors_sig[i][j])
+//      {
+//        for (k=0; p->sys_off_multiex_errors_sig[i][j][k] >= 0; k++)
+//          ;
+//        exp->sys_off_multiex_errors_sig[i][j]
+//          = glb_duplicate_array(p->sys_off_multiex_errors_sig[i][j], (k+1)*sizeof(int));
+//      }
+//      if (p->sys_off_multiex_errors_bg[i][j])
+//      {
+//        for (k=0; p->sys_off_multiex_errors_bg[i][j][k] >= 0; k++)
+//          ;
+//        exp->sys_off_multiex_errors_bg[i][j]
+//          = glb_duplicate_array(p->sys_off_multiex_errors_bg[i][j], (k+1)*sizeof(int));
+//      }
+//    }
+//  }
 
   /* Copy nuisance parameter info */
   exp->n_nuisance = p->n_nuisance;
@@ -1241,48 +1242,49 @@ int glbDefaultExp(glb_exp ins)
 
   /* If this experiment is a subdetector in a multi-detector setup, and if it has
    * its own rules, the parent's rules should not be used */
-  if (in->parent)
-  {
-    if (in->numofrules > in->parent->numofrules)
-    {
-      for (i=0; i < in->parent->numofrules; i++)
-      {
-        glbSetChiFunctionInRule(in, i, GLB_ON, "chiZero", NULL);
-        glbSetChiFunctionInRule(in, i, GLB_OFF, "chiZero", NULL);
-      }
-    }
-    else
-    {
-      for (i=0; i < in->numofrules; i++)
-      {
-        if (strcmp(in->sys_on[i]->name, "chiSpectrumTilt") != 0 &&
-            strcmp(in->sys_on[i]->name, "chiNoSysSpectrum") != 0 &&
-            strcmp(in->sys_on[i]->name, "chiSpectrumOnly") != 0 &&
-            strcmp(in->sys_on[i]->name, "chiTotalRatesTilt") != 0 &&
-            strcmp(in->sys_on[i]->name, "chiNoSysTotalRates") != 0 &&
-            strcmp(in->sys_on[i]->name, "chiSpectrumCalib") != 0 &&
-            strcmp(in->sys_on[i]->name, "chiZero") != 0)
-        {
-          glb_warning("in rule %d: Rule with non-trivial systematics treatment %s inherited\n"
-                      "  from parent experiment. Make sure correlations among systematical "
-                      "errors are treated correctly", i, in->sys_on[i]->name);
-        }
-
-        if (strcmp(in->sys_off[i]->name, "chiSpectrumTilt") != 0 &&
-            strcmp(in->sys_off[i]->name, "chiNoSysSpectrum") != 0 &&
-            strcmp(in->sys_off[i]->name, "chiSpectrumOnly") != 0 &&
-            strcmp(in->sys_off[i]->name, "chiTotalRatesTilt") != 0 &&
-            strcmp(in->sys_off[i]->name, "chiNoSysTotalRates") != 0 &&
-            strcmp(in->sys_off[i]->name, "chiSpectrumCalib") != 0 &&
-            strcmp(in->sys_off[i]->name, "chiZero") != 0)
-        {
-          glb_warning("in rule %d: Rule with non-trivial systematics treatment %s inherited\n"
-                      "  from parent experiment. Make sure correlations among systematical "
-                      "errors are treated correctly", i, in->sys_off[i]->name);
-        }
-      }
-    }
-  }
+  /* JK - 2012-05-11 Removed because it was very confusing */
+//  if (in->parent)
+//  {
+//    if (in->numofrules > in->parent->numofrules)
+//    {
+//      for (i=0; i < in->parent->numofrules; i++)
+//      {
+//        glbSetChiFunctionInRule(in, i, GLB_ON, "chiZero", NULL);
+//        glbSetChiFunctionInRule(in, i, GLB_OFF, "chiZero", NULL);
+//      }
+//    }
+//    else
+//    {
+//      for (i=0; i < in->numofrules; i++)
+//      {
+//        if (strcmp(in->sys_on[i]->name, "chiSpectrumTilt") != 0 &&
+//            strcmp(in->sys_on[i]->name, "chiNoSysSpectrum") != 0 &&
+//            strcmp(in->sys_on[i]->name, "chiSpectrumOnly") != 0 &&
+//            strcmp(in->sys_on[i]->name, "chiTotalRatesTilt") != 0 &&
+//            strcmp(in->sys_on[i]->name, "chiNoSysTotalRates") != 0 &&
+//            strcmp(in->sys_on[i]->name, "chiSpectrumCalib") != 0 &&
+//            strcmp(in->sys_on[i]->name, "chiZero") != 0)
+//        {
+//          glb_warning("in rule %d: Rule with non-trivial systematics treatment %s inherited\n"
+//                      "  from parent experiment. Make sure correlations among systematical "
+//                      "errors are treated correctly", i, in->sys_on[i]->name);
+//        }
+//
+//        if (strcmp(in->sys_off[i]->name, "chiSpectrumTilt") != 0 &&
+//            strcmp(in->sys_off[i]->name, "chiNoSysSpectrum") != 0 &&
+//            strcmp(in->sys_off[i]->name, "chiSpectrumOnly") != 0 &&
+//            strcmp(in->sys_off[i]->name, "chiTotalRatesTilt") != 0 &&
+//            strcmp(in->sys_off[i]->name, "chiNoSysTotalRates") != 0 &&
+//            strcmp(in->sys_off[i]->name, "chiSpectrumCalib") != 0 &&
+//            strcmp(in->sys_off[i]->name, "chiZero") != 0)
+//        {
+//          glb_warning("in rule %d: Rule with non-trivial systematics treatment %s inherited\n"
+//                      "  from parent experiment. Make sure correlations among systematical "
+//                      "errors are treated correctly", i, in->sys_off[i]->name);
+//        }
+//      }
+//    }
+//  }
 
 
   if(in->filter_state==-1){in->filter_state=1;def=-1;}

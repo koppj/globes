@@ -272,3 +272,13 @@
 
 ********** This version tagged 3.2.3 ************
 
+11 May 2012 JK
+        - Increased max. number of channels, rules, etc. to 256
+
+********** This version tagged 3.2.4 ************
+
+11 May 2012 JK
+        - #DETECTOR# directive no longer copies rules - caused a lot of confusion
+
+********** This version tagged 3.2.5 ************
+
