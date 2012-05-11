@@ -324,7 +324,7 @@ void glbInitExpFromParent(struct glb_experiment *exp, struct glb_experiment *p)
 
   exp->parent     = p;
   glbExpAddChild(p, exp);
-  exp->names      = p->names;
+  exp->names      = p->names; //FIXME JK?
 
   if (p->version)   exp->version  = strdup(p->version);
   if (p->citation)  exp->citation = strdup(p->citation);
@@ -420,6 +420,28 @@ void glbInitExpFromParent(struct glb_experiment *exp, struct glb_experiment *p)
 
   /* Copy rules from parent */
   /* JK - 2012-05-11 Removed because it was very confusing */
+  exp->numofrules = 0;
+
+  // Remove rule names from namespace, since rules are not copied
+//FIXME JK?  glb_naming **ptr = &(exp->names);
+//  while (*ptr)
+//  {
+//    printf("%p %s\n", ptr, (*ptr)->name);
+//    if (strcmp((*ptr)->context, "rule") == 0)
+//    {
+//      glb_naming *ptr_old = *ptr;
+//      *ptr = ptr_old->next;
+//      ptr = &((*ptr)->next);
+//      glb_free(ptr_old->name);        ptr_old->name    = NULL;
+//      glb_free(ptr_old->context);     ptr_old->context = NULL;
+//      ptr_old->next = NULL;
+//      glb_free(ptr_old);
+//    }
+//    else
+//      ptr = &((*ptr)->next);
+//  }
+
+
 //  exp->numofrules = p->numofrules;
 //  for (i=0; i < exp->numofrules; i++)
 //  {

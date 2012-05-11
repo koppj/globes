@@ -279,6 +279,8 @@
 
 11 May 2012 JK
         - #DETECTOR# directive no longer copies rules - caused a lot of confusion
+        - Overloading existing environments should now work (still highly experimental
+          though)
 
 ********** This version tagged 3.2.5 ************
 

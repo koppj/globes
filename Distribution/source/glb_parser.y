@@ -271,7 +271,7 @@
 };
 
 
-static void grp_start(char* name)
+static void grp_start(char* name, int id) // id = index of the group among groups of same type
    {
      if(strncmp(name,"rule",4)==0 )
        {
@@ -282,46 +282,43 @@ static void grp_start(char* name)
    }
 
 
-static void grp_end(char* name)
+static void grp_end(char* name, int id) // id = index of the group among groups of same type
    {
      if(strncmp(name,"energy",6)==0 )
        {
-         if(buff.num_of_sm-1 >= 0)
+         if(id-1 >= 0)
            {
              ibf.options=glb_option_type_alloc();
              ibf.options=(glb_option_type *) memmove(ibf.options,&opt,
                                              sizeof(glb_option_type));
 
-             if(buff.smear_data[buff.num_of_sm-1]==NULL)
-               buff.smear_data[buff.num_of_sm-1]=glb_smear_alloc();
-             buff.smear_data[buff.num_of_sm-1]=
-               glb_copy_smear(buff.smear_data[buff.num_of_sm-1],&ibf);
+             if(buff.smear_data[id-1]==NULL)
+               buff.smear_data[id-1]=glb_smear_alloc();
+             buff.smear_data[id-1]=
+               glb_copy_smear(buff.smear_data[id-1],&ibf);
              glb_option_type_free(ibf.options);
              glb_option_type_reset(&opt);
              if(ibf.sigma!=NULL) glb_free(ibf.sigma);
              glb_smear_reset(&ibf);
-
            }
-
        }
 
      if(strncmp(name,"flux",4)==0 )
        {
-
-         if(buff.num_of_fluxes > 0)
+         if(id > 0)
            {
              glb_error("The 'flux' directive is deprecated (consider using 'nuflux').\n"
                        "The flux normalization may not be what you expect.\n"
                        "Please, consult the manual!");
              if(flt.builtin<=0) flt.builtin=GLB_OLD_NORM;
 
-             if (buff.fluxes[buff.num_of_fluxes-1] == NULL)
+             if (buff.fluxes[id-1] == NULL)
              {
-               buff.fluxes[buff.num_of_fluxes-1] = glb_malloc(sizeof(glb_flux));
-               memset(buff.fluxes[buff.num_of_fluxes-1], 0, sizeof(*buff.fluxes[0]));
-               glb_reset_flux(buff.fluxes[buff.num_of_fluxes-1]);
+               buff.fluxes[id-1] = glb_malloc(sizeof(glb_flux));
+               memset(buff.fluxes[id-1], 0, sizeof(*buff.fluxes[0]));
+               glb_reset_flux(buff.fluxes[id-1]);
              }
-             if (glb_copy_flux(buff.fluxes[buff.num_of_fluxes-1], &flt) != GLB_SUCCESS)
+             if (glb_copy_flux(buff.fluxes[id-1], &flt) != GLB_SUCCESS)
                glb_error("grp_end: Error copying flux data");
              glb_reset_flux(&flt);
            }
@@ -330,15 +327,15 @@ static void grp_end(char* name)
 
      if(strncmp(name,"nuflux",6)==0 )
        {
-         if(buff.num_of_fluxes > 0)
+         if(id > 0)
            {
-             if (buff.fluxes[buff.num_of_fluxes-1] == NULL)
+             if (buff.fluxes[id-1] == NULL)
              {
-               buff.fluxes[buff.num_of_fluxes-1] = glb_malloc(sizeof(glb_flux));
-               memset(buff.fluxes[buff.num_of_fluxes-1], 0, sizeof(*buff.fluxes[0]));
-               glb_reset_flux(buff.fluxes[buff.num_of_fluxes-1]);
+               buff.fluxes[id-1] = glb_malloc(sizeof(glb_flux));
+               memset(buff.fluxes[id-1], 0, sizeof(*buff.fluxes[0]));
+               glb_reset_flux(buff.fluxes[id-1]);
              }
-             if (glb_copy_flux(buff.fluxes[buff.num_of_fluxes-1], &flt) != GLB_SUCCESS)
+             if (glb_copy_flux(buff.fluxes[id-1], &flt) != GLB_SUCCESS)
                glb_error("grp_end: Error copying flux data");
              glb_reset_flux(&flt);
            }
@@ -346,15 +343,15 @@ static void grp_end(char* name)
 
      if(strncmp(name,"cross",5)==0 )
        {
-         if(buff.num_of_xsecs > 0)
+         if(id > 0)
            {
-             if (buff.xsecs[buff.num_of_xsecs-1] == NULL)
+             if (buff.xsecs[id-1] == NULL)
              {
-               buff.xsecs[buff.num_of_xsecs-1] = glb_malloc(sizeof(glb_xsec));
-               memset(buff.xsecs[buff.num_of_xsecs-1], 0, sizeof(*buff.xsecs[0]));
-               glb_reset_xsec(buff.xsecs[buff.num_of_xsecs-1]);
+               buff.xsecs[id-1] = glb_malloc(sizeof(glb_xsec));
+               memset(buff.xsecs[id-1], 0, sizeof(*buff.xsecs[0]));
+               glb_reset_xsec(buff.xsecs[id-1]);
              }
-             if (glb_copy_xsec(buff.xsecs[buff.num_of_xsecs-1], &xsc) != GLB_SUCCESS)
+             if (glb_copy_xsec(buff.xsecs[id-1], &xsc) != GLB_SUCCESS)
                glb_error("grp_end: Error copying cross section data");
              glb_reset_xsec(&xsc);
            }
@@ -364,7 +361,7 @@ static void grp_end(char* name)
 
      if(strncmp(name,"rule",4)==0 )
        {
-         int nr = buff.numofrules - 1;
+         int nr = id - 1;
 
          /* Parse old (numerical) errordims */
          if (buff.sys_on_strings[nr] == NULL  &&  errordim_sys_on >= 0)
@@ -376,7 +373,9 @@ static void grp_end(char* name)
      if( strncmp(name,"sys",3) == 0)
      {
        nuis.name = strdup(name_table->name);
-       glb_nuisance *n = buff.nuisance_params[buff.n_nuisance-1] = glb_alloc_nuisance();
+       if (!buff.nuisance_params[id-1])
+         buff.nuisance_params[id-1] = glb_alloc_nuisance();
+       glb_nuisance *n = buff.nuisance_params[id-1];
        if (n)  memcpy(n, &nuis, sizeof(glb_nuisance));
        glbResetNuisance();
      }
@@ -1303,11 +1302,11 @@ group: GID '(' NAME ')'
   loc_count=$3->value;
   glb_free(context);
   context =(char *) strdup($1);
-  grp_start(context);
+  grp_start(context, loc_count);
   if ($1)  { glb_free($1);  $1=NULL; }
 }
 GRPOPEN ingroup GRPCLOSE {
-  grp_end(context);
+  grp_end(context, loc_count);
 }
 | GID '(' RDF ')' GRPOPEN ingroup  GRPCLOSE {
     yyerror("Redefinition of an automatic variable %s", $3->name); YYERROR;
