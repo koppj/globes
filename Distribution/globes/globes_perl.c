@@ -10051,32 +10051,32 @@ XS(SWIG_init) {
   } while(0) /*@SWIG@*/;
   /*@SWIG:%set_constant@*/ do {
     SV *sv = get_sv((char*) SWIG_prefix "GLB_MAX_CHANNELS", TRUE | 0x2);
-    sv_setsv(sv, SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(256)));
+    sv_setsv(sv, SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(64)));
     SvREADONLY_on(sv);
   } while(0) /*@SWIG@*/;
   /*@SWIG:%set_constant@*/ do {
     SV *sv = get_sv((char*) SWIG_prefix "GLB_MAX_RULES", TRUE | 0x2);
-    sv_setsv(sv, SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(256)));
+    sv_setsv(sv, SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(64)));
     SvREADONLY_on(sv);
   } while(0) /*@SWIG@*/;
   /*@SWIG:%set_constant@*/ do {
     SV *sv = get_sv((char*) SWIG_prefix "GLB_MAX_NUISANCE", TRUE | 0x2);
-    sv_setsv(sv, SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(256)));
+    sv_setsv(sv, SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(128)));
     SvREADONLY_on(sv);
   } while(0) /*@SWIG@*/;
   /*@SWIG:%set_constant@*/ do {
     SV *sv = get_sv((char*) SWIG_prefix "GLB_MAX_SMEAR", TRUE | 0x2);
-    sv_setsv(sv, SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(256)));
+    sv_setsv(sv, SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(64)));
     SvREADONLY_on(sv);
   } while(0) /*@SWIG@*/;
   /*@SWIG:%set_constant@*/ do {
     SV *sv = get_sv((char*) SWIG_prefix "GLB_MAX_FLUXES", TRUE | 0x2);
-    sv_setsv(sv, SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(256)));
+    sv_setsv(sv, SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(64)));
     SvREADONLY_on(sv);
   } while(0) /*@SWIG@*/;
   /*@SWIG:%set_constant@*/ do {
     SV *sv = get_sv((char*) SWIG_prefix "GLB_MAX_XSECS", TRUE | 0x2);
-    sv_setsv(sv, SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(256)));
+    sv_setsv(sv, SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(64)));
     SvREADONLY_on(sv);
   } while(0) /*@SWIG@*/;
   ST(0) = &PL_sv_yes;

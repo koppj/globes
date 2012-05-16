@@ -82,12 +82,12 @@ enum glb_enum_minimizers
 #define GLB_MAX_EXP      300
 
 /* maximum numbers of channels, rules, ... per experiment */
-#define GLB_MAX_CHANNELS 256
-#define GLB_MAX_RULES    256
-#define GLB_MAX_NUISANCE 256
-#define GLB_MAX_SMEAR    256
-#define GLB_MAX_FLUXES   256
-#define GLB_MAX_XSECS    256
+#define GLB_MAX_CHANNELS  64
+#define GLB_MAX_RULES     64
+#define GLB_MAX_NUISANCE 128
+#define GLB_MAX_SMEAR     64
+#define GLB_MAX_FLUXES    64
+#define GLB_MAX_XSECS     64
 
 
 

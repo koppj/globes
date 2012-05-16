@@ -284,6 +284,7 @@ static void grp_start(char* name, int id) // id = index of the group among group
 
 static void grp_end(char* name, int id) // id = index of the group among groups of same type
    {
+   // FIXME JK: Overloading environments may cause memory leaks
      if(strncmp(name,"energy",6)==0 )
        {
          if(id-1 >= 0)
