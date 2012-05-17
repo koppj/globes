@@ -53,7 +53,7 @@
 #define INT_LIST_INDEXED 5
 #define ENERGY_MATRIX 6
 #define INT_INDEXED 7
-#define INT_INDEXED_PAIR 8
+//#define INT_INDEXED_PAIR 8
 #define DOUBLE_INDEXED 9
 #define DOUBLE_INDEXED_PAIR 10
 #define DOUBLE_INDEXED_PAIR_INV 11
@@ -599,31 +599,39 @@ static int set_pair(char *name,double value,double value2,int scalar)
                    }
                }
 
-             if(token_list[i].scalar==INT_INDEXED_PAIR) //int
-               {
-                 if(value >= token_list[i].rl && value <= token_list[i].ru)
-                   {
-
-                     ibf=(int*) token_list[i].ptr;
-                     ibf[(loc_count-1)+0*32]=(int) value;
-                     return 0;
-                   }
-                 else
-                   {
-                     fprintf(stderr,"Error: Value for %s out of range\n",
-                             token_list[i].token);
-                     return 2;
-                   }
-               }
+             // JK - 2012-05-17 I think the following wouldn't work. It's not used,
+             // so I comment it out for the moment
+//             if(token_list[i].scalar==INT_INDEXED_PAIR) //int
+//               {
+//                 if(value >= token_list[i].rl && value <= token_list[i].ru)
+//                   {
+//
+//                     ibf=(int*) token_list[i].ptr;
+//                     ibf[(loc_count-1)+0*32]=(int) value;
+//                     return 0;
+//                   }
+//                 else
+//                   {
+//                     fprintf(stderr,"Error: Value for %s out of range\n",
+//                             token_list[i].token);
+//                     return 2;
+//                   }
+//               }
 
              if(token_list[i].scalar==DOUBLE_INDEXED_PAIR) //int
                {
                  if(value >= token_list[i].rl && value <= token_list[i].ru)
                    {
-
-                     dbf=(double*) token_list[i].ptr;
-                     dbf[(loc_count-1)+0*32]=(double) value;
-                     dbf[(loc_count-1)+1*32]=(double) value2;
+                     if (strcmp(token_list[i].ctx, "rule") != 0)
+                       fprintf(stderr, "Error: DOUBLE_INDEXED_PAIR works only inside "
+                                       "a rule environment! Ignoring it.\n");
+                     else
+                     {
+                       int delta = GLB_MAX_RULES;
+                       dbf=(double*) token_list[i].ptr;
+                       dbf[(loc_count-1)+0*delta]=(double) value;
+                       dbf[(loc_count-1)+1*delta]=(double) value2;
+                     }
                      return 0;
                    }
                  else
@@ -1500,12 +1508,14 @@ rule: brule {
   glb_free($1);
 }
 | SYS_ON_FUNCTION '=' FNAME {
-  buff.sys_on_strings[buff.numofrules-1] = strdup($3);
+//JK, 2012-05-17  buff.sys_on_strings[buff.numofrules-1] = strdup($3);
+  buff.sys_on_strings[loc_count-1] = strdup($3);
   if ($1)  { glb_free($1);  $1=NULL; }
   if ($3)  { glb_free($3);  $3=NULL; }
 }
 | SYS_OFF_FUNCTION '=' FNAME {
-  buff.sys_off_strings[buff.numofrules-1] = strdup($3);
+//JK, 2012-05-17  buff.sys_off_strings[buff.numofrules-1] = strdup($3);
+  buff.sys_off_strings[loc_count-1] = strdup($3);
   if ($1)  { glb_free($1);  $1=NULL; }
   if ($3)  { glb_free($3);  $3=NULL; }
 }
