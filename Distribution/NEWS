@@ -288,3 +288,5 @@
         - Went back to max. 64 rules/channels etc. and 128 nuisance params.
           Memory consumption was quite high otherwise
 
+********** This version tagged 3.2.6 ************
+
