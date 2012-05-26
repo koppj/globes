@@ -7699,6 +7699,79 @@ XS(_wrap_glbRegisterProbabilityEngine) {
 }
 
 
+XS(_wrap_glbSetProbabilityEngineInExperiment) {
+  {
+    int arg1 ;
+    int arg2 ;
+    glb_probability_matrix_function arg3 = (glb_probability_matrix_function) 0 ;
+    glb_set_oscillation_parameters_function arg4 = (glb_set_oscillation_parameters_function) 0 ;
+    glb_get_oscillation_parameters_function arg5 = (glb_get_oscillation_parameters_function) 0 ;
+    void *arg6 = (void *) 0 ;
+    int result;
+    int val1 ;
+    int ecode1 = 0 ;
+    int val2 ;
+    int ecode2 = 0 ;
+    int res6 ;
+    int argvi = 0;
+    dXSARGS;
+    
+    if ((items < 6) || (items > 6)) {
+      SWIG_croak("Usage: glbSetProbabilityEngineInExperiment(exp,n_parameters,prob_func,set_params_func,get_params_func,user_data);");
+    }
+    ecode1 = SWIG_AsVal_int SWIG_PERL_CALL_ARGS_2(ST(0), &val1);
+    if (!SWIG_IsOK(ecode1)) {
+      SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "glbSetProbabilityEngineInExperiment" "', argument " "1"" of type '" "int""'");
+    } 
+    arg1 = (int)(val1);
+    ecode2 = SWIG_AsVal_int SWIG_PERL_CALL_ARGS_2(ST(1), &val2);
+    if (!SWIG_IsOK(ecode2)) {
+      SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "glbSetProbabilityEngineInExperiment" "', argument " "2"" of type '" "int""'");
+    } 
+    arg2 = (int)(val2);
+    {
+      int res = SWIG_ConvertFunctionPtr(ST(2), (void**)(&arg3), SWIGTYPE_p_f_a_3__a_3__double_int_double_int_p_q_const__double_p_q_const__double_double_p_void__int);
+      if (!SWIG_IsOK(res)) {
+        SWIG_exception_fail(SWIG_ArgError(res), "in method '" "glbSetProbabilityEngineInExperiment" "', argument " "3"" of type '" "glb_probability_matrix_function""'"); 
+      }
+    }
+    {
+      int res = SWIG_ConvertFunctionPtr(ST(3), (void**)(&arg4), SWIGTYPE_p_f_p_struct_glb_params_type_p_void__int);
+      if (!SWIG_IsOK(res)) {
+        SWIG_exception_fail(SWIG_ArgError(res), "in method '" "glbSetProbabilityEngineInExperiment" "', argument " "4"" of type '" "glb_set_oscillation_parameters_function""'"); 
+      }
+    }
+    {
+      int res = SWIG_ConvertFunctionPtr(ST(4), (void**)(&arg5), SWIGTYPE_p_f_p_struct_glb_params_type_p_void__int);
+      if (!SWIG_IsOK(res)) {
+        SWIG_exception_fail(SWIG_ArgError(res), "in method '" "glbSetProbabilityEngineInExperiment" "', argument " "5"" of type '" "glb_get_oscillation_parameters_function""'"); 
+      }
+    }
+    res6 = SWIG_ConvertPtr(ST(5),SWIG_as_voidptrptr(&arg6), 0, 0);
+    if (!SWIG_IsOK(res6)) {
+      SWIG_exception_fail(SWIG_ArgError(res6), "in method '" "glbSetProbabilityEngineInExperiment" "', argument " "6"" of type '" "void *""'"); 
+    }
+    result = (int)glbSetProbabilityEngineInExperiment(arg1,arg2,arg3,arg4,arg5,arg6);
+    ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
+    
+    
+    
+    
+    
+    
+    XSRETURN(argvi);
+  fail:
+    
+    
+    
+    
+    
+    
+    SWIG_croak_null();
+  }
+}
+
+
 XS(_wrap_glbGetNumOfOscParams) {
   {
     int result;
@@ -9599,6 +9672,7 @@ static swig_command_info swig_commands[] = {
 {"globesc::glbHasParentExp", _wrap_glbHasParentExp},
 {"globesc::glbGetParentExp", _wrap_glbGetParentExp},
 {"globesc::glbRegisterProbabilityEngine", _wrap_glbRegisterProbabilityEngine},
+{"globesc::glbSetProbabilityEngineInExperiment", _wrap_glbSetProbabilityEngineInExperiment},
 {"globesc::glbGetNumOfOscParams", _wrap_glbGetNumOfOscParams},
 {"globesc::glbTotalRuleRate", _wrap_glbTotalRuleRate},
 {"globesc::glbGetChannelRatePtr", _wrap_glbGetChannelRatePtr},

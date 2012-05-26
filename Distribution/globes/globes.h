@@ -340,6 +340,12 @@ int glbRegisterProbabilityEngine(int n_parameters,
                  glb_set_oscillation_parameters_function set_params_func,
                  glb_get_oscillation_parameters_function get_params_func,
                  void *user_data);
+int glbSetProbabilityEngineInExperiment(int exp, int n_parameters,
+                 glb_probability_matrix_function prob_func,
+                 glb_set_oscillation_parameters_function set_params_func,
+                 glb_get_oscillation_parameters_function get_params_func,
+                 void *user_data);
+
 int glbGetNumOfOscParams();
 
 

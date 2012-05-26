@@ -235,6 +235,13 @@ int glb_default_smear(glb_smear *in,const struct glb_experiment *head)
   if(in->e_max==-1) {glb_exp_error(head, "No maximal energy defined!");s=-1;}
   if(in->e_max<=in->e_min) {glb_error("Maximal energy must be larger than"
                                       " the minimal energy!");s=-1;}
+  if (in->e_min != head->emin  ||  in->e_max != head->emax) {
+    glb_exp_error(head, "Wrong energy range in smearnig matrix"); s=-1;
+  }
+  if (in->numofbins != head->numofbins) {
+    glb_exp_error(head, "Wrong number of bins in smearnig matrix"); s=-1;
+  }
+                                
   if(in->e_sim_min!=-1||in->e_sim_max!=-1)
     {
       if(in->e_sim_min<0)
@@ -242,6 +249,14 @@ int glb_default_smear(glb_smear *in,const struct glb_experiment *head)
       if(in->e_sim_max<=in->e_sim_min)
         {glb_exp_error(head, "Maximal sim energy must belarger than the minimal"
                    " sim energy!");s=-1;}
+
+      if (in->e_sim_min != head->simtresh  ||  in->e_sim_max != head->simbeam) {
+        glb_exp_error(head, "Sampling range in smearnig matrix does not agree "
+                            "with $sampling_min/max"); s=-1;
+      }
+      if (in->simbins != head->simbins) {
+        glb_exp_error(head, "Wrong number of sampling points in smearnig matrix"); s=-1;
+      }
     }
   /*
    * if(in->e_sim_min==-1) {in->e_sim_min=in->e_min;d=2;}

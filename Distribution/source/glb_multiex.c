@@ -290,6 +290,11 @@ void glbInitExp(glb_exp ins)
   in->densitytab=NULL;
   in->densitybuffer=NULL;
   in->energy_tab=NULL;
+
+  in->probability_matrix         = NULL;
+  in->set_oscillation_parameters = NULL;
+  in->get_oscillation_parameters = NULL;
+  in->probability_user_data      = NULL;
 }
 
 
@@ -324,7 +329,8 @@ void glbInitExpFromParent(struct glb_experiment *exp, struct glb_experiment *p)
 
   exp->parent     = p;
   glbExpAddChild(p, exp);
-  exp->names      = p->names; //FIXME JK?
+  exp->names      = NULL; /* Namespace will be copied by parser once all
+                             AEDL declarations for this experiment are parsed */
 
   if (p->version)   exp->version  = strdup(p->version);
   if (p->citation)  exp->citation = strdup(p->citation);
@@ -362,7 +368,6 @@ void glbInitExpFromParent(struct glb_experiment *exp, struct glb_experiment *p)
     exp->xsecs[i] = p->xsecs[i];
 
   /* Copy smearing definitions from parent */
-  /* FIXME FIXME FIXME: What if smearing matrix has wrong dimensions? */
   exp->num_of_sm = p->num_of_sm;
   for (i=0; i < exp->num_of_sm; i++)
   {
@@ -373,22 +378,34 @@ void glbInitExpFromParent(struct glb_experiment *exp, struct glb_experiment *p)
     }
     if (p->smear[i])        /* Explicit smearing matrix given in AEDL file */
     {
-      exp->lowrange[i] = glb_malloc(p->numofbins * sizeof(int));
-      exp->uprange[i]  = glb_malloc(p->numofbins * sizeof(int));
-      exp->smear[i]    = glb_malloc(p->numofbins * sizeof(double *));
+      exp->lowrange[i] = glb_malloc((p->numofbins+1) * sizeof(int));
+      exp->uprange[i]  = glb_malloc((p->numofbins+1) * sizeof(int));
+      exp->smear[i]    = glb_malloc((p->numofbins+1) * sizeof(double *));
+      memset(exp->lowrange[i], 0, (p->numofbins+1) * sizeof(int));
+      memset(exp->uprange[i],  0, (p->numofbins+1) * sizeof(int));
+      memset(exp->smear[i],    0, (p->numofbins+1) * sizeof(double *));
       if (exp->lowrange[i]  &&  exp->uprange[i]  &&  exp->smear[i])
       {
-        for (j=0; j < p->numofbins; j++)
+        for (j=0; j < p->numofbins+1; j++)
         {
+          exp->lowrange[i][j] = p->lowrange[i][j];
+          exp->uprange[i][j]  = p->uprange[i][j];
+          if (exp->lowrange[i][j] < 0 || exp->uprange[i][j] < 0)
+            break; /* Just in case the smearing matrix has incorrect dimensions */
           if (p->smear[i][j])
           {
-            exp->lowrange[i][j] = p->lowrange[i][j];
-            exp->uprange[i][j]  = p->uprange[i][j];
-            exp->smear[i][j]    = glb_malloc((exp->uprange[i][j] - exp->lowrange[i][j] + 1)
-                                    * sizeof(double));
-            memcpy(exp->smear[i][j], p->smear[i][j],
-                   (exp->uprange[i][j] - exp->lowrange[i][j] + 1) * sizeof(double));
+            exp->smear[i][j] = glb_malloc((exp->uprange[i][j] - exp->lowrange[i][j] + 2)
+                                 * sizeof(double));
+            if (exp->smear[i][j] != NULL)
+              for (k=0; k < exp->uprange[i][j] - exp->lowrange[i][j] + 2; k++)
+              {
+                exp->smear[i][j][k] = p->smear[i][j][k];
+                if (exp->smear[i][j][k] < 0)
+                  break; /* Just in case the smearing matrix has incorrect dimensions */
+              }
           }
+          else
+            exp->smear[i][j] = NULL;
         }
       }
       else
@@ -407,40 +424,21 @@ void glbInitExpFromParent(struct glb_experiment *exp, struct glb_experiment *p)
                                                  sizeof(int) * exp->numofchannels);
   for (i=0; i < exp->numofchannels; i++)
   {
-    int n = sizeof(double) * (p->simbins + 1);
+    int n1 = sizeof(double) * (p->simbins + 1);
+    int n2 = sizeof(double) * (p->numofbins + 1);
     exp->user_pre_smearing_channel[i]
-      = glb_duplicate_array(p->user_pre_smearing_channel[i], n);
+      = glb_duplicate_array(p->user_pre_smearing_channel[i], n1);
     exp->user_post_smearing_channel[i]
-      = glb_duplicate_array(p->user_post_smearing_channel[i], n);
+      = glb_duplicate_array(p->user_post_smearing_channel[i], n2);
     exp->user_pre_smearing_background[i]
-      = glb_duplicate_array(p->user_pre_smearing_background[i], n);
+      = glb_duplicate_array(p->user_pre_smearing_background[i], n1);
     exp->user_post_smearing_background[i]
-      = glb_duplicate_array(p->user_post_smearing_background[i], n);
+      = glb_duplicate_array(p->user_post_smearing_background[i], n2);
   }
 
   /* Copy rules from parent */
   /* JK - 2012-05-11 Removed because it was very confusing */
   exp->numofrules = 0;
-
-  // Remove rule names from namespace, since rules are not copied
-//FIXME JK?  glb_naming **ptr = &(exp->names);
-//  while (*ptr)
-//  {
-//    printf("%p %s\n", ptr, (*ptr)->name);
-//    if (strcmp((*ptr)->context, "rule") == 0)
-//    {
-//      glb_naming *ptr_old = *ptr;
-//      *ptr = ptr_old->next;
-//      ptr = &((*ptr)->next);
-//      glb_free(ptr_old->name);        ptr_old->name    = NULL;
-//      glb_free(ptr_old->context);     ptr_old->context = NULL;
-//      ptr_old->next = NULL;
-//      glb_free(ptr_old);
-//    }
-//    else
-//      ptr = &((*ptr)->next);
-//  }
-
 
 //  exp->numofrules = p->numofrules;
 //  for (i=0; i < exp->numofrules; i++)
@@ -699,7 +697,8 @@ void glbResetExp(struct glb_experiment *in)
       if (in->smear != NULL  &&  in->smear[i] != NULL)
       {
         for(j=0;j<in->numofbins;j++)
-          my_free(in->smear[i][j]);
+          my_free(in->smear[i][j]); /* FIXME A segfault can happen here
+                                      if the smearing matrix has not numofbins entries */
         my_free(in->smear[i]);
       }
     }
@@ -1315,14 +1314,49 @@ int glbDefaultExp(glb_exp ins)
 
   /* Energy resolution/detector response function (``smearing'') */
   if (in->num_of_sm == -1) { glb_exp_error(in, "No smearing data specified!"); status=-1; }
-  for(i=0;i<in->num_of_sm;i++)
+  for(i=0; i < in->num_of_sm; i++)
   {
     /* Smearing matrix explicitly given in AEDL file? */
-    if(in->smear[i] != NULL)
+    if (in->smear[i] != NULL)
     {
       glb_set_up_smear_data(in->smear_data[i],in);
       glb_default_smear(in->smear_data[i],in);
-    }
+
+      /* Cross-checks, relevant if the user redefines the binning in the AEDL file */
+      if (in->lowrange[i] == NULL) {
+        glb_exp_error(in, "No lowrange defined!"); status=-1;
+      }
+      else
+      {
+        int j;
+        for (j=0; in->lowrange[i][j] >= 0; j++)
+          if (in->lowrange[i][j] < 0 || in->lowrange[i][j] > in->simbins-1) {
+            glb_exp_error(in, "in smearing matrix %d, line %d: Invalid lower "
+                          "sampling point index: %d", i, j, in->lowrange[i][j]); status=-1;
+          }
+        if (j != in->numofbins) {
+          glb_exp_error(in, "number of lines in smearing matrix %d (%d) does not match number "
+                        "of bins (%d) in experiment", i, j, in->numofbins); status=-1;
+          }
+      }
+
+      if (in->uprange[i] == NULL) {
+        glb_exp_error(in, "No uprange defined!"); status=-1;
+      }
+      else
+      {
+        int j;
+        for (j=0; in->uprange[i][j] >= 0; j++)
+          if (in->uprange[i][j] < 0 || in->uprange[i][j] > in->simbins-1) {
+            glb_exp_error(in, "in smearing matrix %d, line %d: Invalid upper "
+                          "sampling point index: %d", i, j, in->uprange[i][j]); status=-1;
+          }
+        if (j != in->numofbins) {
+          glb_exp_error(in, "number of lines in smearing matrix %d (%d) does not match number "
+                        "of bins (%d) in experiment", i, j, in->numofbins); status=-1;
+          }
+      }
+    } /* if (smear[i] != NULL) */
 
     /* If not, generate it according to the parameters from the AEDL file */
     else
@@ -1342,12 +1376,18 @@ int glbDefaultExp(glb_exp ins)
       in->simtresh=in->smear_data[i]->e_sim_min;
       in->simbeam=in->smear_data[i]->e_sim_max;
       in->simbins=in->smear_data[i]->simbins;
-    }
 
-    if(in->smear[i]==NULL){glb_exp_error(in, "No smear matrix defined!"); status=-1;}
-    if(in->lowrange[i]==NULL){glb_exp_error(in, "No lowrange defined!");status=-1;}
-    if(in->uprange[i]==NULL){glb_exp_error(in, "No uprange defined!");status=-1;}
-  }
+      if (in->smear[i] == NULL) {
+        glb_exp_error(in, "No smear matrix defined!"); status=-1;
+      }
+      if (in->lowrange[i] == NULL) {
+        glb_exp_error(in, "No lowrange defined!"); status=-1;
+      }
+      if (in->uprange[i] == NULL) {
+        glb_exp_error(in, "No uprange defined!"); status=-1;
+      }
+    } /* else */
+  } /* for(i) */
 
   if(in->simtresh==-1){glb_exp_error(in, "No simtresh defined!");status=-1;}
   if(in->simbeam==-1){glb_exp_error(in, "No simbeam defined!");status=-1;}

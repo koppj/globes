@@ -480,6 +480,12 @@ struct glb_experiment {
   int *sys_on_multiex_errors_bg[GLB_MAX_RULES][GLB_MAX_CHANNELS];  /* parameters relevant to   */
   int *sys_off_multiex_errors_sig[GLB_MAX_RULES][GLB_MAX_CHANNELS];/* the channels making up   */
   int *sys_off_multiex_errors_bg[GLB_MAX_RULES][GLB_MAX_CHANNELS]; /* the rules                */
+
+  /* Probability engine for this experiment (if different from default) */
+  glb_probability_matrix_function probability_matrix;
+  glb_set_oscillation_parameters_function set_oscillation_parameters;
+  glb_get_oscillation_parameters_function get_oscillation_parameters;
+  void *probability_user_data;
 };
 
 #endif /* GLB_TYPES_H 1 */

@@ -184,6 +184,7 @@ package globes;
 *glbHasParentExp = *globesc::glbHasParentExp;
 *glbGetParentExp = *globesc::glbGetParentExp;
 *glbRegisterProbabilityEngine = *globesc::glbRegisterProbabilityEngine;
+*glbSetProbabilityEngineInExperiment = *globesc::glbSetProbabilityEngineInExperiment;
 *glbGetNumOfOscParams = *globesc::glbGetNumOfOscParams;
 *glbTotalRuleRate = *globesc::glbTotalRuleRate;
 *glbGetChannelRatePtr = *globesc::glbGetChannelRatePtr;

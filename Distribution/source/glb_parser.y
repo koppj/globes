@@ -284,8 +284,7 @@ static void grp_start(char* name, int id) // id = index of the group among group
 
 static void grp_end(char* name, int id) // id = index of the group among groups of same type
    {
-   // FIXME JK: Overloading environments may cause memory leaks
-     if(strncmp(name,"energy",6)==0 )
+     if (strncmp(name,"energy",6)==0 )
        {
          if(id-1 >= 0)
            {
@@ -293,10 +292,13 @@ static void grp_end(char* name, int id) // id = index of the group among groups 
              ibf.options=(glb_option_type *) memmove(ibf.options,&opt,
                                              sizeof(glb_option_type));
 
-             if(buff.smear_data[id-1]==NULL)
-               buff.smear_data[id-1]=glb_smear_alloc();
-             buff.smear_data[id-1]=
-               glb_copy_smear(buff.smear_data[id-1],&ibf);
+             if (buff.smear_data[id-1] != NULL)
+             {
+               glb_smear_free(buff.smear_data[id-1]);
+               buff.smear_data[id-1] = NULL;
+             }
+             buff.smear_data[id-1] = glb_smear_alloc();
+             buff.smear_data[id-1] = glb_copy_smear(buff.smear_data[id-1],&ibf);
              glb_option_type_free(ibf.options);
              glb_option_type_reset(&opt);
              if(ibf.sigma!=NULL) glb_free(ibf.sigma);
@@ -304,7 +306,7 @@ static void grp_end(char* name, int id) // id = index of the group among groups 
            }
        }
 
-     if(strncmp(name,"flux",4)==0 )
+     if (strncmp(name,"flux",4)==0 )
        {
          if(id > 0)
            {
@@ -313,12 +315,14 @@ static void grp_end(char* name, int id) // id = index of the group among groups 
                        "Please, consult the manual!");
              if(flt.builtin<=0) flt.builtin=GLB_OLD_NORM;
 
-             if (buff.fluxes[id-1] == NULL)
-             {
-               buff.fluxes[id-1] = glb_malloc(sizeof(glb_flux));
-               memset(buff.fluxes[id-1], 0, sizeof(*buff.fluxes[0]));
-               glb_reset_flux(buff.fluxes[id-1]);
+             if (buff.fluxes[id-1] != NULL)
+             { 
+               glb_free_flux(buff.fluxes[id-1]);
+               buff.fluxes[id-1] = NULL;
              }
+             buff.fluxes[id-1] = glb_malloc(sizeof(glb_flux));
+             memset(buff.fluxes[id-1], 0, sizeof(*buff.fluxes[0]));
+             glb_reset_flux(buff.fluxes[id-1]);
              if (glb_copy_flux(buff.fluxes[id-1], &flt) != GLB_SUCCESS)
                glb_error("grp_end: Error copying flux data");
              glb_reset_flux(&flt);
@@ -326,32 +330,36 @@ static void grp_end(char* name, int id) // id = index of the group among groups 
        }
 
 
-     if(strncmp(name,"nuflux",6)==0 )
+     if (strncmp(name,"nuflux",6)==0 )
        {
          if(id > 0)
            {
-             if (buff.fluxes[id-1] == NULL)
-             {
-               buff.fluxes[id-1] = glb_malloc(sizeof(glb_flux));
-               memset(buff.fluxes[id-1], 0, sizeof(*buff.fluxes[0]));
-               glb_reset_flux(buff.fluxes[id-1]);
+             if (buff.fluxes[id-1] != NULL)
+             { 
+               glb_free_flux(buff.fluxes[id-1]);
+               buff.fluxes[id-1] = NULL;
              }
+             buff.fluxes[id-1] = glb_malloc(sizeof(glb_flux));
+             memset(buff.fluxes[id-1], 0, sizeof(*buff.fluxes[0]));
+             glb_reset_flux(buff.fluxes[id-1]);
              if (glb_copy_flux(buff.fluxes[id-1], &flt) != GLB_SUCCESS)
                glb_error("grp_end: Error copying flux data");
              glb_reset_flux(&flt);
            }
        }
 
-     if(strncmp(name,"cross",5)==0 )
+     if (strncmp(name,"cross",5)==0 )
        {
          if(id > 0)
            {
-             if (buff.xsecs[id-1] == NULL)
+             if (buff.xsecs[id-1] != NULL)
              {
-               buff.xsecs[id-1] = glb_malloc(sizeof(glb_xsec));
-               memset(buff.xsecs[id-1], 0, sizeof(*buff.xsecs[0]));
-               glb_reset_xsec(buff.xsecs[id-1]);
+               glb_free_xsec(buff.xsecs[id-1]);
+               buff.xsecs[id-1] = NULL;
              }
+             buff.xsecs[id-1] = glb_malloc(sizeof(glb_xsec));
+             memset(buff.xsecs[id-1], 0, sizeof(*buff.xsecs[0]));
+             glb_reset_xsec(buff.xsecs[id-1]);
              if (glb_copy_xsec(buff.xsecs[id-1], &xsc) != GLB_SUCCESS)
                glb_error("grp_end: Error copying cross section data");
              glb_reset_xsec(&xsc);
@@ -360,7 +368,7 @@ static void grp_end(char* name, int id) // id = index of the group among groups 
 
 
 
-     if(strncmp(name,"rule",4)==0 )
+     if (strncmp(name,"rule",4)==0 )
        {
          int nr = id - 1;
 
@@ -371,8 +379,13 @@ static void grp_end(char* name, int id) // id = index of the group among groups 
            buff.sys_off_strings[nr] = glbConvertErrorDim(errordim_sys_off);
        }
 
-     if( strncmp(name,"sys",3) == 0)
+     if (strncmp(name,"sys",3) == 0)
      {
+       if (nuis.name)
+       {
+         glb_free(nuis.name);
+         nuis.name = NULL;
+       }
        nuis.name = strdup(name_table->name);
        if (!buff.nuisance_params[id-1])
          buff.nuisance_params[id-1] = glb_alloc_nuisance();
@@ -1002,86 +1015,80 @@ static int set_exp_energy(char *name, glb_List **value)
   int v1,v2;
   double **list;
 
-  for(i=0;token_list[i].token!=NULL;i++)
+  for(i=0; token_list[i].token != NULL; i++)
+  {
+    if(strncmp(name,token_list[i].token, strlen(token_list[i].token)) == 0 &&
+       strncmp(context,token_list[i].ctx, strlen(token_list[i].ctx)) == 0)
     {
-      if(strncmp(name,token_list[i].token,strlen(token_list[i].token))==0&&
-         strncmp(context,token_list[i].ctx,
-                 strlen(token_list[i].ctx))==0 )
-        {
-          switch((int) token_list[i].scalar) {
+      switch((int) token_list[i].scalar)
+      {
+        case ENERGY_MATRIX:
+          list = (double**) glb_malloc(sizeof(double* ) * (energy_len+1));
+          buff.lowrange[loc_count-1] = (int*) glb_malloc((energy_len+1)*sizeof(int));
+          buff.uprange[loc_count-1]  = (int*) glb_malloc((energy_len+1)*sizeof(int));
 
-          case ENERGY_MATRIX:
-            list=(double**) glb_malloc(sizeof(double* ) * energy_len);
-            buff.lowrange[loc_count-1]=(int*) glb_malloc(energy_len*sizeof(int));
-            buff.uprange[loc_count-1]=(int*) glb_malloc(energy_len*sizeof(int));
+          /* Loop over all analysis bins */
+          for(l=0; l < energy_len; l++)
+          {
+            len = (int) list_length(value[l]); /* how long is the list provided by the user? */
+            if (len < 2) {
+              fprintf(stderr, "Error: in line %d: in @smear number %d: sublist %d too short!\n",
+                              glb_line_num, loc_count, l); return 2;
+            }
 
-            for(l=0;l<energy_len;l++)
+            dbf = (double***) token_list[i].ptr;
+            list[l] = (double*) glb_malloc(sizeof(double)*(len-2+1));
+            dbf[loc_count-1] = list;
+
+            v1 = (int) list_take(value[l], len-0-1); /* Sampling point range for this bin */
+            v2 = (int) list_take(value[l], len-1-1);
+
+            if(v1 >= 0  && v2 <= buff.simbins  &&
+               v2 >= v1 && v2-v1 == len-3)
+            {
+              buff.lowrange[loc_count-1][l] = v1;
+              buff.uprange[loc_count-1][l]  = v2;
+            }
+            else
+            {
+              fprintf(stderr,"Error: In line %d: Value for ranges in smear out of range\n",
+                      glb_line_num);
+              glb_free(list[l]);
+              glb_free(buff.lowrange[loc_count-1]);
+              glb_free(buff.uprange[loc_count-1]);
+              return 2;
+            }
+
+            /* Loop over all sampling points contributing to the current analysis bin */
+            for(k=0; k < len-2; k++)
+            {
+              val = list_take(value[l], len-(k+2)-1);
+              if (val >= token_list[i].rl && val <= token_list[i].ru)
+                list[l][k]=val;
+              else
               {
-                len=(int) list_length(value[l]); // how long is the list
-                if(len<2) {fprintf(stderr,"Error: in line %d: in @smear "
-                                   "number %d: sublist %d is too short!\n"
-                                   ,glb_line_num,loc_count,l);return 2;}
-                //lbf=(int*) token_list[i].len;
-
-
-                //lbf[loc_count-1]=len;  // setting the length correctly in exp
-
-
-
-                dbf= (double***) token_list[i].ptr;
-                list[l]=(double*) glb_malloc(sizeof(double)*(len-2));
-                dbf[loc_count-1]=list;
-
-
-                v1=(int) list_take(value[l],len-0-1);
-                v2=(int) list_take(value[l],len-1-1);
-
-                if(v1 >= 0 &&  v2 <= buff.simbins
-                   && v2 >= v1&&v2-v1==len-3 )
-                  {
-
-                    buff.lowrange[loc_count-1][l]= v1;
-                    buff.uprange[loc_count-1][l]= v2;
-
-                  }
-                else
-                  {
-                    fprintf(stderr,"Error: In line %d: "
-                            "Value for ranges in smear out of range\n",
-                            glb_line_num);
-                    glb_free(list[l]);
-                    glb_free(buff.lowrange[loc_count-1]);
-                    glb_free(buff.uprange[loc_count-1]);
-                    return 2;
-                  }
-
-                for(k=0;k<len-2;k++)
-                  {
-                    val=list_take(value[l],len-(k+2)-1);
-
-                    if(val >= token_list[i].rl && val <= token_list[i].ru)
-                      {
-                        list[l][k]=val;
-
-                      }
-                    else
-                      {
-                        fprintf(stderr,"Error: In line %d: "
-                                "Value for %s out of range\n",
-                                glb_line_num,token_list[i].token);
-                        free(list[l]);
-                        return 2;
-                      }
-                  }
-                list_free(value[l]);
+                fprintf(stderr,"Error: In line %d: Value for %s out of range\n",
+                        glb_line_num, token_list[i].token);
+                free(list[l]);
+                return 2;
               }
-            glb_free(value);
-            return 0;
-            break;
+            } /* for (k) */
+            list_free(value[l]);
+            value[l] = NULL;
 
-          }
-        }
+            list[l][len-2] = -1; /* This signals the end of the list */
+          } /* for (l) */
+          glb_free(value);
+          value = NULL;
+
+          list[energy_len] = NULL; /* This signals the end of the list */
+          buff.lowrange[loc_count-1][energy_len] = -1;
+          buff.uprange[loc_count-1][energy_len] = -1;
+          return 0;
+          break;
+      } /* switch */
     }
+  } /* for (i) */
   return 1;
 }
 
@@ -2033,6 +2040,26 @@ void glbNewDetector()
   glbResetNuisance();
   glbInitExpFromParent(&buff, buff_list[exp_count-1]);
      //FIXME FIXME FIXME What if parent is not/incorrectly defined?
+
+  // Remove rule names from namespace (rules are not copied by glbInitExpFromParent)
+  glb_namerec **ptr = &name_table;
+  while (*ptr)
+  {
+    if (strcmp((*ptr)->context, "rule") == 0)
+    {
+      glb_namerec *ptr_old = *ptr;
+      *ptr = ptr_old->next;
+      glb_free(ptr_old->name);        ptr_old->name    = NULL;
+      glb_free(ptr_old->context);     ptr_old->context = NULL;
+      ptr_old->next   = NULL;
+      ptr_old->sf     = NULL;
+      ptr_old->type   = ptr_old->value = -1;
+      glb_free(ptr_old);
+    }
+    else
+      ptr = &((*ptr)->next);
+  }
+
 }
 
 void glbResetNuisance()

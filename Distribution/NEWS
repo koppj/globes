@@ -298,3 +298,17 @@
 
 ********** This version tagged 3.2.7 ************
 
+21 May 2012 JK
+        - Added extra cross-checks to glb_default_smear, checking whether the
+          energy ranges in the glb_smear data structure agree with those in the
+          glb_experiment structure. Note sure if this is strictly necessary.
+        - Fixed a bug in glbInitExpFromParent when copying post-smearing efficiencies
+
+25 May 2012 JK
+        - Fixed a few potential memory leaks in the parser (when overloading
+          environments)
+        - Parser now removes rules from namespace when encountering a #DETECTOR#
+          directive
+
+********** This version tagged 3.2.8 ************
+

@@ -594,7 +594,6 @@ glbDefineAEDLList("%para", osc,6);
   fprintf(stdout,"x-sec %lf\n",glbXSection(0,0,0.01,1,-1));
 #endif /* TEST */
 
-
   /* Computing the rates */
   oscp=glbAllocParams();
   if(arguments.oscillation==0)

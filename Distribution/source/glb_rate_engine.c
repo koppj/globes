@@ -524,6 +524,7 @@ void glb_set_new_rates(int fast)
         int ff = channel_list[i][3]; /* Final flavour   */
 
         /* Recalculate rates only if NOSC-flag was not set in glb-file */
+        /* FIXME What if the user didn't call glbSetRates first? */
         if (fi <= 9 && ff <= 9)
         {
           if (!probs)
