@@ -718,6 +718,7 @@ glbDefineAEDLList("%para", osc,6);
     }
 
   /* Cleaning up */
+  glbClearExperimentList();
   glbFreeParams(oscp);
   if(stream!=stdout) fclose(stream);
   if(osc!=NULL) glb_free(osc);

@@ -312,3 +312,20 @@
 
 ********** This version tagged 3.2.8 ************
 
+26 Jun 2012 JK
+        - Parser now allows user to re-define number of bins and sampling points
+          (useful when combining experiments with correlated systematics, but
+          otherwise different implementation)
+
+********** This version tagged 3.2.9 ************
+
+27 Jun 2012 JK
+        - Fixed segfault in glbResetExp which happened when the user provided
+          a smearing matrix with an incorrect number of rows. This required
+          changes to the routines that create smearing matrices
+        - Modified memory management for nuisance parameters (introduced
+          reference counter)
+        - New function glbCorrelateSys
+
+********** This version tagged 3.2.10 ************
+

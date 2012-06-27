@@ -95,6 +95,7 @@ glb_nuisance *glb_alloc_nuisance()
     n->energy_list = NULL;
     n->error_list  = NULL;
     n->a_list      = NULL;
+    n->ref_count   = 1;
   }
 
   return n;
@@ -105,7 +106,7 @@ glb_nuisance *glb_alloc_nuisance()
  * Function glb_copy_nuisance                                              *
  ***************************************************************************
  * Duplicates a nuisance parameter data structure. dest must already       *
- * exist.                                                                  *
+ * exist. Note that the reference counter is *not* copied.                 *
  ***************************************************************************/
 int glb_copy_nuisance(glb_nuisance *dest, glb_nuisance *src)
 {
@@ -138,13 +139,20 @@ int glb_free_nuisance(glb_nuisance *n)
 {
   if (n)
   {
-    glb_free(n->name);          n->name        = NULL;
-    glb_free(n->energy_list);   n->energy_list = NULL;
-    glb_free(n->error_list);    n->error_list  = NULL;
-    glb_free(n->a_list);        n->a_list      = NULL;
-    n->error      = GLB_NAN;
-    n->a          = GLB_NAN;
-    n->n_energies = 0;
+    if (n->ref_count <= 1)
+    {
+      glb_free(n->name);          n->name        = NULL;
+      glb_free(n->energy_list);   n->energy_list = NULL;
+      glb_free(n->error_list);    n->error_list  = NULL;
+      glb_free(n->a_list);        n->a_list      = NULL;
+      n->error      = GLB_NAN;
+      n->a          = GLB_NAN;
+      n->n_energies = 0;
+      n->ref_count  = 0;
+      glb_free(n);
+    }
+    else
+      n->ref_count--;
   }
 
   return GLB_SUCCESS;
@@ -541,7 +549,36 @@ void glbInitExpFromParent(struct glb_experiment *exp, struct glb_experiment *p)
   /* Copy nuisance parameter info */
   exp->n_nuisance = p->n_nuisance;
   for (i=0; i < exp->n_nuisance; i++)
+  {
     exp->nuisance_params[i] = p->nuisance_params[i];
+    exp->nuisance_params[i]->ref_count++;
+  }
+}
+
+
+/***************************************************************************
+ * Function glbCorrelateSys                                                *
+ ***************************************************************************
+ * Correlates the systematic uncertainties between two experiments. This   *
+ * is done by looking for nuisance parameters with identical names, and    *
+ * identifying them with each other                                        *
+ ***************************************************************************/
+int glbCorrelateSys(struct glb_experiment *e1, struct glb_experiment *e2)
+{
+  int i, j;
+  for (i=0; i < e1->n_nuisance; i++)
+    for (j=0; j < e2->n_nuisance; j++)
+    {
+      if (e1->nuisance_params[i]  &&  e2->nuisance_params[j])
+        if (strcmp(e1->nuisance_params[i]->name, e2->nuisance_params[j]->name) == 0)
+        {
+          glb_free_nuisance(e2->nuisance_params[j]);
+          e2->nuisance_params[j] = e1->nuisance_params[i];
+          e1->nuisance_params[i]->ref_count++;
+        }
+    }
+
+  return GLB_SUCCESS;
 }
 
 
@@ -626,8 +663,9 @@ void glbResetExp(struct glb_experiment *in)
   in->n_children = 0;
   glb_free(in->filename);
 
-  /* Fluxes, cross sections, nuisance parameters and the namespace are shared
-   * between parents and children -> remove only those belonging to this experiment */
+  /* Fluxes, cross sections and the namespace are shared between parents and
+   * children -> remove only those belonging to this experiment. Nuisance parameters
+   * have their own reference counter, so no special treatment is required for them. */
   if (!p)
   {
     glb_free_names(in->names);
@@ -640,11 +678,6 @@ void glbResetExp(struct glb_experiment *in)
     {
       glb_free_xsec(in->xsecs[i]);
       in->xsecs[i] = NULL;
-    }
-    for(i=0; i < GLB_MAX_NUISANCE; i++)
-    {
-      glb_free_nuisance(in->nuisance_params[i]);
-      in->nuisance_params[i] = NULL;
     }
   }
   else
@@ -659,11 +692,12 @@ void glbResetExp(struct glb_experiment *in)
       glb_free_xsec(in->xsecs[i]);
       in->xsecs[i] = NULL;
     }
-    for(i=MAX(0, p->n_nuisance); i < GLB_MAX_NUISANCE; i++)
-    {
-      glb_free_nuisance(in->nuisance_params[i]);
-      in->nuisance_params[i] = NULL;
-    }
+  }
+
+  for(i=0; i < GLB_MAX_NUISANCE; i++)
+  {
+    glb_free_nuisance(in->nuisance_params[i]);
+    in->nuisance_params[i] = NULL;
   }
   in->n_nuisance = -1;
 
@@ -696,9 +730,9 @@ void glbResetExp(struct glb_experiment *in)
       my_free(in->uprange[i]);
       if (in->smear != NULL  &&  in->smear[i] != NULL)
       {
-        for(j=0;j<in->numofbins;j++)
-          my_free(in->smear[i][j]); /* FIXME A segfault can happen here
-                                      if the smearing matrix has not numofbins entries */
+        for(j=0; in->smear[i][j] != NULL; j++) /* NULL signals end of list - length can be */
+          my_free(in->smear[i][j]);            /* different from numofbins if smearing matrix */
+                                               /* provided by user had too few lines */
         my_free(in->smear[i]);
       }
     }

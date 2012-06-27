@@ -1377,16 +1377,17 @@ SWIG_Perl_SetModule(swig_module_info *module) {
 #define SWIGTYPE_p_f_a_3__a_3__double_int_double_int_p_q_const__double_p_q_const__double_double_p_void__int swig_types[3]
 #define SWIGTYPE_p_f_int_int_int_p_double_p_double_p_void__double swig_types[4]
 #define SWIGTYPE_p_f_p_struct_glb_params_type_p_void__int swig_types[5]
-#define SWIGTYPE_p_glb_params_type swig_types[6]
-#define SWIGTYPE_p_glb_projection_type swig_types[7]
-#define SWIGTYPE_p_int swig_types[8]
-#define SWIGTYPE_p_p_char swig_types[9]
-#define SWIGTYPE_p_p_double swig_types[10]
-#define SWIGTYPE_p_p_glb_experiment swig_types[11]
-#define SWIGTYPE_p_size_t swig_types[12]
-#define SWIGTYPE_p_void swig_types[13]
-static swig_type_info *swig_types[15];
-static swig_module_info swig_module = {swig_types, 14, 0, 0, 0, 0};
+#define SWIGTYPE_p_glb_experiment swig_types[6]
+#define SWIGTYPE_p_glb_params_type swig_types[7]
+#define SWIGTYPE_p_glb_projection_type swig_types[8]
+#define SWIGTYPE_p_int swig_types[9]
+#define SWIGTYPE_p_p_char swig_types[10]
+#define SWIGTYPE_p_p_double swig_types[11]
+#define SWIGTYPE_p_p_glb_experiment swig_types[12]
+#define SWIGTYPE_p_size_t swig_types[13]
+#define SWIGTYPE_p_void swig_types[14]
+static swig_type_info *swig_types[16];
+static swig_module_info swig_module = {swig_types, 15, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -7552,6 +7553,44 @@ XS(_wrap_glbShiftEnergyScale) {
 }
 
 
+XS(_wrap_glbCorrelateSys) {
+  {
+    struct glb_experiment *arg1 = (struct glb_experiment *) 0 ;
+    struct glb_experiment *arg2 = (struct glb_experiment *) 0 ;
+    int result;
+    void *argp1 = 0 ;
+    int res1 = 0 ;
+    void *argp2 = 0 ;
+    int res2 = 0 ;
+    int argvi = 0;
+    dXSARGS;
+    
+    if ((items < 2) || (items > 2)) {
+      SWIG_croak("Usage: glbCorrelateSys(e1,e2);");
+    }
+    res1 = SWIG_ConvertPtr(ST(0), &argp1,SWIGTYPE_p_glb_experiment, 0 |  0 );
+    if (!SWIG_IsOK(res1)) {
+      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "glbCorrelateSys" "', argument " "1"" of type '" "struct glb_experiment *""'"); 
+    }
+    arg1 = (struct glb_experiment *)(argp1);
+    res2 = SWIG_ConvertPtr(ST(1), &argp2,SWIGTYPE_p_glb_experiment, 0 |  0 );
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "glbCorrelateSys" "', argument " "2"" of type '" "struct glb_experiment *""'"); 
+    }
+    arg2 = (struct glb_experiment *)(argp2);
+    result = (int)glbCorrelateSys(arg1,arg2);
+    ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
+    
+    
+    XSRETURN(argvi);
+  fail:
+    
+    
+    SWIG_croak_null();
+  }
+}
+
+
 XS(_wrap_glbGetNumberOfNuisanceParams) {
   {
     int arg1 ;
@@ -9457,6 +9496,7 @@ static swig_type_info _swigt__p_double = {"_p_double", "double *", 0, 0, (void*)
 static swig_type_info _swigt__p_f_a_3__a_3__double_int_double_int_p_q_const__double_p_q_const__double_double_p_void__int = {"_p_f_a_3__a_3__double_int_double_int_p_q_const__double_p_q_const__double_double_p_void__int", "int (*)(double [3][3],int,double,int,double const *,double const *,double,void *)|glb_probability_matrix_function", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_f_int_int_int_p_double_p_double_p_void__double = {"_p_f_int_int_int_p_double_p_double_p_void__double", "double (*)(int,int,int,double *,double *,void *)|glb_chi_function", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_f_p_struct_glb_params_type_p_void__int = {"_p_f_p_struct_glb_params_type_p_void__int", "int (*)(struct glb_params_type *,void *)|glb_get_oscillation_parameters_function", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_glb_experiment = {"_p_glb_experiment", "struct glb_experiment *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_glb_params_type = {"_p_glb_params_type", "struct glb_params_type *|glb_params", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_glb_projection_type = {"_p_glb_projection_type", "struct glb_projection_type *|glb_projection", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_int = {"_p_int", "int *", 0, 0, (void*)0, 0};
@@ -9473,6 +9513,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_f_a_3__a_3__double_int_double_int_p_q_const__double_p_q_const__double_double_p_void__int,
   &_swigt__p_f_int_int_int_p_double_p_double_p_void__double,
   &_swigt__p_f_p_struct_glb_params_type_p_void__int,
+  &_swigt__p_glb_experiment,
   &_swigt__p_glb_params_type,
   &_swigt__p_glb_projection_type,
   &_swigt__p_int,
@@ -9489,6 +9530,7 @@ static swig_cast_info _swigc__p_double[] = {  {&_swigt__p_double, 0, 0, 0},{0, 0
 static swig_cast_info _swigc__p_f_a_3__a_3__double_int_double_int_p_q_const__double_p_q_const__double_double_p_void__int[] = {  {&_swigt__p_f_a_3__a_3__double_int_double_int_p_q_const__double_p_q_const__double_double_p_void__int, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_f_int_int_int_p_double_p_double_p_void__double[] = {  {&_swigt__p_f_int_int_int_p_double_p_double_p_void__double, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_f_p_struct_glb_params_type_p_void__int[] = {  {&_swigt__p_f_p_struct_glb_params_type_p_void__int, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_glb_experiment[] = {  {&_swigt__p_glb_experiment, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_glb_params_type[] = {  {&_swigt__p_glb_params_type, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_glb_projection_type[] = {  {&_swigt__p_glb_projection_type, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_int[] = {  {&_swigt__p_int, 0, 0, 0},{0, 0, 0, 0}};
@@ -9505,6 +9547,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_f_a_3__a_3__double_int_double_int_p_q_const__double_p_q_const__double_double_p_void__int,
   _swigc__p_f_int_int_int_p_double_p_double_p_void__double,
   _swigc__p_f_p_struct_glb_params_type_p_void__int,
+  _swigc__p_glb_experiment,
   _swigc__p_glb_params_type,
   _swigc__p_glb_projection_type,
   _swigc__p_int,
@@ -9668,6 +9711,7 @@ static swig_command_info swig_commands[] = {
 {"globesc::glbGetSysErrorsListPtr", _wrap_glbGetSysErrorsListPtr},
 {"globesc::glbGetSysStartingValuesListPtr", _wrap_glbGetSysStartingValuesListPtr},
 {"globesc::glbShiftEnergyScale", _wrap_glbShiftEnergyScale},
+{"globesc::glbCorrelateSys", _wrap_glbCorrelateSys},
 {"globesc::glbGetNumberOfNuisanceParams", _wrap_glbGetNumberOfNuisanceParams},
 {"globesc::glbHasParentExp", _wrap_glbHasParentExp},
 {"globesc::glbGetParentExp", _wrap_glbGetParentExp},

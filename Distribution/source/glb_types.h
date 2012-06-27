@@ -156,6 +156,7 @@ typedef struct glb_nuisance
   double *energy_list, *error_list; /* Energies and associated uncertainties if this */
                                /* nuisance parameter is energy-dependent             */
   int n_energies;              /* Number of entries in energy_list and error_list    */
+  int ref_count;               /* Number of experiments using this nuisance param    */
 } glb_nuisance;
 
 

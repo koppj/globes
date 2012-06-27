@@ -180,6 +180,7 @@ package globes;
 *glbGetSysErrorsListPtr = *globesc::glbGetSysErrorsListPtr;
 *glbGetSysStartingValuesListPtr = *globesc::glbGetSysStartingValuesListPtr;
 *glbShiftEnergyScale = *globesc::glbShiftEnergyScale;
+*glbCorrelateSys = *globesc::glbCorrelateSys;
 *glbGetNumberOfNuisanceParams = *globesc::glbGetNumberOfNuisanceParams;
 *glbHasParentExp = *globesc::glbHasParentExp;
 *glbGetParentExp = *globesc::glbGetParentExp;

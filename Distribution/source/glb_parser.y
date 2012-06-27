@@ -526,12 +526,13 @@ static int set_exp(char *name,double value,int scalar)
                    {
 
                      ibf=(int*) token_list[i].ptr;
-                     if(!((*ibf == -1) || (*ibf == (int) value))) {
+/* JK 2012-06-25 Remove this restriction */
+/*                     if(!((*ibf == -1) || (*ibf == (int) value))) {
                        glb_warning("Given length does not"
                                    " match actual length");
                        return 2;
 
-                     }
+                     }*/
                      *ibf=value;
                      return 0;
                    }
@@ -891,8 +892,9 @@ static int set_exp_list(char *name,glb_List *value,int scalar)
             len=list_length(value); // how long is the list
             lbf=(int*) token_list[i].len;
             if(*lbf==-1) *lbf=len;  // setting the length correctly in exp
+/* JK 2012-06-26 Removed to allow for redefinitions of binning
             else if(*lbf!=len) glb_fatal("Line %d: Length mismatch or list"
-                                         " length changed", glb_line_num);
+                                         " length changed", glb_line_num);*/
 
 
             dbf = (double**) token_list[i].ptr;
@@ -2071,6 +2073,7 @@ void glbResetNuisance()
   nuis.energy_list = NULL;
   nuis.error_list  = NULL;
   nuis.a_list      = NULL;
+  nuis.ref_count   = 1;
 }
 
 void glbResetCounters()

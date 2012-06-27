@@ -636,9 +636,9 @@ static double** SmearMatrixA(glb_smear *data, int **lowrange, int **uprange,
       return NULL;
     }
 
-  out=(double**) glb_malloc(sizeof(double*) * data->numofbins);
-  up=(int*) glb_malloc(sizeof(int) * data->numofbins);
-  low=(int*) glb_malloc(sizeof(int) * data->numofbins);
+  out=(double**) glb_malloc(sizeof(double*) * (data->numofbins+1));
+  up=(int*) glb_malloc(sizeof(int) * (data->numofbins+1));
+  low=(int*) glb_malloc(sizeof(int) * (data->numofbins+1));
 
   for(i=0;i<data->numofbins;i++)
     {
@@ -654,7 +654,7 @@ static double** SmearMatrixA(glb_smear *data, int **lowrange, int **uprange,
             {
               prev=1;
               nonzero++;
-              out[i]=(double*) glb_realloc(out[i],sizeof(double)*nonzero);
+              out[i]=(double*) glb_realloc(out[i],sizeof(double)*(nonzero+1));
               out[i][nonzero-1]=erg;
             }
           else
@@ -666,9 +666,11 @@ static double** SmearMatrixA(glb_smear *data, int **lowrange, int **uprange,
 
       low[i]=zero;
       up[i]=zero+nonzero-1;
-
-
-     }
+      out[i][nonzero] = -1;   /* Signals end of list */
+    }
+  low[i] = -1;  /* Signals end of list */
+  up[i]  = -1;
+  out[i] = NULL;
   *lowrange=&low[0];
   *uprange=&up[0];
   return out;
@@ -727,9 +729,9 @@ static double** SmearMatrixC(glb_smear *data, int **lowrange, int **uprange,
     }
 
 
-  out=(double**) malloc(sizeof(double*) * data->numofbins);
-  up=(int*) malloc(sizeof(int) * data->numofbins);
-  low=(int*) malloc(sizeof(int) * data->numofbins);
+  out=(double**) malloc(sizeof(double*) * (data->numofbins + 1));
+  up=(int*) malloc(sizeof(int) * (data->numofbins + 1));
+  low=(int*) malloc(sizeof(int) * (data->numofbins + 1));
 
   for(i=0;i<data->numofbins;i++)
     {
@@ -747,7 +749,7 @@ static double** SmearMatrixC(glb_smear *data, int **lowrange, int **uprange,
             {
               prev=1;
               nonzero++;
-              out[i]=(double*) realloc(out[i],sizeof(double)*nonzero);
+              out[i]=(double*) realloc(out[i],sizeof(double)*(nonzero+1));
               out[i][nonzero-1]=erg;
             }
           else
@@ -759,9 +761,11 @@ static double** SmearMatrixC(glb_smear *data, int **lowrange, int **uprange,
 
       low[i]=zero;
       up[i]=zero+nonzero-1;
-
-
-     }
+      out[i][nonzero] = -1;   /* Signals end of list */
+    }
+  low[i] = -1;  /* Signals end of list */
+  up[i]  = -1;
+  out[i] = NULL;
   *lowrange=&low[0];
   *uprange=&up[0];
   return out;
@@ -815,10 +819,12 @@ void glb_compute_smearing_matrix(double ***matrix,
  ***************************************************************************/
 void glb_optimize_smearing_matrix(glb_smear *s, double **matrix, int *lower, int *upper)
 {
+  int i, m;
+
   if (!s || !lower || !upper || !matrix)
     glb_fatal("glb_optimize_smearing_matrix: NULL pointer argument encountered.");
 
-  for (int i=0; i < s->numofbins; i++)
+  for (i=0; i < s->numofbins; i++)
   {
     if (!matrix[i])
       glb_fatal("glb_optimize_smearing_matrix: Incomplete smearing matrix encountered.");
@@ -837,18 +843,22 @@ void glb_optimize_smearing_matrix(glb_smear *s, double **matrix, int *lower, int
       new_upper--;
     }
 
-    double *new_entry = (double*) malloc(sizeof(double)*(new_upper-new_lower+1));
+    double *new_entry = (double*) malloc(sizeof(double)*(new_upper-new_lower+2));
     if (!new_entry)
       glb_fatal("glb_optimize_smearing_matrix: Unable to allocate smearing matrix.");
 
-    for (int m=0; m < new_upper-new_lower+1; m++)
+    for (m=0; m < new_upper-new_lower+1; m++)
       new_entry[m] = matrix[i][j++];
+    new_entry[m] = -1; /* Signals end of list */
 
     free(matrix[i]);
     matrix[i] = new_entry;
     lower[i]  = new_lower;
     upper[i]  = new_upper;
   }
+  lower[i]  = -1;  /* Signals end of list */
+  upper[i]  = -1;
+  matrix[i] = NULL;
 }
 
 
