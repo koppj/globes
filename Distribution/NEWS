@@ -329,3 +329,9 @@
 
 ********** This version tagged 3.2.10 ************
 
+11 Jul 2012 JK
+        - Fixed a bug in the treatment of correlated systematics. When
+          using glbCorrelateSys, some nuisance parameters got double counted.
+
+********** This version tagged 3.2.11 ************
+

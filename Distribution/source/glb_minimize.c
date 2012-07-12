@@ -1537,27 +1537,34 @@ double glb_hybrid_chi_callback(double *x, int new_rates_flag, void *user_data)
   max_dim = 4;   /* This is sufficient for all internal chi^2 function */
   y = (double *) glb_malloc(sizeof(*y) * max_dim);
   for (i=0; i < glb_num_of_exps; i++)
+    for (j=0; j < glbGetNumberOfNuisanceParams(i); j++)
+      glb_experiment_list[i]->nuisance_params[j]->a = GLB_NAN;
+                             /* See glb_invoke_hybrid_minimizer for explanation */
+  for (i=0; i < glb_num_of_exps; i++)
   {
     if (glb_single_experiment_number!=GLB_ALL && glb_single_experiment_number!=i)
       continue;
     exp = (struct glb_experiment *) glb_experiment_list[i];
 
-    j = glbHasParentExp(i) ? glbGetNumberOfNuisanceParams(glbGetParentExp(i)) : 0;
-    for (; j < glbGetNumberOfNuisanceParams(i); j++) /* Update multiex nuisance params */
+    for (j=0; j < glbGetNumberOfNuisanceParams(i); j++) /* Update multiex nuisance params */
     {
       glb_nuisance *n = exp->nuisance_params[j];
-      if (n->n_energies > 0)
-        for (l=0; l < n->n_energies; l++)
-        {
-          n->a_list[l] = x[m++];
-          chi2 += glb_prior(n->a_list[l], 0.0, n->error_list[l]); /* Prior for nuisance param */
-        }
-      else
+      if (GLB_ISNAN(n->a))
       {
-        n->a = x[m++];
-        chi2 += glb_prior(n->a, 0.0, n->error);
-      }
-    }
+        n->a = 0.0;
+        if (n->n_energies > 0)
+          for (l=0; l < n->n_energies; l++)
+          {
+            n->a_list[l] = x[m++];
+            chi2 += glb_prior(n->a_list[l], 0.0, n->error_list[l]);
+          }
+        else
+        {
+          n->a = x[m++];
+          chi2 += glb_prior(n->a, 0.0, n->error);
+        }
+      } /* isnan(n->a) */
+    } /* for (j) */
 
     for (j=0; j < exp->numofrules; j++)
     {
@@ -1616,17 +1623,28 @@ int glb_invoke_hybrid_minimizer(int exp, int rule, double *x, double *chi2)
      in event rates to speed up the rate computation later on */
   n_sys = 0;
   for (i=0; i < glb_num_of_exps; i++)
+    for (j=0; j < glbGetNumberOfNuisanceParams(i); j++)
+      glb_experiment_list[i]->nuisance_params[j]->a = GLB_NAN;
+             /* We use a here to keep track of which nuisance parameters are
+              * already included in the minimization to avoid double counting.
+              * Those with a=nan have not yet been included */
+  for (i=0; i < glb_num_of_exps; i++)
   {
     if (exp!=GLB_ALL && exp!=i)
       continue;
 
     struct glb_experiment *e = glb_experiment_list[i];
-    j = glbHasParentExp(i) ? glbGetNumberOfNuisanceParams(glbGetParentExp(i)) : 0;
-    for (; j < glbGetNumberOfNuisanceParams(i); j++)
-      if (e->nuisance_params[j]->n_energies > 0)
-        n_sys += e->nuisance_params[j]->n_energies;
-      else
-        n_sys++;
+    for (j=0; j < glbGetNumberOfNuisanceParams(i); j++)
+    {
+      if (GLB_ISNAN(e->nuisance_params[j]->a))
+      {
+        e->nuisance_params[j]->a = 0.0;
+        if (e->nuisance_params[j]->n_energies > 0)
+          n_sys += e->nuisance_params[j]->n_energies;
+        else
+          n_sys++;
+      }
+    }
 
     for (j=0; j < glbGetNumberOfRules(i); j++)
     {
@@ -1638,6 +1656,7 @@ int glb_invoke_hybrid_minimizer(int exp, int rule, double *x, double *chi2)
     glbSetExperiment(glb_experiment_list[i]);
     glb_rate_template();
   }
+  
 
   /* Initialize oscillation parameters */
   P = (double *) glb_malloc(sizeof(*P) * (n_sys + n_free));
@@ -1651,19 +1670,27 @@ int glb_invoke_hybrid_minimizer(int exp, int rule, double *x, double *chi2)
 
   /* Initialize systematics parameters */
   for (i=0; i < glb_num_of_exps; i++)
+    for (j=0; j < glbGetNumberOfNuisanceParams(i); j++)
+      glb_experiment_list[i]->nuisance_params[j]->a = GLB_NAN;  /* See above for explanation */
+  for (i=0; i < glb_num_of_exps; i++)
   {
     if (exp!=GLB_ALL && exp!=i)
       continue;
 
     /* Nuisance parameters for multi-exp systematics */
     struct glb_experiment *e = glb_experiment_list[i];
-    j = glbHasParentExp(i) ? glbGetNumberOfNuisanceParams(glbGetParentExp(i)) : 0;
-    for (; j < glbGetNumberOfNuisanceParams(i); j++)
-      if (e->nuisance_params[j]->n_energies > 0)
-        for (l=0; l < e->nuisance_params[j]->n_energies; l++)
-          P[k++] = 0.0; // FIXME Allow user-defined starting values here
-      else
-        P[k++] = 0.0;
+    for (j=0; j < glbGetNumberOfNuisanceParams(i); j++)
+    {
+      if (GLB_ISNAN(e->nuisance_params[j]->a))
+      {
+        e->nuisance_params[j]->a = 0.0;
+        if (e->nuisance_params[j]->n_energies > 0)
+          for (l=0; l < e->nuisance_params[j]->n_energies; l++)
+            P[k++] = 0.0; // FIXME Allow user-defined starting values here
+        else
+          P[k++] = 0.0;
+      }
+    }
 
     /* Nuisance parameters for individual rules */
     for (j=0; j < glbGetNumberOfRules(i); j++)

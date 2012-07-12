@@ -572,6 +572,7 @@ int glbCorrelateSys(struct glb_experiment *e1, struct glb_experiment *e2)
       if (e1->nuisance_params[i]  &&  e2->nuisance_params[j])
         if (strcmp(e1->nuisance_params[i]->name, e2->nuisance_params[j]->name) == 0)
         {
+//          printf("Correlating %s\n", e1->nuisance_params[i]->name);
           glb_free_nuisance(e2->nuisance_params[j]);
           e2->nuisance_params[j] = e1->nuisance_params[i];
           e1->nuisance_params[i]->ref_count++;

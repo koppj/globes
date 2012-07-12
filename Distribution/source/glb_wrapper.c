@@ -2963,7 +2963,7 @@ int glbGetNumberOfNuisanceParams(int exp)
 {
   if (exp < 0  ||  exp >= glb_num_of_exps)
   {
-    glb_error("glbGetNumberOfFluxes: Invalid experiment index: %d", exp);
+    glb_error("glbGetNumberOfNuisanceParams: Invalid experiment index: %d", exp);
     return -1;
   }
   else
