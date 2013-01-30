@@ -346,7 +346,7 @@
 #define HAVE_RAW_DECL_DUP2 1
 
 /* Define to 1 if dup3 is declared even after undefining macros. */
-/* #undef HAVE_RAW_DECL_DUP3 */
+#define HAVE_RAW_DECL_DUP3 1
 
 /* Define to 1 if endusershell is declared even after undefining macros. */
 #define HAVE_RAW_DECL_ENDUSERSHELL 1
@@ -388,7 +388,7 @@
 #define HAVE_RAW_DECL_FTRUNCATE 1
 
 /* Define to 1 if futimens is declared even after undefining macros. */
-/* #undef HAVE_RAW_DECL_FUTIMENS */
+#define HAVE_RAW_DECL_FUTIMENS 1
 
 /* Define to 1 if getcwd is declared even after undefining macros. */
 #define HAVE_RAW_DECL_GETCWD 1
@@ -499,19 +499,19 @@
 #define HAVE_RAW_DECL_MKNODAT 1
 
 /* Define to 1 if mkostemp is declared even after undefining macros. */
-/* #undef HAVE_RAW_DECL_MKOSTEMP */
+#define HAVE_RAW_DECL_MKOSTEMP 1
 
 /* Define to 1 if mkostemps is declared even after undefining macros. */
-/* #undef HAVE_RAW_DECL_MKOSTEMPS */
+#define HAVE_RAW_DECL_MKOSTEMPS 1
 
 /* Define to 1 if mkstemp is declared even after undefining macros. */
 #define HAVE_RAW_DECL_MKSTEMP 1
 
 /* Define to 1 if mkstemps is declared even after undefining macros. */
-/* #undef HAVE_RAW_DECL_MKSTEMPS */
+#define HAVE_RAW_DECL_MKSTEMPS 1
 
 /* Define to 1 if pipe2 is declared even after undefining macros. */
-/* #undef HAVE_RAW_DECL_PIPE2 */
+#define HAVE_RAW_DECL_PIPE2 1
 
 /* Define to 1 if popen is declared even after undefining macros. */
 #define HAVE_RAW_DECL_POPEN 1
@@ -649,7 +649,7 @@
 #define HAVE_RAW_DECL_USLEEP 1
 
 /* Define to 1 if utimensat is declared even after undefining macros. */
-/* #undef HAVE_RAW_DECL_UTIMENSAT */
+#define HAVE_RAW_DECL_UTIMENSAT 1
 
 /* Define to 1 if vdprintf is declared even after undefining macros. */
 #define HAVE_RAW_DECL_VDPRINTF 1
@@ -840,7 +840,7 @@
 #define PACKAGE_NAME "GLoBES"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "GLoBES 3.2.11"
+#define PACKAGE_STRING "GLoBES 3.2.12"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "globes"
@@ -849,7 +849,7 @@
 #define PACKAGE_URL ""
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "3.2.11"
+#define PACKAGE_VERSION "3.2.12"
 
 /* Define to l, ll, u, ul, ull, etc., as suitable for constants of type
    'ptrdiff_t'. */
@@ -898,7 +898,7 @@
 #define STDC_HEADERS 1
 
 /* Version number of package */
-#define VERSION "3.2.11"
+#define VERSION "3.2.12"
 
 /* Define to l, ll, u, ul, ull, etc., as suitable for constants of type
    'wchar_t'. */
@@ -912,8 +912,13 @@
    `char[]'. */
 #define YYTEXT_POINTER 1
 
+/* Enable large inode numbers on Mac OS X 10.5.  */
+#ifndef _DARWIN_USE_64_BIT_INODE
+# define _DARWIN_USE_64_BIT_INODE 1
+#endif
+
 /* Number of bits in a file offset, on hosts where this is settable. */
-#define _FILE_OFFSET_BITS 64
+/* #undef _FILE_OFFSET_BITS */
 
 /* Define for large files, on AIX-style hosts. */
 /* #undef _LARGE_FILES */

@@ -333,12 +333,20 @@ static void CalcAllProbs(double en, double baseline)
   struct glb_experiment *e = glb_experiment_list[glb_current_exp];
   int status;
 
+  // The following is a temporary solution for making the probability engine aware
+  // of which experiment it is being run for. If the user has set e->probability_user_data,
+  // it is used; otherwise, the global default is used.
+  // In the future, there should be a way of also choosing the whole probability engine
+  // on an experiment-by-experiment basis (some instrumentation for this is already
+  // in the definition of glb_experiment).
   if ((status=glb_hook_probability_matrix(Probs, +1, en, e->psteps, e->lengthtab, e->densitybuffer,
-          (e->filter_state == GLB_ON) ? e->filter_value : -1.0, glb_probability_user_data)) != GLB_SUCCESS)
+          (e->filter_state == GLB_ON) ? e->filter_value : -1.0,
+          e->probability_user_data ? e->probability_user_data : glb_probability_user_data)) != GLB_SUCCESS)
     glb_error("Calculation of oscillation probabilities failed.");
 
   if ((status=glb_hook_probability_matrix(ProbsAnti, -1, en, e->psteps, e->lengthtab, e->densitybuffer,
-          (e->filter_state == GLB_ON) ? e->filter_value : -1.0, glb_probability_user_data)) != GLB_SUCCESS)
+          (e->filter_state == GLB_ON) ? e->filter_value : -1.0,
+          e->probability_user_data ? e->probability_user_data : glb_probability_user_data)) != GLB_SUCCESS)
     glb_error("Calculation of oscillation probabilities failed.");
 }
 

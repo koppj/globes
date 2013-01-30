@@ -335,3 +335,11 @@
 
 ********** This version tagged 3.2.11 ************
 
+30 Jan 2013 JK
+        - If user defines experiment->probability_user_data, it is used instead
+          of the global default.
+
+********** This version tagged 3.2.12 ************
+
+
+
