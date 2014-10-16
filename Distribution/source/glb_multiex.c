@@ -89,6 +89,7 @@ glb_nuisance *glb_alloc_nuisance()
   if (n)
   {
     n->name        = NULL;
+    n->systype     = 0;
     n->error       = GLB_NAN;
     n->a           = GLB_NAN;
     n->n_energies  = 0;
@@ -114,7 +115,8 @@ int glb_copy_nuisance(glb_nuisance *dest, glb_nuisance *src)
   {
     dest->name        = strdup(src->name);
     dest->error       = src->error;
-    dest->a           = src->a;
+    dest->a           = src->a; 
+    dest->systype     = src->systype;
     dest->n_energies  = src->n_energies;
     dest->energy_list = glb_duplicate_array(src->energy_list, src->n_energies*sizeof(double));
     dest->error_list  = glb_duplicate_array(src->error_list, src->n_energies*sizeof(double));
@@ -149,6 +151,7 @@ int glb_free_nuisance(glb_nuisance *n)
       n->a          = GLB_NAN;
       n->n_energies = 0;
       n->ref_count  = 0;
+      n->systype = 0;
       glb_free(n);
     }
     else

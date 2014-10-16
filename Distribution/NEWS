@@ -341,5 +341,9 @@
 
 ********** This version tagged 3.2.12 ************
 
+27 Sep 2013 PH 
+         - Defined @systype directive, which defaults to 0, @systype=1
+           provides an energy calibration error
 
+********** This version tagged 3.2.13 ************
 

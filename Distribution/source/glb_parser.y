@@ -213,10 +213,12 @@
    {"@sys_off_multiex_errors_bg",  ENERGY_MATRIX, 1, GLB_MAX_NUISANCE,
      &buff.sys_off_multiex_errors_bg[0], &loc_count, "rule"},
 
+
    {"sys", UNTYPE, 0, 20, NULL, &buff.n_nuisance, "global"},
    {"@energy_list", DOUBLE_LIST, 0, GMAX, &nuis.energy_list, &nuis.n_energies, "sys"},
    {"@error_list",  DOUBLE_LIST, 0, GMAX, &nuis.error_list,  &nuis.n_energies, "sys"},
-   {"@error",       DOUBLE,      0, GMAX, &nuis.error,       NULL,             "sys"},
+   {"@error",       DOUBLE,      0, GMAX, &nuis.error,       NULL,             "sys"}, 
+    {"@systype",       INT,      0, 20, &nuis.systype,       NULL,             "sys"},
 
 
    {"@energy_window" ,DOUBLE_INDEXED_PAIR_INV,0,GMAX,&buff.energy_window[0],
@@ -2069,6 +2071,7 @@ void glbResetNuisance()
   nuis.name        = NULL;
   nuis.error       = GLB_NAN;
   nuis.a           = GLB_NAN;
+  nuis.systype = 0;
   nuis.n_energies  = -1;
   nuis.energy_list = NULL;
   nuis.error_list  = NULL;

@@ -150,6 +150,8 @@ typedef struct glb_systematic
 typedef struct glb_nuisance
 {
   char *name;                  /* Name of this nuisance parameter                    */
+  int systype; /* this allows to have different types of errors like calibration */
+
   double error;                /* The uncertainty on this nuisance parameter         */
   double a;                    /* The current value of the nuisance parameter        */
   double *a_list;              /* List of a values for energy-dependent parameters   */

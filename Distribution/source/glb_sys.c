@@ -1078,6 +1078,7 @@ double glbChiMultiExp(int exp, int rule, int n_params, double *x, double *errors
   double *bin_centers      = glbGetBinCentersListPtr(exp);
   double *true_rates       = glbGetRuleRatePtr(exp, rule);
   double fit_rates[n_bins];
+  double ratebuffer[n_bins];
   double *coeff_sig        = e->rulescoeff[rule];
   double *coeff_bg         = e->bgrulescoeff[rule];
   int *n_nuis_sig, *n_nuis_bg;
@@ -1087,6 +1088,9 @@ double glbChiMultiExp(int exp, int rule, int n_params, double *x, double *errors
   int ew_low, ew_high;
   double chi2 = 0.0;
   int i, j, k;
+  double emin, emax;
+
+  glbGetEminEmax(exp, &emin, &emax);
 
   if (e->sys_on_off[rule] == GLB_ON)
   {
@@ -1130,90 +1134,119 @@ double glbChiMultiExp(int exp, int rule, int n_params, double *x, double *errors
   /* Signal channels */
   for (j=0; j < nch_sig; j++)
   {
-    for (i=ew_low; i <= ew_high; i++) /* Unperturbed rate (all nuisance params = 0.0) */
-      fit_rates[i] += coeff_sig[j] * chr_sig[j][i];
+    double totalshift=0;
+    for (k=0; k < n_nuis_sig[j]; k++)
+      {
+	glb_nuisance *n = e->nuisance_params[nuis_sig[j][k]];	
+	if(n->systype==1)   totalshift+=n->a;	
+      }
+		
+    glbShiftEnergyScale(totalshift, chr_sig[j],ratebuffer, n_bins, emin, emax);
+
+    for (i=ew_low; i <= ew_high; i++)  
+      fit_rates[i] += coeff_sig[j] * ratebuffer[i];
+	      
+  
 
     for (k=0; k < n_nuis_sig[j]; k++)      /* Add nuisance terms */
-    {
-      glb_nuisance *n = e->nuisance_params[nuis_sig[j][k]];
-      if (n->n_energies > 0)   /* Energy-independent nuisance param */
       {
-        int l = 1;
-        double E0 = n->energy_list[0]; /* Note: glbDefaultExp ensures that energy_list */
-        double E1 = n->energy_list[1]; /* and a_list have at least two entries */
-        double a0 = n->a_list[0];
-        double r = (n->a_list[1] - a0) / (E1 - E0);
-        for (i=ew_low; i <= ew_high; i++)
-        {
-          /* Find energy support point straddling this bin */
-          while (bin_centers[i] > E1  &&  l < n->n_energies)
-          {
-//            printf("CC %g %g %g\n", E0, bin_centers[i], E1);
-            a0 = n->a_list[l];
-            E0 = E1;
-            E1 = n->energy_list[++l];
-            r = (n->a_list[l] - a0) / (E1 - E0);
-          }
-
-          /* Interpolate nuisance parameters between energy support points. Extrapolate
-           * outside the range of support points */
-          fit_rates[i] += (a0 + (bin_centers[i] - E0) * r) * coeff_sig[j] * chr_sig[j][i];
-//          printf("%10.7g %10.7g\n", bin_centers[i], a0 + (bin_centers[i] - E0) * r);
-        }
-      }
-      else
-      {
-        for (i=ew_low; i <= ew_high; i++)
-          fit_rates[i] += n->a * coeff_sig[j] * chr_sig[j][i];
-      }
+	glb_nuisance *n = e->nuisance_params[nuis_sig[j][k]];
+	if(n->systype==0) /* usual systematic type */
+	{
+	  if (n->n_energies > 0)   /* Energy-independent nuisance param */
+	    {
+	      int l = 1;
+	      double E0 = n->energy_list[0]; /* Note: glbDefaultExp ensures that energy_list */
+	      double E1 = n->energy_list[1]; /* and a_list have at least two entries */
+	      double a0 = n->a_list[0];
+	      double r = (n->a_list[1] - a0) / (E1 - E0);
+	      for (i=ew_low; i <= ew_high; i++)
+		{
+		  /* Find energy support point straddling this bin */
+		  while (bin_centers[i] > E1  &&  l < n->n_energies)
+		    {
+		      //            printf("CC %g %g %g\n", E0, bin_centers[i], E1);
+		      a0 = n->a_list[l];
+		      E0 = E1;
+		      E1 = n->energy_list[++l];
+		      r = (n->a_list[l] - a0) / (E1 - E0);
+		    }
+		  
+		  /* Interpolate nuisance parameters between energy support points. Extrapolate
+		   * outside the range of support points */
+		  fit_rates[i] += (a0 + (bin_centers[i] - E0) * r) * coeff_sig[j] * chr_sig[j][i];
+		  //          printf("%10.7g %10.7g\n", bin_centers[i], a0 + (bin_centers[i] - E0) * r);
+		}
+	    }
+	  else
+	    {
+	      for (i=ew_low; i <= ew_high; i++)
+		fit_rates[i] += n->a * coeff_sig[j] * chr_sig[j][i];
+	    }
+	}
     }
   }
 
   /* Background channels */
   for (j=0; j < nch_bg; j++)
   {
-    for (i=ew_low; i <= ew_high; i++) /* Unperturbed rate (all nuisance params = 0.0) */
-      fit_rates[i] += coeff_bg[j] * chr_bg[j][i];
+  
+    double totalshift=0;
+    for (k=0; k < n_nuis_bg[j]; k++)
+      {
+	glb_nuisance *n = e->nuisance_params[nuis_bg[j][k]];	
+	if(n->systype==1)   totalshift+=n->a;	
+      }
+		
+    glbShiftEnergyScale(totalshift, chr_bg[j],ratebuffer, n_bins, emin, emax);
+
+    for (i=ew_low; i <= ew_high; i++)  
+      fit_rates[i] += coeff_bg[j] * ratebuffer[i];
+	      
+  
 
     for (k=0; k < n_nuis_bg[j]; k++)      /* Add nuisance terms */
     {
       glb_nuisance *n = e->nuisance_params[nuis_bg[j][k]];
-      if (n->n_energies > 0)   /* Energy-independent nuisance param */
-      {
-        int l = 1;
-        double E0 = n->energy_list[0]; /* Note: glbDefaultExp ensures that energy_list */
-        double E1 = n->energy_list[1]; /* and a_list have at least two entries */
-        double a0 = n->a_list[0];
-        double r = (n->a_list[1] - a0) / (E1 - E0);
-        for (i=ew_low; i <= ew_high; i++)
-        {
-          /* Find energy support point straddling this bin */
-          while (bin_centers[i] > E1  &&  l < n->n_energies)
-          {
-            a0 = n->a_list[l];
-            E0 = E1;
-            E1 = n->energy_list[++l];
-            r = (n->a_list[l] - a0) / (E1 - E0);
-          }
-
-          /* Interpolate nuisance parameters between energy support points. Extrapolate
-           * outside the range of support points */
-          fit_rates[i] += (a0 + (bin_centers[i] - E0) * r) * coeff_bg[j] * chr_bg[j][i];
-        }
-      }
-      else
-      {
-        for (i=ew_low; i <= ew_high; i++)
-          fit_rates[i] += n->a * coeff_bg[j] * chr_bg[j][i];
-      }
+      if(n->systype==0) /* the usual systematics */
+	{
+	  if (n->n_energies > 0)   /* Energy-independent nuisance param */
+	    {
+	      int l = 1;
+	      double E0 = n->energy_list[0]; /* Note: glbDefaultExp ensures that energy_list */
+	      double E1 = n->energy_list[1]; /* and a_list have at least two entries */
+	      double a0 = n->a_list[0];
+	      double r = (n->a_list[1] - a0) / (E1 - E0);
+	      for (i=ew_low; i <= ew_high; i++)
+		{
+		  /* Find energy support point straddling this bin */
+		  while (bin_centers[i] > E1  &&  l < n->n_energies)
+		    {
+		      a0 = n->a_list[l];
+		      E0 = E1;
+		      E1 = n->energy_list[++l];
+		      r = (n->a_list[l] - a0) / (E1 - E0);
+		  }
+		  
+		  /* Interpolate nuisance parameters between energy support points. Extrapolate
+		   * outside the range of support points */
+		  fit_rates[i] += (a0 + (bin_centers[i] - E0) * r) * coeff_bg[j] * chr_bg[j][i];
+		}
+	    }
+	  else
+	    {
+	      for (i=ew_low; i <= ew_high; i++)
+		fit_rates[i] += n->a * coeff_bg[j] * chr_bg[j][i];
+	    }
+	}
     }
   }
 
   /* Compute chi^2 */
   for (i=ew_low; i <= ew_high; i++)
     chi2 += glb_likelihood(true_rates[i], fit_rates[i]);
-
-//  printf("chi2 = %g\n", chi2);
+  
+  //  printf("chi2 = %g\n", chi2);
   return chi2;
 }
 
