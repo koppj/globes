@@ -421,9 +421,6 @@
 /* Define to 1 if getpagesize is declared even after undefining macros. */
 #define HAVE_RAW_DECL_GETPAGESIZE 1
 
-/* Define to 1 if gets is declared even after undefining macros. */
-/* #undef HAVE_RAW_DECL_GETS */
-
 /* Define to 1 if getsubopt is declared even after undefining macros. */
 #define HAVE_RAW_DECL_GETSUBOPT 1
 
@@ -1051,7 +1048,7 @@
 #endif
 
 /* Number of bits in a file offset, on hosts where this is settable. */
-#define _FILE_OFFSET_BITS 64
+/* #undef _FILE_OFFSET_BITS */
 
 /* Define for large files, on AIX-style hosts. */
 /* #undef _LARGE_FILES */

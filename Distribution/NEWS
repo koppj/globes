@@ -347,3 +347,9 @@
 
 ********** This version tagged 3.2.13 ************
 
+26 Oct 2014 JK
+         - Re-ran gnulib-tool --add-import and autoreconf
+
+********** This version tagged 3.2.14 ************
+
+
