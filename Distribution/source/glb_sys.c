@@ -2277,7 +2277,7 @@ void glbShiftEnergyScale(double b, double *rates_in, double *rates_out,
     else if (k == -1)         /* Assume out-of-bounds bins to contain 0 events */
       rates_out[i] = (1 + b) * rates_in[k+1] * (delta - k);
     else if (k == n_bins - 1)
-      rates_out[i] = (1 + b) * (rates_in[k] * (delta - k) + rates_in[k]);
+      rates_out[i] = (1 + b) * (-rates_in[k] * (delta - k) + rates_in[k]); // JK/MD 02.05.2016
     else
       rates_out[i] = (1 + b) * ((rates_in[k+1] - rates_in[k]) * (delta - k) + rates_in[k]);
 
