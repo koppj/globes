@@ -73,3 +73,14 @@ Date: 21.04.2010
 
 -------------------------------------------------------------------------------
 
+BUG #25 in glbShiftEnergyScale, for the case k==n_bins-1, the expression should
+        read rates_out[i] = (1 + b) * (-rates_in[k] * (delta - k) + rates_in[k])
+        (missing minus sign).
+
+From: Mona Dentler
+Date: 02.05.2016
+Status: Fixed in branches master and newsys
+
+-------------------------------------------------------------------------------
+
+
