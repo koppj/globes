@@ -87,6 +87,7 @@ BUG #25 in glbShiftEnergyScale, for the case k==n_bins-1, the expression should
 
 From: Mona Dentler
 Date: 02.05.2016
+Status: Fixed in branches master and newsys
 
 -------------------------------------------------------------------------------
 
