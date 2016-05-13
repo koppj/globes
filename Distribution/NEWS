@@ -352,4 +352,9 @@
 
 ********** This version tagged 3.2.14 ************
 
+04 May 2015 JK
+         - Fixed bug #25 in in glbShiftEnergyScale
+
+********** This version tagged 3.2.15 ************
+
 
