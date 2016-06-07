@@ -23,6 +23,7 @@
 #define __GLOBES_H 1
 
 #include <stdio.h>
+#include <stdarg.h>
 
 #ifdef __cplusplus
 #  define BEGIN_C_DECLS extern "C" {
@@ -73,7 +74,15 @@ enum glb_enum_minimizers
 
 /* Unit conversion */
 
-#define GLB_EV_TO_KM_FACTOR  1.9747235e-10
+/* PH 06/07/16 updated based in 2016 CODATA values for c and hbar,
+   prior to this date we used 1.9747235e-10 */
+
+#ifdef GLB_OLD_CONSTANTS
+ #define GLB_EV_TO_KM_FACTOR 1.9747235e-10
+#else
+ #define GLB_EV_TO_KM_FACTOR 1.97327e-10
+#endif
+
 #define GLB_KM_TO_EV(x)      ((x) / GLB_EV_TO_KM_FACTOR)
 #define GLB_EV_TO_KM(x)      ((x) * GLB_EV_TO_KM_FACTOR)
 

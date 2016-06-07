@@ -91,3 +91,42 @@ Status: Fixed in branches master and newsys
 
 -------------------------------------------------------------------------------
 
+BUG #26 constants for GLB_KM_TO_EV conversion based on c=3E8 m/s,
+    	fixed to correct value. Also GLB_V_FACTOR updated to reflect
+    	the accurate CODATA based value for Sqrt(2) G_F/u (atomic mass
+    	unit). Introduced GLB_OLD_CONSTANTS, which if defined at
+    	compile time will switch back to the previous values for
+    	compatibility purposes.
+
+From: Dan Dwyer and Joao Coelho
+Date: 07.06.2016
+Status: Fixed in newsys
+-------------------------------------------------------------------------------
+
+BUG #27 the GNULIB replacement for argp creates an error messages
+    	about 'gets' being undefined. The fix is an obscure patch in
+    	stdio.in.h inside the lib directory, which basically assumes
+    	that we deal with some sort of a reasonable operating system,
+    	i.e. there will some appropriate version of gets somewhere.
+
+From: Patrick Huber
+Date: 07.06.2016
+Status: Fixed in newsys
+
+-------------------------------------------------------------------------------
+
+BUG #28 update md5sum for BB100flux_Ne.dat, the file was updated in
+    	2012, but not the md5sum.
+
+From: Patrick Huber
+Date: 07.06.2016
+Status: Fixed in newsys
+
+-------------------------------------------------------------------------------
+
+BUG #29 added #include <stdarg.h> to globes.h to ensure linking of
+    	'globes' works if gnulib replacement are used.
+
+From: Patrick Huber
+Date: 07.06.2016
+Status: Fixed in newsys

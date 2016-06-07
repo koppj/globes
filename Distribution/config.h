@@ -45,7 +45,7 @@
 #define GETTIMEOFDAY_TIMEZONE struct timezone
 
 /* The version of libglb in libtool format c:r:a */
-#define GLB_LIBVERSION "10:0:2"
+#define GLB_LIBVERSION "10:1:2"
 
 /* Define to a C preprocessor expression that evaluates to 1 or 0, depending
    whether the gnulib module malloc-gnu shall be considered present. */
@@ -958,7 +958,7 @@
 #define PACKAGE_NAME "GLoBES"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "GLoBES 3.2.15"
+#define PACKAGE_STRING "GLoBES 3.2.16"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "globes"
@@ -967,7 +967,7 @@
 #define PACKAGE_URL ""
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "3.2.15"
+#define PACKAGE_VERSION "3.2.16"
 
 /* Define to l, ll, u, ul, ull, etc., as suitable for constants of type
    'ptrdiff_t'. */
@@ -1016,7 +1016,7 @@
 #define STDC_HEADERS 1
 
 /* Version number of package */
-#define VERSION "3.2.15"
+#define VERSION "3.2.16"
 
 /* Define to l, ll, u, ul, ull, etc., as suitable for constants of type
    'wchar_t'. */
