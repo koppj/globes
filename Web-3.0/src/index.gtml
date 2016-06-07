@@ -42,7 +42,7 @@ new physics simulation, etc. is now available for <a href="tools.html">download<
 </p>
 <p>
 GLoBES is maintained by <b>Patrick Huber</b>, <b>Joachim Kopp</b>, <b>Manfred Lindner</b>,
-<b>Mark Rolinec</b>, and <b>Walter Winter</b>
+ and <b>Walter Winter</b>
 (<a href="mailto:globes@mpi-hd.mpg.de?subject=GLoBES-contact">globes@mpi-hd.mpg.de</a>).
 
 #include "template_foot.gtml"
