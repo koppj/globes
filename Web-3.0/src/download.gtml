@@ -14,18 +14,21 @@ Latest stable version:
   </li>
 </ul>
 
-Current development version:
-<ul>
-  <li><a href="download/globes-3.1.10.tar.gz">globes-3.1.10.tar.gz</a>
-      &nbsp;(January 26, 2010)
-  </li>
-</ul>
-The development version roughly reflects the current development status of GLoBES.
-Compared to the stable version, it has some added features, but has
-not been tested as thoroughly yet as the stable version. Please refer to the
-NEWS file for a change log and list of new features.
+Current development version: <ul> <li><a
+href="download/globes-3.2.16.tar.gz">globes-3.2.16.tar.gz</a>
+&nbsp;(June 7, 2016) </li> </ul> 
 
+The development version reflects the current development status of
+GLoBES. In particular it includes a new implementation of systematics
+which allows a consistent, self-contained treatment of correlated
+nuisance parameters between near and far detector on a per-channel
+basis. A direct predecessor of this version was used for the most
+recent DUNE CDR. 3.2.16 has been in production use for two years now
+and it appears that all major issues have been resolved.  We are
+working to release accompanying documentation soon.
+ 
 <p>
+
 <b>Note</b>: In v3.0.8, we have
   fixed a bug in the &chi;&sup2; calculations. Up to v3.0.7, the true
   and fitted event rates were interchanged in the computation of the
@@ -43,6 +46,17 @@ NEWS file for a change log and list of new features.
   almost degenerate local minima), but if you need to switch back to the older,
   slower GLB_NESTED_POWELL, you can do so by calling
   glbSelectMinimizer(GLB_NESTED_POWELL).
+
+<p> <b>Note</b>: In v3.2.16 some of the physics constants for matter
+effect calculations have been updated to accurately reflect the
+current CODATA recommended values. For all practical purposes this
+should not affect most calculations, in cases where discrepancies, at
+probablity level, with respect to earlier studies are found you can
+recompile GLoBES with '-D GLB_OLD_CONSTANTS' to use the previous
+values of these constants.
+
+<p>
+
 
 <!--You may also want to check out this statically linked binary
 <a href="download/globes.gz">globes.gz</a>, which should run right of the box
