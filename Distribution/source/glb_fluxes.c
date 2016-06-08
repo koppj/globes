@@ -50,14 +50,13 @@
 #define GLB_ELECTRON_MASS 0.511E-3
 
 static double mmu = 0.1056;           // muon mass in GeV
-static double beam_pol = 0;           // beam polaristaion
+/*static double beam_pol = 0;           // beam polaristaion*/
 static double beam_en = 20;           // beam energy in GeV
 static double beta,rgamma;             // relativistic quantities
 static double stored_muons = 2.0E20;  // stored muons per year
 // or protons on target
 // care must be taken with this, it is a different number for each experiment
 static double power;
-static int    channel = 1;            // channel
 static int FLUX_STEPS = 500;          // Number of sampling points for builtin fluxes
 
 
@@ -171,43 +170,8 @@ double glb_get_max_energy()
   return beam_en;
 }
 
-static void set_beam_polarisation(double pol)
-{
-  beam_pol = pol;
-}
 
-static double check_beam_polarisation()
-{
-  return beam_pol;
-}
-
-static void set_stored_muons(double n)
-{
-  stored_muons = n;
-}
-
-static double check_stored_muons()
-{
-  return stored_muons;
-}
-
-
-static void set_power(double n)
-{
-  power = n;
-}
-
-static double check_power()
-{
-  return power;
-}
-
-
-static void set_channel(double ch)
-{
-  channel = ch;
-}
-
+/* OLD implementation
 static double flux_mu(double en, double baseline, double cost_lab)
 {
   double x_lab, cost, x, xmax;
@@ -238,7 +202,7 @@ static double flux_e(double en, double baseline, double cost_lab)
     return rgamma*(1 - beta*cost) /baseline/baseline/mmu * stored_muons* 6*x*x/PI * ((1-x)-channel*(1-x)*beam_pol*cost);
   else
     return 0.0;
-}
+}*/
 
 static double fastflux_mu(double en, double baseline)
 {
@@ -341,7 +305,7 @@ static double bb_flux(glb_flux *data, double en, int polarity, int l, int anti)
 
 static void builtin_flux_setup(glb_flux *data, flux_calc flx, int pl)
 {
-  double smb,pb,de,emax;
+  double smb,pb,de;
   int i, j;
 
   if (data->builtin == 1  ||  data->builtin == 2)

@@ -137,58 +137,58 @@ void *glb_prior_user_data=NULL;
 //-----------------------
 
 
-//-------------------------------------------------------------
-//------------------    MLAbort handling     ------------------
-//-------------------------------------------------------------
-// the whole stuff is being switched of if GLB_MATHLINK is set to 0.
-
-// this function handels a caught abort message
-// and jumps to the point where setjmp(env) has
-// been called. usually from one of the ChiTheta(),
-// MDChiTheta() or Chi() or SingleChi(). this
-// function then will return a garbage value. this
-// fact is comunicated to the wrappers with the
-// okay_flag. if they encounter an okay_flag=1 they
-// will send the Abort[] mathematica comand and then
-// return.
-
-static void ml_abort_handler()
-{
-  fprintf(stderr,"Mathlink programe catched abort!\n");
-  longjmp(env,1);
-}
-
-// this function checks wether a abort message is sent by the
-// math-kernel, if so it calls the ml_abort_handler().
-// otherwise it calls MLCallYieldFunction() in order to give
-// the kernel a possibility to send its message (this should
-// be needed only in Windows and on MacOS)
-
-#ifdef MLabort
-static void ml_abort_check(int flag)
-{
-
-  if(flag==0) return;
-  if(!MLAbort)
-    {
-      if(UNIX==1) MLCallYieldFunction(MLYieldFunction(stdlink),
-				      stdlink,(MLYieldParameters)0);
-    }
-  if(MLAbort)
-    {
-      ml_abort_handler();
-    }
-}
-#else
-static void  ml_abort_check(int flag)
-{
-  /* To silence gcc -Wall */
-  int i;
-  i=flag;
-  return;
-}
-
-#endif
+////-------------------------------------------------------------
+////------------------    MLAbort handling     ------------------
+////-------------------------------------------------------------
+//// the whole stuff is being switched of if GLB_MATHLINK is set to 0.
+//
+//// this function handels a caught abort message
+//// and jumps to the point where setjmp(env) has
+//// been called. usually from one of the ChiTheta(),
+//// MDChiTheta() or Chi() or SingleChi(). this
+//// function then will return a garbage value. this
+//// fact is comunicated to the wrappers with the
+//// okay_flag. if they encounter an okay_flag=1 they
+//// will send the Abort[] mathematica comand and then
+//// return.
+//
+//static void ml_abort_handler()
+//{
+//  fprintf(stderr,"Mathlink programe catched abort!\n");
+//  longjmp(env,1);
+//}
+//
+//// this function checks wether a abort message is sent by the
+//// math-kernel, if so it calls the ml_abort_handler().
+//// otherwise it calls MLCallYieldFunction() in order to give
+//// the kernel a possibility to send its message (this should
+//// be needed only in Windows and on MacOS)
+//
+//#ifdef MLabort
+//static void ml_abort_check(int flag)
+//{
+//
+//  if(flag==0) return;
+//  if(!MLAbort)
+//    {
+//      if(UNIX==1) MLCallYieldFunction(MLYieldFunction(stdlink),
+//				      stdlink,(MLYieldParameters)0);
+//    }
+//  if(MLAbort)
+//    {
+//      ml_abort_handler();
+//    }
+//}
+//#else
+//static void  ml_abort_check(int flag)
+//{
+//  /* To silence gcc -Wall */
+//  int i;
+//  i=flag;
+//  return;
+//}
+//
+//#endif
 
 
 /***************************************************************************
@@ -291,13 +291,6 @@ static void SelectProjection(int *vec, int check_proj)
   return;
 }
 
-
-static int CheckFree()
-{
-  int k;
-  k=n_free;
-  return k;
-}
 
 static int* CheckProjection()
 {
@@ -541,6 +534,28 @@ double glbChiSys(const glb_params in, int experiment, int rule)
         }
     }
 
+  /* Multi-experiment systematics requires hybrid minimizer */
+  for (i=0; i < glb_num_of_exps; i++)
+  {
+    if (experiment != GLB_ALL  &&  i != experiment)
+      continue;
+    if (glbGetNumberOfNuisanceParams(i) > 0)
+    {
+      if (experiment != GLB_ALL  &&  glbHasParentExp(experiment))
+      {
+        glb_error("glbChiSys: Cannot compute chi^2 for a subdetector in a "
+                  "multi-experiment setup separately");
+        return GLB_NAN;
+      }
+      if (glb_current_minimizer != GLB_MIN_POWELL)
+      {
+        glb_error("glbChiSys: Multi-experiment systematics require hybrid Powell minimizer.\n"
+                  "Use glbSelectMinimizer(GLB_POWELL)");
+        return GLB_NAN;
+      }
+    }
+  }
+
   switch (glb_current_minimizer)
   {
     case GLB_MIN_POWELL:
@@ -655,8 +670,6 @@ double glbChiSys(const glb_params in, int experiment, int rule)
  ***************************************************************************/
 int glbSetInputErrors(const glb_params in)
 {
-  int i;
-
   if (in == NULL  ||  input_errors == NULL)
     { glb_error("glbSetInputErrors: NULL pointer detected"); return -1; }
   if (glbCopyParams(in, input_errors) == NULL)
@@ -688,8 +701,6 @@ int glbGetInputErrors(glb_params in)
  ***************************************************************************/
 int glbSetCentralValues(const glb_params in)
 {
-  int i;
-
   if (in == NULL  ||  central_values == NULL)
     { glb_error("glbSetCentralValues: NULL pointer detected"); return -1; }
   if (glbCopyParams(in, central_values) == NULL)
@@ -721,12 +732,6 @@ int glbGetCentralValues(glb_params in)
 //---- Chi^2 with arbitrary number of free parameters --------------
 //----------------------- 23.01.2004 -------------------------------
 //------------------------------------------------------------------
-
-static double sglb_prior(double x, double center, double sigma)
-{
-  if(fabs(sigma-0)<1E-12) return 0;
-  return (x-center)*(x-center)/sigma/sigma;
-}
 
 static int my_default_sv(const glb_params in, void *user_data)
 {
@@ -871,7 +876,6 @@ static double chi_NP(double x[])
 {
   glb_params prior_input;
   double erg2;
-  double nsp[glbGetNumOfOscParams()-6+1];
   double y[glbGetNumOfOscParams()+1];
   int i;
   prior_input=glbAllocParams();
@@ -1045,6 +1049,23 @@ static double internal_glbSingleChiNP(const glb_params in, glb_params out,
     { glb_error("internal_glbSingleChiNP: Failed to set central values"); return GLB_NAN; }
 
 
+  /* Multi-experiment systematics requires hybrid minimizer */
+  if (glbGetNumberOfNuisanceParams(exp) > 0)
+  {
+    if (glbHasParentExp(exp))
+    {
+      glb_error("internal_glbSingleChiNP: Cannot compute chi^2 for a subdetector in a "
+                "multi-experiment setup separately");
+      return GLB_NAN;
+    }
+    if (glb_current_minimizer != GLB_MIN_POWELL)
+    {
+      glb_error("internal_glbSingleChiNP: Multi-experiment systematics require hybrid Powell minimizer.\n"
+                "Use glbSelectMinimizer(GLB_POWELL)");
+      return GLB_NAN;
+    }
+  }
+
   /* Minimize over the free oscillation parameters */
   switch (glb_current_minimizer)
   {
@@ -1150,6 +1171,15 @@ static double internal_glbChiNP(const glb_params in, glb_params out)
           glb_warning("internal_glbChiNP: Density parameters incompletely defined. Using default 1.0");
           x[i+glbGetNumOfOscParams()] = 1.0;
         }
+    }
+
+  /* Multi-experiment systematics requires hybrid minimizer */
+  for (i=0; i < glb_num_of_exps; i++)
+    if (glbGetNumberOfNuisanceParams(i) > 0  &&  glb_current_minimizer != GLB_MIN_POWELL)
+    {
+      glb_error("internal_glbChiNP: Multi-experiment systematics require hybrid Powell minimizer.\n"
+                "Use glbSelectMinimizer(GLB_POWELL)");
+      return GLB_NAN;
     }
 
 
@@ -1468,7 +1498,7 @@ double glb_hybrid_chi_callback(double *x, int new_rates_flag, void *user_data)
 {
   double *y = NULL;
   double chi2 = 0.0;
-  int i, j, k, m;
+  int i, j, k, l, m;
   int max_dim, this_dim;
   struct glb_experiment *exp;
   struct glb_systematic *sys;
@@ -1507,10 +1537,35 @@ double glb_hybrid_chi_callback(double *x, int new_rates_flag, void *user_data)
   max_dim = 4;   /* This is sufficient for all internal chi^2 function */
   y = (double *) glb_malloc(sizeof(*y) * max_dim);
   for (i=0; i < glb_num_of_exps; i++)
+    for (j=0; j < glbGetNumberOfNuisanceParams(i); j++)
+      glb_experiment_list[i]->nuisance_params[j]->a = GLB_NAN;
+                             /* See glb_invoke_hybrid_minimizer for explanation */
+  for (i=0; i < glb_num_of_exps; i++)
   {
     if (glb_single_experiment_number!=GLB_ALL && glb_single_experiment_number!=i)
       continue;
     exp = (struct glb_experiment *) glb_experiment_list[i];
+
+    for (j=0; j < glbGetNumberOfNuisanceParams(i); j++) /* Update multiex nuisance params */
+    {
+      glb_nuisance *n = exp->nuisance_params[j];
+      if (GLB_ISNAN(n->a))
+      {
+        n->a = 0.0;
+        if (n->n_energies > 0)
+          for (l=0; l < n->n_energies; l++)
+          {
+            n->a_list[l] = x[m++];
+            chi2 += glb_prior(n->a_list[l], 0.0, n->error_list[l]);
+          }
+        else
+        {
+          n->a = x[m++];
+          chi2 += glb_prior(n->a, 0.0, n->error);
+        }
+      } /* isnan(n->a) */
+    } /* for (j) */
+
     for (j=0; j < exp->numofrules; j++)
     {
       if (glb_single_rule_number!=GLB_ALL && glb_single_rule_number!=j)
@@ -1530,8 +1585,8 @@ double glb_hybrid_chi_callback(double *x, int new_rates_flag, void *user_data)
         chi2 += (*(sys->chi_func))(i, j, this_dim, y, exp->sys_on_errors[j], sys->user_data);
       else
         chi2 += (*(sys->chi_func))(i, j, this_dim, y, exp->sys_off_errors[j], sys->user_data);
-    }
-  }
+    } /* for (j) */
+  } /* for (i) */
   glb_free(y);
   y = NULL;
 
@@ -1559,17 +1614,38 @@ double glb_hybrid_chi_callback(double *x, int new_rates_flag, void *user_data)
  ***************************************************************************/
 int glb_invoke_hybrid_minimizer(int exp, int rule, double *x, double *chi2)
 {
+  /* FIXME Avoid pointer to glb_experiment - use Get/Set functions instead */
   double *P = NULL;
-  int n_sys, i, j, k;
+  int n_sys, i, j, k, l;
   int iter;
 
   /* Determine number of systematics parameters, compute constant factors
      in event rates to speed up the rate computation later on */
   n_sys = 0;
   for (i=0; i < glb_num_of_exps; i++)
+    for (j=0; j < glbGetNumberOfNuisanceParams(i); j++)
+      glb_experiment_list[i]->nuisance_params[j]->a = GLB_NAN;
+             /* We use a here to keep track of which nuisance parameters are
+              * already included in the minimization to avoid double counting.
+              * Those with a=nan have not yet been included */
+  for (i=0; i < glb_num_of_exps; i++)
   {
     if (exp!=GLB_ALL && exp!=i)
       continue;
+
+    struct glb_experiment *e = glb_experiment_list[i];
+    for (j=0; j < glbGetNumberOfNuisanceParams(i); j++)
+    {
+      if (GLB_ISNAN(e->nuisance_params[j]->a))
+      {
+        e->nuisance_params[j]->a = 0.0;
+        if (e->nuisance_params[j]->n_energies > 0)
+          n_sys += e->nuisance_params[j]->n_energies;
+        else
+          n_sys++;
+      }
+    }
+
     for (j=0; j < glbGetNumberOfRules(i); j++)
     {
       if (rule!=GLB_ALL && rule!=j)
@@ -1580,6 +1656,7 @@ int glb_invoke_hybrid_minimizer(int exp, int rule, double *x, double *chi2)
     glbSetExperiment(glb_experiment_list[i]);
     glb_rate_template();
   }
+  
 
   /* Initialize oscillation parameters */
   P = (double *) glb_malloc(sizeof(*P) * (n_sys + n_free));
@@ -1593,9 +1670,29 @@ int glb_invoke_hybrid_minimizer(int exp, int rule, double *x, double *chi2)
 
   /* Initialize systematics parameters */
   for (i=0; i < glb_num_of_exps; i++)
+    for (j=0; j < glbGetNumberOfNuisanceParams(i); j++)
+      glb_experiment_list[i]->nuisance_params[j]->a = GLB_NAN;  /* See above for explanation */
+  for (i=0; i < glb_num_of_exps; i++)
   {
     if (exp!=GLB_ALL && exp!=i)
       continue;
+
+    /* Nuisance parameters for multi-exp systematics */
+    struct glb_experiment *e = glb_experiment_list[i];
+    for (j=0; j < glbGetNumberOfNuisanceParams(i); j++)
+    {
+      if (GLB_ISNAN(e->nuisance_params[j]->a))
+      {
+        e->nuisance_params[j]->a = 0.0;
+        if (e->nuisance_params[j]->n_energies > 0)
+          for (l=0; l < e->nuisance_params[j]->n_energies; l++)
+            P[k++] = 0.0; // FIXME Allow user-defined starting values here
+        else
+          P[k++] = 0.0;
+      }
+    }
+
+    /* Nuisance parameters for individual rules */
     for (j=0; j < glbGetNumberOfRules(i); j++)
     {
       if (rule!=GLB_ALL && rule!=j)

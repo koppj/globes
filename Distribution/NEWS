@@ -1,4 +1,4 @@
-**********Version 3.0.1
+h**********Version 3.0.1
 
 18/01/2007 JK
         - Updated copyright notices in all code files
@@ -246,3 +246,119 @@
 
 21 Feb 2011 JK
         - One more problem with the line counting in the lexer fixed
+
+4 Jan 2012 JK
+        - First implementation of new multi-experiment systematics:
+          sys()< > environment + new chi^2 function glbChiMultiExp
+        - New #DETECTOR# directive
+
+********** This version tagged 3.2.0 ************
+
+28 Jan 2012 JK
+        - Fixed problems with copying of efficiencies and smearing matrices to
+          subdetector
+
+********** This version tagged 3.2.1 ************
+
+30 Jan 2012 JK
+        - Fixed bug in treatment of nuisance parameters in child experiments
+          (child did not inherit the current value of the parameter properly)
+
+********** This version tagged 3.2.2 ************
+
+8 May 2012 JK
+        - (in branch newsys) A warning is now given if a rule with non-trivial
+          systematics treatment is inherited from the parent experiment
+
+********** This version tagged 3.2.3 ************
+
+11 May 2012 JK
+        - Increased max. number of channels, rules, etc. to 256
+
+********** This version tagged 3.2.4 ************
+
+11 May 2012 JK
+        - #DETECTOR# directive no longer copies rules - caused a lot of confusion
+        - Overloading existing environments should now work (still highly experimental
+          though)
+
+********** This version tagged 3.2.5 ************
+
+15 May 2012 JK
+        - Went back to max. 64 rules/channels etc. and 128 nuisance params.
+          Memory consumption was quite high otherwise
+
+********** This version tagged 3.2.6 ************
+
+17 May 2012 JK
+        - Fixed bugs in the parser:
+            * sys_on/off_function were not properly overloaded
+            * Type DOUBLE_INDEXED_PAIR did not account for > 32 rules
+            * Type INT_INDEXED_PAIR was implemented incorrectly (-> removed)
+
+********** This version tagged 3.2.7 ************
+
+21 May 2012 JK
+        - Added extra cross-checks to glb_default_smear, checking whether the
+          energy ranges in the glb_smear data structure agree with those in the
+          glb_experiment structure. Note sure if this is strictly necessary.
+        - Fixed a bug in glbInitExpFromParent when copying post-smearing efficiencies
+
+25 May 2012 JK
+        - Fixed a few potential memory leaks in the parser (when overloading
+          environments)
+        - Parser now removes rules from namespace when encountering a #DETECTOR#
+          directive
+
+********** This version tagged 3.2.8 ************
+
+26 Jun 2012 JK
+        - Parser now allows user to re-define number of bins and sampling points
+          (useful when combining experiments with correlated systematics, but
+          otherwise different implementation)
+
+********** This version tagged 3.2.9 ************
+
+27 Jun 2012 JK
+        - Fixed segfault in glbResetExp which happened when the user provided
+          a smearing matrix with an incorrect number of rows. This required
+          changes to the routines that create smearing matrices
+        - Modified memory management for nuisance parameters (introduced
+          reference counter)
+        - New function glbCorrelateSys
+
+********** This version tagged 3.2.10 ************
+
+11 Jul 2012 JK
+        - Fixed a bug in the treatment of correlated systematics. When
+          using glbCorrelateSys, some nuisance parameters got double counted.
+
+********** This version tagged 3.2.11 ************
+
+30 Jan 2013 JK
+        - If user defines experiment->probability_user_data, it is used instead
+          of the global default.
+
+********** This version tagged 3.2.12 ************
+
+27 Sep 2013 PH 
+         - Defined @systype directive, which defaults to 0, @systype=1
+           provides an energy calibration error
+
+********** This version tagged 3.2.13 ************
+
+26 Oct 2014 JK
+         - Re-ran gnulib-tool --add-import and autoreconf
+
+********** This version tagged 3.2.14 ************
+
+04 May 2015 JK
+         - Fixed bug #25 in in glbShiftEnergyScale
+
+********** This version tagged 3.2.15 ************
+
+07 June 2016 PH 
+  	- Updated constants for matter profiles and some smaller bugs
+             related to autotools fixed
+
+********** This version tagged 3.2.16 ************

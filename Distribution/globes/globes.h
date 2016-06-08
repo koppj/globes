@@ -23,6 +23,7 @@
 #define __GLOBES_H 1
 
 #include <stdio.h>
+#include <stdarg.h>
 
 #ifdef __cplusplus
 #  define BEGIN_C_DECLS extern "C" {
@@ -73,15 +74,29 @@ enum glb_enum_minimizers
 
 /* Unit conversion */
 
-#define GLB_EV_TO_KM_FACTOR  1.9747235e-10
+/* PH 06/07/16 updated based in 2016 CODATA values for c and hbar,
+   prior to this date we used 1.9747235e-10 */
+
+#ifdef GLB_OLD_CONSTANTS
+ #define GLB_EV_TO_KM_FACTOR 1.9747235e-10
+#else
+ #define GLB_EV_TO_KM_FACTOR 1.97327e-10
+#endif
+
 #define GLB_KM_TO_EV(x)      ((x) / GLB_EV_TO_KM_FACTOR)
 #define GLB_EV_TO_KM(x)      ((x) * GLB_EV_TO_KM_FACTOR)
 
 
 /* maximum number of experiments */
+#define GLB_MAX_EXP      300
 
-#define GLB_MAX_EXP 300
-
+/* maximum numbers of channels, rules, ... per experiment */
+#define GLB_MAX_CHANNELS  64
+#define GLB_MAX_RULES     64
+#define GLB_MAX_NUISANCE 128
+#define GLB_MAX_SMEAR     64
+#define GLB_MAX_FLUXES    64
+#define GLB_MAX_XSECS     64
 
 
 
@@ -198,6 +213,7 @@ void glbPrintDelimiter(FILE *stream, int character);
 void *glbSetChannelPrintFunction(void *fp);
 void glbSetPrintDelimiters(const char *left,const char *middle,
                            const char *right);
+int glbPrintExp(int exp);
 
 
 /* Event rate calculation */
@@ -315,6 +331,10 @@ double *glbGetSysStartingValuesListPtr(int exp, int rule, int on_off);
 void glbShiftEnergyScale(double g, double *rates_in, double *rates_out,
                          int n_bins, double emin, double emax);
 
+int glbCorrelateSys(struct glb_experiment *e1, struct glb_experiment *e2);
+int glbGetNumberOfNuisanceParams(int exp);
+int glbHasParentExp(int exp);
+int glbGetParentExp(int exp);
 
 #ifndef SWIG
 int glbRegisterPriorFunction(double (*prior)(const glb_params, void *user_data),
@@ -330,6 +350,12 @@ int glbRegisterProbabilityEngine(int n_parameters,
                  glb_set_oscillation_parameters_function set_params_func,
                  glb_get_oscillation_parameters_function get_params_func,
                  void *user_data);
+int glbSetProbabilityEngineInExperiment(int exp, int n_parameters,
+                 glb_probability_matrix_function prob_func,
+                 glb_set_oscillation_parameters_function set_params_func,
+                 glb_get_oscillation_parameters_function get_params_func,
+                 void *user_data);
+
 int glbGetNumOfOscParams();
 
 

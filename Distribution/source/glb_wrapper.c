@@ -475,7 +475,6 @@ int glbSetOscParamByName(glb_params in, double value, const char *name)
 double glbGetOscParamByName(const glb_params in, const char *name)
 {
   int index;
-  double value;
 
   if (!name)
   {
@@ -800,8 +799,11 @@ void
 glbClearExperimentList()
 {
   int i;
-  for(i=0;i<GLB_MAX_EXP;i++) glbFreeExp(glb_experiment_list[i]);
-  for(i=0;i<GLB_MAX_EXP;i++) glb_experiment_list[i]=glbAllocExp();
+  for(i=0; i < GLB_MAX_EXP; i++)
+  {
+    glbFreeExp(glb_experiment_list[i]);
+    glb_experiment_list[i] = glbAllocExp();
+  }
   glb_num_of_exps=0;
   glbResetCounters();
   glb_init_minimizer();   /* Re-initialize minimizer */
@@ -1656,7 +1658,7 @@ glbShowChannelProbs(FILE *stream,
 {
   int i,s,cc,currentchannel[6],filter;
   size_t k,l,m,c;
-  double *ch,*bg,*eff,*temp,**res,*energy,sum;
+  double *ch,**res,*energy,sum;
   glb_smear *smt;
   s=0;
   sum=0.0;
@@ -1865,8 +1867,7 @@ glbTotalRuleRate(
   double out;
   int i,s,cc,channel;
   size_t k,l,m,c,bins;
-  double *ch,*bg,*eff,*temp,*ceff,**res,*energy,sum,coeff;
-  glb_smear *smt;
+  double *ch,*bg,*eff,*temp,*ceff,**res,sum,coeff;
   s=0;
   sum=0.0;
   bins=glb_experiment_list[exp]->numofbins;
@@ -2002,22 +2003,50 @@ void glb_clean_up()
 {
   int i;
 
-  for(i=0;i<GLB_MAX_EXP;i++) {glbFreeExp(glb_experiment_list[i]);}
- glbCleanSysList();
- glb_clean_parser();
- glb_lexer_cleanup();
- obstack_free(&glb_rate_stack,NULL);
- glb_free((char *) printf_left);
- glb_free((char *) printf_right);
- glb_free((char *) printf_middle);
- glb_free((char *) glb_prog_name);
- for(i=0;i<glb_path_vector_length;i++)
-   glb_free((char *) glb_path_vector[i]);
- glb_free((char **) glb_path_vector);
- glb_free_minimizer();
- glb_free_probability_engine();
+  for(i=0;i<GLB_MAX_EXP;i++)
+  {
+    glbFreeExp(glb_experiment_list[i]);
+    glb_experiment_list[i] = NULL;
+  }
+  glbCleanSysList();
+  glb_clean_parser();
+  glb_lexer_cleanup();
+  obstack_free(&glb_rate_stack,NULL);
+  glb_free((char *) printf_left);
+  glb_free((char *) printf_right);
+  glb_free((char *) printf_middle);
+  glb_free((char *) glb_prog_name);
+  for(i=0;i<glb_path_vector_length;i++)
+    glb_free((char *) glb_path_vector[i]);
+  glb_free((char **) glb_path_vector);
+  glb_free_minimizer();
+  glb_free_probability_engine();
 }
 
+
+/***************************************************************************
+ * Function glbPrintExp                                                    *
+ ***************************************************************************
+ * Prints selected experiment parameters to stdout in AEDL format          *
+ ***************************************************************************/
+int glbPrintExp(int exp)
+{
+  int i, status=0;
+
+  if(!(exp >= 0  &&  exp < glb_num_of_exps)  ||  exp==GLB_ALL)
+  {
+    glb_error("glbPrintExp: Invalid value for experiment number: %d", exp);
+    return -1;
+  }
+
+  if (exp == GLB_ALL)
+    for(i=0; i < glb_num_of_exps; i++)
+      status += glbPrintExpByPointer(glb_experiment_list[i]);
+  else
+    status = glbPrintExpByPointer(glb_experiment_list[exp]);
+
+  return status;
+}
 
 
 /* The all important init function */
@@ -2752,6 +2781,20 @@ const char
 }
 
 
+const char
+*glbValueToNameByPointer(struct glb_experiment *in,const char* context, int value)
+{
+  glb_naming *ptr;
+  for (ptr = in->names; ptr != (glb_naming *) NULL;
+       ptr = (glb_naming *)ptr->next)
+    {
+        if (ptr->value == value + 1  && strcmp(ptr->context,context)==0)
+	  return ptr->name;
+    }
+  return NULL;
+}
+
+
 /*********************************************
  * Calculation of oscillation probabilities  *
  *********************************************/
@@ -2894,18 +2937,82 @@ double glbFilteredConstantDensityProbability(int exp,int initial_flavour, int fi
 }
 
 
-/* Number of fluxes in an experiment */
-
+/***************************************************************************
+ * glbGetNumberOfFluxes                                                    *
+ ***************************************************************************
+ * Get number of neutrino flux definitions in an experiment                *
+ ***************************************************************************/
 int glbGetNumberOfFluxes(int exp)
 {
-  int s;
-  /* Testing the experiment number */
-  if(!(((exp >= 0)&&(exp < glb_num_of_exps)))) {
-    glb_error("Invalid value for experiment number");
-    return -1;}
-
-  s=glb_experiment_list[exp]->num_of_fluxes;
-  return s;
-
+  if (exp < 0  ||  exp >= glb_num_of_exps)
+  {
+    glb_error("glbGetNumberOfFluxes: Invalid experiment index: %d", exp);
+    return -1;
+  }
+  else
+    return glb_experiment_list[exp]->num_of_fluxes;
 }
+
+
+/***************************************************************************
+ * glbGetNumberOfNuisanceParams                                            *
+ ***************************************************************************
+ * Get number of nuisance parameter definitions in an experiment           *
+ ***************************************************************************/
+int glbGetNumberOfNuisanceParams(int exp)
+{
+  if (exp < 0  ||  exp >= glb_num_of_exps)
+  {
+    glb_error("glbGetNumberOfNuisanceParams: Invalid experiment index: %d", exp);
+    return -1;
+  }
+  else
+    return glb_experiment_list[exp]->n_nuisance;
+}
+
+
+/***************************************************************************
+ * glbHasParentExp                                                         *
+ ***************************************************************************
+ * Return 1 of the given experiment has a parent experiment, 0 if not, and *
+ * -1 in case of error.                                                    *
+ ***************************************************************************/
+int glbHasParentExp(int exp)
+{
+  if (exp < 0  ||  exp >= glb_num_of_exps)
+  {
+    glb_error("glbHasParentExp: Invalid experiment index: %d", exp);
+    return -1;
+  }
+
+  if (glb_experiment_list[exp]->parent != NULL)
+    return 1;
+  else
+    return 0;
+}
+
+
+/***************************************************************************
+ * glbGetParentExp                                                         *
+ ***************************************************************************
+ * Find the index of an experiments' parent experiment, or return -1 if    *
+ * the experiment has no parent, or -2 in case of error                    *
+ ***************************************************************************/
+int glbGetParentExp(int exp)
+{
+  int i;
+
+  if (exp < 0  ||  exp >= glb_num_of_exps)
+  {
+    glb_error("glbGetParentExp: Invalid experiment index: %d", exp);
+    return -10;
+  }
+  else
+    for (i=0; i < glb_num_of_exps; i++)
+      if (glb_experiment_list[i] == glb_experiment_list[exp]->parent)
+        return i;
+
+  return -1;
+}
+
 

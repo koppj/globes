@@ -52,12 +52,14 @@
 %s glb_lexer_cross
 %s glb_lexer_flux
 %s glb_lexer_nuflux
+%s glb_lexer_sys
 %s glb_lexer_defr
 %s glb_lexer_defc
 %s glb_lexer_defe
 %s glb_lexer_defx
 %s glb_lexer_deff
 %s glb_lexer_defnf
+%s glb_lexer_defsys
 %x glb_lexer_comment
 %x glb_lexer_linecomment
 %x glb_lexer_str
@@ -90,8 +92,8 @@ static int cond_buf;
 /* I am not sure wether this works with nested contexts */
 static int cond_buf_i;
 static int cond_buf_str;
-static char *fnbuf,*fnbuf2;
-static size_t len,i;
+static char *fnbuf;
+static size_t len;
 
 void glb_lexer_cleanup();
 
@@ -103,7 +105,8 @@ void glb_lexer_cleanup();
 
 %}
 
-EOE       #NEXT#
+EOE      #NEXT#
+DET      #DETECTOR#
 FN       [^"]*
 
 GLOB     GLoBES
@@ -125,10 +128,17 @@ LID      %[a-zA-Z][a-zA-Z0-9_]*
 <glb_lexer_comment>\n             ++glb_line_num;
 <glb_lexer_comment>"*"+"/"        BEGIN(cond_buf);
 
+
 {EOE}   {
-glb_copy_buff();
-glbReset();
+  yylval.in = -1;
+  return ENDEXP;
 }
+
+{DET}   {
+  yylval.in = -1;
+  return ENDDET;
+}
+
 
 
 <INITIAL>{
@@ -137,7 +147,8 @@ channel {BEGIN(glb_lexer_defc);yylval.name=strdup(yytext);return GID;}
 energy  {BEGIN(glb_lexer_defe);yylval.name=strdup(yytext);return GID;}
 cross   {BEGIN(glb_lexer_defx);yylval.name=strdup(yytext);return GID;}
 flux    {BEGIN(glb_lexer_deff);yylval.name=strdup(yytext);return GID;}
-nuflux    {BEGIN(glb_lexer_defnf);yylval.name=strdup(yytext);return GID;}
+nuflux  {BEGIN(glb_lexer_defnf);yylval.name=strdup(yytext);return GID;}
+sys     {BEGIN(glb_lexer_defsys);yylval.name=strdup(yytext);return GID;}
 }
 
 include             {cond_buf_i=YY_START;BEGIN(glb_lexer_incl);}
@@ -210,8 +221,10 @@ include             {cond_buf_i=YY_START;BEGIN(glb_lexer_incl);}
 <<EOF>> {
   if (--include_stack_ptr < 0)  /* If top level buffer ends, we're done */
   {
+/*JK 2011-12-29 This would have potentially disregarded the last line in the file
     glb_copy_buff();
-    glbReset();
+    glbReset();*/
+
     /* BUGFIX #9 -- This lines fixes a tricky bug in the parser */
     include_stack_ptr = 0;
     yyterminate();
@@ -228,7 +241,7 @@ include             {cond_buf_i=YY_START;BEGIN(glb_lexer_incl);}
 }
 
 
-<glb_lexer_rule,glb_lexer_chl,glb_lexer_energy,glb_lexer_cross,glb_lexer_flux,glb_lexer_nuflux>[<]  {
+<glb_lexer_rule,glb_lexer_chl,glb_lexer_energy,glb_lexer_cross,glb_lexer_flux,glb_lexer_nuflux,glb_lexer_sys>[<]  {
 yylval.in=-1;
 return GRPOPEN;}
 
@@ -272,6 +285,11 @@ return SYS_ON_FUNCTION;
 <glb_lexer_rule>@sys_off_function   {
 yylval.name=strdup(yytext);
 return SYS_OFF_FUNCTION;
+}
+
+<glb_lexer_rule>@sys_on_multiex_errors_sig|@sys_on_multiex_errors_bg|@sys_off_multiex_errors_sig|@sys_off_multiex_errors_bg {
+yylval.name=strdup(yytext);
+return SYS_MULTIEX_ERRORS;
 }
 
 
@@ -322,7 +340,6 @@ return NUFLUX;}
 <glb_lexer_nuflux>@flux_file_m           {
 yylval.name=strdup(yytext);
 return NUFLUX;}
-
 
 :        {return RULESEP;}
 @        {return RULEMULT;}
@@ -414,6 +431,17 @@ yylval.nameptr = s;
 return s->type;
 }
 
+<glb_lexer_defsys>#{ID}        {
+  glb_namerec *s = glb_getname(yytext,"sys");
+  if (s == 0)  s = glb_putname(yytext,"sys",NAME);
+  BEGIN(INITIAL);
+  BEGIN(glb_lexer_sys);
+  if(strcmp(s->context,"sys") != 0)
+    { yylval.nameptr=s;return RDF; }
+  yylval.nameptr = s;
+  return s->type;
+}
+
 #{ID}        {glb_namerec *s;
 s = glb_getname (yytext,"rule");
 if (s == 0) { yylval.name=strdup(yytext); return NDEF; }
@@ -421,13 +449,13 @@ yylval.nameptr = s;
 return s->type;
 }
 
-<glb_lexer_rule,glb_lexer_chl,glb_lexer_energy,glb_lexer_cross,glb_lexer_flux,glb_lexer_nuflux>[>]        {
+<glb_lexer_rule,glb_lexer_chl,glb_lexer_energy,glb_lexer_cross,glb_lexer_flux,glb_lexer_nuflux,glb_lexer_sys>[>]        {
 BEGIN(INITIAL);
 yylval.in=-1;
 return GRPCLOSE;}
 
 
-<glb_lexer_chl,glb_lexer_rule,glb_lexer_energy,glb_lexer_cross,glb_lexer_flux,glb_lexer_nuflux>@{ID} {
+<glb_lexer_chl,glb_lexer_rule,glb_lexer_energy,glb_lexer_cross,glb_lexer_flux,glb_lexer_nuflux,glb_lexer_sys>@{ID} {
 yylval.name=strdup(yytext);
 return IDN;
 }

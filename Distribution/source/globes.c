@@ -62,7 +62,6 @@ static int parse_definition(const char *str)
   char *endp=NULL;
   char *wrk,*dummy;
   const char *delim="=";
-  double val;
   char *token=NULL;
   char *lhs=NULL;
   char *rhs=NULL;
@@ -595,7 +594,6 @@ glbDefineAEDLList("%para", osc,6);
   fprintf(stdout,"x-sec %lf\n",glbXSection(0,0,0.01,1,-1));
 #endif /* TEST */
 
-
   /* Computing the rates */
   oscp=glbAllocParams();
   if(arguments.oscillation==0)
@@ -720,6 +718,7 @@ glbDefineAEDLList("%para", osc,6);
     }
 
   /* Cleaning up */
+  glbClearExperimentList();
   glbFreeParams(oscp);
   if(stream!=stdout) fclose(stream);
   if(osc!=NULL) glb_free(osc);

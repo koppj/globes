@@ -92,6 +92,8 @@ glb_namerec *glb_putname (char *sym_name, char *context, int sym_type);
 /* they are defined gls_parser.y */
 void glb_copy_buff();
 void glbReset(); 
+void glbResetNuisance();
+void glbNewDetector();
 
 
 #endif /* GLB_PARSER_DATA_H */

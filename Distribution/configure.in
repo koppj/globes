@@ -28,7 +28,9 @@ dnl middle digit: increment when features have been introduced/removed
 dnl first digit: major improvements/rewrites
 dnl In contrast to the result of autoupdate I had to swap the
 dnl the AC_INIT and AC_CONFIG_SRCDIR
-AC_INIT([GLoBES],[3.1.11],[globes@mpi-hd.mpg.de],[globes])
+
+AC_INIT([GLoBES],[3.2.16],[globes@mpi-hd.mpg.de],[globes])
+
 
 AC_CONFIG_SRCDIR([source/glb_wrapper.c])
 AC_CONFIG_MACRO_DIR([m4])
@@ -46,7 +48,7 @@ dnl code changed: c:r+1:a
 dnl API changed: c+1:0:a
 dnl -> API extended: c:0:a+1
 dnl -> API shrunken: c:0:0
-GLBLIBVERSION="9:0:1"
+GLBLIBVERSION="10:1:2"
 
 dnl From here no editing !
 AC_SUBST(GLBLIBVERSION)
@@ -75,11 +77,11 @@ dnl Output our knowledge to the Makefiles
 dnl Checks for programs.
 dnl AC_PROG_AWK
 AC_PROG_CC
-gl_EARLY
 AC_PROG_CC_C99
 if [[ "$ac_cv_prog_cc_stdc" = "no" ]]; then
   AC_MSG_ERROR([C compiler does not support C99 (required).]);
 fi
+gl_EARLY
 dnl AC_PROG_CXX
 AC_PROG_CPP
 AC_PROG_INSTALL

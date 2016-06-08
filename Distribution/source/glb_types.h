@@ -145,6 +145,23 @@ typedef struct glb_systematic
 } glb_systematic;
 
 
+/* Data structure containing information about one nuisance parameter
+ * (as defined in an AEDL "sys< >" block */
+typedef struct glb_nuisance
+{
+  char *name;                  /* Name of this nuisance parameter                    */
+  int systype; /* this allows to have different types of errors like calibration */
+
+  double error;                /* The uncertainty on this nuisance parameter         */
+  double a;                    /* The current value of the nuisance parameter        */
+  double *a_list;              /* List of a values for energy-dependent parameters   */
+  double *energy_list, *error_list; /* Energies and associated uncertainties if this */
+                               /* nuisance parameter is energy-dependent             */
+  int n_energies;              /* Number of entries in energy_list and error_list    */
+  int ref_count;               /* Number of experiments using this nuisance param    */
+} glb_nuisance;
+
+
 
 /** This structure contains a large part of the information for defining
  * an experiment.
@@ -170,6 +187,17 @@ struct glb_experiment {
   /* Name of AEDL file on which this experiment is based */
   char *filename;
 
+  /* A pointer to the primary detector in the case of multi-detector experiment
+   * (defined using the #DETECTOR# diretive in AEDL) */
+  struct glb_experiment *parent;
+  struct glb_experiment *children[GLB_MAX_EXP];
+  int n_children;
+    /* The number of pointers that exist to this experiment, either from
+     * glb_experiment_list, or from other experiments' parent pointers.
+     * Shall be incremented/decremented by using glbIncrExpRefCount and
+     * glbDecrExpRefCount, when ref_count reaches zero, the experimental
+     * data structure will be destroyed. */
+
   /* This contains the parsing meta-information like names of rules etc. */
   glb_naming *names;
   
@@ -177,11 +205,11 @@ struct glb_experiment {
    */
 
   /** That is a new way to define and load fluxes */
-  glb_flux *fluxes[32];
+  glb_flux *fluxes[GLB_MAX_FLUXES];
   int num_of_fluxes;
 
   /** That is a new way to define and load x-sections */
-  glb_xsec *xsecs[32];
+  glb_xsec *xsecs[GLB_MAX_XSECS];
   int num_of_xsecs;
 
  
@@ -220,7 +248,7 @@ struct glb_experiment {
   double targetmass;
 
   
-  /** Number of channels. It is a number between 1 and 32.
+  /** Number of channels. It is a number between 1 and GLB_MAX_CHANNELS.
    */
   int numofchannels;
 
@@ -237,49 +265,49 @@ struct glb_experiment {
   */
   int* listofchannels[6];
 
-  /** Number of rules. Ranges from 1 to 32.
+  /** Number of rules. Ranges from 1 to GLB_MAX_RULES.
    */
   int numofrules;
 
   /** Tells for each rule how many channels are added to form the signal.
-  * Ranges from 1 to 32.
+  * Ranges from 1 to GLB_MAX_RULES.
   */
-  int lengthofrules[32];
+  int lengthofrules[GLB_MAX_RULES];
 
   /** Contains the pre-factor for each channel and rule which is applied to
   * each channel in computing the signal. Has length 
   * lengthofrules*sizeof(double). malloc!
   */
-  double* rulescoeff[32];
+  double* rulescoeff[GLB_MAX_RULES];
 
   /** Contains the identifying number for each channel used in this rule.
   * Has got length lengthofrules*sizeof(int). Range is 0 to lengthofrule-1.
   * malloc!
   */
-  int* rulechannellist[32];
+  int* rulechannellist[GLB_MAX_RULES];
 
   /** Tells for each rule how many channels are added to form the background.
-  * Ranges from 1 to 32.
+  * Ranges from 1 to GLB_MAX_RULES.
   */
-  int lengthofbgrules[32];
+  int lengthofbgrules[GLB_MAX_RULES];
 
   /** Contains the pre-factor for each channel and rule which is applied to
   * each channel in computing the background. Has length 
   * lengthofrules*sizeof(double). malloc!
   */
-  double* bgrulescoeff[32];
+  double* bgrulescoeff[GLB_MAX_RULES];
 
   /** Contains the identifying number for each channel used in this rule.
   * Has got length lengthofrules*sizeof(int). Range is 0 to lengthofrule-1.
   * malloc!
   */
-  int* bgrulechannellist[32];
+  int* bgrulechannellist[GLB_MAX_RULES];
 
   /** Number of smearing data types stored */
   int num_of_sm;
 
   /** Meta information for computing the smear matrix for each rule */
-  glb_smear *smear_data[32];
+  glb_smear *smear_data[GLB_MAX_SMEAR];
 
   /** Thus holds the pointer to the place where the energy resolution
   * function is stored. The energy resolution function is stored as
@@ -295,7 +323,7 @@ struct glb_experiment {
   * for computing this matrix and the other quantities. Also
   * the meta information for this process has to go in here.
   */
-  double** smear[32];
+  double** smear[GLB_MAX_SMEAR];
 
   /** For each analysis bin (numofbins) exists a lower index in the
   * range given by simbins for which smear contains non-zero entries
@@ -305,7 +333,7 @@ struct glb_experiment {
   * for computing this matrix and the other quantities. Also
   * the meta information for this process has to go in here.
   */
-  int* lowrange[32];
+  int* lowrange[GLB_MAX_SMEAR];
 
   /** For each analysis bin (numofbins) exists a upper index in the
   * range given by simbins for which smear contains non-zero entries
@@ -315,7 +343,7 @@ struct glb_experiment {
   * for computing this matrix and the other quantities. Also
   * the meta information for this process has to go in here.
   */
-  int* uprange[32];
+  int* uprange[GLB_MAX_SMEAR];
   
   /** simtresh has the same function for the computation of events than
   * emin for the analysis. simtresh has to be positive and smaller than 
@@ -377,40 +405,34 @@ struct glb_experiment {
   * channel before doing the smearing. Has length simbins. Positive
   * including zero.
   */
-  double* user_pre_smearing_channel[32];
+  double* user_pre_smearing_channel[GLB_MAX_CHANNELS];
 
   /** New.
   * Contains a number for each bin which is multiplied with each
   * channel after doing the smearing. Has length bins. Positive
   * including zero.
   */
-  double* user_post_smearing_channel[32];
+  double* user_post_smearing_channel[GLB_MAX_CHANNELS];
 
   /** New.
   * Contains a number for each bin which is added to each
   * bin before doing the smearing. Has length simbins. Positive
   * including zero.
   */
-  double* user_pre_smearing_background[32];
+  double* user_pre_smearing_background[GLB_MAX_CHANNELS];
 
   /** New.
   * Contains a number for each bin which is added to each
   * bin after doing the smearing. Has length bins. Positive
   * including zero.
   */
-  double* user_post_smearing_background[32];
-
-  /** New.
-  * Store pre-computed background. Has length numofbins. 
-  * Determined internally.
-  */
-  double* no_osc_background[32];
+  double* user_post_smearing_background[GLB_MAX_CHANNELS];
 
   /** Energy range for each rule in which the events are used to compute
   * the chi^2. Lower limit and upper limit.
   */
-  double energy_window[32][2];    /* Energy range */
-  int energy_window_bins[32][2];  /* Bin range    */
+  double energy_window[GLB_MAX_RULES][2];    /* Energy range */
+  int energy_window_bins[GLB_MAX_RULES][2];  /* Bin range    */
 
   /** Has length numofbins */
   double* energy_tab;
@@ -420,34 +442,53 @@ struct glb_experiment {
   * the different parts of event vectors needed during computation.
   * All mallocing has to be done at intialization of a given experiment!
   */
-  double *chrb_0[32], *chrb_1[32]; /* True and fitted pre-smearing rates by channel   */
-  double *chra_0[32], *chra_1[32]; /* True and fitted post-smearing rates by channel */
-  double *chr_template[32];   /* Products of fluxes, cross sections, and prefactors by channel */
-  double* SignalRates[32];    /* "True" signal event rates for all rules */
-  double* BackgroundRates[32];/* "True" background event rates for all rules */
-  double* rates0[32];         /* "True" event rates for all rules */
-  double* rates1[32];         /* Fitted signal rates for all rules */
-  double* rates1BG[32];       /* Fitted background rates for all rules */
+  double *chrb_0[GLB_MAX_CHANNELS], *chrb_1[GLB_MAX_CHANNELS]; /* True/fitted pre-sm. rates by ch  */
+  double *chra_0[GLB_MAX_CHANNELS], *chra_1[GLB_MAX_CHANNELS]; /* True/fitted post-sm. rates by ch */
+  double *chr_template[GLB_MAX_CHANNELS];   /* Products of fluxes, cross sections, and prefactors by ch */
+  double* SignalRates[GLB_MAX_RULES];    /* "True" signal event rates for all rules */
+  double* BackgroundRates[GLB_MAX_RULES];/* "True" background event rates for all rules */
+  double* rates0[GLB_MAX_RULES];         /* "True" event rates for all rules */
+  double* rates1[GLB_MAX_RULES];         /* Fitted signal rates for all rules */
+  double* rates1BG[GLB_MAX_RULES];       /* Fitted background rates for all rules */
 
   /** Systematics functions and on/off states */
-  int sys_on_off[32];         /* Systematics switch (GLB_ON/GLB_OFF)     */
-  glb_systematic *sys_on[32]; /* The chi^2 functions of the rules        */
-  glb_systematic *sys_off[32]; 
-  char *sys_on_strings[32];   /* The errordim strings from the AEDL file */
-  char *sys_off_strings[32];
+  int sys_on_off[GLB_MAX_RULES];         /* Systematics switch (GLB_ON/GLB_OFF)     */
+  glb_systematic *sys_on[GLB_MAX_RULES]; /* The chi^2 functions of the rules        */
+  glb_systematic *sys_off[GLB_MAX_RULES]; 
+  char *sys_on_strings[GLB_MAX_RULES];   /* The errordim strings from the AEDL file */
+  char *sys_off_strings[GLB_MAX_RULES];
 
   /** Systematical error and starting values (GLoBES 3.0 scheme) */
-  double *sys_on_errors[32];     /* Systematical errors */
-  double *sys_on_startvals[32];  /* Starting values for systematics minimization */
-  double *sys_off_errors[32];    /* Systematical errors */
-  double *sys_off_startvals[32]; /* Starting values for systematics minimization */
+  double *sys_on_errors[GLB_MAX_RULES];     /* Systematical errors */
+  double *sys_on_startvals[GLB_MAX_RULES];  /* Starting values for systematics minimization */
+  double *sys_off_errors[GLB_MAX_RULES];    /* Systematical errors */
+  double *sys_off_startvals[GLB_MAX_RULES]; /* Starting values for systematics minimization */
 
   /** Systematical error and starting values (GLoBES 2.0.11 scheme) */
-  double signal_errors[2][32];   /* Signal norm/energy errors for old chi^2 functions */
-  double signal_startvals[2][32];/* Signal starting values for old chi^2 functions */
-  double bg_errors[2][32];       /* Background norm/energy errors for old chi^2 functions */
-  double bg_startvals[2][32];    /* BG starting values for old chi^2 functions */
-  double bg_centers[2][32];      /* BG central values for old chi^2 functions */
+  double signal_errors[2][GLB_MAX_RULES];   /* Signal norm/energy errors for old chi^2 functions */
+  double signal_startvals[2][GLB_MAX_RULES];/* Signal starting values for old chi^2 functions */
+  double bg_errors[2][GLB_MAX_RULES];       /* Background norm/energy errors for old chi^2 functions */
+  double bg_startvals[2][GLB_MAX_RULES];    /* BG starting values for old chi^2 functions */
+  double bg_centers[2][GLB_MAX_RULES];      /* BG central values for old chi^2 functions */
+
+  /** Nuisance parameters for global/multi-experiment systematics */
+  int n_nuisance;                           /* Number of nuisance parameters */
+  glb_nuisance *nuisance_params[GLB_MAX_NUISANCE]; /* Pointers to nuisance params */
+
+  int sys_on_n_nuis_sig[GLB_MAX_RULES][GLB_MAX_CHANNELS]; /* # of nuisance params applied to */
+  int sys_on_n_nuis_bg[GLB_MAX_RULES][GLB_MAX_CHANNELS];  /* the channels making up a rule   */ 
+  int sys_off_n_nuis_sig[GLB_MAX_RULES][GLB_MAX_CHANNELS];
+  int sys_off_n_nuis_bg[GLB_MAX_RULES][GLB_MAX_CHANNELS];
+  int *sys_on_multiex_errors_sig[GLB_MAX_RULES][GLB_MAX_CHANNELS]; /* Pointers to the nuisance */
+  int *sys_on_multiex_errors_bg[GLB_MAX_RULES][GLB_MAX_CHANNELS];  /* parameters relevant to   */
+  int *sys_off_multiex_errors_sig[GLB_MAX_RULES][GLB_MAX_CHANNELS];/* the channels making up   */
+  int *sys_off_multiex_errors_bg[GLB_MAX_RULES][GLB_MAX_CHANNELS]; /* the rules                */
+
+  /* Probability engine for this experiment (if different from default) */
+  glb_probability_matrix_function probability_matrix;
+  glb_set_oscillation_parameters_function set_oscillation_parameters;
+  glb_get_oscillation_parameters_function get_oscillation_parameters;
+  void *probability_user_data;
 };
 
 #endif /* GLB_TYPES_H 1 */

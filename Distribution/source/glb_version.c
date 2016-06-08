@@ -43,7 +43,7 @@ break_up_version(char const *version,int *first,int *second, int *third)
 {
 
   char c;
-  size_t length,i,k,ct=0,ctb=0;
+  size_t length,i,ct=0,ctb=0;
   char *vec=NULL;
   int res[4]={-1,-1,-1,-1};
   if(version==NULL)
@@ -83,7 +83,6 @@ break_up_version(char const *version,int *first,int *second, int *third)
 int
 glbTestReleaseVersion(const char *version)
 {
-  char buf[10];
   int s;
   int major,minor,bug,tmajor,tminor,tbug;
   break_up_version(version,&major,&minor,&bug);

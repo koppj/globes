@@ -33,6 +33,7 @@
 #include <gsl/gsl_matrix.h>
 #include <gsl/gsl_blas.h>
 #include "globes/globes.h"
+#include "glb_error.h"
 #include "glb_wrapper.h"
 #include "glb_minimize.h"
 #include "glb_probability.h"
@@ -874,8 +875,6 @@ int glbRegisterProbabilityEngine(int n_parameters,
                     glb_get_oscillation_parameters_function get_params_func,
                     void *user_data)
 {
-  int i;
-
   /* Free array containing parameter names */
   glbClearParamNames();
 
@@ -918,5 +917,55 @@ int glbGetNumOfOscParams()
 {
   return glb_oscp;
 }
+
+
+/***************************************************************************
+ * Function glbSetProbabilityEngineInExperiment                            *
+ ***************************************************************************
+ * Replaces the functions glb_probability_matrix,                          *
+ * glb_set_oscillation_parameters, and glb_get_oscillation_parameters by   *
+ * user-defined functions *for a given experiment*.                        *
+ ***************************************************************************
+ * Parameters:                                                             *
+ *   n_parameters:    New number of oscillation parameters                 *
+ *   prob_func:       The replacement for glb_probability_matrix           *
+ *   set_params_func: The replacement for glb_set_oscillation_parameters   *
+ *   get_params_func: The replacement for glb_get_oscillation_parameters   *
+ *   user_data:       Arbitrary pointer, passed to user-defined functions  *
+ * If n_parameters != glb_oscp the function fails since this would imply   *
+ * potentially incompatible oscillation parameter vectors being used       *
+ * in different experiments.                                               *
+ * If any of the pointer-valued arguments is NULL, the respective hook     *
+ * will be reset to its default value.                                     *
+ ***************************************************************************/
+int glbSetProbabilityEngineInExperiment(int exp, int n_parameters,
+                    glb_probability_matrix_function prob_func,
+                    glb_set_oscillation_parameters_function set_params_func,
+                    glb_get_oscillation_parameters_function get_params_func,
+                    void *user_data)
+{
+  struct glb_experiment *in;
+
+  if (exp < 0  ||  exp >= glb_num_of_exps)
+  {
+    glb_error("glbSetProbabilityEngineInExperiment: Invalid experiment number");
+    return -1;
+  }
+
+  if (n_parameters != glb_oscp)
+  {
+    glb_error("glbSetProbabilityEngineInExperiment: Number of oscillation parameters "
+              "  incompatible with default oscillation engine.");
+    return -2;
+  }
+
+  in->probability_matrix         = prob_func;
+  in->set_oscillation_parameters = set_params_func;
+  in->get_oscillation_parameters = get_params_func;
+  in->probability_user_data      = user_data;
+
+  return 0;
+}
+
 
 

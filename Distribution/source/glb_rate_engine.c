@@ -56,24 +56,24 @@ static double treshold = 5.0;     // treshold energy
 
 static double Probs[3][3];
 static double ProbsAnti[3][3];
-double** glb_calc_smearing[32];
-int* glb_calc_uprange[32];
-int* glb_calc_lowrange[32];
-static int* rules[32];
-static int rule_length[32];
-static double* rule_coeff[32];
-static int* BGrules[32];
-static int BGrule_length[32];
-static double* BGrule_coeff[32];
- double* glb_calc_signal_rates[32];
- double* glb_calc_bg_rates[32];
+double** glb_calc_smearing[GLB_MAX_SMEAR];
+int* glb_calc_uprange[GLB_MAX_SMEAR];
+int* glb_calc_lowrange[GLB_MAX_SMEAR];
+static int* rules[GLB_MAX_RULES];
+static int rule_length[GLB_MAX_RULES];
+static double* rule_coeff[GLB_MAX_RULES];
+static int* BGrules[GLB_MAX_RULES];
+static int BGrule_length[GLB_MAX_RULES];
+static double* BGrule_coeff[GLB_MAX_RULES];
+double* glb_calc_signal_rates[GLB_MAX_RULES];
+double* glb_calc_bg_rates[GLB_MAX_RULES];
 // ---------------------------------
-double* glb_calc_rates_0[32];
-double* glb_calc_rates_1[32];
-double* glb_calc_rates_1BG[32];
+double* glb_calc_rates_0[GLB_MAX_RULES];
+double* glb_calc_rates_1[GLB_MAX_RULES];
+double* glb_calc_rates_1BG[GLB_MAX_RULES];
 double* glb_calc_energy_tab;
-double glb_bg_norm_center[32];
-double glb_bg_tilt_center[32];
+double glb_bg_norm_center[GLB_MAX_RULES];
+double glb_bg_tilt_center[GLB_MAX_RULES];
 
 
 int glb_calc_simbins;
@@ -82,39 +82,33 @@ double glb_calc_simbeam;
 
 static double* smm;
 static int exptype = 1;
-static int channel_list[32][6];
+static int channel_list[GLB_MAX_CHANNELS][6];
 static int num_of_ch = 1;
 int glb_num_of_rules=1;
 
 
 /* storing the channel result before glb_calc_smearing (glb_calc_simbins) */
-double *glb_calc_chrb_0[32];
-double *glb_calc_chrb_1[32];
+double *glb_calc_chrb_0[GLB_MAX_CHANNELS];
+double *glb_calc_chrb_1[GLB_MAX_CHANNELS];
 
 /* storing the channel result after glb_calc_smearing (bins) */
-double *glb_calc_chra_0[32];
-double *glb_calc_chra_1[32];
+double *glb_calc_chra_0[GLB_MAX_CHANNELS];
+double *glb_calc_chra_1[GLB_MAX_CHANNELS];
 
-double *glb_calc_chr_template[32];
+double *glb_calc_chr_template[GLB_MAX_CHANNELS];
 
-//binwise glb_calc_efficiencies
-double* glb_calc_efficiencies[32];
-//constant background
-double* glb_calc_const_background[32];
-
-
-double *glb_calc_user_pre_sm_channel[32];
-double *glb_calc_user_post_sm_channel[32];
-double *glb_calc_user_pre_sm_background[32];
-double *glb_calc_user_post_sm_background[32];
+double *glb_calc_user_pre_sm_channel[GLB_MAX_CHANNELS];
+double *glb_calc_user_post_sm_channel[GLB_MAX_CHANNELS];
+double *glb_calc_user_pre_sm_background[GLB_MAX_CHANNELS];
+double *glb_calc_user_post_sm_background[GLB_MAX_CHANNELS];
 
 /* the new glb_calc_smearing structure */
 
-glb_smear *glb_calc_smear_data[32];
+glb_smear *glb_calc_smear_data[GLB_MAX_SMEAR];
 
 
-glb_flux *glb_calc_fluxes[32];
-glb_xsec *glb_calc_xsecs[32];
+glb_flux *glb_calc_fluxes[GLB_MAX_FLUXES];
+glb_xsec *glb_calc_xsecs[GLB_MAX_XSECS];
 
 
 
@@ -337,15 +331,22 @@ void glb_set_bg_rule(int i, int cn, int *rule, double *coeff)
 static void CalcAllProbs(double en, double baseline)
 {
   struct glb_experiment *e = glb_experiment_list[glb_current_exp];
-  int i, j;
   int status;
 
+  // The following is a temporary solution for making the probability engine aware
+  // of which experiment it is being run for. If the user has set e->probability_user_data,
+  // it is used; otherwise, the global default is used.
+  // In the future, there should be a way of also choosing the whole probability engine
+  // on an experiment-by-experiment basis (some instrumentation for this is already
+  // in the definition of glb_experiment).
   if ((status=glb_hook_probability_matrix(Probs, +1, en, e->psteps, e->lengthtab, e->densitybuffer,
-          (e->filter_state == GLB_ON) ? e->filter_value : -1.0, glb_probability_user_data)) != GLB_SUCCESS)
+          (e->filter_state == GLB_ON) ? e->filter_value : -1.0,
+          e->probability_user_data ? e->probability_user_data : glb_probability_user_data)) != GLB_SUCCESS)
     glb_error("Calculation of oscillation probabilities failed.");
 
   if ((status=glb_hook_probability_matrix(ProbsAnti, -1, en, e->psteps, e->lengthtab, e->densitybuffer,
-          (e->filter_state == GLB_ON) ? e->filter_value : -1.0, glb_probability_user_data)) != GLB_SUCCESS)
+          (e->filter_state == GLB_ON) ? e->filter_value : -1.0,
+          e->probability_user_data ? e->probability_user_data : glb_probability_user_data)) != GLB_SUCCESS)
     glb_error("Calculation of oscillation probabilities failed.");
 }
 
@@ -412,31 +413,6 @@ double glb_calc_channel(int i, double en, double baseline)
 }
 
 
-static double Signal(int cn, double en, double baseline)
-{
-  int k;
-  double ergebnis=0.0;
-  for (k=0;k<rule_length[cn];k++)
-    {
-      ergebnis += rule_coeff[cn][k] * glb_calc_channel(rules[cn][k],en,baseline);
-
-
-    }
-  return ergebnis;
-}
-
-static double Background(int cn, double en, double baseline)
-{
-  int k;
-  double ergebnis=0.0;
-  for (k=0;k<BGrule_length[cn];k++)
-    {
-      ergebnis += BGrule_coeff[cn][k] * glb_calc_channel(BGrules[cn][k],en,baseline);
-    }
-  return ergebnis;
-}
-
-
 inline static double BinEnergy(int i)
 {
   /* This fixed a bug with energy window stuff for variable bin width */
@@ -452,7 +428,6 @@ inline static double BinEnergy(int i)
 void glb_set_rates()
 {
   int i, j, k, s;
-  int ew_low, ew_high;
 
   for(j=0; j < bins; j++)
     glb_calc_energy_tab[j] = BinEnergy(j);
@@ -557,6 +532,7 @@ void glb_set_new_rates(int fast)
         int ff = channel_list[i][3]; /* Final flavour   */
 
         /* Recalculate rates only if NOSC-flag was not set in glb-file */
+        /* FIXME What if the user didn't call glbSetRates first? */
         if (fi <= 9 && ff <= 9)
         {
           if (!probs)
@@ -694,27 +670,32 @@ void glb_set_bg_center(int i,double norm, double tilt)
 void glb_remove_calc_pointers()
 {
   int k;
-  for(k=0;k<32;k++)
-    {
-      glb_calc_smear_data[k]=NULL;
-      glb_calc_smearing[k]=NULL;
-      rules[k]=NULL;
-      rule_coeff[k]=NULL;
-      BGrules[k]=NULL;
-      BGrule_coeff[k]=NULL;
-      glb_calc_signal_rates[k]=NULL;
-      glb_calc_bg_rates[k]=NULL;
-      glb_calc_rates_0[k]=NULL;
-      glb_calc_rates_1[k]=NULL;
-      glb_calc_rates_1BG[k]=NULL;
-      glb_calc_energy_tab=NULL;
-      glb_calc_efficiencies[k]=NULL;
-      glb_calc_const_background[k]=NULL;
-      glb_calc_chra_0[k]=NULL;
-      glb_calc_chra_1[k]=NULL;
-      glb_calc_chrb_0[k]=NULL;
-      glb_calc_chrb_1[k]=NULL;
-    }
+  for (k=0; k < GLB_MAX_CHANNELS; k++)
+  {
+    glb_calc_chra_0[k]=NULL;
+    glb_calc_chra_1[k]=NULL;
+    glb_calc_chrb_0[k]=NULL;
+    glb_calc_chrb_1[k]=NULL;
+  }
+  for (k=0; k < GLB_MAX_RULES; k++)
+  {
+    rules[k]=NULL;
+    rule_coeff[k]=NULL;
+    BGrules[k]=NULL;
+    BGrule_coeff[k]=NULL;
+    glb_calc_signal_rates[k]=NULL;
+    glb_calc_bg_rates[k]=NULL;
+    glb_calc_rates_0[k]=NULL;
+    glb_calc_rates_1[k]=NULL;
+    glb_calc_rates_1BG[k]=NULL;
+  }
+  for (k=0; k < GLB_MAX_SMEAR; k++)
+  {
+    glb_calc_smear_data[k]=NULL;
+    glb_calc_smearing[k]=NULL;
+  }
+
+  glb_calc_energy_tab=NULL;
   smm=NULL;
 
 }

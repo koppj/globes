@@ -30,8 +30,16 @@
 #include <globes/globes.h>
 
 /* Constants */
-//#define GLB_V_FACTOR        7.56e-14   /* Conversion factor for matter potentials */
-#define GLB_V_FACTOR        7.5e-14   /* Conversion factor for matter potentials */
+
+/* PH 06/07/16 we used for GLB_V_FACTOR 7.5e-14 till that date, the
+   correct number is sqrt(2) G_F/u based on 2016 CODATA valyes */
+
+#ifdef GLB_OLD_CONSTANTS
+ #define GLB_V_FACTOR 7.5e-14
+#else
+ #define GLB_V_FACTOR 7.63247e-14   /* Conversion factor for matter potentials */
+#endif
+
 //#define GLB_Ne_MANTLE       0.497      /* Effective electron numbers for calculation */
 #define GLB_Ne_MANTLE       0.5        /* Effective electron numbers for calculation */
 #define GLB_Ne_CORE         0.468      /*   of MSW potentials                        */

@@ -1,5 +1,5 @@
-# strnlen.m4 serial 11
-dnl Copyright (C) 2002-2003, 2005-2007, 2009-2010 Free Software Foundation,
+# strnlen.m4 serial 13
+dnl Copyright (C) 2002-2003, 2005-2007, 2009-2012 Free Software Foundation,
 dnl Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
@@ -15,16 +15,14 @@ AC_DEFUN([gl_FUNC_STRNLEN],
   AC_CHECK_DECLS_ONCE([strnlen])
   if test $ac_cv_have_decl_strnlen = no; then
     HAVE_DECL_STRNLEN=0
-  fi
-
-  AC_FUNC_STRNLEN
-  if test $ac_cv_func_strnlen_working = no; then
-    REPLACE_STRNLEN=1
-    # This is necessary because automake-1.6.1 doesn't understand
-    # that the above use of AC_FUNC_STRNLEN means we may have to use
-    # lib/strnlen.c.
-    #AC_LIBOBJ([strnlen])
-    gl_PREREQ_STRNLEN
+  else
+    m4_pushdef([AC_LIBOBJ], [:])
+    dnl Note: AC_FUNC_STRNLEN does AC_LIBOBJ([strnlen]).
+    AC_FUNC_STRNLEN
+    m4_popdef([AC_LIBOBJ])
+    if test $ac_cv_func_strnlen_working = no; then
+      REPLACE_STRNLEN=1
+    fi
   fi
 ])
 

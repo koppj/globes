@@ -91,4 +91,7 @@ void glb_init(char *name);
 
 void glb_clean_up();
 
+const char
+*glbValueToNameByPointer(struct glb_experiment *in,const char* context, int value);
+
 #endif /* GLB_WRAPPER_H 1 */
