@@ -73,8 +73,6 @@ Date: 21.04.2010
 
 -------------------------------------------------------------------------------
 
-<<<<<<< HEAD
-=======
 BUG #24 GLoBES does not check whether a smearing matrix given in an AEDL file
         has the correct number of rows
 
@@ -83,7 +81,6 @@ Date: 29.12.2011
 
 -------------------------------------------------------------------------------
 
->>>>>>> ed253223d1e286012f071e788eb6a9b1f7a70070
 BUG #25 in glbShiftEnergyScale, for the case k==n_bins-1, the expression should
         read rates_out[i] = (1 + b) * (-rates_in[k] * (delta - k) + rates_in[k])
         (missing minus sign).
@@ -94,9 +91,6 @@ Status: Fixed in branches master and newsys
 
 -------------------------------------------------------------------------------
 
-<<<<<<< HEAD
-
-=======
 BUG #26 constants for GLB_KM_TO_EV conversion based on c=3E8 m/s,
     	fixed to correct value. Also GLB_V_FACTOR updated to reflect
     	the accurate CODATA based value for Sqrt(2) G_F/u (atomic mass
@@ -136,4 +130,4 @@ BUG #29 added #include <stdarg.h> to globes.h to ensure linking of
 From: Patrick Huber
 Date: 07.06.2016
 Status: Fixed in newsys
->>>>>>> ed253223d1e286012f071e788eb6a9b1f7a70070
+
