@@ -81,7 +81,8 @@ AC_PROG_CC_C99
 if [[ "$ac_cv_prog_cc_stdc" = "no" ]]; then
   AC_MSG_ERROR([C compiler does not support C99 (required).]);
 fi
-gl_EARLY
+dnl removing gnulib support since it creates more problems than it solves
+dnl gl_EARLY
 dnl AC_PROG_CXX
 AC_PROG_CPP
 AC_PROG_INSTALL
@@ -92,10 +93,11 @@ AC_PROG_LEX
 dnl Configure libtool
 AC_PROG_LIBTOOL
 
+dnl removing gnulib support
 dnl gnulib support
 dnl FIXME: for some reason this macro has to be called before any
 dnl of the AC_CHECK_LIB stuff below
-gl_INIT
+dnl gl_INIT
 
 dnl we need libtool first
 AC_PROG_SWIG
@@ -149,7 +151,9 @@ AC_CHECK_FUNCS([strdup mkstemp tempnam])
 AC_FUNC_ALLOCA
 LTALLOCA=`echo "$ALLOCA" | sed 's/\.[^.]* /.lo /g;s/\.[^.]*$/.lo/'`
 AC_SUBST(LTALLOCA)
-gl_ARGP
+
+dnl this is where all the trouble originates
+dnl gl_ARGP
 dnl AM_XGETTEXT_OPTION([--flag=argp_error:2:c-format --flag=argp_failure:4:c-format])
 
 
@@ -164,7 +168,7 @@ AC_CONFIG_FILES(globes.spec)
 
 
 
-AC_CONFIG_FILES([Makefile lib/Makefile \
+AC_CONFIG_FILES([Makefile \
  globes/Makefile globes/example.pl source/Makefile\
  examples/Makefile\
  data/Makefile  globes-config doc/Makefile])

@@ -858,9 +858,27 @@ static glb_List *glb_interpolation(glb_List *xval,glb_List *yval,int flag,glb_Li
 
   head=where;
   for(i=0; head; i++){
-     rlist[i]=gsl_spline_eval(spline,head->entry,acc);
-    head=head->next;
- }
+
+    /* PH 06/09/16 in going from GSL 1.14 to 1.15 the behavior
+     changed: if head->entry is outside the range of xlist a fatal
+     error is generated, i.e. no more implicit extrapolation, so we
+     have to catch that by hand */
+
+    if(head->entry<xlist[0])
+      {
+	glb_warning("Linear extrapolation used because x value %f is out of range %f - %f",head->entry,xlist[0],xlist[yl-1]);
+	rlist[i]=ylist[0]-(xlist[0]-head->entry)*(ylist[1]-ylist[0])/(xlist[1]-xlist[0]);
+      }
+    else if(head->entry>xlist[yl-1])
+      {
+	glb_warning("Linear extrapolation used because x value %f is out of range %f - %f",head->entry,xlist[0],xlist[yl-1]);
+	rlist[i]=ylist[yl-1]-(xlist[yl-1]-head->entry)*(ylist[yl-2]-ylist[yl-1])/(xlist[yl-2]-xlist[yl-1]);
+      }
+    else
+      {   
+	rlist[i]=gsl_spline_eval(spline,head->entry,acc);
+      }
+     head=head->next; }
 
   for(i=rl;i>0;i--) res=list_cons(res,rlist[i-1]);
 

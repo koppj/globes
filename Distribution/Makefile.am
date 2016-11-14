@@ -1,7 +1,7 @@
 ACLOCAL_AMFLAGS = -I m4
 
-DIST_SUBDIRS = lib source data  globes doc
-SUBDIRS = lib source data globes doc
+DIST_SUBDIRS = source data  globes doc
+SUBDIRS = source data globes doc
 INCLUDES = $(F2CINC) $(GSLINC)
 
 EXTRA_DIST = examples/Makefile.in examples/example1.c	      \
@@ -11,7 +11,7 @@ EXTRA_DIST = examples/Makefile.in examples/example1.c	      \
   examples/NFstandard.glb examples/D-Chooz_far.glb examples/D-Chooz_near.glb \
   examples/Reactor1.glb examples/Reactor.dat examples/XCC.dat examples/XNC.dat \
   examples/XCCreactor.dat BUGS globes.m4 data/md5-sums \
-  examples/DocPlots.nb m4/gnulib-cache.m4
+  examples/DocPlots.nb 
 
 # that is only needed if the testsuite should go into the release
 # testsuite/01-probabilities.c             testsuite/03-chisys.glb   testsuite/06-chibars.c \
