@@ -85,15 +85,20 @@ DIST_COMMON = INSTALL NEWS README AUTHORS ChangeLog \
 	$(top_srcdir)/configure $(am__configure_deps) \
 	$(srcdir)/config-h.in mkinstalldirs $(srcdir)/globes.spec.in \
 	$(top_srcdir)/examples/Makefile.in $(srcdir)/globes-config.in \
-	COPYING TODO compile config.guess config.rpath config.sub \
-	depcomp install-sh missing ylwrap ltmain.sh ltconfig
+	COPYING TODO ar-lib compile config.guess config.rpath \
+	config.sub depcomp install-sh missing ylwrap ltmain.sh \
+	ltconfig
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/m4/gsl.m4 \
-	$(top_srcdir)/m4/libtool.m4 $(top_srcdir)/m4/ltoptions.m4 \
-	$(top_srcdir)/m4/ltsugar.m4 $(top_srcdir)/m4/ltversion.m4 \
-	$(top_srcdir)/m4/lt~obsolete.m4 $(top_srcdir)/m4/rpm.m4 \
-	$(top_srcdir)/m4/swig.m4 $(top_srcdir)/m4/swig_perl.m4 \
-	$(top_srcdir)/acinclude.m4 $(top_srcdir)/configure.in
+am__aclocal_m4_deps = $(top_srcdir)/m4/exitfail.m4 \
+	$(top_srcdir)/m4/gnulib.m4 $(top_srcdir)/m4/gsl.m4 \
+	$(top_srcdir)/m4/inttypes_h.m4 $(top_srcdir)/m4/libtool.m4 \
+	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
+	$(top_srcdir)/m4/ltversion.m4 $(top_srcdir)/m4/lt~obsolete.m4 \
+	$(top_srcdir)/m4/obstack.m4 $(top_srcdir)/m4/rpm.m4 \
+	$(top_srcdir)/m4/stdint_h.m4 $(top_srcdir)/m4/swig.m4 \
+	$(top_srcdir)/m4/swig_perl.m4 $(top_srcdir)/m4/uintmax_t.m4 \
+	$(top_srcdir)/m4/ulonglong.m4 $(top_srcdir)/acinclude.m4 \
+	$(top_srcdir)/configure.in
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
@@ -382,10 +387,12 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 wl = @wl@
 ACLOCAL_AMFLAGS = -I m4
-DIST_SUBDIRS = source data  globes doc
-SUBDIRS = source data globes doc
+DIST_SUBDIRS = source data  globes doc lib
+SUBDIRS = lib source data globes doc 
 INCLUDES = $(F2CINC) $(GSLINC)
-EXTRA_DIST = examples/Makefile.in examples/example1.c	      \
+EXTRA_DIST = m4/gnulib-cache.m4  lib/Makefile.in \
+examples/Makefile.in \
+examples/example1.c\
   examples/example3.c examples/myio.c examples/example-tour.c \
   examples/example2.c examples/example4.c examples/example5.c examples/example6.c \
   examples/myio.h \

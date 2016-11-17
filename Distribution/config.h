@@ -37,6 +37,10 @@
 /* Define to 1 if you have the <inttypes.h> header file. */
 #define HAVE_INTTYPES_H 1
 
+/* Define if <inttypes.h> exists, doesn't clash with <sys/types.h>, and
+   declares uintmax_t. */
+#define HAVE_INTTYPES_H_WITH_UINTMAX 1
+
 /* Define to 1 if you have the `m' library (-lm). */
 #define HAVE_LIBM 1
 
@@ -46,11 +50,18 @@
 /* Define to 1 if you have the `mkstemp' function. */
 #define HAVE_MKSTEMP 1
 
+/* Define to 1 if libc includes obstacks. */
+#define HAVE_OBSTACK 1
+
 /* Define to 1 if you have the <perl.h> header file. */
 /* #undef HAVE_PERL_H */
 
 /* Define to 1 if you have the <stdint.h> header file. */
 #define HAVE_STDINT_H 1
+
+/* Define if <stdint.h> exists, doesn't clash with <sys/types.h>, and declares
+   uintmax_t. */
+#define HAVE_STDINT_H_WITH_UINTMAX 1
 
 /* Define to 1 if you have the <stdlib.h> header file. */
 #define HAVE_STDLIB_H 1
@@ -73,8 +84,14 @@
 /* Define to 1 if you have the `tempnam' function. */
 #define HAVE_TEMPNAM 1
 
+/* Define if you have the 'uintmax_t' type in <stdint.h> or <inttypes.h>. */
+#define HAVE_UINTMAX_T 1
+
 /* Define to 1 if you have the <unistd.h> header file. */
 #define HAVE_UNISTD_H 1
+
+/* Define if you have the 'unsigned long long' type. */
+#define HAVE_UNSIGNED_LONG_LONG 1
 
 /* Define to 1 if you have the <XSUB.h> header file. */
 /* #undef HAVE_XSUB_H */
@@ -127,3 +144,7 @@
 
 /* Define to `unsigned int' if <sys/types.h> does not define. */
 /* #undef size_t */
+
+/* Define to unsigned long or unsigned long long if <stdint.h> and
+   <inttypes.h> don't define. */
+/* #undef uintmax_t */

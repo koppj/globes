@@ -87,12 +87,16 @@ DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/mkinstalldirs glb_parser.h glb_parser.c \
 	glb_lexer.c $(top_srcdir)/depcomp $(top_srcdir)/ylwrap
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/m4/gsl.m4 \
-	$(top_srcdir)/m4/libtool.m4 $(top_srcdir)/m4/ltoptions.m4 \
-	$(top_srcdir)/m4/ltsugar.m4 $(top_srcdir)/m4/ltversion.m4 \
-	$(top_srcdir)/m4/lt~obsolete.m4 $(top_srcdir)/m4/rpm.m4 \
-	$(top_srcdir)/m4/swig.m4 $(top_srcdir)/m4/swig_perl.m4 \
-	$(top_srcdir)/acinclude.m4 $(top_srcdir)/configure.in
+am__aclocal_m4_deps = $(top_srcdir)/m4/exitfail.m4 \
+	$(top_srcdir)/m4/gnulib.m4 $(top_srcdir)/m4/gsl.m4 \
+	$(top_srcdir)/m4/inttypes_h.m4 $(top_srcdir)/m4/libtool.m4 \
+	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
+	$(top_srcdir)/m4/ltversion.m4 $(top_srcdir)/m4/lt~obsolete.m4 \
+	$(top_srcdir)/m4/obstack.m4 $(top_srcdir)/m4/rpm.m4 \
+	$(top_srcdir)/m4/stdint_h.m4 $(top_srcdir)/m4/swig.m4 \
+	$(top_srcdir)/m4/swig_perl.m4 $(top_srcdir)/m4/uintmax_t.m4 \
+	$(top_srcdir)/m4/ulonglong.m4 $(top_srcdir)/acinclude.m4 \
+	$(top_srcdir)/configure.in
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
@@ -416,7 +420,8 @@ libglobes_la_SOURCES = glb_minimize.c glb_error.c glb_path.c glb_multiex.c \
  glb_min_sup.h  glb_version.h glb_lexer.h glb_fluxes.h glb_parser_type.h \
  glb_wrapper.h glb_profile.h glb_sys.h glb_glb.c glb_prior.h glb_prior.c glb_compat.c
 
-libglobes_la_LDFLAGS = @LIBS@ -version-info @GLBLIBVERSION@
+libglobes_la_LDFLAGS = @LIBS@ -version-info @GLBLIBVERSION@ \
+	$(top_builddir)/lib/libgnu.la
 libglobes_la_CPPFLAGS = -DGLB_MODULE_DIR=\"$(pkglibdir)\"
 libglobes_la_DEPENDENCIES = 
 globes_SOURCES = globes.c 
