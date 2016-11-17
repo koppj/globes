@@ -126,7 +126,7 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/00gnulib.m4 \
 	$(top_srcdir)/m4/malloc.m4 $(top_srcdir)/m4/memchr.m4 \
 	$(top_srcdir)/m4/mempcpy.m4 $(top_srcdir)/m4/mkstemp.m4 \
 	$(top_srcdir)/m4/mmap-anon.m4 $(top_srcdir)/m4/multiarch.m4 \
-	$(top_srcdir)/m4/nocrash.m4 $(top_srcdir)/m4/onceonly.m4 \
+	$(top_srcdir)/m4/nocrash.m4 $(top_srcdir)/m4/onceonly_2_57.m4 \
 	$(top_srcdir)/m4/pathmax.m4 $(top_srcdir)/m4/printf.m4 \
 	$(top_srcdir)/m4/rawmemchr.m4 $(top_srcdir)/m4/rpm.m4 \
 	$(top_srcdir)/m4/size_max.m4 $(top_srcdir)/m4/sleep.m4 \
@@ -376,7 +376,6 @@ GNULIB_GETLOADAVG = @GNULIB_GETLOADAVG@
 GNULIB_GETLOGIN = @GNULIB_GETLOGIN@
 GNULIB_GETLOGIN_R = @GNULIB_GETLOGIN_R@
 GNULIB_GETPAGESIZE = @GNULIB_GETPAGESIZE@
-GNULIB_GETS = @GNULIB_GETS@
 GNULIB_GETSUBOPT = @GNULIB_GETSUBOPT@
 GNULIB_GETTIMEOFDAY = @GNULIB_GETTIMEOFDAY@
 GNULIB_GETUSERSHELL = @GNULIB_GETUSERSHELL@
