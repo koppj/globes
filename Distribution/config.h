@@ -90,8 +90,8 @@
 /* Define to 1 if you have the <unistd.h> header file. */
 #define HAVE_UNISTD_H 1
 
-/* Define if you have the 'unsigned long long' type. */
-#define HAVE_UNSIGNED_LONG_LONG 1
+/* Define to 1 if the system has the type 'unsigned long long int'. */
+#define HAVE_UNSIGNED_LONG_LONG_INT 1
 
 /* Define to 1 if you have the <XSUB.h> header file. */
 /* #undef HAVE_XSUB_H */

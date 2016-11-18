@@ -92,8 +92,8 @@ build_triplet = @build@
 host_triplet = @host@
 subdir = lib
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
-	$(top_srcdir)/mkinstalldirs exitfail.c exitfail.h obstack.c \
-	obstack.h
+	$(top_srcdir)/mkinstalldirs obstack.c obstack.h exitfail.c \
+	exitfail.h
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/exitfail.m4 \
 	$(top_srcdir)/m4/gnulib.m4 $(top_srcdir)/m4/gsl.m4 \
@@ -102,8 +102,7 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/exitfail.m4 \
 	$(top_srcdir)/m4/ltversion.m4 $(top_srcdir)/m4/lt~obsolete.m4 \
 	$(top_srcdir)/m4/obstack.m4 $(top_srcdir)/m4/rpm.m4 \
 	$(top_srcdir)/m4/stdint_h.m4 $(top_srcdir)/m4/swig.m4 \
-	$(top_srcdir)/m4/swig_perl.m4 $(top_srcdir)/m4/uintmax_t.m4 \
-	$(top_srcdir)/m4/ulonglong.m4 $(top_srcdir)/acinclude.m4 \
+	$(top_srcdir)/m4/swig_perl.m4 $(top_srcdir)/acinclude.m4 \
 	$(top_srcdir)/configure.in
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)

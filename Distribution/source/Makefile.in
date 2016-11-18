@@ -79,9 +79,11 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = globes$(EXEEXT) globes-accuracy$(EXEEXT) \
-	globes-deltatheta$(EXEEXT) globes-discovery$(EXEEXT) \
-	globes-simple$(EXEEXT)
+@ENABLE_BINARY_TRUE@bin_PROGRAMS = globes$(EXEEXT) \
+@ENABLE_BINARY_TRUE@	globes-accuracy$(EXEEXT) \
+@ENABLE_BINARY_TRUE@	globes-deltatheta$(EXEEXT) \
+@ENABLE_BINARY_TRUE@	globes-discovery$(EXEEXT) \
+@ENABLE_BINARY_TRUE@	globes-simple$(EXEEXT)
 subdir = source
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/mkinstalldirs glb_parser.h glb_parser.c \
@@ -94,8 +96,7 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/exitfail.m4 \
 	$(top_srcdir)/m4/ltversion.m4 $(top_srcdir)/m4/lt~obsolete.m4 \
 	$(top_srcdir)/m4/obstack.m4 $(top_srcdir)/m4/rpm.m4 \
 	$(top_srcdir)/m4/stdint_h.m4 $(top_srcdir)/m4/swig.m4 \
-	$(top_srcdir)/m4/swig_perl.m4 $(top_srcdir)/m4/uintmax_t.m4 \
-	$(top_srcdir)/m4/ulonglong.m4 $(top_srcdir)/acinclude.m4 \
+	$(top_srcdir)/m4/swig_perl.m4 $(top_srcdir)/acinclude.m4 \
 	$(top_srcdir)/configure.in
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)

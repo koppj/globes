@@ -89,8 +89,7 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/exitfail.m4 \
 	$(top_srcdir)/m4/ltversion.m4 $(top_srcdir)/m4/lt~obsolete.m4 \
 	$(top_srcdir)/m4/obstack.m4 $(top_srcdir)/m4/rpm.m4 \
 	$(top_srcdir)/m4/stdint_h.m4 $(top_srcdir)/m4/swig.m4 \
-	$(top_srcdir)/m4/swig_perl.m4 $(top_srcdir)/m4/uintmax_t.m4 \
-	$(top_srcdir)/m4/ulonglong.m4 $(top_srcdir)/acinclude.m4 \
+	$(top_srcdir)/m4/swig_perl.m4 $(top_srcdir)/acinclude.m4 \
 	$(top_srcdir)/configure.in
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)

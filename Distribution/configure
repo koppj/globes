@@ -635,6 +635,8 @@ ac_includes_default="\
 ac_subst_vars='am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
+ENABLE_BINARY_FALSE
+ENABLE_BINARY_TRUE
 MAKE_RPMS_FALSE
 MAKE_RPMS_TRUE
 RPM_CONFIGURE_ARGS
@@ -813,6 +815,7 @@ with_rpm_prog
 enable_rpm_rules
 with_rpm_extra_args
 with_rpm_targets
+enable_binary
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1460,6 +1463,7 @@ Optional Features:
   --enable-perl             Enable/Require Perl support
   --disable-gsltest       Do not try to compile and run a test GSL program
   --enable-rpm-rules       Try to create rpm make rules [default=no]
+  --disable-binary        Disable building of globes binary [check]
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -12123,36 +12127,59 @@ _ACEOF
   fi
 
 
-  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for unsigned long long" >&5
-$as_echo_n "checking for unsigned long long... " >&6; }
-if ${ac_cv_type_unsigned_long_long+:} false; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for unsigned long long int" >&5
+$as_echo_n "checking for unsigned long long int... " >&6; }
+if ${ac_cv_type_unsigned_long_long_int+:} false; then :
   $as_echo_n "(cached) " >&6
 else
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+  ac_cv_type_unsigned_long_long_int=yes
+     if test "x${ac_cv_prog_cc_c99-no}" = xno; then
+       cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
-unsigned long long ull = 1ULL; int i = 63;
+
+  /* For now, do not test the preprocessor; as of 2007 there are too many
+         implementations with broken preprocessors.  Perhaps this can
+         be revisited in 2012.  In the meantime, code should not expect
+         #if to work with literals wider than 32 bits.  */
+      /* Test literals.  */
+      long long int ll = 9223372036854775807ll;
+      long long int nll = -9223372036854775807LL;
+      unsigned long long int ull = 18446744073709551615ULL;
+      /* Test constant expressions.   */
+      typedef int a[((-9223372036854775807LL < 0 && 0 < 9223372036854775807ll)
+                     ? 1 : -1)];
+      typedef int b[(18446744073709551615ULL <= (unsigned long long int) -1
+                     ? 1 : -1)];
+      int i = 63;
 int
 main ()
 {
-unsigned long long ullmax = (unsigned long long) -1;
-     return ull << i | ull >> i | ullmax / ull | ullmax % ull;
+/* Test availability of runtime routines for shift and division.  */
+      long long int llmax = 9223372036854775807ll;
+      unsigned long long int ullmax = 18446744073709551615ull;
+      return ((ll << 63) | (ll >> 63) | (ll < i) | (ll > i)
+              | (llmax / ll) | (llmax % ll)
+              | (ull << 63) | (ull >> 63) | (ull << i) | (ull >> i)
+              | (ullmax / ull) | (ullmax % ull));
   ;
   return 0;
 }
+
 _ACEOF
 if ac_fn_c_try_link "$LINENO"; then :
-  ac_cv_type_unsigned_long_long=yes
+
 else
-  ac_cv_type_unsigned_long_long=no
+  ac_cv_type_unsigned_long_long_int=no
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
+     fi
 fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_type_unsigned_long_long" >&5
-$as_echo "$ac_cv_type_unsigned_long_long" >&6; }
-  if test $ac_cv_type_unsigned_long_long = yes; then
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_type_unsigned_long_long_int" >&5
+$as_echo "$ac_cv_type_unsigned_long_long_int" >&6; }
+  if test $ac_cv_type_unsigned_long_long_int = yes; then
 
-$as_echo "#define HAVE_UNSIGNED_LONG_LONG 1" >>confdefs.h
+$as_echo "#define HAVE_UNSIGNED_LONG_LONG_INT 1" >>confdefs.h
 
   fi
 
@@ -12161,7 +12188,7 @@ $as_echo "#define HAVE_UNSIGNED_LONG_LONG 1" >>confdefs.h
 
   if test $gl_cv_header_inttypes_h = no && test $gl_cv_header_stdint_h = no; then
 
-    test $ac_cv_type_unsigned_long_long = yes \
+    test $ac_cv_type_unsigned_long_long_int = yes \
       && ac_type='unsigned long long' \
       || ac_type='unsigned long'
 
@@ -13499,6 +13526,22 @@ fi
 ac_config_files="$ac_config_files globes.spec"
 
 
+# Check whether --enable-binary was given.
+if test "${enable_binary+set}" = set; then :
+  enableval=$enable_binary; :
+else
+  enable_binary=check
+fi
+
+
+ if test "$enable_binary" != "no"; then
+  ENABLE_BINARY_TRUE=
+  ENABLE_BINARY_FALSE='#'
+else
+  ENABLE_BINARY_TRUE='#'
+  ENABLE_BINARY_FALSE=
+fi
+
 
 
 ac_config_files="$ac_config_files Makefile globes/Makefile globes/example.pl source/Makefile examples/Makefile data/Makefile globes-config doc/Makefile lib/Makefile"
@@ -13648,6 +13691,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${MAKE_RPMS_TRUE}" && test -z "${MAKE_RPMS_FALSE}"; then
   as_fn_error $? "conditional \"MAKE_RPMS\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${ENABLE_BINARY_TRUE}" && test -z "${ENABLE_BINARY_FALSE}"; then
+  as_fn_error $? "conditional \"ENABLE_BINARY\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 
