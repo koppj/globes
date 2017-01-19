@@ -1,5 +1,5 @@
-# unistd_h.m4 serial 63
-dnl Copyright (C) 2006-2012 Free Software Foundation, Inc.
+# unistd_h.m4 serial 68
+dnl Copyright (C) 2006-2016 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -11,7 +11,6 @@ AC_DEFUN([gl_UNISTD_H],
   dnl Use AC_REQUIRE here, so that the default behavior below is expanded
   dnl once only, before all statements that occur in other macros.
   AC_REQUIRE([gl_UNISTD_H_DEFAULTS])
-  AC_REQUIRE([AC_C_INLINE])
 
   gl_CHECK_NEXT_HEADERS([unistd.h])
   if test $ac_cv_header_unistd_h = yes; then
@@ -23,6 +22,9 @@ AC_DEFUN([gl_UNISTD_H],
 
   dnl Ensure the type pid_t gets defined.
   AC_REQUIRE([AC_TYPE_PID_T])
+
+  dnl Determine WINDOWS_64_BIT_OFF_T.
+  AC_REQUIRE([gl_TYPE_OFF_T])
 
   dnl Check for declarations of anything we want to poison if the
   dnl corresponding gnulib module is not in use.
@@ -155,8 +157,10 @@ AC_DEFUN([gl_UNISTD_H_DEFAULTS],
   REPLACE_DUP=0;          AC_SUBST([REPLACE_DUP])
   REPLACE_DUP2=0;         AC_SUBST([REPLACE_DUP2])
   REPLACE_FCHOWNAT=0;     AC_SUBST([REPLACE_FCHOWNAT])
+  REPLACE_FTRUNCATE=0;    AC_SUBST([REPLACE_FTRUNCATE])
   REPLACE_GETCWD=0;       AC_SUBST([REPLACE_GETCWD])
   REPLACE_GETDOMAINNAME=0; AC_SUBST([REPLACE_GETDOMAINNAME])
+  REPLACE_GETDTABLESIZE=0; AC_SUBST([REPLACE_GETDTABLESIZE])
   REPLACE_GETLOGIN_R=0;   AC_SUBST([REPLACE_GETLOGIN_R])
   REPLACE_GETGROUPS=0;    AC_SUBST([REPLACE_GETGROUPS])
   REPLACE_GETPAGESIZE=0;  AC_SUBST([REPLACE_GETPAGESIZE])
@@ -169,9 +173,11 @@ AC_DEFUN([gl_UNISTD_H_DEFAULTS],
   REPLACE_PWRITE=0;       AC_SUBST([REPLACE_PWRITE])
   REPLACE_READ=0;         AC_SUBST([REPLACE_READ])
   REPLACE_READLINK=0;     AC_SUBST([REPLACE_READLINK])
+  REPLACE_READLINKAT=0;   AC_SUBST([REPLACE_READLINKAT])
   REPLACE_RMDIR=0;        AC_SUBST([REPLACE_RMDIR])
   REPLACE_SLEEP=0;        AC_SUBST([REPLACE_SLEEP])
   REPLACE_SYMLINK=0;      AC_SUBST([REPLACE_SYMLINK])
+  REPLACE_SYMLINKAT=0;    AC_SUBST([REPLACE_SYMLINKAT])
   REPLACE_TTYNAME_R=0;    AC_SUBST([REPLACE_TTYNAME_R])
   REPLACE_UNLINK=0;       AC_SUBST([REPLACE_UNLINK])
   REPLACE_UNLINKAT=0;     AC_SUBST([REPLACE_UNLINKAT])

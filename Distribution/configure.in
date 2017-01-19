@@ -81,6 +81,7 @@ AC_PROG_CC_C99
 if [[ "$ac_cv_prog_cc_stdc" = "no" ]]; then
   AC_MSG_ERROR([C compiler does not support C99 (required).]);
 fi
+dnl removing gnulib support since it creates more problems than it solves
 gl_EARLY
 dnl AC_PROG_CXX
 AC_PROG_CPP
@@ -92,6 +93,7 @@ AC_PROG_LEX
 dnl Configure libtool
 AC_PROG_LIBTOOL
 
+dnl removing gnulib support
 dnl gnulib support
 dnl FIXME: for some reason this macro has to be called before any
 dnl of the AC_CHECK_LIB stuff below
@@ -149,7 +151,9 @@ AC_CHECK_FUNCS([strdup mkstemp tempnam])
 AC_FUNC_ALLOCA
 LTALLOCA=`echo "$ALLOCA" | sed 's/\.[^.]* /.lo /g;s/\.[^.]*$/.lo/'`
 AC_SUBST(LTALLOCA)
-gl_ARGP
+
+dnl this is where all the trouble originates
+dnl gl_ARGP
 dnl AM_XGETTEXT_OPTION([--flag=argp_error:2:c-format --flag=argp_failure:4:c-format])
 
 
@@ -162,12 +166,19 @@ dnl   dnl Enable or disable the rpm making rules in Makefile.am
 AM_CONDITIONAL(MAKE_RPMS, test x$make_rpms = xtrue)
 AC_CONFIG_FILES(globes.spec)
 
+dnl allow to disable binaries
+AC_ARG_ENABLE([binary],
+  [AS_HELP_STRING([--disable-binary], [Disable building of globes binary  @<:@check@:>@])],
+  [:],
+  [enable_binary=check])
+
+AM_CONDITIONAL([ENABLE_BINARY], [test "$enable_binary" != "no"])
 
 
-AC_CONFIG_FILES([Makefile lib/Makefile \
+AC_CONFIG_FILES([Makefile \
  globes/Makefile globes/example.pl source/Makefile\
  examples/Makefile\
- data/Makefile  globes-config doc/Makefile])
+ data/Makefile  globes-config doc/Makefile lib/Makefile])
 
 
 AC_OUTPUT

@@ -241,10 +241,20 @@ Inside Cygwin GLoBES needs to be built with these commands:
 Mac OS
 ------
 
-Everything should work as usual, however, if you install GLoBES in a
-non-standard location you have to set the approriate environment variable to
-ensure that the linker finds the library at run-time. Typically this variable
-is named DYLD_LIBRARY_PATH.
+Mac OS' libc does not provide argp.h and the related functionality,
+which is used by the globes binary (not the library). Replacements for
+argp have turned out be unreliable and thus, the only option to
+install GLoBES on a Mac currently is to build without the globes
+binary, which leaves all functionality of the GLoBES library itself
+intact. To do that:
+	./configure --disable-binary
+	make
+
+Apart from this, everything should work as usual, however, if you
+install GLoBES in a non-standard location you have to set the
+approriate environment variable to ensure that the linker finds the
+library at run-time. Typically this variable is named
+DYLD_LIBRARY_PATH.
 
 Compilers and Options
 =====================

@@ -124,7 +124,7 @@ extern int yydebug;
 typedef union YYSTYPE YYSTYPE;
 union YYSTYPE
 {
-#line 1169 "glb_parser.y" /* yacc.c:1909  */
+#line 1187 "glb_parser.y" /* yacc.c:1909  */
 
   double  val;  /* For returning numbers.                   */
   double *dpt;  /* for rules */

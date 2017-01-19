@@ -17,8 +17,14 @@ libglobes_la_CPPFLAGS = -DGLB_MODULE_DIR=\"$(pkglibdir)\"
 libglobes_la_DEPENDENCIES =
 libglobes_la_LDFLAGS += $(top_builddir)/lib/libgnu.la
 
+
+if ENABLE_BINARY
+
 bin_PROGRAMS = globes globes-accuracy globes-deltatheta globes-discovery\
  globes-simple
+
+endif
+
 
 globes_SOURCES = globes.c 
 globes_LDADD = libglobes.la @LIBS@
