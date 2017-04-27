@@ -117,17 +117,6 @@ glb_xsec *glb_calc_xsecs[GLB_MAX_XSECS];
 // ------------------------------------------
 // some of these functions may be superflous
 
-void glb_set_type(int type)
-{
-  exptype =type;
-}
-
-int glb_get_type()
-{
-  return exptype;
-}
-
-
 void glb_set_baseline(double l)
 {
   struct glb_experiment *e = glb_experiment_list[glb_current_exp];
@@ -378,7 +367,6 @@ static double RatesXX(double en, double baseline, int polarity, int anti, int l,
       ergebnis=glb_get_xsec(en,m,anti,glb_calc_xsecs[ident])
 	*glb_get_flux(en,baseline,l,anti,glb_calc_fluxes[polarity])
 	*ProbsAnti[l-1][m-1]*target_mass;
-
     }
   return ergebnis;
 }

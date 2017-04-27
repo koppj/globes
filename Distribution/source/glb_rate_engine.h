@@ -54,8 +54,6 @@ double glb_check_energy_treshold();
 void glb_set_number_of_bins(int nr);
 int glb_check_number_of_bins();
 int glb_get_number_of_bins();
-void glb_set_type(int type);
-int glb_get_type();
 
 double glb_list_likelihood(double* ratest, double* ratesm);
 
