@@ -138,13 +138,12 @@ libglobes_la_LIBADD =
 am_libglobes_la_OBJECTS = libglobes_la-glb_minimize.lo \
 	libglobes_la-glb_error.lo libglobes_la-glb_path.lo \
 	libglobes_la-glb_multiex.lo libglobes_la-glb_version.lo \
-	libglobes_la-glb_rate_engine.lo libglobes_la-glb_parser.lo \
-	libglobes_la-glb_min_sup.lo libglobes_la-glb_fluxes.lo \
-	libglobes_la-glb_smear.lo libglobes_la-glb_lexer.lo \
-	libglobes_la-glb_probability.lo libglobes_la-glb_profile.lo \
-	libglobes_la-glb_sys.lo libglobes_la-glb_wrapper.lo \
-	libglobes_la-glb_glb.lo libglobes_la-glb_prior.lo \
-	libglobes_la-glb_compat.lo
+	libglobes_la-glb_parser.lo libglobes_la-glb_min_sup.lo \
+	libglobes_la-glb_fluxes.lo libglobes_la-glb_smear.lo \
+	libglobes_la-glb_lexer.lo libglobes_la-glb_probability.lo \
+	libglobes_la-glb_profile.lo libglobes_la-glb_sys.lo \
+	libglobes_la-glb_wrapper.lo libglobes_la-glb_glb.lo \
+	libglobes_la-glb_prior.lo libglobes_la-glb_compat.lo
 libglobes_la_OBJECTS = $(am_libglobes_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -415,10 +414,10 @@ AM_YFLAGS = -d
 lib_LTLIBRARIES = libglobes.la
 BUILT_SOURCES = glb_parser.h glb_parser.c
 libglobes_la_SOURCES = glb_minimize.c glb_error.c glb_path.c glb_multiex.c \
- glb_version.c glb_rate_engine.c  glb_parser.y glb_min_sup.c glb_fluxes.c \
+ glb_version.c glb_parser.y glb_min_sup.c glb_fluxes.c \
  glb_smear.c glb_lexer.l glb_probability.c glb_profile.c glb_sys.c glb_wrapper.c \
  glb_minimize.h glb_error.h glb_path.h glb_parser_addons.h glb_multiex.h \
- glb_probability.h glb_smear.h glb_rate_engine.h glb_types.h \
+ glb_probability.h glb_smear.h glb_types.h \
  glb_min_sup.h  glb_version.h glb_lexer.h glb_fluxes.h glb_parser_type.h \
  glb_wrapper.h glb_profile.h glb_sys.h glb_glb.c glb_prior.h glb_prior.c glb_compat.c
 
@@ -619,7 +618,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libglobes_la-glb_prior.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libglobes_la-glb_probability.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libglobes_la-glb_profile.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libglobes_la-glb_rate_engine.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libglobes_la-glb_smear.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libglobes_la-glb_sys.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libglobes_la-glb_version.Plo@am__quote@
@@ -680,13 +678,6 @@ libglobes_la-glb_version.lo: glb_version.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='glb_version.c' object='libglobes_la-glb_version.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libglobes_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libglobes_la-glb_version.lo `test -f 'glb_version.c' || echo '$(srcdir)/'`glb_version.c
-
-libglobes_la-glb_rate_engine.lo: glb_rate_engine.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libglobes_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libglobes_la-glb_rate_engine.lo -MD -MP -MF $(DEPDIR)/libglobes_la-glb_rate_engine.Tpo -c -o libglobes_la-glb_rate_engine.lo `test -f 'glb_rate_engine.c' || echo '$(srcdir)/'`glb_rate_engine.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libglobes_la-glb_rate_engine.Tpo $(DEPDIR)/libglobes_la-glb_rate_engine.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='glb_rate_engine.c' object='libglobes_la-glb_rate_engine.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libglobes_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libglobes_la-glb_rate_engine.lo `test -f 'glb_rate_engine.c' || echo '$(srcdir)/'`glb_rate_engine.c
 
 libglobes_la-glb_parser.lo: glb_parser.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libglobes_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libglobes_la-glb_parser.lo -MD -MP -MF $(DEPDIR)/libglobes_la-glb_parser.Tpo -c -o libglobes_la-glb_parser.lo `test -f 'glb_parser.c' || echo '$(srcdir)/'`glb_parser.c

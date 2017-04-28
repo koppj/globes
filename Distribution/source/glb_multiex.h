@@ -28,7 +28,7 @@
 
 #include "glb_types.h"
 
-extern int glb_current_exp;
+//extern int glb_current_exp;
 extern int glb_ignore_invalid_chi2;
 
 glb_nuisance *glb_alloc_nuisance();
@@ -36,7 +36,6 @@ int glb_copy_nuisance(glb_nuisance *dest, glb_nuisance *src);
 int glb_free_nuisance(glb_nuisance *n);
 
 glb_exp glbAllocExp();
-void glbSetExperiment(glb_exp in);   
 int glbDefaultExp(glb_exp ins);      
 void glbInitExp(glb_exp ins);        
 void glbInitExpFromParent(struct glb_experiment *exp, struct glb_experiment *p);

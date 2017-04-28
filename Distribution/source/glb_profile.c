@@ -219,13 +219,6 @@ int glbAverageDensityProfile(double baseline, double **length,
   return 0;
 }
 
-/* Accessing the actual profile data as used in oszprob */
-
-int glbGetProfileData(size_t *layers, double** length, double** density)
-{
-  return glbGetProfileDataInExperiment(glb_current_exp, layers, length, density);
-}
-
 
 int glbGetProfileDataInExperiment(int exp,
 				  size_t *layers,

@@ -98,7 +98,9 @@ enum glb_enum_minimizers
 #define GLB_MAX_FLUXES    64
 #define GLB_MAX_XSECS     64
 
-
+/* Options for event rate calculation */
+#define GLB_SET_RATES_TRUE   1  /* fill vector for true rates */
+#define GLB_SET_RATES_TEST   2  /* fill vector for fitted rates */
 
 /* Data structures */
 /* --------------- */
@@ -217,6 +219,7 @@ int glbPrintExp(int exp);
 
 
 /* Event rate calculation */
+int glbSetRatesInExperiment(int experiment, int which_rates);
 void glbSetRates();
 void glbSetNewRates();
 

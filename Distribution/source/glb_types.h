@@ -437,18 +437,15 @@ struct glb_experiment {
   /** Has length numofbins */
   double* energy_tab;
 
-
-  /** Now comes a bunch of pointers which finally are vectors containing
-  * the different parts of event vectors needed during computation.
-  * All mallocing has to be done at intialization of a given experiment!
-  */
+  /* Vectors for event rates in channels before/after smearing and in rules
+   * All mallocing has to be done at intialization of a given experiment! */
   double *chrb_0[GLB_MAX_CHANNELS], *chrb_1[GLB_MAX_CHANNELS]; /* True/fitted pre-sm. rates by ch  */
   double *chra_0[GLB_MAX_CHANNELS], *chra_1[GLB_MAX_CHANNELS]; /* True/fitted post-sm. rates by ch */
   double *chr_template[GLB_MAX_CHANNELS];   /* Products of fluxes, cross sections, and prefactors by ch */
   double* SignalRates[GLB_MAX_RULES];    /* "True" signal event rates for all rules */
   double* BackgroundRates[GLB_MAX_RULES];/* "True" background event rates for all rules */
   double* rates0[GLB_MAX_RULES];         /* "True" event rates for all rules */
-  double* rates1[GLB_MAX_RULES];         /* Fitted signal rates for all rules */
+  double* rates1Sig[GLB_MAX_RULES];      /* Fitted signal rates for all rules */
   double* rates1BG[GLB_MAX_RULES];       /* Fitted background rates for all rules */
 
   /** Systematics functions and on/off states */

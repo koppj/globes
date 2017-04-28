@@ -362,3 +362,12 @@ h**********Version 3.0.1
              related to autotools fixed
 
 ********** This version tagged 3.2.16 ************
+
+28 April 2017 JK
+        - New rate engine: glb_rate_engine.c removed completely
+        - As concept of "current experiment" no longer exists, the
+          function glbGetProfileData had to be removed
+          (glbGetProfileDataInExperiment stays.)
+
+********** This version tagged 3.2.18 ************
+

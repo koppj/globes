@@ -92,7 +92,7 @@ build_triplet = @build@
 host_triplet = @host@
 subdir = lib
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
-	$(top_srcdir)/mkinstalldirs exitfail.c exitfail.h obstack.c \
+	$(top_srcdir)/mkinstalldirs exitfail.c obstack.c exitfail.h \
 	obstack.h
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/exitfail.m4 \

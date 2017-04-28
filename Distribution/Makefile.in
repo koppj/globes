@@ -85,9 +85,8 @@ DIST_COMMON = INSTALL NEWS README AUTHORS ChangeLog \
 	$(top_srcdir)/configure $(am__configure_deps) \
 	$(srcdir)/config-h.in mkinstalldirs $(srcdir)/globes.spec.in \
 	$(top_srcdir)/examples/Makefile.in $(srcdir)/globes-config.in \
-	COPYING TODO ar-lib compile config.guess config.rpath \
-	config.sub depcomp install-sh missing ylwrap ltmain.sh \
-	ltconfig
+	COPYING TODO compile config.guess config.rpath config.sub \
+	depcomp install-sh missing ylwrap ltmain.sh ltconfig
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/exitfail.m4 \
 	$(top_srcdir)/m4/gnulib.m4 $(top_srcdir)/m4/gsl.m4 \

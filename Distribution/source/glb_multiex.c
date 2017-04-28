@@ -48,8 +48,6 @@
 #define PI 3.1415
 
 /* global variables */
-int glb_current_exp = -1;  // Indicates which experiment is currently
-                           // being processed by the rate engine
 int glb_ignore_invalid_chi2 = 0; /* If != 0, use chiZero instead of throwing an error
                                     if unknown chi^2 function is used. This is necessary
                                     when an AEDL file using user-defined systematics is
@@ -262,7 +260,7 @@ void glbInitExp(glb_exp ins)
     in->SignalRates[i]           = NULL;
     in->BackgroundRates[i]       = NULL;
     in->rates0[i]                = NULL;
-    in->rates1[i]                = NULL;
+    in->rates1Sig[i]             = NULL;
     in->rates1BG[i]              = NULL;
   }
 
@@ -322,9 +320,8 @@ static void my_free(void *ptr)
  ***************************************************************************
  * Initialize a glb_experiment data structure by copying certain properties*
  * from another detector. This is used when the AEDL parser encounters a   *
- * #DETECTOR# directive. Note that rules inherited from a parent experiment*
- * will only be used if the child does not have its own rule defined in    *
- * the AEDL file.                                                          *
+ * #DETECTOR# directive. Note that the child experiment does *not* inherit *
+ * any rules                                                               *
  ***************************************************************************/
 void glbInitExpFromParent(struct glb_experiment *exp, struct glb_experiment *p)
 {
@@ -761,7 +758,7 @@ void glbResetExp(struct glb_experiment *in)
       my_free(in->SignalRates[i]);
       my_free(in->BackgroundRates[i]);
       my_free(in->rates0[i]);
-      my_free(in->rates1[i]);
+      my_free(in->rates1Sig[i]);
       my_free(in->rates1BG[i]);
       my_free(in->sys_on_errors[i]);
       for(j=0;j<in->numofchannels;j++)
@@ -1562,7 +1559,7 @@ int glbDefaultExp(glb_exp ins)
       if(in->SignalRates[i]==NULL||
          in->BackgroundRates[i]==NULL||
          in->rates0[i]==NULL||
-         in->rates1[i]==NULL||
+         in->rates1Sig[i]==NULL||
          in->rates1BG[i]==NULL)
       {
         glb_rule_error(in, i, "No memory for ratevectors allocated!");
@@ -1877,48 +1874,7 @@ int glbPrintExpByPointer(struct glb_experiment *e)
 }
 
 
-
-
-// this function moves the pointers to the ratevectors to the correct address
-// allocated with MInitFile().
-// this is crucial for multiple experiment support
-// without reprogramming everything !
-// here we pass a pointer for efficiency since this function is used in every step
-
-static void MMovePointers(struct glb_experiment *in)
-{
-  int k;
-  for (k=0;k<in->numofrules;k++)
-    {
-      glb_calc_rates_0[k] = in->rates0[k];
-      glb_calc_rates_1[k] = in->rates1[k];
-      glb_calc_rates_1BG[k] = in->rates1BG[k];
-      glb_calc_signal_rates[k] = in->SignalRates[k];
-      glb_calc_bg_rates[k] = in->BackgroundRates[k];
-      /* FIXME -- wrong number */
-    }
-  for(k=0;k<in->num_of_sm;k++) glb_calc_smear_data[k]=in->smear_data[k];
-  for(k=0;k<in->numofchannels;k++)
-    {
-      glb_calc_chrb_0[k] = in->chrb_0[k];
-      glb_calc_chrb_1[k] = in->chrb_1[k];
-      glb_calc_chra_0[k] = in->chra_0[k];
-      glb_calc_chra_1[k] = in->chra_1[k];
-      glb_calc_chr_template[k] = in->chr_template[k];
-      glb_calc_user_pre_sm_channel[k]=in->user_pre_smearing_channel[k];
-      glb_calc_user_post_sm_channel[k]= in->user_post_smearing_channel[k];
-      glb_calc_user_pre_sm_background[k]=in->user_pre_smearing_background[k];
-      glb_calc_user_post_sm_background[k]=in-> user_post_smearing_background[k];
-    }
-
-  for(k=0;k<in->num_of_fluxes;k++) glb_calc_fluxes[k]=in->fluxes[k];
-  for(k=0;k<in->num_of_xsecs;k++) glb_calc_xsecs[k]=in->xsecs[k];
-  glb_calc_energy_tab = in->energy_tab;
-  return;
-}
-
 // memory allocation for all the ratevecvtors
-
 static struct glb_experiment MInitMemory0(struct glb_experiment in)
 {
  struct glb_experiment out;
@@ -1935,7 +1891,7 @@ static struct glb_experiment MInitMemory0(struct glb_experiment in)
       for (k=0;k<out.numofrules;k++)
         {
           out.rates0[k] =  (double*) glb_malloc( len*sizeof(double));
-          out.rates1[k] = (double*) glb_malloc( len*sizeof(double));
+          out.rates1Sig[k] = (double*) glb_malloc( len*sizeof(double));
           out.rates1BG[k] = (double*) glb_malloc( len*sizeof(double));
           if(out.simbins<=0) glb_exp_error(&in, "Too few simbins defined!");
           else
@@ -1988,200 +1944,159 @@ static void glb_set_profile_scaling_sec(struct glb_experiment *in)
 }
 
 
-// This function actually sets all switches and parameters to the values specified
-// in an struct glb_experiment object and calls MMovePointers().
-// here we pass a pointer for efficiency since this function is used in every step
-
-void glbSetExperiment(glb_exp in)
-{
-  int i;
-  struct glb_experiment *s;
-  s=(struct glb_experiment *) in;
-
-  glb_rule_number=0;
-  glb_current_exp = -1;              // Find experiment number
-  for (i=0; i < glb_num_of_exps; i++)
-    if (glb_experiment_list[i] == s)
-    {
-      glb_current_exp = i;
-      break;
-    }
-
-
-  // pointer moving for density profile
-  glb_set_baseline(s->baseline);
-  //density=in->densitytab;
-  glb_set_profile_scaling_sec(s);
-  //analog of SetEnergy
-
-  glb_set_energy_treshold(s->emin);
-  glb_set_max_energy(s->emax);
-  glb_set_number_of_bins(s->numofbins);
-
-
-  //analog of SetLuminosity
-
-  glb_set_target_mass(s->targetmass);
-
-
-  glb_set_num_of_channels(s->numofchannels);
-  for (i=0;i<s->numofchannels;i++) glb_set_channel(i,s->listofchannels[0][i],
-                                               s->listofchannels[1][i],
-                                               s->listofchannels[2][i],
-                                               s->listofchannels[3][i],
-                                               s->listofchannels[4][i],
-                                               s->listofchannels[5][i]
-                                               );
-
-  // analog of SetRules
-
-
-  glb_set_number_of_rules(s->numofrules);
-  for (i=0;i<s->numofrules;i++)
-    {
-      glb_set_rule(i,s->lengthofrules[i],
-                   (int*) s->rulechannellist[i],s->rulescoeff[i]);
-      glb_set_bg_rule(i,s->lengthofbgrules[i],
-                              s->bgrulechannellist[i],s->bgrulescoeff[i]);
-      glb_set_bg_center(i,(double) s->bg_centers[0][i],(double) s->bg_centers[1][i]);
-
-      // this is preliminary (0 should be replaced by i)
-      glb_calc_simbins=s->simbins;
-      glb_calc_simtresh=s->simtresh;
-      glb_calc_simbeam=s->simbeam;
-    }
-
-  for(i=0;i<s->num_of_sm;i++)
-    {
-      glb_calc_smearing[i]=s->smear[i];
-      glb_calc_uprange[i]=s->uprange[i];
-      glb_calc_lowrange[i]=s->lowrange[i];
-    }
-
-
-
-
-//  glb_switch_filter(s->filter_state);
-//  glb_set_filter(s->filter_value);
-
-
-
-  MMovePointers(s);
-
-  return;
-}
-
-
 /***************************************************************************
  * Function glbSetRatesInExperiment                                        *
  ***************************************************************************
- * Compute "true" event rates for the given experiment                     *
+ * Compute "true" event rates for the given experiment. Same as            *
+ * glbSetRatesInExperimentByPointer, but identifies the experiment by its  *
+ * ID in glb_experiment_list rather than by a direct pointer.              *
  ***************************************************************************/
-int glbSetRatesInExperiment(int experiment)
+int glbSetRatesInExperiment(int exp, int which_rates)
 {
-  struct glb_experiment *e;
-  double Pnu[3][3], Pnubar[3][3];  // Oscillation probabilities
-  int i, j, k, s;
-
-  if (experiment < 0  ||  experiment >= glb_num_of_exps)
+  /* Check arguments */
+  if (exp < 0  ||  exp >= glb_num_of_exps)
   {
     glb_error("glbSetRatesInExperiment: Invalid experiment number");
     return GLBERR_INVALID_ARGS;
   }
-  e = (struct glb_experiment *) glb_experiment_list[experiment];
+  else
+    return glbSetRatesInExperimentByPointer(glb_experiment_list[exp]);
+}
 
-  /* Get bin centers */
-  for (j=0; j < e->numofbins; j++)
-    e->energy_tab[j] = glb_bin_center(j, e->smear_data[0]);
 
-  /* Set scaling factor for matter denisty to 1 */
-  glb_set_profile_scaling_sec(e);
+/***************************************************************************
+ * Function glbSetRatesInExperimentByPointer                               *
+ ***************************************************************************
+ * Compute "true" event rates for the given experiment                     *
+ ***************************************************************************/
+int glbSetRatesInExperimentByPointer(struct glb_experiment *e, int which_rates)
+{
+  double Pnu[3][3], Pnubar[3][3];  // Oscillation probabilities
+  int i, j, k, s;
+  double **chrb, **chra;  // Rates for each channel before/after smearing
+  double **rule_rates_bg, **rule_rates_sig;
+
+  /* Check arguments */
+  if (e == NULL)
+  {
+    glb_error("glbSetRatesInExperimentByPointer: Invalid experiment (NULL)");
+    return GLBERR_INVALID_ARGS;
+  }
+  if (which_rates != GLB_SET_RATES_TRUE  &&  which_rates != GLB_SET_RATES_TEST)
+  {
+    glb_error("glbSetRatesInExperimentByPointer: Invalid command: which_rates = %d",
+              which_rates);
+    return GLBERR_INVALID_ARGS;
+  }
+
+  /* The following is a temporary solution for making the probability engine aware
+   * of which experiment it is being run for. If the user has seti
+   * e->probability_user_data, it is used; otherwise, the global default is used.
+   * In the future, there should be a way of also choosing the whole probability engine
+   * on an experiment-by-experiment basis (some instrumentation for this is already
+   * in the definition of glb_experiment). */
+  double filter = (e->filter_state == GLB_ON) ? e->filter_value : -1.0;
+  void *user_data = e->probability_user_data
+                         ? e->probability_user_data : glb_probability_user_data;
+
+  if (which_rates == GLB_SET_RATES_TEST)
+  {
+    chrb = e->chrb_1;
+    chra = e->chra_1;
+    rule_rates_sig = e->rates1Sig;
+    rule_rates_bg  = e->rates1BG;
+  }
+  else
+  {
+    chrb = e->chrb_0;
+    chra = e->chra_0;
+    rule_rates_sig = e->SignalRates;
+    rule_rates_bg  = e->BackgroundRates;
+
+    /* Get bin centers */
+    for (j=0; j < e->numofbins; j++)
+      e->energy_tab[j] = glb_bin_center(j, e->smear_data[0]);
+
+    /* Set scaling factor for matter denisty to 1 */
+    glb_set_profile_scaling_sec(e);
+  }
 
   /* Calculate pre-smearing rates for all channels */
   for (j=0; j < e->simbins; j++)
   {
-    /* Calculate probability matrix */
-    /* The following is a temporary solution for making the probability engine aware
-     * of which experiment it is being run for. If the user has set e->probability_user_data,
-     * it is used; otherwise, the global default is used.
-     * In the future, there should be a way of also choosing the whole probability engine
-     * on an experiment-by-experiment basis (some instrumentation for this is already
-     * in the definition of glb_experiment). */
-    double filter = (e->filter_state == GLB_ON) ? e->filter_value : -1.0;
-    void *user_data = e->probability_user_data
-                           ? e->probability_user_data : glb_probability_user_data;
     double E = e->smear_data[0]->simbincenter[j];
-    int status = glb_hook_probability_matrix(Pnu, +1, E, e->psteps, e->lengthtab,
-                                             e->densitybuffer, filter, user_data);
-    if (status != GLB_SUCCESS)
-      glb_error("glbSetRatesInExperimnt: Calculation of osc. probabilities (CP=+1) failed.");
 
-    status = glb_hook_probability_matrix(Pnubar, -1, E, e->psteps, e->lengthtab,
-                                         e->densitybuffer, filter, user_data);
-    if (status != GLB_SUCCESS)
-      glb_error("glbSetRatesInExperimnt: Calculation of osc. probabilities (CP=-1) failed.");
-
+    /* Calculate rates for all channels; incorporare pre-smearing efficiencies
+     * and pre-smearing backgrounds */
     for (i=0; i < e->numofchannels; i++)
     {
-      /* Calculate rate and incorporare pre-smearing efficiencies and
-       * pre-smearing backgrounds */
-      double P;
-      int flux_id        = e->listofchannels[0][i]; /* Flux ID */
-      int cp_sign        = e->listofchannels[1][i]; /* 1=neutrinos, -1=antineutrinos */
       int initial_flavor = e->listofchannels[2][i]; /* Initial flavor */
       int final_flavor   = e->listofchannels[3][i]; /* Final flavour */
-      int xsec_id        = e->listofchannels[4][i]; /* Cross section ID */
-      int smear_id       = e->listofchannels[5][i]; /* ID of smearing matrix */
-      int nosc = 0;                                 /* 1=ignore oscillation, 0=standard behavior */
+      int nosc = 0;                                 /* 1=ignore oscillation, 0=std. behavior */
+      int probs = 0;                                /* Probabilities already computed? */
       if (final_flavor > 9)    { final_flavor   -= 10;  nosc=1; }
       if (initial_flavor > 9)  { initial_flavor -= 10;  nosc=1; }
+
+      /* Recomputation of channel rates can be skipped for NOSC-channels */
+      if (!(which_rates==GLB_SET_RATES_TEST  &&  nosc))
+      {
+        /* Calculate probability matrix */
+        if (!nosc && !probs)
+        {
+          if (glb_hook_probability_matrix(Pnu, +1, E, e->psteps, e->lengthtab,
+                                          e->densitybuffer, filter, user_data) != GLB_SUCCESS)
+            glb_error("glbSetRatesInExperimntByPointer: Calculation of osc. probabilities (CP=+1) failed.");
+          if (glb_hook_probability_matrix(Pnubar, -1, E, e->psteps, e->lengthtab,
+                                          e->densitybuffer, filter, user_data) != GLB_SUCCESS)
+            glb_error("glbSetRatesInExperimntByPointer: Calculation of osc. probabilities (CP=-1) failed.");
+          probs = 1;
+        } // if (!nosc && !probs)
+
+        int flux_id        = e->listofchannels[0][i]; /* Flux ID */
+        int cp_sign        = e->listofchannels[1][i]; /* 1=neutrinos, -1=antineutrinos */
+        int xsec_id        = e->listofchannels[4][i]; /* Cross section ID */
+        int smear_id       = e->listofchannels[5][i]; /* ID of smearing matrix */
+        double P;
      
-      double E    = e->smear_data[smear_id]->simbincenter[j]; 
-      double flux = glb_get_flux(E, e->baseline, initial_flavor, cp_sign, e->fluxes[flux_id]);
-      double xsec = glb_get_xsec(E, final_flavor, cp_sign, e->xsecs[xsec_id]);
-      if (nosc)
-        P = 1.0;
-      else
-        P = (cp_sign==1) ? Pnu[initial_flavor-1][final_flavor-1] :
-                                Pnubar[initial_flavor-1][final_flavor-1];
+        double flux = glb_get_flux(E, e->baseline, initial_flavor, cp_sign, e->fluxes[flux_id]);
+        double xsec = glb_get_xsec(E, final_flavor, cp_sign, e->xsecs[xsec_id]);
+        if (nosc)
+          P = 1.0;
+        else
+          P = (cp_sign==1) ? Pnu[initial_flavor-1][final_flavor-1] :
+                                  Pnubar[initial_flavor-1][final_flavor-1];
 
-      e->chrb_0[i][j] = flux * xsec * e->targetmass * P
-                          * e->user_pre_smearing_channel[i][j]
-                          * e->smear_data[smear_id]->simbinsize[j]
-                        + e->user_pre_smearing_background[i][j];
-
-      /* If NOSC-flag was set in glb-file, the "true" and fitted rates
-       * are identical --> store them also in chrb_1 */
-      if (nosc)
-        e->chrb_1[i][j] = e->chrb_0[i][j];
-    }
-  }
+        chrb[i][j] = flux * xsec * e->targetmass * P
+                            * e->user_pre_smearing_channel[i][j]
+                            * e->smear_data[smear_id]->simbinsize[j]
+                          + e->user_pre_smearing_background[i][j];
+      } // if !(test rates & nosc)
+    } // for (i=channels)
+  } // for (j=simbins)
 
   /* Calculate post-smearing rates for all channels */
   for (i=0; i < e->numofchannels; i++)
   {
-    int smear_id = e->listofchannels[5][i]; /* ID of smearing matrix */
-    for (j=0; j < e->numofbins; j++)
+    if (!(which_rates==GLB_SET_RATES_TEST  &&
+        (e->listofchannels[2][i] > 9 || e->listofchannels[3][i] > 9)))
     {
-      /* Apply smearing matrix */
-      e->chra_0[i][j] = 0.0;
-      for (k=e->lowrange[smear_id][j]; k < e->uprange[smear_id][j]+1; k++)
+      int smear_id = e->listofchannels[5][i]; /* ID of smearing matrix */
+      for (j=0; j < e->numofbins; j++)
       {
-        e->chra_0[i][j] += e->smear[smear_id][j][k - e->lowrange[smear_id][j]]
-                             * e->chrb_0[i][k];
-      }
+        /* Apply smearing matrix */
+        chra[i][j] = 0.0;
+        for (k=e->lowrange[smear_id][j]; k < e->uprange[smear_id][j]+1; k++)
+        {
+          chra[i][j] += e->smear[smear_id][j][k - e->lowrange[smear_id][j]]
+                               * chrb[i][k];
+        }
 
-      /* Apply post-smearing efficiencies and post-smearing backgrounds */
-      e->chra_0[i][j] = e->chra_0[i][j] * e->user_post_smearing_channel[i][j]
-                          + e->user_post_smearing_background[i][j];
-    }
-
-    /* If NOSC-flag was set in glb-file, the "true" and fitted rates
-     * are identical --> store them also in chra_1 */
-    if (e->listofchannels[2][i] > 9 || e->listofchannels[3][i] > 9)
-      for(j=0; j < e->numofbins; j++)
-        e->chra_1[i][j] = e->chra_0[i][j];
-  }
+        /* Apply post-smearing efficiencies and post-smearing backgrounds */
+        chra[i][j] = chra[i][j] * e->user_post_smearing_channel[i][j]
+                            + e->user_post_smearing_background[i][j];
+      } // for (j=bins)
+    } // if (!(test_rates & nosc))
+  } // for (i=channels)
 
   /* Merge channel rates into signal, background, and total rates */
   for (i=0; i < e->numofrules; i++)
@@ -2189,22 +2104,35 @@ int glbSetRatesInExperiment(int experiment)
     for(j=0; j < e->numofbins; j++)
     {
       /* Background */
-      e->BackgroundRates[i][j] = 0.0;
+      rule_rates_bg[i][j] = 0.0;
       for (k=0; k < e->lengthofbgrules[i]; k++)
-        e->BackgroundRates[i][j] += e->bgrulescoeff[i][k]
-                                       * e->chra_0[e->bgrulechannellist[i][k]][j];
+        rule_rates_bg[i][j] += e->bgrulescoeff[i][k] * chra[e->bgrulechannellist[i][k]][j];
 
       /* Signal */
-      e->SignalRates[i][j] = 0.0;
+      rule_rates_sig[i][j] = 0.0;
       for (k=0; k < e->lengthofrules[i]; k++)
-        e->SignalRates[i][j] += e->rulescoeff[i][k] * e->chra_0[e->rulechannellist[i][k]][j];
+        rule_rates_sig[i][j] += e->rulescoeff[i][k] * chra[e->rulechannellist[i][k]][j];
     }
 
     /* Total */
-    for (j=0; j < e->numofbins; j++)
+    if (which_rates==GLB_SET_RATES_TRUE)
     {
-      e->rates0[i][j] = e->SignalRates[i][j]
-                             + e->BackgroundRates[i][j] * e->bg_centers[0][i];
+      for (j=0; j < e->numofbins; j++)
+        e->rates0[i][j] = e->SignalRates[i][j] + e->BackgroundRates[i][j] * e->bg_centers[0][i];
+    }
+  }
+
+  /* If NOSC-flag was set in glb-file for a channel, the "true" and fitted rates
+   * are identical --> store them also in chrb_1, chra_1 */
+  if (which_rates==GLB_SET_RATES_TRUE  &&
+      (e->listofchannels[2][i] > 9 || e->listofchannels[3][i] > 9))
+  {
+    for (i=0; i < e->numofchannels; i++)
+    {
+      for (j=0; j < e->simbins; j++)
+        e->chrb_1[i][j] = chrb[i][j];
+      for (j=0; j < e->numofbins; j++)
+        e->chra_1[i][j] = chra[i][j];
     }
   }
 }
@@ -2219,44 +2147,30 @@ void glbSetRates()
 {
   int i;
   for (i=0; i < glb_num_of_exps; i++)
-  {
-    glbSetRatesInExperiment(i);
-//    glbSetExperiment(glb_experiment_list[i]);
-//    glb_set_rates();
-  }
+    glbSetRatesInExperiment(i, GLB_SET_RATES_TRUE);
 }
 
 
-
-// redefinition of SetNewRates()
+/***************************************************************************
+ * Function glbSetNewRates                                                 *
+ ***************************************************************************
+ * Compute "fitted" event rates for all experiments                        *
+ ***************************************************************************/
 void glbSetNewRates()
 {
   int i;
-  for (i=0;i<glb_num_of_exps;i++)
-    {
-      glbSetExperiment(glb_experiment_list[i]);
-      glb_set_new_rates();
-    }
+  for (i=0; i < glb_num_of_exps; i++)
+    glbSetRatesInExperiment(i, GLB_SET_RATES_TEST);
 }
-
-// a bunch of comands which allow to modify
-// certain elements of a struct glb_experiment object
-// in glb_experiment_list
 
 
 void glb_set_profile_scaling(double scale,int i)
 {
   int k;
-//  glb_set_length_ptr(glb_experiment_list[i]->lengthtab);
-
-//  glb_set_psteps(glb_experiment_list[i]->psteps);
-  for(k=0;k<glb_experiment_list[i]->psteps;k++)
-    {
-      glb_experiment_list[i]->densitybuffer[k]=(double)
-        scale*glb_experiment_list[i]->densitytab[k];
-    }
-//  glb_set_density_ptr(glb_experiment_list[i]->densitybuffer);
-
+  for(k=0; k < glb_experiment_list[i]->psteps; k++)
+  {
+    glb_experiment_list[i]->densitybuffer[k]=(double) //FIXME daughter exps!
+      scale*glb_experiment_list[i]->densitytab[k];
+  }
 }
-
 

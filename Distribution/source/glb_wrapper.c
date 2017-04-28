@@ -49,7 +49,6 @@
 /* The global variables */
 int glb_num_of_exps;
 glb_exp glb_experiment_list[GLB_MAX_EXP];
-int glb_rule_number;
 
 char **glb_param_names = NULL;
 
@@ -969,7 +968,7 @@ double *glbGetSignalFitRatePtr(int exp, int rule)
     return NULL;
   }
 
-  return glb_experiment_list[exp]->rates1[rule];
+  return glb_experiment_list[exp]->rates1Sig[rule];
 }
 
 
@@ -2062,7 +2061,6 @@ glb_init(char *name)
 
   for(i=0;i<GLB_MAX_EXP;i++) glb_experiment_list[i]=glbAllocExp();
   glb_num_of_exps=0;
-  glb_rule_number=0;
   obstack_init(&glb_rate_stack);
   glbSetPrintDelimiters("","\t","\n");
   glbSetChannelPrintFunction(glb_builtin_channel_printf);
