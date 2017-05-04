@@ -526,6 +526,7 @@ int glb_init_flux(glb_flux *flux)
 double glb_get_flux(double E, double L, int f, int cp_sign, const glb_flux *flux)
 {
   double result;
+  double geom_factor = 1./(L*L);
 
   switch (flux->binning_type)
   {
@@ -589,7 +590,7 @@ double glb_get_flux(double E, double L, int f, int cp_sign, const glb_flux *flux
   }
 
   result *= norm2(flux->builtin) * flux->time * flux->target_power
-             * flux->stored_muons * flux->norm / (L*L);
+             * flux->stored_muons * flux->norm * geom_factor;
   return result;
 }
 

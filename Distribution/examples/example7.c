@@ -91,12 +91,12 @@ int main(int argc, char *argv[])
 //    {
 //      double E = exp(logE*log(10.));
 //      printf("%10.5g %10.5g   %10.5g %10.5g %10.5g   %10.5g %10.5g %10.5g\n", cza, E,
-//          glbFlux(0, 2, E, glbCosThetaToL(cza), GLB_NU_E,   +1),
-//          glbFlux(0, 2, E, glbCosThetaToL(cza), GLB_NU_MU,  +1),
-//          glbFlux(0, 2, E, glbCosThetaToL(cza), GLB_NU_TAU, +1),
-//          glbFlux(0, 2, E, glbCosThetaToL(cza), GLB_NU_E,   -1),
-//          glbFlux(0, 2, E, glbCosThetaToL(cza), GLB_NU_MU,  -1),
-//          glbFlux(0, 2, E, glbCosThetaToL(cza), GLB_NU_TAU, -1));
+//          glbFlux(0, 0, E, glbCosThetaToL(cza), GLB_NU_E,   +1),
+//          glbFlux(0, 0, E, glbCosThetaToL(cza), GLB_NU_MU,  +1),
+//          glbFlux(0, 0, E, glbCosThetaToL(cza), GLB_NU_TAU, +1),
+//          glbFlux(0, 0, E, glbCosThetaToL(cza), GLB_NU_E,   -1),
+//          glbFlux(0, 0, E, glbCosThetaToL(cza), GLB_NU_MU,  -1),
+//          glbFlux(0, 0, E, glbCosThetaToL(cza), GLB_NU_TAU, -1));
 //    }
 //  getchar();
 
