@@ -26,5 +26,8 @@
 #  include "config.h"
 #endif
 
+int glbSetBaselineInExperimentByPointer(struct glb_experiment *ins, double baseline);
+double glb_cos_theta_to_L(double cos_theta);
+double glb_L_to_cos_theta(double L);
 
 #endif /* glb_PROFILE_H */

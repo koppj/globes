@@ -28,6 +28,14 @@
 
 #include "glb_types.h"
 
+/* Options for glbInitExpFromParent */
+#define GLB_COPY_RULES      1
+#define GLB_DONT_COPY_RULES 0
+
+/* Options for glbSetRatesInExperiment */
+#define GLB_SET_RATES_SLOW  0   /* Don't use precomputed chr_template */
+#define GLB_SET_RATES_FAST  1   /* Use precomputed chr_template */
+
 //extern int glb_current_exp;
 extern int glb_ignore_invalid_chi2;
 
@@ -36,15 +44,23 @@ int glb_copy_nuisance(glb_nuisance *dest, glb_nuisance *src);
 int glb_free_nuisance(glb_nuisance *n);
 
 glb_exp glbAllocExp();
-int glbDefaultExp(glb_exp ins);      
-void glbInitExp(glb_exp ins);        
-void glbInitExpFromParent(struct glb_experiment *exp, struct glb_experiment *p);
-void glbResetExp(struct glb_experiment *in);        
-void glbFreeExp(struct glb_experiment *in);        
+int glbDefaultExp(glb_exp ins);
+void glbInitExp(glb_exp ins);
+void glbInitExpFromParent(struct glb_experiment *exp, struct glb_experiment *p,
+                          int copy_rules);
+void glbResetExp(struct glb_experiment *in);
+void glbFreeExp(struct glb_experiment *in);
 void glbExpAddChild(struct glb_experiment *parent, struct glb_experiment *child);
 void glbExpRemoveChild(struct glb_experiment *parent, struct glb_experiment *child);
 int glbPrintExpByPointer(struct glb_experiment *exp);
 
+int glbRateTemplate(struct glb_experiment *e, int which_rates);
+
 void glb_set_profile_scaling(double scale,int i);
+
+/* Declarations for functions defined in the AEDL parser */
+glb_naming *glb_copy_names_from_parser(glb_naming *head);
+glb_naming *glb_copy_names(glb_naming *in, glb_naming *head);
+void glb_free_names(glb_naming *stale);
 
 #endif /* GLB_MULTIEX_H */

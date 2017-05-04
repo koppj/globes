@@ -60,7 +60,6 @@ extern void *glb_probability_user_data;
 #define SQR(x)      ((x)*(x))                        /* x^2   */
 #define SQR_ABS(x)  (SQR(creal(x)) + SQR(cimag(x)))  /* |x|^2 */
 
-
 /* Functions */
 int glb_init_probability_engine();
 int glb_free_probability_engine();

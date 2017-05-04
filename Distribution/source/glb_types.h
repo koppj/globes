@@ -38,18 +38,20 @@
 
 struct glb_naming
 {
-  char *name; /* name of symbol      */   
-  char *context;  /* context rule, channel etc.           */
-  int value;  /* e.g. rule number */
-  struct glb_naming *next;    /* link field              */
+  char *name;              /* name of symbol */   
+  char *context;           /* context rule, channel etc. */
+  int value;               /* e.g. rule number */
+  struct glb_naming *next; /* link field */
 };
 
 typedef struct glb_naming glb_naming;
 
 /* Data structure for handling fluxes and built-in fluxes */
-#define GLB_FLUX_COLUMNS   7           /* Number of columns in flux file         */
+#define GLB_FLUX_COLUMNS_E_ONLY 7      /* Number of columns in flux file binned in E */
+#define GLB_FLUX_COLUMNS_E_L    8      /* Number of columns in flux file binned in E & L */
 typedef struct {
   int builtin;
+  int binning_type;                    /* expect binning only in E, or in E and L/\cos\theta */
   double time;
   double parent_energy;
   double stored_muons;
@@ -58,9 +60,9 @@ typedef struct {
   double gamma;
   double end_point;
 
-  int n_lines;                         /* Number of columns in flux file         */
-  char *file_name;                     /* Name of flux file                      */
-  double *flux_data[GLB_FLUX_COLUMNS]; /* Flux data (7 x n_lines array)          */
+  int n_E, n_L;                        /* Number of grid points in energy and L/\cos\theta */
+  char *file_name;                     /* Name of flux file */
+  double *flux_data[GLB_FLUX_COLUMNS_E_L]; /* Flux data */
 } glb_flux;
 
 /* Data structure for handling X-sections and built-in X-sections,
@@ -242,6 +244,15 @@ struct glb_experiment {
   */
   int numofbins;
 
+  int n_Lbins;      /* Number of bins in L (baseline). When != 0, a child experiment is
+                       created for each bin in L. */
+  double Lmin;      /* Minimum baseline for $Lbins > 1 */
+  double Lmax;      /* Maximum baseline for $Lbins > 1 */
+  int n_cos_theta_bins; /* Number of bins in \cos\theta (zenith angle). When != 0,
+                       a child experiment is created for each bin in \cos\theta. */
+  double cos_theta_min; /* Minimum zenith angle for $cos_theta_bins > 1 */
+  double cos_theta_max; /* Maximum zenith angle for $cos_theta_bins > 1 */
+  double *Lbinsize; /* Widths of the L bins */
 
   /** Target mass in units of kt (=1000 tons). It is positive.
    */

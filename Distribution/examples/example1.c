@@ -82,6 +82,32 @@ int main(int argc, char *argv[])
       /* Compute Chi^2 for all loaded experiments and all rules */
       res=glbChiSys(test_values,GLB_ALL,GLB_ALL);
       AddToOutput(x,y,res);
+
+      int i, j;
+      double *p;
+//      for (j=0; j < 4; j++)
+//      {
+//        p = glbGetSignalFitRatePtr(0,j);
+//        printf("Sig %1d:  ", j);
+//        for (i=0; i < glbGetNumberOfBins(0); i++)
+//          printf("%7.4g ", p[i]);
+//        printf("\n");
+//
+//        p = glbGetBGFitRatePtr(0,j);
+//        printf("BG %1d:   ", j);
+//        for (i=0; i < glbGetNumberOfBins(0); i++)
+//          printf("%7.4g ", p[i]);
+//        printf("\n");
+//      }
+//      for (j=0; j < 6; j++)
+//      {
+//        p = glbGetChannelFitRatePtr(0,j,GLB_POST);
+//        printf("Ch %1d:  ", j);
+//        for (i=0; i < glbGetNumberOfBins(0); i++)
+//          printf("%7.4g ", p[i]);
+//        printf("\n");
+//      }
+//      getchar();
   }
    
   /* Destroy parameter vector(s) */

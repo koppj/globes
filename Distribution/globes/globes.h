@@ -44,6 +44,8 @@
 #define GLB_NU_FLAVOURS  3
 
 
+enum glb_neutrino_flavours
+       { GLB_NU_E = 1, GLB_NU_MU = 2, GLB_NU_TAU = 3 };
 enum glb_enum_oscillation_parameters
        { GLB_THETA_12 = 0, GLB_THETA_13 = 1, GLB_THETA_23 = 2,
          GLB_DELTA_CP = 3, GLB_DM_21 = 4, GLB_DM_31 = 5 };
@@ -57,6 +59,11 @@ enum glb_enum_param_fixed_free
        { GLB_FIXED = 0, GLB_FREE = 1 };
 enum glb_enum_efficiency_types
        { GLB_PRE = 1, GLB_POST = 2 };
+enum glb_enum_flux_binning_types  /* possible values for @binning_type in AEDL */
+       { GLB_BINNING_E_ONLY,      /* flux table gives fluxes as function of energy only */
+         GLB_BINNING_E_L,         /* fluxes are binned in energy and baseline */
+         GLB_BINNING_E_COS_THETA, /* fluxes are binned in energy and zenith angle */
+         GLB_N_BINNING_TYPES };
 
 /* Available minimization algorithms */
 enum glb_enum_minimizers
@@ -70,7 +77,8 @@ enum glb_enum_minimizers
 
 #define GLB_ALL   -1
 
-#define GLB_EARTH_RADIUS 6371.0 /* km */
+#define GLB_EARTH_RADIUS 6371.0 /* [km] Earth radius */
+#define GLB_ATM_THICKNESS  15.0 /* [km] Production height for atmospheric neutrinos */
 
 /* Unit conversion */
 
@@ -219,7 +227,7 @@ int glbPrintExp(int exp);
 
 
 /* Event rate calculation */
-int glbSetRatesInExperiment(int experiment, int which_rates);
+int glbSetRatesInExperiment(int experiment, int which_rates, int fast_rates);
 void glbSetRates();
 void glbSetNewRates();
 
@@ -267,6 +275,8 @@ int glbSetProfileDataInExperiment(int exp, size_t layers,const double* length,
 int glbSetBaselineInExperiment(int exp, double baseline);
 int glbGetProfileTypeInExperiment(int exp);
 double glbGetBaselineInExperiment(int exp);
+double glbCosThetaToL(double cos_theta);
+double glbLToCosTheta(double L);
 
 
 /* Access to miscellaneous experiment parameters */

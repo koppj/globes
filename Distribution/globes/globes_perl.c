@@ -3777,16 +3777,19 @@ XS(_wrap_glbSetRatesInExperiment) {
   {
     int arg1 ;
     int arg2 ;
+    int arg3 ;
     int val1 ;
     int ecode1 = 0 ;
     int val2 ;
     int ecode2 = 0 ;
+    int val3 ;
+    int ecode3 = 0 ;
     int argvi = 0;
     int result;
     dXSARGS;
     
-    if ((items < 2) || (items > 2)) {
-      SWIG_croak("Usage: glbSetRatesInExperiment(experiment,which_rates);");
+    if ((items < 3) || (items > 3)) {
+      SWIG_croak("Usage: glbSetRatesInExperiment(experiment,which_rates,fast_rates);");
     }
     ecode1 = SWIG_AsVal_int SWIG_PERL_CALL_ARGS_2(ST(0), &val1);
     if (!SWIG_IsOK(ecode1)) {
@@ -3798,12 +3801,19 @@ XS(_wrap_glbSetRatesInExperiment) {
       SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "glbSetRatesInExperiment" "', argument " "2"" of type '" "int""'");
     } 
     arg2 = (int)(val2);
-    result = (int)glbSetRatesInExperiment(arg1,arg2);
+    ecode3 = SWIG_AsVal_int SWIG_PERL_CALL_ARGS_2(ST(2), &val3);
+    if (!SWIG_IsOK(ecode3)) {
+      SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "glbSetRatesInExperiment" "', argument " "3"" of type '" "int""'");
+    } 
+    arg3 = (int)(val3);
+    result = (int)glbSetRatesInExperiment(arg1,arg2,arg3);
     ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
+    
     
     
     XSRETURN(argvi);
   fail:
+    
     
     
     SWIG_croak_null();
@@ -5214,6 +5224,62 @@ XS(_wrap_glbGetBaselineInExperiment) {
     } 
     arg1 = (int)(val1);
     result = (double)glbGetBaselineInExperiment(arg1);
+    ST(argvi) = SWIG_From_double  SWIG_PERL_CALL_ARGS_1((double)(result)); argvi++ ;
+    
+    XSRETURN(argvi);
+  fail:
+    
+    SWIG_croak_null();
+  }
+}
+
+
+XS(_wrap_glbCosThetaToL) {
+  {
+    double arg1 ;
+    double val1 ;
+    int ecode1 = 0 ;
+    int argvi = 0;
+    double result;
+    dXSARGS;
+    
+    if ((items < 1) || (items > 1)) {
+      SWIG_croak("Usage: glbCosThetaToL(cos_theta);");
+    }
+    ecode1 = SWIG_AsVal_double SWIG_PERL_CALL_ARGS_2(ST(0), &val1);
+    if (!SWIG_IsOK(ecode1)) {
+      SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "glbCosThetaToL" "', argument " "1"" of type '" "double""'");
+    } 
+    arg1 = (double)(val1);
+    result = (double)glbCosThetaToL(arg1);
+    ST(argvi) = SWIG_From_double  SWIG_PERL_CALL_ARGS_1((double)(result)); argvi++ ;
+    
+    XSRETURN(argvi);
+  fail:
+    
+    SWIG_croak_null();
+  }
+}
+
+
+XS(_wrap_glbLToCosTheta) {
+  {
+    double arg1 ;
+    double val1 ;
+    int ecode1 = 0 ;
+    int argvi = 0;
+    double result;
+    dXSARGS;
+    
+    if ((items < 1) || (items > 1)) {
+      SWIG_croak("Usage: glbLToCosTheta(L);");
+    }
+    ecode1 = SWIG_AsVal_double SWIG_PERL_CALL_ARGS_2(ST(0), &val1);
+    if (!SWIG_IsOK(ecode1)) {
+      SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "glbLToCosTheta" "', argument " "1"" of type '" "double""'");
+    } 
+    arg1 = (double)(val1);
+    result = (double)glbLToCosTheta(arg1);
     ST(argvi) = SWIG_From_double  SWIG_PERL_CALL_ARGS_1((double)(result)); argvi++ ;
     
     XSRETURN(argvi);
@@ -9832,6 +9898,8 @@ static swig_command_info swig_commands[] = {
 {"globesc::glbSetBaselineInExperiment", _wrap_glbSetBaselineInExperiment},
 {"globesc::glbGetProfileTypeInExperiment", _wrap_glbGetProfileTypeInExperiment},
 {"globesc::glbGetBaselineInExperiment", _wrap_glbGetBaselineInExperiment},
+{"globesc::glbCosThetaToL", _wrap_glbCosThetaToL},
+{"globesc::glbLToCosTheta", _wrap_glbLToCosTheta},
 {"globesc::glbSetTargetMass", _wrap_glbSetTargetMass},
 {"globesc::glbSetSourcePower", _wrap_glbSetSourcePower},
 {"globesc::glbSetRunningTime", _wrap_glbSetRunningTime},
@@ -10237,6 +10305,21 @@ XS(SWIG_init) {
     SvREADONLY_on(sv);
   } while(0) /*@SWIG@*/;
   /*@SWIG:/usr/share/swig2.0/perl5/perltypemaps.swg,65,%set_constant@*/ do {
+    SV *sv = get_sv((char*) SWIG_prefix "GLB_NU_E", TRUE | 0x2 | GV_ADDMULTI);
+    sv_setsv(sv, SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(GLB_NU_E)));
+    SvREADONLY_on(sv);
+  } while(0) /*@SWIG@*/;
+  /*@SWIG:/usr/share/swig2.0/perl5/perltypemaps.swg,65,%set_constant@*/ do {
+    SV *sv = get_sv((char*) SWIG_prefix "GLB_NU_MU", TRUE | 0x2 | GV_ADDMULTI);
+    sv_setsv(sv, SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(GLB_NU_MU)));
+    SvREADONLY_on(sv);
+  } while(0) /*@SWIG@*/;
+  /*@SWIG:/usr/share/swig2.0/perl5/perltypemaps.swg,65,%set_constant@*/ do {
+    SV *sv = get_sv((char*) SWIG_prefix "GLB_NU_TAU", TRUE | 0x2 | GV_ADDMULTI);
+    sv_setsv(sv, SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(GLB_NU_TAU)));
+    SvREADONLY_on(sv);
+  } while(0) /*@SWIG@*/;
+  /*@SWIG:/usr/share/swig2.0/perl5/perltypemaps.swg,65,%set_constant@*/ do {
     SV *sv = get_sv((char*) SWIG_prefix "GLB_THETA_12", TRUE | 0x2 | GV_ADDMULTI);
     sv_setsv(sv, SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(GLB_THETA_12)));
     SvREADONLY_on(sv);
@@ -10327,6 +10410,26 @@ XS(SWIG_init) {
     SvREADONLY_on(sv);
   } while(0) /*@SWIG@*/;
   /*@SWIG:/usr/share/swig2.0/perl5/perltypemaps.swg,65,%set_constant@*/ do {
+    SV *sv = get_sv((char*) SWIG_prefix "GLB_BINNING_E_ONLY", TRUE | 0x2 | GV_ADDMULTI);
+    sv_setsv(sv, SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(GLB_BINNING_E_ONLY)));
+    SvREADONLY_on(sv);
+  } while(0) /*@SWIG@*/;
+  /*@SWIG:/usr/share/swig2.0/perl5/perltypemaps.swg,65,%set_constant@*/ do {
+    SV *sv = get_sv((char*) SWIG_prefix "GLB_BINNING_E_L", TRUE | 0x2 | GV_ADDMULTI);
+    sv_setsv(sv, SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(GLB_BINNING_E_L)));
+    SvREADONLY_on(sv);
+  } while(0) /*@SWIG@*/;
+  /*@SWIG:/usr/share/swig2.0/perl5/perltypemaps.swg,65,%set_constant@*/ do {
+    SV *sv = get_sv((char*) SWIG_prefix "GLB_BINNING_E_COS_THETA", TRUE | 0x2 | GV_ADDMULTI);
+    sv_setsv(sv, SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(GLB_BINNING_E_COS_THETA)));
+    SvREADONLY_on(sv);
+  } while(0) /*@SWIG@*/;
+  /*@SWIG:/usr/share/swig2.0/perl5/perltypemaps.swg,65,%set_constant@*/ do {
+    SV *sv = get_sv((char*) SWIG_prefix "GLB_N_BINNING_TYPES", TRUE | 0x2 | GV_ADDMULTI);
+    sv_setsv(sv, SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(GLB_N_BINNING_TYPES)));
+    SvREADONLY_on(sv);
+  } while(0) /*@SWIG@*/;
+  /*@SWIG:/usr/share/swig2.0/perl5/perltypemaps.swg,65,%set_constant@*/ do {
     SV *sv = get_sv((char*) SWIG_prefix "GLB_MIN_NESTED_POWELL", TRUE | 0x2 | GV_ADDMULTI);
     sv_setsv(sv, SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(GLB_MIN_NESTED_POWELL)));
     SvREADONLY_on(sv);
@@ -10359,6 +10462,11 @@ XS(SWIG_init) {
   /*@SWIG:/usr/share/swig2.0/perl5/perltypemaps.swg,65,%set_constant@*/ do {
     SV *sv = get_sv((char*) SWIG_prefix "GLB_EARTH_RADIUS", TRUE | 0x2 | GV_ADDMULTI);
     sv_setsv(sv, SWIG_From_double  SWIG_PERL_CALL_ARGS_1((double)(6371.0)));
+    SvREADONLY_on(sv);
+  } while(0) /*@SWIG@*/;
+  /*@SWIG:/usr/share/swig2.0/perl5/perltypemaps.swg,65,%set_constant@*/ do {
+    SV *sv = get_sv((char*) SWIG_prefix "GLB_ATM_THICKNESS", TRUE | 0x2 | GV_ADDMULTI);
+    sv_setsv(sv, SWIG_From_double  SWIG_PERL_CALL_ARGS_1((double)(15.0)));
     SvREADONLY_on(sv);
   } while(0) /*@SWIG@*/;
   /*@SWIG:/usr/share/swig2.0/perl5/perltypemaps.swg,65,%set_constant@*/ do {

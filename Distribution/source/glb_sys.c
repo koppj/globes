@@ -28,9 +28,8 @@
 #include <globes/globes.h>
 #include "glb_error.h"
 #include "glb_multiex.h"
-#include "glb_rate_engine.h"
 #include "glb_minimize.h"
-
+#include "glb_sys.h"
 
 /* Global variables */
 glb_systematic *glb_sys_list;   /* Connected list of systematics definitions */

@@ -31,7 +31,6 @@
 
 #include "glb_probability.h"
 #include "glb_fluxes.h"
-#include "glb_rate_engine.h"
 #include "glb_minimize.h"
 #include "glb_types.h"
 #include "glb_multiex.h"

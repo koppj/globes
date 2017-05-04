@@ -60,13 +60,13 @@
 
 #include "glb_probability.h"
 #include "glb_fluxes.h"
-#include "glb_rate_engine.h"
 #include "glb_min_sup.h"
 #include "glb_minimize.h"
 #include "glb_types.h"
 #include "glb_multiex.h"
 #include "glb_error.h"
 #include "glb_wrapper.h"
+#include "glb_sys.h"
 
 /* global variabels */
 int glb_single_experiment_number=GLB_ALL;
@@ -442,7 +442,7 @@ static double Chi(double x[])
   for (i=0;i<glb_num_of_exps;i++)
     {
       glb_set_profile_scaling(x[glbGetNumOfOscParams()+i],i);
-      glbSetRatesInExperiment(i, GLB_SET_RATES_TEST);
+      glbSetRatesInExperiment(i, GLB_SET_RATES_TEST, GLB_SET_RATES_SLOW);
     }
   if (setjmp(env)==1)
     {
@@ -470,7 +470,7 @@ static double SingleChi(double x[glbGetNumOfOscParams()+1],int exp)
   glbFreeParams(p);
 
   glb_set_profile_scaling(x[glbGetNumOfOscParams()],exp);
-  glbSetRatesInExperiment(exp, GLB_SET_RATES_TEST);
+  glbSetRatesInExperiment(exp, GLB_SET_RATES_TEST, GLB_SET_RATES_SLOW);
 
   if (setjmp(env)==1)
     {
@@ -495,7 +495,7 @@ static double SingleRuleChi(double x[glbGetNumOfOscParams()+1],int exp, int rule
   glbFreeParams(p);
 
   glb_set_profile_scaling(x[glbGetNumOfOscParams()],exp);
-  glbSetRatesInExperiment(exp, GLB_SET_RATES_TEST);
+  glbSetRatesInExperiment(exp, GLB_SET_RATES_TEST, GLB_SET_RATES_SLOW);
 
   erg=ChiS0_Rule(exp, rule);
   return erg;
@@ -789,7 +789,7 @@ static double MD_chi_NP(double x[])
   for (i=0;i<glb_num_of_exps;i++)
     {
       glb_set_profile_scaling(y[glbGetNumOfOscParams()+i],i);
-      glbSetRatesInExperiment(i, GLB_SET_RATES_TEST);
+      glbSetRatesInExperiment(i, GLB_SET_RATES_TEST, GLB_SET_RATES_SLOW);
     }
 
   erg2=ChiS();
@@ -883,7 +883,8 @@ static double chi_NP(double x[])
   glbFreeParams(p);
 
   glb_set_profile_scaling(y[glbGetNumOfOscParams()],glb_single_experiment_number);
-  glbSetRatesInExperiment(glb_single_experiment_number, GLB_SET_RATES_TEST);
+  glbSetRatesInExperiment(glb_single_experiment_number,
+                          GLB_SET_RATES_TEST, GLB_SET_RATES_SLOW);
 
   erg2=ChiS0(glb_single_experiment_number);
 
@@ -1511,7 +1512,7 @@ double glb_hybrid_chi_callback(double *x, int new_rates_flag, void *user_data)
       if (glb_single_experiment_number!=GLB_ALL && glb_single_experiment_number!=i)
         continue;
       glb_set_profile_scaling(p->density->density_params[i],i);
-      glbSetRatesInExperiment(i, GLB_SET_RATES_TEST);
+      glbSetRatesInExperiment(i, GLB_SET_RATES_TEST, GLB_SET_RATES_FAST);
     }
 
     /* Compute priors */
@@ -1639,6 +1640,8 @@ int glb_invoke_hybrid_minimizer(int exp, int rule, double *x, double *chi2)
         continue;
       n_sys += glbGetSysDimInExperiment(i, j, glbGetSysOnOffState(i, j));
     }
+
+    glbRateTemplate(e, GLB_SET_RATES_TEST); /* precompute constant factors in event rates */
   }
   
 

@@ -128,118 +128,116 @@
     {"$numofbins",COUNTER,0,500,&buff.numofbins,NULL,"global"},
     {"$simbinsize",DOUBLE_LIST,0,GMAX,&buff.simbinsize,
      &buff.simbins,"global"},
-/* JK - Has been removed
-    {"$errorfunction",INT,0,1,&buff.errorfunction,NULL,"global"},
-    {"@treshold_setttings" ,DOUBLE_INDEXED_PAIR,
-     0,100,&buff.bgtcenter[0],&loc_count,"rule"},
-    {"@treshold_error" ,DOUBLE_INDEXED_PAIR,
-     0,100,&buff.bgterror[0],&loc_count,"rule"}, */
 #endif /* GLB_OLD_AEDL */
     {"$sampling_points" ,COUNTER,0,500,&buff.simbins,NULL,"global"},
     {"$sampling_min" ,DOUBLE,0,GMAX,&buff.simtresh,NULL,"global"},
     {"$sampling_max" ,DOUBLE,0,GMAX,&buff.simbeam,NULL,"global"},
-    /* FIXME -- this was not properly recognized due to the fact the first match is performed
-     * by matching only the letters up to the length of the word ins this list, ie.
-     * if 'bins' is before 'binsize' in this list, 'binsize' will be matched as
-     * 'bins'
-     */
-    {"$binsize",DOUBLE_LIST,0,GMAX,&buff.binsize,
-     &buff.numofbins,"global"},
 
+    /* Binning in energy */
+    {"$binsize",DOUBLE_LIST,0,GMAX,&buff.binsize,&buff.numofbins,"global"},
+                                                /* must come before $bins! */
     {"$bins",COUNTER,0,500,&buff.numofbins,NULL,"global"},
     {"$emin",DOUBLE,0,GMAX,&buff.emin,NULL,"global"},
     {"$emax",DOUBLE,0,GMAX,&buff.emax,NULL,"global"},
 
+    /* Binning in L */
+    {"$Lbinsize", DOUBLE_LIST, 0, GMAX, &buff.Lbinsize, &buff.n_Lbins, "global"},
+                                                /* must come before $Lbins! */
+    {"$Lbins",          COUNTER, 0, 500,  &buff.n_Lbins,          NULL, "global"},
+    {"$Lmin",           DOUBLE,  0, GMAX, &buff.Lmin,             NULL, "global"},
+    {"$Lmax",           DOUBLE,  0, GMAX, &buff.Lmax,             NULL, "global"},
+    {"$cos_theta_bins", COUNTER, 0, 500,  &buff.n_cos_theta_bins, NULL, "global"},
+    {"$cos_theta_min",  DOUBLE, -1, 1,    &buff.cos_theta_min,    NULL, "global"},
+    {"$cos_theta_max",  DOUBLE,  1, 1,    &buff.cos_theta_max,    NULL, "global"},
+
+    /* Baseline and matter density profile */
     {"$baseline",DOUBLE,0,2*GLB_EARTH_RADIUS,&buff.baseline,NULL,"global"},
     {"$profiletype",INT,1,3,&buff.density_profile_type,NULL,"global"},
+    {"$densitytab",DOUBLE_LIST,0,GMAX,&buff.densitytab,&buff.psteps,"global"},
+    {"$lengthtab",DOUBLE_LIST,0,2*GLB_EARTH_RADIUS,
+     &buff.lengthtab,&buff.psteps,"global"},
 
     {"$sampling_stepsize",DOUBLE_LIST,0,GMAX,&buff.simbinsize,
      &buff.simbins,"global"},
 
-   {"$densitytab",DOUBLE_LIST,0,GMAX,&buff.densitytab,&buff.psteps,"global"},
-   {"$lengthtab",DOUBLE_LIST,0,2*GLB_EARTH_RADIUS,
-    &buff.lengthtab,&buff.psteps,"global"},
-   {"rulechannellist",INT_LIST_INDEXED,0,GMAX,&buff.rulechannellist[0],
-    &buff.lengthofrules[0],"rule"},
-   {"rulescoeff",DOUBLE_LIST_INDEXED,0,GMAX,&buff.rulescoeff[0],
-    &buff.lengthofrules[0],"rule"},
 
-   {"bgrulechannellist",INT_LIST_INDEXED,0,GMAX,&buff.bgrulechannellist[0],
-    &buff.lengthofbgrules[0],"rule"},
-   {"bgrulescoeff",DOUBLE_LIST_INDEXED,0,GMAX,&buff.bgrulescoeff[0],
-    &buff.lengthofbgrules[0],"rule"},
-   {"rule",UNTYPE,-1,1,NULL,&buff.numofrules,"global"},
-   {"@signal",UNTYPE,-1,1,NULL,&loc_count,"rule"},
-   {"@background",UNTYPE,-1,1,NULL,&loc_count,"rule"},
+    {"rulechannellist",INT_LIST_INDEXED,0,GMAX,&buff.rulechannellist[0],
+     &buff.lengthofrules[0],"rule"},
+    {"rulescoeff",DOUBLE_LIST_INDEXED,0,GMAX,&buff.rulescoeff[0],
+     &buff.lengthofrules[0],"rule"},
 
+    {"bgrulechannellist",INT_LIST_INDEXED,0,GMAX,&buff.bgrulechannellist[0],
+     &buff.lengthofbgrules[0],"rule"},
+    {"bgrulescoeff",DOUBLE_LIST_INDEXED,0,GMAX,&buff.bgrulescoeff[0],
+     &buff.lengthofbgrules[0],"rule"},
+
+    /* Channel definition */
+    {"channel",UNTYPE,-1,1,NULL,&buff.numofchannels,"global"},
+    {"@channel",INT_LIST_INDEXED,-1,1,&buff.listofchannels[0],
+     &buff.numofchannels,"channel"},
     {"@pre_smearing_efficiencies",DOUBLE_LIST_INDEXED,0,GMAX,
      &buff.user_pre_smearing_channel[0],&loc_count,"channel"},
-
     {"@pre_smearing_background",DOUBLE_LIST_INDEXED,0,GMAX,
      &buff.user_pre_smearing_background[0],&loc_count,"channel"},
-
     {"@post_smearing_efficiencies",DOUBLE_LIST_INDEXED,0,GMAX,
      &buff.user_post_smearing_channel[0],&loc_count,"channel"},
-
     {"@post_smearing_background",DOUBLE_LIST_INDEXED,0,GMAX,
      &buff.user_post_smearing_background[0],&loc_count,"channel"},
 
+    /* Rule definition */
+    {"rule",UNTYPE,-1,1,NULL,&buff.numofrules,"global"},
+    {"@signal",UNTYPE,-1,1,NULL,&loc_count,"rule"},
+    {"@background",UNTYPE,-1,1,NULL,&loc_count,"rule"},
 
-   {"@errordim_sys_on",INT,0,20,&errordim_sys_on,NULL,"rule"},
-   {"@errordim_sys_off",INT,0,20,&errordim_sys_off,NULL,"rule"},
-   {"@sys_on_function",CHAR,0,20,&buff.sys_on_strings[0],&loc_count,"rule"},
-   {"@sys_off_function",CHAR,0,20,&buff.sys_off_strings[0],&loc_count,"rule"},
+    /* Systematics - deprecrated */
+    {"@errordim_sys_on",INT,0,20,&errordim_sys_on,NULL,"rule"},
+    {"@errordim_sys_off",INT,0,20,&errordim_sys_off,NULL,"rule"},
+    {"@signalerror",DOUBLE_INDEXED_PAIR,
+     0,100,&buff.signal_errors[0],&loc_count,"rule"},
+    {"@backgrounderror",DOUBLE_INDEXED_PAIR,
+     0,100,&buff.bg_errors[0],&loc_count,"rule"},
+    {"@backgroundcenter",DOUBLE_INDEXED_PAIR,
+     0,100,&buff.bg_centers[0],&loc_count,"rule"},
 
-   {"channel",UNTYPE,-1,1,NULL,&buff.numofchannels,"global"},
-   {"@channel",INT_LIST_INDEXED,-1,1,&buff.listofchannels[0],
-    &buff.numofchannels,"channel"},
-   {"energy",UNTYPE,-1,1,NULL,&buff.num_of_sm,"global"},
-   {"@energy",ENERGY_MATRIX,-1,GMAX,&buff.smear[0],&loc_count,"energy"},
+    /* Systematics */
+    {"@sys_on_function",CHAR,0,20,&buff.sys_on_strings[0],&loc_count,"rule"},
+    {"@sys_off_function",CHAR,0,20,&buff.sys_off_strings[0],&loc_count,"rule"},
+    {"@sys_on_errors",DOUBLE_LIST_INDEXED,0,GMAX,
+     &buff.sys_on_errors[0],&loc_count,"rule"},
+    {"@sys_off_errors",DOUBLE_LIST_INDEXED,0,GMAX,
+     &buff.sys_off_errors[0],&loc_count,"rule"},
+    {"@sys_on_multiex_errors_sig",  ENERGY_MATRIX, 1, GLB_MAX_NUISANCE,
+      &buff.sys_on_multiex_errors_sig[0], &loc_count, "rule"},
+    {"@sys_on_multiex_errors_bg",   ENERGY_MATRIX, 1, GLB_MAX_NUISANCE,
+      &buff.sys_on_multiex_errors_bg[0], &loc_count, "rule"},
+    {"@sys_off_multiex_errors_sig", ENERGY_MATRIX, 1, GLB_MAX_NUISANCE,
+      &buff.sys_off_multiex_errors_sig[0], &loc_count, "rule"},
+    {"@sys_off_multiex_errors_bg",  ENERGY_MATRIX, 1, GLB_MAX_NUISANCE,
+      &buff.sys_off_multiex_errors_bg[0], &loc_count, "rule"},
 
-   {"@signalerror",DOUBLE_INDEXED_PAIR,
-    0,100,&buff.signal_errors[0],&loc_count,"rule"},
-   {"@backgrounderror",DOUBLE_INDEXED_PAIR,
-    0,100,&buff.bg_errors[0],&loc_count,"rule"},
-   {"@backgroundcenter",DOUBLE_INDEXED_PAIR,
-    0,100,&buff.bg_centers[0],&loc_count,"rule"},
-
-   {"@sys_on_errors",DOUBLE_LIST_INDEXED,0,GMAX,
-    &buff.sys_on_errors[0],&loc_count,"rule"},
-   {"@sys_off_errors",DOUBLE_LIST_INDEXED,0,GMAX,
-    &buff.sys_off_errors[0],&loc_count,"rule"},
-   {"@sys_on_multiex_errors_sig",  ENERGY_MATRIX, 1, GLB_MAX_NUISANCE,
-     &buff.sys_on_multiex_errors_sig[0], &loc_count, "rule"},
-   {"@sys_on_multiex_errors_bg",   ENERGY_MATRIX, 1, GLB_MAX_NUISANCE,
-     &buff.sys_on_multiex_errors_bg[0], &loc_count, "rule"},
-   {"@sys_off_multiex_errors_sig", ENERGY_MATRIX, 1, GLB_MAX_NUISANCE,
-     &buff.sys_off_multiex_errors_sig[0], &loc_count, "rule"},
-   {"@sys_off_multiex_errors_bg",  ENERGY_MATRIX, 1, GLB_MAX_NUISANCE,
-     &buff.sys_off_multiex_errors_bg[0], &loc_count, "rule"},
-
-
-   {"sys", UNTYPE, 0, 20, NULL, &buff.n_nuisance, "global"},
-   {"@energy_list", DOUBLE_LIST, 0, GMAX, &nuis.energy_list, &nuis.n_energies, "sys"},
-   {"@error_list",  DOUBLE_LIST, 0, GMAX, &nuis.error_list,  &nuis.n_energies, "sys"},
-   {"@error",       DOUBLE,      0, GMAX, &nuis.error,       NULL,             "sys"}, 
-    {"@systype",       INT,      0, 20, &nuis.systype,       NULL,             "sys"},
-
-
-   {"@energy_window" ,DOUBLE_INDEXED_PAIR_INV,0,GMAX,&buff.energy_window[0],
-    &loc_count,"rule"},
-   {"$densitysteps",COUNTER,1,GMAX,&buff.psteps,NULL,"global"},
+    /* Multi-experiment systematics - definition of a nuisance parameter */
+    {"sys", UNTYPE, 0, 20, NULL, &buff.n_nuisance, "global"},
+    {"@energy_list", DOUBLE_LIST, 0, GMAX, &nuis.energy_list, &nuis.n_energies, "sys"},
+    {"@error_list",  DOUBLE_LIST, 0, GMAX, &nuis.error_list,  &nuis.n_energies, "sys"},
+    {"@error",       DOUBLE,      0, GMAX, &nuis.error,       NULL,             "sys"}, 
+    {"@systype",     INT,         0, 20,   &nuis.systype,     NULL,             "sys"},
 
 
+    {"@energy_window" ,DOUBLE_INDEXED_PAIR_INV,0,GMAX,&buff.energy_window[0],
+     &loc_count,"rule"},
+    {"$densitysteps",COUNTER,1,GMAX,&buff.psteps,NULL,"global"},
 
-   {"$filter_state",INT,GLB_OFF,GLB_ON,&buff.filter_state,NULL,"global"},
-   {"$filter_value",DOUBLE,0,GMAX,&buff.filter_value,NULL,"global"},
+    /* low-pass filter */
+    {"$filter_state",INT,GLB_OFF,GLB_ON,&buff.filter_state,NULL,"global"},
+    {"$filter_value",DOUBLE,0,GMAX,&buff.filter_value,NULL,"global"},
 
-   {"cross",UNTYPE,0,20,NULL,&buff.num_of_xsecs,"global"},
-   {"@cross_file",CHAR,0,20,&xsc.file_name,NULL,"cross"},
+    /* cross sections */
+    {"cross",UNTYPE,0,20,NULL,&buff.num_of_xsecs,"global"},
+    {"@cross_file",CHAR,0,20,&xsc.file_name,NULL,"cross"},
 
-
-   {"flux",UNTYPE,0,20,NULL,&buff.num_of_fluxes,"global"},
-   {"@flux_file",CHAR,0,20,&flt.file_name,NULL,"flux"},
-
+    /* fluxes - deprecated */
+    {"flux",UNTYPE,0,20,NULL,&buff.num_of_fluxes,"global"},
+    {"@flux_file",CHAR,0,20,&flt.file_name,NULL,"flux"},
     {"@builtin",INT,1,4,&flt.builtin,NULL,"flux"},
     {"@time",DOUBLE,0,GMAX,&flt.time,NULL,"flux"},
     {"@power",DOUBLE,0,GMAX,&flt.target_power,NULL,"flux"},
@@ -250,11 +248,9 @@
     {"@end_point",DOUBLE,0,GMAX,&flt.end_point,NULL,"flux"},
     {"@stored_ions",DOUBLE,0,GMAX,&flt.stored_muons,NULL,"flux"},
 
-
-
+    /* fluxes */
     {"nuflux",UNTYPE,0,20,NULL,&buff.num_of_fluxes,"global"},
     {"@flux_file",CHAR,0,20,&flt.file_name,NULL,"nuflux"},
-
     {"@builtin",INT,1,4,&flt.builtin,NULL,"nuflux"},
     {"@time",DOUBLE,0,GMAX,&flt.time,NULL,"nuflux"},
     {"@power",DOUBLE,0,GMAX,&flt.target_power,NULL,"nuflux"},
@@ -264,15 +260,17 @@
     {"@gamma",DOUBLE,0,GMAX,&flt.gamma,NULL,"nuflux"},
     {"@end_point",DOUBLE,0,GMAX,&flt.end_point,NULL,"nuflux"},
     {"@stored_ions",DOUBLE,0,GMAX,&flt.stored_muons,NULL,"nuflux"},
+    {"@binning_type",INT,0,GLB_N_BINNING_TYPES-1,&flt.binning_type,NULL,"nuflux"},
 
+    /* Energy smearing */
+    {"energy",UNTYPE,-1,1,NULL,&buff.num_of_sm,"global"},
+    {"@energy",ENERGY_MATRIX,-1,GMAX,&buff.smear[0],&loc_count,"energy"},
+    {"@type" ,INT,1,2,&ibf.type,&loc_count,"energy"},
+    {"@sigma_e" ,DOUBLE_LIST,0,GMAX,&ibf.sigma,&ibf.num_of_params,"energy"},
+    {"@sigma_function" ,FUN,0,1000,&ibf.sig_f,NULL,"energy"},
 
-   {"@type" ,INT,1,2,&ibf.type,&loc_count,"energy"},
-   {"@sigma_e" ,DOUBLE_LIST,0,GMAX,&ibf.sigma,&ibf.num_of_params,"energy"},
-   {"@sigma_function" ,FUN,0,1000,&ibf.sig_f,NULL,"energy"},
-
-
-
-   {NULL,UNTYPE,0,0,NULL,NULL,"global"}
+    /* Signals end of list */
+    {NULL,UNTYPE,0,0,NULL,NULL,"global"}
 };
 
 
@@ -1868,36 +1866,6 @@ glb_putsym (char *sym_name, int sym_type)
 
 /* Name handling */
 
-static glb_naming *glb_putnames (char *sym_name, char *context, int value,
-                                 glb_naming *in)
-{
-  glb_naming *ptr;
-  ptr = (glb_naming *) glb_malloc (sizeof (glb_naming));
-  ptr->name = (char *) glb_malloc (strlen (sym_name) + 1);
-  strcpy (ptr->name,sym_name);
-  ptr->context = (char *) glb_malloc (strlen (context) + 1);
-  strcpy (ptr->context,context);
-  ptr->value = value; /* set value to -1 for new ones  */
-
-  ptr->next = (struct glb_naming *) in;
-  //in = ptr;
-  return ptr;
-}
-
-static glb_naming *copy_names (glb_naming *in)
-{
-
-  glb_namerec *ptr;
-  for (ptr = name_table; ptr != (glb_namerec *) NULL;
-       ptr = (glb_namerec *)ptr->next)
-    {
-      in=glb_putnames(ptr->name,ptr->context,ptr->value,in);
-    }
-  return in;
-}
-
-
-
 glb_namerec *glb_getname (const char *sym_name, char* context)
 {
   glb_namerec *ptr;
@@ -2008,12 +1976,16 @@ void glbDefineAEDLList(const char *name, double *list, size_t length)
 }
 
 
-
-
 void glb_copy_buff()
 {
+  if (buff.names) /* glbInitExperimentFromParent may have created a namespace already. */
+  {               /* Remove it first to avoid duplicate entires */
+    glb_free_names(buff.names);
+    buff.names = NULL;
+  }
+
   /* I am not sure how well this assigment really works */
-  buff.names=copy_names(buff.names);
+  buff.names=glb_copy_names_from_parser(buff.names);
   if (buff.filename)  glb_free(buff.filename);
   buff.filename=strdup(glb_file_id);
   buff_list[exp_count]  = glbAllocExp();
@@ -2025,6 +1997,73 @@ void glb_copy_buff()
     glbExpAddChild(p, buff_list[exp_count]);
   }
   exp_count++;
+}
+
+
+/***************************************************************************
+ * Function glb_free_names                                                 *
+ ***************************************************************************
+ * Destroy a list of name record                                           *
+ ***************************************************************************/
+void glb_free_names(glb_naming *stale)
+{
+  glb_naming *ptr;
+  glb_naming *dummy;
+  ptr = stale;
+  while(ptr != (glb_naming *) NULL)
+  {
+    glb_free(ptr->name);
+    glb_free(ptr->context);
+    dummy=ptr->next;
+    glb_free(ptr);
+    ptr=dummy;
+  }
+  stale=NULL;
+}
+
+
+/***************************************************************************
+ * Function glb_copy_names_from_parser                                     *
+ ***************************************************************************
+ * Prepends the current parser namespace the GLoBES namesapce head and     *
+ * returns the new head                                                    *
+ ***************************************************************************/
+glb_naming *glb_copy_names_from_parser(glb_naming *head)
+{
+  glb_namerec *pp; /* Parser name record */
+  glb_naming *pg;  /* GLoBES name record */
+  for (pp=name_table; pp != NULL; pp=pp->next)
+  {
+    pg = (glb_naming *) glb_malloc(sizeof(glb_naming));
+    pg->name    = strdup(pp->name);
+    pg->context = strdup(pp->context);
+    pg->value   = pp->value;
+    pg->next    = head;
+    head        = pg;
+  }
+  return head;
+}
+
+
+/***************************************************************************
+ * Function glb_copy_names                                                 *
+ ***************************************************************************
+ * Duplicates a list of glb_naming records and prepends them to head       *
+ ***************************************************************************/
+glb_naming *glb_copy_names(glb_naming *in, glb_naming *head)
+{
+  glb_naming *p;
+  glb_naming *pnew;
+  for (p=in; p != NULL; p=p->next)
+  {
+    pnew = (glb_naming *) glb_malloc(sizeof(glb_naming));
+    pnew->name    = strdup(p->name);
+    pnew->context = strdup(p->context);
+    pnew->value   = p->value;
+    pnew->next    = head;
+    head          = pnew;
+  }
+  return head;
 }
 
 
@@ -2063,7 +2102,7 @@ void glbNewDetector()
   glb_copy_buff();
   energy_len = 1;
   glbResetNuisance();
-  glbInitExpFromParent(&buff, buff_list[exp_count-1]);
+  glbInitExpFromParent(&buff, buff_list[exp_count-1], GLB_DONT_COPY_RULES);
      //FIXME FIXME FIXME What if parent is not/incorrectly defined?
 
   // Remove rule names from namespace (rules are not copied by glbInitExpFromParent)
@@ -2147,7 +2186,8 @@ void glb_clean_parser()
 int glbInitExperiment(char *inf,glb_exp *in, int *counter)
 {
   FILE *input;
-  int k,i;
+  int i;
+  int status;
   const char tch[]="%!GLoBES";
   char tct[11];
   struct glb_experiment **ins;
@@ -2174,7 +2214,9 @@ int glbInitExperiment(char *inf,glb_exp *in, int *counter)
   if(yyin==NULL) return -2;
   glb_file_id=(char*) strdup(inf);
   glbResetEOF();
-  k=yyparse ();
+
+  /* Run AEDL parser */
+  status = yyparse();
 
   /* Copy last experiment and reset data structures */
   glb_copy_buff();
@@ -2184,23 +2226,37 @@ int glbInitExperiment(char *inf,glb_exp *in, int *counter)
   glb_free(context);
   glb_free(glb_file_id);
 
-  if(k!=0) return -2;
+  if(status != 0) return -2;
 
-  k=0;
+  status = 0;
+  for (i=0; i < exp_count; i++)
+  {
+    struct glb_experiment *exp = buff_list[i];
+    int n_children_old, n_children_new;
+    if (*counter >= GLB_MAX_EXP)
+      glb_fatal("Too many experiments (max. is %d)!", GLB_MAX_EXP);
+    ins[*counter]   = exp;
+    buff_list[i]    = NULL; /* Remove our pointer to that exp to prevent destruction */
 
-  if(*counter+exp_count>GLB_MAX_EXP) glb_fatal("Too many experiments!");
-  for(i=0;i<exp_count;i++)
-    {
-      ins[*counter+i] = buff_list[i];
-      buff_list[i]    = NULL; /* Remove our pointer to that exp to prevent destruction */
-      k              += glbDefaultExp(ins[*counter+i]);
+    n_children_old  = exp->n_children; /* Remember # of children from #DETECTOR# */
+    status         += glbDefaultExp(exp);
+    n_children_new  = exp->n_children;
+    *counter        = *counter + 1;
+    if (n_children_new > n_children_old) /* did glbDefaultExp create new children? */
+    {                                    /* (happens when $Lbins > 1) */
+      int j;                             /* -> add new children to ins[] as well */
+      for (j=n_children_old; j < n_children_new; j++)
+      {
+        ins[*counter] = exp->children[j];
+        *counter      = *counter + 1;
+      }
     }
-  (*counter)= (*counter) + exp_count;
+  }
 
   /* Reallocate data structures for the minimizer */
   glb_init_minimizer();
 
-  if(k!=0) return -1;
+  if (status != 0) return -1;
 
   return 0;
 

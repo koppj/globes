@@ -319,24 +319,62 @@ int glb_default_smear(glb_smear *in,const struct glb_experiment *head)
 }
 
 
-glb_smear  *glb_copy_smear(glb_smear *dest, const glb_smear *src)
+/***************************************************************************
+ * Function glb_copy_smear                                                 *
+ ***************************************************************************
+ * Duplicates a smearing definition                                        *
+ ***************************************************************************/
+glb_smear *glb_copy_smear(glb_smear *dest, const glb_smear *src)
 {
-  int i;
-  glb_option_type *temp;
-  if(dest->options==NULL) temp=glb_option_type_alloc();
-  else temp=dest->options;
-  dest=(glb_smear *) memmove(dest,src,sizeof(glb_smear));
-  dest->options=temp;
-  dest->options=(glb_option_type *) memmove(dest->options,src->options,
-                                    sizeof(glb_option_type));
+  if (dest != NULL  &&  src != NULL)
+  {
+    glb_smear *result = dest;
 
+    if (dest->options)      { glb_free(dest->options);      dest->options=NULL;      }
+    if (dest->sigma)        { glb_free(dest->sigma);        dest->sigma=NULL;        }
+    if (dest->binsize)      { glb_free(dest->binsize);      dest->binsize=NULL;      }
+    if (dest->simbinsize)   { glb_free(dest->simbinsize);   dest->simbinsize=NULL;   }
+    if (dest->bincenter)    { glb_free(dest->bincenter);    dest->bincenter=NULL;    }
+    if (dest->simbincenter) { glb_free(dest->simbincenter); dest->simbincenter=NULL; }
 
-  if(src->num_of_params <= 0) return dest;
-  dest->sigma=(double *) glb_malloc(src->num_of_params*sizeof(double));
-  for(i=0;i<src->num_of_params;i++) dest->sigma[i]=src->sigma[i];
-  /* What about binsize etc ? */
+    memmove(dest, src, sizeof(glb_smear));
 
+    if (src->options)
+      if ((dest->options=glb_option_type_alloc()) == NULL)
+        result = NULL;
+      else
+        memmove(dest->options, src->options, sizeof(glb_option_type));
 
+    if (src->num_of_params > 0  &&  src->sigma)
+      if ((dest->sigma=(double *) glb_malloc(src->num_of_params*sizeof(double))) == NULL)
+        result = NULL;
+      else
+        memmove(dest->sigma, src->sigma, src->num_of_params * sizeof(double));
+
+    if (src->numofbins > 0  &&  src->binsize)
+      if ((dest->binsize= (double *) glb_malloc(src->numofbins*sizeof(double))) == NULL)
+        result = NULL;
+      else
+        memmove(dest->binsize, src->binsize, src->numofbins*sizeof(double));
+
+    if (src->numofbins > 0  &&  src->bincenter)
+      if ((dest->bincenter= (double *) glb_malloc(src->numofbins*sizeof(double))) == NULL)
+        result = NULL;
+      else
+        memmove(dest->bincenter, src->bincenter, src->numofbins*sizeof(double));
+
+    if (src->simbins > 0  &&  src->simbinsize)
+      if ((dest->simbinsize= (double *) glb_malloc(src->simbins*sizeof(double))) == NULL)
+        result = NULL;
+      else
+        memmove(dest->simbinsize, src->simbinsize, src->simbins*sizeof(double));
+
+    if (src->simbins > 0  &&  src->simbincenter)
+      if ((dest->simbincenter= (double *) glb_malloc(src->simbins*sizeof(double))) == NULL)
+        result = NULL;
+      else
+        memmove(dest->simbincenter, src->simbincenter, src->simbins*sizeof(double));
+  }
   return dest;
 }
 

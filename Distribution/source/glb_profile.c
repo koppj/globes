@@ -322,22 +322,26 @@ int glbSetProfileDataInExperiment(int exp,
     }
 }
 
-/* Changing a baseline according to density_profile_type */
 
-int
-glbSetBaselineInExperiment(int exp, double baseline)
+/***************************************************************************
+ * Function glbSetBaselineInExperimentByPointer                            *
+ ***************************************************************************
+ * Change the baseline in an experiment, respecting density_profile_type:  *
+ *   1 = constant density, obtained by averaging over the PREM profile     *
+ *   2 = PREM profile with given number of equidistant steps               *
+ *   3 = Arbitray profile, defined by $lengthtab, $densitytab              *
+ ***************************************************************************/
+int glbSetBaselineInExperimentByPointer(struct glb_experiment *ins, double baseline)
 {
-  struct glb_experiment *ins;
   double *lb,*db,scale;
   size_t l;
   int s=-1,i;
   double ttl=0;
-  if((exp<0)||(exp>=glb_num_of_exps))
-    {
-      glb_error("Experiment number out of range");
-      return -1;
-    }
-  ins=(struct glb_experiment *) glb_experiment_list[exp];
+  if (!ins)
+  {
+    glb_error("glbSetBaselineInExperimentByPointer: NULL pointer encountered.");
+    return -1;
+  }
 
   if(ins->density_profile_type==-1)
     {glb_error("No profile type specified");s=-1;}
@@ -417,8 +421,25 @@ glbSetBaselineInExperiment(int exp, double baseline)
 
   glb_error("glbSetBaselineInExperiment failed");
   return -1;
-
 }
+
+
+/***************************************************************************
+ * Function glbSetBaselineInExperiment                                   *
+ ***************************************************************************
+ * same as glbSetBaselineInExperimentByPointer, but refers to experiment   *
+ * by its index in glb_experiment_list rather than a pointer               *
+ ***************************************************************************/
+int glbSetBaselineInExperiment(int exp, double baseline)
+{
+  if(exp < 0 || exp >= glb_num_of_exps)
+  {
+    glb_error("glbSetBaselineInExperiment: experiment number (%d) out of range", exp);
+    return -1;
+  }
+  return glbSetBaselineInExperimentByPointer(glb_experiment_list[exp], baseline);
+}
+
 
 double
 glbGetBaselineInExperiment(int exp)
@@ -437,3 +458,34 @@ glbGetBaselineInExperiment(int exp)
 
   return out;
 }
+
+
+/***************************************************************************
+ * Function glbCosThetaToL                                                 *
+ ***************************************************************************
+ * Convert \cos\theta (cosine of the zenith angle) to baseline.            *
+ * See for instance JK's diploma thesis.                                   *
+ ***************************************************************************/
+double glbCosThetaToL(double cos_theta)
+{
+  return -GLB_EARTH_RADIUS * cos_theta
+                     + sqrt(SQR(GLB_EARTH_RADIUS) * SQR(cos_theta)
+                          + GLB_ATM_THICKNESS * (GLB_ATM_THICKNESS + 2*GLB_EARTH_RADIUS));
+}
+
+
+/***************************************************************************
+ * Function glb_L_to_cos_theta                                             *
+ ***************************************************************************
+ * Convert L (baseline) to \cos\theta (cosine of the zenith angle).        *
+ ***************************************************************************/
+double glbLToCosTheta(double L)
+{
+  if (L < GLB_ATM_THICKNESS || L > 2.*GLB_EARTH_RADIUS + GLB_ATM_THICKNESS)
+    return DBL_MAX;
+  
+  return ( SQR(GLB_ATM_THICKNESS) + 2.*GLB_ATM_THICKNESS*GLB_EARTH_RADIUS - SQR(L) )
+       / ( 2. * L * GLB_EARTH_RADIUS );
+}
+
+

@@ -42,8 +42,10 @@
 
 #include "glb_types.h"
 #include "glb_error.h"
+#include "glb_profile.h"
 #include "glb_fluxes.h"
 #include "glb_multiex.h"
+#include "glb_min_sup.h"
 
 #define PI 3.1415
 #define NORM 6.02204*1E-12 //10^-38/u (atomic mass unit)
@@ -312,14 +314,19 @@ static void builtin_flux_setup(glb_flux *data, flux_calc flx, int pl)
     de=data->parent_energy/(FLUX_STEPS+1);
   else if (data->builtin == 3  ||  data->builtin == 4)
     de=2 * data->gamma * (data->end_point + GLB_ELECTRON_MASS)/(FLUX_STEPS+1);
+  else
+  {
+    glb_error("builtin_flux_setup: invalid builtin flux: %d", data->builtin);
+    return;
+  }
   smb=stored_muons;
   pb=power;
   stored_muons=data->stored_muons;
   power=data->target_power;
   glb_set_max_energy(data->parent_energy);
-  for (j=0; j < GLB_FLUX_COLUMNS; j++)
+  for (j=0; j < GLB_FLUX_COLUMNS_E_ONLY; j++)  /* Builtin fluxes can only be binned in E, not in L */
     data->flux_data[j] = glb_malloc((FLUX_STEPS+1) * sizeof(data->flux_data[j][0]));
-  data->n_lines = FLUX_STEPS + 1;
+  data->n_E = FLUX_STEPS + 1;
   for(i=0; i <= FLUX_STEPS; i++)
   {
     data->flux_data[0][i] = i*de;
@@ -371,6 +378,8 @@ static double norm2(int type)
  ***************************************************************************/
 int glb_init_flux(glb_flux *flux)
 {
+  int i, j;
+  int status = 0;
   if (!flux)
     return GLBERR_UNINITIALIZED;
 
@@ -378,6 +387,15 @@ int glb_init_flux(glb_flux *flux)
   if (flux->target_power < 0)  flux->target_power = 1.0;
   if (flux->stored_muons < 0)  flux->stored_muons = 1.0;
   if (flux->norm < 0)          flux->norm         = 1.0;
+
+  if (flux->binning_type != GLB_BINNING_E_ONLY)
+  {
+    if (flux->builtin != -1)
+    {
+      glb_error("@builtin can only be used with @binning_type=0 (binning in E only)");
+      return GLBERR_INVALID_FILE_FORMAT;
+    }
+  }
 
   /* Initialize flux tables according to user specification */
   switch (flux->builtin)
@@ -420,8 +438,79 @@ int glb_init_flux(glb_flux *flux)
         glb_error("No flux file specified");
         return GLBERR_INVALID_FILE_FORMAT;
       }
-      return glb_load_n_columns(flux->file_name, GLB_FLUX_COLUMNS,
-                                &flux->n_lines, flux->flux_data);
+      switch (flux->binning_type)
+      {
+        /* Binning in energy only */
+        case GLB_BINNING_E_ONLY:
+          if ((status=glb_load_n_columns(flux->file_name, GLB_FLUX_COLUMNS_E_ONLY,
+                                         &flux->n_E, flux->flux_data)) != GLB_SUCCESS)
+            return status;
+
+          /* check that energies are monotonically increasing */
+          for (i=1; i < flux->n_E; i++)
+          {
+            if (flux->flux_data[0][i] < flux->flux_data[0][i-1])
+            {
+              glb_error("Energy not monotonically increasing in file %s, E=%g",
+                        flux->file_name, flux->flux_data[0][i]);
+              return GLBERR_INVALID_FILE_FORMAT;
+            }
+          }
+          break;
+
+        /* Binning in energy and baseline/zenith angle */
+        case GLB_BINNING_E_L:
+        case GLB_BINNING_E_COS_THETA:
+          if ((status=glb_load_n_columns(flux->file_name, GLB_FLUX_COLUMNS_E_L,
+                                         &flux->n_L, flux->flux_data)) != GLB_SUCCESS)
+            return status;
+
+          /* check that data is given on a regular grid and determine dimensions */
+          for (i=1; i < flux->n_L; i++)
+          {
+            if (flux->flux_data[0][i] < flux->flux_data[0][i-1])
+            {
+              glb_error("L/\\cos\\theta not monotonically increasing in file %s (entry %d)",
+                        flux->file_name, i+1);
+              return GLBERR_INVALID_FILE_FORMAT;
+            }
+            if (flux->flux_data[1][i] < flux->flux_data[1][i-1])
+            {
+              if (flux->n_E <= 0)
+                flux->n_E = i;
+              else if (i % flux->n_E != 0)
+              {
+                glb_error("Fluxes in file %s are not given on a regular grid (entry %d).",
+                          flux->file_name, i+1);
+                return GLBERR_INVALID_FILE_FORMAT;
+              }
+            }
+          }
+          flux->n_L /= flux->n_E;
+
+          for (i=0; i < flux->n_L; i++)
+            for (j=0; j < flux->n_E; j++)
+            {
+              int n_E = flux->n_E;
+              if (flux->flux_data[0][i*n_E + j] != flux->flux_data[0][i*n_E])
+              {
+                glb_error("Irregular L/\\cos\\theta value in file %s (entry %d).",
+                          flux->file_name, i*n_E+j+1);
+                return GLBERR_INVALID_FILE_FORMAT;
+              }
+              if (flux->flux_data[1][i*n_E + j] != flux->flux_data[1][j])
+              {
+                glb_error("Irregular energy in file %s, line %d (entry %d).",
+                          flux->file_name, i*n_E+j+1);
+                return GLBERR_INVALID_FILE_FORMAT;
+              }
+            }
+          break;
+
+        default:
+          glb_error("Invalid @binning_type: %d", flux->binning_type);
+          return GLBERR_INVALID_FILE_FORMAT;
+      }
       break;
   }
 
@@ -436,45 +525,71 @@ int glb_init_flux(glb_flux *flux)
  ***************************************************************************/
 double glb_get_flux(double E, double L, int f, int cp_sign, const glb_flux *flux)
 {
-// JK 2010-11-27 We now allow non-equidistant support points 
-//  int col = (int) f + 3*(1-cp_sign)/2;  /* Which column of the flux table? */
-//  int n_steps = flux->n_lines - 1;
-//  double E_binsize = (flux->flux_data[0][n_steps] - flux->flux_data[0][0]) / n_steps;
-//  double result;
-//
-//  int k = floor((E - flux->flux_data[0][0]) / E_binsize);
-//  if (k < 0 || k >= n_steps)
-//    return 0.0;
-//  else
-//  {
-//    double E_lo    = flux->flux_data[0][k];
-//    double flux_lo = flux->flux_data[col][k];
-//    double flux_up = flux->flux_data[col][k+1];
-//    result  = flux_lo + (E - E_lo)*(flux_up - flux_lo)/E_binsize;
-//    result *= norm2(flux->builtin) * flux->time * flux->target_power
-//                * flux->stored_muons * flux->norm / (L*L);
-//  }
-//  return result;
-
-  int col = (int) f + 3*(1-cp_sign)/2;  /* Which column of the flux table? */
-  int n_steps = flux->n_lines - 1;
   double result;
 
-  int k=0;
-  while (k <= n_steps  &&  flux->flux_data[0][k] < E)
-    k++;
-  if (k <= 0 || k > n_steps)
-    return 0.0;
-  else
+  switch (flux->binning_type)
   {
-    double E_lo    = flux->flux_data[0][k-1];
-    double E_up    = flux->flux_data[0][k];
-    double flux_lo = flux->flux_data[col][k-1];
-    double flux_up = flux->flux_data[col][k];
-    result  = flux_lo + (E - E_lo)*(flux_up - flux_lo)/(E_up - E_lo);
-    result *= norm2(flux->builtin) * flux->time * flux->target_power
-                * flux->stored_muons * flux->norm / (L*L);
+    case GLB_BINNING_E_ONLY:
+    {
+      int col = (int) f + 3*(1-cp_sign)/2;  /* Which column of the flux table? */
+      int n_steps = flux->n_E - 1;
+
+      int k=0;
+      while (k <= n_steps  &&  flux->flux_data[0][k] < E)
+        k++;
+      if (k <= 0 || k > n_steps)
+        return 0.0;
+      else
+      {
+        double E_lo    = flux->flux_data[0][k-1];
+        double E_up    = flux->flux_data[0][k];
+        double flux_lo = flux->flux_data[col][k-1];
+        double flux_up = flux->flux_data[col][k];
+        result  = flux_lo + (E - E_lo)*(flux_up - flux_lo)/(E_up - E_lo);
+      }
+      break;
+    }
+
+    case GLB_BINNING_E_L:
+    case GLB_BINNING_E_COS_THETA:
+    {
+      int col = (int) f + 3*(1-cp_sign)/2 + 1;  /* Which column of the flux table? */
+
+      if (flux->binning_type == GLB_BINNING_E_COS_THETA)
+        L = glbLToCosTheta(L); /* L is misused to store \cos\theta */
+
+      int n_E = flux->n_E;
+      int n_L = flux->n_L;
+      int k=0, m=0;
+      while (k < n_E  &&  flux->flux_data[1][k] < E)
+        k++;
+      while (m < n_L  &&  flux->flux_data[0][m*n_E] < L)
+        m++;
+
+      if (k <= 0 || k >= n_E || m <= 0 || m >= n_L)
+        return 0.0;
+      else
+      {
+        /* 2d linear interpolation of flux */
+        double E_lo    = flux->flux_data[1][k-1];
+        double E_up    = flux->flux_data[1][k];
+        double L_lo    = flux->flux_data[0][(m-1)*n_E];
+        double L_up    = flux->flux_data[0][m*n_E];
+        double f00     = flux->flux_data[col][(m-1)*n_E + (k-1)]; /* lower L, lower E */
+        double f01     = flux->flux_data[col][(m-1)*n_E + k];     /* lower L, upper E */
+        double f10     = flux->flux_data[col][m*n_E + (k-1)];     /* upper L, lower E */
+        double f11     = flux->flux_data[col][m*n_E + k];         /* upper L, upper E */
+
+        double flux_E_lo = f00 + (L - L_lo) * (f10 - f00) / (L_up - L_lo); /* interpolate in L */
+        double flux_E_up = f01 + (L - L_lo) * (f11 - f01) / (L_up - L_lo);
+        result = flux_E_lo + (E - E_lo) * (flux_E_up - flux_E_lo) / (E_up - E_lo);
+      }
+    }
+    break;
   }
+
+  result *= norm2(flux->builtin) * flux->time * flux->target_power
+             * flux->stored_muons * flux->norm / (L*L);
   return result;
 }
 
@@ -512,8 +627,9 @@ int glb_reset_flux(glb_flux *flux)
     flux->gamma         = -1;
     flux->end_point     = -1;
     flux->norm          = -1;
-    flux->n_lines       = 0;
-    for (i=0; i < GLB_FLUX_COLUMNS; i++)
+    flux->n_E           = 0;
+    flux->n_L           = 0;
+    for (i=0; i < GLB_FLUX_COLUMNS_E_L; i++)
     {
       if (flux->flux_data[i])
       {
@@ -551,12 +667,13 @@ int glb_copy_flux(glb_flux *dest, const glb_flux *src)
     if (!dest->file_name)
       glb_fatal("glb_copy_flux: Cannot copy name of cross section file");
   }
-  for (j=0; j < GLB_FLUX_COLUMNS; j++)
+  for (j=0; j < GLB_FLUX_COLUMNS_E_L; j++)
   {
     if (src->flux_data[j])
     {
-      dest->flux_data[j] = glb_malloc(src->n_lines*sizeof(src->flux_data[j][0]));
-      for (i=0; i < dest->n_lines; i++)
+      int n_lines = MAX(src->n_E, src->n_E * src->n_L);
+      dest->flux_data[j] = glb_malloc(n_lines*sizeof(src->flux_data[j][0]));
+      for (i=0; i < n_lines; i++)
         dest->flux_data[j][i] = src->flux_data[j][i];
     }
   }
