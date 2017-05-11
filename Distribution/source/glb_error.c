@@ -190,6 +190,7 @@ void *glb_realloc (void *ptr, size_t size)
   return value;
 }
 
+/* Duplicate array of a given length */
 void *glb_duplicate_array(void *src, size_t size)
 {
   void *dest = NULL;
@@ -198,6 +199,23 @@ void *glb_duplicate_array(void *src, size_t size)
     dest = glb_malloc(size);
     if (dest)
       memcpy(dest, src, size);
+  }
+  
+  return dest;
+}
+
+/* Duplicate array, determining the length by considering "-1" as a terminating entry */
+double *glb_duplicate_terminated_array(double *src)
+{
+  void *dest = NULL;
+  if (src)
+  {
+    int n;
+    for (n=0; src[n] !=- 1; n++)
+      ;
+    dest = glb_malloc(n*sizeof(*src));
+    if (dest)
+      memcpy(dest, src, n*sizeof(*src));
   }
   
   return dest;

@@ -34,19 +34,20 @@
 #include "glb_types.h"
 
 /* Error codes */
-#define GLB_SUCCESS                 0  /* No error, everything's fine                           */
-#define GLBERR_INVALID_ARGS        -1  /* A function has been given invalid arguments           */
-#define GLBERR_UNINITIALIZED       -2  /* An object has not been initialized properly           */
-#define GLBERR_MALLOC_FAILED       -3  /* Memory allocation error                               */
-#define GLBERR_FILE_NOT_FOUND      -4  /* File not found                                        */
-#define GLBERR_INVALID_FILE_FORMAT -5  /* Error in an input file                                */
-#define GLBERR_GSL_ERROR           -6  /* A call to a GSL routine failed                        */
-#define GLBERR_NO_CONVERGENCE      -7  /* Numerical algorithm failed to converge                */
-#define GLBERR_PREM_NOT_LOADED     -8  /* Error with PREM profile data                          */
-#define GLBERR_NOT_IMPLEMENTED     -9  /* Requested a feature that has not been implemented yet */
-#define GLBERR_DEPRECATED         -10  /* Requested a deprecated feature                        */
-#define GLBERR_NAME_NOT_FOUND     -11  /* A name could not be translated into an index          */
-#define GLBERR_GENERIC            -99  /* Unspecified error                                     */
+#define GLB_SUCCESS                 0  /* No error, everything's fine */
+#define GLBERR_INVALID_ARGS        -1  /* A function has been given invalid arguments */
+#define GLBERR_UNINITIALIZED       -2  /* An object has not been initialized properly */
+#define GLBERR_MALLOC_FAILED       -3  /* Memory allocation error */
+#define GLBERR_FILE_NOT_FOUND      -4  /* File not found */
+#define GLBERR_INVALID_FILE_FORMAT -5  /* Error in an input file */
+#define GLBERR_GSL_ERROR           -6  /* A call to a GSL routine failed */
+#define GLBERR_NO_CONVERGENCE      -7  /* Numerical algorithm failed to converge */
+#define GLBERR_PREM_NOT_LOADED     -8  /* Error with PREM profile data */
+#define GLBERR_NOT_IMPLEMENTED     -9  /* Requested a feature that is not implemented yet */
+#define GLBERR_DEPRECATED         -10  /* Requested a deprecated feature */
+#define GLBERR_NAME_NOT_FOUND     -11  /* A name could not be translated into an index */
+#define GLBERR_GENERIC            -99  /* Unspecified error */
+#define GLB_USING_DEFAULTS          1  /* missing AEDL directives are replaced by defaults */
 
 
 /* Define NaN (not a number) */
@@ -74,6 +75,7 @@ extern void glb_rule_error   (const struct glb_experiment *exp, int rule, const 
 extern void *glb_malloc (size_t size);
 extern void *glb_realloc (void *ptr, size_t size);
 void *glb_duplicate_array(void *src, size_t size);
+double *glb_duplicate_terminated_array(double *src);
 extern void glb_free(void *ptr);
 extern FILE *glb_fopen(const char *filename, const char *mode);
 extern int glb_fclose(FILE *stream);

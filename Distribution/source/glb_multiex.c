@@ -434,17 +434,17 @@ void glbInitExpFromParent(struct glb_experiment *exp, struct glb_experiment *p,
                                                  sizeof(int) * exp->numofchannels);
   for (i=0; i < exp->numofchannels; i++)
   {
+    exp->user_pre_smearing_channel[i]
+      = glb_duplicate_terminated_array(p->user_pre_smearing_channel[i]);
+    exp->user_post_smearing_channel[i]
+      = glb_duplicate_terminated_array(p->user_post_smearing_channel[i]);
+    exp->user_pre_smearing_background[i]
+      = glb_duplicate_terminated_array(p->user_pre_smearing_background[i]);
+    exp->user_post_smearing_background[i]
+      = glb_duplicate_terminated_array(p->user_post_smearing_background[i]);
+
     int n1 = sizeof(double) * p->simbins;
     int n2 = sizeof(double) * p->numofbins;
-    exp->user_pre_smearing_channel[i]
-      = glb_duplicate_array(p->user_pre_smearing_channel[i], n1);
-    exp->user_post_smearing_channel[i]
-      = glb_duplicate_array(p->user_post_smearing_channel[i], n2);
-    exp->user_pre_smearing_background[i]
-      = glb_duplicate_array(p->user_pre_smearing_background[i], n1);
-    exp->user_post_smearing_background[i]
-      = glb_duplicate_array(p->user_post_smearing_background[i], n2);
-
     exp->chrb_0[i]       = glb_duplicate_array(p->chrb_0, n1);
     exp->chrb_1[i]       = glb_duplicate_array(p->chrb_1, n1);
     exp->chr_template[i] = glb_duplicate_array(p->chr_template, n1);
@@ -892,7 +892,7 @@ static int setup_density_profile(glb_exp ins)
 int glbSetupDensityProfile(struct glb_experiment *in)
 {
   int status = 0;
-  int i;
+  int i, j;
 
   /* Binning in L */
   /* ------------ */
@@ -1017,6 +1017,76 @@ int glbSetupDensityProfile(struct glb_experiment *in)
         glbSetBaselineInExperimentByPointer(exp, L);
       }
     }
+
+    /* efficiency/background vectors are allowed to have length n_Lbins*n_Ebins
+     * if they contain independent efficiencies for all L bins. In this case,
+     * distribute efficiencies accordingly. */
+    for (i=0; i < in->numofchannels; i++)
+    {
+      int n_pre = in->simbins;
+      int n_post = in->numofbins;
+      int n;
+
+      for (n=0; in->user_pre_smearing_channel[i][n] !=- 1; n++)
+        ;
+      if (n == n_pre * in->n_Lbins)
+      {
+        for (j=0; j < in->n_Lbins; j++)
+        {
+          struct glb_experiment *exp = (j==0) ? in : in->children[j-1];
+          double *x = glb_malloc(sizeof(double) * (n_pre+1)); /* copy efficiencies for this L */
+          memcpy(x, exp->user_pre_smearing_channel[i] + j*n_pre, n_pre*sizeof(*x));
+          x[n_pre] = -1; /* terminate vector */
+          glb_free(exp->user_pre_smearing_channel[i]); /* free superfluous memory */
+          exp->user_pre_smearing_channel[i] = x;
+        }
+      }
+
+      for (n=0; in->user_pre_smearing_background[i][n] !=- 1; n++)
+        ;
+      if (n == n_pre * in->n_Lbins)
+      {
+        for (j=0; j < in->n_Lbins; j++)
+        {
+          struct glb_experiment *exp = (j==0) ? in : in->children[j-1];
+          double *x = glb_malloc(sizeof(double) * (n_pre+1));
+          memcpy(x, exp->user_pre_smearing_background[i] + j*n_pre, n_pre*sizeof(*x));
+          x[n_pre] = -1;
+          glb_free(exp->user_pre_smearing_background[i]);
+          exp->user_pre_smearing_background[i] = x;
+        }
+      }
+
+      for (n=0; in->user_post_smearing_channel[i][n] !=- 1; n++)
+        ;
+      if (n == n_post * in->n_Lbins)
+      {
+        for (j=0; j < in->n_Lbins; j++)
+        {
+          struct glb_experiment *exp = (j==0) ? in : in->children[j-1];
+          double *x = glb_malloc(sizeof(double) * (n_post+1));
+          memcpy(x, exp->user_post_smearing_channel[i] + j*n_post, n_post*sizeof(*x));
+          x[n_post] = -1;
+          glb_free(exp->user_post_smearing_channel[i]);
+          exp->user_post_smearing_channel[i] = x;
+        }
+      }
+
+      for (n=0; in->user_post_smearing_background[i][n] !=- 1; n++)
+        ;
+      if (n == n_post * in->n_Lbins)
+      {
+        for (j=0; j < in->n_Lbins; j++)
+        {
+          struct glb_experiment *exp = (j==0) ? in : in->children[j-1];
+          double *x = glb_malloc(sizeof(double) * (n_post+1));
+          memcpy(x, exp->user_post_smearing_background[i] + j*n_post, n_post*sizeof(*x));
+          x[n_post] = -1;
+          glb_free(exp->user_post_smearing_background[i]);
+          exp->user_post_smearing_background[i] = x;
+        }
+      }
+    } /* for (i=channels) */
   }
 
   /* Make sure initialization of baseline and density profile worked */
@@ -1041,7 +1111,7 @@ int glbSetupDensityProfile(struct glb_experiment *in)
  ***************************************************************************/
 int glbInitRateVectors(struct glb_experiment *in)
 {
-  int status = 0;
+  int status = GLB_SUCCESS;
   int n_bins = in->numofbins;
   int n_sampling_points = MAX(in->numofbins, in->simbins);
   int k;
@@ -1049,12 +1119,12 @@ int glbInitRateVectors(struct glb_experiment *in)
   if (n_bins <= 0)
   {
     glb_exp_error(in, "Too few energy bins defined.");
-    status = -1;
+    status = GLBERR_INVALID_ARGS;
   }
   else if (in->simbins <= 0)
   {
     glb_exp_error(in, "Too few sampling points defined.");
-    status = -1;
+    status = GLBERR_INVALID_ARGS;
   }
   else
   {
@@ -1077,6 +1147,115 @@ int glbInitRateVectors(struct glb_experiment *in)
       in->chra_1[k]       = (double*) glb_malloc(n_bins*sizeof(double));
     }
   }
+
+  return status;
+}
+
+
+/***************************************************************************
+ * Function glbSetupEfficiencies                                           *
+ ***************************************************************************
+ * This helper function for glbDefaultExp checks the definitions of        *
+ * pre-/post-smearing efficiencies and backgrounds and assigns defaults    *
+ * if no definition is found                                               *
+ ***************************************************************************/
+int glbSetupEfficiencies(struct glb_experiment *in)
+{
+  int n_pre = in->simbins;
+  int n_post = in->numofbins;
+  int i, k, n;
+  int status = GLB_SUCCESS;
+
+  if (n_pre <= 0)
+  {
+    glb_exp_error(in, "Number of sampling points undefined.");
+    return GLBERR_INVALID_ARGS;
+  }
+
+  if (n_post <= 0) 
+  {
+    glb_exp_error(in, "Number of bins undefined.");
+    return GLBERR_INVALID_ARGS;
+  }
+
+  for (i=0; i < in->numofchannels; i++)
+  {
+    if (in->user_pre_smearing_channel[i] == NULL)
+    {
+      in->user_pre_smearing_channel[i] = (double*) glb_malloc(sizeof(double) * n_pre);
+      for (k=0; k < n_pre; k++)
+        in->user_pre_smearing_channel[i][k] = 1.0;
+      status = GLB_USING_DEFAULTS;
+    }
+    else
+    {
+      for (n=0; in->user_pre_smearing_channel[i][n] !=- 1; n++)
+        ;
+      if (n != n_pre  &&  (in->n_Lbins < 0 || n != n_pre * in->n_Lbins)
+                      &&  (in->n_cos_theta_bins < 0 || n != n_pre * in->n_cos_theta_bins))
+      {
+        glb_exp_error(in, "@pre_smearing_efficiencies has incorrect length in channel %d.", i);
+        status = GLBERR_INVALID_ARGS;
+      }
+    }
+
+    if (in->user_pre_smearing_background[i] == NULL)
+    {
+      in->user_pre_smearing_background[i] = (double*) glb_malloc(sizeof(double) * n_pre);
+      for (k=0; k < n_pre; k++)
+        in->user_pre_smearing_background[i][k] = 0.0;
+      status = GLB_USING_DEFAULTS;
+    }
+    else
+    {
+      for (n=0; in->user_pre_smearing_background[i][n] != -1; n++)
+        ;
+      if (n != n_pre  &&  (in->n_Lbins < 0 || n != n_pre * in->n_Lbins)
+                      &&  (in->n_cos_theta_bins < 0 || n != n_pre * in->n_cos_theta_bins))
+      {
+        glb_exp_error(in, "@pre_smearing_background has incorrect length in channel %d/", i);
+        status = GLBERR_INVALID_ARGS;
+      }
+    }
+
+    if (in->user_post_smearing_channel[i] == NULL)
+    {
+      in->user_post_smearing_channel[i] = (double*) glb_malloc(sizeof(double) * n_post);
+      for (k=0; k < n_post; k++)
+        in->user_post_smearing_channel[i][k] = 1.0;
+      status = GLB_USING_DEFAULTS;
+    }
+    else
+    {
+      for (n=0; in->user_post_smearing_channel[i][n] != -1; n++)
+        ;
+      if (n != n_post  &&  (in->n_Lbins < 0 || n != n_post * in->n_Lbins)
+                       &&  (in->n_cos_theta_bins < 0 || n != n_post * in->n_cos_theta_bins))
+      {
+        glb_exp_error(in, "@post_smearing_efficiencies has incorrect length in channel %d", i);
+        status = GLBERR_INVALID_ARGS;
+      }
+    }
+
+    if (in->user_post_smearing_background[i] == NULL)
+    {
+      in->user_post_smearing_background[i] = (double*) glb_malloc(sizeof(double) * n_post);
+      for (k=0; k < n_post; k++)
+        in->user_post_smearing_background[i][k] = 0.0;
+      status = GLB_USING_DEFAULTS;
+    }
+    else
+    {
+      for (n=0; in->user_post_smearing_background[i][n] !=- 1; n++)
+        ;
+      if (n != n_post  &&  (in->n_Lbins < 0 || n != n_post * in->n_Lbins)
+                       &&  (in->n_cos_theta_bins < 0 || n != n_post * in->n_cos_theta_bins))
+      {
+        glb_exp_error(in, "@post_smearing_background has incorrect length in channel %d", i);
+        status = GLBERR_INVALID_ARGS;
+      }
+    }
+  } /* for(i=channels) */
 
   return status;
 }
@@ -1660,92 +1839,22 @@ int glbDefaultExp(glb_exp ins)
                                 status=-1;}
 
   /* Allocate memory for event rate vectors */
-  if (glbInitRateVectors(in) != 0)
+  if (glbInitRateVectors(in) != GLB_SUCCESS)
     status = -1;
 
-  // here we use lot of defaults -- and its not that clear how many
-  // there are numofrules ? numofchannels ?
-  for(i=0;i<in->numofchannels;i++)
-    {
-      if(in->simbins<=0) glb_exp_error(in, "Too few simbins defined!");
-      else
-        {
+  /* Check definitions of pre-/post-smearing efficiencies and backgrounds */
+  switch (glbSetupEfficiencies(in))
+  {
+    case GLB_SUCCESS:
+      break;
+    case GLB_USING_DEFAULTS:
+      def = -1;
+      break;
+    default:
+      status = -1;
+  }
 
-          if(in->user_pre_smearing_channel[i]==NULL)
-            {
-              in->user_pre_smearing_channel[i]=(double*)
-                glb_malloc(sizeof(double)* in->simbins);
-              for(k=0;k<in->simbins;k++)
-                in->user_pre_smearing_channel[i][k]=1;
-              def=-1;
-            }
-          else
-            {
-              for(ct=0;in->user_pre_smearing_channel[i][ct]!=-1;ct++) ct=ct;
-              if(ct!=in->simbins)
-              {
-                glb_exp_error(in, "user_pre_smearing_channel has not simbins elements");
-                status=-1;
-              }
-            }
-
-          if(in->user_pre_smearing_background[i]==NULL)
-            {
-              in->user_pre_smearing_background[i]=(double*)
-                glb_malloc(sizeof(double)*in->simbins);
-              for(k=0;k<in->simbins;k++)
-                {in->user_pre_smearing_background[i][k]=0;}
-              def=-1;
-            }
-          else
-            {
-              for(ct=0;in->user_pre_smearing_background[i][ct]!=-1;ct++) ct=ct;
-              if(ct!=in->simbins)
-              {
-                glb_exp_error(in, "user_pre_smearing_background has not simbins elements");
-                status=-1;
-              }
-            }
-
-          if(in->user_post_smearing_channel[i]==NULL)
-            {
-              in->user_post_smearing_channel[i]=(double*)
-                glb_malloc(sizeof(double)*in->numofbins);
-              for(k=0;k<in->numofbins;k++)
-                in->user_post_smearing_channel[i][k]=1;
-              def=-1;
-            }
-          else
-            {
-              for(ct=0;in->user_post_smearing_channel[i][ct]!=-1;ct++) ct=ct;
-              if(ct!=in->numofbins)
-              {
-                glb_exp_error(in, "user_post_smearing_channel has not numofbins elements");
-                status=-1;
-              }
-            }
-          if(in->user_post_smearing_background[i]==NULL)
-            {
-              in->user_post_smearing_background[i]=(double*)
-                glb_malloc(sizeof(double)*in->numofbins);
-              for(k=0;k<in->numofbins;k++)
-                {in->user_post_smearing_background[i][k]=0;}
-              def=-1;
-            }
-          else
-            {
-              for(ct=0;in->user_post_smearing_background[i][ct]!=-1;ct++)
-                ct=ct;
-              if(ct!=in->numofbins)
-              {
-                glb_exp_error(in, "user_post_smearing_background has not numofbins elements");
-                status=-1;
-              }
-            }
-        }
-    }
-
-    for(i=0;i<in->numofrules;i++)
+  for(i=0;i<in->numofrules;i++)
     {
       if (in->energy_window[i][0] == -1  ||  in->energy_window[i][0] < in->emin)
       {
