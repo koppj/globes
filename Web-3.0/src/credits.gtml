@@ -23,23 +23,25 @@ to improvements in the software.
 The development of GLoBES is currently supported by:
 <ul>
  <li>US Department of Energy</li>
-  <li>Physics Departement of Virginia Tech</li>
-  <li>Fermilab</li>
-  <li>Max-Planck-Institut f&uuml;r Kernphysik, Heidelberg </li>
-  <li>Universit&auml;t W&uuml;rzburg</li>
+ <li>Virginia Tech</li>
+ <li>Universit&auml;t Mainz</li>     
+ <li>DESY</li>
+ <li>Max-Planck-Institut f&uuml;r Kernphysik </li>  
 </ul>
 
 In the past support was also provided by:
 <ul>
-  <li>Physik Department der Technischen Universit&auml;t M&uuml;nchen</li>
-  <li>CERN, Geneva </li>
-  <li>Physics Department of the University of Wisconsin</li>
-  <li>Sonderforschungsbereich 375 f&uuml;r Astro-Teilchenphysik 
-      der Deutschen Forschungsgemeinschaft</li>
-  <li>Max-Planck-Institut f&uuml;r Physik, M&uuml;nchen </li>
+  <li>Technische Universit&auml;t M&uuml;nchen</li>
+  <li>CERN</li>
+  <li>Fermilab</li>
+  <li>University of Wisconsin - Madison</li>
+  <li>Deutsche Forschungsgemeinschaft</li>
+  <li>Universit&auml;t W&uuml;rzburg</li>
+  <li>Max-Planck-Institut f&uuml;r Physik </li>
   <li>Institute for Advanced Study, Princeton</li>
   <li>W. M. Keck Foundation</li>
   <li>Studienstiftung des Deutschen Volkes </li>
+
 </ul>
 
 #include "template_foot.gtml"
