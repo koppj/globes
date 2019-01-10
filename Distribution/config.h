@@ -110,7 +110,7 @@
 #define PACKAGE_NAME "GLoBES"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "GLoBES 3.3.18"
+#define PACKAGE_STRING "GLoBES 3.2.17.0"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "globes"
@@ -119,7 +119,7 @@
 #define PACKAGE_URL ""
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "3.3.18"
+#define PACKAGE_VERSION "3.2.17.0"
 
 /* If using the C implementation of alloca, define if you know the
    direction of stack growth for your system; otherwise it will be
@@ -133,7 +133,7 @@
 #define STDC_HEADERS 1
 
 /* Version number of package */
-#define VERSION "3.3.18"
+#define VERSION "3.2.17.0"
 
 /* Define to 1 if `lex' declares `yytext' as a `char *' by default, not a
    `char[]'. */
