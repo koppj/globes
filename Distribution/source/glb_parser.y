@@ -120,6 +120,7 @@
     {"$version",CHAR,0,1E8,&buff.version,NULL,"global"},
     {"$citation",CHAR,0,1E8,&buff.citation,NULL,"global"},
     {"$parent_energy",DOUBLE,0,GMAX,&buff.emax,NULL,"global"},
+    {"$oscillation_engine",CHAR,0,1E8,&buff.osc_engine.name,NULL,"global"},
     {"$target_mass",DOUBLE,0,GMAX,&buff.targetmass,NULL,"global"},
 #ifdef GLB_OLD_AEDL
     {"$simbins" ,COUNTER,0,500,&buff.simbins,NULL,"global"},
@@ -187,6 +188,9 @@
 
    {"@errordim_sys_on",INT,0,20,&errordim_sys_on,NULL,"rule"},
    {"@errordim_sys_off",INT,0,20,&errordim_sys_off,NULL,"rule"},
+   {"@data_flag",INT_INDEXED,0,1,&buff.data_on_off[0],&loc_count,"rule"},
+   {"@data",DOUBLE_LIST_INDEXED,-GMAX,GMAX,&buff.data[0],&loc_count,"rule"},
+
    {"@sys_on_function",CHAR,0,20,&buff.sys_on_strings[0],&loc_count,"rule"},
    {"@sys_off_function",CHAR,0,20,&buff.sys_off_strings[0],&loc_count,"rule"},
 
@@ -1201,7 +1205,7 @@ static int set_multiex_errors(char *name, glb_List **value)
 %token <tptr> BOGUS LVAR VAR FNCT   /* Variable and Function */
 %token <name> IDN CROSS FLUXP FLUXM NUFLUX
 %token <name> SYS_ON_FUNCTION SYS_OFF_FUNCTION SYS_MULTIEX_ERRORS
-%token <name> GRP GID FNAME VERS
+%token <name> GRP GID FNAME VERS 
 %token <name> SIGNAL BG
 %token <name> ENERGY CHANNEL
 %token <name> NDEF
@@ -1222,6 +1226,8 @@ static int set_multiex_errors(char *name, glb_List **value)
 %type <name> flux
 %type <name> nuflux
 %type <name> version
+
+
 
 %expect 2
 %nonassoc ','

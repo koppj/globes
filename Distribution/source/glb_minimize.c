@@ -322,6 +322,15 @@ double glb_chi_callback(double *params)
 
 
 
+/* PH 01/10/19 */
+
+static double initial_step=1.0;
+
+int glbSetInitialStep(double step)
+{
+  initial_step=step;
+  return GLB_SUCCESS;
+}
 
 // this an init function -
 // setting up the input matrix for minimization
@@ -336,7 +345,7 @@ static void init_mat(double **m, int dim)
 	{
 	  if (i==j)
 	    {
-	      m[i][j]=1.0;
+	      m[i][j]=initial_step;
 	    }
 	  else
 	    {

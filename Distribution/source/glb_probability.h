@@ -28,6 +28,7 @@
 
 #include <complex.h>
 #include <globes/globes.h>
+#include "glb_types.h" /* PH 01/10/19 */
 
 /* Constants */
 
@@ -73,6 +74,11 @@ int glb_filtered_probability_matrix_cd(double P[3][3], double E, double L,
 int glb_probability_matrix(double P[3][3], int cp_sign, double E,
     int psteps, const double *length, const double *density,
     double filter_sigma, void *user_data);
+
+glb_osc_engine *glbFindOscEngineByName(const char *name);
+
+int glb_switch_osc_engine(glb_osc_engine *p);
+
 
 #endif /* GLB_OSZPROB_H */
 

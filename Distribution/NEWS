@@ -362,3 +362,14 @@ h**********Version 3.0.1
              related to autotools fixed
 
 ********** This version tagged 3.2.16 ************
+
+10 January 2019 PH 
+
+   	- Introduced rule-based @data and @data_flag AEDL identifiers,
+          which allow to supply data to be fitted for each rule.
+
+	- Introduced per-experiment named oscillation engines, which
+          can be accessed from within AEDL by the global
+          $oscillation_engine variable.
+
+********** This version tagged 3.3.18 ************

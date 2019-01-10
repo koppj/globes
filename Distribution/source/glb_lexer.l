@@ -313,6 +313,11 @@ return VERS;
 
 $citation {
 yylval.name=strdup(yytext);
+return VERS; 
+}
+
+$oscillation_engine {
+yylval.name=strdup(yytext);
 return VERS;
 }
 

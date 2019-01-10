@@ -150,5 +150,7 @@ extern double *glb_calc_user_post_sm_channel[GLB_MAX_CHANNELS];
 extern double *glb_calc_user_pre_sm_background[GLB_MAX_CHANNELS];
 extern double *glb_calc_user_post_sm_background[GLB_MAX_CHANNELS];
 
+extern int glb_calc_data_on_off[GLB_MAX_RULES];
+extern double* glb_calc_data[GLB_MAX_RULES];
 
 #endif /* GLB_CALC_H */

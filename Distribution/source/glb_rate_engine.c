@@ -110,6 +110,8 @@ glb_smear *glb_calc_smear_data[GLB_MAX_SMEAR];
 glb_flux *glb_calc_fluxes[GLB_MAX_FLUXES];
 glb_xsec *glb_calc_xsecs[GLB_MAX_XSECS];
 
+double* glb_calc_data[GLB_MAX_RULES];
+int glb_calc_data_on_off[GLB_MAX_RULES];
 
 
 // ------------------------------------------
@@ -339,15 +341,31 @@ static void CalcAllProbs(double en, double baseline)
   // In the future, there should be a way of also choosing the whole probability engine
   // on an experiment-by-experiment basis (some instrumentation for this is already
   // in the definition of glb_experiment).
+  /*
+    if ((status=glb_hook_probability_matrix(Probs, +1, en, e->psteps, e->lengthtab, e->densitybuffer,
+    (e->filter_state == GLB_ON) ? e->filter_value : -1.0,
+    e->probability_user_data ? e->probability_user_data : glb_probability_user_data)) != GLB_SUCCESS)
+    glb_error("Calculation of oscillation probabilities failed.");
+    
+    if ((status=glb_hook_probability_matrix(ProbsAnti, -1, en, e->psteps, e->lengthtab, e->densitybuffer,
+    (e->filter_state == GLB_ON) ? e->filter_value : -1.0,
+    e->probability_user_data ? e->probability_user_data : glb_probability_user_data)) != GLB_SUCCESS)
+    glb_error("Calculation of oscillation probabilities failed.");
+  */
+  
+  /* This is a bit of a mess, I believe with the use of
+     switch_oscillation engine in set_experiment this should be all
+     taken care of and the following should work just fine - PH
+     01/10/19 */
+
   if ((status=glb_hook_probability_matrix(Probs, +1, en, e->psteps, e->lengthtab, e->densitybuffer,
-          (e->filter_state == GLB_ON) ? e->filter_value : -1.0,
-          e->probability_user_data ? e->probability_user_data : glb_probability_user_data)) != GLB_SUCCESS)
+          (e->filter_state == GLB_ON) ? e->filter_value : -1.0, e->osc_engine.user_data)) != GLB_SUCCESS)
     glb_error("Calculation of oscillation probabilities failed.");
 
   if ((status=glb_hook_probability_matrix(ProbsAnti, -1, en, e->psteps, e->lengthtab, e->densitybuffer,
-          (e->filter_state == GLB_ON) ? e->filter_value : -1.0,
-          e->probability_user_data ? e->probability_user_data : glb_probability_user_data)) != GLB_SUCCESS)
+          (e->filter_state == GLB_ON) ? e->filter_value : -1.0,e->osc_engine.user_data)) != GLB_SUCCESS)
     glb_error("Calculation of oscillation probabilities failed.");
+  
 }
 
 static double RatesNOSC(double en, double baseline,
@@ -497,12 +515,37 @@ void glb_set_rates()
         glb_calc_signal_rates[i][j] += rule_coeff[i][k] * glb_calc_chra_0[rules[i][k]][j];
     }
 
-    for (j=0; j < bins; j++)
-    {
-      /* Total */
-      glb_calc_rates_0[i][j] = glb_calc_signal_rates[i][j]
-                               + glb_calc_bg_rates[i][j]*glb_bg_norm_center[i];
-    }
+    /* PH 01/10/19 fit real data */
+    if(glb_calc_data_on_off[i]==GLB_OFF)
+      {
+	for (j=0; j < bins; j++)
+	  {
+	    /* Total */
+	    glb_calc_rates_0[i][j] = glb_calc_signal_rates[i][j]
+	      + glb_calc_bg_rates[i][j]*glb_bg_norm_center[i];
+	  }
+      }
+    else if (glb_calc_data[i]!=NULL)
+      {
+	/* use real data as true data */
+	for (j=0; j < bins ; j++)
+	  {
+	    glb_calc_rates_0[i][j] = glb_calc_data[i][j];
+	    //  fprintf(stderr,"glb_calc_data[%d][%d] %f\n", i,j,glb_calc_data[i][j]);
+	  }
+      }
+    else
+      {
+	glb_error("Your trying to use data which is not there. Simulated data will be used instead");
+	/* use simulated data as true data */
+	for (j=0; j < bins; j++)
+	  {
+	    /* Total */
+	    glb_calc_rates_0[i][j] = glb_calc_signal_rates[i][j]
+	      + glb_calc_bg_rates[i][j]*glb_bg_norm_center[i];
+	  }     
+      }
+    
   }
 }
 

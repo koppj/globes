@@ -38,6 +38,11 @@
 #include "glb_minimize.h"
 #include "glb_probability.h"
 
+/* PH 01/11/19 */
+
+#include <string.h>
+#include "glb_types.h"
+
 
 /* Fundamental oscillation parameters */
 static double th12, th13, th23; // Mixing angles
@@ -61,6 +66,19 @@ gsl_matrix_complex *S=NULL; /* The neutrino S-matrix                            
 gsl_matrix_complex *H0_template=NULL;  /* Used in the construction of the vac. Hamiltonian */
 gsl_matrix_complex *S1=NULL, *T0=NULL; /* Temporary matrix storage                         */
 
+
+/* PH 01/10/19 
+ * Here comes the stuff to name an oscillation engine and
+ * to retrieve it by its name 
+ */
+
+glb_osc_engine *glb_osc_list;   /* Connected list of oscillation engines */
+
+static const char *glb_osc_functions[] = 
+  {
+    "default",
+    ""    /* The last entry must be the empty string for loops to terminate */
+  };
 
 /***************************************************************************
  *            3 x 3   E I G E N S Y S T E M   F U N C T I O N S            *
@@ -919,10 +937,17 @@ int glbGetNumOfOscParams()
 }
 
 
-/***************************************************************************
+/* PH 01/10/19 a whole number of changes below to enable named
+ *  oscillation engines by experiment in a transparent manner.
+ */
+
+/* Kept for backward compatibility to allow un-named versions of 
+ * oscillation engines, not sure anyone is using this.
+ *
+ ***************************************************************************
  * Function glbSetProbabilityEngineInExperiment                            *
  ***************************************************************************
- * Replaces the functions glb_probability_matrix,                          *
+ * Replaces the functions glb_probability_matrix,     h                     *
  * glb_set_oscillation_parameters, and glb_get_oscillation_parameters by   *
  * user-defined functions *for a given experiment*.                        *
  ***************************************************************************
@@ -959,13 +984,172 @@ int glbSetProbabilityEngineInExperiment(int exp, int n_parameters,
     return -2;
   }
 
-  in->probability_matrix         = prob_func;
-  in->set_oscillation_parameters = set_params_func;
-  in->get_oscillation_parameters = get_params_func;
-  in->probability_user_data      = user_data;
+  /*
+    in->probability_matrix         = prob_func;
+    in->set_oscillation_parameters = set_params_func;
+    in->get_oscillation_parameters = get_params_func;
+    in->probability_user_data      = user_data;
+  */
 
+  in->osc_engine.matrix_function         = prob_func;
+  in->osc_engine.set_function = set_params_func;
+  in->osc_engine.get_function = get_params_func;
+  in->osc_engine.user_data      = user_data;
+  
+  return 0;
+}
+
+/* In principle, we could offer a a way to change one named engine
+   inside an experiment against another one, but the whole purpose of
+   naming these in the first place was to ensure a one-to-one
+   correspondence with the AEDL file and above function does allow to
+   achieve this through the API without the name. The name stored
+   inside the experiment, however, does not matter since the name is
+   only used when reading the AEDL file.
+*/
+
+
+/***************************************************************************
+ * Function glbFindOscEngineByName                                         *
+ ***************************************************************************
+ * Returns a pointer to the glb_osc_engine structure for the oscillation   *
+ * engine with the given name                                              *
+ ***************************************************************************/
+glb_osc_engine *glbFindOscEngineByName(const char *name)
+{
+  glb_osc_engine *osc;
+  
+  for (osc = glb_osc_list; osc != NULL; osc = osc->next)
+    if (strcmp(name, osc->name) == 0)
+      break;
+
+  if (osc == NULL)
+  {
+    glb_error("glbFindOscEngineByName: Unknown oscillation engine specified");
+    return NULL;
+  }
+
+  return osc;
+}
+
+
+/***************************************************************************
+ * Function glbCleanOscList                                                *
+ ***************************************************************************
+ * Removes all oscillation engines from the list glb_osc_list.             *
+ ***************************************************************************/
+int glbCleanOscList()
+{
+  glb_osc_engine *p = glb_osc_list;
+
+  while (glb_osc_list != NULL)
+  {
+    glb_free(glb_osc_list->name);
+    p = glb_osc_list;
+    glb_osc_list = glb_osc_list->next;
+    glb_free(p);
+  }
   return 0;
 }
 
 
+/***************************************************************************
+ *                       A P I   F U N C T I O N S                         *
+ ***************************************************************************/
+
+/***************************************************************************
+ * Function glbDefineOscEngine                                             *
+ ***************************************************************************
+ * Registers an oscillation engine for use in AEDL files read by           *
+ * subsequent calls to glbInitExperiment.                                  *
+ ***************************************************************************
+ * Parameters:                                                             *
+ *   n_parameters: number of oscillation parameters                        *
+ *   prob_func:  A pointer to the oscilaltion probability matrix function  *
+ *   set_params_func: A pointer to the set_oscillation parameters function *
+ *   get_params_func: A pointer to the get_oscillation parameters function *
+ *   name:      The unique name for chi_func that appears in the AEDL file *
+ *   user_data: Arbitrary pointer which will be passed to the user-defined *
+ *              function                                                   *
+ **************************************************************************/
+
+
+int glbDefineOscEngine(int n_parameters,
+		       glb_probability_matrix_function prob_func,
+		       glb_set_oscillation_parameters_function set_params_func,
+		       glb_get_oscillation_parameters_function get_params_func,
+		       const char *name,  void *user_data)
+{
+  glb_osc_engine *old_root = glb_osc_list;   /* Save old list root */
+
+  if (n_parameters < 0)
+  {
+    glb_error("glbDefineOscEngine: Dimension of parameter space must be >= 0");
+    return -1;
+  }
+  
+  /* Create new list entry */
+  glb_osc_list = (glb_osc_engine *) glb_malloc(sizeof(glb_osc_engine));
+  if (glb_osc_list != NULL)
+  {
+    glb_osc_list->matrix_function  = prob_func;
+    glb_osc_list->set_function = set_params_func;
+    glb_osc_list->get_function = get_params_func;
+    glb_osc_list->num_of_params       = n_parameters;
+    glb_osc_list->user_data = user_data;
+    glb_osc_list->name      = (char *) glb_malloc(strlen(name)+1);
+    if (glb_osc_list->name != NULL)
+    {
+      strcpy(glb_osc_list->name, name);
+      glb_osc_list->next = old_root;         /* Reconnect list */
+      return 0;
+    }
+    else
+      {
+	glb_error("glbDefineOscEngine: name argument is NULL.");
+      }
+  } 
+  
+  return -1;
+}
+
+
+/* We need this function internally, to do the switching between
+   experiments. */
+
+/* TODO: maybe this function should default to the default oscillation
+   engine instead of doing nothing?  */
+
+int glb_switch_osc_engine(glb_osc_engine *p)
+{
+  glb_probability_matrix_function prob_func= p->matrix_function;
+  glb_set_oscillation_parameters_function set_params_func =  p->set_function;
+  glb_get_oscillation_parameters_function get_params_func = p->get_function;
+  int n_parameters = p->num_of_params;
+  void *user_data = p->user_data;
+  
+  /* the idea is, that if we don't have any experiment specific data,
+     we don't do anything here and everything should be compatible
+     with versions prior to 3.3.18, if we do have experiment specific
+     information we use it. 
+  */
+
+  if (n_parameters >0)
+    glb_oscp = n_parameters;
+  
+ 
+  if (prob_func != NULL)
+    glb_hook_probability_matrix = prob_func;
+  
+  if (set_params_func != NULL)
+    glb_hook_set_oscillation_parameters = set_params_func;
+  
+  if (get_params_func != NULL)
+    glb_hook_get_oscillation_parameters = get_params_func;
+  
+  if (user_data !=NULL)
+    glb_probability_user_data = user_data;
+
+  return 0;
+}
 

@@ -29,7 +29,7 @@ dnl first digit: major improvements/rewrites
 dnl In contrast to the result of autoupdate I had to swap the
 dnl the AC_INIT and AC_CONFIG_SRCDIR
 
-AC_INIT([GLoBES],[3.2.17],[globes@mpi-hd.mpg.de],[globes])
+AC_INIT([GLoBES],[3.3.18],[globes@mpi-hd.mpg.de],[globes])
 
 
 AC_CONFIG_SRCDIR([source/glb_wrapper.c])
@@ -48,7 +48,7 @@ dnl code changed: c:r+1:a
 dnl API changed: c+1:0:a
 dnl -> API extended: c:0:a+1
 dnl -> API shrunken: c:0:0
-GLBLIBVERSION="10:1:2"
+GLBLIBVERSION="11:2:3"
 
 dnl From here no editing !
 AC_SUBST(GLBLIBVERSION)

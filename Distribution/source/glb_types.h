@@ -145,6 +145,24 @@ typedef struct glb_systematic
 } glb_systematic;
 
 
+
+
+/* PH 01/10/19 -- in support of in-experiment oscillation engines  *
+ * Data structure containing information about oscillation engines */
+
+typedef struct glb_osc_engine
+{
+  glb_probability_matrix_function matrix_function;
+  glb_set_oscillation_parameters_function set_function;
+  glb_get_oscillation_parameters_function get_function;
+  int num_of_params;            /* Number of oscillation parameters                   */
+  char *name;                  /* Unique name of this oscillation engine                  */
+  struct glb_osc_engine *next; /* Pointer to next entry in
+				  glb_osc_engine_list             */
+  void *user_data;             /* Arbitrary user-defined parameter for chi^2 routine */
+} glb_osc_engine;
+
+
 /* Data structure containing information about one nuisance parameter
  * (as defined in an AEDL "sys< >" block */
 typedef struct glb_nuisance
@@ -484,11 +502,26 @@ struct glb_experiment {
   int *sys_off_multiex_errors_sig[GLB_MAX_RULES][GLB_MAX_CHANNELS];/* the channels making up   */
   int *sys_off_multiex_errors_bg[GLB_MAX_RULES][GLB_MAX_CHANNELS]; /* the rules                */
 
-  /* Probability engine for this experiment (if different from default) */
-  glb_probability_matrix_function probability_matrix;
-  glb_set_oscillation_parameters_function set_oscillation_parameters;
-  glb_get_oscillation_parameters_function get_oscillation_parameters;
-  void *probability_user_data;
+
+  /* added in version 3.3.18 */
+  double * data[GLB_MAX_RULES]; /* contains the data if we try to fit a real
+ 			experiment */
+
+  int data_on_off[GLB_MAX_RULES]; /* use data in data[] or use the simulated data
+ 			  in rates0[] */
+
+
+  /* PH 01/10/19 this will be now all collected in one element
+   * Probability engine for this experiment (if different from default) 
+   *
+   * glb_probability_matrix_function probability_matrix;
+   * glb_set_oscillation_parameters_function set_oscillation_parameters;
+   *  glb_get_oscillation_parameters_function get_oscillation_parameters;
+   * void *probability_user_data;
+   */
+
+  glb_osc_engine osc_engine;
+  
 };
 
 #endif /* GLB_TYPES_H 1 */

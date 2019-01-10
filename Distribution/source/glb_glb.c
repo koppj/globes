@@ -62,6 +62,10 @@ void glbInit(char *name)
 			       &glb_get_oscillation_parameters,
 			       NULL);
 
+  /* PH 01/10/11 standard oscillation engine, which maybe redundant to above */
+  glbDefineOscEngine(6,NULL,NULL,NULL,"default",NULL);
+
+
   /* Select default minimizer */
   glbSelectMinimizer(GLB_MIN_DEFAULT);
 

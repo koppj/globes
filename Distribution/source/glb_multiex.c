@@ -264,6 +264,9 @@ void glbInitExp(glb_exp ins)
     in->rates0[i]                = NULL;
     in->rates1[i]                = NULL;
     in->rates1BG[i]              = NULL;
+    /* PH 01/10/19 */
+    in->data_on_off[i]=GLB_OFF;
+    in->data[i]=NULL;
   }
 
   in->numofchannels=-1;
@@ -302,10 +305,22 @@ void glbInitExp(glb_exp ins)
   in->densitybuffer=NULL;
   in->energy_tab=NULL;
 
-  in->probability_matrix         = NULL;
-  in->set_oscillation_parameters = NULL;
-  in->get_oscillation_parameters = NULL;
-  in->probability_user_data      = NULL;
+  /*
+    in->probability_matrix         = NULL;
+    in->set_oscillation_parameters = NULL;
+    in->get_oscillation_parameters = NULL;
+    in->probability_user_data      = NULL;
+  */
+  
+  /* named oscillation engine setup */
+
+  (in->osc_engine).num_of_params=-1;
+  (in->osc_engine).matrix_function=NULL;
+  (in->osc_engine).get_function=NULL;
+  (in->osc_engine).set_function=NULL;
+  (in->osc_engine).name=NULL; /* memory leak ? */
+  (in->osc_engine).user_data=NULL;
+
 }
 
 
@@ -346,6 +361,10 @@ void glbInitExpFromParent(struct glb_experiment *exp, struct glb_experiment *p)
   if (p->version)   exp->version  = strdup(p->version);
   if (p->citation)  exp->citation = strdup(p->citation);
   if (p->filename)  exp->filename = strdup(p->filename);
+  /* I believe this is necessary so that named oscillation engines are
+  inherited from the parent, and that clearly should be default
+  behavior - PH 01/10/19 */
+  if (p->osc_engine.name) exp->osc_engine.name = strdup(p->osc_engine.name);
 
   /* Binning */
   exp->emin       = p->emin;
@@ -718,6 +737,7 @@ void glbResetExp(struct glb_experiment *in)
       my_free(in->rulechannellist[i]);
       my_free(in->bgrulescoeff[i]);
       my_free(in->bgrulechannellist[i]);
+      my_free(in->data[i]);
     }
 
   for(i=0;i<in->numofrules;i++)
@@ -781,7 +801,8 @@ void glbResetExp(struct glb_experiment *in)
     }
 
   my_free(in->energy_tab);
-
+  my_free((in->osc_engine).name);
+  
   /* Re-initialize */
   glbInitExp(in);
 }
@@ -1570,6 +1591,17 @@ int glbDefaultExp(glb_exp ins)
       }
     }
 
+  if(in->data[i]!=NULL )
+    {
+      for(ct=0;in->data[i][ct]!=-1;ct++) ct=ct;
+      if(ct!=in->numofbins)
+	{
+	  glb_exp_error(in, "data has not numofbins elements");
+	  status=-1;
+	}
+      
+    }
+
   for(i=0; i < in->numofchannels; i++)
   {
     if(in->chrb_0[i]==NULL || in->chrb_1[i]==NULL ||
@@ -1583,6 +1615,29 @@ int glbDefaultExp(glb_exp ins)
   if(in->energy_tab==NULL){glb_exp_error(in, "energy_tab not allocated!");
   status=-1;}
 
+  /* This is where the name of an oscillation engine is looked up in
+     the list osc_engine list and the pointers are reset appropriately
+     PH 01/10/19
+  */
+  
+  glb_osc_engine *tmp_osce;
+
+  if(in->osc_engine.name!=NULL) {
+
+    tmp_osce =   glbFindOscEngineByName(in->osc_engine.name);
+
+    if(tmp_osce==NULL) {status=-1;}
+    else {
+      in->osc_engine.matrix_function=tmp_osce->matrix_function; 
+      in->osc_engine.get_function=tmp_osce->get_function;
+      in->osc_engine.set_function=tmp_osce->set_function;
+      in->osc_engine.num_of_params=tmp_osce->num_of_params;
+      in->osc_engine.user_data= tmp_osce->user_data;
+
+    }
+  }
+
+  
   /* Final report */
   if(status != 0)
     glb_fatal("Incompletely or incorrectly defined experiment!");
@@ -1888,8 +1943,11 @@ int glbPrintExpByPointer(struct glb_experiment *e)
 static void MMovePointers(struct glb_experiment *in)
 {
   int k;
+  
   for (k=0;k<in->numofrules;k++)
     {
+      glb_calc_data_on_off[k]=in->data_on_off[k];
+      glb_calc_data[k] = in->data[k];
       glb_calc_rates_0[k] = in->rates0[k];
       glb_calc_rates_1[k] = in->rates1[k];
       glb_calc_rates_1BG[k] = in->rates1BG[k];
@@ -2058,7 +2116,8 @@ void glbSetExperiment(glb_exp in)
       glb_calc_lowrange[i]=s->lowrange[i];
     }
 
-
+  /* set the current oscillation engine - PH 01/10/19 */
+  glb_switch_osc_engine(&(in->osc_engine));
 
 
 //  glb_switch_filter(s->filter_state);

@@ -356,6 +356,12 @@ int glbSetProbabilityEngineInExperiment(int exp, int n_parameters,
                  glb_get_oscillation_parameters_function get_params_func,
                  void *user_data);
 
+int glbDefineOscEngine(int n_parameters,
+		       glb_probability_matrix_function prob_func,
+		       glb_set_oscillation_parameters_function set_params_func,
+		       glb_get_oscillation_parameters_function get_params_func,
+		       const char *name,  void *user_data);
+
 int glbGetNumOfOscParams();
 
 
@@ -387,7 +393,8 @@ double glbFilteredConstantDensityProbability(int exp,int initial_flavour,
 /* Selecting a minization algorithm */
 int glbSelectMinimizer(int minimizer_ID);
 
-
+/* Setting step sizes for the minimizer */
+int glbSetInitialStep(double step);
 
 /* Some symbols which are provided for compatibility with */
 /* older versiond of GLoBES                               */
