@@ -371,3 +371,10 @@ h**********Version 3.0.1
 
 ********** This version tagged 3.2.18 ************
 
+13 June 2017 JK
+       - Choosing a separate probability engine for each experiment should
+         now work
+
+17 August 2018 JK
+       - Added first version of NuSQuIDS support (activative with #define GLB_USE_NUSQUIDS)
+

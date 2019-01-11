@@ -984,8 +984,8 @@ int glbSetupDensityProfile(struct glb_experiment *in)
   /* -------------------------------------------------------- */
   else
   {
-    if(in->baseline==-1) { glb_exp_error(in, "No baseline specified!"); status=-1; }
     status += setup_density_profile(in);
+    if(in->baseline==-1) { glb_exp_error(in, "No baseline specified!"); status=-1; }
     if (in->psteps <= 0)
       { glb_exp_error(in, "Too few density steps defined."); status=-1; }
     else if (in->densitybuffer == NULL)
@@ -2269,12 +2269,15 @@ int glbSetRatesInExperimentByPointer(struct glb_experiment *e, int which_rates,
   }
 
   /* The following is a temporary solution for making the probability engine aware
-   * of which experiment it is being run for. If the user has seti
+   * of which experiment it is being run for. If the user has set
    * e->probability_user_data, it is used; otherwise, the global default is used.
    * In the future, there should be a way of also choosing the whole probability engine
    * on an experiment-by-experiment basis (some instrumentation for this is already
    * in the definition of glb_experiment). */
   double filter = (e->filter_state == GLB_ON) ? e->filter_value : -1.0;
+
+  glb_probability_matrix_function probability_matrix = e->probability_matrix
+                         ? e->probability_matrix : glb_hook_probability_matrix;
   void *user_data = e->probability_user_data
                          ? e->probability_user_data : glb_probability_user_data;
 
@@ -2305,6 +2308,95 @@ int glbSetRatesInExperimentByPointer(struct glb_experiment *e, int which_rates,
     glbRateTemplate(e, which_rates);
 
   /* Calculate pre-smearing rates for all channels */
+  /* When compiled with NuSQuIDS support, use NuSQuIDS if glb_hook_nusquids is defined,
+   * otherwise fall back to regular GLoBES probability engine */
+#ifdef GLB_USE_NUSQUIDS
+  if (glb_hook_nusquids)
+  {
+    /* Loop over all channels */
+    for (i=0; i < e->numofchannels; i++)
+    {
+      int cp_sign        = e->listofchannels[1][i]; /* 1=neutrinos, -1=antineutrinos */
+      int initial_flavor = e->listofchannels[2][i]; /* Initial flavor */
+      int final_flavor   = e->listofchannels[3][i]; /* Final flavour */
+      int xsec_id        = e->listofchannels[4][i]; /* Cross section ID */
+      int nosc = 0;                                 /* 1=ignore oscillation, 0=std. behavior */
+      int probs = 0;                                /* Probabilities already computed? */
+      if (final_flavor > 9)    { final_flavor   -= 10;  nosc=1; }
+      if (initial_flavor > 9)  { initial_flavor -= 10;  nosc=1; }
+
+      double P[e->simbins][2][3];
+      double bin_centers[e->simbins];
+      for (j=0; j < e->simbins; j++)
+        bin_centers[j] = e->smear_data[0]->simbincenter[j];
+
+      /* Recomputation of channel rates can be skipped for NOSC-channels */
+      if (!(which_rates==GLB_SET_RATES_TEST  &&  nosc))
+      {
+        double ini_state_nu[e->simbins][3];
+        double ini_state_nubar[e->simbins][3];
+        double ini_state_total = 0.0;
+        memset(ini_state_nu,    0.0, e->simbins * 3 * sizeof(ini_state_nu[0][0]));
+        memset(ini_state_nubar, 0.0, e->simbins * 3 * sizeof(ini_state_nubar[0][0]));
+
+        /* Generate initial state. Note that, when NuSQuIDS is used,
+           chr_template does *not* contain cross sections yet because we need
+           to evolve the flux, not flux * x-sec! */
+        if (cp_sign == 1)
+          for (j=0; j < e->simbins; j++)
+          {
+            int m = e->simbins - j - 1;
+            ini_state_nu[m][initial_flavor-1] = e->chr_template[i][j];
+            ini_state_total += ini_state_nu[m][initial_flavor-1];
+          }
+        else
+          for (j=0; j < e->simbins; j++)
+          {
+            int m = e->simbins - j - 1;
+            ini_state_nubar[m][initial_flavor-1] = e->chr_template[i][j];
+            ini_state_total += ini_state_nubar[m][initial_flavor-1];
+          }
+
+        double eps = 1e-10 * ini_state_total;
+        int f;
+        for (j=0; j < e->simbins; j++)
+          for (f=0; f < 3; f++)
+          {
+            if (ini_state_nu[j][3] < eps)
+              ini_state_nu[j][3] = eps;
+            if (ini_state_nubar[j][3] < eps)
+              ini_state_nubar[j][3] = eps;
+          }
+
+        glb_hook_nusquids(P, e->simbins, bin_centers, ini_state_nu, ini_state_nubar,
+                          e->psteps, e->lengthtab, e->densitybuffer);
+      }
+
+      // FIXME We add neutrino and antineutrino rates here -- for detectors with
+      // charge ID, this is INCORRECT!
+      for (j=0; j < e->simbins; j++)
+      {
+        double E          = e->smear_data[0]->simbincenter[j];
+        double xsec_nu    = glb_get_xsec(E, final_flavor, +1, e->xsecs[xsec_id]);
+        double xsec_nubar = glb_get_xsec(E, final_flavor, -1, e->xsecs[xsec_id]);
+        if (nosc)
+          chrb[i][j] = xsec * e->chr_template[i][j] + e->user_pre_smearing_background[i][j];
+        else 
+          chrb[i][j] = xsec * (xsec_nu*P[j][0][final_flavor-1] + xsec_nubar*P[j][1][final_flavor-1])
+                            + e->user_pre_smearing_background[i][j];
+//        else if (cp_sign == 1)
+//          chrb[i][j] = P[j][0][final_flavor-1];
+//        else
+//          chrb[i][j] = P[j][1][final_flavor-1];
+      } /* for (j=simbins) */
+    } /* for (i=channels) */
+  } /* if (glb_hook_nusquids != NULL) */
+  else
+  {
+    glb_warning("glbSetRatesInExperimentByPointer: nuSQuIDS engine not defined",
+                which_rates);
+#endif // ifdef GLB_USE_NUSQUIDS
+
   for (j=0; j < e->simbins; j++)
   {
     double E = e->smear_data[0]->simbincenter[j];
@@ -2326,10 +2418,10 @@ int glbSetRatesInExperimentByPointer(struct glb_experiment *e, int which_rates,
         /* Calculate probability matrix */
         if (!nosc && !probs)
         {
-          if (glb_hook_probability_matrix(Pnu, +1, E, e->psteps, e->lengthtab,
+          if (probability_matrix(Pnu, +1, E, e->psteps, e->lengthtab,
                                           e->densitybuffer, filter, user_data) != GLB_SUCCESS)
             glb_error("glbSetRatesInExperimntByPointer: Calculation of osc. probabilities (CP=+1) failed.");
-          if (glb_hook_probability_matrix(Pnubar, -1, E, e->psteps, e->lengthtab,
+          if (probability_matrix(Pnubar, -1, E, e->psteps, e->lengthtab,
                                           e->densitybuffer, filter, user_data) != GLB_SUCCESS)
             glb_error("glbSetRatesInExperimntByPointer: Calculation of osc. probabilities (CP=-1) failed.");
           probs = 1;
@@ -2348,6 +2440,10 @@ int glbSetRatesInExperimentByPointer(struct glb_experiment *e, int which_rates,
       } // if !(test rates & nosc)
     } // for (i=channels)
   } // for (j=simbins)
+
+#ifdef GLB_USE_NUSQUIDS
+  } /* end "else" block, i.e. if not glb_hook_nusquids != NULL */
+#endif
 
   /* Calculate post-smearing rates for all channels */
   for (i=0; i < e->numofchannels; i++)
@@ -2499,7 +2595,11 @@ int glbRateTemplate(struct glb_experiment *e, int which_rates)
     {
       double E    = e->smear_data[0]->simbincenter[j];
       double flux = glb_get_flux(E, e->baseline, initial_flavor, cp_sign, e->fluxes[flux_id]);
+#ifdef GLB_USE_NUSQUIDS        /* when using NuSQuIDS, chr_template should *not* contain */
+      const double xsec = 1.0; /* x-secs as we need to evolve the flux, not flux*xsec    */
+#else                          /* (The other factors are constants and don't matter.)    */
       double xsec = glb_get_xsec(E, final_flavor, cp_sign, e->xsecs[xsec_id]);
+#endif
 
       e->chr_template[i][j] = flux * xsec * e->targetmass
                             * e->user_pre_smearing_channel[i][j]

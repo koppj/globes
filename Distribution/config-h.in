@@ -11,6 +11,9 @@
 /* The version of libglb in libtool format c:r:a */
 #undef GLB_LIBVERSION
 
+/* Enable NuSQuIDS support */
+#undef GLB_USE_NUSQUIDS
+
 /* Define to 1 if you have `alloca', as a function or macro. */
 #undef HAVE_ALLOCA
 

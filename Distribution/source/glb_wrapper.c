@@ -773,7 +773,16 @@ glbSetOscillationParameters(const glb_params in)
   if (in == NULL)
     return -1;
   else
+  {
+    int exp;
+    for (exp=0; exp < glb_num_of_exps; exp++)
+    {
+      struct glb_experiment *e = glb_experiment_list[exp];
+      if (e->set_oscillation_parameters)
+        e->set_oscillation_parameters(in, e->probability_user_data);
+    }
     return glb_hook_set_oscillation_parameters(in, glb_probability_user_data);
+  }
 }
 
 

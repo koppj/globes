@@ -50,6 +50,9 @@ glb_probability_matrix_function glb_hook_probability_matrix;
 glb_set_oscillation_parameters_function glb_hook_set_oscillation_parameters;
 glb_get_oscillation_parameters_function glb_hook_get_oscillation_parameters;
 void *glb_probability_user_data=NULL;
+#ifdef GLB_USE_NUSQUIDS
+glb_probability_nusquids_function glb_hook_nusquids = NULL;
+#endif
 
 /* Internal temporary variables */
 gsl_matrix_complex *U=NULL; /* The vacuum mixing matrix                           */
@@ -905,6 +908,29 @@ int glbRegisterProbabilityEngine(int n_parameters,
 
   return 0;
 }
+
+#ifdef GLB_USE_NUSQUIDS
+
+/***************************************************************************
+ * Function glbRegisterNuSQuIDSEngine                                      *
+ ***************************************************************************
+ * Tells GLoBES which function to call to get oscillation probabilities in *
+ * nuSQuIDS mode (#define GLB_USE_NUSQUIDS)                                *
+ ***************************************************************************
+ * Parameters:                                                             *
+ *   nusquids_func:   Pointer to nuSQuIDS interface function               *
+ ***************************************************************************/
+int glbRegisterNuSQuIDSEngine(glb_probability_nusquids_function nusquids_func)
+{
+  if (nusquids_func != NULL)
+    glb_hook_nusquids = nusquids_func;
+  else
+    glb_hook_nusquids = NULL;
+
+  return 0;
+}
+
+#endif /* #ifdef GLB_USE_NUSQUIDS */
 
 
 /***************************************************************************

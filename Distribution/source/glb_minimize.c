@@ -437,13 +437,17 @@ static double Chi(double x[])
   for (i=0; i < glbGetNumOfOscParams(); i++)
     p->osc->osc_params[i] = x[i];
   glb_hook_set_oscillation_parameters(p, glb_probability_user_data);
-  glbFreeParams(p);
 
   for (i=0;i<glb_num_of_exps;i++)
     {
+      struct glb_experiment *e = glb_experiment_list[i];
+      if (e->set_oscillation_parameters)
+        e->set_oscillation_parameters(p, e->probability_user_data);
       glb_set_profile_scaling(x[glbGetNumOfOscParams()+i],i);
       glbSetRatesInExperiment(i, GLB_SET_RATES_TEST, GLB_SET_RATES_SLOW);
     }
+  glbFreeParams(p);
+
   if (setjmp(env)==1)
     {
       okay_flag=1;
@@ -467,6 +471,9 @@ static double SingleChi(double x[glbGetNumOfOscParams()+1],int exp)
   for (i=0; i < glbGetNumOfOscParams(); i++)
     p->osc->osc_params[i] = x[i];
   glb_hook_set_oscillation_parameters(p, glb_probability_user_data);
+  struct glb_experiment *e = glb_experiment_list[exp];
+  if (e->set_oscillation_parameters)
+    e->set_oscillation_parameters(p, e->probability_user_data);
   glbFreeParams(p);
 
   glb_set_profile_scaling(x[glbGetNumOfOscParams()],exp);
@@ -492,6 +499,9 @@ static double SingleRuleChi(double x[glbGetNumOfOscParams()+1],int exp, int rule
   for (i=0; i < glbGetNumOfOscParams(); i++)
     p->osc->osc_params[i] = x[i];
   glb_hook_set_oscillation_parameters(p, glb_probability_user_data);
+  struct glb_experiment *e = glb_experiment_list[exp];
+  if (e->set_oscillation_parameters)
+    e->set_oscillation_parameters(p, e->probability_user_data);
   glbFreeParams(p);
 
   glb_set_profile_scaling(x[glbGetNumOfOscParams()],exp);
@@ -784,13 +794,16 @@ static double MD_chi_NP(double x[])
   for (i=0; i < glbGetNumOfOscParams(); i++)
     p->osc->osc_params[i] = y[i];
   glb_hook_set_oscillation_parameters(p, glb_probability_user_data);
-  glbFreeParams(p);
 
   for (i=0;i<glb_num_of_exps;i++)
     {
+      struct glb_experiment *e = glb_experiment_list[i];
+      if (e->set_oscillation_parameters)
+        e->set_oscillation_parameters(p, e->probability_user_data);
       glb_set_profile_scaling(y[glbGetNumOfOscParams()+i],i);
       glbSetRatesInExperiment(i, GLB_SET_RATES_TEST, GLB_SET_RATES_SLOW);
     }
+  glbFreeParams(p);
 
   erg2=ChiS();
   // adding  the user defined prior
@@ -880,6 +893,9 @@ static double chi_NP(double x[])
   for (i=0; i < glbGetNumOfOscParams(); i++)
     p->osc->osc_params[i] = y[i];
   glb_hook_set_oscillation_parameters(p, glb_probability_user_data);
+  struct glb_experiment *e = glb_experiment_list[glb_single_experiment_number];
+  if (e->set_oscillation_parameters)
+    e->set_oscillation_parameters(p, e->probability_user_data);
   glbFreeParams(p);
 
   glb_set_profile_scaling(y[glbGetNumOfOscParams()],glb_single_experiment_number);
@@ -1511,6 +1527,9 @@ double glb_hybrid_chi_callback(double *x, int new_rates_flag, void *user_data)
     {
       if (glb_single_experiment_number!=GLB_ALL && glb_single_experiment_number!=i)
         continue;
+      struct glb_experiment *e = glb_experiment_list[i];
+      if (e->set_oscillation_parameters)
+        e->set_oscillation_parameters(p, e->probability_user_data);
       glb_set_profile_scaling(p->density->density_params[i],i);
       glbSetRatesInExperiment(i, GLB_SET_RATES_TEST, GLB_SET_RATES_FAST);
     }

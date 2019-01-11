@@ -53,6 +53,9 @@ extern glb_probability_matrix_function glb_hook_probability_matrix;
 extern glb_set_oscillation_parameters_function glb_hook_set_oscillation_parameters;
 extern glb_get_oscillation_parameters_function glb_hook_get_oscillation_parameters;
 extern void *glb_probability_user_data;
+#ifdef GLB_USE_NUSQUIDS
+extern glb_probability_nusquids_function glb_hook_nusquids;
+#endif
 
 
 

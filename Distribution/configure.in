@@ -172,6 +172,13 @@ AC_ARG_ENABLE([binary],
   [:],
   [enable_binary=check])
 
+dnl allow to enable/disable NuSQuIDS
+AC_ARG_ENABLE([nusquids],
+  AS_HELP_STRING([--enable-nusquids], [Compile with NuSQuIDS support]))
+AS_IF([test "x$enable_nusquids" = "xyes"], [
+  AC_DEFINE([GLB_USE_NUSQUIDS], [], [Enable NuSQuIDS support])
+])
+
 AM_CONDITIONAL([ENABLE_BINARY], [test "$enable_binary" != "no"])
 
 

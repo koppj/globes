@@ -106,9 +106,13 @@ enum glb_enum_minimizers
 #define GLB_MAX_FLUXES    64
 #define GLB_MAX_XSECS     64
 
-/* Options for event rate calculation */
-#define GLB_SET_RATES_TRUE   1  /* fill vector for true rates */
-#define GLB_SET_RATES_TEST   2  /* fill vector for fitted rates */
+/* Options for glbSetRatesInExperiment */
+#define GLB_SET_RATES_TRUE  1   /* fill vector for true rates */
+#define GLB_SET_RATES_TEST  2   /* fill vector for fitted rates */
+
+#define GLB_SET_RATES_SLOW  3   /* Don't use precomputed chr_template */
+#define GLB_SET_RATES_FAST  4   /* Use precomputed chr_template */
+
 
 /* Data structures */
 /* --------------- */
@@ -129,6 +133,12 @@ typedef int (*glb_probability_matrix_function)(double P[3][3], int cp_sign, doub
                   double filter_sigma, void *user_data);
 typedef int (*glb_set_oscillation_parameters_function)(glb_params p, void *user_data);
 typedef int (*glb_get_oscillation_parameters_function)(glb_params p, void *user_data);
+
+//#ifdef GLB_USE_NUSQUIDS
+typedef int (*glb_probability_nusquids_function)(double P[][2][3],
+             unsigned n_E, double *E, double ini_state_nu[][3], double ini_state_nubar[][3],
+             int psteps, const double *length, const double *density);
+//#endif
 
 
 /* External variables */
@@ -368,6 +378,9 @@ int glbSetProbabilityEngineInExperiment(int exp, int n_parameters,
                  glb_set_oscillation_parameters_function set_params_func,
                  glb_get_oscillation_parameters_function get_params_func,
                  void *user_data);
+//#ifdef GLB_USE_NUSQUIDS
+int glbRegisterNuSQuIDSEngine(glb_probability_nusquids_function nusquids_func);
+//#endif
 
 int glbGetNumOfOscParams();
 

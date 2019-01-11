@@ -32,10 +32,6 @@
 #define GLB_COPY_RULES      1
 #define GLB_DONT_COPY_RULES 0
 
-/* Options for glbSetRatesInExperiment */
-#define GLB_SET_RATES_SLOW  0   /* Don't use precomputed chr_template */
-#define GLB_SET_RATES_FAST  1   /* Use precomputed chr_template */
-
 //extern int glb_current_exp;
 extern int glb_ignore_invalid_chi2;
 
