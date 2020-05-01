@@ -72,7 +72,7 @@
 \newcommand{\Fig}{Fig.}
 \newcommand{\figs}{Figs.}
 \newcommand{\Figs}{Figs.}
-\newcommand{\Ref}{Ref.}
+\renewcommand{\Ref}{Ref.}
 \newcommand{\Refs}{Refs.}
 \newcommand{\Sec}{Sec.}
 \newcommand{\Secs}{Secs.}
@@ -205,14 +205,14 @@ General Long Baseline Experiment Simulator \\ }
 \vspace*{0.5cm}
 {\large \bf User's and experiment definition manual }
 
-%\vspace*{1.5cm}
-%{\large \bf !!!DRAFT IN PROGRESS!!! }
+\vspace*{1.5cm}
+{\large \bf !!!DRAFT IN PROGRESS!!! }
 \end{center}
 
 \vspace{0.5cm}
 
 \begin{center}
-{\large Patrick Huber$^a$, Joachim Kopp$^b$, Manfred Lindner$^b$, \\ Mark Rolinec$^c$, Walter Winter$^d$}
+{\large Patrick Huber$^a$, Joachim Kopp$^b$, Manfred Lindner$^c$, \\ Walter Winter$^d$}
 \end{center}
 
 \vspace{0.3cm}
@@ -238,7 +238,7 @@ General Long Baseline Experiment Simulator \\ }
 \vspace{1cm}
 
 \begin{center}
-Version from \today\ for \GLOBES\ 3.1
+Version from \today\ for \GLOBES\ 3.2.18
 \end{center}
 
 
@@ -249,23 +249,24 @@ Version from \today\ for \GLOBES\ 3.1
 \vspace*{0.1cm}
 
 {\em\small $^{\mathrm{a}}$%
-       Virginia Tech, Physics Department, Blacksburg, VA 24061, USA}
+       Virginia Tech, Center for Neutrino Physics, Blacksburg, VA 24061, USA}
 
 {\em\small $^{\mathrm{b}}$%
+  Theoretical Physics Department,
+  CERN and Johannes Gutenberg University Mainz (Germany),
+  1211 Geneve 23, Switzerland
+}
+
+{\em\small $^{\mathrm{c}}$%
        Max--Planck--Institut f\"ur Kernphysik, 
        Postfach 10~39~80, D--69029 Heidelberg, Germany} 
 
-{\em\small $^{\mathrm{c}}$%
-       Technische Universit\"at M\"unchen,
-       Institut f\"ur Theoretische Physik, Physik--Department,\\
-       James--Franck--Strasse, D--85748 Garching, Germany}
-
 {\em\small $^{\mathrm{d}}$%
-       Universit\"at W\"urzburg, 
-       Lehrstuhl f\"ur theoretische Physik II, \\
-       Institut f\"ur theoretische Physik und Astrophysik, 
-       Am Hubland,
-       D-97074 W\"urzburg, Germany}
+Deutsches Elektronen-Synchrotron (DESY)
+Platanenallee 6
+15738 Zeuthen, Germany} 
+
+
 
 %\end{titlepage}
 
@@ -281,7 +282,7 @@ Version from \today\ for \GLOBES\ 3.1
 \thispagestyle{empty}
 \bigskip
 \begin{quote}
-    Copyright \copyright  2004--2010  The GLoBES Team.
+    Copyright \copyright  2004--2020  The GLoBES Team.
     Permission is granted to copy, distribute and/or modify this document
     under the terms of the GNU Free Documentation License, Version 1.2
     or any later version published by the Free Software Foundation;
@@ -419,6 +420,18 @@ refer to the respective parts of the manual. Please note that any new \GLOBES\ v
 compatible with older versions, \ie, old application software and \AEDL\ files should, with minor
 modifications, run with the new version as well.  However, some function names and features will
 evolve during time, which means that outdated features may not be documented anymore.
+
+\section*{Version 3.2.18}
+\index{norm}{Version 3.2.18}
+
+\begin{itemize}
+
+  \item Systematics correlated across experiments/detector; see
+    \Sec~\ref{sec:newsys}. This feature has been extensively tested
+    and used, amongst others, for the DUNE CDR~\cite{Acciarri:2015uup}.
+\item Fitting of actual data; see \Sec~\ref{sec:fitting}.
+\end{itemize}
+
 
 \section*{Version 3.0}
 \index{norm}{Version 3.0}

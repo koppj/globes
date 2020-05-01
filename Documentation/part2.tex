@@ -340,10 +340,22 @@ If you want to have several experiments in one file, separate the different
 \begin{quote}
 {\tt    \#NEXT\#}
 \end{quote}
-This command resets the counters for channels, rules, fluxes, cross section 
-and energy resolution environments. All variables have their scope limited 
-by either {\tt \%!GLoBES, \#NEXT\#} or {\tt EOF}.  This allows 
-a consistent treatment of various experiments in one file.
+This command resets the counters for channels, rules, fluxes, cross
+section and energy resolution environments. All, except named nuisance
+parameters (see. Sec.~\ref{sec:newsys}), variables have their scope limited by either {\tt
+  \%!GLoBES, \#NEXT\#} or {\tt EOF}.  This allows a consistent
+treatment of various experiments in one file.
+
+\index{aedl}{DETECTOR@{\tt \#DETECTOR\#}}
+If you want to have several detectors in the same beam, separate the different
+ detectors by 
+\begin{quote}
+{\tt    \#DETECTOR\#}
+\end{quote}
+This command resets the counters and names \emph{only} for rules. All
+other variables have global scope.  This feature is useful to define
+correlated systematics for near and far detector type setups as
+described in Sec.~\ref{sec:newsys}.
 
 \index{aedl}{include@{\tt include}}
 As another feature of \AEDL , can use include files with the {\tt include} command. Includes can be nested up to {\tt MAX\_INCLUSION\_DEPTH}, which is currently set to $10$. Error reporting works 
@@ -1679,6 +1691,134 @@ Eventually, a complete rule may look like this:
 >}
 \end{quote}
 \index{aedl}{rule@{\tt rule}|)}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Systematics correlated accross experiments and rules*}
+\label{sec:newsys}
+
+\index{norm}{Systematics!correlated|(} 
+\index{aedl}{sys@{\tt sys}|(} In many cases the simple rule-based
+style of systematics is sufficient, but there are cases, notably DUNE
+and almost all modern reactor experiments, where a more fine-grained
+systematics implementation is necessary.  The way to accomplish is to introduce named nuisance parameters:
+\begin{quote}
+  {\tt sys(\#norm)<\\
+    \tb @systype=0\\
+\tb  @error = 0.02\\
+>}
+\end{quote}
+
+\index{aedl}{sys@{\tt sys}!error@{\tt "@error}}
+
+\index{aedl}{sys@{\tt sys}!systype@{\tt "@systype}}
+
+{\tt @systype} defaults to $0$, a common multiplicative nuisance
+parameter.  {\tt @systype} can also be set to $1$ where this becomes a
+energy calibration error as desribed in Sec.~\ref{sec:energy}.
+
+
+In this case we introduced a nuisance parameter {\tt \#norm} with an
+error of $0.02$ and a central value of $1$. These named nuisance
+parameters now can be used in the definition of a rule:
+
+\begin{quote}
+  {\tt rule(\#NU\_E\_Disappearance)<\\
+\tb    @signal     = 0.4@\#nu\_e\_disappearance\_CC\_U235 \\
+\tb    @sys\_on\_multiex\_errors\_sig =\{\#norm,\#flux235\} \\
+\tb    @background = 0.1@\#nu\_e\_bg\\
+\tb     @sys\_on\_multiex\_errors\_bg  = {\#bgnorm}\\
+\tb        @sys\_on\_function  = "chiMultiExp"\\
+\tb        @sys\_off\_function = "chiNoSysSpectrum"\\
+>}
+\end{quote}
+
+The key here is the line {\tt @sys\_on\_multiex\_errors\_sig
+  =\{\#norm,\#flux235\} }, where the tag {\tt
+  @sys\_on\_multiex\_errors\_sig } is invoked to signal the use of
+this feature and each {\tt \{ ...\}} contains all named nuisance
+parameters applicable to the corresponding part of {\tt @signal}
+definition; the same syntax applies to {\tt
+  @sys\_on\_multiex\_errors\_bg } for the {\tt @background} part of
+the rule.  {\tt @sys\_on\_function = "chiMultiExp"} ensures that the
+appropriate $\chi^2$-function is used to handle named nuisance
+parameters.%
+
+\index{aedl}{rule@{\tt rule}!sys on multiex errors  sig@{\tt "@sys\_on\_multiex\_errors\_sig}}
+
+\index{aedl}{rule@{\tt rule}!sys on multiex errors bg@{\tt "@sys\_on\_multiex\_errors\_bg}}
+
+
+
+Now this very same technique can be used in different rules of the
+same experiment but also in rules defined in \emph{different}
+experiments. All instance of the named parameter, in this example {\tt
+  \#norm}, will be fully correlated. In the context of
+near/far-detector experiments also the {\tt \#DETECTOR\#} directive is
+interesting since it allows to reuse flux, channel etc. definitions
+seamlessly. It is important that all named parameters have been
+defined using the {\tt sys<>} environment before they are used. It is
+good practive to put all {\tt sys<>} definitions in one file and to
+include this file into all subsequent {\sf AEDL} files.
+
+
+Sometimes, systematics are energy dependent and this can be implemented within the same framework as
+\begin{quote}
+  {\tt sys(\#norm)<\\
+    \tb @energy\_list =\{ 0.002,0.005,0.006,0.009\}\\
+    \tb  @error\_list = \{0.02,0.01,0.005,0\}\\
+>}
+\end{quote}
+\index{aedl}{sys@{\tt sys}!error list@{\tt "@error\_list}}
+\index{aedl}{sys@{\tt sys}!energy list@{\tt "@energy\_list}}
+
+This effectively introduces 1 nuisance parameter in the fit which
+varies the rate by 0.02 at 0.002\,GeV and by 0.01 at 0.005\,GeV
+asf. fully correlated among all energies. For bin center energies
+between the support points in {\tt @energy\_list} linear interpolation is
+used. Both lists need to have the same number of elements.
+
+
+\index{aedl}{sys@{\tt sys}|)}
+\index{norm}{Systematics!correlated|)} 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Fitting actual experimental data*}
+\label{sec:fitting}
+
+\index{norm}{Fitting of data|(}
+The framework presented so far is general enough to achieve an
+accurate decsription of real experiments and thus, the user may want
+to fit actual data with {\sf GLoBES}. This can be conveniently achieved by using
+
+
+\begin{quote}
+  {\tt rule(\#foo)<\\
+    \tb all the usual definitions of a rule\\
+    \\
+    \tb @data\_flag=1\\
+    \tb @data=\{1.23,2.34,3.45,...,42\}\\
+>}
+\end{quote}
+\index{aedl}{rule@{\tt rule}!data flag@{\tt "@data\_flag}}
+\index{aedl}{rule@{\tt rule}!data@{\tt "@data}}
+
+where {\tt @data} is a list of the actual data which needs to have
+{\tt \$bins} elements and the {\tt @data\_flag} can be use to turn
+fitting of this data on (1) or off (0).
+
+In some cases a non-standard oscillation probability calculaton may be
+required, to include for instance the size of the neutrino production
+region. This requires to use the mechanism to define an oscillation
+engine and to name it, this is done with {\tt DefineOscEngine} and to
+then call the corresponding name from withing {\sf AEDL}, which is
+accomplished with the {\tt \$oscillation\_engine} directive. Note,
+that the scope of {\tt \$oscillation\_engine} is not limited by {\tt
+  \#DETECTOR\#}.
+
+\GLBNS{DefineOscEngine}
+\index{aedl}{oscillation engine@{\tt "\$oscillation\_engine}}
+
+\index{norm}{Fitting of data|)}
 
 % THIS PART HAS GAINED IMPORTANCE AND THEREFORE BEEN EXPLAINED ALREADY IN THE LAST CHAPTER!
 %

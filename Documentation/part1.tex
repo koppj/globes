@@ -3138,6 +3138,22 @@ The number of oscillation parameters can, at any time, be obtained with
 {\tt  int glbGetNumOfOscParams()} returns the number of oscillation parameters.
 \end{function}
 
+A related function which allows to name an oscillation engine without invoking it
+\begin{function}
+  \GLBNS{DefineOscEngine}
+{\tt int glbDefineOscillationEngine(int n\_parameters,
+                 glb\_probability\_matrix\_function prob\_func, \\
+                 glb\_set\_oscillation\_parameters\_function set\_params\_func, \\
+                 glb\_get\_oscillation\_parameters\_function get\_params\_func, \\
+                 const char[] name,\\
+                 void* user\_data)} defines a probability
+engine for the simulation of non-standard physics with {\tt n\_parameters} oscillation parameters ({\tt n\_parameters} $\ge6$). The three functions {\tt prob\_func}, {\tt set\_params\_func}, and {\tt get\_params\_func} 
+will be used with the function types defined above. In order to circumvent global variables, an arbitrary pointer {\tt user\_data} can be defined, that will be passed to the probability engine in each function call. {\tt name} can be use to refer to the so defined oscillation engine within {\sf AEDL} using the {\tt \$oscillation\_engine} directive.
+\end{function}
+\index{aedl}{oscillation engine@{\tt "\$oscillation\_engine}}
+
+
+
 Let us now illustrate the implementation of non-standard physics with a simple example, which can
 be found as {\tt example6.c} in the example directory.
 This example is a simplified version of \Sec~4 of 
