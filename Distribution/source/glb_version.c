@@ -38,6 +38,8 @@
 const char *glb_release_version = VERSION;
 static const char *library_version = GLB_LIBVERSION;
 
+/* TODO: support for 4-digit version numbers is missing */
+
 static int
 break_up_version(char const *version,int *first,int *second, int *third)
 {
