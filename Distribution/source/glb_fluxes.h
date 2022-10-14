@@ -47,4 +47,10 @@ int glb_free_xsec(glb_xsec *xs);
 int glb_reset_xsec(glb_xsec *xs);
 int glb_copy_xsec(glb_xsec *dest, const glb_xsec *src);
 
+/* EFT */
+#ifdef GLB_EFT
+double glb_eft_get_flux_coeff(int X, double E, const glb_flux *flux);
+double glb_eft_get_xsec_coeff(int X, double E, const glb_xsec *xs);
+#endif
+
 #endif /* GLB_FLUXES_H */

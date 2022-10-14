@@ -40,6 +40,9 @@
 /* Activate compatibility mode, i.e. allow deprecated symbol names */
 #define GLB_COMPAT
 
+/* Enable SMEFT plugin */
+#define GLB_EFT
+
 /* Number of neutrino flavours */
 #define GLB_NU_FLAVOURS  3
 
@@ -454,6 +457,16 @@ int glbSetInitialStep(double step);
   int glbGetNumberOfSimBins(int exp);
 #endif  /* #ifdef GLB_COMPAT */
 
+
+/* Definitions for SMEFT plugin */
+/* ---------------------------- */
+#ifdef GLB_EFT
+  enum eft_Lorentz_structures  /* Lorentz structures supported */
+    { GLB_EFT_V, GLB_EFT_A, GLB_EFT_S, GLB_EFT_P, GLB_EFT_T,
+      GLB_EFT_N_LORENTZ_STRUCTURES };
+  double glbEFTFluxCoeff(int experiment, int flux_ident, int X, double energy);
+  double glbEFTXSecCoeff(int experiment, int xsec_ident, int X, double energy);
+#endif /* #ifdef GLB_EFT */
 
 END_C_DECLS
 

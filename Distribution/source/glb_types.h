@@ -61,6 +61,12 @@ typedef struct {
   int n_lines;                         /* Number of columns in flux file         */
   char *file_name;                     /* Name of flux file                      */
   double *flux_data[GLB_FLUX_COLUMNS]; /* Flux data (7 x n_lines array)          */
+
+#ifdef GLB_EFT
+  char *eft_coeff_file;                /* file containing EFT production coefficients */
+  int eft_n_E;                         /* number of lines in EFT prod. coeff. file */
+  double *eft_flux_coeff[GLB_EFT_N_LORENTZ_STRUCTURES+1]; /* data from that file */
+#endif
 } glb_flux;
 
 /* Data structure for handling X-sections and built-in X-sections,
@@ -72,6 +78,11 @@ typedef struct {
   int n_lines;                         /* Number of lines in cross section file  */
   char *file_name;                     /* Name of cross section file             */
   double *xsec_data[GLB_XSEC_COLUMNS]; /* Cross section data (7 x n_lines array) */
+#ifdef GLB_EFT
+  char *eft_coeff_file;                /* file containing EFT detection coefficients */
+  int eft_n_E;                         /* number of lines in EFT det. coeff. file */
+  double *eft_xsec_coeff[GLB_EFT_N_LORENTZ_STRUCTURES+1]; /* data from that file */
+#endif
 } glb_xsec;
 
 

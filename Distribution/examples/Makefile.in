@@ -49,7 +49,7 @@ local_LTLDFLAGS:=$(shell $(globesconf) --ltlibs)
 
 
 
-BIN = example-tour example-static example1 example2 example3 example4 example5 example6
+BIN = example-tour example1 example2 example3 example4 example5 example6 example-smeft
 OBJ = example-tour.o example-tour-s.o example1.o example2.o example3.o example4.o \
       example5.o example6.o myio.o
 
@@ -57,9 +57,6 @@ all: $(BIN)
 
 example-tour: example-tour.o
 	gcc example-tour.o -o example-tour $(LDFLAGS) $(local_LDFLAGS)
-
-example-static: example-tour.o
-	gcc example-tour.o -o example-static -static $(LDFLAGS) $(local_LDFLAGS) 
 
 example1: example1.o myio.o
 	gcc example1.o myio.o -o example1  $(LDFLAGS) $(local_LDFLAGS)
@@ -78,6 +75,9 @@ example5: example5.o myio.o
 
 example6: example6.o myio.o
 	gcc example6.o myio.o -o example6  $(LDFLAGS) $(local_LDFLAGS)
+
+example-smeft: example-smeft.o myio.o
+	gcc example-smeft.o myio.o -o example-smeft  $(LDFLAGS) $(local_LDFLAGS)
 
 %.o : %.c
 	gcc $(CFLAGS) $(local_CFLAGS) -c $< $(INCFLAGS)

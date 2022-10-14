@@ -239,7 +239,9 @@
 
    {"cross",UNTYPE,0,20,NULL,&buff.num_of_xsecs,"global"},
    {"@cross_file",CHAR,0,20,&xsc.file_name,NULL,"cross"},
-
+#ifdef GLB_EFT
+   {"@eft_coeff_file",CHAR,0,20,&xsc.eft_coeff_file,NULL,"cross"},
+#endif
 
    {"flux",UNTYPE,0,20,NULL,&buff.num_of_fluxes,"global"},
    {"@flux_file",CHAR,0,20,&flt.file_name,NULL,"flux"},
@@ -268,7 +270,9 @@
     {"@gamma",DOUBLE,0,GMAX,&flt.gamma,NULL,"nuflux"},
     {"@end_point",DOUBLE,0,GMAX,&flt.end_point,NULL,"nuflux"},
     {"@stored_ions",DOUBLE,0,GMAX,&flt.stored_muons,NULL,"nuflux"},
-
+#ifdef GLB_EFT
+    {"@eft_coeff_file",CHAR,0,20,&flt.eft_coeff_file,NULL,"nuflux"},
+#endif
 
    {"@type" ,INT,1,2,&ibf.type,&loc_count,"energy"},
    {"@sigma_e" ,DOUBLE_LIST,0,GMAX,&ibf.sigma,&ibf.num_of_params,"energy"},
@@ -1203,7 +1207,7 @@ static int set_multiex_errors(char *name, glb_List **value)
 %token <val> NUM
 %token <nameptr> SFNCT
 %token <tptr> BOGUS LVAR VAR FNCT   /* Variable and Function */
-%token <name> IDN CROSS FLUXP FLUXM NUFLUX
+%token <name> IDN CROSS FLUXP FLUXM NUFLUX EFT_FLUX_COEFF_FILE EFT_XSEC_COEFF_FILE
 %token <name> SYS_ON_FUNCTION SYS_OFF_FUNCTION SYS_MULTIEX_ERRORS
 %token <name> GRP GID FNAME VERS 
 %token <name> SIGNAL BG
@@ -1225,6 +1229,8 @@ static int set_multiex_errors(char *name, glb_List **value)
 %type <name> cross
 %type <name> flux
 %type <name> nuflux
+%type <name> eft_flux_coeff
+%type <name> eft_xsec_coeff
 %type <name> version
 
 
@@ -1375,6 +1381,8 @@ ingroup_statement: exp {}
 | cross {}
 | flux {}
 | nuflux {}
+| eft_flux_coeff {}
+| eft_xsec_coeff {}
 ;
 
 /* version: A version declaration */
@@ -1415,6 +1423,24 @@ nuflux: NUFLUX '=' FNAME {
   flt.file_name=strdup($3);
 
   //if(set_exp($1,$3,0)==1) yyerror("Unknown identifier");
+  $$=$3;
+  if ($1)  { glb_free($1);  $1=NULL; }
+  if ($3)  { glb_free($3);  $3=NULL; }
+}
+;
+
+/* EFT production/detection coefficients */
+eft_flux_coeff: EFT_FLUX_COEFF_FILE '=' FNAME {
+  flt.eft_coeff_file=strdup($3);
+
+  $$=$3;
+  if ($1)  { glb_free($1);  $1=NULL; }
+  if ($3)  { glb_free($3);  $3=NULL; }
+}
+;
+
+eft_xsec_coeff: EFT_XSEC_COEFF_FILE '=' FNAME {
+  xsc.eft_coeff_file=strdup($3);
   $$=$3;
   if ($1)  { glb_free($1);  $1=NULL; }
   if ($3)  { glb_free($3);  $3=NULL; }

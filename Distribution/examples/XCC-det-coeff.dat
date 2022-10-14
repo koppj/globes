@@ -1,0 +1,12 @@
+# A sample file of EFT detection coefficients
+# (**** THIS IS JUST FOR TESTING, NO PHYSICAL MEANING ****)
+# columns are the same as in GLoBES cross-section files:
+#
+#                      Detection coefficient for interaction type
+#  log10(E/GeV)     V            A            S            P            T
+     -1.           0.1          0.1          0.1          0.01         0.1
+      0.           0.2          0.2          0.2          0.02         0.2
+      1.           0.4          0.4          0.4          0.04         0.4
+      2.           0.4          0.4          0.4          0.04         0.4
+      3.           0.4          0.4          0.4          0.04         0.4
+

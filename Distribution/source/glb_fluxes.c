@@ -425,6 +425,35 @@ int glb_init_flux(glb_flux *flux)
       break;
   }
 
+  /* Load EFT production coefficients */
+#ifdef GLB_EFT
+  int status;
+  int i;
+  if (flux->eft_coeff_file != NULL && strlen(flux->eft_coeff_file) > 0)
+  {
+    if ((status=glb_load_n_columns(flux->eft_coeff_file, GLB_EFT_N_LORENTZ_STRUCTURES+1,
+                                  &flux->eft_n_E, flux->eft_flux_coeff)) != GLB_SUCCESS)
+      return status;
+
+    /* check that energies are monotonically increasing */
+    for (i=1; i < flux->eft_n_E; i++)
+    {
+      if (flux->eft_flux_coeff[0][i] < flux->eft_flux_coeff[0][i-1])
+      {
+        glb_error("Energy not monotonically increasing in file %s, E=%g",
+                  flux->eft_coeff_file, flux->eft_flux_coeff[0][i]);
+        return GLBERR_INVALID_FILE_FORMAT;
+      }
+    }
+  }
+  else
+  {
+    flux->eft_n_E = 0;
+    for (i=0; i < GLB_EFT_N_LORENTZ_STRUCTURES+1; i++)
+      flux->eft_flux_coeff[i] = NULL;
+  }
+#endif /* #ifdef GLB_EFT */
+
   return GLB_SUCCESS;
 }
 
@@ -480,6 +509,43 @@ double glb_get_flux(double E, double L, int f, int cp_sign, const glb_flux *flux
 
 
 /***************************************************************************
+ * Function glb_eft_get_flux_coeff                                         *
+ ***************************************************************************
+ * Return the EFT production coefficient for Lorentz structure X at        *
+ * energy E                                                                *
+ ***************************************************************************/
+#ifdef GLB_EFT
+double glb_eft_get_flux_coeff(int X, double E, const glb_flux *flux)
+{
+  double result;
+
+  int col = X + 1;
+  int n_steps = flux->eft_n_E - 1;
+
+  /* no EFT coefficients defined? -> return zero */
+  if (flux->eft_n_E == 0 || !flux->eft_flux_coeff[X])
+    return 0.0;
+
+  int k=0;
+  while (k <= n_steps  &&  flux->eft_flux_coeff[0][k] < E)
+    k++;
+  if (k <= 0 || k > n_steps)
+    return 0.0;
+  else
+  {
+    double E_lo    = flux->eft_flux_coeff[0][k-1];
+    double E_up    = flux->eft_flux_coeff[0][k];
+    double flux_lo = flux->eft_flux_coeff[col][k-1];
+    double flux_up = flux->eft_flux_coeff[col][k];
+    result  = flux_lo + (E - E_lo)*(flux_up - flux_lo)/(E_up - E_lo);
+  }
+
+  return result;
+}
+#endif
+
+
+/***************************************************************************
  * Function glb_free_flux                                                  *
  ***************************************************************************
  * Free flux data structue                                                 *
@@ -526,6 +592,22 @@ int glb_reset_flux(glb_flux *flux)
       glb_free(flux->file_name);
       flux->file_name = NULL;
     }
+#ifdef GLB_EFT
+    for (i=0; i < GLB_EFT_N_LORENTZ_STRUCTURES+1; i++)
+    {
+      if (flux->eft_flux_coeff[i])
+      {
+        glb_free(flux->eft_flux_coeff[i]);
+        flux->eft_flux_coeff[i] = NULL;
+      }
+    }
+    if (flux->eft_coeff_file)
+    {
+      glb_free(flux->eft_coeff_file);
+      flux->eft_coeff_file = NULL;
+    }
+    flux->eft_n_E = 0;
+#endif
   }
 
   return GLB_SUCCESS;
@@ -561,6 +643,24 @@ int glb_copy_flux(glb_flux *dest, const glb_flux *src)
     }
   }
 
+#ifdef GLB_EFT
+  if (src->eft_coeff_file)
+  {
+    dest->eft_coeff_file = strdup(src->eft_coeff_file);
+    if (!dest->eft_coeff_file)
+      glb_fatal("glb_copy_flux: cannot copy name of EFT production coefficient file");
+  }
+  for (j=0; j < GLB_EFT_N_LORENTZ_STRUCTURES+1; j++)
+  {
+    if (src->eft_flux_coeff[j])
+    {
+      dest->eft_flux_coeff[j] = glb_malloc(dest->eft_n_E*sizeof(src->eft_flux_coeff[j][0]));
+      for (i=0; i < dest->eft_n_E; i++)
+        dest->eft_flux_coeff[j][i] = src->eft_flux_coeff[j][i];
+    }
+  }
+#endif
+
   return GLB_SUCCESS;
 }
 
@@ -577,10 +677,44 @@ int glb_copy_flux(glb_flux *dest, const glb_flux *src)
  ***************************************************************************/
 int glb_init_xsec(glb_xsec *xs)
 {
+  int status;
+  int i;
+
   if (!xs || !xs->file_name)
     return GLBERR_UNINITIALIZED;
 
-  return glb_load_n_columns(xs->file_name, GLB_XSEC_COLUMNS, &xs->n_lines, xs->xsec_data);
+  if ((status=glb_load_n_columns(xs->file_name, GLB_XSEC_COLUMNS,
+                                 &xs->n_lines, xs->xsec_data)) != GLB_SUCCESS)
+    return status;
+
+  /* Load EFT detection coefficients */
+#ifdef GLB_EFT
+  if (xs->eft_coeff_file != NULL && strlen(xs->eft_coeff_file) > 0)
+  {
+    if ((status=glb_load_n_columns(xs->eft_coeff_file, GLB_EFT_N_LORENTZ_STRUCTURES+1,
+                                  &xs->eft_n_E, xs->eft_xsec_coeff)) != GLB_SUCCESS)
+      return status;
+
+      /* check that energies are monotonically increasing */
+      for (i=1; i < xs->eft_n_E; i++)
+      {
+        if (xs->eft_xsec_coeff[0][i] < xs->eft_xsec_coeff[0][i-1])
+        {
+          glb_error("Energy not monotonically increasing in file %s, E=%g",
+                    xs->eft_coeff_file, xs->eft_xsec_coeff[0][i]);
+          return GLBERR_INVALID_FILE_FORMAT;
+        }
+      }
+  }
+  else
+  {
+    xs->eft_n_E = 0;
+    for (i=0; i < GLB_EFT_N_LORENTZ_STRUCTURES+1; i++)
+      xs->eft_xsec_coeff[i] = NULL;
+  }
+#endif /* #ifdef GLB_EFT */
+
+  return GLB_SUCCESS;
 }
 
 
@@ -630,6 +764,40 @@ double glb_get_xsec(double E, int f, int cp_sign, const glb_xsec *xs)
 
 
 /***************************************************************************
+ * Function glb_eft_get_xsec_coeff                                         *
+ ***************************************************************************
+ * Returns the EFT detection coefficient for Lorentz structure X and       *
+ * energy E                                                                *
+ ***************************************************************************/
+#ifdef GLB_EFT
+double glb_eft_get_xsec_coeff(int X, double E, const glb_xsec *xs)
+{
+  double logE = log10(E);
+  int col = X + 1;
+  int n_steps = xs->eft_n_E - 1;
+
+  /* no EFT coefficients defined? -> return zero */
+  if (xs->eft_n_E == 0 || !xs->eft_xsec_coeff[X])
+    return 0.0;
+
+  int k=0;
+  while (k <= n_steps  &&  xs->eft_xsec_coeff[0][k] < logE)
+    k++;
+  if (k <= 0 || k > n_steps)
+    return 0.0;
+  else
+  {
+    double logE_lo = xs->eft_xsec_coeff[0][k-1];
+    double logE_up = xs->eft_xsec_coeff[0][k];
+    double xs_lo   = xs->eft_xsec_coeff[col][k-1];
+    double xs_up   = xs->eft_xsec_coeff[col][k];
+    return E * ( xs_lo + (logE - logE_lo)*(xs_up - xs_lo)/(logE_up - logE_lo) );
+  }
+}
+#endif
+
+
+/***************************************************************************
  * Function glb_free_xsec                                                  *
  ***************************************************************************
  * Free cross section data structures                                      *
@@ -669,6 +837,22 @@ int glb_reset_xsec(glb_xsec *xs)
       glb_free(xs->file_name);
       xs->file_name = NULL;
     }
+#ifdef GLB_EFT
+    for (i=0; i < GLB_EFT_N_LORENTZ_STRUCTURES+1; i++)
+    {
+      if (xs->eft_xsec_coeff[i])
+      {
+        glb_free(xs->eft_xsec_coeff[i]);
+        xs->eft_xsec_coeff[i] = NULL;
+      }
+    }
+    if (xs->eft_coeff_file)
+    {
+      glb_free(xs->eft_coeff_file);
+      xs->eft_coeff_file = NULL;
+    }
+    xs->eft_n_E = 0;
+#endif
   }
 
   return GLB_SUCCESS;
@@ -703,6 +887,24 @@ int glb_copy_xsec(glb_xsec *dest, const glb_xsec *src)
         dest->xsec_data[j][i] = src->xsec_data[j][i];
     }
   }
+
+#ifdef GLB_EFT
+  if (src->eft_coeff_file)
+  {
+    dest->eft_coeff_file = strdup(src->eft_coeff_file);
+    if (!dest->eft_coeff_file)
+      glb_fatal("glb_copy_xsec: cannot copy name of EFT detection coefficient file");
+  }
+  for (j=0; j < GLB_EFT_N_LORENTZ_STRUCTURES+1; j++)
+  {
+    if (src->eft_xsec_coeff[j])
+    {
+      dest->eft_xsec_coeff[j] = glb_malloc(dest->eft_n_E*sizeof(src->eft_xsec_coeff[j][0]));
+      for (i=0; i < dest->eft_n_E; i++)
+        dest->eft_xsec_coeff[j][i] = src->eft_xsec_coeff[j][i];
+    }
+  }
+#endif
 
   return GLB_SUCCESS;
 }

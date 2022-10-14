@@ -325,26 +325,31 @@ return VERS;
 yylval.name=strdup(yytext);
 return CROSS;}
 
+<glb_lexer_cross>@eft_coeff_file      {
+yylval.name=strdup(yytext);
+return EFT_XSEC_COEFF_FILE;}
+
+
 <glb_lexer_flux>@flux_file          {
 yylval.name=strdup(yytext);
 return FLUXP;}
-
 
 <glb_lexer_flux>@flux_file_m           {
 yylval.name=strdup(yytext);
 return FLUXM;}
 
 
-
-
 <glb_lexer_nuflux>@flux_file          {
 yylval.name=strdup(yytext);
 return NUFLUX;}
 
-
 <glb_lexer_nuflux>@flux_file_m           {
 yylval.name=strdup(yytext);
 return NUFLUX;}
+
+<glb_lexer_nuflux>@eft_coeff_file     {
+yylval.name=strdup(yytext);
+return EFT_FLUX_COEFF_FILE;}
 
 :        {return RULESEP;}
 @        {return RULEMULT;}

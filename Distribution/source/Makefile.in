@@ -434,7 +434,6 @@ prefix = @prefix@
 program_transform_name = @program_transform_name@
 psdir = @psdir@
 really_build_perl = @really_build_perl@
-runstatedir = @runstatedir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 shrext_cmds = @shrext_cmds@

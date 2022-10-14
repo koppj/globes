@@ -51,7 +51,7 @@
 #define HAVE_MKSTEMP 1
 
 /* Define to 1 if libc includes obstacks. */
-#define HAVE_OBSTACK 1
+/* #undef HAVE_OBSTACK */
 
 /* Define to 1 if you have the <perl.h> header file. */
 /* #undef HAVE_PERL_H */
@@ -137,7 +137,7 @@
 
 /* Define to 1 if `lex' declares `yytext' as a `char *' by default, not a
    `char[]'. */
-/* #undef YYTEXT_POINTER */
+#define YYTEXT_POINTER 1
 
 /* Define to empty if `const' does not conform to ANSI C. */
 /* #undef const */

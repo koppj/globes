@@ -1610,7 +1610,7 @@ rule_coeff(const double *ch, double coeff, double **res, int flag)
   size_t lch;
   int i;
   double *temp;
-  if((ch==NULL))
+  if(ch==NULL)
     {
       glb_error("Rate or background vector may not be NULL");
       return -1;
@@ -2258,6 +2258,62 @@ double glbXSection(int experiment, int xsec_ident,
 
   return out;
 }
+
+#ifdef GLB_EFT
+/***************************************************************************
+ * Function glbEFTFluxCoeff                                                *
+ ***************************************************************************
+ * Return EFT production coefficients associated with the given neutrino   *
+ * flux definition; X is one of the GLB_EFT_XXX constants indicating the   *
+ * desired Lorentz structure                                               *
+ ***************************************************************************/
+double glbEFTFluxCoeff(int experiment, int flux_ident, int X, double energy)
+{
+  struct glb_experiment *in;
+  if(!(experiment >= 0 && experiment < glb_num_of_exps))
+  {
+    glb_error("glbEFTFluxCoeff: invalid experiment number: %d", experiment);
+    return -1;
+  }
+  in = (struct glb_experiment *) glb_experiment_list[experiment];
+  if(!(flux_ident >= 0 && flux_ident < in->num_of_fluxes))
+  {
+    glb_error("glbEFTFluxCoeff: invalid flux ID: %d in experiment %d",
+              flux_ident, experiment);
+    return -1;
+  }
+
+  return glb_eft_get_flux_coeff(X, energy, in->fluxes[flux_ident]);
+}
+
+
+/***************************************************************************
+ * Function glbEFTXSecCoeff                                                *
+ ***************************************************************************
+ * Return EFT detection coefficients associated with the given neutrino    *
+ * cross-section definition; X is one of the GLB_EFT_XXX constants         *
+ * indicating the desired Lorentz structure                                *
+ ***************************************************************************/
+double glbEFTXSecCoeff(int experiment, int xsec_ident, int X, double energy)
+{
+  struct glb_experiment *in;
+  if(!(experiment >= 0 && experiment < glb_num_of_exps))
+  {
+    glb_error("glbEFTXSecCoeff: invalid experiment number: %d", experiment);
+    return -1;
+  }
+  in = (struct glb_experiment *) glb_experiment_list[experiment];
+  if(!(xsec_ident >= 0 && xsec_ident < in->num_of_xsecs))
+  {
+    glb_error("glbEFTXSecCoeff: invalid cross-section ID: %d in experiment %d",
+              xsec_ident, experiment);
+    return -1;
+  }
+
+  return glb_eft_get_xsec_coeff(X, energy, in->xsecs[xsec_ident]);
+}
+#endif
+
 
 int
 glbSetSourcePower(int experiment, int flux_ident, double power)

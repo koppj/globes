@@ -1,0 +1,12 @@
+# A sample file of EFT production coefficients
+# (**** THIS IS JUST FOR TESTING, NO PHYSICAL MEANING ****)
+# columns are the same as in GLoBES flux files:
+#
+#                  Production coefficient for interaction type
+#   E/GeV     V            A            S            P            T
+      0.     0.4          0.1          0.1          0.01         0.1
+      1.     0.4          0.2          0.2          0.02         0.2
+      5.     0.4          0.4          0.4          0.04         0.4
+     10.     0.2          0.4          0.4          0.04         0.4
+    100.     0.1          0.4          0.4          0.04         0.4
+
