@@ -73,18 +73,18 @@ int main(int argc, char *argv[])
   double E = 1.5;
   printf("E=%g, prod. coeff=(%g %g %g %g %g)\n",
          E,
-         glbEFTFluxCoeff(0, 0, GLB_EFT_V, 0, 1, E),
-         glbEFTFluxCoeff(0, 0, GLB_EFT_A, 0, 1, E),
-         glbEFTFluxCoeff(0, 0, GLB_EFT_S, 0, 1, E),
-         glbEFTFluxCoeff(0, 0, GLB_EFT_P, 0, 1, E),
-         glbEFTFluxCoeff(0, 0, GLB_EFT_T, 0, 1, E));
+         glbEFTFluxCoeff(0, 0, GLB_EFT_L, GLB_EFT_L, 0, E),
+         glbEFTFluxCoeff(0, 0, GLB_EFT_L, GLB_EFT_R, 0, E),
+         glbEFTFluxCoeff(0, 0, GLB_EFT_S, GLB_EFT_P, 0, E),
+         glbEFTFluxCoeff(0, 0, GLB_EFT_P, GLB_EFT_T, 0, E),
+         glbEFTFluxCoeff(0, 0, GLB_EFT_T, GLB_EFT_T, 2, E));
   printf("E=%g, det. coeff=(%g %g %g %g %g)\n",
          E,
-         glbEFTXSecCoeff(0, 0, GLB_EFT_V, 2, 1, E),
-         glbEFTXSecCoeff(0, 0, GLB_EFT_A, 2, 1, E),
-         glbEFTXSecCoeff(0, 0, GLB_EFT_S, 2, 1, E),
-         glbEFTXSecCoeff(0, 0, GLB_EFT_P, 2, 1, E),
-         glbEFTXSecCoeff(0, 0, GLB_EFT_T, 2, 1, E));
+         glbEFTXSecCoeff(0, 0, GLB_EFT_L, GLB_EFT_L, 0, E),
+         glbEFTXSecCoeff(0, 0, GLB_EFT_L, GLB_EFT_R, 0, E),
+         glbEFTXSecCoeff(0, 0, GLB_EFT_S, GLB_EFT_T, 0, E),
+         glbEFTXSecCoeff(0, 0, GLB_EFT_P, GLB_EFT_T, 0, E),
+         glbEFTXSecCoeff(0, 0, GLB_EFT_T, GLB_EFT_T, 2, E));
   getchar();
 
 

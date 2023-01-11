@@ -432,7 +432,7 @@ int glb_init_flux(glb_flux *flux)
 #ifdef GLB_EFT
   int status;
   int i;
-  int n_columns = 1 + n_leptonflavors * n_leptonflavors * GLB_EFT_N_LORENTZ_STRUCTURES;
+  int n_columns = 1 + n_leptonflavors * SQR(GLB_EFT_N_LORENTZ_STRUCTURES);
  
   if (flux->eft_coeff_file != NULL && strlen(flux->eft_coeff_file) > 0)
   {
@@ -516,17 +516,17 @@ double glb_get_flux(double E, double L, int f, int cp_sign, const glb_flux *flux
 /***************************************************************************
  * Function glb_eft_get_flux_coeff                                         *
  ***************************************************************************
- * Return the EFT production coefficient with flavor indices (alpha, beta) *
- * for Lorentz structure X at energy E                                     *
+ * Return the EFT production coefficient with flavor index alpha           *
+ * for Lorentz structure (X,Y) at energy E                                 *
  ***************************************************************************/
 #ifdef GLB_EFT
-double glb_eft_get_flux_coeff(int X, int alpha, int beta, double E, const glb_flux *flux)
+double glb_eft_get_flux_coeff(int X, int Y, int alpha, double E, const glb_flux *flux)
 {
   double result;
 
-  int col = 1 + X*n_leptonflavors*n_leptonflavors
-              + alpha*n_leptonflavors
-              + beta;   /* which columns of the flux coefficient table to access */
+  int col = 1 + X*n_leptonflavors*GLB_EFT_N_LORENTZ_STRUCTURES
+              + Y*n_leptonflavors
+              + alpha;   /* which columns of the flux coefficient table to access */
   int n_steps = flux->eft_n_E - 1;
 
   /* no EFT coefficients defined? -> return zero */
@@ -600,7 +600,7 @@ int glb_reset_flux(glb_flux *flux)
       flux->file_name = NULL;
     }
 #ifdef GLB_EFT
-    int n_columns = 1 + n_leptonflavors * n_leptonflavors * GLB_EFT_N_LORENTZ_STRUCTURES;
+    int n_columns = 1 + n_leptonflavors * SQR(GLB_EFT_N_LORENTZ_STRUCTURES);
     for (i=0; i < n_columns; i++)
     {
       if (flux->eft_flux_coeff[i])
@@ -658,7 +658,7 @@ int glb_copy_flux(glb_flux *dest, const glb_flux *src)
     if (!dest->eft_coeff_file)
       glb_fatal("glb_copy_flux: cannot copy name of EFT production coefficient file");
   }
-  int n_columns = 1 + n_leptonflavors * n_leptonflavors * GLB_EFT_N_LORENTZ_STRUCTURES;
+  int n_columns = 1 + n_leptonflavors * SQR(GLB_EFT_N_LORENTZ_STRUCTURES);
   for (j=0; j < n_columns; j++)
   {
     if (src->eft_flux_coeff[j])
@@ -698,7 +698,7 @@ int glb_init_xsec(glb_xsec *xs)
 
   /* Load EFT detection coefficients */
 #ifdef GLB_EFT
-  int n_columns = 1 + n_leptonflavors * n_leptonflavors * GLB_EFT_N_LORENTZ_STRUCTURES;
+  int n_columns = 1 + n_leptonflavors * SQR(GLB_EFT_N_LORENTZ_STRUCTURES);
   if (xs->eft_coeff_file != NULL && strlen(xs->eft_coeff_file) > 0)
   {
     if ((status=glb_load_n_columns(xs->eft_coeff_file, n_columns,
@@ -776,16 +776,16 @@ double glb_get_xsec(double E, int f, int cp_sign, const glb_xsec *xs)
 /***************************************************************************
  * Function glb_eft_get_xsec_coeff                                         *
  ***************************************************************************
- * Return the EFT detection coefficient with flavor indices (alpha, beta)  *
- * for Lorentz structure X at energy E                                     *
+ * Return the EFT detection coefficient with flavor index alpha            *
+ * for Lorentz structure (X,Y) at energy E                                 *
  ***************************************************************************/
 #ifdef GLB_EFT
-double glb_eft_get_xsec_coeff(int X, int alpha, int beta, double E, const glb_xsec *xs)
+double glb_eft_get_xsec_coeff(int X, int Y, int alpha, double E, const glb_xsec *xs)
 {
   double logE = log10(E);
-  int col = 1 + X*n_leptonflavors*n_leptonflavors
-              + alpha*n_leptonflavors
-              + beta;   /* which columns of the xsec coefficient table to access */
+  int col = 1 + X*n_leptonflavors*GLB_EFT_N_LORENTZ_STRUCTURES
+              + Y*n_leptonflavors
+              + alpha;   /* which columns of the xsec coefficient table to access */
   int n_steps = xs->eft_n_E - 1;
 
   /* no EFT coefficients defined? -> return zero */
@@ -850,7 +850,7 @@ int glb_reset_xsec(glb_xsec *xs)
       xs->file_name = NULL;
     }
 #ifdef GLB_EFT
-    int n_columns = 1 + n_leptonflavors * n_leptonflavors * GLB_EFT_N_LORENTZ_STRUCTURES;
+    int n_columns = 1 + n_leptonflavors * SQR(GLB_EFT_N_LORENTZ_STRUCTURES);
     for (i=0; i < n_columns; i++)
     {
       if (xs->eft_xsec_coeff[i])
@@ -908,7 +908,7 @@ int glb_copy_xsec(glb_xsec *dest, const glb_xsec *src)
     if (!dest->eft_coeff_file)
       glb_fatal("glb_copy_xsec: cannot copy name of EFT detection coefficient file");
   }
-  int n_columns = 1 + n_leptonflavors * n_leptonflavors * GLB_EFT_N_LORENTZ_STRUCTURES;
+  int n_columns = 1 + n_leptonflavors * SQR(GLB_EFT_N_LORENTZ_STRUCTURES);
   for (j=0; j < n_columns; j++)
   {
     if (src->eft_xsec_coeff[j])

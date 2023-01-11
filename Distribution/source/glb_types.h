@@ -69,7 +69,7 @@ typedef struct {
 #ifdef GLB_EFT
   char *eft_coeff_file;                /* file containing EFT production coefficients */
   int eft_n_E;                         /* number of lines in EFT prod. coeff. file */
-  double *eft_flux_coeff[MAX_FLAVORS*MAX_FLAVORS*GLB_EFT_N_LORENTZ_STRUCTURES+1];
+  double *eft_flux_coeff[MAX_FLAVORS*SQR(GLB_EFT_N_LORENTZ_STRUCTURES)+1];
                                        /* data from that file                    */
 #endif
 } glb_flux;
@@ -86,7 +86,7 @@ typedef struct {
 #ifdef GLB_EFT
   char *eft_coeff_file;                /* file containing EFT detection coefficients */
   int eft_n_E;                         /* number of lines in EFT det. coeff. file */
-  double *eft_xsec_coeff[MAX_FLAVORS*MAX_FLAVORS*GLB_EFT_N_LORENTZ_STRUCTURES+1];
+  double *eft_xsec_coeff[MAX_FLAVORS*SQR(GLB_EFT_N_LORENTZ_STRUCTURES)+1];
                                        /* data from that file                    */
 #endif
 } glb_xsec;

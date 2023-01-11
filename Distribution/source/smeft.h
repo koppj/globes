@@ -32,6 +32,9 @@ extern char smeft_param_strings[][64];
 #define MAX_FLAVORS      6
 #define MAX_INTERACTIONS 5
 
+/* Macros */
+#define SQR(x)      ((x)*(x))                        /* x^2   */
+
 
 // Function declarations
 // ---------------------

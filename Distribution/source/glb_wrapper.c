@@ -2267,10 +2267,10 @@ double glbXSection(int experiment, int xsec_ident,
  * Function glbEFTFluxCoeff                                                *
  ***************************************************************************
  * Return EFT production coefficients associated with the given neutrino   *
- * flux definition; X is one of the GLB_EFT_XXX constants indicating the   *
- * desired Lorentz structure, alpha and beta are lepton flavor indices     *
+ * flux definition; X, Y are two of the GLB_EFT_XXX constants indicating   *
+ * desired Lorentz structure, and alpha is a lepton flavor index           *
  ***************************************************************************/
-double glbEFTFluxCoeff(int experiment, int flux_ident, int X, int alpha, int beta, double energy)
+double glbEFTFluxCoeff(int experiment, int flux_ident, int X, int Y, int alpha, double energy)
 {
   struct glb_experiment *in;
   if(!(experiment >= 0 && experiment < glb_num_of_exps))
@@ -2285,14 +2285,19 @@ double glbEFTFluxCoeff(int experiment, int flux_ident, int X, int alpha, int bet
               flux_ident, experiment);
     return -1;
   }
-  if (alpha < 0 || alpha >= n_leptonflavors || beta < 0 || beta >= n_leptonflavors)
+  if (alpha < 0 || alpha >= n_leptonflavors)
   {
-    glb_error("glbEFTFluxCoeff: invalid flavor indices: (%d, %d)",
-              alpha, beta);
+    glb_error("glbEFTFluxCoeff: invalid flavor index: %d", alpha);
+    return -1;
+  }
+  if (X < 0 || X >= GLB_EFT_N_LORENTZ_STRUCTURES ||
+      Y < 0 || Y >= GLB_EFT_N_LORENTZ_STRUCTURES)
+  {
+    glb_error("glbEFTFluxCoeff: invalid Lorentz Structure: (%d,%d)", X, Y);
     return -1;
   }
 
-  return glb_eft_get_flux_coeff(X, alpha, beta, energy, in->fluxes[flux_ident]);
+  return glb_eft_get_flux_coeff(X, Y, alpha, energy, in->fluxes[flux_ident]);
 }
 
 
@@ -2300,11 +2305,11 @@ double glbEFTFluxCoeff(int experiment, int flux_ident, int X, int alpha, int bet
  * Function glbEFTXSecCoeff                                                *
  ***************************************************************************
  * Return EFT detection coefficients associated with the given neutrino    *
- * cross-section definition; X is one of the GLB_EFT_XXX constants         *
- * indicating the desired Lorentz structure, alpha and beta are lepton     *
- * flavor indices                                                          *
+ * cross-section definition; X,Y are two of the GLB_EFT_XXX constants      *
+ * indicating the desired Lorentz structure, and alpha is a lepton flavor  *
+ * index                                                                   *
  ***************************************************************************/
-double glbEFTXSecCoeff(int experiment, int xsec_ident, int X, int alpha, int beta, double energy)
+double glbEFTXSecCoeff(int experiment, int xsec_ident, int X, int Y, int alpha, double energy)
 {
   struct glb_experiment *in;
   if(!(experiment >= 0 && experiment < glb_num_of_exps))
@@ -2319,13 +2324,18 @@ double glbEFTXSecCoeff(int experiment, int xsec_ident, int X, int alpha, int bet
               xsec_ident, experiment);
     return -1;
   }
-  if (alpha < 0 || alpha >= n_leptonflavors || beta < 0 || beta >= n_leptonflavors)
+  if (alpha < 0 || alpha >= n_leptonflavors)
   {
-    glb_error("glbEFTXSecCoeff: invalid flavor indices: (%d, %d)",
-              alpha, beta);
+    glb_error("glbEFTXSecCoeff: invalid flavor index: %d", alpha);
     return -1;
   }
-  return glb_eft_get_xsec_coeff(X, alpha, beta, energy, in->xsecs[xsec_ident]);
+  if (X < 0 || X >= GLB_EFT_N_LORENTZ_STRUCTURES ||
+      Y < 0 || Y >= GLB_EFT_N_LORENTZ_STRUCTURES)
+  {
+    glb_error("glbEFTXSecCoeff: invalid Lorentz Structure: (%d,%d)", X, Y);
+    return -1;
+  }
+  return glb_eft_get_xsec_coeff(X, Y, alpha, energy, in->xsecs[xsec_ident]);
 }
 #endif
 

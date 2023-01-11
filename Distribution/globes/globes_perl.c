@@ -9870,7 +9870,7 @@ XS(_wrap_glbEFTFluxCoeff) {
     dXSARGS;
     
     if ((items < 6) || (items > 6)) {
-      SWIG_croak("Usage: glbEFTFluxCoeff(experiment,flux_ident,X,alpha,beta,energy);");
+      SWIG_croak("Usage: glbEFTFluxCoeff(experiment,flux_ident,X,Y,alpha,energy);");
     }
     ecode1 = SWIG_AsVal_int SWIG_PERL_CALL_ARGS_2(ST(0), &val1);
     if (!SWIG_IsOK(ecode1)) {
@@ -9948,7 +9948,7 @@ XS(_wrap_glbEFTXSecCoeff) {
     dXSARGS;
     
     if ((items < 6) || (items > 6)) {
-      SWIG_croak("Usage: glbEFTXSecCoeff(experiment,xsec_ident,X,alpha,beta,energy);");
+      SWIG_croak("Usage: glbEFTXSecCoeff(experiment,xsec_ident,X,Y,alpha,energy);");
     }
     ecode1 = SWIG_AsVal_int SWIG_PERL_CALL_ARGS_2(ST(0), &val1);
     if (!SWIG_IsOK(ecode1)) {
@@ -10771,13 +10771,13 @@ XS(SWIG_init) {
     SvREADONLY_on(sv);
   } while(0) /*@SWIG@*/;
   /*@SWIG:/usr/local/Cellar/swig/4.0.2/share/swig/4.0.2/perl5/perltypemaps.swg,65,%set_constant@*/ do {
-    SV *sv = get_sv((char*) SWIG_prefix "GLB_EFT_V", TRUE | 0x2 | GV_ADDMULTI);
-    sv_setsv(sv, SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(GLB_EFT_V)));
+    SV *sv = get_sv((char*) SWIG_prefix "GLB_EFT_L", TRUE | 0x2 | GV_ADDMULTI);
+    sv_setsv(sv, SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(GLB_EFT_L)));
     SvREADONLY_on(sv);
   } while(0) /*@SWIG@*/;
   /*@SWIG:/usr/local/Cellar/swig/4.0.2/share/swig/4.0.2/perl5/perltypemaps.swg,65,%set_constant@*/ do {
-    SV *sv = get_sv((char*) SWIG_prefix "GLB_EFT_A", TRUE | 0x2 | GV_ADDMULTI);
-    sv_setsv(sv, SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(GLB_EFT_A)));
+    SV *sv = get_sv((char*) SWIG_prefix "GLB_EFT_R", TRUE | 0x2 | GV_ADDMULTI);
+    sv_setsv(sv, SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(GLB_EFT_R)));
     SvREADONLY_on(sv);
   } while(0) /*@SWIG@*/;
   /*@SWIG:/usr/local/Cellar/swig/4.0.2/share/swig/4.0.2/perl5/perltypemaps.swg,65,%set_constant@*/ do {
