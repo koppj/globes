@@ -1,6 +1,10 @@
 #ifndef __SMEFT_H
 #define __SMEFT_H
 
+#if HAVE_CONFIG_H   /* config.h should come before any other includes */
+#  include "config.h"
+#endif
+
 #include <globes/globes.h>
 
 // Arrangement of oscillation parameters in glb_params data structure:
@@ -25,8 +29,8 @@
 // Names of oscillation parameters
 extern char smeft_param_strings[][64];
 
-#define MAX_FLAVORS      9
-#define MAX_INTERACTIONS      5
+#define MAX_FLAVORS      6
+#define MAX_INTERACTIONS 5
 
 
 // Function declarations

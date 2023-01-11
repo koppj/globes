@@ -53,6 +53,9 @@ int glb_rule_number;
 
 char **glb_param_names = NULL;
 
+#ifdef GLB_EFT
+  extern int n_leptonflavors; /* import from smeft.c */
+#endif
 
 #define obstack_chunk_alloc glb_malloc
 #define obstack_chunk_free glb_free
@@ -2265,9 +2268,9 @@ double glbXSection(int experiment, int xsec_ident,
  ***************************************************************************
  * Return EFT production coefficients associated with the given neutrino   *
  * flux definition; X is one of the GLB_EFT_XXX constants indicating the   *
- * desired Lorentz structure                                               *
+ * desired Lorentz structure, alpha and beta are lepton flavor indices     *
  ***************************************************************************/
-double glbEFTFluxCoeff(int experiment, int flux_ident, int X, double energy)
+double glbEFTFluxCoeff(int experiment, int flux_ident, int X, int alpha, int beta, double energy)
 {
   struct glb_experiment *in;
   if(!(experiment >= 0 && experiment < glb_num_of_exps))
@@ -2282,8 +2285,14 @@ double glbEFTFluxCoeff(int experiment, int flux_ident, int X, double energy)
               flux_ident, experiment);
     return -1;
   }
+  if (alpha < 0 || alpha >= n_leptonflavors || beta < 0 || beta >= n_leptonflavors)
+  {
+    glb_error("glbEFTFluxCoeff: invalid flavor indices: (%d, %d)",
+              alpha, beta);
+    return -1;
+  }
 
-  return glb_eft_get_flux_coeff(X, energy, in->fluxes[flux_ident]);
+  return glb_eft_get_flux_coeff(X, alpha, beta, energy, in->fluxes[flux_ident]);
 }
 
 
@@ -2292,9 +2301,10 @@ double glbEFTFluxCoeff(int experiment, int flux_ident, int X, double energy)
  ***************************************************************************
  * Return EFT detection coefficients associated with the given neutrino    *
  * cross-section definition; X is one of the GLB_EFT_XXX constants         *
- * indicating the desired Lorentz structure                                *
+ * indicating the desired Lorentz structure, alpha and beta are lepton     *
+ * flavor indices                                                          *
  ***************************************************************************/
-double glbEFTXSecCoeff(int experiment, int xsec_ident, int X, double energy)
+double glbEFTXSecCoeff(int experiment, int xsec_ident, int X, int alpha, int beta, double energy)
 {
   struct glb_experiment *in;
   if(!(experiment >= 0 && experiment < glb_num_of_exps))
@@ -2309,8 +2319,13 @@ double glbEFTXSecCoeff(int experiment, int xsec_ident, int X, double energy)
               xsec_ident, experiment);
     return -1;
   }
-
-  return glb_eft_get_xsec_coeff(X, energy, in->xsecs[xsec_ident]);
+  if (alpha < 0 || alpha >= n_leptonflavors || beta < 0 || beta >= n_leptonflavors)
+  {
+    glb_error("glbEFTXSecCoeff: invalid flavor indices: (%d, %d)",
+              alpha, beta);
+    return -1;
+  }
+  return glb_eft_get_xsec_coeff(X, alpha, beta, energy, in->xsecs[xsec_ident]);
 }
 #endif
 

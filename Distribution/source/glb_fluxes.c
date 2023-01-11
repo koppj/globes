@@ -59,6 +59,9 @@ static double stored_muons = 2.0E20;  // stored muons per year
 static double power;
 static int FLUX_STEPS = 500;          // Number of sampling points for builtin fluxes
 
+#ifdef GLB_EFT
+  extern int n_leptonflavors; /* import from smeft.c */
+#endif
 
 
 /***************************************************************************
@@ -429,10 +432,12 @@ int glb_init_flux(glb_flux *flux)
 #ifdef GLB_EFT
   int status;
   int i;
+  int n_columns = 1 + n_leptonflavors * n_leptonflavors * GLB_EFT_N_LORENTZ_STRUCTURES;
+ 
   if (flux->eft_coeff_file != NULL && strlen(flux->eft_coeff_file) > 0)
   {
-    if ((status=glb_load_n_columns(flux->eft_coeff_file, GLB_EFT_N_LORENTZ_STRUCTURES+1,
-                                  &flux->eft_n_E, flux->eft_flux_coeff)) != GLB_SUCCESS)
+    if ((status=glb_load_n_columns(flux->eft_coeff_file, n_columns,
+                  &flux->eft_n_E, flux->eft_flux_coeff)) != GLB_SUCCESS)
       return status;
 
     /* check that energies are monotonically increasing */
@@ -449,7 +454,7 @@ int glb_init_flux(glb_flux *flux)
   else
   {
     flux->eft_n_E = 0;
-    for (i=0; i < GLB_EFT_N_LORENTZ_STRUCTURES+1; i++)
+    for (i=0; i < n_columns; i++)
       flux->eft_flux_coeff[i] = NULL;
   }
 #endif /* #ifdef GLB_EFT */
@@ -511,15 +516,17 @@ double glb_get_flux(double E, double L, int f, int cp_sign, const glb_flux *flux
 /***************************************************************************
  * Function glb_eft_get_flux_coeff                                         *
  ***************************************************************************
- * Return the EFT production coefficient for Lorentz structure X at        *
- * energy E                                                                *
+ * Return the EFT production coefficient with flavor indices (alpha, beta) *
+ * for Lorentz structure X at energy E                                     *
  ***************************************************************************/
 #ifdef GLB_EFT
-double glb_eft_get_flux_coeff(int X, double E, const glb_flux *flux)
+double glb_eft_get_flux_coeff(int X, int alpha, int beta, double E, const glb_flux *flux)
 {
   double result;
 
-  int col = X + 1;
+  int col = 1 + X*n_leptonflavors*n_leptonflavors
+              + alpha*n_leptonflavors
+              + beta;   /* which columns of the flux coefficient table to access */
   int n_steps = flux->eft_n_E - 1;
 
   /* no EFT coefficients defined? -> return zero */
@@ -593,7 +600,8 @@ int glb_reset_flux(glb_flux *flux)
       flux->file_name = NULL;
     }
 #ifdef GLB_EFT
-    for (i=0; i < GLB_EFT_N_LORENTZ_STRUCTURES+1; i++)
+    int n_columns = 1 + n_leptonflavors * n_leptonflavors * GLB_EFT_N_LORENTZ_STRUCTURES;
+    for (i=0; i < n_columns; i++)
     {
       if (flux->eft_flux_coeff[i])
       {
@@ -650,7 +658,8 @@ int glb_copy_flux(glb_flux *dest, const glb_flux *src)
     if (!dest->eft_coeff_file)
       glb_fatal("glb_copy_flux: cannot copy name of EFT production coefficient file");
   }
-  for (j=0; j < GLB_EFT_N_LORENTZ_STRUCTURES+1; j++)
+  int n_columns = 1 + n_leptonflavors * n_leptonflavors * GLB_EFT_N_LORENTZ_STRUCTURES;
+  for (j=0; j < n_columns; j++)
   {
     if (src->eft_flux_coeff[j])
     {
@@ -689,10 +698,11 @@ int glb_init_xsec(glb_xsec *xs)
 
   /* Load EFT detection coefficients */
 #ifdef GLB_EFT
+  int n_columns = 1 + n_leptonflavors * n_leptonflavors * GLB_EFT_N_LORENTZ_STRUCTURES;
   if (xs->eft_coeff_file != NULL && strlen(xs->eft_coeff_file) > 0)
   {
-    if ((status=glb_load_n_columns(xs->eft_coeff_file, GLB_EFT_N_LORENTZ_STRUCTURES+1,
-                                  &xs->eft_n_E, xs->eft_xsec_coeff)) != GLB_SUCCESS)
+    if ((status=glb_load_n_columns(xs->eft_coeff_file, n_columns,
+                  &xs->eft_n_E, xs->eft_xsec_coeff)) != GLB_SUCCESS)
       return status;
 
       /* check that energies are monotonically increasing */
@@ -709,7 +719,7 @@ int glb_init_xsec(glb_xsec *xs)
   else
   {
     xs->eft_n_E = 0;
-    for (i=0; i < GLB_EFT_N_LORENTZ_STRUCTURES+1; i++)
+    for (i=0; i < n_columns; i++)
       xs->eft_xsec_coeff[i] = NULL;
   }
 #endif /* #ifdef GLB_EFT */
@@ -766,14 +776,16 @@ double glb_get_xsec(double E, int f, int cp_sign, const glb_xsec *xs)
 /***************************************************************************
  * Function glb_eft_get_xsec_coeff                                         *
  ***************************************************************************
- * Returns the EFT detection coefficient for Lorentz structure X and       *
- * energy E                                                                *
+ * Return the EFT detection coefficient with flavor indices (alpha, beta)  *
+ * for Lorentz structure X at energy E                                     *
  ***************************************************************************/
 #ifdef GLB_EFT
-double glb_eft_get_xsec_coeff(int X, double E, const glb_xsec *xs)
+double glb_eft_get_xsec_coeff(int X, int alpha, int beta, double E, const glb_xsec *xs)
 {
   double logE = log10(E);
-  int col = X + 1;
+  int col = 1 + X*n_leptonflavors*n_leptonflavors
+              + alpha*n_leptonflavors
+              + beta;   /* which columns of the xsec coefficient table to access */
   int n_steps = xs->eft_n_E - 1;
 
   /* no EFT coefficients defined? -> return zero */
@@ -838,7 +850,8 @@ int glb_reset_xsec(glb_xsec *xs)
       xs->file_name = NULL;
     }
 #ifdef GLB_EFT
-    for (i=0; i < GLB_EFT_N_LORENTZ_STRUCTURES+1; i++)
+    int n_columns = 1 + n_leptonflavors * n_leptonflavors * GLB_EFT_N_LORENTZ_STRUCTURES;
+    for (i=0; i < n_columns; i++)
     {
       if (xs->eft_xsec_coeff[i])
       {
@@ -895,7 +908,8 @@ int glb_copy_xsec(glb_xsec *dest, const glb_xsec *src)
     if (!dest->eft_coeff_file)
       glb_fatal("glb_copy_xsec: cannot copy name of EFT detection coefficient file");
   }
-  for (j=0; j < GLB_EFT_N_LORENTZ_STRUCTURES+1; j++)
+  int n_columns = 1 + n_leptonflavors * n_leptonflavors * GLB_EFT_N_LORENTZ_STRUCTURES;
+  for (j=0; j < n_columns; j++)
   {
     if (src->eft_xsec_coeff[j])
     {

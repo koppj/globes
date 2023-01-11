@@ -464,8 +464,8 @@ int glbSetInitialStep(double step);
   enum eft_Lorentz_structures  /* Lorentz structures supported */
     { GLB_EFT_V, GLB_EFT_A, GLB_EFT_S, GLB_EFT_P, GLB_EFT_T,
       GLB_EFT_N_LORENTZ_STRUCTURES };
-  double glbEFTFluxCoeff(int experiment, int flux_ident, int X, double energy);
-  double glbEFTXSecCoeff(int experiment, int xsec_ident, int X, double energy);
+  double glbEFTFluxCoeff(int experiment, int flux_ident, int X, int alpha, int beta, double energy);
+  double glbEFTXSecCoeff(int experiment, int xsec_ident, int X, int alpha, int beta, double energy);
 #endif /* #ifdef GLB_EFT */
 
 END_C_DECLS

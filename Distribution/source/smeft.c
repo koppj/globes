@@ -29,7 +29,7 @@
 // -std=gnu99
 // ----------------------------------------------------------------------------
 // ChangeLog:
-//   2011-01-14: - Implemented filter feature for n_laptonflavors > 3
+//   2011-01-14: - Implemented filter feature for n_leptonflavors > 3
 //               - New function smeft_probability_matrix_all returns
 //                 oscillation probabilities to/from sterile flavors
 //                 (the standard smeft_probability_matrix returns only
@@ -73,6 +73,9 @@
 //         of the present NSI engine was used.",
 //     }
 // ----------------------------------------------------------------------------
+#if HAVE_CONFIG_H   /* config.h should come before any other includes */
+#  include "config.h"
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -86,7 +89,9 @@
 #include <gsl/gsl_blas.h>
 #include <gsl/gsl_eigen.h>
 #include "globes/globes.h"
+#include "glb_error.h"
 #include "smeft.h"
+
 
 // Constants
 #define GLB_V_FACTOR        7.5e-14    // Conversion factor for matter potentials
@@ -111,7 +116,7 @@
 #define MAX_PHASES    (((MAX_FLAVORS-1)*(MAX_FLAVORS-2))/2)
 
 // Fundamental oscillation parameters
-int n_laptonflavors = 0;
+int n_leptonflavors = 3;
 int n_quarks = 0;
 int n_params  = 0;
 int n_angles  = 0;
@@ -562,15 +567,15 @@ int smeft_init_probability_engine_3()
 
 
 // ----------------------------------------------------------------------------
-int smeft_init_probability_engine(int _n_laptonflavors, int _rotation_order[][2], int _phase_order[])
+int smeft_init_probability_engine(int _n_leptonflavors, int _rotation_order[][2], int _phase_order[])
 // ----------------------------------------------------------------------------
 // Allocates internal data structures for the probability engine.
 // ----------------------------------------------------------------------------
 {
-  if (_n_laptonflavors < 3 || _n_laptonflavors > MAX_FLAVORS)
+  if (_n_leptonflavors < 3 || _n_leptonflavors > MAX_FLAVORS)
   {
     fprintf(stderr, "smeft_init_probability_engine: Too many or too few neutrino flavors (%d).\n",
-            _n_laptonflavors);
+            _n_leptonflavors);
     return -1;
   }
 
@@ -588,26 +593,26 @@ int smeft_init_probability_engine(int _n_laptonflavors, int _rotation_order[][2]
   //   which gives 6*n^2 parameters
 
   // = n(n-1)+2 * 6 * 5 * n^2+ 2 * 3 * n^2 = 67 * n^2-n
-  n_laptonflavors = _n_laptonflavors;
-  n_params  = (SQR(n_laptonflavors)-n_laptonflavors)+(2 * 5 * SQR(n_laptonflavors) * 6)+(SQR(n_laptonflavors)*2*3);
-  n_angles  = (n_laptonflavors * (n_laptonflavors-1))/2;
-  n_phases  = ((n_laptonflavors-1)*(n_laptonflavors-2))/2;
+  n_leptonflavors = _n_leptonflavors;
+  n_params  = (SQR(n_leptonflavors)-n_leptonflavors)+(2 * 5 * SQR(n_leptonflavors) * 6)+(SQR(n_leptonflavors)*2*3);
+  n_angles  = (n_leptonflavors * (n_leptonflavors-1))/2;
+  n_phases  = ((n_leptonflavors-1)*(n_leptonflavors-2))/2;
 
   smeft_free_probability_engine();
 
-  U = gsl_matrix_complex_calloc(n_laptonflavors, n_laptonflavors);
-  H = gsl_matrix_complex_calloc(n_laptonflavors, n_laptonflavors);
-  Q = gsl_matrix_complex_calloc(n_laptonflavors, n_laptonflavors);
-  lambda = gsl_vector_alloc(n_laptonflavors);
-  S = gsl_matrix_complex_calloc(n_laptonflavors, n_laptonflavors);
+  U = gsl_matrix_complex_calloc(n_leptonflavors, n_leptonflavors);
+  H = gsl_matrix_complex_calloc(n_leptonflavors, n_leptonflavors);
+  Q = gsl_matrix_complex_calloc(n_leptonflavors, n_leptonflavors);
+  lambda = gsl_vector_alloc(n_leptonflavors);
+  S = gsl_matrix_complex_calloc(n_leptonflavors, n_leptonflavors);
 
-  H0_template = gsl_matrix_complex_calloc(n_laptonflavors, n_laptonflavors);
-  S1 = gsl_matrix_complex_calloc(n_laptonflavors, n_laptonflavors);
-  T0 = gsl_matrix_complex_calloc(n_laptonflavors, n_laptonflavors);
-  Q1 = gsl_matrix_complex_calloc(n_laptonflavors, n_laptonflavors);
-  Q2 = gsl_matrix_complex_calloc(n_laptonflavors, n_laptonflavors);
+  H0_template = gsl_matrix_complex_calloc(n_leptonflavors, n_leptonflavors);
+  S1 = gsl_matrix_complex_calloc(n_leptonflavors, n_leptonflavors);
+  T0 = gsl_matrix_complex_calloc(n_leptonflavors, n_leptonflavors);
+  Q1 = gsl_matrix_complex_calloc(n_leptonflavors, n_leptonflavors);
+  Q2 = gsl_matrix_complex_calloc(n_leptonflavors, n_leptonflavors);
 
-  w  = gsl_eigen_hermv_alloc(n_laptonflavors);
+  w  = gsl_eigen_hermv_alloc(n_leptonflavors);
 
   for (int i=0; i < n_angles; i++)
   {
@@ -646,11 +651,11 @@ int smeft_init_probability_engine(int _n_laptonflavors, int _rotation_order[][2]
   sprintf(smeft_param_strings[5], "%s", "DM31");
 
   int k = 6;
-  for (int i=4; i <= n_laptonflavors; i++)            // Mass squared differences
+  for (int i=4; i <= n_leptonflavors; i++)            // Mass squared differences
     sprintf(smeft_param_strings[k++], "DM%d1", i);
 
-  for (int i=1; i <= n_laptonflavors; i++)            // Sterile mixing angles
-    for (int j=MAX(i+1,4); j <= n_laptonflavors; j++)
+  for (int i=1; i <= n_leptonflavors; i++)            // Sterile mixing angles
+    for (int j=MAX(i+1,4); j <= n_leptonflavors; j++)
       sprintf(smeft_param_strings[k++], "TH%d%d", i, j);
 
   for (int i=1; i <= n_phases-1; i++)
@@ -666,8 +671,8 @@ int smeft_init_probability_engine(int _n_laptonflavors, int _rotation_order[][2]
   for (int x=0; x < 5; x++)                   // Production/Detection NSI: CC WEFT
     for (int l=0; l < 2; l++)
       for (int m=0; m < 3; m++)
-          for (int i=0; i < n_laptonflavors; i++)
-              for (int j=0; j < n_laptonflavors; j++)
+          for (int i=0; i < n_leptonflavors; i++)
+              for (int j=0; j < n_leptonflavors; j++)
     {
       sprintf(smeft_param_strings[k++], "ABS_EPS_CC_%s_%s%s_%s%s", interactions[x], upquarks[l], downquarks[m], laptonflavors[i], laptonflavors[j]);
       sprintf(smeft_param_strings[k++], "ARG_EPS_CC_%s_%s%s_%s%s", interactions[x], upquarks[l], downquarks[m], laptonflavors[i], laptonflavors[j]);
@@ -676,10 +681,10 @@ int smeft_init_probability_engine(int _n_laptonflavors, int _rotation_order[][2]
 
     for (int x=0; x < 2; x++)     // Propagation NSI: NC WEFT
       for (int f=0; f < 3; f++)
-        for (int i=0; i < n_laptonflavors; i++)
+        for (int i=0; i < n_leptonflavors; i++)
   {
     sprintf(smeft_param_strings[k++], "EPS_NC_%s_%s%s_%s%s", interactions[x], matterfermions[f], matterfermions[f], laptonflavors[i], laptonflavors[i]);
-    for (int j=i+1; j < n_laptonflavors; j++)
+    for (int j=i+1; j < n_leptonflavors; j++)
     {
       sprintf(smeft_param_strings[k++], "ABS_EPS_NC_%s_%s%s_%s%s", interactions[x], matterfermions[f], matterfermions[f], laptonflavors[i], laptonflavors[j]);
       sprintf(smeft_param_strings[k++], "ARG_EPS_NC_%s_%s%s_%s%s", interactions[x], matterfermions[f], matterfermions[f], laptonflavors[i], laptonflavors[j]);
@@ -695,7 +700,7 @@ int smeft_init_probability_engine(int _n_laptonflavors, int _rotation_order[][2]
   }
 
 
-//  printf("Oscillation engine initialized for %d neutrino flavors\n", n_laptonflavors);
+//  printf("Oscillation engine initialized for %d neutrino flavors\n", n_leptonflavors);
 //  printf("Oscillation parameters are:\n");
 //  for (int i=0; i < n_params; i++)
 //  {
@@ -738,10 +743,10 @@ int smeft_set_oscillation_parameters(glb_params p, void *user_data)
 // matrix and part of the Hamiltonian.
 // ----------------------------------------------------------------------------
 {
-  gsl_matrix_complex *R = gsl_matrix_complex_alloc(n_laptonflavors, n_laptonflavors);
-  gsl_matrix_complex *T = gsl_matrix_complex_alloc(n_laptonflavors, n_laptonflavors);
-  double complex (*_R)[n_laptonflavors]
-    = (double complex (*)[n_laptonflavors]) gsl_matrix_complex_ptr(R, 0, 0);
+  gsl_matrix_complex *R = gsl_matrix_complex_alloc(n_leptonflavors, n_leptonflavors);
+  gsl_matrix_complex *T = gsl_matrix_complex_alloc(n_leptonflavors, n_leptonflavors);
+  double complex (*_R)[n_leptonflavors]
+    = (double complex (*)[n_leptonflavors]) gsl_matrix_complex_ptr(R, 0, 0);
   int i, j, k;
 
   // Implement correlations between density parameters. This requires that under
@@ -761,11 +766,11 @@ int smeft_set_oscillation_parameters(glb_params p, void *user_data)
   dmsq[1]  = glbGetOscParams(p, GLB_DM_31);
 
   k = 6;
-  for (i=4; i <= n_laptonflavors; i++)                // Mass squared differences
+  for (i=4; i <= n_leptonflavors; i++)                // Mass squared differences
     dmsq[i-2] = glbGetOscParams(p, k++);
 
-  for (i=1; i <= n_laptonflavors; i++)                // Sterile mixing angles
-    for (j=MAX(i+1,4); j <= n_laptonflavors; j++)
+  for (i=1; i <= n_leptonflavors; i++)                // Sterile mixing angles
+    for (j=MAX(i+1,4); j <= n_leptonflavors; j++)
       th[i][j] = glbGetOscParams(p, k++);
 
   for (i=1; i <= n_phases-1; i++)               // Sterile phases
@@ -778,9 +783,9 @@ int smeft_set_oscillation_parameters(glb_params p, void *user_data)
     {
       for (int m=0; m < 3; m++)
       {
-        for (int i=0; i < n_laptonflavors; i++)
+        for (int i=0; i < n_leptonflavors; i++)
         {
-          for (int j=0; j < n_laptonflavors; j++)
+          for (int j=0; j < n_leptonflavors; j++)
           {
             epsilon_CC[x][l][m][i][j] = glbGetOscParams(p,k) * cexp(I*glbGetOscParams(p,k+1));
             k += 2;
@@ -794,11 +799,11 @@ int smeft_set_oscillation_parameters(glb_params p, void *user_data)
   {
     for (int f=0; f < 3; f++)
     {
-      for (int i=0; i < n_laptonflavors; i++)
+      for (int i=0; i < n_leptonflavors; i++)
       {
         epsilon_NC[x][f][f][i][i] = glbGetOscParams(p,k);
         k++;
-        for (j=i+1; j < n_laptonflavors; j++)
+        for (j=i+1; j < n_leptonflavors; j++)
         {
           epsilon_NC[x][f][f][i][j] = glbGetOscParams(p,k) * cexp(I*glbGetOscParams(p,k+1));
           epsilon_NC[x][f][f][j][i] = conj(epsilon_NC[x][f][f][i][j]);
@@ -839,7 +844,7 @@ int smeft_set_oscillation_parameters(glb_params p, void *user_data)
   /* Calculate energy independent matrix H0 * E */
   gsl_matrix_complex_set_zero(H0_template);
   gsl_matrix_complex_set_zero(H);
-  for (i=1; i < n_laptonflavors; i++)
+  for (i=1; i < n_leptonflavors; i++)
     gsl_matrix_complex_set(H0_template, i, i, gsl_complex_rect(0.5*dmsq[i-1], 0.0));
 
   gsl_blas_zgemm(CblasNoTrans, CblasConjTrans, GSL_COMPLEX_ONE, H0_template, U, // T=H0.U^\dagger
@@ -865,11 +870,11 @@ int smeft_get_oscillation_parameters(glb_params p, void *user_data)
   glbDefineParams(p, th[1][2], th[1][3], th[2][3], delta[0], dmsq[0], dmsq[1]);
 
   k = 6;
-  for (i=4; i <= n_laptonflavors; i++)                // Mass squared differences
+  for (i=4; i <= n_leptonflavors; i++)                // Mass squared differences
     glbSetOscParams(p, dmsq[i-2], k++);
 
-  for (i=1; i <= n_laptonflavors; i++)                // Sterile mixing angles
-    for (j=MAX(i+1,4); j <= n_laptonflavors; j++)
+  for (i=1; i <= n_leptonflavors; i++)                // Sterile mixing angles
+    for (j=MAX(i+1,4); j <= n_leptonflavors; j++)
       glbSetOscParams(p, th[i][j], k++);
 
   for (i=1; i <= n_phases-1; i++)                // Sterile phases
@@ -882,9 +887,9 @@ for (int x=0; x < 5; x++)                     // Production/Detection NSI: CC WE
   {
     for (int m=0; m < 3; m++)
     {
-      for (int i=0; i < n_laptonflavors; i++)
+      for (int i=0; i < n_leptonflavors; i++)
       {
-        for (int j=0; j < n_laptonflavors; j++)
+        for (int j=0; j < n_leptonflavors; j++)
         {
           glbSetOscParams(p, cabs(epsilon_CC[x][l][m][i][j]), k);
           glbSetOscParams(p, carg(epsilon_CC[x][l][m][i][j]), k+1);
@@ -899,11 +904,11 @@ for (int x=0; x < 2; x++)           // Propagation NSI: NC WEFT
 {
   for (int f=0; f < 3; f++)
   {
-    for (int i=0; i < n_laptonflavors; i++)
+    for (int i=0; i < n_leptonflavors; i++)
     {
         glbSetOscParams(p, epsilon_NC[x][f][f][i][i], k);
       k++;
-      for (j=i+1; j < n_laptonflavors; j++)
+      for (j=i+1; j < n_leptonflavors; j++)
       {
         glbSetOscParams(p, cabs(epsilon_NC[x][f][f][i][j]), k);
         glbSetOscParams(p, carg(epsilon_NC[x][f][f][i][j]), k+1);
@@ -929,22 +934,22 @@ int smeft_hamiltonian_cd(double E, double rho, int cp_sign)
   double Ve = cp_sign * rho * (GLB_V_FACTOR * GLB_Ne_MANTLE); // Matter potential
   double Vn = cp_sign * rho * (GLB_V_FACTOR * (1.0 - GLB_Ne_MANTLE) / 2.0);
 
-  double complex (*_H)[n_laptonflavors]
-    = (double complex (*)[n_laptonflavors]) gsl_matrix_complex_ptr(H, 0, 0);
-  double complex (*_H0_template)[n_laptonflavors]
-    = (double complex (*)[n_laptonflavors]) gsl_matrix_complex_ptr(H0_template, 0, 0);
+  double complex (*_H)[n_leptonflavors]
+    = (double complex (*)[n_leptonflavors]) gsl_matrix_complex_ptr(H, 0, 0);
+  double complex (*_H0_template)[n_leptonflavors]
+    = (double complex (*)[n_leptonflavors]) gsl_matrix_complex_ptr(H0_template, 0, 0);
   int i, j;
 
   if (cp_sign > 0)
   {
-    for (i=0; i < n_laptonflavors; i++)
-      for (j=0; j < n_laptonflavors; j++)
+    for (i=0; i < n_leptonflavors; i++)
+      for (j=0; j < n_leptonflavors; j++)
         _H[i][j] = _H0_template[i][j] * inv_E  +  Ve*epsilon_m[i][j];
   }
   else
   {
-    for (i=0; i < n_laptonflavors; i++)
-      for (j=0; j < n_laptonflavors; j++)
+    for (i=0; i < n_leptonflavors; i++)
+      for (j=0; j < n_leptonflavors; j++)
         _H[i][j] = conj(_H0_template[i][j] * inv_E  +  Ve*epsilon_m[i][j]);
                                                 // delta_CP -> -delta_CP
   }
@@ -980,9 +985,9 @@ int smeft_S_matrix_cd(double E, double L, double rho, int cp_sign)
 // ----------------------------------------------------------------------------
 {
   // Introduce some abbreviations
-  double complex (*_S)[n_laptonflavors] =(double complex (*)[n_laptonflavors])gsl_matrix_complex_ptr(S,0,0);
-  double complex (*_Q)[n_laptonflavors] =(double complex (*)[n_laptonflavors])gsl_matrix_complex_ptr(Q,0,0);
-  double complex (*_T0)[n_laptonflavors]=(double complex (*)[n_laptonflavors])gsl_matrix_complex_ptr(T0,0,0);
+  double complex (*_S)[n_leptonflavors] =(double complex (*)[n_leptonflavors])gsl_matrix_complex_ptr(S,0,0);
+  double complex (*_Q)[n_leptonflavors] =(double complex (*)[n_leptonflavors])gsl_matrix_complex_ptr(Q,0,0);
+  double complex (*_T0)[n_leptonflavors]=(double complex (*)[n_leptonflavors])gsl_matrix_complex_ptr(T0,0,0);
   double *_lambda = gsl_vector_ptr(lambda,0);
   int status;
   int i, j, k;
@@ -992,17 +997,17 @@ int smeft_S_matrix_cd(double E, double L, double rho, int cp_sign)
     // Use vacuum mixing angles and masses
     double inv_E = 0.5/E;
     _lambda[0] = 0.0;
-    for (i=1; i < n_laptonflavors; i++)
+    for (i=1; i < n_leptonflavors; i++)
       _lambda[i] = dmsq[i-1] * inv_E;
 
     if (cp_sign > 0)
       gsl_matrix_complex_memcpy(Q, U);
     else
     {
-      double complex (*_U)[n_laptonflavors]
-        = (double complex (*)[n_laptonflavors]) gsl_matrix_complex_ptr(U,0,0);
-      for (i=0; i < n_laptonflavors; i++)
-        for (j=0; j < n_laptonflavors; j++)
+      double complex (*_U)[n_leptonflavors]
+        = (double complex (*)[n_leptonflavors]) gsl_matrix_complex_ptr(U,0,0);
+      for (i=0; i < n_leptonflavors; i++)
+        for (j=0; j < n_leptonflavors; j++)
           _Q[i][j] = conj(_U[i][j]);
     }
   }
@@ -1013,7 +1018,7 @@ int smeft_S_matrix_cd(double E, double L, double rho, int cp_sign)
       return status;
 
     // Calculate eigenvalues of Hamiltonian
-    if (n_laptonflavors == 3)
+    if (n_leptonflavors == 3)
     {
       double complex (*_H)[3] = (double complex (*)[3]) gsl_matrix_complex_ptr(H,0,0);
       double complex (*_Q)[3] = (double complex (*)[3]) gsl_matrix_complex_ptr(Q,0,0);
@@ -1031,7 +1036,7 @@ int smeft_S_matrix_cd(double E, double L, double rho, int cp_sign)
   // Calculate S-Matrix in mass basis in matter ...
   double phase;
   gsl_matrix_complex_set_zero(S);
-  for (i=0; i < n_laptonflavors; i++)
+  for (i=0; i < n_leptonflavors; i++)
   {
     phase    = -L * _lambda[i];
     _S[i][i] = cos(phase) + I*sin(phase);
@@ -1040,10 +1045,10 @@ int smeft_S_matrix_cd(double E, double L, double rho, int cp_sign)
   // ... and transform it to the flavour basis
   gsl_matrix_complex_set_zero(T0);
   double complex *p = &_T0[0][0];
-  for (i=0; i < n_laptonflavors; i++)              // T0 = S.Q^\dagger
-    for (j=0; j < n_laptonflavors; j++)
+  for (i=0; i < n_leptonflavors; i++)              // T0 = S.Q^\dagger
+    for (j=0; j < n_leptonflavors; j++)
     {
-      for (int k=0; k < n_laptonflavors; k++)
+      for (int k=0; k < n_leptonflavors; k++)
       {
         *p += ( creal(_S[i][k])*creal(_Q[j][k])+cimag(_S[i][k])*cimag(_Q[j][k]) )
                 + I * ( cimag(_S[i][k])*creal(_Q[j][k])-creal(_S[i][k])*cimag(_Q[j][k]) );
@@ -1052,10 +1057,10 @@ int smeft_S_matrix_cd(double E, double L, double rho, int cp_sign)
     }
   gsl_matrix_complex_set_zero(S);
   p = &_S[0][0];
-  for (i=0; i < n_laptonflavors; i++)              // S = Q.T0
-    for (j=0; j < n_laptonflavors; j++)
+  for (i=0; i < n_leptonflavors; i++)              // S = Q.T0
+    for (j=0; j < n_leptonflavors; j++)
     {
-      for (k=0; k < n_laptonflavors; k++)
+      for (k=0; k < n_leptonflavors; k++)
       {
         *p += ( creal(_Q[i][k])*creal(_T0[k][j])-cimag(_Q[i][k])*cimag(_T0[k][j]) )
                 + I * ( cimag(_Q[i][k])*creal(_T0[k][j])+creal(_Q[i][k])*cimag(_T0[k][j]) );
@@ -1067,27 +1072,27 @@ int smeft_S_matrix_cd(double E, double L, double rho, int cp_sign)
   if (cp_sign > 0)
   {
     gsl_matrix_complex_set_zero(T0);
-    for (i=0; i < n_laptonflavors; i++)            // T0 = S.(1+epsilon_s)
-      for (j=0; j < n_laptonflavors; j++)
-        for (k=0; k < n_laptonflavors; k++)
+    for (i=0; i < n_leptonflavors; i++)            // T0 = S.(1+epsilon_s)
+      for (j=0; j < n_leptonflavors; j++)
+        for (k=0; k < n_leptonflavors; k++)
           _T0[i][j] += _S[i][k] * epsilon_s_plus_1[k][j];
     gsl_matrix_complex_set_zero(S);
-    for (i=0; i < n_laptonflavors; i++)            // S = (1+epsilon_d).T0
-      for (j=0; j < n_laptonflavors; j++)
-        for (k=0; k < n_laptonflavors; k++)
+    for (i=0; i < n_leptonflavors; i++)            // S = (1+epsilon_d).T0
+      for (j=0; j < n_leptonflavors; j++)
+        for (k=0; k < n_leptonflavors; k++)
           _S[i][j] += epsilon_d_plus_1[i][k] * _T0[k][j];
   }
   else
   {
     gsl_matrix_complex_set_zero(T0);
-    for (i=0; i < n_laptonflavors; i++)            // T0 = S.conj(1+epsilon_s)
-      for (j=0; j < n_laptonflavors; j++)
-        for (k=0; k < n_laptonflavors; k++)
+    for (i=0; i < n_leptonflavors; i++)            // T0 = S.conj(1+epsilon_s)
+      for (j=0; j < n_leptonflavors; j++)
+        for (k=0; k < n_leptonflavors; k++)
           _T0[i][j] += _S[i][k] * conj(epsilon_s_plus_1[k][j]);
     gsl_matrix_complex_set_zero(S);
-    for (i=0; i < n_laptonflavors; i++)            // S = conj(1+epsilon_d).T0
-      for (j=0; j < n_laptonflavors; j++)
-        for (k=0; k < n_laptonflavors; k++)
+    for (i=0; i < n_leptonflavors; i++)            // S = conj(1+epsilon_d).T0
+      for (j=0; j < n_leptonflavors; j++)
+        for (k=0; k < n_leptonflavors; k++)
           _S[i][j] += conj(epsilon_d_plus_1[i][k]) * _T0[k][j];
   }
 
@@ -1116,10 +1121,10 @@ int smeft_filtered_probability_matrix_cd(double P[MAX_FLAVORS][MAX_FLAVORS],
 // ----------------------------------------------------------------------------
 {
   // Introduce some abbreviations
-  double complex (*_Q)[n_laptonflavors]  = (double complex (*)[n_laptonflavors]) gsl_matrix_complex_ptr(Q,0,0);
-  double complex (*_T0)[n_laptonflavors] = (double complex (*)[n_laptonflavors]) gsl_matrix_complex_ptr(T0,0,0);
-  double complex (*_Q1)[n_laptonflavors] = (double complex (*)[n_laptonflavors]) gsl_matrix_complex_ptr(Q1,0,0);
-  double complex (*_Q2)[n_laptonflavors] = (double complex (*)[n_laptonflavors]) gsl_matrix_complex_ptr(Q2,0,0);
+  double complex (*_Q)[n_leptonflavors]  = (double complex (*)[n_leptonflavors]) gsl_matrix_complex_ptr(Q,0,0);
+  double complex (*_T0)[n_leptonflavors] = (double complex (*)[n_leptonflavors]) gsl_matrix_complex_ptr(T0,0,0);
+  double complex (*_Q1)[n_leptonflavors] = (double complex (*)[n_leptonflavors]) gsl_matrix_complex_ptr(Q1,0,0);
+  double complex (*_Q2)[n_leptonflavors] = (double complex (*)[n_leptonflavors]) gsl_matrix_complex_ptr(Q2,0,0);
   double *_lambda = gsl_vector_ptr(lambda,0);
   int status;
   int i, j, k, l;
@@ -1129,17 +1134,17 @@ int smeft_filtered_probability_matrix_cd(double P[MAX_FLAVORS][MAX_FLAVORS],
   {
     double inv_E = 0.5/E;
     _lambda[0] = 0.0;
-    for (i=1; i < n_laptonflavors; i++)
+    for (i=1; i < n_leptonflavors; i++)
       _lambda[i] = dmsq[i-1] * inv_E;
 
     if (cp_sign > 0)
       gsl_matrix_complex_memcpy(Q, U);
     else
     {
-      double complex (*_U)[n_laptonflavors]
-        = (double complex (*)[n_laptonflavors]) gsl_matrix_complex_ptr(U,0,0);
-      for (i=0; i < n_laptonflavors; i++)
-        for (j=0; j < n_laptonflavors; j++)
+      double complex (*_U)[n_leptonflavors]
+        = (double complex (*)[n_leptonflavors]) gsl_matrix_complex_ptr(U,0,0);
+      for (i=0; i < n_leptonflavors; i++)
+        for (j=0; j < n_leptonflavors; j++)
           _Q[i][j] = conj(_U[i][j]);
     }
   }
@@ -1152,7 +1157,7 @@ int smeft_filtered_probability_matrix_cd(double P[MAX_FLAVORS][MAX_FLAVORS],
       return status;
 
     // Calculate eigenvalues and eigenvectors of Hamiltonian
-    if (n_laptonflavors == 3)
+    if (n_leptonflavors == 3)
     {
       double complex (*_H)[3] = (double complex (*)[3]) gsl_matrix_complex_ptr(H,0,0);
       double complex (*_Q)[3] = (double complex (*)[3]) gsl_matrix_complex_ptr(Q,0,0);
@@ -1173,24 +1178,24 @@ int smeft_filtered_probability_matrix_cd(double P[MAX_FLAVORS][MAX_FLAVORS],
   gsl_matrix_complex_set_zero(Q2);
   if (cp_sign > 0)
   {
-    for (i=0; i < n_laptonflavors; i++)
-      for (j=0; j < n_laptonflavors; j++)
-        for (k=0; k < n_laptonflavors; k++)
+    for (i=0; i < n_leptonflavors; i++)
+      for (j=0; j < n_leptonflavors; j++)
+        for (k=0; k < n_leptonflavors; k++)
           _Q1[i][j] += conj(epsilon_s_plus_1[k][i]) * _Q[k][j];
-    for (i=0; i < n_laptonflavors; i++)
-      for (j=0; j < n_laptonflavors; j++)
-        for (k=0; k < n_laptonflavors; k++)
+    for (i=0; i < n_leptonflavors; i++)
+      for (j=0; j < n_leptonflavors; j++)
+        for (k=0; k < n_leptonflavors; k++)
           _Q2[i][j] += epsilon_d_plus_1[i][k] * _Q[k][j];
   }
   else
   {
-    for (i=0; i < n_laptonflavors; i++)
-      for (j=0; j < n_laptonflavors; j++)
-        for (k=0; k < n_laptonflavors; k++)
+    for (i=0; i < n_leptonflavors; i++)
+      for (j=0; j < n_leptonflavors; j++)
+        for (k=0; k < n_leptonflavors; k++)
           _Q1[i][j] += epsilon_s_plus_1[k][i] * _Q[k][j];
-    for (i=0; i < n_laptonflavors; i++)
-      for (j=0; j < n_laptonflavors; j++)
-        for (k=0; k < n_laptonflavors; k++)
+    for (i=0; i < n_leptonflavors; i++)
+      for (j=0; j < n_leptonflavors; j++)
+        for (k=0; k < n_leptonflavors; k++)
           _Q2[i][j] += conj(epsilon_d_plus_1[i][k]) * _Q[k][j];
   }
 
@@ -1199,22 +1204,22 @@ int smeft_filtered_probability_matrix_cd(double P[MAX_FLAVORS][MAX_FLAVORS],
   double phase, filter_factor;
   double t = -0.5/1.0e-18 * SQR(sigma) / SQR(E);
   gsl_matrix_complex_set_zero(T0);
-  for (i=0; i < n_laptonflavors; i++)
-    for (j=i+1; j < n_laptonflavors; j++)
+  for (i=0; i < n_leptonflavors; i++)
+    for (j=i+1; j < n_leptonflavors; j++)
     {
       phase         = -L * (_lambda[i] - _lambda[j]);
       filter_factor = exp(t * SQR(phase));
       _T0[i][j]     = filter_factor * (cos(phase) + I*sin(phase));
     }
 
-  for (k=0; k < n_laptonflavors; k++)
-    for (l=0; l < n_laptonflavors; l++)
+  for (k=0; k < n_leptonflavors; k++)
+    for (l=0; l < n_leptonflavors; l++)
     {
       P[k][l] = 0.0;
-      for (i=0; i < n_laptonflavors; i++)
+      for (i=0; i < n_leptonflavors; i++)
       {
         complex t = conj(_Q1[k][i]) * _Q2[l][i];
-        for (j=i+1; j < n_laptonflavors; j++)
+        for (j=i+1; j < n_leptonflavors; j++)
           P[k][l] += 2.0 * creal(_Q1[k][j] * conj(_Q2[l][j]) * t * _T0[i][j]);
         P[k][l] += SQR_ABS(_Q1[k][i]) * SQR_ABS(_Q2[l][i]);
       }
@@ -1303,10 +1308,10 @@ int smeft_probability_matrix_all(double P[MAX_FLAVORS][MAX_FLAVORS], int cp_sign
         return status;
     }
 
-    double complex (*_S)[n_laptonflavors]
-      = (double complex (*)[n_laptonflavors]) gsl_matrix_complex_ptr(S,0,0);
-    for (i=0; i < n_laptonflavors; i++)
-      for (j=0; j < n_laptonflavors; j++)
+    double complex (*_S)[n_leptonflavors]
+      = (double complex (*)[n_leptonflavors]) gsl_matrix_complex_ptr(S,0,0);
+    for (i=0; i < n_leptonflavors; i++)
+      for (j=0; j < n_leptonflavors; j++)
         P[j][i] = SQR_ABS(_S[i][j]);
   }
 
@@ -1372,10 +1377,10 @@ int smeft_probability_matrix_m_to_f(double P[MAX_FLAVORS][MAX_FLAVORS], int cp_s
                    GSL_COMPLEX_ZERO, S1);
     gsl_matrix_complex_memcpy(S, S1);                                      // S  = S1
 
-    double complex (*_S)[n_laptonflavors]
-      = (double complex (*)[n_laptonflavors]) gsl_matrix_complex_ptr(S,0,0);
-    for (i=0; i < n_laptonflavors; i++)
-      for (j=0; j < n_laptonflavors; j++)
+    double complex (*_S)[n_leptonflavors]
+      = (double complex (*)[n_leptonflavors]) gsl_matrix_complex_ptr(S,0,0);
+    for (i=0; i < n_leptonflavors; i++)
+      for (j=0; j < n_leptonflavors; j++)
         P[j][i] = SQR_ABS(_S[i][j]);
   }
 

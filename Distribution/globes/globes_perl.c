@@ -9850,21 +9850,27 @@ XS(_wrap_glbEFTFluxCoeff) {
     int arg1 ;
     int arg2 ;
     int arg3 ;
-    double arg4 ;
+    int arg4 ;
+    int arg5 ;
+    double arg6 ;
     int val1 ;
     int ecode1 = 0 ;
     int val2 ;
     int ecode2 = 0 ;
     int val3 ;
     int ecode3 = 0 ;
-    double val4 ;
+    int val4 ;
     int ecode4 = 0 ;
+    int val5 ;
+    int ecode5 = 0 ;
+    double val6 ;
+    int ecode6 = 0 ;
     int argvi = 0;
     double result;
     dXSARGS;
     
-    if ((items < 4) || (items > 4)) {
-      SWIG_croak("Usage: glbEFTFluxCoeff(experiment,flux_ident,X,energy);");
+    if ((items < 6) || (items > 6)) {
+      SWIG_croak("Usage: glbEFTFluxCoeff(experiment,flux_ident,X,alpha,beta,energy);");
     }
     ecode1 = SWIG_AsVal_int SWIG_PERL_CALL_ARGS_2(ST(0), &val1);
     if (!SWIG_IsOK(ecode1)) {
@@ -9881,19 +9887,33 @@ XS(_wrap_glbEFTFluxCoeff) {
       SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "glbEFTFluxCoeff" "', argument " "3"" of type '" "int""'");
     } 
     arg3 = (int)(val3);
-    ecode4 = SWIG_AsVal_double SWIG_PERL_CALL_ARGS_2(ST(3), &val4);
+    ecode4 = SWIG_AsVal_int SWIG_PERL_CALL_ARGS_2(ST(3), &val4);
     if (!SWIG_IsOK(ecode4)) {
-      SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "glbEFTFluxCoeff" "', argument " "4"" of type '" "double""'");
+      SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "glbEFTFluxCoeff" "', argument " "4"" of type '" "int""'");
     } 
-    arg4 = (double)(val4);
-    result = (double)glbEFTFluxCoeff(arg1,arg2,arg3,arg4);
+    arg4 = (int)(val4);
+    ecode5 = SWIG_AsVal_int SWIG_PERL_CALL_ARGS_2(ST(4), &val5);
+    if (!SWIG_IsOK(ecode5)) {
+      SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "glbEFTFluxCoeff" "', argument " "5"" of type '" "int""'");
+    } 
+    arg5 = (int)(val5);
+    ecode6 = SWIG_AsVal_double SWIG_PERL_CALL_ARGS_2(ST(5), &val6);
+    if (!SWIG_IsOK(ecode6)) {
+      SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "glbEFTFluxCoeff" "', argument " "6"" of type '" "double""'");
+    } 
+    arg6 = (double)(val6);
+    result = (double)glbEFTFluxCoeff(arg1,arg2,arg3,arg4,arg5,arg6);
     ST(argvi) = SWIG_From_double  SWIG_PERL_CALL_ARGS_1((double)(result)); argvi++ ;
+    
+    
     
     
     
     
     XSRETURN(argvi);
   fail:
+    
+    
     
     
     
@@ -9908,21 +9928,27 @@ XS(_wrap_glbEFTXSecCoeff) {
     int arg1 ;
     int arg2 ;
     int arg3 ;
-    double arg4 ;
+    int arg4 ;
+    int arg5 ;
+    double arg6 ;
     int val1 ;
     int ecode1 = 0 ;
     int val2 ;
     int ecode2 = 0 ;
     int val3 ;
     int ecode3 = 0 ;
-    double val4 ;
+    int val4 ;
     int ecode4 = 0 ;
+    int val5 ;
+    int ecode5 = 0 ;
+    double val6 ;
+    int ecode6 = 0 ;
     int argvi = 0;
     double result;
     dXSARGS;
     
-    if ((items < 4) || (items > 4)) {
-      SWIG_croak("Usage: glbEFTXSecCoeff(experiment,xsec_ident,X,energy);");
+    if ((items < 6) || (items > 6)) {
+      SWIG_croak("Usage: glbEFTXSecCoeff(experiment,xsec_ident,X,alpha,beta,energy);");
     }
     ecode1 = SWIG_AsVal_int SWIG_PERL_CALL_ARGS_2(ST(0), &val1);
     if (!SWIG_IsOK(ecode1)) {
@@ -9939,19 +9965,33 @@ XS(_wrap_glbEFTXSecCoeff) {
       SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "glbEFTXSecCoeff" "', argument " "3"" of type '" "int""'");
     } 
     arg3 = (int)(val3);
-    ecode4 = SWIG_AsVal_double SWIG_PERL_CALL_ARGS_2(ST(3), &val4);
+    ecode4 = SWIG_AsVal_int SWIG_PERL_CALL_ARGS_2(ST(3), &val4);
     if (!SWIG_IsOK(ecode4)) {
-      SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "glbEFTXSecCoeff" "', argument " "4"" of type '" "double""'");
+      SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "glbEFTXSecCoeff" "', argument " "4"" of type '" "int""'");
     } 
-    arg4 = (double)(val4);
-    result = (double)glbEFTXSecCoeff(arg1,arg2,arg3,arg4);
+    arg4 = (int)(val4);
+    ecode5 = SWIG_AsVal_int SWIG_PERL_CALL_ARGS_2(ST(4), &val5);
+    if (!SWIG_IsOK(ecode5)) {
+      SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "glbEFTXSecCoeff" "', argument " "5"" of type '" "int""'");
+    } 
+    arg5 = (int)(val5);
+    ecode6 = SWIG_AsVal_double SWIG_PERL_CALL_ARGS_2(ST(5), &val6);
+    if (!SWIG_IsOK(ecode6)) {
+      SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "glbEFTXSecCoeff" "', argument " "6"" of type '" "double""'");
+    } 
+    arg6 = (double)(val6);
+    result = (double)glbEFTXSecCoeff(arg1,arg2,arg3,arg4,arg5,arg6);
     ST(argvi) = SWIG_From_double  SWIG_PERL_CALL_ARGS_1((double)(result)); argvi++ ;
+    
+    
     
     
     
     
     XSRETURN(argvi);
   fail:
+    
+    
     
     
     
