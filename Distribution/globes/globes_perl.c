@@ -9923,6 +9923,44 @@ XS(_wrap_glbEFTFluxCoeff) {
 }
 
 
+XS(_wrap_glbEFTFluxQuarkFlavors) {
+  {
+    int arg1 ;
+    int arg2 ;
+    int val1 ;
+    int ecode1 = 0 ;
+    int val2 ;
+    int ecode2 = 0 ;
+    int argvi = 0;
+    int *result = 0 ;
+    dXSARGS;
+    
+    if ((items < 2) || (items > 2)) {
+      SWIG_croak("Usage: glbEFTFluxQuarkFlavors(experiment,flux_ident);");
+    }
+    ecode1 = SWIG_AsVal_int SWIG_PERL_CALL_ARGS_2(ST(0), &val1);
+    if (!SWIG_IsOK(ecode1)) {
+      SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "glbEFTFluxQuarkFlavors" "', argument " "1"" of type '" "int""'");
+    } 
+    arg1 = (int)(val1);
+    ecode2 = SWIG_AsVal_int SWIG_PERL_CALL_ARGS_2(ST(1), &val2);
+    if (!SWIG_IsOK(ecode2)) {
+      SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "glbEFTFluxQuarkFlavors" "', argument " "2"" of type '" "int""'");
+    } 
+    arg2 = (int)(val2);
+    result = (int *)glbEFTFluxQuarkFlavors(arg1,arg2);
+    ST(argvi) = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_int, 0 | 0); argvi++ ;
+    
+    
+    XSRETURN(argvi);
+  fail:
+    
+    
+    SWIG_croak_null();
+  }
+}
+
+
 XS(_wrap_glbEFTXSecCoeff) {
   {
     int arg1 ;
@@ -9994,6 +10032,44 @@ XS(_wrap_glbEFTXSecCoeff) {
     
     
     
+    
+    
+    SWIG_croak_null();
+  }
+}
+
+
+XS(_wrap_glbEFTXSecQuarkFlavors) {
+  {
+    int arg1 ;
+    int arg2 ;
+    int val1 ;
+    int ecode1 = 0 ;
+    int val2 ;
+    int ecode2 = 0 ;
+    int argvi = 0;
+    int *result = 0 ;
+    dXSARGS;
+    
+    if ((items < 2) || (items > 2)) {
+      SWIG_croak("Usage: glbEFTXSecQuarkFlavors(experiment,flux_ident);");
+    }
+    ecode1 = SWIG_AsVal_int SWIG_PERL_CALL_ARGS_2(ST(0), &val1);
+    if (!SWIG_IsOK(ecode1)) {
+      SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "glbEFTXSecQuarkFlavors" "', argument " "1"" of type '" "int""'");
+    } 
+    arg1 = (int)(val1);
+    ecode2 = SWIG_AsVal_int SWIG_PERL_CALL_ARGS_2(ST(1), &val2);
+    if (!SWIG_IsOK(ecode2)) {
+      SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "glbEFTXSecQuarkFlavors" "', argument " "2"" of type '" "int""'");
+    } 
+    arg2 = (int)(val2);
+    result = (int *)glbEFTXSecQuarkFlavors(arg1,arg2);
+    ST(argvi) = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_int, 0 | 0); argvi++ ;
+    
+    
+    XSRETURN(argvi);
+  fail:
     
     
     SWIG_croak_null();
@@ -10299,7 +10375,9 @@ static swig_command_info swig_commands[] = {
 {"globesc::glbGetStartingValues", _wrap_glbGetStartingValues},
 {"globesc::glbGetNumberOfSimBins", _wrap_glbGetNumberOfSimBins},
 {"globesc::glbEFTFluxCoeff", _wrap_glbEFTFluxCoeff},
+{"globesc::glbEFTFluxQuarkFlavors", _wrap_glbEFTFluxQuarkFlavors},
 {"globesc::glbEFTXSecCoeff", _wrap_glbEFTXSecCoeff},
+{"globesc::glbEFTXSecQuarkFlavors", _wrap_glbEFTXSecQuarkFlavors},
 {"globesc::PInit", _wrap_PInit},
 {0,0}
 };

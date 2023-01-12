@@ -428,8 +428,8 @@ int glb_init_flux(glb_flux *flux)
       break;
   }
 
-  /* Load EFT production coefficients */
 #ifdef GLB_EFT
+  /* Load EFT production coefficients */
   int status;
   int i;
   int n_columns = 1 + n_leptonflavors * SQR(GLB_EFT_N_LORENTZ_STRUCTURES);
@@ -450,13 +450,25 @@ int glb_init_flux(glb_flux *flux)
         return GLBERR_INVALID_FILE_FORMAT;
       }
     }
+
+    /* if production coefficients are defined, quark flavor indices
+     * must given as well */
+    if (flux->q[0] < 0 || flux->q[0] > 2 || flux->q[1] < 0 || flux->q[1] > 2)
+    {
+      glb_error("Quark flavors not given (or out of bounds). "
+                "(Must begiven in nuflux environment when using EFT engine.");
+      return GLBERR_INVALID_FILE_FORMAT;
+    }
   }
   else
   {
     flux->eft_n_E = 0;
     for (i=0; i < n_columns; i++)
       flux->eft_flux_coeff[i] = NULL;
+    flux->q[0] = -1;
+    flux->q[1] = -1;
   }
+
 #endif /* #ifdef GLB_EFT */
 
   return GLB_SUCCESS;
@@ -615,6 +627,8 @@ int glb_reset_flux(glb_flux *flux)
       flux->eft_coeff_file = NULL;
     }
     flux->eft_n_E = 0;
+    flux->q[0] = -1;
+    flux->q[1] = -1;
 #endif
   }
 
@@ -705,22 +719,33 @@ int glb_init_xsec(glb_xsec *xs)
                   &xs->eft_n_E, xs->eft_xsec_coeff)) != GLB_SUCCESS)
       return status;
 
-      /* check that energies are monotonically increasing */
-      for (i=1; i < xs->eft_n_E; i++)
+    /* check that energies are monotonically increasing */
+    for (i=1; i < xs->eft_n_E; i++)
+    {
+      if (xs->eft_xsec_coeff[0][i] < xs->eft_xsec_coeff[0][i-1])
       {
-        if (xs->eft_xsec_coeff[0][i] < xs->eft_xsec_coeff[0][i-1])
-        {
-          glb_error("Energy not monotonically increasing in file %s, E=%g",
-                    xs->eft_coeff_file, xs->eft_xsec_coeff[0][i]);
-          return GLBERR_INVALID_FILE_FORMAT;
-        }
+        glb_error("Energy not monotonically increasing in file %s, E=%g",
+                  xs->eft_coeff_file, xs->eft_xsec_coeff[0][i]);
+        return GLBERR_INVALID_FILE_FORMAT;
       }
+    }
+
+    /* if detection coefficients are defined, quark flavor indices
+     * must given as well */
+    if (xs->q[0] < 0 || xs->q[0] > 2 || xs->q[1] < 0 || xs->q[1] > 2)
+    {
+      glb_error("Quark flavors not given (or out of bounds). "
+                "(Must begiven in cross environment when using EFT engine.");
+      return GLBERR_INVALID_FILE_FORMAT;
+    }
   }
   else
   {
     xs->eft_n_E = 0;
     for (i=0; i < n_columns; i++)
       xs->eft_xsec_coeff[i] = NULL;
+    xs->q[0] = -1;
+    xs->q[1] = -1;
   }
 #endif /* #ifdef GLB_EFT */
 
@@ -865,6 +890,8 @@ int glb_reset_xsec(glb_xsec *xs)
       xs->eft_coeff_file = NULL;
     }
     xs->eft_n_E = 0;
+    xs->q[0] = -1;
+    xs->q[1] = -1;
 #endif
   }
 

@@ -2302,6 +2302,32 @@ double glbEFTFluxCoeff(int experiment, int flux_ident, int X, int Y, int alpha, 
 
 
 /***************************************************************************
+ * Function glbEFTFluxQuarkFlavors                                         *
+ ***************************************************************************
+ * Return the quark flavors appearing in the neutrino production process   *
+ * described by the given flux definition.  Returns a list of two integers *
+ * which the user should *not* modify.                                     *
+ ***************************************************************************/
+int *glbEFTFluxQuarkFlavors(int experiment, int flux_ident)
+{
+  struct glb_experiment *in;
+  if(!(experiment >= 0 && experiment < glb_num_of_exps))
+  {
+    glb_error("glbEFTFluxQuarkFlavors: invalid experiment number: %d", experiment);
+    return -1;
+  }
+  in = (struct glb_experiment *) glb_experiment_list[experiment];
+  if(!(flux_ident >= 0 && flux_ident < in->num_of_fluxes))
+  {
+    glb_error("glbEFTFluxQuarkFlavors: invalid flux ID: %d in experiment %d",
+              flux_ident, experiment);
+    return -1;
+  }
+  return in->fluxes[flux_ident]->q;
+}
+
+
+/***************************************************************************
  * Function glbEFTXSecCoeff                                                *
  ***************************************************************************
  * Return EFT detection coefficients associated with the given neutrino    *
@@ -2336,6 +2362,32 @@ double glbEFTXSecCoeff(int experiment, int xsec_ident, int X, int Y, int alpha, 
     return -1;
   }
   return glb_eft_get_xsec_coeff(X, Y, alpha, energy, in->xsecs[xsec_ident]);
+}
+
+
+/***************************************************************************
+ * Function glbEFTXSecQuarkFlavors                                         *
+ ***************************************************************************
+ * Return the quark flavors appearing in the interactions described by the *
+ * given cross-section definition.  Returns a list of two integers which   *
+ * the user should *not* modify.                                           *
+ ***************************************************************************/
+int *glbEFTXSecQuarkFlavors(int experiment, int xsec_ident)
+{
+  struct glb_experiment *in;
+  if(!(experiment >= 0 && experiment < glb_num_of_exps))
+  {
+    glb_error("glbEFTXSecQuarkFlavors: invalid experiment number: %d", experiment);
+    return -1;
+  }
+  in = (struct glb_experiment *) glb_experiment_list[experiment];
+  if(!(xsec_ident >= 0 && xsec_ident < in->num_of_xsecs))
+  {
+    glb_error("glbEFTXSecQuarkFlavors: invalid cross-section ID: %d in experiment %d",
+              xsec_ident, experiment);
+    return -1;
+  }
+  return in->xsecs[xsec_ident]->q;
 }
 #endif
 

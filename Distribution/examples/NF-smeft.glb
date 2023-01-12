@@ -34,6 +34,7 @@ nuflux(#one)<
 @stored_muons = 10.66e+20 
 @time = 4	/* years */
 @eft_coeff_file = "NF-prod-coeff.dat"
+@quark_flavors = 0 : 1 // dummy values
 >
 
 nuflux(#two)<
@@ -42,6 +43,7 @@ nuflux(#two)<
 @stored_muons = 10.66e+20
 @time = 4	/* years */
 @eft_coeff_file = "NF-prod-coeff.dat"
+@quark_flavors = 1 : 2 // dummy values
 >
 
 /* ####### Detector settings ####### */
@@ -85,6 +87,7 @@ energy(#ERES)<
 cross(#CC)<
 	@cross_file = "XCC.dat"
         @eft_coeff_file = "XCC-det-coeff.dat"
+        @quark_flavors = 1 : 0 // dummy values
 >
 
 cross(#NC)<

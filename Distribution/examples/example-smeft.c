@@ -85,6 +85,14 @@ int main(int argc, char *argv[])
          glbEFTXSecCoeff(0, 0, GLB_EFT_S, GLB_EFT_T, 0, E),
          glbEFTXSecCoeff(0, 0, GLB_EFT_P, GLB_EFT_T, 0, E),
          glbEFTXSecCoeff(0, 0, GLB_EFT_T, GLB_EFT_T, 2, E));
+  int *q = glbEFTFluxQuarkFlavors(0, 0);
+  printf("quark flavors flux #0: %d %d\n", q[0], q[1]);
+  q = glbEFTFluxQuarkFlavors(0, 1);
+  printf("quark flavors flux #1: %d %d\n", q[0], q[1]);
+  q = glbEFTXSecQuarkFlavors(0, 0);
+  printf("quark flavors xsec #0: %d %d\n", q[0], q[1]);
+  q = glbEFTXSecQuarkFlavors(0, 1);
+  printf("quark flavors xsec #1: %d %d\n", q[0], q[1]);
   getchar();
 
 

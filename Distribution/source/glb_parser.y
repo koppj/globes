@@ -66,6 +66,7 @@
 #define DOUBLE_LIST_INDEXED_BL 15
 #define COUNTER 16
 #define DOUBLE_PAIR 17
+#define INT_PAIR 18
 #define GMAX 1E100
 
   static int exp_count=1;
@@ -225,14 +226,11 @@
    {"@energy_list", DOUBLE_LIST, 0, GMAX, &nuis.energy_list, &nuis.n_energies, "sys"},
    {"@error_list",  DOUBLE_LIST, 0, GMAX, &nuis.error_list,  &nuis.n_energies, "sys"},
    {"@error",       DOUBLE,      0, GMAX, &nuis.error,       NULL,             "sys"}, 
-    {"@systype",       INT,      0, 20, &nuis.systype,       NULL,             "sys"},
-
+   {"@systype",     INT,         0, 20, &nuis.systype,       NULL,             "sys"},
 
    {"@energy_window" ,DOUBLE_INDEXED_PAIR_INV,0,GMAX,&buff.energy_window[0],
     &loc_count,"rule"},
    {"$densitysteps",COUNTER,1,GMAX,&buff.psteps,NULL,"global"},
-
-
 
    {"$filter_state",INT,GLB_OFF,GLB_ON,&buff.filter_state,NULL,"global"},
    {"$filter_value",DOUBLE,0,GMAX,&buff.filter_value,NULL,"global"},
@@ -241,37 +239,37 @@
    {"@cross_file",CHAR,0,20,&xsc.file_name,NULL,"cross"},
 #ifdef GLB_EFT
    {"@eft_coeff_file",CHAR,0,20,&xsc.eft_coeff_file,NULL,"cross"},
+   {"@quark_flavors",INT_PAIR,0,2,&xsc.q,NULL,"cross"},
 #endif
 
    {"flux",UNTYPE,0,20,NULL,&buff.num_of_fluxes,"global"},
    {"@flux_file",CHAR,0,20,&flt.file_name,NULL,"flux"},
 
-    {"@builtin",INT,1,4,&flt.builtin,NULL,"flux"},
-    {"@time",DOUBLE,0,GMAX,&flt.time,NULL,"flux"},
-    {"@power",DOUBLE,0,GMAX,&flt.target_power,NULL,"flux"},
-    {"@stored_muons",DOUBLE,0,GMAX,&flt.stored_muons,NULL,"flux"},
-    {"@parent_energy",DOUBLE,0,GMAX,&flt.parent_energy,NULL,"flux"},
-    {"@norm",DOUBLE,0,GMAX,&flt.norm,NULL,"flux"},
-    {"@gamma",DOUBLE,0,GMAX,&flt.gamma,NULL,"flux"},
-    {"@end_point",DOUBLE,0,GMAX,&flt.end_point,NULL,"flux"},
-    {"@stored_ions",DOUBLE,0,GMAX,&flt.stored_muons,NULL,"flux"},
+   {"@builtin",INT,1,4,&flt.builtin,NULL,"flux"},
+   {"@time",DOUBLE,0,GMAX,&flt.time,NULL,"flux"},
+   {"@power",DOUBLE,0,GMAX,&flt.target_power,NULL,"flux"},
+   {"@stored_muons",DOUBLE,0,GMAX,&flt.stored_muons,NULL,"flux"},
+   {"@parent_energy",DOUBLE,0,GMAX,&flt.parent_energy,NULL,"flux"},
+   {"@norm",DOUBLE,0,GMAX,&flt.norm,NULL,"flux"},
+   {"@gamma",DOUBLE,0,GMAX,&flt.gamma,NULL,"flux"},
+   {"@end_point",DOUBLE,0,GMAX,&flt.end_point,NULL,"flux"},
+   {"@stored_ions",DOUBLE,0,GMAX,&flt.stored_muons,NULL,"flux"},
 
+   {"nuflux",UNTYPE,0,20,NULL,&buff.num_of_fluxes,"global"},
+   {"@flux_file",CHAR,0,20,&flt.file_name,NULL,"nuflux"},
 
-
-    {"nuflux",UNTYPE,0,20,NULL,&buff.num_of_fluxes,"global"},
-    {"@flux_file",CHAR,0,20,&flt.file_name,NULL,"nuflux"},
-
-    {"@builtin",INT,1,4,&flt.builtin,NULL,"nuflux"},
-    {"@time",DOUBLE,0,GMAX,&flt.time,NULL,"nuflux"},
-    {"@power",DOUBLE,0,GMAX,&flt.target_power,NULL,"nuflux"},
-    {"@stored_muons",DOUBLE,0,GMAX,&flt.stored_muons,NULL,"nuflux"},
-    {"@parent_energy",DOUBLE,0,GMAX,&flt.parent_energy,NULL,"nuflux"},
-    {"@norm",DOUBLE,0,GMAX,&flt.norm,NULL,"nuflux"},
-    {"@gamma",DOUBLE,0,GMAX,&flt.gamma,NULL,"nuflux"},
-    {"@end_point",DOUBLE,0,GMAX,&flt.end_point,NULL,"nuflux"},
-    {"@stored_ions",DOUBLE,0,GMAX,&flt.stored_muons,NULL,"nuflux"},
+   {"@builtin",INT,1,4,&flt.builtin,NULL,"nuflux"},
+   {"@time",DOUBLE,0,GMAX,&flt.time,NULL,"nuflux"},
+   {"@power",DOUBLE,0,GMAX,&flt.target_power,NULL,"nuflux"},
+   {"@stored_muons",DOUBLE,0,GMAX,&flt.stored_muons,NULL,"nuflux"},
+   {"@parent_energy",DOUBLE,0,GMAX,&flt.parent_energy,NULL,"nuflux"},
+   {"@norm",DOUBLE,0,GMAX,&flt.norm,NULL,"nuflux"},
+   {"@gamma",DOUBLE,0,GMAX,&flt.gamma,NULL,"nuflux"},
+   {"@end_point",DOUBLE,0,GMAX,&flt.end_point,NULL,"nuflux"},
+   {"@stored_ions",DOUBLE,0,GMAX,&flt.stored_muons,NULL,"nuflux"},
 #ifdef GLB_EFT
-    {"@eft_coeff_file",CHAR,0,20,&flt.eft_coeff_file,NULL,"nuflux"},
+   {"@eft_coeff_file",CHAR,0,20,&flt.eft_coeff_file,NULL,"nuflux"},
+   {"@quark_flavors",INT_PAIR,0,2,&flt.q,NULL,"nuflux"},
 #endif
 
    {"@type" ,INT,1,2,&ibf.type,&loc_count,"energy"},
@@ -616,6 +614,23 @@ static int set_pair(char *name,double value,double value2,int scalar)
                      dbf=(double*) token_list[i].ptr;
                      dbf[0]=(double) value;
                      dbf[1]=(double) value2;
+                     return 0;
+                   }
+                 else
+                   {
+                     fprintf(stderr,"Error: Value for %s out of range\n",
+                             token_list[i].token);
+                     return 2;
+                   }
+               }
+
+             if(token_list[i].scalar==INT_PAIR)
+               {
+                 if(value >= token_list[i].rl && value <= token_list[i].ru)
+                   {
+                     ibf=(int*) token_list[i].ptr;
+                     ibf[0]=(int) value;
+                     ibf[1]=(int) value2;
                      return 0;
                    }
                  else

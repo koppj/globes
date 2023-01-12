@@ -228,7 +228,9 @@ package globes;
 *glbGetStartingValues = *globesc::glbGetStartingValues;
 *glbGetNumberOfSimBins = *globesc::glbGetNumberOfSimBins;
 *glbEFTFluxCoeff = *globesc::glbEFTFluxCoeff;
+*glbEFTFluxQuarkFlavors = *globesc::glbEFTFluxQuarkFlavors;
 *glbEFTXSecCoeff = *globesc::glbEFTXSecCoeff;
+*glbEFTXSecQuarkFlavors = *globesc::glbEFTXSecQuarkFlavors;
 *PInit = *globesc::PInit;
 
 # ------- VARIABLE STUBS --------

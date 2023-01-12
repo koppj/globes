@@ -465,7 +465,9 @@ int glbSetInitialStep(double step);
     { GLB_EFT_L, GLB_EFT_R, GLB_EFT_S, GLB_EFT_P, GLB_EFT_T,
       GLB_EFT_N_LORENTZ_STRUCTURES };
   double glbEFTFluxCoeff(int experiment, int flux_ident, int X, int Y, int alpha, double energy);
+  int *glbEFTFluxQuarkFlavors(int experiment, int flux_ident);
   double glbEFTXSecCoeff(int experiment, int xsec_ident, int X, int Y, int alpha, double energy);
+  int *glbEFTXSecQuarkFlavors(int experiment, int flux_ident);
 #endif /* #ifdef GLB_EFT */
 
 END_C_DECLS

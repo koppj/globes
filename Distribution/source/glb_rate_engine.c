@@ -358,14 +358,23 @@ static void CalcAllProbs(double en, double baseline)
      taken care of and the following should work just fine - PH
      01/10/19 */
 
+  void *user_data = e->osc_engine.user_data;
+#ifdef GLB_EFT
+  /* the EFT engine expects user_data to be a pointer to the current
+   * experiment. Here, we make sure it is. */
+  if (glb_hook_probability_matrix == smeft_probability_matrix)
+    user_data = e;
+#endif 
+
+
   if ((status=glb_hook_probability_matrix(Probs, +1, en, e->psteps, e->lengthtab, e->densitybuffer,
-          (e->filter_state == GLB_ON) ? e->filter_value : -1.0, e->osc_engine.user_data)) != GLB_SUCCESS)
+          (e->filter_state == GLB_ON) ? e->filter_value : -1.0, user_data)) != GLB_SUCCESS)
     glb_error("Calculation of oscillation probabilities failed.");
 
   if ((status=glb_hook_probability_matrix(ProbsAnti, -1, en, e->psteps, e->lengthtab, e->densitybuffer,
-          (e->filter_state == GLB_ON) ? e->filter_value : -1.0,e->osc_engine.user_data)) != GLB_SUCCESS)
+          (e->filter_state == GLB_ON) ? e->filter_value : -1.0,user_data)) != GLB_SUCCESS)
     glb_error("Calculation of oscillation probabilities failed.");
-  
+ 
 }
 
 static double RatesNOSC(double en, double baseline,

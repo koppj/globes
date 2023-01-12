@@ -196,6 +196,7 @@
 #define DOUBLE_LIST_INDEXED_BL 15
 #define COUNTER 16
 #define DOUBLE_PAIR 17
+#define INT_PAIR 18
 #define GMAX 1E100
 
   static int exp_count=1;
@@ -355,14 +356,11 @@
    {"@energy_list", DOUBLE_LIST, 0, GMAX, &nuis.energy_list, &nuis.n_energies, "sys"},
    {"@error_list",  DOUBLE_LIST, 0, GMAX, &nuis.error_list,  &nuis.n_energies, "sys"},
    {"@error",       DOUBLE,      0, GMAX, &nuis.error,       NULL,             "sys"}, 
-    {"@systype",       INT,      0, 20, &nuis.systype,       NULL,             "sys"},
-
+   {"@systype",     INT,         0, 20, &nuis.systype,       NULL,             "sys"},
 
    {"@energy_window" ,DOUBLE_INDEXED_PAIR_INV,0,GMAX,&buff.energy_window[0],
     &loc_count,"rule"},
    {"$densitysteps",COUNTER,1,GMAX,&buff.psteps,NULL,"global"},
-
-
 
    {"$filter_state",INT,GLB_OFF,GLB_ON,&buff.filter_state,NULL,"global"},
    {"$filter_value",DOUBLE,0,GMAX,&buff.filter_value,NULL,"global"},
@@ -371,37 +369,37 @@
    {"@cross_file",CHAR,0,20,&xsc.file_name,NULL,"cross"},
 #ifdef GLB_EFT
    {"@eft_coeff_file",CHAR,0,20,&xsc.eft_coeff_file,NULL,"cross"},
+   {"@quark_flavors",INT_PAIR,0,2,&xsc.q,NULL,"cross"},
 #endif
 
    {"flux",UNTYPE,0,20,NULL,&buff.num_of_fluxes,"global"},
    {"@flux_file",CHAR,0,20,&flt.file_name,NULL,"flux"},
 
-    {"@builtin",INT,1,4,&flt.builtin,NULL,"flux"},
-    {"@time",DOUBLE,0,GMAX,&flt.time,NULL,"flux"},
-    {"@power",DOUBLE,0,GMAX,&flt.target_power,NULL,"flux"},
-    {"@stored_muons",DOUBLE,0,GMAX,&flt.stored_muons,NULL,"flux"},
-    {"@parent_energy",DOUBLE,0,GMAX,&flt.parent_energy,NULL,"flux"},
-    {"@norm",DOUBLE,0,GMAX,&flt.norm,NULL,"flux"},
-    {"@gamma",DOUBLE,0,GMAX,&flt.gamma,NULL,"flux"},
-    {"@end_point",DOUBLE,0,GMAX,&flt.end_point,NULL,"flux"},
-    {"@stored_ions",DOUBLE,0,GMAX,&flt.stored_muons,NULL,"flux"},
+   {"@builtin",INT,1,4,&flt.builtin,NULL,"flux"},
+   {"@time",DOUBLE,0,GMAX,&flt.time,NULL,"flux"},
+   {"@power",DOUBLE,0,GMAX,&flt.target_power,NULL,"flux"},
+   {"@stored_muons",DOUBLE,0,GMAX,&flt.stored_muons,NULL,"flux"},
+   {"@parent_energy",DOUBLE,0,GMAX,&flt.parent_energy,NULL,"flux"},
+   {"@norm",DOUBLE,0,GMAX,&flt.norm,NULL,"flux"},
+   {"@gamma",DOUBLE,0,GMAX,&flt.gamma,NULL,"flux"},
+   {"@end_point",DOUBLE,0,GMAX,&flt.end_point,NULL,"flux"},
+   {"@stored_ions",DOUBLE,0,GMAX,&flt.stored_muons,NULL,"flux"},
 
+   {"nuflux",UNTYPE,0,20,NULL,&buff.num_of_fluxes,"global"},
+   {"@flux_file",CHAR,0,20,&flt.file_name,NULL,"nuflux"},
 
-
-    {"nuflux",UNTYPE,0,20,NULL,&buff.num_of_fluxes,"global"},
-    {"@flux_file",CHAR,0,20,&flt.file_name,NULL,"nuflux"},
-
-    {"@builtin",INT,1,4,&flt.builtin,NULL,"nuflux"},
-    {"@time",DOUBLE,0,GMAX,&flt.time,NULL,"nuflux"},
-    {"@power",DOUBLE,0,GMAX,&flt.target_power,NULL,"nuflux"},
-    {"@stored_muons",DOUBLE,0,GMAX,&flt.stored_muons,NULL,"nuflux"},
-    {"@parent_energy",DOUBLE,0,GMAX,&flt.parent_energy,NULL,"nuflux"},
-    {"@norm",DOUBLE,0,GMAX,&flt.norm,NULL,"nuflux"},
-    {"@gamma",DOUBLE,0,GMAX,&flt.gamma,NULL,"nuflux"},
-    {"@end_point",DOUBLE,0,GMAX,&flt.end_point,NULL,"nuflux"},
-    {"@stored_ions",DOUBLE,0,GMAX,&flt.stored_muons,NULL,"nuflux"},
+   {"@builtin",INT,1,4,&flt.builtin,NULL,"nuflux"},
+   {"@time",DOUBLE,0,GMAX,&flt.time,NULL,"nuflux"},
+   {"@power",DOUBLE,0,GMAX,&flt.target_power,NULL,"nuflux"},
+   {"@stored_muons",DOUBLE,0,GMAX,&flt.stored_muons,NULL,"nuflux"},
+   {"@parent_energy",DOUBLE,0,GMAX,&flt.parent_energy,NULL,"nuflux"},
+   {"@norm",DOUBLE,0,GMAX,&flt.norm,NULL,"nuflux"},
+   {"@gamma",DOUBLE,0,GMAX,&flt.gamma,NULL,"nuflux"},
+   {"@end_point",DOUBLE,0,GMAX,&flt.end_point,NULL,"nuflux"},
+   {"@stored_ions",DOUBLE,0,GMAX,&flt.stored_muons,NULL,"nuflux"},
 #ifdef GLB_EFT
-    {"@eft_coeff_file",CHAR,0,20,&flt.eft_coeff_file,NULL,"nuflux"},
+   {"@eft_coeff_file",CHAR,0,20,&flt.eft_coeff_file,NULL,"nuflux"},
+   {"@quark_flavors",INT_PAIR,0,2,&flt.q,NULL,"nuflux"},
 #endif
 
    {"@type" ,INT,1,2,&ibf.type,&loc_count,"energy"},
@@ -746,6 +744,23 @@ static int set_pair(char *name,double value,double value2,int scalar)
                      dbf=(double*) token_list[i].ptr;
                      dbf[0]=(double) value;
                      dbf[1]=(double) value2;
+                     return 0;
+                   }
+                 else
+                   {
+                     fprintf(stderr,"Error: Value for %s out of range\n",
+                             token_list[i].token);
+                     return 2;
+                   }
+               }
+
+             if(token_list[i].scalar==INT_PAIR)
+               {
+                 if(value >= token_list[i].rl && value <= token_list[i].ru)
+                   {
+                     ibf=(int*) token_list[i].ptr;
+                     ibf[0]=(int) value;
+                     ibf[1]=(int) value2;
                      return 0;
                    }
                  else
@@ -1343,7 +1358,7 @@ static int set_multiex_errors(char *name, glb_List **value)
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 1195 "glb_parser.y"
+#line 1210 "glb_parser.y"
 {
   double  val;  /* For returning numbers.                   */
   double *dpt;  /* for rules */
@@ -1356,7 +1371,7 @@ typedef union YYSTYPE
   glb_namerec *nameptr;
 }
 /* Line 193 of yacc.c.  */
-#line 1360 "glb_parser.c"
+#line 1375 "glb_parser.c"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
@@ -1369,7 +1384,7 @@ typedef union YYSTYPE
 
 
 /* Line 216 of yacc.c.  */
-#line 1373 "glb_parser.c"
+#line 1388 "glb_parser.c"
 
 #ifdef short
 # undef short
@@ -1690,15 +1705,15 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,  1256,  1256,  1257,  1258,  1259,  1263,  1264,  1265,  1266,
-    1267,  1271,  1272,  1273,  1274,  1275,  1280,  1284,  1289,  1295,
-    1296,  1297,  1298,  1299,  1300,  1301,  1302,  1303,  1307,  1316,
-    1321,  1325,  1326,  1327,  1328,  1333,  1334,  1335,  1336,  1337,
-    1338,  1339,  1343,  1354,  1353,  1364,  1371,  1372,  1376,  1377,
-    1378,  1379,  1380,  1381,  1382,  1383,  1384,  1385,  1389,  1399,
-    1409,  1421,  1433,  1442,  1451,  1470,  1471,  1475,  1476,  1477,
-    1482,  1490,  1504,  1508,  1515,  1524,  1535,  1545,  1556,  1565,
-    1574,  1580,  1586
+       0,  1271,  1271,  1272,  1273,  1274,  1278,  1279,  1280,  1281,
+    1282,  1286,  1287,  1288,  1289,  1290,  1295,  1299,  1304,  1310,
+    1311,  1312,  1313,  1314,  1315,  1316,  1317,  1318,  1322,  1331,
+    1336,  1340,  1341,  1342,  1343,  1348,  1349,  1350,  1351,  1352,
+    1353,  1354,  1358,  1369,  1368,  1379,  1386,  1387,  1391,  1392,
+    1393,  1394,  1395,  1396,  1397,  1398,  1399,  1400,  1404,  1414,
+    1424,  1436,  1448,  1457,  1466,  1485,  1486,  1490,  1491,  1492,
+    1497,  1505,  1519,  1523,  1530,  1539,  1550,  1560,  1571,  1580,
+    1589,  1595,  1601
 };
 #endif
 
@@ -2747,72 +2762,72 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 1256 "glb_parser.y"
+#line 1271 "glb_parser.y"
     {}
     break;
 
   case 3:
-#line 1257 "glb_parser.y"
+#line 1272 "glb_parser.y"
     {}
     break;
 
   case 4:
-#line 1258 "glb_parser.y"
+#line 1273 "glb_parser.y"
     {YYABORT;}
     break;
 
   case 5:
-#line 1259 "glb_parser.y"
+#line 1274 "glb_parser.y"
     {YYABORT;}
     break;
 
   case 6:
-#line 1263 "glb_parser.y"
+#line 1278 "glb_parser.y"
     {}
     break;
 
   case 7:
-#line 1264 "glb_parser.y"
+#line 1279 "glb_parser.y"
     {}
     break;
 
   case 8:
-#line 1265 "glb_parser.y"
+#line 1280 "glb_parser.y"
     {}
     break;
 
   case 9:
-#line 1266 "glb_parser.y"
+#line 1281 "glb_parser.y"
     { glb_copy_buff();  glbReset(); }
     break;
 
   case 10:
-#line 1267 "glb_parser.y"
+#line 1282 "glb_parser.y"
     { glbNewDetector(); }
     break;
 
   case 11:
-#line 1271 "glb_parser.y"
+#line 1286 "glb_parser.y"
     { (yyval.val) = (yyvsp[(1) - (1)].val);                     }
     break;
 
   case 12:
-#line 1272 "glb_parser.y"
+#line 1287 "glb_parser.y"
     { (yyval.val) = (yyvsp[(1) - (1)].nameptr)->value;              }
     break;
 
   case 13:
-#line 1273 "glb_parser.y"
+#line 1288 "glb_parser.y"
     { (yyval.val) = (yyvsp[(1) - (1)].tptr)->value.var;          }
     break;
 
   case 14:
-#line 1274 "glb_parser.y"
+#line 1289 "glb_parser.y"
     { (yyval.val) = (yyvsp[(3) - (3)].val); (yyvsp[(1) - (3)].tptr)->value.var = (yyvsp[(3) - (3)].val); }
     break;
 
   case 15:
-#line 1275 "glb_parser.y"
+#line 1290 "glb_parser.y"
     {
   if(set_exp((yyvsp[(1) - (3)].name),(yyvsp[(3) - (3)].val),0)==1) yyerror("Unknown identifier: %s", (yyvsp[(1) - (3)].name));
   (yyval.val) = (yyvsp[(3) - (3)].val);
@@ -2821,7 +2836,7 @@ yyreduce:
     break;
 
   case 16:
-#line 1280 "glb_parser.y"
+#line 1295 "glb_parser.y"
     {
   if(set_fnct((yyvsp[(1) - (3)].name),(yyvsp[(3) - (3)].nameptr)->sf)==1) yyerror("Unknown identifier: %s", (yyvsp[(1) - (3)].name));
   if ((yyvsp[(1) - (3)].name))  { glb_free((yyvsp[(1) - (3)].name));  (yyvsp[(1) - (3)].name)=NULL; }
@@ -2829,7 +2844,7 @@ yyreduce:
     break;
 
   case 17:
-#line 1284 "glb_parser.y"
+#line 1299 "glb_parser.y"
     {
   if(set_pair((yyvsp[(1) - (5)].name),(yyvsp[(3) - (5)].val),(yyvsp[(5) - (5)].val),0)==1) yyerror("Unknown identifier: %s", (yyvsp[(1) - (5)].name));
   (yyval.val) = (yyvsp[(3) - (5)].val);
@@ -2838,7 +2853,7 @@ yyreduce:
     break;
 
   case 18:
-#line 1289 "glb_parser.y"
+#line 1304 "glb_parser.y"
     {
   /* added safety in case the function pointer is NULL, which is
      sometimes useful for special functions */
@@ -2847,52 +2862,52 @@ yyreduce:
     break;
 
   case 19:
-#line 1295 "glb_parser.y"
+#line 1310 "glb_parser.y"
     { (yyval.val) = (yyvsp[(1) - (3)].val) + (yyvsp[(3) - (3)].val);      }
     break;
 
   case 20:
-#line 1296 "glb_parser.y"
+#line 1311 "glb_parser.y"
     { (yyval.val) = (yyvsp[(1) - (3)].val) - (yyvsp[(3) - (3)].val);      }
     break;
 
   case 21:
-#line 1297 "glb_parser.y"
+#line 1312 "glb_parser.y"
     { (yyval.val) = (yyvsp[(1) - (3)].val) * (yyvsp[(3) - (3)].val);      }
     break;
 
   case 22:
-#line 1298 "glb_parser.y"
+#line 1313 "glb_parser.y"
     { (yyval.val) = (yyvsp[(1) - (3)].val) / (yyvsp[(3) - (3)].val);      }
     break;
 
   case 23:
-#line 1299 "glb_parser.y"
+#line 1314 "glb_parser.y"
     { (yyval.val) = -(yyvsp[(2) - (2)].val);          }
     break;
 
   case 24:
-#line 1300 "glb_parser.y"
+#line 1315 "glb_parser.y"
     { (yyval.val) = pow ((yyvsp[(1) - (3)].val), (yyvsp[(3) - (3)].val)); }
     break;
 
   case 25:
-#line 1301 "glb_parser.y"
+#line 1316 "glb_parser.y"
     { (yyval.val) = (yyvsp[(2) - (3)].val);           }
     break;
 
   case 26:
-#line 1302 "glb_parser.y"
+#line 1317 "glb_parser.y"
     { (yyval.val) = 0;            }
     break;
 
   case 27:
-#line 1303 "glb_parser.y"
+#line 1318 "glb_parser.y"
     { yyerror("Unknown name: %s", (yyvsp[(1) - (1)].name)); YYERROR; }
     break;
 
   case 28:
-#line 1307 "glb_parser.y"
+#line 1322 "glb_parser.y"
     {
   glb_List *ltemp;
   ltemp=thread_list(&glb_list_copy,0,0,(yyvsp[(4) - (4)].tptr)->list);
@@ -2903,7 +2918,7 @@ yyreduce:
     break;
 
   case 29:
-#line 1316 "glb_parser.y"
+#line 1331 "glb_parser.y"
     {
    glb_List *buf = list_cons(NULL, (yyvsp[(1) - (3)].val));
    buf = list_cons(buf, (yyvsp[(3) - (3)].val));
@@ -2912,27 +2927,27 @@ yyreduce:
     break;
 
   case 30:
-#line 1321 "glb_parser.y"
+#line 1336 "glb_parser.y"
     { (yyval.ptr) = list_cons((yyvsp[(1) - (3)].ptr), (yyvsp[(3) - (3)].val)); }
     break;
 
   case 31:
-#line 1325 "glb_parser.y"
+#line 1340 "glb_parser.y"
     {(yyval.ptr)=NULL;}
     break;
 
   case 32:
-#line 1326 "glb_parser.y"
+#line 1341 "glb_parser.y"
     {(yyval.ptr)=(yyvsp[(2) - (3)].ptr); }
     break;
 
   case 33:
-#line 1327 "glb_parser.y"
+#line 1342 "glb_parser.y"
     {(yyval.ptr)=list_cons(NULL,(yyvsp[(2) - (3)].val)); }
     break;
 
   case 34:
-#line 1328 "glb_parser.y"
+#line 1343 "glb_parser.y"
     {
   if(set_exp_list((yyvsp[(1) - (3)].name),(yyvsp[(3) - (3)].ptr),3)==1)  yyerror("Unknown identifier");
   (yyval.ptr) = (yyvsp[(3) - (3)].ptr);
@@ -2941,42 +2956,42 @@ yyreduce:
     break;
 
   case 35:
-#line 1333 "glb_parser.y"
+#line 1348 "glb_parser.y"
     {(yyval.ptr) = thread_list((yyvsp[(1) - (4)].tptr)->value.fnctptr,(yyvsp[(1) - (4)].tptr)->reverse,(yyvsp[(1) - (4)].tptr)->destroy,(yyvsp[(3) - (4)].ptr));}
     break;
 
   case 36:
-#line 1334 "glb_parser.y"
+#line 1349 "glb_parser.y"
     {(yyval.ptr) = thread_list((yyvsp[(1) - (4)].tptr)->value.fnctptr,(yyvsp[(1) - (4)].tptr)->reverse,(yyvsp[(1) - (4)].tptr)->destroy,(yyvsp[(3) - (4)].ptr));}
     break;
 
   case 37:
-#line 1335 "glb_parser.y"
+#line 1350 "glb_parser.y"
     {(yyval.ptr) = (*((yyvsp[(1) - (3)].tptr)->value.lfnctptr))();}
     break;
 
   case 38:
-#line 1336 "glb_parser.y"
+#line 1351 "glb_parser.y"
     { (yyval.ptr) = (yyvsp[(1) - (1)].tptr)->list;              }
     break;
 
   case 39:
-#line 1337 "glb_parser.y"
+#line 1352 "glb_parser.y"
     { (yyval.ptr) = (yyvsp[(3) - (3)].ptr); (yyvsp[(1) - (3)].tptr)->list = (yyvsp[(3) - (3)].ptr); }
     break;
 
   case 40:
-#line 1338 "glb_parser.y"
+#line 1353 "glb_parser.y"
     {(yyval.ptr)=glb_interpolation((yyvsp[(3) - (10)].ptr),(yyvsp[(5) - (10)].ptr),floor((yyvsp[(7) - (10)].val)),(yyvsp[(9) - (10)].ptr));}
     break;
 
   case 41:
-#line 1339 "glb_parser.y"
+#line 1354 "glb_parser.y"
     {}
     break;
 
   case 42:
-#line 1343 "glb_parser.y"
+#line 1358 "glb_parser.y"
     {
   double *buf;
   buf=(double*) glb_malloc(sizeof(double)*2);
@@ -2987,7 +3002,7 @@ yyreduce:
     break;
 
   case 43:
-#line 1354 "glb_parser.y"
+#line 1369 "glb_parser.y"
     { if((yyvsp[(3) - (4)].nameptr)->value==-1) {(yyvsp[(3) - (4)].nameptr)->value=step_counter((yyvsp[(1) - (4)].name)); }
   loc_count=(yyvsp[(3) - (4)].nameptr)->value;
   glb_free(context);
@@ -2998,14 +3013,14 @@ yyreduce:
     break;
 
   case 44:
-#line 1361 "glb_parser.y"
+#line 1376 "glb_parser.y"
     {
   grp_end(context, loc_count);
 }
     break;
 
   case 45:
-#line 1364 "glb_parser.y"
+#line 1379 "glb_parser.y"
     {
     yyerror("Redefinition of an automatic variable %s", (yyvsp[(3) - (7)].nameptr)->name); YYERROR;
     if ((yyvsp[(1) - (7)].name))  { glb_free((yyvsp[(1) - (7)].name));  (yyvsp[(1) - (7)].name)=NULL; }
@@ -3013,57 +3028,57 @@ yyreduce:
     break;
 
   case 48:
-#line 1376 "glb_parser.y"
+#line 1391 "glb_parser.y"
     {}
     break;
 
   case 49:
-#line 1377 "glb_parser.y"
+#line 1392 "glb_parser.y"
     {}
     break;
 
   case 50:
-#line 1378 "glb_parser.y"
+#line 1393 "glb_parser.y"
     {}
     break;
 
   case 51:
-#line 1379 "glb_parser.y"
+#line 1394 "glb_parser.y"
     {}
     break;
 
   case 52:
-#line 1380 "glb_parser.y"
+#line 1395 "glb_parser.y"
     {}
     break;
 
   case 53:
-#line 1381 "glb_parser.y"
+#line 1396 "glb_parser.y"
     {}
     break;
 
   case 54:
-#line 1382 "glb_parser.y"
+#line 1397 "glb_parser.y"
     {}
     break;
 
   case 55:
-#line 1383 "glb_parser.y"
+#line 1398 "glb_parser.y"
     {}
     break;
 
   case 56:
-#line 1384 "glb_parser.y"
+#line 1399 "glb_parser.y"
     {}
     break;
 
   case 57:
-#line 1385 "glb_parser.y"
+#line 1400 "glb_parser.y"
     {}
     break;
 
   case 58:
-#line 1389 "glb_parser.y"
+#line 1404 "glb_parser.y"
     {
 //  buff.version=strdup($3);
   if (set_string((yyvsp[(1) - (3)].name), (yyvsp[(3) - (3)].name)) != 0)
@@ -3074,7 +3089,7 @@ yyreduce:
     break;
 
   case 59:
-#line 1399 "glb_parser.y"
+#line 1414 "glb_parser.y"
     {
   //load_cross($3,loc_count-1);
   xsc.file_name=strdup((yyvsp[(3) - (3)].name));
@@ -3085,7 +3100,7 @@ yyreduce:
     break;
 
   case 60:
-#line 1409 "glb_parser.y"
+#line 1424 "glb_parser.y"
     {
   //load_flux($3,loc_count-1,1);
   flt.file_name=strdup((yyvsp[(3) - (3)].name));
@@ -3098,7 +3113,7 @@ yyreduce:
     break;
 
   case 61:
-#line 1421 "glb_parser.y"
+#line 1436 "glb_parser.y"
     {
   //load_flux($3,loc_count-1,1);
   flt.file_name=strdup((yyvsp[(3) - (3)].name));
@@ -3111,7 +3126,7 @@ yyreduce:
     break;
 
   case 62:
-#line 1433 "glb_parser.y"
+#line 1448 "glb_parser.y"
     {
   flt.eft_coeff_file=strdup((yyvsp[(3) - (3)].name));
 
@@ -3122,7 +3137,7 @@ yyreduce:
     break;
 
   case 63:
-#line 1442 "glb_parser.y"
+#line 1457 "glb_parser.y"
     {
   xsc.eft_coeff_file=strdup((yyvsp[(3) - (3)].name));
   (yyval.name)=(yyvsp[(3) - (3)].name);
@@ -3132,7 +3147,7 @@ yyreduce:
     break;
 
   case 64:
-#line 1452 "glb_parser.y"
+#line 1467 "glb_parser.y"
     {
 
   int x[6];
@@ -3149,32 +3164,32 @@ yyreduce:
     break;
 
   case 65:
-#line 1470 "glb_parser.y"
+#line 1485 "glb_parser.y"
     {(yyval.nameptr)=(yyvsp[(1) - (1)].nameptr);}
     break;
 
   case 66:
-#line 1471 "glb_parser.y"
+#line 1486 "glb_parser.y"
     { yyerror("Unknown name: %s", (yyvsp[(1) - (1)].name)); YYERROR; }
     break;
 
   case 67:
-#line 1475 "glb_parser.y"
+#line 1490 "glb_parser.y"
     {(yyval.in)=(yyvsp[(1) - (1)].in);}
     break;
 
   case 68:
-#line 1476 "glb_parser.y"
+#line 1491 "glb_parser.y"
     {(yyval.in)=1;}
     break;
 
   case 69:
-#line 1477 "glb_parser.y"
+#line 1492 "glb_parser.y"
     {(yyval.in)=-1;}
     break;
 
   case 70:
-#line 1482 "glb_parser.y"
+#line 1497 "glb_parser.y"
     {
   glb_List **buf;
   energy_len=1;
@@ -3186,7 +3201,7 @@ yyreduce:
     break;
 
   case 71:
-#line 1491 "glb_parser.y"
+#line 1506 "glb_parser.y"
     {
   glb_List **buf;
   buf=(yyvsp[(1) - (3)].ptrq);
@@ -3200,7 +3215,7 @@ yyreduce:
     break;
 
   case 72:
-#line 1504 "glb_parser.y"
+#line 1519 "glb_parser.y"
     {
   set_exp_energy("@energy",(yyvsp[(3) - (3)].ptrq));
   if ((yyvsp[(1) - (3)].name))  { glb_free((yyvsp[(1) - (3)].name));  (yyvsp[(1) - (3)].name)=NULL; }
@@ -3208,7 +3223,7 @@ yyreduce:
     break;
 
   case 73:
-#line 1508 "glb_parser.y"
+#line 1523 "glb_parser.y"
     {
   set_exp_energy("@energy",(yyvsp[(3) - (4)].ptrq)); 
   if ((yyvsp[(1) - (4)].name))  { glb_free((yyvsp[(1) - (4)].name));  (yyvsp[(1) - (4)].name)=NULL; }
@@ -3216,7 +3231,7 @@ yyreduce:
     break;
 
   case 74:
-#line 1515 "glb_parser.y"
+#line 1530 "glb_parser.y"
     {
   glb_List **buf;
   buf=(glb_List**) glb_malloc(sizeof(glb_List*)*2);
@@ -3229,7 +3244,7 @@ yyreduce:
     break;
 
   case 75:
-#line 1524 "glb_parser.y"
+#line 1539 "glb_parser.y"
     {
   glb_List **buf;
   buf=(yyvsp[(1) - (3)].ptrq);
@@ -3241,7 +3256,7 @@ yyreduce:
     break;
 
   case 76:
-#line 1535 "glb_parser.y"
+#line 1550 "glb_parser.y"
     {
   glb_List **buf;
 
@@ -3255,7 +3270,7 @@ yyreduce:
     break;
 
   case 77:
-#line 1545 "glb_parser.y"
+#line 1560 "glb_parser.y"
     {
   glb_List **buf;
   buf=(yyvsp[(1) - (3)].ptrq);
@@ -3267,7 +3282,7 @@ yyreduce:
     break;
 
   case 78:
-#line 1556 "glb_parser.y"
+#line 1571 "glb_parser.y"
     {
   int flag;
   (yyval.ptrq)=(yyvsp[(1) - (1)].ptrq);
@@ -3280,7 +3295,7 @@ yyreduce:
     break;
 
   case 79:
-#line 1565 "glb_parser.y"
+#line 1580 "glb_parser.y"
     {
   int flag;
   (yyval.ptrq)=(yyvsp[(1) - (1)].ptrq);
@@ -3293,7 +3308,7 @@ yyreduce:
     break;
 
   case 80:
-#line 1574 "glb_parser.y"
+#line 1589 "glb_parser.y"
     {
 //JK, 2012-05-17  buff.sys_on_strings[buff.numofrules-1] = strdup($3);
   buff.sys_on_strings[loc_count-1] = strdup((yyvsp[(3) - (3)].name));
@@ -3303,7 +3318,7 @@ yyreduce:
     break;
 
   case 81:
-#line 1580 "glb_parser.y"
+#line 1595 "glb_parser.y"
     {
 //JK, 2012-05-17  buff.sys_off_strings[buff.numofrules-1] = strdup($3);
   buff.sys_off_strings[loc_count-1] = strdup((yyvsp[(3) - (3)].name));
@@ -3313,7 +3328,7 @@ yyreduce:
     break;
 
   case 82:
-#line 1586 "glb_parser.y"
+#line 1601 "glb_parser.y"
     {
   set_multiex_errors((yyvsp[(1) - (3)].name), (yyvsp[(3) - (3)].ptrq));
   if ((yyvsp[(1) - (3)].name))  { glb_free((yyvsp[(1) - (3)].name));  (yyvsp[(1) - (3)].name)=NULL; }
@@ -3322,7 +3337,7 @@ yyreduce:
 
 
 /* Line 1267 of yacc.c.  */
-#line 3326 "glb_parser.c"
+#line 3341 "glb_parser.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -3536,7 +3551,7 @@ yyreturn:
 }
 
 
-#line 1592 "glb_parser.y"
+#line 1607 "glb_parser.y"
 
 
 extern glb_symrec *sym_table;
