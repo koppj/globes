@@ -534,11 +534,11 @@ static int zheevh3(double complex A[3][3], double complex Q[3][3], double w[3])
 // ----------------------------------------------------------------------------
 
 // ----------------------------------------------------------------------------
-int smeft_print_gsl_matrix_complex(gsl_matrix_complex *A)
+//int smeft_print_gsl_matrix_complex(gsl_matrix_complex *A)
 // ----------------------------------------------------------------------------
 // Print entries of a complex GSL matrix in human-readable form
 // ----------------------------------------------------------------------------
-{
+/*{
   int i, j;
   for (i=0; i < A->size1; i++)
   {
@@ -552,7 +552,7 @@ int smeft_print_gsl_matrix_complex(gsl_matrix_complex *A)
 
   return 0;
 }
-
+*/
 
 // ----------------------------------------------------------------------------
 int smeft_init_probability_engine_3()
