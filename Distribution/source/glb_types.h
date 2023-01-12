@@ -71,6 +71,7 @@ typedef struct {
   int eft_n_E;                         /* number of lines in EFT prod. coeff. file */
   double *eft_flux_coeff[MAX_FLAVORS*SQR(GLB_EFT_N_LORENTZ_STRUCTURES)+1];
                                        /* data from that file                    */
+  int q1, q2;                          /* quark flavor indices                   */
 #endif
 } glb_flux;
 
@@ -88,6 +89,7 @@ typedef struct {
   int eft_n_E;                         /* number of lines in EFT det. coeff. file */
   double *eft_xsec_coeff[MAX_FLAVORS*SQR(GLB_EFT_N_LORENTZ_STRUCTURES)+1];
                                        /* data from that file                    */
+  int q1, q2;                          /* quark flavor indices                   */
 #endif
 } glb_xsec;
 
