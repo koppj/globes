@@ -101,6 +101,7 @@
                                        // vacuum algorithms are used
 #define M_SQRT3  1.73205080756887729352744634151     // sqrt(3)
 
+
 // Macros
 #define SQR(x)      ((x)*(x))                        // x^2
 #define SQR_ABS(x)  (SQR(creal(x)) + SQR(cimag(x)))  // |x|^2
@@ -125,12 +126,36 @@ static double th[MAX_FLAVORS+1][MAX_FLAVORS+1];// Mixing angles
 static double delta[MAX_PHASES];            // Dirac CP phase
 static double dmsq[MAX_FLAVORS-1];         // Mass squared differences
 
+
 static double complex epsilon_s_plus_1[MAX_FLAVORS][MAX_FLAVORS]; // NSI in the source
 static double complex epsilon_m[MAX_FLAVORS][MAX_FLAVORS];        // NSI in the propagation
 static double complex epsilon_d_plus_1[MAX_FLAVORS][MAX_FLAVORS]; // NSI in the detector
 
-static double complex epsilon_CC[MAX_INTERACTIONS][2][3][MAX_FLAVORS][MAX_FLAVORS]; // NSI in the source
-static double complex epsilon_NC[MAX_INTERACTIONS][2][3][MAX_FLAVORS][MAX_FLAVORS]; // NSI in the source
+
+//static double complex epsilon_CC[MAX_INTERACTIONS][2][3][MAX_FLAVORS][MAX_FLAVORS]; // NSI in the source
+//static double complex epsilon_NC[2][3][3][MAX_FLAVORS][MAX_FLAVORS]; // NSI in the source
+
+struct WEFT {
+  double complex epsilon_CC[MAX_INTERACTIONS][2][3][MAX_FLAVORS][MAX_FLAVORS]; // Interaction index("L", "R", "S", "P", "T"),up-like index, down-like index,  charged lepton, neutrino
+  double complex epsilon_NC[2][3][3][MAX_FLAVORS][MAX_FLAVORS]; // Interaction index("L", "R"),matterfermions, matterfermions,  laptonflavors, laptonflavors
+};
+
+struct SMEFT {
+  double w3_phi_ll[3][3], w3_phi_q[3][3],w_phi_ud[3][3],w_ll[3][3][3][3], w3_lq[3][3][3][3],w_ledq[3][3][3],w_lequ[3][3][3],w3_lequ[3][3][3],w3_ledq[3][3][3];
+
+};
+
+
+struct WEFT weft;
+struct SMEFT smeft;
+
+
+// These are temporary production and detection coefficients.
+complex double dXY[MAX_INTERACTIONS][MAX_INTERACTIONS][3][3][MAX_FLAVORS];         // detection coefficient, linear
+//static double complex dXX[MAX_INTERACTIONS][3][3][MAX_FLAVORS];         // detection coefficient, quadratic
+complex double pXY[MAX_INTERACTIONS][MAX_INTERACTIONS][3][3][MAX_FLAVORS];         // production coefficient, linear
+//static double complex pXX[MAX_INTERACTIONS][3][3][MAX_FLAVORS];         // production coefficient, quadratic
+
 // Names of NSI parameters
 char smeft_param_strings[MAX_PARAMS][64];
 
@@ -146,6 +171,7 @@ static gsl_matrix_complex *S1=NULL, *T0=NULL; // Temporary matrix storage
 static gsl_matrix_complex *Q1=NULL, *Q2=NULL; // More temporary storage
 
 static gsl_eigen_hermv_workspace *w=NULL;     // Workspace for eigenvector algorithm
+complex double QTil[MAX_INTERACTIONS][2][3][MAX_FLAVORS][MAX_FLAVORS]; // Interaction index("L", "R", "S", "P", "T"),up-like index, down-like index,  charged lepton, neutrino
 
 extern int density_corr[];
 
@@ -528,17 +554,16 @@ static int zheevh3(double complex A[3][3], double complex Q[3][3], double w[3])
   return 0;
 }
 
-
 // ----------------------------------------------------------------------------
 //                    I N T E R N A L   F U N C T I O N S
 // ----------------------------------------------------------------------------
 
 // ----------------------------------------------------------------------------
-//int smeft_print_gsl_matrix_complex(gsl_matrix_complex *A)
+int smeft_print_gsl_matrix_complex(gsl_matrix_complex *A)
 // ----------------------------------------------------------------------------
 // Print entries of a complex GSL matrix in human-readable form
 // ----------------------------------------------------------------------------
-/*{
+{
   int i, j;
   for (i=0; i < A->size1; i++)
   {
@@ -552,7 +577,7 @@ static int zheevh3(double complex A[3][3], double complex Q[3][3], double w[3])
 
   return 0;
 }
-*/
+
 
 // ----------------------------------------------------------------------------
 int smeft_init_probability_engine_3()
@@ -611,6 +636,7 @@ int smeft_init_probability_engine(int _n_leptonflavors, int _rotation_order[][2]
   T0 = gsl_matrix_complex_calloc(n_leptonflavors, n_leptonflavors);
   Q1 = gsl_matrix_complex_calloc(n_leptonflavors, n_leptonflavors);
   Q2 = gsl_matrix_complex_calloc(n_leptonflavors, n_leptonflavors);
+
 
   w  = gsl_eigen_hermv_alloc(n_leptonflavors);
 
@@ -735,7 +761,6 @@ int smeft_free_probability_engine()
   return 0;
 }
 
-
 // ----------------------------------------------------------------------------
 int smeft_set_oscillation_parameters(glb_params p, void *user_data)
 // ----------------------------------------------------------------------------
@@ -787,7 +812,7 @@ int smeft_set_oscillation_parameters(glb_params p, void *user_data)
         {
           for (int j=0; j < n_leptonflavors; j++)
           {
-            epsilon_CC[x][l][m][i][j] = glbGetOscParams(p,k) * cexp(I*glbGetOscParams(p,k+1));
+            weft.epsilon_CC[x][l][m][i][j] = glbGetOscParams(p,k) * cexp(I*glbGetOscParams(p,k+1));
             k += 2;
           }
         }
@@ -801,12 +826,12 @@ int smeft_set_oscillation_parameters(glb_params p, void *user_data)
     {
       for (int i=0; i < n_leptonflavors; i++)
       {
-        epsilon_NC[x][f][f][i][i] = glbGetOscParams(p,k);
+        weft.epsilon_NC[x][f][f][i][i] = glbGetOscParams(p,k);
         k++;
         for (j=i+1; j < n_leptonflavors; j++)
         {
-          epsilon_NC[x][f][f][i][j] = glbGetOscParams(p,k) * cexp(I*glbGetOscParams(p,k+1));
-          epsilon_NC[x][f][f][j][i] = conj(epsilon_NC[x][f][f][i][j]);
+          weft.epsilon_NC[x][f][f][i][j] = glbGetOscParams(p,k) * cexp(I*glbGetOscParams(p,k+1));
+          weft.epsilon_NC[x][f][f][j][i] = conj(weft.epsilon_NC[x][f][f][i][j]);
           k += 2;
         }
       }
@@ -852,6 +877,14 @@ int smeft_set_oscillation_parameters(glb_params p, void *user_data)
   gsl_blas_zgemm(CblasNoTrans, CblasNoTrans, GSL_COMPLEX_ONE, U, T,             // H0=U.T
                  GSL_COMPLEX_ZERO, H0_template);
 
+// Above changes the mass-squared difference part to the flavor basis. Now I want y
+// total Hamiltonian which is defined below to be in the mass basis. So I do the inverse
+// of this to move the whole thing to the mass basis.
+  gsl_blas_zgemm(CblasConjTrans, CblasNoTrans, GSL_COMPLEX_ONE, U, H, // T=U^\dagger.H
+                 GSL_COMPLEX_ZERO, T);
+  gsl_blas_zgemm(CblasNoTrans, CblasNoTrans, GSL_COMPLEX_ONE, T, U,             // H=T.U
+                 GSL_COMPLEX_ZERO, H);
+
   gsl_matrix_complex_free(T);
   gsl_matrix_complex_free(R);
 
@@ -891,8 +924,8 @@ for (int x=0; x < 5; x++)                     // Production/Detection NSI: CC WE
       {
         for (int j=0; j < n_leptonflavors; j++)
         {
-          glbSetOscParams(p, cabs(epsilon_CC[x][l][m][i][j]), k);
-          glbSetOscParams(p, carg(epsilon_CC[x][l][m][i][j]), k+1);
+          glbSetOscParams(p, cabs(weft.epsilon_CC[x][l][m][i][j]), k);
+          glbSetOscParams(p, carg(weft.epsilon_CC[x][l][m][i][j]), k+1);
           k += 2;
         }
       }
@@ -906,12 +939,12 @@ for (int x=0; x < 2; x++)           // Propagation NSI: NC WEFT
   {
     for (int i=0; i < n_leptonflavors; i++)
     {
-        glbSetOscParams(p, epsilon_NC[x][f][f][i][i], k);
+        glbSetOscParams(p, weft.epsilon_NC[x][f][f][i][i], k);
       k++;
       for (j=i+1; j < n_leptonflavors; j++)
       {
-        glbSetOscParams(p, cabs(epsilon_NC[x][f][f][i][j]), k);
-        glbSetOscParams(p, carg(epsilon_NC[x][f][f][i][j]), k+1);
+        glbSetOscParams(p, cabs(weft.epsilon_NC[x][f][f][i][j]), k);
+        glbSetOscParams(p, carg(weft.epsilon_NC[x][f][f][i][j]), k+1);
         k += 2;
       }
     }
@@ -934,23 +967,34 @@ int smeft_hamiltonian_cd(double E, double rho, int cp_sign)
   double Ve = cp_sign * rho * (GLB_V_FACTOR * GLB_Ne_MANTLE); // Matter potential
   double Vn = cp_sign * rho * (GLB_V_FACTOR * (1.0 - GLB_Ne_MANTLE) / 2.0);
 
+  double Ne = 1;
+  double Nu = 3 * Ne; // The number 3 is for the u/d number density on the
+  double Nd = 3 * Ne; // earth. It should change to 2 for the sun.
+  double Nf[3]={Ne, Nu, Nd};
+
+
   double complex (*_H)[n_leptonflavors]
     = (double complex (*)[n_leptonflavors]) gsl_matrix_complex_ptr(H, 0, 0);
   double complex (*_H0_template)[n_leptonflavors]
     = (double complex (*)[n_leptonflavors]) gsl_matrix_complex_ptr(H0_template, 0, 0);
   int i, j;
 
+
   if (cp_sign > 0)
   {
-    for (i=0; i < n_leptonflavors; i++)
-      for (j=0; j < n_leptonflavors; j++)
-        _H[i][j] = _H0_template[i][j] * inv_E  +  Ve*epsilon_m[i][j];
+    for (int x=0; x < 2; x++)
+      for (int f=0; f < 3; f++)
+        for (i=0; i < n_leptonflavors; i++)
+          for (j=0; j < n_leptonflavors; j++)
+        _H[i][j] = _H0_template[i][j] * inv_E  +  Ve*Nf[f] * weft.epsilon_NC[x][f][f][i][j];
   }
   else
   {
-    for (i=0; i < n_leptonflavors; i++)
-      for (j=0; j < n_leptonflavors; j++)
-        _H[i][j] = conj(_H0_template[i][j] * inv_E  +  Ve*epsilon_m[i][j]);
+    for (int x=0; x < 2; x++)
+      for (int f=0; f < 3; f++)
+        for (i=0; i < n_leptonflavors; i++)
+          for (j=0; j < n_leptonflavors; j++)
+        _H[i][j] = conj(_H0_template[i][j] * inv_E  +  Ve*Nf[f] * weft.epsilon_NC[x][f][f][i][j]);
                                                 // delta_CP -> -delta_CP
   }
 
@@ -1042,7 +1086,9 @@ int smeft_S_matrix_cd(double E, double L, double rho, int cp_sign)
     _S[i][i] = cos(phase) + I*sin(phase);
   }
 
+/*
   // ... and transform it to the flavour basis
+
   gsl_matrix_complex_set_zero(T0);
   double complex *p = &_T0[0][0];
   for (i=0; i < n_leptonflavors; i++)              // T0 = S.Q^\dagger
@@ -1069,6 +1115,7 @@ int smeft_S_matrix_cd(double E, double L, double rho, int cp_sign)
     }
 
   // Incorporate non-standard interactions in the source and in the detector
+
   if (cp_sign > 0)
   {
     gsl_matrix_complex_set_zero(T0);
@@ -1098,7 +1145,7 @@ int smeft_S_matrix_cd(double E, double L, double rho, int cp_sign)
 
 // S --> epsilon_d_plus_1 . S . epsilon_s_plus_1
 // for anti-nu: S --> epsilon_d_plus_1^* . S . epsilon_s_plus_1^*
-
+*/
   return 0;
 }
 
@@ -1127,7 +1174,8 @@ int smeft_filtered_probability_matrix_cd(double P[MAX_FLAVORS][MAX_FLAVORS],
   double complex (*_Q2)[n_leptonflavors] = (double complex (*)[n_leptonflavors]) gsl_matrix_complex_ptr(Q2,0,0);
   double *_lambda = gsl_vector_ptr(lambda,0);
   int status;
-  int i, j, k, l;
+  int i, j, k, l, x, y, r, s, m;
+
 
   // Vacuum: Use vacuum mixing angles and masses
   if (fabs(rho) < RHO_THRESHOLD)
@@ -1172,32 +1220,164 @@ int smeft_filtered_probability_matrix_cd(double P[MAX_FLAVORS][MAX_FLAVORS],
     }
   }
 
-  // Define Q_1^\dag = Q^\dag . (1 + \eps^s) and Q_2 = (1 + \eps^d) . Q
-  // (for anti-neutrinos: \eps^{s,d} -> (\eps^{s,d})^*
-  gsl_matrix_complex_set_zero(Q1);
-  gsl_matrix_complex_set_zero(Q2);
-  if (cp_sign > 0)
+
+
+
+    //main function parameters:
+    //static double RatesNOSC(double en, double baseline,
+    //		 int polarity, int anti, int l, int m,int ident)
+
+//double glb_get_xsec(double E, int f, int cp_sign, const glb_xsec *xs)
+//glb_get_xsec(en,m,anti,glb_calc_xsecs[ident])
+
+//double glb_get_flux(double E, double L, int f, int cp_sign, const glb_flux *flux)
+//glb_get_flux(en,baseline,l,anti,glb_calc_fluxes[polarity])
+
+//double glb_eft_get_xsec_coeff(int X, int Y, int alpha, double E, const glb_xsec *xs)
+// glb_eft_get_xsec_coeff(X, Y, alpha, energy, in->xsecs[xsec_ident]);
+
+//for quark flavors:
+//int *glbEFTXSecQuarkFlavors(int experiment, int xsec_ident)
+// in->xsecs[xsec_ident]->q;
+
+//double glb_eft_get_flux_coeff(int X, int Y, int alpha, double E, const glb_flux *flux)
+//glb_eft_get_flux_coeff(X, Y, alpha, energy, in->fluxes[flux_ident]);
+// in->fluxes[flux_ident]->q;
+//int *glbEFTFluxQuarkFlavors(int experiment, int flux_ident)
+
+
+
+
+
+//Starting smeft
+
+  struct glb_experiment *in;
+  int experiment;
+  if(!(experiment >= 0 && experiment < glb_num_of_exps))
   {
-    for (i=0; i < n_leptonflavors; i++)
-      for (j=0; j < n_leptonflavors; j++)
-        for (k=0; k < n_leptonflavors; k++)
-          _Q1[i][j] += conj(epsilon_s_plus_1[k][i]) * _Q[k][j];
-    for (i=0; i < n_leptonflavors; i++)
-      for (j=0; j < n_leptonflavors; j++)
-        for (k=0; k < n_leptonflavors; k++)
-          _Q2[i][j] += epsilon_d_plus_1[i][k] * _Q[k][j];
+    glb_error("glbEFTFluxQuarkFlavors: invalid experiment number: %d", experiment);
+    return -1;
   }
-  else
+  if(!(experiment >= 0 && experiment < glb_num_of_exps))
   {
-    for (i=0; i < n_leptonflavors; i++)
-      for (j=0; j < n_leptonflavors; j++)
-        for (k=0; k < n_leptonflavors; k++)
-          _Q1[i][j] += epsilon_s_plus_1[k][i] * _Q[k][j];
-    for (i=0; i < n_leptonflavors; i++)
-      for (j=0; j < n_leptonflavors; j++)
-        for (k=0; k < n_leptonflavors; k++)
-          _Q2[i][j] += conj(epsilon_d_plus_1[i][k]) * _Q[k][j];
+    glb_error("glbEFTXSecQuarkFlavors: invalid experiment number: %d", experiment);
+    return -1;
   }
+  in = (struct glb_experiment *) glb_experiment_list[experiment];
+
+  int flux_ident;
+  int *qFlux;
+  if(!(flux_ident >= 0 && flux_ident < in->num_of_fluxes))
+  {
+    glb_error("glbEFTFluxQuarkFlavors: invalid flux ID: %d in experiment %d",
+              flux_ident, experiment);
+    return -1;
+  }
+  qFlux  = in->fluxes[flux_ident]->q;
+
+  int *qFlux2 = glbEFTFluxQuarkFlavors(experiment, flux_ident);
+
+
+
+  int xsec_ident;
+  int *qXsec;
+  if(!(xsec_ident >= 0 && xsec_ident < in->num_of_xsecs))
+  {
+    glb_error("glbEFTXSecQuarkFlavors: invalid cross-section ID: %d in experiment %d",
+              xsec_ident, experiment);
+    return -1;
+  }
+  qXsec = in->xsecs[xsec_ident]->q;
+  int *qXsec2 = glbEFTXSecQuarkFlavors(experiment, xsec_ident);
+
+
+double complex UTil[MAX_INTERACTIONS][2][3][MAX_FLAVORS][MAX_FLAVORS]; // Interaction index("L", "R", "S", "P", "T"),up-like index, down-like index,  charged lepton, neutrino
+
+
+
+    for (int x=0; x < 5; x++)
+      for (l=0; l < 2; l++)
+        for (int m=0; m < 3; m++)
+          for (int i=0; i < n_leptonflavors; i++)
+            for (int j=0; j < n_leptonflavors; j++)
+            {
+               double t;
+               t=0.0;
+               for (int k=0; k < n_leptonflavors; k++)
+              {
+                 t+=(weft.epsilon_CC[x][l][m][i][k])*_Q[k][j] ;
+              }
+                UTil[x][l][m][i][j] =t;
+            }
+
+    double complex ProdLin[2][3][MAX_FLAVORS][MAX_FLAVORS][MAX_FLAVORS]; // Interaction index("L", "R", "S", "P", "T"),up-like index, down-like index,  charged lepton, neutrino
+    double complex ProdQuad[2][3][MAX_FLAVORS][MAX_FLAVORS][MAX_FLAVORS]; // Interaction index("L", "R", "S", "P", "T"),up-like index, down-like index,  charged lepton, neutrino
+    double complex DetLin[2][3][MAX_FLAVORS][MAX_FLAVORS][MAX_FLAVORS]; // Interaction index("L", "R", "S", "P", "T"),up-like index, down-like index,  charged lepton, neutrino
+    double complex DetQuad[2][3][MAX_FLAVORS][MAX_FLAVORS][MAX_FLAVORS]; // Interaction index("L", "R", "S", "P", "T"),up-like index, down-like index,  charged lepton, neutrino
+
+
+    for (l=0; l < 2; l++)
+      for (int m=0; m < 3; m++)
+        for (int i=0; i < n_leptonflavors; i++)
+          for (int j=0; j < n_leptonflavors; j++)
+            for (int k=0; k < n_leptonflavors; k++)
+            {
+               double t;
+               t=0.0;
+               for (int x=0; x < MAX_INTERACTIONS; x++)
+              {
+                 t+=glb_eft_get_flux_coeff(x, 0, i, E, in->fluxes[flux_ident])*conj(UTil[x][l][m][i][j])*_Q[i][k];
+              }
+                ProdLin[l][m][i][j][k] =t;
+            }
+
+    for (l=0; l < 2; l++)
+      for (int m=0; m < 3; m++)
+        for (int i=0; i < n_leptonflavors; i++)
+          for (int j=0; j < n_leptonflavors; j++)
+            for (int k=0; k < n_leptonflavors; k++)
+              {
+                double t;
+                t=0.0;
+              for (int x=0; x < MAX_INTERACTIONS; x++)
+                for (int y=0; y < x+1; y++)
+                {
+                  t+=glb_eft_get_flux_coeff(x, y, i, E, in->fluxes[flux_ident])*conj(UTil[x][l][m][i][j])*UTil[y][l][m][i][k];
+                }
+                    ProdQuad[l][m][i][j][k] =t;
+              }
+
+
+     for (l=0; l < 2; l++)
+       for (int m=0; m < 3; m++)
+         for (int i=0; i < n_leptonflavors; i++)
+           for (int j=0; j < n_leptonflavors; j++)
+             for (int k=0; k < n_leptonflavors; k++)
+               {
+               double t;
+               t=0.0;
+               for (int x=0; x < MAX_INTERACTIONS; x++)
+                 {
+                 t+=glb_eft_get_xsec_coeff(x, 0, i, E, in->xsecs[xsec_ident])*UTil[x][l][m][i][j]*conj(_Q[i][k]);
+                 }
+                DetLin[l][m][i][j][k] =t;
+               }
+
+    for (l=0; l < 2; l++)
+      for (int m=0; m < 3; m++)
+        for (int i=0; i < n_leptonflavors; i++)
+          for (int j=0; j < n_leptonflavors; j++)
+            for (int k=0; k < n_leptonflavors; k++)
+              {
+                double t;
+                t=0.0;
+              for (int x=0; x < MAX_INTERACTIONS; x++)
+                for (int y=0; y < x+1; y++)
+                {
+                  t+=glb_eft_get_xsec_coeff(x, y, i, E, in->xsecs[xsec_ident])*UTil[x][l][m][i][j]*conj(UTil[y][l][m][i][k]);
+                }
+                    DetQuad[l][m][i][j][k] =t;
+              }
 
 
   // Calculate probability matrix (see GLoBES manual for a discussion of the algorithm)
@@ -1212,17 +1392,33 @@ int smeft_filtered_probability_matrix_cd(double P[MAX_FLAVORS][MAX_FLAVORS],
       _T0[i][j]     = filter_factor * (cos(phase) + I*sin(phase));
     }
 
-  for (k=0; k < n_leptonflavors; k++)
-    for (l=0; l < n_leptonflavors; l++)
-    {
-      P[k][l] = 0.0;
-      for (i=0; i < n_leptonflavors; i++)
-      {
-        complex t = conj(_Q1[k][i]) * _Q2[l][i];
-        for (j=i+1; j < n_leptonflavors; j++)
-          P[k][l] += 2.0 * creal(_Q1[k][j] * conj(_Q2[l][j]) * t * _T0[i][j]);
-        P[k][l] += SQR_ABS(_Q1[k][i]) * SQR_ABS(_Q2[l][i]);
-      }
+
+for (k=0; k < n_leptonflavors; k++)
+  for (l=0; l < n_leptonflavors; l++)
+  {
+   P[k][l] = 0.0;
+        for (i=0; i < n_leptonflavors; i++)
+          for (j=0; j < n_leptonflavors; j++)
+              {
+                double s1, s2, s3, s4;
+                s1 = qFlux2[0];
+                s2 = qFlux2[1];
+                s3 = qXsec2[0];
+                s4 = qXsec2[1];
+
+                P[k][l]+= (_T0[i][j])
+                        *(conj(_Q[k][i]) * _Q[k][j]
+                        +ProdLin[s1][s2][k][i][j]
+                        +conj(ProdLin[s1][s2][k][i][j])
+                        +ProdQuad[s1][s2][k][i][j]
+                        )
+                        *(_Q[l][i] * conj(_Q[l][j])
+                        +DetLin[s3][s4][l][i][j]
+                        +conj(DetLin[s3][s4][l][i][j])
+                        +DetQuad[s3][s4][l][i][j]
+                         );
+              }
+            P[k][l] =P[k][l];
     }
 
   return 0;
@@ -1273,6 +1469,7 @@ int smeft_probability_matrix_all(double P[MAX_FLAVORS][MAX_FLAVORS], int cp_sign
 {
   int status;
   int i, j;
+  int k, l, x, y, r, s;
 
   // Convert energy to eV
   E *= 1.0e9;
@@ -1310,78 +1507,194 @@ int smeft_probability_matrix_all(double P[MAX_FLAVORS][MAX_FLAVORS], int cp_sign
 
     double complex (*_S)[n_leptonflavors]
       = (double complex (*)[n_leptonflavors]) gsl_matrix_complex_ptr(S,0,0);
-    for (i=0; i < n_leptonflavors; i++)
-      for (j=0; j < n_leptonflavors; j++)
-        P[j][i] = SQR_ABS(_S[i][j]);
-  }
 
-  return 0;
-}
-
-
-// ----------------------------------------------------------------------------
-int smeft_probability_matrix_m_to_f(double P[MAX_FLAVORS][MAX_FLAVORS], int cp_sign, double E,
-    int psteps, const double *length, const double *density,
-    double filter_sigma, void *user_data)
-// ----------------------------------------------------------------------------
-// Calculates the neutrino oscillation probability matrix, assuming that the
-// initial state is a vacuum _mass_ eigenstate (e.g. for solar neutrinos)
-// ----------------------------------------------------------------------------
-// Parameters:
-//   P:       Buffer for the storage of the matrix
-//   cp_sign: +1 for neutrinos, -1 for antineutrinos
-//   E:       Neutrino energy (in GeV)
-//   psteps:  Number of layers in the matter density profile
-//   length:  Lengths of the layers in the matter density profile in km
-//   density: The matter densities in g/cm^3
-//   filter_sigma: Width of low-pass filter or <0 for no filter
-//   user_data: Unused here, should be NULL
-// ----------------------------------------------------------------------------
-{
-  int status;
-  int i, j;
-
-  // Convert energy to eV
-  E *= 1.0e9;
-
-  if (filter_sigma > 0.0)                     // With low-pass filter
-  {
-    fprintf(stderr, "ERROR: Filter feature not implemented for mass -> flavor oscillation\n");
-    memset(P, 0, MAX_FLAVORS*MAX_FLAVORS*sizeof(P[0][0]));
-  }
-  else                                        // Without low-pass filter
-  {
-    if (psteps > 1)
-    {
-      gsl_matrix_complex_set_identity(S1);                                 // S1 = 1
-      for (i=0; i < psteps; i++)
-      {
-        status = smeft_S_matrix_cd(E, GLB_KM_TO_EV(length[i]), density[i], cp_sign);
-        if (status != 0)
-          return status;
-        gsl_blas_zgemm(CblasNoTrans, CblasNoTrans, GSL_COMPLEX_ONE, S, S1, // T0 = S.S1
-                       GSL_COMPLEX_ZERO, T0);
-        gsl_matrix_complex_memcpy(S1, T0);                                 // S1 = T0
-      }
-      gsl_matrix_complex_memcpy(S, S1);                                    // S  = S1
-    }
+    double complex (*_Q)[n_leptonflavors]  = (double complex (*)[n_leptonflavors]) gsl_matrix_complex_ptr(Q,0,0);
+    if (cp_sign > 0)
+      gsl_matrix_complex_memcpy(Q, U);
     else
     {
-      status = smeft_S_matrix_cd(E, GLB_KM_TO_EV(length[0]), density[0], cp_sign);
-      if (status != 0)
-        return status;
+      double complex (*_U)[n_leptonflavors]
+        = (double complex (*)[n_leptonflavors]) gsl_matrix_complex_ptr(U,0,0);
+      for (i=0; i < n_leptonflavors; i++)
+        for (j=0; j < n_leptonflavors; j++)
+          _Q[i][j] = conj(_U[i][j]);
     }
 
-    // Convert initial states from mass to flavor basis
-    gsl_blas_zgemm(CblasNoTrans, CblasNoTrans, GSL_COMPLEX_ONE, S, U,      // S1 = S.U
-                   GSL_COMPLEX_ZERO, S1);
-    gsl_matrix_complex_memcpy(S, S1);                                      // S  = S1
 
-    double complex (*_S)[n_leptonflavors]
-      = (double complex (*)[n_leptonflavors]) gsl_matrix_complex_ptr(S,0,0);
-    for (i=0; i < n_leptonflavors; i++)
-      for (j=0; j < n_leptonflavors; j++)
-        P[j][i] = SQR_ABS(_S[i][j]);
+
+    /* Temporary Definition. Will change */
+  //  double pPL[3]={-5581.44, -26.9933, 0};
+  //  double pPP[3]={3.1152*pow(10 , 7), 728.64, 0};
+  //  double dPL[3]={0, 0, 0};
+    /* for dPP I should define these in a more user friendly way */
+  //  double dPP[3]={pow(10 , -9) * E,pow(10 , -9)* 2 * E, pow(10 , -9)* 3 * E};
+
+
+  //   for (i=0; i < 3; i++)
+  //     pXY[3][0][0][0][i]+=pPL[i];
+
+  //   for (i=0; i < 3; i++)
+  //     pXY[3][3][0][0][i]+=pPP[i];
+
+  //   for (i=0; i < 3; i++)
+  //     dXY[3][3][0][0][i]+=dPP[i];
+
+  struct glb_experiment *in;
+  int experiment;
+  if(!(experiment >= 0 && experiment < glb_num_of_exps))
+  {
+    glb_error("glbEFTFluxQuarkFlavors: invalid experiment number: %d", experiment);
+    return -1;
+  }
+  if(!(experiment >= 0 && experiment < glb_num_of_exps))
+  {
+    glb_error("glbEFTXSecQuarkFlavors: invalid experiment number: %d", experiment);
+    return -1;
+  }
+  in = (struct glb_experiment *) glb_experiment_list[experiment];
+
+  int flux_ident;
+  int *qFlux;
+  if(!(flux_ident >= 0 && flux_ident < in->num_of_fluxes))
+  {
+    glb_error("glbEFTFluxQuarkFlavors: invalid flux ID: %d in experiment %d",
+              flux_ident, experiment);
+    return -1;
+  }
+  qFlux  = in->fluxes[flux_ident]->q;
+
+  int *qFlux2 = glbEFTFluxQuarkFlavors(experiment, flux_ident);
+
+
+
+  int xsec_ident;
+  int *qXsec;
+  if(!(xsec_ident >= 0 && xsec_ident < in->num_of_xsecs))
+  {
+    glb_error("glbEFTXSecQuarkFlavors: invalid cross-section ID: %d in experiment %d",
+              xsec_ident, experiment);
+    return -1;
+  }
+  qXsec = in->xsecs[xsec_ident]->q;
+  int *qXsec2 = glbEFTXSecQuarkFlavors(experiment, xsec_ident);
+
+
+  double complex UTil[MAX_INTERACTIONS][2][3][MAX_FLAVORS][MAX_FLAVORS]; // Interaction index("L", "R", "S", "P", "T"),up-like index, down-like index,  charged lepton, neutrino
+
+
+
+    for (int x=0; x < 5; x++)
+      for (l=0; l < 2; l++)
+        for (int m=0; m < 3; m++)
+          for (int i=0; i < n_leptonflavors; i++)
+            for (int j=0; j < n_leptonflavors; j++)
+            {
+               double t;
+               t=0.0;
+               for (int k=0; k < n_leptonflavors; k++)
+              {
+                 t+=(weft.epsilon_CC[x][l][m][i][k])*_Q[k][j] ;
+              }
+                UTil[x][l][m][i][j] =t;
+            }
+
+    double complex ProdLin[2][3][MAX_FLAVORS][MAX_FLAVORS][MAX_FLAVORS]; // Interaction index("L", "R", "S", "P", "T"),up-like index, down-like index,  charged lepton, neutrino
+    double complex ProdQuad[2][3][MAX_FLAVORS][MAX_FLAVORS][MAX_FLAVORS]; // Interaction index("L", "R", "S", "P", "T"),up-like index, down-like index,  charged lepton, neutrino
+    double complex DetLin[2][3][MAX_FLAVORS][MAX_FLAVORS][MAX_FLAVORS]; // Interaction index("L", "R", "S", "P", "T"),up-like index, down-like index,  charged lepton, neutrino
+    double complex DetQuad[2][3][MAX_FLAVORS][MAX_FLAVORS][MAX_FLAVORS]; // Interaction index("L", "R", "S", "P", "T"),up-like index, down-like index,  charged lepton, neutrino
+
+
+    for (l=0; l < 2; l++)
+      for (int m=0; m < 3; m++)
+        for (int i=0; i < n_leptonflavors; i++)
+          for (int j=0; j < n_leptonflavors; j++)
+            for (int k=0; k < n_leptonflavors; k++)
+            {
+               double t;
+               t=0.0;
+               for (int x=0; x < MAX_INTERACTIONS; x++)
+              {
+                 t+=glb_eft_get_flux_coeff(x, 0, i, E, in->fluxes[flux_ident])*conj(UTil[x][l][m][i][j])*_Q[i][k];
+              }
+                ProdLin[l][m][i][j][k] =t;
+            }
+
+    for (l=0; l < 2; l++)
+      for (int m=0; m < 3; m++)
+        for (int i=0; i < n_leptonflavors; i++)
+          for (int j=0; j < n_leptonflavors; j++)
+            for (int k=0; k < n_leptonflavors; k++)
+              {
+                double t;
+                t=0.0;
+              for (int x=0; x < MAX_INTERACTIONS; x++)
+                for (int y=0; y < x+1; y++)
+                {
+                  t+=glb_eft_get_flux_coeff(x, y, i, E, in->fluxes[flux_ident])*conj(UTil[x][l][m][i][j])*UTil[y][l][m][i][k];
+                }
+                    ProdQuad[l][m][i][j][k] =t;
+              }
+
+
+     for (l=0; l < 2; l++)
+       for (int m=0; m < 3; m++)
+         for (int i=0; i < n_leptonflavors; i++)
+           for (int j=0; j < n_leptonflavors; j++)
+             for (int k=0; k < n_leptonflavors; k++)
+               {
+               double t;
+               t=0.0;
+               for (int x=0; x < MAX_INTERACTIONS; x++)
+                 {
+                 t+=glb_eft_get_xsec_coeff(x, 0, i, E, in->xsecs[xsec_ident])*UTil[x][l][m][i][j]*conj(_Q[i][k]);
+                 }
+                DetLin[l][m][i][j][k] =t;
+               }
+
+    for (l=0; l < 2; l++)
+      for (int m=0; m < 3; m++)
+        for (int i=0; i < n_leptonflavors; i++)
+          for (int j=0; j < n_leptonflavors; j++)
+            for (int k=0; k < n_leptonflavors; k++)
+              {
+                double t;
+                t=0.0;
+              for (int x=0; x < MAX_INTERACTIONS; x++)
+                for (int y=0; y < x+1; y++)
+                {
+                  t+=glb_eft_get_xsec_coeff(x, y, i, E, in->xsecs[xsec_ident])*UTil[x][l][m][i][j]*conj(UTil[y][l][m][i][k]);
+                }
+                    DetQuad[l][m][i][j][k] =t;
+              }
+
+for (k=0; k < n_leptonflavors; k++)
+  for (l=0; l < n_leptonflavors; l++)
+  {
+   P[k][l] = 0.0;
+        for (i=0; i < n_leptonflavors; i++)
+          for (j=0; j < n_leptonflavors; j++)
+              {
+                double s1, s2, s3, s4;
+                s1 = qFlux2[0];
+                s2 = qFlux2[1];
+                s3 = qXsec2[0];
+                s4 = qXsec2[1];
+
+                P[k][l]+= (_S[i][i] * conj(_S[j][j]))
+                        *(conj(_Q[k][i]) * _Q[k][j]
+                        +ProdLin[s1][s2][k][i][j]
+                        +conj(ProdLin[s1][s2][k][i][j])
+                        +ProdQuad[s1][s2][k][i][j]
+                        )
+                        *(_Q[l][i] * conj(_Q[l][j])
+                        +DetLin[s3][s4][l][i][j]
+                        +conj(DetLin[s3][s4][l][i][j])
+                        +DetQuad[s3][s4][l][i][j]
+                         );
+              }
+            P[k][l] =P[k][l];
+    }
+
   }
 
   return 0;
