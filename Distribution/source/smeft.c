@@ -1083,15 +1083,17 @@ int smeft_S_matrix_cd(double E, double L, double rho, int cp_sign)
   for (i=0; i < n_leptonflavors; i++)
   {
     phase    = -L * _lambda[i];
-    _S[i][i] = cos(phase) + I*sin(phase);
+    _S[i][i] = (cos(phase) + I*sin(phase));
   }
 
-/*
-  // ... and transform it to the flavour basis
+  gsl_matrix_complex_set_identity(S1);                                 // S1 = 1
 
+
+  // ... and transform it to the flavour basis
+/*
   gsl_matrix_complex_set_zero(T0);
   double complex *p = &_T0[0][0];
-  for (i=0; i < n_leptonflavors; i++)              // T0 = S.Q^\dagger
+  for (i=0; i < n_leptonflavors; i++)              // T0 = S.S1^\dagger
     for (j=0; j < n_leptonflavors; j++)
     {
       for (int k=0; k < n_leptonflavors; k++)
@@ -1148,7 +1150,17 @@ int smeft_S_matrix_cd(double E, double L, double rho, int cp_sign)
 */
   return 0;
 }
+// ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+double glb_eft_get_flux_coeff(int X, int Y, int alpha, double E, const glb_flux *flux);
+double glb_eft_get_xsec_coeff(int X, int Y, int alpha, double E, const glb_xsec *xs);
+double glbEFTFluxCoeff(int experiment, int flux_ident, int X, int Y, int alpha, double energy);
+int *glbEFTFluxQuarkFlavors(int experiment, int flux_ident);
+double glbEFTXSecCoeff(int experiment, int xsec_ident, int X, int Y, int alpha, double energy);
+int *glbEFTXSecQuarkFlavors(int experiment, int xsec_ident);
 
+// ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 // ----------------------------------------------------------------------------
 int smeft_filtered_probability_matrix_cd(double P[MAX_FLAVORS][MAX_FLAVORS],
@@ -1250,45 +1262,49 @@ int smeft_filtered_probability_matrix_cd(double P[MAX_FLAVORS][MAX_FLAVORS],
 
 
 //Starting smeft
+struct glb_experiment *in;
+int experiment;
+int glb_num_of_exps;
+if(!(experiment >= 0 && experiment < glb_num_of_exps))
+{
+  glb_error("glbEFTFluxQuarkFlavors: invalid experiment number: %d", experiment);
+  return -1;
+}
+if(!(experiment >= 0 && experiment < glb_num_of_exps))
+{
+  glb_error("glbEFTXSecQuarkFlavors: invalid experiment number: %d", experiment);
+  return -1;
+}
+in = (struct glb_experiment *) glb_experiment_list[experiment];
+int flux_ident;
+//int *qFlux2 = glbEFTFluxQuarkFlavors(experiment, flux_ident);
 
-  struct glb_experiment *in;
-  int experiment;
-  if(!(experiment >= 0 && experiment < glb_num_of_exps))
-  {
-    glb_error("glbEFTFluxQuarkFlavors: invalid experiment number: %d", experiment);
-    return -1;
-  }
-  if(!(experiment >= 0 && experiment < glb_num_of_exps))
-  {
-    glb_error("glbEFTXSecQuarkFlavors: invalid experiment number: %d", experiment);
-    return -1;
-  }
-  in = (struct glb_experiment *) glb_experiment_list[experiment];
 
-  int flux_ident;
-  int *qFlux;
+
+
+  int *qFlux2;
   if(!(flux_ident >= 0 && flux_ident < in->num_of_fluxes))
   {
     glb_error("glbEFTFluxQuarkFlavors: invalid flux ID: %d in experiment %d",
               flux_ident, experiment);
     return -1;
   }
-  qFlux  = in->fluxes[flux_ident]->q;
+  qFlux2  = (in->fluxes[flux_ident])->q;
 
-  int *qFlux2 = glbEFTFluxQuarkFlavors(experiment, flux_ident);
+
 
 
 
   int xsec_ident;
-  int *qXsec;
+  int *qXsec2;
   if(!(xsec_ident >= 0 && xsec_ident < in->num_of_xsecs))
   {
     glb_error("glbEFTXSecQuarkFlavors: invalid cross-section ID: %d in experiment %d",
               xsec_ident, experiment);
     return -1;
   }
-  qXsec = in->xsecs[xsec_ident]->q;
-  int *qXsec2 = glbEFTXSecQuarkFlavors(experiment, xsec_ident);
+  qXsec2 = (in->xsecs[xsec_ident])->q;
+//  int *qXsec2 = glbEFTXSecQuarkFlavors(experiment, xsec_ident);
 
 
 double complex UTil[MAX_INTERACTIONS][2][3][MAX_FLAVORS][MAX_FLAVORS]; // Interaction index("L", "R", "S", "P", "T"),up-like index, down-like index,  charged lepton, neutrino
@@ -1400,7 +1416,7 @@ for (k=0; k < n_leptonflavors; k++)
         for (i=0; i < n_leptonflavors; i++)
           for (j=0; j < n_leptonflavors; j++)
               {
-                double s1, s2, s3, s4;
+                int s1, s2, s3, s4;
                 s1 = qFlux2[0];
                 s2 = qFlux2[1];
                 s3 = qXsec2[0];
@@ -1520,25 +1536,32 @@ int smeft_probability_matrix_all(double P[MAX_FLAVORS][MAX_FLAVORS], int cp_sign
           _Q[i][j] = conj(_U[i][j]);
     }
 
+    struct glb_experiment *in;
+    int experiment;
+    int glb_num_of_exps;
+    /*if(!(experiment >= 0 && experiment < glb_num_of_exps))
+    {
+      glb_error("glbEFTFluxQuarkFlavors: invalid experiment number: %d", experiment);
+      return -1;
+    }
+    if(!(experiment >= 0 && experiment < glb_num_of_exps))
+    {
+      glb_error("glbEFTXSecQuarkFlavors: invalid experiment number: %d", experiment);
+      return -1;
+    }
 
+*/
+    in = (struct glb_experiment *) glb_experiment_list[experiment];
+    int flux_ident;
 
-    /* Temporary Definition. Will change */
-  //  double pPL[3]={-5581.44, -26.9933, 0};
-  //  double pPP[3]={3.1152*pow(10 , 7), 728.64, 0};
-  //  double dPL[3]={0, 0, 0};
-    /* for dPP I should define these in a more user friendly way */
-  //  double dPP[3]={pow(10 , -9) * E,pow(10 , -9)* 2 * E, pow(10 , -9)* 3 * E};
+    int *qFlux2;
+    qFlux2  = (in->fluxes[flux_ident])->q;
 
+    int xsec_ident;
+    int *qXsec2;
+    qXsec2 = (in->xsecs[xsec_ident])->q;
 
-  //   for (i=0; i < 3; i++)
-  //     pXY[3][0][0][0][i]+=pPL[i];
-
-  //   for (i=0; i < 3; i++)
-  //     pXY[3][3][0][0][i]+=pPP[i];
-
-  //   for (i=0; i < 3; i++)
-  //     dXY[3][3][0][0][i]+=dPP[i];
-
+/*
   struct glb_experiment *in;
   int experiment;
   if(!(experiment >= 0 && experiment < glb_num_of_exps))
@@ -1578,7 +1601,7 @@ int smeft_probability_matrix_all(double P[MAX_FLAVORS][MAX_FLAVORS], int cp_sign
   qXsec = in->xsecs[xsec_ident]->q;
   int *qXsec2 = glbEFTXSecQuarkFlavors(experiment, xsec_ident);
 
-
+*/
   double complex UTil[MAX_INTERACTIONS][2][3][MAX_FLAVORS][MAX_FLAVORS]; // Interaction index("L", "R", "S", "P", "T"),up-like index, down-like index,  charged lepton, neutrino
 
 
@@ -1668,18 +1691,20 @@ int smeft_probability_matrix_all(double P[MAX_FLAVORS][MAX_FLAVORS], int cp_sign
               }
 
 for (k=0; k < n_leptonflavors; k++)
+{
   for (l=0; l < n_leptonflavors; l++)
   {
    P[k][l] = 0.0;
         for (i=0; i < n_leptonflavors; i++)
+        {
           for (j=0; j < n_leptonflavors; j++)
               {
-                double s1, s2, s3, s4;
+                int s1, s2, s3, s4;
                 s1 = qFlux2[0];
                 s2 = qFlux2[1];
                 s3 = qXsec2[0];
                 s4 = qXsec2[1];
-
+                
                 P[k][l]+= (_S[i][i] * conj(_S[j][j]))
                         *(conj(_Q[k][i]) * _Q[k][j]
                         +ProdLin[s1][s2][k][i][j]
@@ -1692,8 +1717,14 @@ for (k=0; k < n_leptonflavors; k++)
                         +DetQuad[s3][s4][l][i][j]
                          );
               }
-            P[k][l] =P[k][l];
+         }
+            P[k][l];
     }
+  }
+
+
+
+
 
   }
 

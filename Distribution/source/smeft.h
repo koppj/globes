@@ -5,6 +5,7 @@
 #  include "config.h"
 #endif
 
+#include "glb_types.h"
 #include <globes/globes.h>
 
 // Arrangement of oscillation parameters in glb_params data structure:
@@ -63,5 +64,7 @@ double GetPREMDensity(double t, double L);
 double GetAvgPREMDensity(double L_tot, double L1, double L2);
 int GetPREM3LayerApprox(double L, int *n_layers, double *lengths,
                         double *densities);
+
+
 
 #endif

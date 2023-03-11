@@ -752,7 +752,7 @@ int glbSetProjectionFlagByName(glb_projection in, int flag, const char *name)
 int glbGetProjectionFlagByName(const glb_projection in, const char *name)
 {
   int index;
-  
+
   if (!name)
   {
     glb_error("glbSetProjectionFlagByName: Invalid parameter name (NULL)");
@@ -3147,5 +3147,3 @@ int glbGetParentExp(int exp)
 
   return -1;
 }
-
-
