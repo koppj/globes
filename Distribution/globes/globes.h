@@ -94,7 +94,7 @@ enum glb_enum_minimizers
 #define GLB_MAX_EXP      300
 
 /* maximum numbers of channels, rules, ... per experiment */
-#define GLB_MAX_CHANNELS  64
+#define GLB_MAX_CHANNELS  200
 #define GLB_MAX_RULES     64
 #define GLB_MAX_NUISANCE 128
 #define GLB_MAX_SMEAR     64
@@ -130,7 +130,6 @@ typedef int (*glb_get_oscillation_parameters_function)(glb_params p, void *user_
 extern char **glb_path_vector;
 extern size_t glb_path_vector_length;
 extern int glb_num_of_exps;
-
 extern int glb_single_experiment_number;
 #ifdef SWIG
 /* I really have no clue why I have to 
@@ -461,6 +460,8 @@ int glbSetInitialStep(double step);
 /* Definitions for SMEFT plugin */
 /* ---------------------------- */
 #ifdef GLB_EFT
+#define MAX_FLAVORS      6
+#define MAX_INTERACTIONS 5
   enum eft_Lorentz_structures  /* Lorentz structures supported */
     { GLB_EFT_L, GLB_EFT_R, GLB_EFT_S, GLB_EFT_P, GLB_EFT_T,
       GLB_EFT_N_LORENTZ_STRUCTURES };

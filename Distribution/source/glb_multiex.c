@@ -1505,6 +1505,7 @@ int glbDefaultExp(glb_exp ins)
               for(ct=0;in->user_pre_smearing_background[i][ct]!=-1;ct++) ct=ct;
               if(ct!=in->simbins)
               {
+              
                 glb_exp_error(in, "user_pre_smearing_background has not simbins elements");
                 status=-1;
               }

@@ -381,6 +381,49 @@ int glb_init_flux(glb_flux *flux)
   if (flux->target_power < 0)  flux->target_power = 1.0;
   if (flux->stored_muons < 0)  flux->stored_muons = 1.0;
   if (flux->norm < 0)          flux->norm         = 1.0;
+  
+  #ifdef GLB_EFT
+  /* Load EFT production coefficients */
+  int status;
+  int i;
+  int n_columns = 1 + n_leptonflavors * SQR(GLB_EFT_N_LORENTZ_STRUCTURES);
+ 
+  if (flux->eft_coeff_file != NULL && strlen(flux->eft_coeff_file) > 0)
+  {
+    if ((status=glb_load_n_columns(flux->eft_coeff_file, n_columns,
+                  &flux->eft_n_E, flux->eft_flux_coeff)) != GLB_SUCCESS)
+      return status;
+
+    /* check that energies are monotonically increasing */
+    for (i=1; i < flux->eft_n_E; i++)
+    {
+      if (flux->eft_flux_coeff[0][i] < flux->eft_flux_coeff[0][i-1])
+      {
+        glb_error("Energy not monotonically increasing in file %s, E=%g",
+                  flux->eft_coeff_file, flux->eft_flux_coeff[0][i]);
+        return GLBERR_INVALID_FILE_FORMAT;
+      }
+    }
+
+    /* if production coefficients are defined, quark flavor indices
+     * must given as well */
+    if (flux->q[0] < 0 || flux->q[0] > 2 || flux->q[1] < 0 || flux->q[1] > 2)
+    {
+      glb_error("Quark flavors not given (or out of bounds). "
+                "(Must begiven in nuflux environment when using EFT engine.");
+      return GLBERR_INVALID_FILE_FORMAT;
+    }
+  }
+  else
+  {
+    flux->eft_n_E = 0;
+    for (i=0; i < n_columns; i++)
+      flux->eft_flux_coeff[i] = NULL;
+    flux->q[0] = -1;
+    flux->q[1] = -1;
+  }
+
+#endif /* #ifdef GLB_EFT */
 
   /* Initialize flux tables according to user specification */
   switch (flux->builtin)
@@ -428,48 +471,7 @@ int glb_init_flux(glb_flux *flux)
       break;
   }
 
-#ifdef GLB_EFT
-  /* Load EFT production coefficients */
-  int status;
-  int i;
-  int n_columns = 1 + n_leptonflavors * SQR(GLB_EFT_N_LORENTZ_STRUCTURES);
- 
-  if (flux->eft_coeff_file != NULL && strlen(flux->eft_coeff_file) > 0)
-  {
-    if ((status=glb_load_n_columns(flux->eft_coeff_file, n_columns,
-                  &flux->eft_n_E, flux->eft_flux_coeff)) != GLB_SUCCESS)
-      return status;
 
-    /* check that energies are monotonically increasing */
-    for (i=1; i < flux->eft_n_E; i++)
-    {
-      if (flux->eft_flux_coeff[0][i] < flux->eft_flux_coeff[0][i-1])
-      {
-        glb_error("Energy not monotonically increasing in file %s, E=%g",
-                  flux->eft_coeff_file, flux->eft_flux_coeff[0][i]);
-        return GLBERR_INVALID_FILE_FORMAT;
-      }
-    }
-
-    /* if production coefficients are defined, quark flavor indices
-     * must given as well */
-    if (flux->q[0] < 0 || flux->q[0] > 2 || flux->q[1] < 0 || flux->q[1] > 2)
-    {
-      glb_error("Quark flavors not given (or out of bounds). "
-                "(Must begiven in nuflux environment when using EFT engine.");
-      return GLBERR_INVALID_FILE_FORMAT;
-    }
-  }
-  else
-  {
-    flux->eft_n_E = 0;
-    for (i=0; i < n_columns; i++)
-      flux->eft_flux_coeff[i] = NULL;
-    flux->q[0] = -1;
-    flux->q[1] = -1;
-  }
-
-#endif /* #ifdef GLB_EFT */
 
   return GLB_SUCCESS;
 }

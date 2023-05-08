@@ -5,8 +5,9 @@
 #  include "config.h"
 #endif
 
-#include "glb_types.h"
+/*#include "glb_types.h"*/
 #include <globes/globes.h>
+
 
 // Arrangement of oscillation parameters in glb_params data structure:
 //   th12,    th13,    th23,    deltaCP,
@@ -30,8 +31,7 @@
 // Names of oscillation parameters
 extern char smeft_param_strings[][64];
 
-#define MAX_FLAVORS      6
-#define MAX_INTERACTIONS 5
+
 
 /* Macros */
 #define SQR(x)      ((x)*(x))                        /* x^2   */
@@ -47,7 +47,7 @@ int smeft_free_probability_engine();
 int smeft_set_oscillation_parameters(glb_params p, void *user_data);
 int smeft_get_oscillation_parameters(glb_params p, void *user_data);
 int smeft_filtered_probability_matrix_cd(double P[MAX_FLAVORS][MAX_FLAVORS],
-        double E, double L, double V, double sigma, int cp_sign);
+        double E, double L, double V, double sigma, int cp_sign,void *user_data);
 int smeft_probability_matrix(double _P[3][3], int cp_sign, double E,
         int psteps, const double *length, const double *density,
         double filter_sigma, void *user_data);

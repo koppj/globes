@@ -93,6 +93,7 @@
 #include "smeft.h"
 
 
+
 // Constants
 #define GLB_V_FACTOR        7.5e-14    // Conversion factor for matter potentials
 #define GLB_Ne_MANTLE       0.5        // Effective electron numbers for calculation
@@ -565,12 +566,17 @@ int smeft_print_gsl_matrix_complex(gsl_matrix_complex *A)
 // ----------------------------------------------------------------------------
 {
   int i, j;
+  
+   
   for (i=0; i < A->size1; i++)
   {
     for (j=0; j < A->size2; j++)
     {
-      printf("%10.4g +%10.4g*I   ", GSL_REAL(gsl_matrix_complex_get(A, i, j)),
-             GSL_IMAG(gsl_matrix_complex_get(A, i, j)));
+    
+    gsl_complex w = gsl_matrix_complex_get(A, i, j);
+    
+     printf("%.4f +%.4f*I   ", GSL_REAL(w),GSL_IMAG(w));
+
     }
     printf("\n");
   }
@@ -1164,7 +1170,7 @@ int *glbEFTXSecQuarkFlavors(int experiment, int xsec_ident);
 
 // ----------------------------------------------------------------------------
 int smeft_filtered_probability_matrix_cd(double P[MAX_FLAVORS][MAX_FLAVORS],
-        double E, double L, double rho, double sigma, int cp_sign)
+        double E, double L, double rho, double sigma, int cp_sign,void *user_data)
 // ----------------------------------------------------------------------------
 // Calculates the probability matrix for neutrino oscillations in matter
 // of constant density, including a low pass filter to suppress aliasing
@@ -1265,6 +1271,7 @@ int smeft_filtered_probability_matrix_cd(double P[MAX_FLAVORS][MAX_FLAVORS],
 struct glb_experiment *in;
 int experiment;
 int glb_num_of_exps;
+/*
 if(!(experiment >= 0 && experiment < glb_num_of_exps))
 {
   glb_error("glbEFTFluxQuarkFlavors: invalid experiment number: %d", experiment);
@@ -1274,8 +1281,11 @@ if(!(experiment >= 0 && experiment < glb_num_of_exps))
 {
   glb_error("glbEFTXSecQuarkFlavors: invalid experiment number: %d", experiment);
   return -1;
-}
+}*/
 in = (struct glb_experiment *) glb_experiment_list[experiment];
+
+	
+
 int flux_ident;
 //int *qFlux2 = glbEFTFluxQuarkFlavors(experiment, flux_ident);
 
@@ -1342,7 +1352,8 @@ double complex UTil[MAX_INTERACTIONS][2][3][MAX_FLAVORS][MAX_FLAVORS]; // Intera
                t=0.0;
                for (int x=0; x < MAX_INTERACTIONS; x++)
               {
-                 t+=glb_eft_get_flux_coeff(x, 0, i, E, in->fluxes[flux_ident])*conj(UTil[x][l][m][i][j])*_Q[i][k];
+                 t+=glb_eft_get_flux_coeff(x, 0, i, E/1.0e9, in->fluxes[flux_ident])*conj(UTil[x][l][m][i][j])*_Q[i][k];
+                 
               }
                 ProdLin[l][m][i][j][k] =t;
             }
@@ -1358,7 +1369,7 @@ double complex UTil[MAX_INTERACTIONS][2][3][MAX_FLAVORS][MAX_FLAVORS]; // Intera
               for (int x=0; x < MAX_INTERACTIONS; x++)
                 for (int y=0; y < x+1; y++)
                 {
-                  t+=glb_eft_get_flux_coeff(x, y, i, E, in->fluxes[flux_ident])*conj(UTil[x][l][m][i][j])*UTil[y][l][m][i][k];
+                  t+=glb_eft_get_flux_coeff(x, y, i, E/1.0e9, in->fluxes[flux_ident])*conj(UTil[x][l][m][i][j])*UTil[y][l][m][i][k];
                 }
                     ProdQuad[l][m][i][j][k] =t;
               }
@@ -1374,7 +1385,7 @@ double complex UTil[MAX_INTERACTIONS][2][3][MAX_FLAVORS][MAX_FLAVORS]; // Intera
                t=0.0;
                for (int x=0; x < MAX_INTERACTIONS; x++)
                  {
-                 t+=glb_eft_get_xsec_coeff(x, 0, i, E, in->xsecs[xsec_ident])*UTil[x][l][m][i][j]*conj(_Q[i][k]);
+                 t+=glb_eft_get_xsec_coeff(x, 0, i, E/1.0e9, in->xsecs[xsec_ident])*UTil[x][l][m][i][j]*conj(_Q[i][k]);
                  }
                 DetLin[l][m][i][j][k] =t;
                }
@@ -1390,7 +1401,7 @@ double complex UTil[MAX_INTERACTIONS][2][3][MAX_FLAVORS][MAX_FLAVORS]; // Intera
               for (int x=0; x < MAX_INTERACTIONS; x++)
                 for (int y=0; y < x+1; y++)
                 {
-                  t+=glb_eft_get_xsec_coeff(x, y, i, E, in->xsecs[xsec_ident])*UTil[x][l][m][i][j]*conj(UTil[y][l][m][i][k]);
+                  t+=glb_eft_get_xsec_coeff(x, y, i, E/1.0e9, in->xsecs[xsec_ident])*UTil[x][l][m][i][j]*conj(UTil[y][l][m][i][k]);
                 }
                     DetQuad[l][m][i][j][k] =t;
               }
@@ -1434,7 +1445,8 @@ for (k=0; k < n_leptonflavors; k++)
                         +DetQuad[s3][s4][l][i][j]
                          );
               }
-            P[k][l] =P[k][l];
+            //P[k][l] =P[k][l];
+            //printf("%.20f \n",P[k][l]);
     }
 
   return 0;
@@ -1457,10 +1469,13 @@ int smeft_probability_matrix(double _P[3][3], int cp_sign, double E,
 
   status = smeft_probability_matrix_all(P, cp_sign, E, psteps, length, density,
                                       filter_sigma, user_data);
-  for (i=0; i < 3; i++)
-    for (j=0; j < 3; j++)
+                                      
+  for (i=0; i < 3; i++){
+    for (j=0; j < 3; j++){
       _P[j][i] = P[j][i];
-
+      //printf("%.20f \n",_P[j][i]);
+      }
+}
   return status;
 }
 
@@ -1494,7 +1509,7 @@ int smeft_probability_matrix_all(double P[MAX_FLAVORS][MAX_FLAVORS], int cp_sign
   {
     if (psteps == 1)
       smeft_filtered_probability_matrix_cd(P, E, GLB_KM_TO_EV(length[0]),
-                                         density[0], filter_sigma, cp_sign);
+                                         density[0], filter_sigma, cp_sign,user_data);
     else
       return -1;
   }
@@ -1536,6 +1551,7 @@ int smeft_probability_matrix_all(double P[MAX_FLAVORS][MAX_FLAVORS], int cp_sign
           _Q[i][j] = conj(_U[i][j]);
     }
 
+    //struct glb_experiment *in;
     struct glb_experiment *in;
     int experiment;
     int glb_num_of_exps;
@@ -1552,7 +1568,13 @@ int smeft_probability_matrix_all(double P[MAX_FLAVORS][MAX_FLAVORS], int cp_sign
 
 */
     in = (struct glb_experiment *) glb_experiment_list[experiment];
+    //double L = *(in->lengthtab);
     int flux_ident;
+    //double coeff =glb_eft_get_flux_coeff(0, 0, 0, 0.5, in->fluxes[flux_ident]);
+    //double coeff2 = glbEFTFluxCoeff(0, 0, GLB_EFT_L, GLB_EFT_L, 0, 0.5);
+     printf("flux_ident %d \n",flux_ident);
+     printf("experiment %d \n",experiment); 
+   
 
     int *qFlux2;
     qFlux2  = (in->fluxes[flux_ident])->q;
@@ -1607,9 +1629,13 @@ int smeft_probability_matrix_all(double P[MAX_FLAVORS][MAX_FLAVORS], int cp_sign
 
 
     for (int x=0; x < 5; x++)
+    {
       for (l=0; l < 2; l++)
+      {
         for (int m=0; m < 3; m++)
+        {
           for (int i=0; i < n_leptonflavors; i++)
+          {
             for (int j=0; j < n_leptonflavors; j++)
             {
                double t;
@@ -1619,8 +1645,13 @@ int smeft_probability_matrix_all(double P[MAX_FLAVORS][MAX_FLAVORS], int cp_sign
                  t+=(weft.epsilon_CC[x][l][m][i][k])*_Q[k][j] ;
               }
                 UTil[x][l][m][i][j] =t;
+                 //printf("%.20f \n",t); OKAY
             }
-
+          }
+        }
+       }
+      }
+         
     double complex ProdLin[2][3][MAX_FLAVORS][MAX_FLAVORS][MAX_FLAVORS]; // Interaction index("L", "R", "S", "P", "T"),up-like index, down-like index,  charged lepton, neutrino
     double complex ProdQuad[2][3][MAX_FLAVORS][MAX_FLAVORS][MAX_FLAVORS]; // Interaction index("L", "R", "S", "P", "T"),up-like index, down-like index,  charged lepton, neutrino
     double complex DetLin[2][3][MAX_FLAVORS][MAX_FLAVORS][MAX_FLAVORS]; // Interaction index("L", "R", "S", "P", "T"),up-like index, down-like index,  charged lepton, neutrino
@@ -1628,24 +1659,39 @@ int smeft_probability_matrix_all(double P[MAX_FLAVORS][MAX_FLAVORS], int cp_sign
 
 
     for (l=0; l < 2; l++)
+    {
       for (int m=0; m < 3; m++)
+      {
         for (int i=0; i < n_leptonflavors; i++)
+        {
           for (int j=0; j < n_leptonflavors; j++)
+          {
             for (int k=0; k < n_leptonflavors; k++)
             {
                double t;
                t=0.0;
                for (int x=0; x < MAX_INTERACTIONS; x++)
               {
-                 t+=glb_eft_get_flux_coeff(x, 0, i, E, in->fluxes[flux_ident])*conj(UTil[x][l][m][i][j])*_Q[i][k];
+                 t+=glb_eft_get_flux_coeff(x, 0, i, E/1.0e9, in->fluxes[flux_ident])*conj(UTil[x][l][m][i][j])*_Q[i][k];
+                 
+                 
               }
                 ProdLin[l][m][i][j][k] =t;
+                
             }
-
+          }
+        }
+      }
+    }
+          
     for (l=0; l < 2; l++)
+    {
       for (int m=0; m < 3; m++)
+      {
         for (int i=0; i < n_leptonflavors; i++)
+        {
           for (int j=0; j < n_leptonflavors; j++)
+          {
             for (int k=0; k < n_leptonflavors; k++)
               {
                 double t;
@@ -1653,31 +1699,46 @@ int smeft_probability_matrix_all(double P[MAX_FLAVORS][MAX_FLAVORS], int cp_sign
               for (int x=0; x < MAX_INTERACTIONS; x++)
                 for (int y=0; y < x+1; y++)
                 {
-                  t+=glb_eft_get_flux_coeff(x, y, i, E, in->fluxes[flux_ident])*conj(UTil[x][l][m][i][j])*UTil[y][l][m][i][k];
+                  t+=glb_eft_get_flux_coeff(x, y, i, E/1.0e9, in->fluxes[flux_ident])*conj(UTil[x][l][m][i][j])*UTil[y][l][m][i][k];
                 }
                     ProdQuad[l][m][i][j][k] =t;
               }
+           }
+         }
+       }
+     }
 
 
      for (l=0; l < 2; l++)
+     {
        for (int m=0; m < 3; m++)
+       {
          for (int i=0; i < n_leptonflavors; i++)
+         {
            for (int j=0; j < n_leptonflavors; j++)
+           {
              for (int k=0; k < n_leptonflavors; k++)
                {
                double t;
                t=0.0;
                for (int x=0; x < MAX_INTERACTIONS; x++)
                  {
-                 t+=glb_eft_get_xsec_coeff(x, 0, i, E, in->xsecs[xsec_ident])*UTil[x][l][m][i][j]*conj(_Q[i][k]);
+                 t+=glb_eft_get_xsec_coeff(x, 0, i, E/1.0e9, in->xsecs[xsec_ident])*UTil[x][l][m][i][j]*conj(_Q[i][k]);
                  }
                 DetLin[l][m][i][j][k] =t;
                }
-
+           }
+        }
+      }
+    }
     for (l=0; l < 2; l++)
+    {
       for (int m=0; m < 3; m++)
+      {
         for (int i=0; i < n_leptonflavors; i++)
+        {
           for (int j=0; j < n_leptonflavors; j++)
+          {
             for (int k=0; k < n_leptonflavors; k++)
               {
                 double t;
@@ -1685,10 +1746,14 @@ int smeft_probability_matrix_all(double P[MAX_FLAVORS][MAX_FLAVORS], int cp_sign
               for (int x=0; x < MAX_INTERACTIONS; x++)
                 for (int y=0; y < x+1; y++)
                 {
-                  t+=glb_eft_get_xsec_coeff(x, y, i, E, in->xsecs[xsec_ident])*UTil[x][l][m][i][j]*conj(UTil[y][l][m][i][k]);
+                  t+=glb_eft_get_xsec_coeff(x, y, i, E/1.0e9, in->xsecs[xsec_ident])*UTil[x][l][m][i][j]*conj(UTil[y][l][m][i][k]);
                 }
                     DetQuad[l][m][i][j][k] =t;
               }
+          }
+        }
+       }
+     }
 
 for (k=0; k < n_leptonflavors; k++)
 {
@@ -1718,7 +1783,9 @@ for (k=0; k < n_leptonflavors; k++)
                          );
               }
          }
-            P[k][l];
+         //printf("%.20f \n",P[k][l]);
+            //P[k][l];
+            
     }
   }
 
