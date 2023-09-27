@@ -47,6 +47,16 @@ int glbSetSysErrorsListInRule(int exp, int rule, int on_off, const double *sys_l
 int glbSetSignalStartingValuesInRule(int exp, int rule, double norm, double tilt);
 int glbSetBGStartingValuesInRule(int exp, int rule, double norm, double tilt);
 int glbSetSysStartingValuesListInRule(int exp, int rule, int on_off, const double *sys_list);
+double glb_prior(double x, double center, double sigma);
+/* chi^2 functions */
+double glbChiSpectrumTilt(int exp, int rule, int n_params, double *x, double *errors, void *user_data);
+double glbChiNoSysSpectrum(int exp, int rule, int n_params, double *x, double *errors, void *user_data);
+double glbChiSpectrumOnly(int exp, int rule, int n_params, double *x, double *errors, void *user_data);
+double glbChiTotalRatesTilt(int exp, int rule, int n_params, double *x, double *errors, void *user_data);
+double glbChiNoSysTotalRates(int exp, int rule, int n_params, double *x, double *errors, void *user_data);
+double glbChiSpectrumCalib(int exp, int rule, int n_params, double *x, double *errors, void *user_data);
+double glbChiMultiExp(int exp, int rule, int n_params, double *x, double *errors, void *user_data);
+double glbChiZero(int exp, int rule, int n_params, double *x, double *errors, void *user_data);
 
 
 #endif /* GLB_SYS_H */

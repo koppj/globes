@@ -118,7 +118,9 @@
 #define NEG 294
 
 
-
+void glb_free_names(glb_naming *stale);
+glb_naming *glb_copy_names_from_parser(glb_naming *head);
+glb_naming *glb_copy_names(glb_naming *in, glb_naming *head);
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
@@ -134,6 +136,7 @@ typedef union YYSTYPE
   int in;
   glb_namerec *nameptr;
 }
+
 /* Line 1529 of yacc.c.  */
 #line 139 "glb_parser.h"
 	YYSTYPE;

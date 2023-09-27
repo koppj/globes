@@ -3660,6 +3660,72 @@ static struct glb_init arith_fncts[] =
     {NULL, NULL,0,0}
      };
 
+/***************************************************************************
+ * Function glb_free_names                                                 *
+ ***************************************************************************
+ * Destroy a list of name record                                           *
+ ***************************************************************************/
+void glb_free_names(glb_naming *stale)
+{
+  glb_naming *ptr;
+  glb_naming *dummy;
+  ptr = stale;
+  while(ptr != (glb_naming *) NULL)
+  {
+    glb_free(ptr->name);
+    glb_free(ptr->context);
+    dummy=ptr->next;
+    glb_free(ptr);
+    ptr=dummy;
+  }
+  stale=NULL;
+}
+
+
+/***************************************************************************
+ * Function glb_copy_names_from_parser                                     *
+ ***************************************************************************
+ * Prepends the current parser namespace the GLoBES namesapce head and     *
+ * returns the new head                                                    *
+ ***************************************************************************/
+glb_naming *glb_copy_names_from_parser(glb_naming *head)
+{
+  glb_namerec *pp; /* Parser name record */
+  glb_naming *pg;  /* GLoBES name record */
+  for (pp=name_table; pp != NULL; pp=pp->next)
+  {
+    pg = (glb_naming *) glb_malloc(sizeof(glb_naming));
+    pg->name    = strdup(pp->name);
+    pg->context = strdup(pp->context);
+    pg->value   = pp->value;
+    pg->next    = head;
+    head        = pg;
+  }
+  return head;
+}
+
+/***************************************************************************
+ * Function glb_copy_names                                                 *
+ ***************************************************************************
+ * Duplicates a list of glb_naming records and prepends them to head       *
+ ***************************************************************************/
+glb_naming *glb_copy_names(glb_naming *in, glb_naming *head)
+{
+  glb_naming *p;
+  glb_naming *pnew;
+  for (p=in; p != NULL; p=p->next)
+  {
+    pnew = (glb_naming *) glb_malloc(sizeof(glb_naming));
+    pnew->name    = strdup(p->name);
+    pnew->context = strdup(p->context);
+    pnew->value   = p->value;
+    pnew->next    = head;
+    head          = pnew;
+  }
+  return head;
+}
+
+
 
 //void glb_set_up_smear_data(glb_smear *test,const struct glb_experiment *head)
 static glb_List *glb_bincenter(void)

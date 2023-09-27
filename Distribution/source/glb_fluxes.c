@@ -814,14 +814,16 @@ double glb_eft_get_xsec_coeff(int X, int Y, int alpha, double E, const glb_xsec 
               + Y*n_leptonflavors
               + alpha;   /* which columns of the xsec coefficient table to access */
   int n_steps = xs->eft_n_E - 1;
+  
 
   /* no EFT coefficients defined? -> return zero */
   if (xs->eft_n_E == 0 || !xs->eft_xsec_coeff[X])
     return 0.0;
 
   int k=0;
-  while (k <= n_steps  &&  xs->eft_xsec_coeff[0][k] < logE)
+  while (k <= n_steps  &&  xs->eft_xsec_coeff[0][k] < logE){
     k++;
+    }
   if (k <= 0 || k > n_steps)
     return 0.0;
   else
@@ -830,7 +832,7 @@ double glb_eft_get_xsec_coeff(int X, int Y, int alpha, double E, const glb_xsec 
     double logE_up = xs->eft_xsec_coeff[0][k];
     double xs_lo   = xs->eft_xsec_coeff[col][k-1];
     double xs_up   = xs->eft_xsec_coeff[col][k];
-    return E * ( xs_lo + (logE - logE_lo)*(xs_up - xs_lo)/(logE_up - logE_lo) );
+    return  xs_lo + (logE - logE_lo)*(xs_up - xs_lo)/(logE_up - logE_lo) ;
   }
 }
 #endif

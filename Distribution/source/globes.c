@@ -487,12 +487,12 @@ int main(int argc, char *argv[])
       exit(1);
     }
   osc = (double *) glb_malloc(sizeof(*osc) * glbGetNumOfOscParams());
-  osc[0] = 0.553574;                /* theta_12 */
-  osc[1] = 0.160875;                /* theta_13 */
-  osc[2] = M_PI/4;                  /* theta_23 */
-  osc[3] = 0.0;                     /* delta_CP */
-  osc[4] = 0.00007;                 /* dm_21    */
-  osc[5] = 0.003;                   /* dm_31    */
+  osc[0] = 0.5903;                /* theta_12 */
+  osc[1] = 0.1503;                /* theta_13 */
+  osc[2] = 0.8674;                  /* theta_23 */
+  osc[3] = 217*M_PI/180;                     /* delta_CP */
+  osc[4] = 7.39e-5;                 /* dm_21    */
+  osc[5] = 2.525e-3;                   /* dm_31    */
   for (i=6; i < glbGetNumOfOscParams(); i++)
     osc[i] = 0.0;                   /* Non-standard parameters */
 

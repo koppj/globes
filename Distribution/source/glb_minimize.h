@@ -37,6 +37,7 @@ void glb_set_errordim(int typ,int rule);
 int glb_check_errordim(int rule);
 
 
+static int glb_current_rule;
 
 // setting all the glb_prior need for projections
 void glbSetDensityStartingValue(double start, int typ);

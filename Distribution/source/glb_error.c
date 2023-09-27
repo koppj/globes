@@ -134,6 +134,22 @@ glb_fatal (const char *message, ...)
   error(EXIT_FAILURE, 1, "FATAL", message, args);
 }
 
+double *glb_duplicate_terminated_array(double *src)
+{
+  void *dest = NULL;
+  if (src)
+  {
+    int n;
+    for (n=0; src[n] !=- 1; n++)
+      ;
+    dest = glb_malloc(n*sizeof(*src));
+    if (dest)
+      memcpy(dest, src, n*sizeof(*src));
+  }
+  
+  return dest;
+}
+
 void
 glb_exp_error (const struct glb_experiment *exp, const char *message, ...)
 {

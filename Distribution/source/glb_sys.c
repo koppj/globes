@@ -28,7 +28,6 @@
 #include <globes/globes.h>
 #include "glb_error.h"
 #include "glb_multiex.h"
-#include "glb_rate_engine.h"
 #include "glb_minimize.h"
 
 
@@ -789,7 +788,7 @@ inline double glb_likelihood(double true_rate, double fit_rate)
  ***************************************************************************
  * Calculate prior term of the form ((x - x_center)/error)^2.              *
  ***************************************************************************/
-inline double glb_prior(double x, double center, double sigma)
+double glb_prior(double x, double center, double sigma)
 {
   double tmp = (x - center)/sigma;
   return tmp*tmp;

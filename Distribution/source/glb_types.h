@@ -530,14 +530,14 @@ struct glb_experiment {
  			  in rates0[] */
 
 
-  /* PH 01/10/19 this will be now all collected in one element
-   * Probability engine for this experiment (if different from default) 
-   *
-   * glb_probability_matrix_function probability_matrix;
-   * glb_set_oscillation_parameters_function set_oscillation_parameters;
-   *  glb_get_oscillation_parameters_function get_oscillation_parameters;
-   * void *probability_user_data;
-   */
+  //PH 01/10/19 this will be now all collected in one element
+  //Probability engine for this experiment (if different from default) 
+   
+   /*glb_probability_matrix_function probability_matrix;
+   glb_set_oscillation_parameters_function set_oscillation_parameters;
+   glb_get_oscillation_parameters_function get_oscillation_parameters;
+   void *probability_user_data;*/
+  
 
   glb_osc_engine osc_engine;
   

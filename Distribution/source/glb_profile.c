@@ -31,6 +31,7 @@
 #include "glb_types.h"
 #include "glb_error.h"
 #include "glb_multiex.h"
+#include "glb_minimize.h"
 #include "glb_probability.h"
 
 
@@ -223,7 +224,7 @@ int glbAverageDensityProfile(double baseline, double **length,
 
 int glbGetProfileData(size_t *layers, double** length, double** density)
 {
-  return glbGetProfileDataInExperiment(glb_current_exp, layers, length, density);
+  return glbGetProfileDataInExperiment(glb_current_experiment, layers, length, density);
 }
 
 

@@ -31,7 +31,6 @@
 
 #include "glb_probability.h"
 #include "glb_fluxes.h"
-#include "glb_rate_engine.h"
 #include "glb_minimize.h"
 #include "glb_types.h"
 #include "glb_multiex.h"
@@ -2314,14 +2313,16 @@ int *glbEFTFluxQuarkFlavors(int experiment, int flux_ident)
   if(!(experiment >= 0 && experiment < glb_num_of_exps))
   {
     glb_error("glbEFTFluxQuarkFlavors: invalid experiment number: %d", experiment);
-    return -1;
+    static int err_val = -1;
+    return &err_val;
   }
   in = (struct glb_experiment *) glb_experiment_list[experiment];
   if(!(flux_ident >= 0 && flux_ident < in->num_of_fluxes))
   {
     glb_error("glbEFTFluxQuarkFlavors: invalid flux ID: %d in experiment %d",
               flux_ident, experiment);
-    return -1;
+    static int err_val = -1;
+    return &err_val;
   }
   return in->fluxes[flux_ident]->q;
 }
@@ -2378,14 +2379,16 @@ int *glbEFTXSecQuarkFlavors(int experiment, int xsec_ident)
   if(!(experiment >= 0 && experiment < glb_num_of_exps))
   {
     glb_error("glbEFTXSecQuarkFlavors: invalid experiment number: %d", experiment);
-    return -1;
+    static int err_val = -1;
+    return &err_val;
   }
   in = (struct glb_experiment *) glb_experiment_list[experiment];
   if(!(xsec_ident >= 0 && xsec_ident < in->num_of_xsecs))
   {
     glb_error("glbEFTXSecQuarkFlavors: invalid cross-section ID: %d in experiment %d",
               xsec_ident, experiment);
-    return -1;
+    static int err_val = -1;
+    return &err_val;
   }
   return in->xsecs[xsec_ident]->q;
 }

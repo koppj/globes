@@ -29,7 +29,6 @@
 #include "source/glb_error.h"
 #include "glb_prior.h"
 #include "glb_probability.h"
-#include "glb_rate_engine.h"
 #include "glb_sys.h"
 
 
