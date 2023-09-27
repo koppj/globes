@@ -91,12 +91,12 @@ enum glb_enum_minimizers
 
 
 /* maximum number of experiments */
-#define GLB_MAX_EXP      300
+#define GLB_MAX_EXP      100
 
 /* maximum numbers of channels, rules, ... per experiment */
-#define GLB_MAX_CHANNELS  200
-#define GLB_MAX_RULES     64
-#define GLB_MAX_NUISANCE 128
+#define GLB_MAX_CHANNELS  530
+#define GLB_MAX_RULES     230
+#define GLB_MAX_NUISANCE 200
 #define GLB_MAX_SMEAR     64
 #define GLB_MAX_FLUXES    64
 #define GLB_MAX_XSECS     64
@@ -474,5 +474,11 @@ int glbSetInitialStep(double step);
 END_C_DECLS
 
 #endif /* #ifndef __GLOBES_H */
+
+#define GLB_SET_RATES_TRUE  1   /* fill vector for true rates */
+#define GLB_SET_RATES_TEST  2   /* fill vector for fitted rates */
+
+#define GLB_SET_RATES_SLOW  3   /* Don't use precomputed chr_template */
+#define GLB_SET_RATES_FAST  4   /* Use precomputed chr_template */
 
 
