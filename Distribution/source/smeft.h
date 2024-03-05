@@ -31,6 +31,8 @@
 // Names of oscillation parameters
 extern char smeft_param_strings[][64];
 
+#define MAX_FLAVORS      6
+#define MAX_INTERACTIONS 5
 
 
 /* Macros */

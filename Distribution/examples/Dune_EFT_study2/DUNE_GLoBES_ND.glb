@@ -42,7 +42,7 @@ $sampling_stepsize = {0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.
 
 
 /* Technical information */
-$filter_state = 1
+$filter_state = 0
 $filter_value = 0.125
 
 

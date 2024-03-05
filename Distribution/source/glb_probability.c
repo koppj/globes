@@ -67,14 +67,14 @@ gsl_matrix_complex *H0_template=NULL;  /* Used in the construction of the vac. H
 gsl_matrix_complex *S1=NULL, *T0=NULL; /* Temporary matrix storage                         */
 
 
-/* PH 01/10/19 
+/* PH 01/10/19
  * Here comes the stuff to name an oscillation engine and
- * to retrieve it by its name 
+ * to retrieve it by its name
  */
 
 glb_osc_engine *glb_osc_list;   /* Connected list of oscillation engines */
 
-static const char *glb_osc_functions[] = 
+static const char *glb_osc_functions[] =
   {
     "default",
     ""    /* The last entry must be the empty string for loops to terminate */
@@ -521,9 +521,9 @@ int glb_set_oscillation_parameters(glb_params p, void *user_data)
   th13  = p->osc->osc_params[1];
   th23  = p->osc->osc_params[2];
   delta = p->osc->osc_params[3];
-  mq[0] = abs(p->osc->osc_params[5]);
-  mq[1] = abs(p->osc->osc_params[5]) + p->osc->osc_params[4];
-  mq[2] = abs(p->osc->osc_params[5]) + p->osc->osc_params[5];
+  mq[0] = fabs(p->osc->osc_params[5]);
+  mq[1] = fabs(p->osc->osc_params[5]) + p->osc->osc_params[4];
+  mq[2] = fabs(p->osc->osc_params[5]) + p->osc->osc_params[5];
 
   /* Compute vacuum mixing matrix */
   _U[0][0] = cos(th12)*cos(th13);
@@ -941,7 +941,7 @@ int glbGetNumOfOscParams()
  *  oscillation engines by experiment in a transparent manner.
  */
 
-/* Kept for backward compatibility to allow un-named versions of 
+/* Kept for backward compatibility to allow un-named versions of
  * oscillation engines, not sure anyone is using this.
  *
  ***************************************************************************
@@ -995,7 +995,7 @@ int glbSetProbabilityEngineInExperiment(int exp, int n_parameters,
   in->osc_engine.set_function = set_params_func;
   in->osc_engine.get_function = get_params_func;
   in->osc_engine.user_data      = user_data;
-  
+
   return 0;
 }
 
@@ -1018,7 +1018,7 @@ int glbSetProbabilityEngineInExperiment(int exp, int n_parameters,
 glb_osc_engine *glbFindOscEngineByName(const char *name)
 {
   glb_osc_engine *osc;
-  
+
   for (osc = glb_osc_list; osc != NULL; osc = osc->next)
     if (strcmp(name, osc->name) == 0)
       break;
@@ -1087,7 +1087,7 @@ int glbDefineOscEngine(int n_parameters,
     glb_error("glbDefineOscEngine: Dimension of parameter space must be >= 0");
     return -1;
   }
-  
+
   /* Create new list entry */
   glb_osc_list = (glb_osc_engine *) glb_malloc(sizeof(glb_osc_engine));
   if (glb_osc_list != NULL)
@@ -1108,8 +1108,8 @@ int glbDefineOscEngine(int n_parameters,
       {
 	glb_error("glbDefineOscEngine: name argument is NULL.");
       }
-  } 
-  
+  }
+
   return -1;
 }
 
@@ -1127,29 +1127,28 @@ int glb_switch_osc_engine(glb_osc_engine *p)
   glb_get_oscillation_parameters_function get_params_func = p->get_function;
   int n_parameters = p->num_of_params;
   void *user_data = p->user_data;
-  
+
   /* the idea is, that if we don't have any experiment specific data,
      we don't do anything here and everything should be compatible
      with versions prior to 3.3.18, if we do have experiment specific
-     information we use it. 
+     information we use it.
   */
 
   if (n_parameters >0)
     glb_oscp = n_parameters;
-  
- 
+
+
   if (prob_func != NULL)
     glb_hook_probability_matrix = prob_func;
-  
+
   if (set_params_func != NULL)
     glb_hook_set_oscillation_parameters = set_params_func;
-  
+
   if (get_params_func != NULL)
     glb_hook_get_oscillation_parameters = get_params_func;
-  
+
   if (user_data !=NULL)
     glb_probability_user_data = user_data;
 
   return 0;
 }
-

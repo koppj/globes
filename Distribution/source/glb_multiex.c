@@ -50,7 +50,7 @@ int glb_ignore_invalid_chi2 = 0; /* If != 0, use chiZero instead of throwing an 
                                     if unknown chi^2 function is used. This is necessary
                                     when an AEDL file using user-defined systematics is
                                     run through the standalone globes binary */
-glb_current_experiment = -1;
+int glb_current_experiment = -1;
 static double Probs[3][3];
 static double ProbsAnti[3][3];
 
@@ -61,7 +61,7 @@ struct indices {
     int cross_id;
     int d1;
     int d2;
-    int d3; 
+    int d3;
     int d4;
 };
 
@@ -103,7 +103,7 @@ int glb_copy_nuisance(glb_nuisance *dest, glb_nuisance *src)
   {
     dest->name        = strdup(src->name);
     dest->error       = src->error;
-    dest->a           = src->a; 
+    dest->a           = src->a;
     dest->systype     = src->systype;
     dest->n_energies  = src->n_energies;
     dest->energy_list = glb_duplicate_array(src->energy_list, src->n_energies*sizeof(double));
@@ -198,8 +198,8 @@ void glbInitExp(glb_exp ins)
   in->binsize          = NULL;
   in->simbinsize       = NULL;
 
-  
- 
+
+
 
   in->baseline         = -1;
   in->targetmass       = -1;
@@ -213,7 +213,7 @@ void glbInitExp(glb_exp ins)
     in->lengthofbgrules[i]       = -1;
     in->bgrulescoeff[i]          = NULL;
     in->bgrulechannellist[i]     = NULL;
-                                 
+
     in->sys_on[i]                = NULL;
     in->sys_off[i]               = NULL;
     in->sys_on_strings[i]        = NULL;
@@ -234,7 +234,7 @@ void glbInitExp(glb_exp ins)
       in->sys_off_multiex_errors_sig[i][j] = NULL;
       in->sys_off_multiex_errors_bg[i][j]  = NULL;
     }
-                                 
+
     in->bg_centers[0][i]         =  1.0;
     in->bg_centers[1][i]         =  0.0;
     in->signal_errors[0][i]      = -1.0;
@@ -264,7 +264,7 @@ void glbInitExp(glb_exp ins)
     in->chrb_1[i]                        = NULL;
     in->chra_0[i]                        = NULL;
     in->chra_1[i]                        = NULL;
-    in->chr_template[i]                  = NULL; 
+    in->chr_template[i]                  = NULL;
     in->user_pre_smearing_channel[i]     = NULL;
     in->user_post_smearing_channel[i]    = NULL;
     in->user_pre_smearing_background[i]  = NULL;
@@ -299,7 +299,7 @@ void glbInitExp(glb_exp ins)
     in->get_oscillation_parameters = NULL;
     in->probability_user_data      = NULL;
   */
-  
+
   /* named oscillation engine setup */
 
   (in->osc_engine).num_of_params=-1;
@@ -363,7 +363,7 @@ void glbInitExpFromParent(struct glb_experiment *exp, struct glb_experiment *p)
   exp->simbins          = p->simbins;
   exp->simbinsize       = glb_duplicate_array(p->simbinsize, exp->simbins * sizeof(double));
 
-  
+
 
   /* Detector parameteres */
   exp->targetmass           = p->targetmass;
@@ -472,7 +472,7 @@ void glbInitExpFromParent(struct glb_experiment *exp, struct glb_experiment *p)
   {
     // FIXME TBD
     exp->numofrules = p->numofrules;
-   
+
     for (i=0; i < exp->numofrules; i++)
     {
       int n = sizeof(double) * p->numofbins;
@@ -729,7 +729,7 @@ void glbResetExp(struct glb_experiment *in)
   in->binsize=NULL;
   my_free(in->simbinsize);
   in->simbinsize=NULL;
-  
+
 
   for(i=0;i<in->numofrules;i++)
     {
@@ -751,7 +751,8 @@ void glbResetExp(struct glb_experiment *in)
     {
       my_free(in->lowrange[i]);
       my_free(in->uprange[i]);
-      if (in->smear != NULL  &&  in->smear[i] != NULL)
+      if (//in->smear != NULL  &&
+        in->smear[i] != NULL)
       {
         for(j=0; in->smear[i][j] != NULL; j++) /* NULL signals end of list - length can be */
           my_free(in->smear[i][j]);            /* different from numofbins if smearing matrix */
@@ -904,25 +905,25 @@ int glbSetupDensityProfile(struct glb_experiment *in)
   int status = 0;
   int i, j;
 
- 
+
 
   /* Binning only in energy (the traditional GLoBES approach) */
   /* -------------------------------------------------------- */
- 
+
     status += setup_density_profile(in);
     if(in->baseline==-1) { glb_exp_error(in, "No baseline specified!"); status=-1; }
     if (in->psteps <= 0)
       { glb_exp_error(in, "Too few density steps defined."); status=-1; }
     else if (in->densitybuffer == NULL)
       in->densitybuffer = (double *) glb_malloc(in->psteps * sizeof(in->densitybuffer[0]));
-  
 
- 
+
+
 
     /* efficiency/background vectors are allowed to have length n_Lbins*n_Ebins
      * if they contain independent efficiencies for all L bins. In this case,
      * distribute efficiencies accordingly. */
-   
+
 
   /* Make sure initialization of baseline and density profile worked */
   if (in->psteps==-1)
@@ -1007,7 +1008,7 @@ int glbSetupEfficiencies(struct glb_experiment *in)
     return GLBERR_INVALID_ARGS;
   }
 
-  if (n_post <= 0) 
+  if (n_post <= 0)
   {
     glb_exp_error(in, "Number of bins undefined.");
     return GLBERR_INVALID_ARGS;
@@ -1502,7 +1503,7 @@ int glbDefaultExp(glb_exp ins)
   if(in->num_of_fluxes<1)  {glb_exp_error(in, "No flux selected!");status=-1;}
   if(in->num_of_fluxes>31)  {glb_exp_error(in, "To many fluxes!");status=-1;}
 
-  
+
   /* Initialize flux tables */
   if(in->num_of_fluxes>0&&in->num_of_fluxes<GLB_MAX_FLUXES)
   {
@@ -1876,7 +1877,7 @@ int glbPrintExpByPointer(struct glb_experiment *e)
   printf("\n");
 
   printf("// Baseline ranges\n");
-  
+
   printf("\n");
   printf("\n");
 
@@ -2132,22 +2133,22 @@ int status;
 
 
 
-  
-    
-      struct indices indices_ch;
-      
 
-     
+
+      struct indices indices_ch;
+
+
+
       double bin_centers[e->simbins];
       for (j=0; j < e->simbins; j++){
         bin_centers[j] = e->smear_data[0]->simbincenter[j];
-      
-      
+
+
       }
-      
-      
-      
-      
+
+
+
+
 
 
 
@@ -2158,9 +2159,9 @@ int status;
   if ((status=glb_hook_probability_matrix(ProbsAnti, -1, en, e->psteps, e->lengthtab, e->densitybuffer,
           (e->filter_state == GLB_ON) ? e->filter_value : -1.0,user_data)) != GLB_SUCCESS)
     glb_error("Calculation of oscillation probabilities failed.");*/
-      
 
-  
+
+
 
 
   for (j=0; j < e->simbins; j++)
@@ -2171,9 +2172,9 @@ int status;
      * and pre-smearing backgrounds */
     for (i=0; i < e->numofchannels; i++)
     {
-    
+
     //printf("channel %d \n" ,i);
-    
+
       int flux_id = e->listofchannels[0][i];
       int cp_sign        = e->listofchannels[1][i]; /* 1=neutrinos, -1=antineutrinos */
       int initial_flavor = e->listofchannels[2][i]; /* Initial flavor */
@@ -2184,21 +2185,21 @@ int status;
      //printf("CROSS %d \n" ,xsec_id);
        if (glb_hook_probability_matrix == smeft_probability_matrix)
        user_data = &indices_ch;
-      
+
       indices_ch.flux_id =  flux_id;
       indices_ch.cross_id = xsec_id;
       indices_ch.d1 = e->listofchannels[1][i];
       indices_ch.d2 = e->listofchannels[2][i];
       indices_ch.d3 = e->listofchannels[3][i];
       indices_ch.d4 = e->listofchannels[5][i];
-      
-      
-    
-    //We still want to access the probability since even if there is no propagation there are detection and production effects. 
-     
+
+
+
+    //We still want to access the probability since even if there is no propagation there are detection and production effects.
+
       if (final_flavor > 9)    { final_flavor   -= 10;  nosc=0; }
       if (initial_flavor > 9)  { initial_flavor -= 10;  nosc=0; }
-      
+
 
       /* Recomputation of channel rates can be skipped for NOSC-channels */
       if (!(which_rates==GLB_SET_RATES_TEST  &&  nosc))
@@ -2224,7 +2225,7 @@ int status;
          #else
          P= 1;
          #endif
-          
+
         }else{
           P = (cp_sign==1) ? Pnu[initial_flavor-1][final_flavor-1] :
                                   Pnubar[initial_flavor-1][final_flavor-1];
@@ -2336,7 +2337,7 @@ int glbSetRatesInExperiment(int exp, int which_rates, int fast_rates)
 void glbSetRates()
 {
   int i;
- 
+
   for (i=0; i < glb_num_of_exps; i++){
     glbSetRatesInExperiment(i, GLB_SET_RATES_TRUE, GLB_SET_RATES_SLOW);
     }
@@ -2351,7 +2352,7 @@ void glbSetRates()
 void glbSetNewRates()
 {
   int i;
-  
+
   for (i=0; i < glb_num_of_exps; i++){
     glbSetRatesInExperiment(i, GLB_SET_RATES_TEST, GLB_SET_RATES_SLOW);
     }
